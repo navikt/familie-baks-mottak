@@ -66,6 +66,7 @@
     </dependencies>
 
     <build>
+        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
         <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
