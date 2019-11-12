@@ -21,7 +21,10 @@ spec:
     enabled: true
     path: /internal/prometheus
   vault:
-    enabled: false
+    enabled: true
+    paths:
+      - kvPath: serviceuser/data/dev/srvfamilie-ba-mottak
+        mountPath: /secrets/srvfamilie-ba-mottak
   replicas:
     min: 2
     max: 4
