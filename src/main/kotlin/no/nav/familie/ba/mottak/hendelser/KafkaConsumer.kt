@@ -10,7 +10,7 @@ class KafkaConsumer {
 
     val log = LoggerFactory.getLogger(KafkaConsumer::class.java)
 
-    @KafkaListener(topics = "aapen-person-pdl-leesah-v1", id = "personhendelse", idIsGroup = false)
+    @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"])
     fun listen(@Payload message : String) {
         log.info(message)
     }
