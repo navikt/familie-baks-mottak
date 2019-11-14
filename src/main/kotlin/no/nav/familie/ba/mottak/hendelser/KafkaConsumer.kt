@@ -1,0 +1,17 @@
+package no.nav.familie.ba.mottak.hendelser
+
+import org.slf4j.LoggerFactory
+import org.springframework.kafka.annotation.KafkaListener
+import org.springframework.messaging.handler.annotation.Payload
+import org.springframework.stereotype.Service
+
+@Service
+class KafkaConsumer {
+
+    val log = LoggerFactory.getLogger(KafkaConsumer::class.java)
+
+    @KafkaListener(topics = "aapen-person-pdl-leesah-v1", id = "personhendelse", idIsGroup = false)
+    fun listen(@Payload message : String) {
+        log.info(message)
+    }
+}

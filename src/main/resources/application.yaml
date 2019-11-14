@@ -14,3 +14,23 @@ management:
     path-mapping:
       info: "status/isAlive"
   metrics.export.prometheus.enabled: true
+
+  spring:
+    kafka:
+      bootstrap-servers: localhost:9092
+      properties:
+        client:
+          id: kafka-demo
+        security.protocol: SASL_PLAINTEXT
+        sasl:
+          mechanism: PLAIN
+          jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="igroup" password="itest";
+      consumer:
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        group-id: srvc01
+        auto-offset-reset: earliest
+
+  app:
+    topic:
+      pdl: aapen-person-pdl-leesah-v1
