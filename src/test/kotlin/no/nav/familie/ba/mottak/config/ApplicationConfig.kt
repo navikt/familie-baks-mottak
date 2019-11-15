@@ -15,8 +15,6 @@ class ApplicationConfig {
         val vaultServiceUser = VaultServiceUser(
                 serviceuserUsername = "not-a-real-srvuser",
                 serviceuserPassword = "not-a-real-pw")
-        System.setProperty("credential.username", vaultServiceUser.serviceuserUsername)
-        System.setProperty("credential.password", vaultServiceUser.serviceuserPassword)
         return vaultServiceUser
     }
 }

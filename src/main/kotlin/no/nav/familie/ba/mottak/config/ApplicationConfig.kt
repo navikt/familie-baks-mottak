@@ -16,9 +16,6 @@ class ApplicationConfig {
         val vaultServiceUser = VaultServiceUser(
                 serviceuserUsername = getFileAsString("/secrets/srvfamilie-ba-mottak/username"),
                 serviceuserPassword = getFileAsString("/secrets/srvfamilie-ba-mottak/password"))
-
-        System.setProperty("credential.username", vaultServiceUser.serviceuserUsername)
-        System.setProperty("credential.password", vaultServiceUser.serviceuserPassword)
         return vaultServiceUser
     }
 
