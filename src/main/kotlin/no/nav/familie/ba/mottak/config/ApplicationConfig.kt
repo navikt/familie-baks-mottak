@@ -13,9 +13,13 @@ class ApplicationConfig {
 
     @Bean
     fun vaultServiceUser(): VaultServiceUser {
-        return VaultServiceUser(
+        val vaultServiceUser = VaultServiceUser(
                 serviceuserUsername = getFileAsString("/secrets/srvfamilie-ba-mottak/username"),
                 serviceuserPassword = getFileAsString("/secrets/srvfamilie-ba-mottak/password"))
+
+        System.setProperty("credential.username", vaultServiceUser.serviceuserUsername)
+        System.setProperty("credential.password", vaultServiceUser.serviceuserPassword)
+        return vaultServiceUser
     }
 
     @Throws(IOException::class, URISyntaxException::class)

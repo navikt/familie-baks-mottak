@@ -6,19 +6,20 @@ spring:
   autoconfigure.exclude: org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
   main.banner-mode: "off"
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00046.preprod.local:8443
     properties:
       client:
         id: familie-ba-mottak
       security.protocol: SASL_PLAINTEXT
       sasl:
         mechanism: PLAIN
-        jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="igroup" password="itest";
+        jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${credential.username}" password="${credential.password}";
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       group-id: srvfamilie-ba-mottak
-      auto-offset-reset: earliest
+      auto-offset-reset: latest
+      enable-auto-commit: false
 
 management:
   endpoint.health.show-details: always
