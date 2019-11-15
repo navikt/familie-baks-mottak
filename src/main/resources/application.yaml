@@ -6,11 +6,11 @@ spring:
   autoconfigure.exclude: org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
   main.banner-mode: "off"
   kafka:
-    bootstrap-servers: ${KAFKA_BROKERS}
+    bootstrap-servers: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443
     properties:
       client:
         id: familie-ba-mottak
-      security.protocol: SASL_PLAINTEXT
+      security.protocol: SASL_SSL
       sasl:
         mechanism: PLAIN
         jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${CREDENTIAL_USERNAME}" password="${CREDENTIAL_PASSWORD}";
