@@ -17,7 +17,7 @@ spring:
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      group-id: KC-srvfamilie-ba-mottak
+      group-id: srvfamilie-ba-mottak
       auto-offset-reset: latest
       enable-auto-commit: false
 
