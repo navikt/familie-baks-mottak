@@ -12,6 +12,6 @@ class KafkaConsumer {
 
     @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"])
     fun listen(@Payload message : String) {
-        log.info(message)
+        log.info("KafkaConsumer lytter på melding {} ", message)
     }
 }
