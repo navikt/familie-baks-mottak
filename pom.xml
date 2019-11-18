@@ -74,6 +74,13 @@
             <version>${felles.version}</version>
         </dependency>
 
+        <!-- Kafka -->
+        <dependency>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro</artifactId>
+            <version>1.9.1</version>
+        </dependency>
+
         <!-- Diverse -->
         <dependency>
             <groupId>io.micrometer</groupId>
