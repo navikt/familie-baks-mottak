@@ -15,7 +15,10 @@ class KafkaConsumer {
     @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"])
     fun listen(cr: ConsumerRecord<String, GenericRecord>) {
         log.info("Melding mottatt på topic: {}, partisjon: {} med offset: {}, og verdi: {}", cr.topic(), cr.partition(), cr.offset(), cr.value())
-        log.info("Opplysningstype: {}, Aktørid: {}, Endringstype: {}", cr.value().hentOpplysningstype(), cr.value().hentAktorId(), cr.value().hentEndringstype())
+
+        val hendelse = cr.value()
+        val opplysningstype = hendelse.hentOpplysningstype()
+        log.info("Opplysningstype: $opplysningstype")
     }
 
     private fun GenericRecord.hentOpplysningstype() =
