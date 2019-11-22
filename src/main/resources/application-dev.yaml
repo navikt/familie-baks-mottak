@@ -10,7 +10,7 @@ spring:
         jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="igroup" password="itest";
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.streams.serdes.avro.GenericAvroDeserializer
       group-id: srvc01
       auto-offset-reset: latest
 
