@@ -6,10 +6,9 @@ spring:
   autoconfigure.exclude: org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
   main.banner-mode: "off"
   kafka:
+    client-id: familie-ba-mottak
     bootstrap-servers: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443
     properties:
-      client:
-        id: familie-ba-mottak
       security.protocol: SASL_SSL
       sasl:
         mechanism: PLAIN
@@ -18,6 +17,7 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       group-id: srvfamilie-ba-mottak
+      max-poll-records: 1
       auto-offset-reset: latest
       enable-auto-commit: false
 
