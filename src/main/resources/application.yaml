@@ -16,6 +16,7 @@ spring:
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: io.confluent.kafka.streams.serdes.avro.GenericAvroDeserializer
+      schema.registry.url: https://kafka-schema-registry.nais.preprod.local
       group-id: srvfamilie-ba-mottak
       max-poll-records: 1
       auto-offset-reset: latest
