@@ -12,7 +12,7 @@ class KafkaConsumer {
 
     val log = LoggerFactory.getLogger(KafkaConsumer::class.java)
 
-    @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"], id = "personhendelse", idIsGroup = false, containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"], id = "personhendelse", idIsGroup = false, containerFactory = "kafkaListenerContainerFactoryPersonhendelse")
     fun listen(cr: ConsumerRecord<String, GenericRecord>) {
         log.info("Melding mottatt på topic: {}, partisjon: {} med offset: {}, og verdi: {}", cr.topic(), cr.partition(), cr.offset(), cr.value())
 
