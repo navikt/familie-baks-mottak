@@ -10,13 +10,13 @@ spring:
     bootstrap-servers: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443
     properties:
       security.protocol: SASL_SSL
+      schema.registry.url: https://kafka-schema-registry.nais.preprod.local
       sasl:
         mechanism: PLAIN
         jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${CREDENTIAL_USERNAME}" password="${CREDENTIAL_PASSWORD}";
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: io.confluent.kafka.streams.serdes.avro.GenericAvroDeserializer
-      schema.registry.url: https://kafka-schema-registry.nais.preprod.local
       group-id: srvfamilie-ba-mottak
       max-poll-records: 1
       auto-offset-reset: latest
