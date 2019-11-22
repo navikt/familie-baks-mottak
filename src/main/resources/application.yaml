@@ -16,7 +16,7 @@ spring:
         jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${CREDENTIAL_USERNAME}" password="${CREDENTIAL_PASSWORD}";
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: io.confluent.kafka.streams.serdes.avro.GenericAvroDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
       group-id: srvfamilie-ba-mottak
       max-poll-records: 1
       auto-offset-reset: latest
