@@ -13,3 +13,5 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       group-id: srvc01
       auto-offset-reset: latest
+
+KAFKA_BROKERS: http://localhost:9092
