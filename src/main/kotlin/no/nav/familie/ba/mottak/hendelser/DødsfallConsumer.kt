@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.hendelser
 
+import io.micrometer.core.instrument.Metrics
 import org.apache.avro.generic.GenericData
 import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -8,18 +9,26 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
-@Service
-class KafkaConsumer {
+private const val OPPLYSNINGSTYPE_DODSFALL = "DOEDSFALL_V1"
 
-    val log = LoggerFactory.getLogger(KafkaConsumer::class.java)
+@Service
+class DødsfallConsumer {
+
+    val dødsfallCounter = Metrics.counter("barnetrygd.dodsfall")
+    val log = LoggerFactory.getLogger(DødsfallConsumer::class.java)
 
     @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"], id = "personhendelse", idIsGroup = false, containerFactory = "kafkaListenerContainerFactory")
     fun listen(cr: ConsumerRecord<String, GenericRecord>) {
-        log.info("Melding mottatt på topic: {}, partisjon: {} med offset: {}, og verdi: {}", cr.topic(), cr.partition(), cr.offset(), cr.value())
+        if (cr.value().erDodsfall()) {
+            dødsfallCounter.increment()
+        }
+        log.info("Melding mottatt på topic: {}, partisjon: {} med offset: {}", cr.topic(), cr.partition(), cr.offset())
         log.info("Opplysningstype: {}, Aktørid: {}, Endringstype: {}, Dødsdato: {}", cr.value().hentOpplysningstype(),
                 cr.value().hentAktorId(), cr.value().hentEndringstype(), cr.value().hentDodsdato())
-
     }
+
+    private fun GenericRecord.erDodsfall() =
+            get("opplysningstype").toString() == OPPLYSNINGSTYPE_DODSFALL
 
     private fun GenericRecord.hentOpplysningstype() =
             get("opplysningstype").toString()
