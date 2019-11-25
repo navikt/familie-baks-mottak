@@ -22,9 +22,9 @@ class DødsfallConsumer {
         if (cr.value().erDodsfall()) {
             dødsfallCounter.increment()
         }
-        log.info("Melding mottatt på topic: {}, partisjon: {} med offset: {}", cr.topic(), cr.partition(), cr.offset())
-        log.info("Opplysningstype: {}, Aktørid: {}, Endringstype: {}, Dødsdato: {}", cr.value().hentOpplysningstype(),
-                cr.value().hentAktorId(), cr.value().hentEndringstype(), cr.value().hentDodsdato())
+        log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}, dødsdato: {}",
+                cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktorId(),
+                cr.value().hentEndringstype(), cr.value().hentDodsdato())
     }
 
     private fun GenericRecord.erDodsfall() =
