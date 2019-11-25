@@ -6,6 +6,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class KafkaConsumer {
@@ -15,13 +16,9 @@ class KafkaConsumer {
     @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"], id = "personhendelse", idIsGroup = false, containerFactory = "kafkaListenerContainerFactory")
     fun listen(cr: ConsumerRecord<String, GenericRecord>) {
         log.info("Melding mottatt på topic: {}, partisjon: {} med offset: {}, og verdi: {}", cr.topic(), cr.partition(), cr.offset(), cr.value())
-        log.info("Opplysningstype: {}, Aktørid: {}, Endringstype: {}", cr.value().hentOpplysningstype(), cr.value().hentAktorId(), cr.value().hentEndringstype())
+        log.info("Opplysningstype: {}, Aktørid: {}, Endringstype: {}, Dødsdato: {}", cr.value().hentOpplysningstype(),
+                cr.value().hentAktorId(), cr.value().hentEndringstype(), cr.value().hentDodsdato())
 
-        /*
-        val hendelse = cr.value()
-        val opplysningstype = hendelse.hentOpplysningstype()
-        log.info("Opplysningstype: $opplysningstype")
-        */
     }
 
     private fun GenericRecord.hentOpplysningstype() =
@@ -34,4 +31,13 @@ class KafkaConsumer {
 
     private fun GenericRecord.hentEndringstype() =
             get("endringstype").toString()
+
+    private fun GenericRecord.hentDodsdato(): LocalDate {
+        try {
+            return LocalDate.ofEpochDay((get("doedsfall") as GenericRecord?)?.get("doedsdato").toString().toLong())
+        } catch (exception: Exception) {
+            log.error("Deserialisering av dødsdato feiler")
+            throw exception
+        }
+    }
 }
