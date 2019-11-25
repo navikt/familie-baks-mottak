@@ -1,17 +1,11 @@
 spring:
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BROKERS}
     properties:
-      client:
-        id: familie-ba-mottak
       security.protocol: SASL_PLAINTEXT
       sasl:
-        mechanism: PLAIN
         jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="igroup" password="itest";
     consumer:
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: io.confluent.kafka.streams.serdes.avro.GenericAvroDeserializer
       group-id: srvc01
-      auto-offset-reset: latest
 
 KAFKA_BROKERS: http://localhost:9092
