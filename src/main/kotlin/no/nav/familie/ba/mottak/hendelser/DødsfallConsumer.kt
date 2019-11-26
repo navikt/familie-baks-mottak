@@ -9,6 +9,8 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
+private const val OPPRETTET = "OPPRETTET"
+private const val KORRIGERT = "KORRIGERT"
 private const val OPPLYSNINGSTYPE_DODSFALL = "DOEDSFALL_V1"
 
 @Service
@@ -22,9 +24,17 @@ class DødsfallConsumer {
         if (cr.value().erDodsfall()) {
             dødsfallCounter.increment()
         }
-        log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}, dødsdato: {}",
-                cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktorId(),
-                cr.value().hentEndringstype(), cr.value().hentDodsdato())
+        when (cr.value().hentEndringstype()) {
+            OPPRETTET, KORRIGERT -> {
+                log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}, dødsdato: {}",
+                        cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktorId(),
+                        cr.value().hentEndringstype(), cr.value().hentDodsdato())
+            }
+            else  -> {
+                log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}",
+                        cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktorId(), cr.value().hentEndringstype())
+            }
+        }
     }
 
     private fun GenericRecord.erDodsfall() =
