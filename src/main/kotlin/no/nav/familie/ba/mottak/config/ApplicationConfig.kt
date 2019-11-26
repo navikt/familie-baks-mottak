@@ -1,23 +1,27 @@
 package no.nav.familie.ba.mottak.config
 
+import no.nav.familie.log.filter.LogFilter
 import org.springframework.boot.SpringBootConfiguration
+import org.springframework.boot.web.embedded.jetty.JettyServletWebServerFactory
+import org.springframework.boot.web.servlet.FilterRegistrationBean
+import org.springframework.boot.web.servlet.server.ServletWebServerFactory
 import org.springframework.context.annotation.Bean
-import java.io.IOException
-import java.net.URISyntaxException
-import java.nio.charset.StandardCharsets
-import java.nio.file.Files
-import java.nio.file.Paths
 
 @SpringBootConfiguration
 class ApplicationConfig {
 
     @Bean
-    fun vaultServiceUser(): VaultServiceUser {
-        return VaultServiceUser(
-                serviceuserUsername = getFileAsString("/secrets/srvfamilie-ba-mottak/username"),
-                serviceuserPassword = getFileAsString("/secrets/srvfamilie-ba-mottak/password"))
+    fun servletWebServerFactory(): ServletWebServerFactory {
+        val serverFactory = JettyServletWebServerFactory()
+        serverFactory.port = 8080
+        return serverFactory
     }
 
-    @Throws(IOException::class, URISyntaxException::class)
-    fun getFileAsString(filePath: String) = String(Files.readAllBytes(Paths.get(filePath)), StandardCharsets.UTF_8)
+    @Bean
+    fun logFilter(): FilterRegistrationBean<LogFilter> {
+        val filterRegistration = FilterRegistrationBean<LogFilter>()
+        filterRegistration.filter = LogFilter()
+        filterRegistration.order = 1
+        return filterRegistration
+    }
 }
