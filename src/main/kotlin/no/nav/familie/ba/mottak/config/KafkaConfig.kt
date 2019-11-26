@@ -1,8 +1,5 @@
 package no.nav.familie.ba.mottak.config
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.apache.avro.generic.GenericRecord
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties
 import org.springframework.context.annotation.Bean
@@ -26,12 +23,5 @@ class KafkaConfig {
         val factory = ConcurrentKafkaListenerContainerFactory<String, GenericRecord>()
         factory.consumerFactory = consumerFactory
         return factory
-    }
-
-    @Bean
-    fun kafkaObjectMapper(): ObjectMapper {
-        return ObjectMapper()
-                .registerModule(JavaTimeModule())
-                .registerModule(KotlinModule())
     }
 }
