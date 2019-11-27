@@ -1,5 +1,5 @@
 # familie-ba-mottak
-Mottaksapplikasjon for barnetrygd. Lytter på fødselshendelser og mottar søknader. 
+Mottaksapplikasjon for barnetrygd. Lytter på ulike hendelser (fødsler, dødsfall mm) og mottar søknader. 
 
 ## Lokal kjøring
 Appen bygges med maven og kan kjøres fra DevLauncher-klassen. Lokalt må man kjøre serveren sammen med [navkafka-docker-compose][1]. Topicen vi lytter på må da opprettes via deres api med følgende data:
