@@ -1,5 +1,35 @@
+no.nav.security.jwt:
+  issuer.azuread:
+    discoveryurl: https://login.microsoftonline.com/navno.onmicrosoft.com/v2.0/.well-known/openid-configuration
+    accepted_audience: ${CLIENT_ID}
+    proxyurl: http://webproxy-nais.nav.no:8088
+    cookie_name: azure_token
+  client:
+    registration:
+      ba-sak-clientcredentials:
+        resource-url: ${FAMILIE_BA_SAK_API_URL}
+        token-endpoint-url: https://login.microsoftonline.com/navno.onmicrosoft.com/oauth2/v2.0/token
+        grant-type: client_credentials
+        scope: ${BA_SAK_SCOPE}
+        authentication:
+          client-id: ${CLIENT_ID}
+          client-secret: ${CLIENT_SECRET}
+          client-auth-method: client_secret_basic
+      integrasjoner-clientcredentials:
+        resource-url: ${FAMILIE_INTEGRASJONER_API_URL}
+        token-endpoint-url: https://login.microsoftonline.com/navno.onmicrosoft.com/oauth2/v2.0/token
+        grant-type: client_credentials
+        scope: ${FAMILIE_INTEGRASJONER_SCOPE}
+        authentication:
+          client-id: ${CLIENT_ID}
+          client-secret: ${CLIENT_SECRET}
+          client-auth-method: client_secret_basic
+
+
 spring:
   kafka:
     bootstrap-servers: a01apvl00145.adeo.no:8443,a01apvl00146.adeo.no:8443,a01apvl00147.adeo.no:8443,a01apvl00148.adeo.no:8443,a01apvl00149.adeo.no:8443,a01apvl00150.adeo.no:8443
     properties:
       schema.registry.url: http://kafka-schema-registry.tpa:8081
+  datasource:
+    url: jdbc:postgresql://A01DBVL010.adeo.no:5432/familie-ba-mottak

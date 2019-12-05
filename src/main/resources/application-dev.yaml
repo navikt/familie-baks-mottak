@@ -1,3 +1,30 @@
+no.nav.security.jwt:
+  issuer.azuread:
+    discoveryurl: https://login.microsoftonline.com/navq.onmicrosoft.com/v2.0/.well-known/openid-configuration
+    accepted_audience: ${CLIENT_ID}
+    cookie_name: azure_token
+  client:
+    registration:
+      ba-sak-clientcredentials:
+        resource-url: ${FAMILIE_BA_SAK_API_URL}
+        token-endpoint-url: https://login.microsoftonline.com/navq.onmicrosoft.com/oauth2/v2.0/token
+        grant-type: client_credentials
+        scope: ${BA_SAK_SCOPE}
+        authentication:
+          client-id: ${CLIENT_ID}
+          client-secret: ${CLIENT_SECRET}
+          client-auth-method: client_secret_basic
+      integrasjoner-clientcredentials:
+        resource-url: ${FAMILIE_INTEGRASJONER_API_URL}
+        token-endpoint-url: https://login.microsoftonline.com/navq.onmicrosoft.com/oauth2/v2.0/token
+        grant-type: client_credentials
+        scope: ${FAMILIE_INTEGRASJONER_SCOPE}
+        authentication:
+          client-id: ${CLIENT_ID}
+          client-secret: ${CLIENT_SECRET}
+          client-auth-method: client_secret_basic
+
+
 spring:
   kafka:
     bootstrap-servers: ${KAFKA_BROKERS}
@@ -8,5 +35,20 @@ spring:
       schema.registry.url: ${KAFKA_BROKERS}
     consumer:
       group-id: srvc01
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql=false
+    hibernate:
+      ddl-auto: create
+  flyway:
+    enabled: false
+
+logging:
+  config: "classpath:logback-test.xml"
+
+FAMILIE_BA_SAK_API_URL: http://localhost:8089/api
+FAMILIE_INTEGRASJONER_API_URL: http://localhost:8085/api
 
 KAFKA_BROKERS: http://localhost:9092

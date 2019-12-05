@@ -18,6 +18,12 @@ Appen bygges med maven og kan kjøres fra DevLauncher-klassen. Lokalt må man kj
 ```
 Se README i navkafka-docker-compose for mer info om hvordan man kjører den og kaller apiet.
 
+## Lokal kjøring med Postgres
+For å kjøre mot lokal postgress så kan man kjøre DevLauncherPostgress.
+```
+docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -d postgres
+```
+
 ## Henvendelser
 For NAV-interne kan henvendelser rettes til #team-familie på slack. Ellers kan henvendelser rettes via et issue her på github-repoet. 
 

@@ -8,7 +8,7 @@ metadata:
 
 spec:
   image: navikt/familie-ba-mottak:{{version}}
-  port: 8080
+  port: 8090
   liveness:
     path: /internal/status/isAlive
     initialDelay: 30
