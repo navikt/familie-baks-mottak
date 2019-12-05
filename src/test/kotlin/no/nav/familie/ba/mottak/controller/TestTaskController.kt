@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/test")
-@Profile("dev")
+@Profile(value = ["dev", "postgres"])
 class TestTaskController(private val taskRepository: TaskRepository) {
 
 
