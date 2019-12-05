@@ -19,12 +19,9 @@ Appen bygges med maven og kan kjøres fra DevLauncher-klassen. Lokalt må man kj
 Se README i navkafka-docker-compose for mer info om hvordan man kjører den og kaller apiet.
 
 ## Lokal kjøring med Postgres
+For å kjøre mot lokal postgress så kan man kjøre DevLauncherPostgress.
 ```
-docker run --name postgres -e POSTGRES_PASSWORD=postgres -d -p 5432:5432 postgres
-docker ps (finn container id)
-docker exec -it <container_id> bash
-psql -U postgres
-CREATE DATABASE "familie-ba-mottak";
+docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -d postgres
 ```
 
 ## Henvendelser

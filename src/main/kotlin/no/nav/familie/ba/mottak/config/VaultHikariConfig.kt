@@ -27,8 +27,6 @@ class VaultHikariConfig(private val container: SecretLeaseContainer,
                 val password = leaseEvent.secrets["password"].toString()
                 hikariDataSource.username = username
                 hikariDataSource.password = password
-                hikariDataSource.hikariConfigMXBean.setUsername(username)
-                hikariDataSource.hikariConfigMXBean.setPassword(password)
                 hikariDataSource.hikariPoolMXBean.softEvictConnections()
             }
         }

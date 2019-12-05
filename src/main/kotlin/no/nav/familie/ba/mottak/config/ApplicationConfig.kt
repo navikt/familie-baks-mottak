@@ -25,7 +25,6 @@ class ApplicationConfig {
     @Bean
     fun servletWebServerFactory(): ServletWebServerFactory {
         val serverFactory = JettyServletWebServerFactory()
-        serverFactory.port = 8090
         return serverFactory
     }
 
