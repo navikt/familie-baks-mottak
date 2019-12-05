@@ -11,7 +11,7 @@ CREATE TABLE task (
 );
 
 
-CREATE SEQUENCE task_seq;
+CREATE SEQUENCE task_seq INCREMENT BY 50 START WITH 1000000 NO CYCLE;
 
 CREATE INDEX ON task (status);
 
@@ -25,6 +25,6 @@ CREATE TABLE task_logg (
     endret_av     varchar(100) DEFAULT 'VL'::character varying
 );
 
-CREATE SEQUENCE task_logg_seq;
+CREATE SEQUENCE task_logg_seq INCREMENT BY 50 START WITH 1000000 NO CYCLE;
 
 CREATE INDEX ON task_logg (task_id);

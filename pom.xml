@@ -122,6 +122,11 @@
             <artifactId>spring-cloud-vault-config-databases</artifactId>
             <version>${spring.cloud.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.6</version>
+        </dependency>
 
         <!-- Test -->
         <dependency>

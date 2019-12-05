@@ -1,8 +1,4 @@
 no.nav.security.jwt:
-  issuer.selvbetjening:
-    discoveryurl: http://localhost:8080/metadata
-    accepted_audience: aud-localhost
-    cookie_name: localhost-idtoken
   issuer.azuread:
     discoveryurl: https://login.microsoftonline.com/navq.onmicrosoft.com/v2.0/.well-known/openid-configuration
     accepted_audience: ${CLIENT_ID}
@@ -51,9 +47,6 @@ spring:
 
 logging:
   config: "classpath:logback-test.xml"
-
-server:
-  port: 8090
 
 FAMILIE_BA_SAK_API_URL: http://localhost:8089/api
 FAMILIE_INTEGRASJONER_API_URL: http://localhost:8085/api
