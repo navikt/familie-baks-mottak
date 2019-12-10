@@ -24,8 +24,7 @@ class ApplicationConfig {
 
     @Bean
     fun servletWebServerFactory(): ServletWebServerFactory {
-        val serverFactory = JettyServletWebServerFactory()
-        return serverFactory
+        return JettyServletWebServerFactory()
     }
 
     @Bean
