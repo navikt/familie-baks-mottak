@@ -23,16 +23,17 @@ class DødsfallConsumer {
     fun listen(cr: ConsumerRecord<String, GenericRecord>) {
         if (cr.value().erDodsfall()) {
             dødsfallCounter.increment()
-        }
-        when (cr.value().hentEndringstype()) {
-            OPPRETTET, KORRIGERT -> {
-                log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}, dødsdato: {}",
-                        cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktorId(),
-                        cr.value().hentEndringstype(), cr.value().hentDodsdato())
-            }
-            else  -> {
-                log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}",
-                        cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktorId(), cr.value().hentEndringstype())
+
+            when (cr.value().hentEndringstype()) {
+                OPPRETTET, KORRIGERT -> {
+                    log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}, dødsdato: {}",
+                            cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktorId(),
+                            cr.value().hentEndringstype(), cr.value().hentDodsdato())
+                }
+                else  -> {
+                    log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}",
+                            cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktorId(), cr.value().hentEndringstype())
+                }
             }
         }
     }
