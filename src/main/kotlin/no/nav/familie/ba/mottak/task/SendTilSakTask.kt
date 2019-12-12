@@ -7,7 +7,7 @@ import no.nav.familie.prosessering.domene.TaskRepository
 import org.springframework.stereotype.Service
 
 @Service
-@TaskStepBeskrivelse(taskStepType = SendTilSakTask.SEND_TIL_SAK, beskrivelse = "Send til sak")
+@TaskStepBeskrivelse(taskStepType = SendTilSakTask.TASK_STEP_TYPE, beskrivelse = "Send til sak")
 class SendTilSakTask(private val taskRepository: TaskRepository) : AsyncTaskStep {
 
     override fun doTask(task: Task) {
@@ -19,6 +19,6 @@ class SendTilSakTask(private val taskRepository: TaskRepository) : AsyncTaskStep
     }
 
     companion object {
-        const val SEND_TIL_SAK = "sendTilSak"
+        const val TASK_STEP_TYPE = "sendTilSak"
     }
 }
