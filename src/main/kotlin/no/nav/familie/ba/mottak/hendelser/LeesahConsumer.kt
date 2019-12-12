@@ -55,7 +55,8 @@ class LeesahConsumer(val taskRepository: TaskRepository) {
                         fødselKorrigertCounter.increment()
                     }
 
-                    Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE, cr.value().hentPersonident(), LocalDateTime.now().plusHours(24))
+                    val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE, cr.value().hentPersonident(), LocalDateTime.now().plusHours(24))
+                    taskRepository.save(task)
                 }
                 else -> {
                     log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}",
