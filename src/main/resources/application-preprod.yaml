@@ -34,3 +34,6 @@ spring:
       schema.registry.url: https://kafka-schema-registry.nais.preprod.local
   datasource:
     url: jdbc:postgresql://b27dbvl009.preprod.local:5432/familie-ba-mottak
+
+FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1
+FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTER: 1

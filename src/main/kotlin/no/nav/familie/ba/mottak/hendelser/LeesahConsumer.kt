@@ -8,6 +8,7 @@ import org.apache.avro.generic.GenericData
 import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -25,6 +26,9 @@ class LeesahConsumer(val taskRepository: TaskRepository) {
     val fødselOpprettetCounter = Metrics.counter("barnetrygd.fodsel.opprettet")
     val fødselKorrigertCounter = Metrics.counter("barnetrygd.fodsel.korrigert")
     val log = LoggerFactory.getLogger(LeesahConsumer::class.java)
+
+    @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}")
+    lateinit var triggerTidForTps: String
 
     @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"], id = "personhendelse", idIsGroup = false, containerFactory = "kafkaListenerContainerFactory")
     fun listen(cr: ConsumerRecord<String, GenericRecord>) {
@@ -55,7 +59,7 @@ class LeesahConsumer(val taskRepository: TaskRepository) {
                         fødselKorrigertCounter.increment()
                     }
 
-                    val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE, cr.value().hentPersonident(), LocalDateTime.now().plusHours(24))
+                    val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE, cr.value().hentPersonident(), LocalDateTime.now().plusMinutes(triggerTidForTps.toLong()))
                     taskRepository.save(task)
                 }
                 else -> {

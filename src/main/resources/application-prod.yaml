@@ -33,3 +33,6 @@ spring:
       schema.registry.url: http://kafka-schema-registry.tpa:8081
   datasource:
     url: jdbc:postgresql://A01DBVL010.adeo.no:5432/familie-ba-mottak
+
+FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1440
+FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTER: 180
