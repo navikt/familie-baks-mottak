@@ -8,7 +8,6 @@ import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 
 @Service
@@ -26,9 +25,9 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository, priv
             val personMedRelasjoner = personService.hentPersonMedRelasjoner(task.payload)
             log.info("kjønn: ${personMedRelasjoner.kjønn} fdato: ${personMedRelasjoner.fødselsdato}")
         } catch (ex: RuntimeException) {
-            log.info("Relasjon ikke funnet i TPS")
-            task.triggerTid = LocalDateTime.now().plusMinutes(rekjøringsintervall.toLong())
-            taskRepository.save(task)
+            log.info("Relasjon ikke funnet i TPS. msg=${ex.message} stacktrace=${ex.stackTrace}")
+            //task.triggerTid = LocalDateTime.now().plusMinutes(rekjøringsintervall.toLong())
+            //taskRepository.save(task)
             throw ex
         }
     }
