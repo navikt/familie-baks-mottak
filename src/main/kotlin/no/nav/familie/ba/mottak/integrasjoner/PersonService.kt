@@ -4,7 +4,6 @@ import no.nav.familie.ba.mottak.domene.personopplysning.Personinfo
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.log.NavHttpHeaders
 import no.nav.familie.log.mdc.MDCConstants
-import no.nav.familie.sikkerhet.OIDCUtil
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import org.slf4j.LoggerFactory
@@ -34,9 +33,7 @@ private const val OAUTH2_CLIENT_CONFIG_KEY = "integrasjoner-clientcredentials"
 class PersonService @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonerServiceUri: URI,
                                                  restTemplateBuilderMedProxy: RestTemplateBuilder?,
                                                  clientConfigurationProperties: ClientConfigurationProperties?,
-                                                 oAuth2AccessTokenService: OAuth2AccessTokenService?,
-                                                 private val oidcUtil: OIDCUtil) : BaseService(OAUTH2_CLIENT_CONFIG_KEY, restTemplateBuilderMedProxy!!, clientConfigurationProperties!!, oAuth2AccessTokenService!!) {
-
+                                                 oAuth2AccessTokenService: OAuth2AccessTokenService?) : BaseService(OAUTH2_CLIENT_CONFIG_KEY, restTemplateBuilderMedProxy!!, clientConfigurationProperties!!, oAuth2AccessTokenService!!) {
     private inline fun <reified T, U> request(uri: URI, method: HttpMethod, httpEntity: HttpEntity<U>) : ResponseEntity<T>? {
         val ressursResponse = restTemplate.exchange(uri, method, httpEntity, T::class.java)
 
