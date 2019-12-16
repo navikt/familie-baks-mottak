@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service
 class MottaFødselshendelseTask(private val taskRepository: TaskRepository, private val personService: PersonService) : AsyncTaskStep {
     val log = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
 
-    @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTER: 1}")
+    @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}")
     lateinit var rekjøringsintervall: String
 
     override fun doTask(task: Task) {
