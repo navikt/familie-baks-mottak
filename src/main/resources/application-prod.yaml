@@ -33,3 +33,6 @@ spring:
       schema.registry.url: http://kafka-schema-registry.tpa:8081
   datasource:
     url: jdbc:postgresql://A01DBVL010.adeo.no:5432/familie-ba-mottak
+
+#Brukes til tilgangskontroll av familie-ks-mottak-frontend
+MOTTAK_ROLLE: ${MOTTAK_ROLLE}

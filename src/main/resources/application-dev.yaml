@@ -52,3 +52,6 @@ FAMILIE_BA_SAK_API_URL: http://localhost:8089/api
 FAMILIE_INTEGRASJONER_API_URL: http://localhost:8085/api
 
 KAFKA_BROKERS: http://localhost:9092
+
+#Brukes til tilgangskontroll av familie-ks-mottak-frontend
+MOTTAK_ROLLE: group1
