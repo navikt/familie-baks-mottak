@@ -8,10 +8,11 @@ import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 
 @Service
-@TaskStepBeskrivelse(taskStepType = MottaFødselshendelseTask.TASK_STEP_TYPE, beskrivelse = "Motta fødselshendelse", maxAntallFeil = 10)
+@TaskStepBeskrivelse(taskStepType = MottaFødselshendelseTask.TASK_STEP_TYPE, beskrivelse = "Motta fødselshendelse", maxAntallFeil = 3)
 class MottaFødselshendelseTask(private val taskRepository: TaskRepository, private val personService: PersonService) : AsyncTaskStep {
     val log = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
 
@@ -21,13 +22,13 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository, priv
     override fun doTask(task: Task) {
         try {
             log.info("MottaFødselshendelseTask kjører.")
-            //val personMedRelasjoner = personService.hentPersonMedRelasjoner(task.payload)
-            //log.info("kjønn: ${personMedRelasjoner.kjønn} fdato: ${personMedRelasjoner.fødselsdato}")
+            val personMedRelasjoner = personService.hentPersonMedRelasjoner(task.payload)
+            log.info("kjønn: ${personMedRelasjoner.kjønn} fdato: ${personMedRelasjoner.fødselsdato}")
 
         } catch (ex: RuntimeException) {
-            log.info("Relasjon ikke funnet i TPS. msg=${ex.message} stacktrace=${ex.stackTrace}")
-            //task.triggerTid = LocalDateTime.now().plusMinutes(rekjøringsintervall.toLong())
-            //taskRepository.save(task)
+            log.info("Feil mot TPS. msg=${ex.message} stacktrace=${ex.stackTrace}")
+            task.triggerTid = LocalDateTime.now().plusMinutes(rekjøringsintervall.toLong())
+            taskRepository.save(task)
             throw ex
         }
     }
