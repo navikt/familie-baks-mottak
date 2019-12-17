@@ -21,9 +21,9 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository, priv
     override fun doTask(task: Task) {
         try {
             log.info("MottaFødselshendelseTask kjører.")
-            // vi går mot familie-integrasjoner, personopplysning v1/info
-            val personMedRelasjoner = personService.hentPersonMedRelasjoner(task.payload)
-            log.info("kjønn: ${personMedRelasjoner.kjønn} fdato: ${personMedRelasjoner.fødselsdato}")
+            //val personMedRelasjoner = personService.hentPersonMedRelasjoner(task.payload)
+            //log.info("kjønn: ${personMedRelasjoner.kjønn} fdato: ${personMedRelasjoner.fødselsdato}")
+
         } catch (ex: RuntimeException) {
             log.info("Relasjon ikke funnet i TPS. msg=${ex.message} stacktrace=${ex.stackTrace}")
             //task.triggerTid = LocalDateTime.now().plusMinutes(rekjøringsintervall.toLong())
@@ -34,6 +34,11 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository, priv
 
     override fun onCompletion(task: Task) {
         log.info("MottaFødselshendelseTask er ferdig.")
+        val nesteTask = Task.nyTask(
+                SendTilSakTask.TASK_STEP_TYPE,
+                "{'fødselsnummer':'12345678901','barnasFødselsnummer':[${task.payload}],'behandlingType':'FØRSTEGANGSBEHANDLING'}"
+        )
+        taskRepository.save(nesteTask);
     }
 
     companion object {
