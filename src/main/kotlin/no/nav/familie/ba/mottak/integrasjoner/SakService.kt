@@ -17,13 +17,13 @@ private val secureLogger = LoggerFactory.getLogger("secureLogger")
 private const val OAUTH2_CLIENT_CONFIG_KEY = "ba-sak-clientcredentials"
 
 @Component
-class SakService @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}") private val sakServiceUri: URI,
+class SakService @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}") private val sakServiceUri: String,
                                            restTemplateBuilderMedProxy: RestTemplateBuilder?,
                                            clientConfigurationProperties: ClientConfigurationProperties?,
                                            oAuth2AccessTokenService: OAuth2AccessTokenService?) : BaseService(OAUTH2_CLIENT_CONFIG_KEY, restTemplateBuilderMedProxy!!, clientConfigurationProperties!!, oAuth2AccessTokenService!!) {
 
     fun sendTilSak(søknadsdataJson: String) {
-        val uri = sakServiceUri.resolve("/behandling/opprett")
+        val uri = URI.create("$sakServiceUri/behandling/opprett")
         logger.info("Sender søknad til {}", uri)
         try {
             val response: ResponseEntity<String>? = postRequest(uri, søknadsdataJson)
