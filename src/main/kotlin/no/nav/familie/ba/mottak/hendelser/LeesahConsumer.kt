@@ -22,48 +22,61 @@ private const val OPPLYSNINGSTYPE_FØDSEL = "FOEDSEL_V1"
 class LeesahConsumer(val taskRepository: TaskRepository) {
 
     val dødsfallCounter = Metrics.counter("barnetrygd.dodsfall")
+    val leesahFeiletCounter = Metrics.counter("barnetrygd.hendelse.leesha.feilet")
     val fødselOpprettetCounter = Metrics.counter("barnetrygd.fodsel.opprettet")
     val fødselKorrigertCounter = Metrics.counter("barnetrygd.fodsel.korrigert")
     val log = LoggerFactory.getLogger(LeesahConsumer::class.java)
 
     @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"], id = "personhendelse", idIsGroup = false, containerFactory = "kafkaListenerContainerFactory")
     fun listen(cr: ConsumerRecord<String, GenericRecord>) {
-        if (cr.value().erDødsfall()) {
-            dødsfallCounter.increment()
 
-            when (cr.value().hentEndringstype()) {
-                OPPRETTET, KORRIGERT -> {
-                    log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}, dødsdato: {}",
-                            cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktørId(),
-                            cr.value().hentEndringstype(), cr.value().hentDødsdato())
-                }
-                else -> {
-                    log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}",
-                            cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktørId(), cr.value().hentEndringstype())
-                }
-            }
-        } else if (cr.value().erFødsel())
-            when (cr.value().hentEndringstype()) {
-                OPPRETTET, KORRIGERT -> {
-                    log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}, fødselsdato: {}",
-                            cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktørId(),
-                            cr.value().hentEndringstype(), cr.value().hentFødselsdato())
+        try {
+            if (cr.value().erDødsfall()) {
+                dødsfallCounter.increment()
 
-                    if (cr.value().hentEndringstype() == OPPRETTET) {
-                        fødselOpprettetCounter.increment()
-                    } else if (cr.value().hentEndringstype() == KORRIGERT) {
-                        fødselKorrigertCounter.increment()
+                when (cr.value().hentEndringstype()) {
+                    OPPRETTET, KORRIGERT -> {
+                        log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}, dødsdato: {}",
+                                cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktørId(),
+                                cr.value().hentEndringstype(), cr.value().hentDødsdato())
                     }
+                    else -> {
+                        log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}",
+                                cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktørId(), cr.value().hentEndringstype())
+                    }
+                }
+            } else if (cr.value().erFødsel())
+                when (cr.value().hentEndringstype()) {
+                    OPPRETTET, KORRIGERT -> {
+                        log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}, fødselsdato: {}",
+                                cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktørId(),
+                                cr.value().hentEndringstype(), cr.value().hentFødselsdato())
 
-                    val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE, cr.value().hentPersonident(), LocalDateTime.now().plusHours(24))
-                    taskRepository.save(task)
+                        if (cr.value().hentEndringstype() == OPPRETTET) {
+                            fødselOpprettetCounter.increment()
+                        } else if (cr.value().hentEndringstype() == KORRIGERT) {
+                            fødselKorrigertCounter.increment()
+                        }
+
+                        val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE, cr.value().hentPersonident(), LocalDateTime.now().plusHours(24))
+                        taskRepository.save(task)
+                    }
+                    else -> {
+                        log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}",
+                                cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktørId(), cr.value().hentEndringstype())
+                    }
                 }
-                else -> {
-                    log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}",
-                            cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktørId(), cr.value().hentEndringstype())
-                }
-            }
+        } catch (e: RuntimeException) {
+            leesahFeiletCounter.increment()
+            log.error("Feil ved konsumering av melding fra aapen-person-pdl-leesah-v1 . id {}, offset: {}, partition: {}",
+                      cr.key(),
+                      cr.offset(),
+                      cr.partition()
+            );
+            throw e;
         }
+
+    }
 
     private fun GenericRecord.erDødsfall() =
             get("opplysningstype").toString() == OPPLYSNINGSTYPE_DØDSFALL
