@@ -30,6 +30,9 @@ class LeesahConsumer(val taskRepository: TaskRepository) {
     @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}")
     lateinit var triggerTidForTps: String
 
+    @Value("\${TESTBRUKER_FNR}")
+    lateinit var testbrukerFnr: String
+
     @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"], id = "personhendelse", idIsGroup = false, containerFactory = "kafkaListenerContainerFactory")
     fun listen(cr: ConsumerRecord<String, GenericRecord>) {
         if (cr.value().erDødsfall()) {
@@ -59,8 +62,13 @@ class LeesahConsumer(val taskRepository: TaskRepository) {
                         fødselKorrigertCounter.increment()
                     }
 
-                    val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE, cr.value().hentPersonident(), LocalDateTime.now().plusMinutes(triggerTidForTps.toLong()))
-                    taskRepository.save(task)
+                    // kun for å teste TPS - skal fjernes senere.
+                    if (testbrukerFnr.length == 11) {
+                        val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE, /*cr.value().hentPersonident()*/ testbrukerFnr, LocalDateTime.now().plusMinutes(triggerTidForTps.toLong()))
+                        taskRepository.save(task)
+                    } else {
+                        log.warn("TESTBRUKER_FNR ikke riktig konfigurert")
+                    }
                 }
                 else -> {
                     log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}",
