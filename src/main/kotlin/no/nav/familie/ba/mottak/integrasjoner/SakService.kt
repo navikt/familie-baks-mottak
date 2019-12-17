@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.integrasjoner
 
+import no.nav.familie.ba.mottak.domene.NyBehandling
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import org.slf4j.LoggerFactory
@@ -25,11 +26,11 @@ class SakService @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}
                                            oAuth2AccessTokenService: OAuth2AccessTokenService?) : BaseService(OAUTH2_CLIENT_CONFIG_KEY, restTemplateBuilderMedProxy!!, clientConfigurationProperties!!, oAuth2AccessTokenService!!) {
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
-    fun sendTilSak(søknadsdataJson: String) {
+    fun sendTilSak(nyBehandling: NyBehandling) {
         val uri = URI.create("$sakServiceUri/behandling/opprett")
         logger.info("Sender søknad til {}", uri)
         try {
-            val response: ResponseEntity<String>? = postRequest(uri, søknadsdataJson)
+            val response: ResponseEntity<String>? = postRequest(uri, nyBehandling)
             logger.info("Søknad sendt til sak. Status=${response?.statusCode}")
         } catch (e: RestClientResponseException) {
             logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
