@@ -28,7 +28,7 @@ class PersonService @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
     fun hentPersonMedRelasjoner(personIdent: String): Personinfo {
         val uri = URI.create("$integrasjonerServiceUri/personopplysning/v1/info")
-        logger.info("Henter personinfo fra $integrasjonerServiceUri")
+        logger.info("Henter personinfo fra $uri")
         return try {
             val response = requestMedPersonIdent<Ressurs<Personinfo>>(uri, personIdent)
             secureLogger.info("Personinfo for {}: {}", personIdent, response?.body)
