@@ -23,6 +23,7 @@ class PersonService @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
                                                  restTemplateBuilderMedProxy: RestTemplateBuilder?,
                                                  clientConfigurationProperties: ClientConfigurationProperties?,
                                                  oAuth2AccessTokenService: OAuth2AccessTokenService?) : BaseService(OAUTH2_CLIENT_CONFIG_KEY, restTemplateBuilderMedProxy!!, clientConfigurationProperties!!, oAuth2AccessTokenService!!) {
+    val log = LoggerFactory.getLogger(PersonService::class.java)
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
     fun hentPersonMedRelasjoner(personIdent: String): Personinfo {
@@ -33,6 +34,7 @@ class PersonService @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
             secureLogger.info("Personinfo for {}: {}", personIdent, response?.body)
             response?.body?.data ?: throw RuntimeException("Response, body eller data er null.")
         } catch (e: RestClientException) {
+            log.info("Feil mot TPS. msg=${e.message}, stacktrace=${e.stackTrace.toList()}")
             throw RuntimeException("Kall mot integrasjon feilet ved uthenting av personinfo. Exception=${e} Uri=${uri}")
         }
     }

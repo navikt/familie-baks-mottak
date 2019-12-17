@@ -26,7 +26,7 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository, priv
             log.info("kjønn: ${personMedRelasjoner.kjønn} fdato: ${personMedRelasjoner.fødselsdato}")
 
         } catch (ex: RuntimeException) {
-            log.info("Feil mot TPS. msg=${ex.message} stacktrace=${ex.stackTrace}")
+            log.info("Feil ved uthenting av personinfo.")
             task.triggerTid = LocalDateTime.now().plusMinutes(rekjøringsintervall.toLong())
             taskRepository.save(task)
             throw ex
