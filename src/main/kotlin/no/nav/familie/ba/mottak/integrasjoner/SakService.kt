@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.ResponseEntity
+import org.springframework.retry.annotation.Backoff
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
@@ -22,6 +24,7 @@ class SakService @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}
                                            clientConfigurationProperties: ClientConfigurationProperties?,
                                            oAuth2AccessTokenService: OAuth2AccessTokenService?) : BaseService(OAUTH2_CLIENT_CONFIG_KEY, restTemplateBuilderMedProxy!!, clientConfigurationProperties!!, oAuth2AccessTokenService!!) {
 
+    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
     fun sendTilSak(søknadsdataJson: String) {
         val uri = URI.create("$sakServiceUri/behandling/opprett")
         logger.info("Sender søknad til {}", uri)
