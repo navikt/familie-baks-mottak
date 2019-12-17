@@ -23,9 +23,10 @@ class SakService @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}
                                            oAuth2AccessTokenService: OAuth2AccessTokenService?) : BaseService(OAUTH2_CLIENT_CONFIG_KEY, restTemplateBuilderMedProxy!!, clientConfigurationProperties!!, oAuth2AccessTokenService!!) {
 
     fun sendTilSak(søknadsdataJson: String) {
-        logger.info("Sender søknad til {}", sakServiceUri)
+        val uri = sakServiceUri.resolve("/behandling/opprett")
+        logger.info("Sender søknad til {}", uri)
         try {
-            val response: ResponseEntity<String>? = postRequest(sakServiceUri.resolve("/behandling/opprett"), søknadsdataJson)
+            val response: ResponseEntity<String>? = postRequest(uri, søknadsdataJson)
             logger.info("Søknad sendt til sak. Status=${response?.statusCode}")
         } catch (e: RestClientResponseException) {
             logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
