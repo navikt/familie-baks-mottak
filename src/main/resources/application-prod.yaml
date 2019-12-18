@@ -36,3 +36,6 @@ spring:
 
 FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1440
 FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 180
+
+#Brukes til tilgangskontroll av familie-ks-mottak-frontend
+MOTTAK_ROLLE: ${MOTTAK_ROLLE}
