@@ -19,6 +19,7 @@ private const val KORRIGERT = "KORRIGERT"
 private const val OPPLYSNINGSTYPE_DØDSFALL = "DOEDSFALL_V1"
 private const val OPPLYSNINGSTYPE_FØDSEL = "FOEDSEL_V1"
 
+
 @Service
 class LeesahConsumer(val taskRepository: TaskRepository) {
 
@@ -31,7 +32,7 @@ class LeesahConsumer(val taskRepository: TaskRepository) {
     @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}")
     lateinit var triggerTidForTps: String
 
-    @Value("\${TESTBRUKER_FNR}")
+    @Value("\${TESTBRUKER_FNR: 12345678910}")
     lateinit var testbrukerFnr: String
 
     @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"], id = "personhendelse", idIsGroup = false, containerFactory = "kafkaListenerContainerFactory")
