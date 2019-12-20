@@ -17,7 +17,7 @@ data class Personinfo(
         var utlandsadresse: String?,
         var geografiskTilknytning: String?,
         var diskresjonskode: String?,
-        var adresseLandkode: String) {
+        var adresseLandkode: String?) {
 
 }
 
