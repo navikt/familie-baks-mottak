@@ -13,7 +13,8 @@ import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
-import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.RestOperations
+import org.springframework.web.client.exchange
 import java.net.URI
 import java.util.*
 
@@ -33,12 +34,12 @@ open class BaseService(clientConfigKey: String, restTemplateBuilder: RestTemplat
             clientConfigurationProperties.registration[clientConfigKey])
             .orElseThrow { RuntimeException("could not find oauth2 client config for key=$clientConfigKey") }
 
-    val restTemplate: RestTemplate = restTemplateBuilder
+    val restOperations: RestOperations = restTemplateBuilder
             .additionalInterceptors(BearerAuthorizationInterceptor(oAuth2AccessTokenService, clientProperties))
             .build()
 
     protected inline fun <reified T, U> request(uri: URI, method: HttpMethod, httpEntity: HttpEntity<U>) : ResponseEntity<T>? {
-        val ressursResponse = restTemplate.exchange(uri, method, httpEntity, T::class.java)
+        val ressursResponse = restOperations.exchange<T>(uri, method, httpEntity)
 
         if (ressursResponse.getBody() == null) {
             throw RuntimeException("Response kan ikke være tom: " + uri)
