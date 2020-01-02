@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.task
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.familie.ba.mottak.domene.BehandlingType
 import no.nav.familie.ba.mottak.domene.NyBehandling
 import no.nav.familie.ba.mottak.integrasjoner.SakService
@@ -15,8 +16,8 @@ import org.springframework.stereotype.Service
 class SendTilSakTask(private val taskRepository: TaskRepository, private val sakService: SakService) : AsyncTaskStep {
 
     override fun doTask(task: Task) {
-        println("SendTilSakTask")
-        sakService.sendTilSak(NyBehandling("12345678901", arrayOf(task.payload), BehandlingType.FØRSTEGANGSBEHANDLING, null))
+
+        sakService.sendTilSak(jacksonObjectMapper().readValue(task.payload, NyBehandling::class.java))
 
     }
 

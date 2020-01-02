@@ -1,5 +1,14 @@
 package no.nav.familie.ba.mottak.task
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import net.logstash.logback.marker.ObjectAppendingMarker
+import no.nav.familie.ba.mottak.domene.BehandlingType
+import no.nav.familie.ba.mottak.domene.NyBehandling
+import no.nav.familie.ba.mottak.domene.personopplysning.Familierelasjon
+import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
+import no.nav.familie.ba.mottak.domene.personopplysning.Personinfo
+import no.nav.familie.ba.mottak.domene.personopplysning.RelasjonsRolleType
 import no.nav.familie.ba.mottak.integrasjoner.PersonService
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -25,6 +34,14 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository, priv
             val personMedRelasjoner = personService.hentPersonMedRelasjoner(task.payload)
             log.info("kjønn: ${personMedRelasjoner.kjønn} fdato: ${personMedRelasjoner.fødselsdato}")
 
+            val nesteTask = Task.nyTask(
+                    SendTilSakTask.TASK_STEP_TYPE,
+                    jacksonObjectMapper().writeValueAsString(NyBehandling (hentForsørger(personMedRelasjoner).id!!, arrayOf(task.payload), BehandlingType.FØRSTEGANGSBEHANDLING, null))
+                    //"{'fødselsnummer': ${hentForsørger(personMedRelasjoner)},'barnasFødselsnummer':[${task.payload}]}"
+            )
+            taskRepository.save(nesteTask)
+
+
         } catch (ex: RuntimeException) {
             log.info("Feil ved uthenting av personinfo.")
             task.triggerTid = LocalDateTime.now().plusMinutes(rekjøringsintervall.toLong())
@@ -35,11 +52,22 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository, priv
 
     override fun onCompletion(task: Task) {
         log.info("MottaFødselshendelseTask er ferdig.")
-        val nesteTask = Task.nyTask(
-                SendTilSakTask.TASK_STEP_TYPE,
-                "{'fødselsnummer':'12345678901','barnasFødselsnummer':[${task.payload}],'behandlingType':'FØRSTEGANGSBEHANDLING'}"
-        )
-        taskRepository.save(nesteTask);
+    }
+
+    fun hentForsørger(personinfo: Personinfo): PersonIdent {
+       for (familierelasjon: Familierelasjon in personinfo.familierelasjoner!!) {
+           if (familierelasjon.relasjonsrolle == RelasjonsRolleType.MORA) {
+               return familierelasjon.personIdent
+           }
+       }
+       // hvis vi ikke fant mora returner fara
+        for (familierelasjon: Familierelasjon in personinfo.familierelasjoner!!) {
+            if (familierelasjon.relasjonsrolle == RelasjonsRolleType.FARA) {
+                return familierelasjon.personIdent
+            }
+        }
+        log.warn("Fant hverken far eller mor...")
+        throw IllegalStateException("Fant hverken mor eller far. Må behandles manuellt")
     }
 
     companion object {

@@ -66,8 +66,8 @@ data class Landkode(var kode: String?) {
 }
 
 class Familierelasjon(
-        var personIdent: PersonIdent?,
-        var relasjonsrolle: RelasjonsRolleType?,
+        var personIdent: PersonIdent,
+        var relasjonsrolle: RelasjonsRolleType,
         var fødselsdato: LocalDate?,
         var harSammeBosted: Boolean?) {
 }

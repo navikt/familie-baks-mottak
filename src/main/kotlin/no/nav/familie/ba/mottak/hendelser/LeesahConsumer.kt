@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.hendelser
 
+import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.prosessering.domene.Task
@@ -7,6 +8,7 @@ import no.nav.familie.prosessering.domene.TaskRepository
 import org.apache.avro.generic.GenericData
 import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.annotation.KafkaListener
@@ -23,17 +25,15 @@ private const val OPPLYSNINGSTYPE_FØDSEL = "FOEDSEL_V1"
 @Service
 class LeesahConsumer(val taskRepository: TaskRepository) {
 
-    val dødsfallCounter = Metrics.counter("barnetrygd.dodsfall")
-    val leesahFeiletCounter = Metrics.counter("barnetrygd.hendelse.leesha.feilet")
-    val fødselOpprettetCounter = Metrics.counter("barnetrygd.fodsel.opprettet")
-    val fødselKorrigertCounter = Metrics.counter("barnetrygd.fodsel.korrigert")
-    val log = LoggerFactory.getLogger(LeesahConsumer::class.java)
+    val dødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall")
+    val leesahFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesha.feilet")
+    val fødselOpprettetCounter: Counter = Metrics.counter("barnetrygd.fodsel.opprettet")
+    val fødselKorrigertCounter: Counter = Metrics.counter("barnetrygd.fodsel.korrigert")
+    val log: Logger = LoggerFactory.getLogger(LeesahConsumer::class.java)
 
     @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}")
     lateinit var triggerTidForTps: String
 
-    @Value("\${TESTBRUKER_FNR: 12345678910}")
-    lateinit var testbrukerFnr: String
 
     @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"], id = "personhendelse", idIsGroup = false, containerFactory = "kafkaListenerContainerFactory")
     fun listen(cr: ConsumerRecord<String, GenericRecord>) {
@@ -66,13 +66,9 @@ class LeesahConsumer(val taskRepository: TaskRepository) {
                             fødselKorrigertCounter.increment()
                         }
 
-                        // kun for å teste TPS - skal fjernes senere.
-                        if (testbrukerFnr.length == 11) {
-                            val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE, /*cr.value().hentPersonident()*/ testbrukerFnr, LocalDateTime.now().plusMinutes(triggerTidForTps.toLong()))
-                            taskRepository.save(task)
-                        } else {
-                            log.warn("TESTBRUKER_FNR ikke riktig konfigurert")
-                        }
+                        val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE, cr.value().hentPersonident(), LocalDateTime.now().plusMinutes(triggerTidForTps.toLong()))
+                        taskRepository.save(task)
+
                     }
                     else -> {
                         log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}",
@@ -85,8 +81,8 @@ class LeesahConsumer(val taskRepository: TaskRepository) {
                       cr.key(),
                       cr.offset(),
                       cr.partition()
-            );
-            throw e;
+            )
+            throw e
         }
 
     }
