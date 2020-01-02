@@ -260,6 +260,7 @@
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro-maven-plugin</artifactId>
                 <version>1.9.1</version>
+                <!--
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -273,7 +274,7 @@
                             <stringType>String</stringType>
                         </configuration>
                     </execution>
-                </executions>
+                </executions> -->
             </plugin>
             <plugin>
                 <dependencies>
