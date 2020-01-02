@@ -2,6 +2,8 @@ package no.nav.familie.ba.mottak.hendelser
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
+import no.nav.familie.ba.mottak.domene.Hendelseslogg
+import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
@@ -12,9 +14,11 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.annotation.KafkaListener
+import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
+import javax.transaction.Transactional
 
 private const val OPPRETTET = "OPPRETTET"
 private const val KORRIGERT = "KORRIGERT"
@@ -23,7 +27,7 @@ private const val OPPLYSNINGSTYPE_FØDSEL = "FOEDSEL_V1"
 
 
 @Service
-class LeesahConsumer(val taskRepository: TaskRepository) {
+class LeesahConsumer(val taskRepository: TaskRepository, val hendelsesloggRepository: HendelsesloggRepository) {
 
     val dødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall")
     val leesahFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesha.feilet")
@@ -36,9 +40,14 @@ class LeesahConsumer(val taskRepository: TaskRepository) {
 
 
     @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"], id = "personhendelse", idIsGroup = false, containerFactory = "kafkaListenerContainerFactory")
-    fun listen(cr: ConsumerRecord<String, GenericRecord>) {
+    @Transactional
+    fun listen(cr: ConsumerRecord<String, GenericRecord>, ack: Acknowledgment) {
 
         try {
+            if (hendelsesloggRepository.existsByHendelseId(cr.value().hentHendelseId())){
+                ack.acknowledge()
+                return
+            }
             if (cr.value().erDødsfall()) {
                 dødsfallCounter.increment()
 
@@ -53,12 +62,18 @@ class LeesahConsumer(val taskRepository: TaskRepository) {
                                 cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktørId(), cr.value().hentEndringstype())
                     }
                 }
-            } else if (cr.value().erFødsel())
+                hendelsesloggRepository.save(Hendelseslogg(cr.offset(),cr.value().hentHendelseId(),cr.value().hentAktørId(),cr.value().hentOpplysningstype(),cr.value().hentEndringstype()))
+            } else if (cr.value().erFødsel()) {
                 when (cr.value().hentEndringstype()) {
                     OPPRETTET, KORRIGERT -> {
                         log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}, fødselsdato: {}",
-                                cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktørId(),
-                                cr.value().hentEndringstype(), cr.value().hentFødselsdato())
+                                 cr.topic(),
+                                 cr.partition(),
+                                 cr.offset(),
+                                 cr.value().hentOpplysningstype(),
+                                 cr.value().hentAktørId(),
+                                 cr.value().hentEndringstype(),
+                                 cr.value().hentFødselsdato())
 
                         if (cr.value().hentEndringstype() == OPPRETTET) {
                             fødselOpprettetCounter.increment()
@@ -66,15 +81,29 @@ class LeesahConsumer(val taskRepository: TaskRepository) {
                             fødselKorrigertCounter.increment()
                         }
 
-                        val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE, cr.value().hentPersonident(), LocalDateTime.now().plusMinutes(triggerTidForTps.toLong()))
+                        val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE,
+                                                            cr.value().hentPersonident(),
+                                                            LocalDateTime.now().plusMinutes(triggerTidForTps.toLong()))
                         taskRepository.save(task)
 
                     }
+
                     else -> {
                         log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}",
-                                cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktørId(), cr.value().hentEndringstype())
+                                 cr.topic(),
+                                 cr.partition(),
+                                 cr.key(),
+                                 cr.offset(),
+                                 cr.value().hentOpplysningstype(),
+                                 cr.value().hentAktørId(),
+                                 cr.value().hentEndringstype())
                     }
                 }
+                hendelsesloggRepository.save(Hendelseslogg(cr.offset(),cr.value().hentHendelseId(),cr.value().hentAktørId(),cr.value().hentOpplysningstype(),cr.value().hentEndringstype()))
+            }
+
+            ack.acknowledge()
+
         } catch (e: RuntimeException) {
             leesahFeiletCounter.increment()
             log.error("Feil ved konsumering av melding fra aapen-person-pdl-leesah-v1 . id {}, offset: {}, partition: {}",
@@ -108,6 +137,9 @@ class LeesahConsumer(val taskRepository: TaskRepository) {
 
     private fun GenericRecord.hentEndringstype() =
             get("endringstype").toString()
+
+    private fun GenericRecord.hentHendelseId() =
+            get("hendelseId").toString()
 
     private fun GenericRecord.hentDødsdato(): LocalDate {
         try {
