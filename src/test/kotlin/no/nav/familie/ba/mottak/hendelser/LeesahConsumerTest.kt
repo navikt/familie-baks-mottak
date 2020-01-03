@@ -2,6 +2,7 @@ package no.nav.familie.ba.mottak.hendelser
 
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.util.DbContainerInitializer
+import org.apache.avro.SchemaBuilder
 import org.apache.avro.generic.GenericRecord
 import org.apache.avro.generic.GenericRecordBuilder
 import org.junit.jupiter.api.AfterAll
@@ -84,10 +85,12 @@ class LeesahConsumerTest {
         producer!!.defaultTopic = "aapen-person-pdl-leesah-v1"
 
         // Given
-        //var genericRecord: GenericRecordBuilder = GenericRecordBuilder()
-        //genericRecord.set("hendelseId", "123")
+        var schema = SchemaBuilder.record("hendelse").fields().requiredString("hendelseId").endRecord()
+        var genericRecord: GenericRecordBuilder = GenericRecordBuilder(schema)
+        genericRecord.set("hendelseId", "123")
 
-        //producer!!.sendDefault(12, "Hello world")
+
+        producer!!.sendDefault("123", null)
 
         //Thread.sleep(100_000)
         // Then
