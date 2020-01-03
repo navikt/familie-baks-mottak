@@ -25,7 +25,7 @@ import java.time.LocalDateTime
 class MottaFødselshendelseTask(private val taskRepository: TaskRepository, private val personService: PersonService) : AsyncTaskStep {
     val log = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
 
-    @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}")
+    @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER:1}")
     lateinit var rekjøringsintervall: String
 
     override fun doTask(task: Task) {

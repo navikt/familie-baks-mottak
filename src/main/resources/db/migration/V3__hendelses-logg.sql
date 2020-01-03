@@ -10,4 +10,4 @@ CREATE TABLE hendelseslogg (
 
 CREATE SEQUENCE hendelseslogg_seq INCREMENT BY 50 START WITH 1000000 NO CYCLE;
 
-CREATE INDEX ON hendelseslogg (kafka_key);
+CREATE INDEX ON hendelseslogg (hendelse_id);
