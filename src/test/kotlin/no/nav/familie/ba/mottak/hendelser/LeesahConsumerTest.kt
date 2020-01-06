@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit
 @SpringBootTest(properties = ["spring.kafka.bootstrap-servers=\${spring.embedded.kafka.brokers}"])
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(initializers = [DbContainerInitializer::class])
-@ActiveProfiles("postgres", "mock-dokgen")
+@ActiveProfiles("postgres")
 @EmbeddedKafka(
         // We're only needing to test Kafka serializing interactions, so keep partitioning simple
         partitions = 1,
@@ -36,28 +36,6 @@ import java.util.concurrent.TimeUnit
         )
 @Tag("integration")
 class LeesahConsumerTest {
-
-    companion object {
-
-
-        @BeforeAll
-        @JvmStatic
-        fun setup() {
-            System.out.println("BINGO")
-            //System.setProperty("spring.kafka.bootstrap-servers", embeddedEnvironment.brokersURL.replace("PLAINTEXT","http"))
-            //System.setProperty("spring.embedded.kafka.brokers", embeddedEnvironment.brokersURL.replace("PLAINTEXT","http"))
-            //System.setProperty("spring.cloud.stream.kafka.binder.zkNodes", embeddedEnvironment.zookeeper.url)
-
-        }
-
-        @AfterAll
-        @JvmStatic
-        fun teardown() {
-            //embeddedEnvironment.tearDown()
-        }
-
-
-    }
 
     @Autowired
     lateinit var hendelsesloggRepository: HendelsesloggRepository
@@ -90,13 +68,8 @@ class LeesahConsumerTest {
         genericRecord.set("hendelseId", "123")
 
 
-        producer!!.sendDefault("123", null)
+        //producer!!.sendDefault("123", null)
 
-        //Thread.sleep(100_000)
-        // Then
-        //Assert.assertThat(true).isTrue()
-
-        System.out.println("BINGO")
     }
 
 }

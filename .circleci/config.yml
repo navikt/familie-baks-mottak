@@ -47,7 +47,7 @@ jobs:
       - run:
           name: Bygger produksjon
           command: |
-            mvn clean package
+            mvn clean package -DexcludedGroups="integration"
       - persist_to_workspace:
           root: /home/circleci/project
           paths:
