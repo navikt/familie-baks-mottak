@@ -67,5 +67,4 @@ class Familierelasjon(
         var personIdent: PersonIdent,
         var relasjonsrolle: RelasjonsRolleType,
         var fødselsdato: LocalDate?,
-        var harSammeBosted: Boolean?) {
-}
+        var harSammeBosted: Boolean?)

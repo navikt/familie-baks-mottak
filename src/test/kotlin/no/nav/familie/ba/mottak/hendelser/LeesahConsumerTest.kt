@@ -57,7 +57,7 @@ class LeesahConsumerTest {
     fun `Dødshendelse skal prosesseres uten feil`() {
         val producer = buildKafkaProducer()
 
-        var personhendelse: GenericRecordBuilder = GenericRecordBuilder(Personhendelse.`SCHEMA$`)
+        var personhendelse = GenericRecordBuilder(Personhendelse.`SCHEMA$`)
         personhendelse.set("hendelseId", "1")
         val personidenter = ArrayList<String>()
         personidenter.add("1234567890123")
@@ -67,7 +67,7 @@ class LeesahConsumerTest {
         personhendelse.set("opplysningstype", "DOEDSFALL_V1")
         personhendelse.set("endringstype", Endringstype.OPPRETTET)
 
-        var dødsfall: GenericRecordBuilder = GenericRecordBuilder(Doedsfall.`SCHEMA$`)
+        var dødsfall = GenericRecordBuilder(Doedsfall.`SCHEMA$`)
         dødsfall.set("doedsdato", 1)
         personhendelse.set("doedsfall", dødsfall.build())
 
@@ -79,7 +79,7 @@ class LeesahConsumerTest {
     fun `Fødselshendelse skal prosesseres uten feil`() {
         val producer = buildKafkaProducer()
 
-        var personhendelse: GenericRecordBuilder = GenericRecordBuilder(Personhendelse.`SCHEMA$`)
+        var personhendelse = GenericRecordBuilder(Personhendelse.`SCHEMA$`)
         personhendelse.set("hendelseId", "1")
         val personidenter = ArrayList<String>()
         personidenter.add("1234567890123")
@@ -90,17 +90,17 @@ class LeesahConsumerTest {
         personhendelse.set("opplysningstype", "FOEDSEL_V1")
         personhendelse.set("endringstype", Endringstype.OPPRETTET)
 
-        var fødsel: GenericRecordBuilder = GenericRecordBuilder(Foedsel.`SCHEMA$`)
+        var fødsel = GenericRecordBuilder(Foedsel.`SCHEMA$`)
         fødsel.set("foedselsdato", 1)
         personhendelse.set("foedsel", fødsel.build())
 
         producer.send(ProducerRecord("aapen-person-pdl-leesah-v1", personhendelse.build()))
 
-        var fantTask: Boolean = false;
+        var fantTask = false
         for (i in  1..10) {
             if (taskRepository.count() > 0) {
-                fantTask = true;
-                break;
+                fantTask = true
+                break
             } else {
                 Thread.sleep(1000)
             }
@@ -116,8 +116,8 @@ class CustomKafkaAvroSerializer : KafkaAvroSerializer {
         super.schemaRegistry = MockSchemaRegistryClient()
     }
 
-    constructor(client: SchemaRegistryClient?) : super(MockSchemaRegistryClient()) {}
-    constructor(client: SchemaRegistryClient?, props: Map<String?, *>?) : super(MockSchemaRegistryClient(), props) {}
+    constructor(client: SchemaRegistryClient?) : super(MockSchemaRegistryClient())
+    constructor(client: SchemaRegistryClient?, props: Map<String?, *>?) : super(MockSchemaRegistryClient(), props)
 }
 
 class CustomKafkaAvroDeserializer : KafkaAvroDeserializer() {

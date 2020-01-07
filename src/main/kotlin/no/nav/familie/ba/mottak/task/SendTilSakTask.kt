@@ -6,12 +6,11 @@ import no.nav.familie.ba.mottak.integrasjoner.SakService
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
 import org.springframework.stereotype.Service
 
 @Service
 @TaskStepBeskrivelse(taskStepType = SendTilSakTask.TASK_STEP_TYPE, beskrivelse = "Send til sak")
-class SendTilSakTask(private val taskRepository: TaskRepository, private val sakService: SakService) : AsyncTaskStep {
+class SendTilSakTask(private val sakService: SakService) : AsyncTaskStep {
 
     override fun doTask(task: Task) {
         sakService.sendTilSak(jacksonObjectMapper().readValue(task.payload, NyBehandling::class.java))
