@@ -17,13 +17,13 @@ import org.apache.avro.generic.GenericRecordBuilder
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.kafka.test.EmbeddedKafkaBroker
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
@@ -40,9 +40,6 @@ class LeesahConsumerTest {
     lateinit var hendelsesloggRepository: HendelsesloggRepository
 
     @Autowired
-    lateinit var embeddedKafkaBroker: EmbeddedKafkaBroker
-
-    @Autowired
     lateinit var kafkaProperties: KafkaProperties
 
     @Autowired
@@ -55,8 +52,6 @@ class LeesahConsumerTest {
 
     @Test
     fun `Dødshendelse skal prosesseres uten feil`() {
-        val producer = buildKafkaProducer()
-
         val personhendelse = GenericRecordBuilder(Personhendelse.`SCHEMA$`)
         personhendelse.set("hendelseId", "1")
         val personidenter = ArrayList<String>()
@@ -71,16 +66,15 @@ class LeesahConsumerTest {
         dødsfall.set("doedsdato", 1)
         personhendelse.set("doedsfall", dødsfall.build())
 
+        val producer = buildKafkaProducer()
         producer.send(ProducerRecord("aapen-person-pdl-leesah-v1", personhendelse.build()))
         Thread.sleep(1000)
     }
 
     @Test
     fun `Fødselshendelse skal prosesseres uten feil`() {
-        val producer = buildKafkaProducer()
-
         val personhendelse = GenericRecordBuilder(Personhendelse.`SCHEMA$`)
-        personhendelse.set("hendelseId", "1")
+        personhendelse.set("hendelseId", "2")
         val personidenter = ArrayList<String>()
         personidenter.add("1234567890123")
         personidenter.add("12345678901")
@@ -94,6 +88,7 @@ class LeesahConsumerTest {
         fødsel.set("foedselsdato", 1)
         personhendelse.set("foedsel", fødsel.build())
 
+        val producer = buildKafkaProducer()
         producer.send(ProducerRecord("aapen-person-pdl-leesah-v1", personhendelse.build()))
 
         var fantTask = false
@@ -106,8 +101,8 @@ class LeesahConsumerTest {
             }
         }
 
-        assert(fantTask) // Tester at fødselshendelsen generer en task.
-        assert(hendelsesloggRepository.existsByHendelseId("1")) // Tester at vi får logget hendelsesIden som brukes i idempotenssjekken.
+        assertThat(fantTask).isTrue() // Tester at fødselshendelsen generer en task.
+        assertThat(hendelsesloggRepository.existsByHendelseId("1")).isTrue() // Tester at vi får logget hendelsesIden som brukes i idempotenssjekken.
     }
 }
 
