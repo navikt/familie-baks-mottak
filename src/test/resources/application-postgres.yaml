@@ -50,8 +50,22 @@ spring:
     bootstrap-servers: ${KAFKA_BROKERS}
     properties:
       schema.registry.url: ${KAFKA_BROKERS}
+      specific.avro.reader: true # isn't a known config.
     consumer:
+      #properties.schema.registry.url: not-used
+      value-deserializer: no.nav.familie.ba.mottak.hendelser.CustomKafkaAvroDeserializer
+      #value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      #key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      key-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
       group-id: srvc01
+    producer:
+      #properties.schema.registry.url: not-used
+      value-serializer: no.nav.familie.ba.mottak.hendelser.CustomKafkaAvroSerializer
+      key-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      #key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      #key-serializer: no.nav.familie.ba.mottak.hendelser.CustomKafkaAvroSerializer
+      group-id: showcase-producer-id
+      auto.register.schemas: true
 
 
 

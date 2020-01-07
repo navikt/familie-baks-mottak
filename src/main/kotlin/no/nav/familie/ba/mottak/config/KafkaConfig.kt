@@ -14,13 +14,13 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 class KafkaConfig {
 
     @Bean
-    fun consumerFactory(properties : KafkaProperties) : ConsumerFactory<String, GenericRecord> {
+    fun consumerFactory(properties : KafkaProperties) : ConsumerFactory<Int, GenericRecord> {
         return DefaultKafkaConsumerFactory(properties.buildConsumerProperties())
     }
 
     @Bean
-    fun kafkaListenerContainerFactory(consumerFactory: ConsumerFactory<String, GenericRecord>) : ConcurrentKafkaListenerContainerFactory<String, GenericRecord> {
-        val factory = ConcurrentKafkaListenerContainerFactory<String, GenericRecord>()
+    fun kafkaListenerContainerFactory(consumerFactory: ConsumerFactory<Int, GenericRecord>) : ConcurrentKafkaListenerContainerFactory<Int, GenericRecord> {
+        val factory = ConcurrentKafkaListenerContainerFactory<Int, GenericRecord>()
         factory.consumerFactory = consumerFactory
         return factory
     }

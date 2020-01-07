@@ -14,7 +14,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.annotation.KafkaListener
-import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -24,7 +23,6 @@ private const val OPPRETTET = "OPPRETTET"
 private const val KORRIGERT = "KORRIGERT"
 private const val OPPLYSNINGSTYPE_DØDSFALL = "DOEDSFALL_V1"
 private const val OPPLYSNINGSTYPE_FØDSEL = "FOEDSEL_V1"
-
 
 @Service
 class LeesahConsumer(val taskRepository: TaskRepository, val hendelsesloggRepository: HendelsesloggRepository) {
@@ -38,14 +36,11 @@ class LeesahConsumer(val taskRepository: TaskRepository, val hendelsesloggReposi
     @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER:1}")
     lateinit var triggerTidForTps: String
 
-
     @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"], id = "personhendelse", idIsGroup = false, containerFactory = "kafkaListenerContainerFactory")
     @Transactional
-    fun listen(cr: ConsumerRecord<String, GenericRecord>, ack: Acknowledgment) {
-
+    fun listen(cr: ConsumerRecord<Int, GenericRecord>) {
         try {
             if (hendelsesloggRepository.existsByHendelseId(cr.value().hentHendelseId())){
-                ack.acknowledge()
                 return
             }
             if (cr.value().erDødsfall()) {
@@ -101,9 +96,6 @@ class LeesahConsumer(val taskRepository: TaskRepository, val hendelsesloggReposi
                 }
                 hendelsesloggRepository.save(Hendelseslogg(cr.offset(),cr.value().hentHendelseId(),cr.value().hentAktørId(),cr.value().hentOpplysningstype(),cr.value().hentEndringstype()))
             }
-
-            ack.acknowledge()
-
         } catch (e: RuntimeException) {
             leesahFeiletCounter.increment()
             log.error("Feil ved konsumering av melding fra aapen-person-pdl-leesah-v1 . id {}, offset: {}, partition: {}",
