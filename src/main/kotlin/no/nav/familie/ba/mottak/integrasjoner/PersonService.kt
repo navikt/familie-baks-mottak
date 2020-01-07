@@ -4,6 +4,7 @@ import no.nav.familie.ba.mottak.domene.personopplysning.Personinfo
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -23,7 +24,7 @@ class PersonService @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
                                                  restTemplateBuilderMedProxy: RestTemplateBuilder?,
                                                  clientConfigurationProperties: ClientConfigurationProperties?,
                                                  oAuth2AccessTokenService: OAuth2AccessTokenService?) : BaseService(OAUTH2_CLIENT_CONFIG_KEY, restTemplateBuilderMedProxy!!, clientConfigurationProperties!!, oAuth2AccessTokenService!!) {
-    val log = LoggerFactory.getLogger(PersonService::class.java)
+    val log: Logger = LoggerFactory.getLogger(PersonService::class.java)
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
     fun hentPersonMedRelasjoner(personIdent: String): Personinfo {

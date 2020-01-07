@@ -33,7 +33,7 @@ class LeesahConsumer(val taskRepository: TaskRepository, val hendelsesloggReposi
     val fødselOpprettetCounter: Counter = Metrics.counter("barnetrygd.fodsel.opprettet")
     val fødselKorrigertCounter: Counter = Metrics.counter("barnetrygd.fodsel.korrigert")
     val log: Logger = LoggerFactory.getLogger(LeesahConsumer::class.java)
-    val secureLogger = LoggerFactory.getLogger("secureLogger")
+    val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
 
     @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER:1}")
     lateinit var triggerTidForTps: String

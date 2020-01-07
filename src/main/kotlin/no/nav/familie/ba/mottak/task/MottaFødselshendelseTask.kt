@@ -12,6 +12,7 @@ import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -21,7 +22,7 @@ import java.time.LocalDateTime
 @Service
 @TaskStepBeskrivelse(taskStepType = MottaFødselshendelseTask.TASK_STEP_TYPE, beskrivelse = "Motta fødselshendelse", maxAntallFeil = 3)
 class MottaFødselshendelseTask(private val taskRepository: TaskRepository, private val personService: PersonService) : AsyncTaskStep {
-    val log = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
+    val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
 
     @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER:1}")
     lateinit var rekjøringsintervall: String
