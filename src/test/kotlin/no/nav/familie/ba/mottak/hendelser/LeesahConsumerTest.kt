@@ -6,9 +6,11 @@ import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroSerializer
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.util.DbContainerInitializer
+import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.person.pdl.leesah.Endringstype
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.doedsfall.Doedsfall
+import no.nav.person.pdl.leesah.foedsel.Foedsel
 import org.apache.avro.Schema
 import org.apache.avro.generic.GenericRecord
 import org.apache.avro.generic.GenericRecordBuilder
@@ -43,40 +45,23 @@ class LeesahConsumerTest {
     @Autowired
     lateinit var kafkaProperties: KafkaProperties
 
+    @Autowired
+    lateinit var taskRepository: TaskRepository
+
     private fun buildKafkaProducer(): Producer<Int, GenericRecord> {
         val senderProps = kafkaProperties.buildProducerProperties()
         return KafkaProducer(senderProps)
     }
 
     @Test
-    @Throws(InterruptedException::class)
-    fun listenerShouldConsumeMessages() {
-        val producer2 = buildKafkaProducer()
-
-        var genericRecord: GenericRecordBuilder = GenericRecordBuilder(Personhendelse.`SCHEMA$`)
-        genericRecord.set("hendelseId", "123")
-        val x = ArrayList<String>()
-        x.add("asdsa")
-        genericRecord.set("personidenter", x)
-        genericRecord.set("master", "Geirmund")
-        genericRecord.set("opprettet", 123678126L)
-        genericRecord.set("opplysningstype", "opplysn")
-        genericRecord.set("endringstype", Endringstype.OPPRETTET)
-
-        producer2.send(ProducerRecord("aapen-person-pdl-leesah-v1", genericRecord.build()))
-
-        Thread.sleep(100_000)
-    }
-
-    @Test
-    fun `Ack skal ikke kaste feil`() {
+    fun `Dødshendelse skal prosesseres uten feil`() {
         val producer = buildKafkaProducer()
 
         var personhendelse: GenericRecordBuilder = GenericRecordBuilder(Personhendelse.`SCHEMA$`)
         personhendelse.set("hendelseId", "1")
-        val x = ArrayList<String>()
-        x.add("1234567890123")
-        personhendelse.set("personidenter", x)
+        val personidenter = ArrayList<String>()
+        personidenter.add("1234567890123")
+        personhendelse.set("personidenter", personidenter)
         personhendelse.set("master", "")
         personhendelse.set("opprettet", 0L)
         personhendelse.set("opplysningstype", "DOEDSFALL_V1")
@@ -87,8 +72,42 @@ class LeesahConsumerTest {
         personhendelse.set("doedsfall", dødsfall.build())
 
         producer.send(ProducerRecord("aapen-person-pdl-leesah-v1", personhendelse.build()))
+        Thread.sleep(1000)
+    }
 
-        Thread.sleep(100_000)
+    @Test
+    fun `Fødselshendelse skal prosesseres uten feil`() {
+        val producer = buildKafkaProducer()
+
+        var personhendelse: GenericRecordBuilder = GenericRecordBuilder(Personhendelse.`SCHEMA$`)
+        personhendelse.set("hendelseId", "1")
+        val personidenter = ArrayList<String>()
+        personidenter.add("1234567890123")
+        personidenter.add("12345678901")
+        personhendelse.set("personidenter", personidenter)
+        personhendelse.set("master", "")
+        personhendelse.set("opprettet", 0L)
+        personhendelse.set("opplysningstype", "FOEDSEL_V1")
+        personhendelse.set("endringstype", Endringstype.OPPRETTET)
+
+        var fødsel: GenericRecordBuilder = GenericRecordBuilder(Foedsel.`SCHEMA$`)
+        fødsel.set("foedselsdato", 1)
+        personhendelse.set("foedsel", fødsel.build())
+
+        producer.send(ProducerRecord("aapen-person-pdl-leesah-v1", personhendelse.build()))
+
+        var fantTask: Boolean = false;
+        for (i in  1..10) {
+            if (taskRepository.count() > 0) {
+                fantTask = true;
+                break;
+            } else {
+                Thread.sleep(1000)
+            }
+        }
+
+        assert(fantTask) // Tester at fødselshendelsen generer en task.
+        assert(hendelsesloggRepository.existsByHendelseId("1")) // Tester at vi får logget hendelsesIden som brukes i idempotenssjekken.
     }
 }
 
