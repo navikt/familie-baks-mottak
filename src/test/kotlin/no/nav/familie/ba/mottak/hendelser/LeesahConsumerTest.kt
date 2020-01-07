@@ -97,7 +97,7 @@ class LeesahConsumerTest {
         producer.send(ProducerRecord("aapen-person-pdl-leesah-v1", personhendelse.build()))
 
         var fantTask = false
-        for (i in  1..10) {
+        for (i in  1..30) {
             if (taskRepository.count() > 0) {
                 fantTask = true
                 break
