@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.transaction.Transactional
-import kotlin.reflect.jvm.jvmName
 
 private const val OPPRETTET = "OPPRETTET"
 private const val KORRIGERT = "KORRIGERT"
@@ -142,12 +141,13 @@ class LeesahConsumer(val taskRepository: TaskRepository, val hendelsesloggReposi
     private fun GenericRecord.hentDødsdato(): LocalDate {
         try {
             val dato = (get("doedsfall") as GenericRecord?)?.get("doedsdato")
-            log.info("dato: " + dato!!::class.jvmName)
 
+            // Integrasjonstester bruker EmbeddedKafka, der en datoverdi tolkes direkte som en LocalDate.
+            // I prod tolkes datoer som en Integer.
             if (dato is LocalDate) {
                 return dato
             } else {
-                return LocalDate.ofEpochDay(dato.toString().toLong())
+                return LocalDate.ofEpochDay(dato as Long)
             }
 
         } catch (exception: Exception) {
@@ -159,12 +159,11 @@ class LeesahConsumer(val taskRepository: TaskRepository, val hendelsesloggReposi
     private fun GenericRecord.hentFødselsdato(): LocalDate {
         try {
             val dato = (get("foedsel") as GenericRecord?)?.get("foedselsdato")
-            log.info("dato: " + dato!!::class.jvmName)
 
             if (dato is LocalDate) {
                 return dato
             } else {
-                return LocalDate.ofEpochDay(dato.toString().toLong())
+                return LocalDate.ofEpochDay(dato as Long)
             }
         } catch (exception: Exception) {
             log.error("Deserialisering av fødselsdato feiler")
