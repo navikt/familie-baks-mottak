@@ -145,7 +145,7 @@ class LeesahConsumer(val taskRepository: TaskRepository, val hendelsesloggReposi
             if (dato is LocalDate) {
                 return dato
             } else {
-                return LocalDate.ofEpochDay(dato as Long)
+                return LocalDate.ofEpochDay((dato as Int).toLong())
             }
 
         } catch (exception: Exception) {
@@ -161,7 +161,7 @@ class LeesahConsumer(val taskRepository: TaskRepository, val hendelsesloggReposi
             if (dato is LocalDate) {
                 return dato
             } else {
-                return LocalDate.ofEpochDay(dato as Long)
+                return LocalDate.ofEpochDay((dato as Int).toLong())
             }
         } catch (exception: Exception) {
             log.error("Deserialisering av fødselsdato feiler")
