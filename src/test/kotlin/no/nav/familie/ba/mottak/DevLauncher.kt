@@ -1,10 +1,7 @@
 package no.nav.familie.ba.mottak
 
 import no.nav.familie.ba.mottak.config.ApplicationConfig
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.SpringApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
-
 
 object DevLauncher {
     @JvmStatic

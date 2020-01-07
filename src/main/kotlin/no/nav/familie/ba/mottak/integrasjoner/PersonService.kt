@@ -38,20 +38,4 @@ class PersonService @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
             throw RuntimeException("Kall mot integrasjon feilet ved uthenting av personinfo. Exception=${e} Uri=${uri}")
         }
     }
-
-    /*
-    @Retryable(value = [IntegrasjonException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
-    fun oppdaterGosysOppgave(fnr: String?, journalpostID: String?, beskrivelse: String?) {
-        val uri = URI.create("$integrasjonerServiceUri/oppgave/oppdater")
-        logger.info("Sender \"oppdater oppgave\"-request til $uri")
-        val oppgave = Oppgave(hentAktørId(fnr).getId(), journalpostID, null, beskrivelse)
-        try {
-            postRequest<T>(uri, OppgaveKt.toJson(oppgave), MutableMap::class.java)
-        } catch (e: HttpClientErrorException.NotFound) {
-            logger.warn("Oppgave returnerte 404, men kaster ikke feil. Uri: {}", uri)
-        } catch (e: RestClientException) {
-            throw IntegrasjonException("Kan ikke oppdater Gosys-oppgave", e, uri, oppgave.getAktorId())
-        }
-    }
-    */
 }

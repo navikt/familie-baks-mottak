@@ -1,8 +1,6 @@
 package no.nav.familie.ba.mottak.task
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import net.logstash.logback.marker.ObjectAppendingMarker
 import no.nav.familie.ba.mottak.domene.BehandlingType
 import no.nav.familie.ba.mottak.domene.NyBehandling
 import no.nav.familie.ba.mottak.domene.personopplysning.Familierelasjon
@@ -37,7 +35,6 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository, priv
             val nesteTask = Task.nyTask(
                     SendTilSakTask.TASK_STEP_TYPE,
                     jacksonObjectMapper().writeValueAsString(NyBehandling (hentForsørger(personMedRelasjoner).id!!, arrayOf(task.payload), BehandlingType.FØRSTEGANGSBEHANDLING, null))
-                    //"{'fødselsnummer': ${hentForsørger(personMedRelasjoner)},'barnasFødselsnummer':[${task.payload}]}"
             )
             taskRepository.save(nesteTask)
 

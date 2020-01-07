@@ -6,9 +6,6 @@ import javax.persistence.*
 @Entity
 @Table(name = "HENDELSESLOGG")
 data class Hendelseslogg(
-
-
-
         @Column(name="kafka_offset")
         val offset: Long,
 
@@ -31,6 +28,4 @@ data class Hendelseslogg(
 
         @Column(name = "opprettet_tid", nullable = false, updatable = false)
         val opprettetTidspunkt: LocalDateTime = LocalDateTime.now()
-
-
 )

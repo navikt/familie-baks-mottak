@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import java.time.Duration
 
-
 @Configuration
 class RestTemplateConfig {
     @Profile("!dev")
