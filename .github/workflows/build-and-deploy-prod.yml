@@ -1,0 +1,58 @@
+name: Deploy-Prod
+on:
+  push:
+    tags:
+      - 'v*'
+jobs:
+  deploy-to-prod:
+    name: Deploy tag til prod-fss
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+      - name: Sjekk at tag ligger på master
+        run: |
+          commit=$(git rev-parse --short HEAD)
+          if ! [[ $(git branch -r --contains "$commit" | grep -E '(^|\s)origin/master$') ]]; then exit 1; fi
+      - name: Set up JDK 1.11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
+      - name: Bygg med maven
+        env:
+          GITHUB_USERNAME: x-access-token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn package --settings .github/maven-settings.xml --file pom.xml
+      - name: Lag Docker tag
+        env:
+          NAME: familie-ba-mottak
+        run: |
+          echo "docker.pkg.github.com"/"$GITHUB_REPOSITORY"/"$NAME" > .docker_image
+          echo "$(date "+%Y.%m.%d")-$(git rev-parse --short HEAD)" > .docker_tag
+      - name: Bygg Docker image
+        run: |
+          docker build -t $(cat .docker_image):$(cat .docker_tag) .
+      - name: Login to Github Package Registry
+        env:
+          DOCKER_USERNAME: x-access-token
+          DOCKER_PASSWORD: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin docker.pkg.github.com
+      - name: Push Docker image
+        run: "docker push $(cat .docker_image):$(cat .docker_tag)"
+      - name: Deploy til dev-fss
+        uses: navikt/deployment-cli/action@b60ef91
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+        with:
+          cluster: dev-fss
+          team: teamfamilie
+          resource: app-preprod.yaml
+      - name: Deploy til prod-fss
+        uses: navikt/deployment-cli/action@b60ef91
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+        with:
+          cluster: prod-fss
+          team: teamfamilie
+          resource: app-prod.yaml
