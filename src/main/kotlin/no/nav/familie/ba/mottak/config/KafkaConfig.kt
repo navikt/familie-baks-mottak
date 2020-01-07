@@ -8,6 +8,7 @@ import org.springframework.kafka.annotation.EnableKafka
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
+import org.springframework.kafka.listener.ContainerProperties
 
 @EnableKafka
 @Configuration
@@ -21,6 +22,7 @@ class KafkaConfig {
     @Bean
     fun kafkaListenerContainerFactory(consumerFactory: ConsumerFactory<Int, GenericRecord>) : ConcurrentKafkaListenerContainerFactory<Int, GenericRecord> {
         val factory = ConcurrentKafkaListenerContainerFactory<Int, GenericRecord>()
+        factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
         factory.consumerFactory = consumerFactory
         return factory
     }

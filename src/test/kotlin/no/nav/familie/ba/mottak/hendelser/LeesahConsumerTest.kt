@@ -8,11 +8,10 @@ import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.util.DbContainerInitializer
 import no.nav.person.pdl.leesah.Endringstype
 import no.nav.person.pdl.leesah.Personhendelse
+import no.nav.person.pdl.leesah.doedsfall.Doedsfall
 import org.apache.avro.Schema
-import org.apache.avro.SchemaBuilder
 import org.apache.avro.generic.GenericRecord
 import org.apache.avro.generic.GenericRecordBuilder
-import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -68,6 +67,29 @@ class LeesahConsumerTest {
 
         Thread.sleep(100_000)
     }
+
+    @Test
+    fun `Ack skal ikke kaste feil`() {
+        val producer = buildKafkaProducer()
+
+        var personhendelse: GenericRecordBuilder = GenericRecordBuilder(Personhendelse.`SCHEMA$`)
+        personhendelse.set("hendelseId", "1")
+        val x = ArrayList<String>()
+        x.add("1234567890123")
+        personhendelse.set("personidenter", x)
+        personhendelse.set("master", "")
+        personhendelse.set("opprettet", 0L)
+        personhendelse.set("opplysningstype", "DOEDSFALL_V1")
+        personhendelse.set("endringstype", Endringstype.OPPRETTET)
+
+        var dødsfall: GenericRecordBuilder = GenericRecordBuilder(Doedsfall.`SCHEMA$`)
+        dødsfall.set("doedsdato", 1)
+        personhendelse.set("doedsfall", dødsfall.build())
+
+        producer.send(ProducerRecord("aapen-person-pdl-leesah-v1", personhendelse.build()))
+
+        Thread.sleep(100_000)
+    }
 }
 
 class CustomKafkaAvroSerializer : KafkaAvroSerializer {
@@ -95,23 +117,5 @@ private fun getMockClient(schema: Schema): SchemaRegistryClient? {
         override fun getById(id: Int): Schema {
             return schema
         }
-    }
-}
-
-class Hendelse(var hendelseId: String? = "") : SpecificRecord {
-    fun getReaderSchema(writerSchema: Schema) : Schema {
-        return writerSchema
-    }
-
-    override fun put(i: Int, v: Any?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun get(i: Int): Any {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun getSchema(): Schema {
-        return SchemaBuilder.record("no.nav.familie.ba.mottak.hendelser.Hendelse").fields().requiredString("hendelseId").endRecord()
     }
 }

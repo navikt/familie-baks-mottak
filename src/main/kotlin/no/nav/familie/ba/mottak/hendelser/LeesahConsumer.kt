@@ -14,10 +14,12 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.annotation.KafkaListener
+import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.transaction.Transactional
+import kotlin.reflect.jvm.jvmName
 
 private const val OPPRETTET = "OPPRETTET"
 private const val KORRIGERT = "KORRIGERT"
@@ -39,9 +41,10 @@ class LeesahConsumer(val taskRepository: TaskRepository, val hendelsesloggReposi
 
     @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"], id = "personhendelse", idIsGroup = false, containerFactory = "kafkaListenerContainerFactory")
     @Transactional
-    fun listen(cr: ConsumerRecord<Int, GenericRecord>) {
+    fun listen(cr: ConsumerRecord<Int, GenericRecord>, ack: Acknowledgment) {
         try {
             if (hendelsesloggRepository.existsByHendelseId(cr.value().hentHendelseId())){
+                ack.acknowledge()
                 return
             }
             if (cr.value().erDødsfall()) {
@@ -108,6 +111,7 @@ class LeesahConsumer(val taskRepository: TaskRepository, val hendelsesloggReposi
             throw RuntimeException("Feil i prosessering av leesah-hendelser")
         }
 
+        ack.acknowledge()
     }
 
     private fun GenericRecord.erDødsfall() =
@@ -137,7 +141,15 @@ class LeesahConsumer(val taskRepository: TaskRepository, val hendelsesloggReposi
 
     private fun GenericRecord.hentDødsdato(): LocalDate {
         try {
-            return LocalDate.ofEpochDay((get("doedsfall") as GenericRecord?)?.get("doedsdato").toString().toLong())
+            val dato = (get("doedsfall") as GenericRecord?)?.get("doedsdato")
+            log.info("dato: " + dato!!::class.jvmName)
+
+            if (dato is LocalDate) {
+                return dato
+            } else {
+                return LocalDate.ofEpochDay(dato.toString().toLong())
+            }
+
         } catch (exception: Exception) {
             log.error("Deserialisering av dødsdato feiler")
             throw exception
@@ -146,7 +158,14 @@ class LeesahConsumer(val taskRepository: TaskRepository, val hendelsesloggReposi
 
     private fun GenericRecord.hentFødselsdato(): LocalDate {
         try {
-            return LocalDate.ofEpochDay((get("foedsel") as GenericRecord?)?.get("foedselsdato").toString().toLong())
+            val dato = (get("foedsel") as GenericRecord?)?.get("foedselsdato")
+            log.info("dato: " + dato!!::class.jvmName)
+
+            if (dato is LocalDate) {
+                return dato
+            } else {
+                return LocalDate.ofEpochDay(dato.toString().toLong())
+            }
         } catch (exception: Exception) {
             log.error("Deserialisering av fødselsdato feiler")
             throw exception
