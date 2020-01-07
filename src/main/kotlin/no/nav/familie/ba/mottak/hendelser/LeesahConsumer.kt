@@ -139,15 +139,15 @@ class LeesahConsumer(val taskRepository: TaskRepository, val hendelsesloggReposi
             get("hendelseId").toString()
 
     private fun GenericRecord.hentDødsdato(): LocalDate {
-        try {
+        return try {
             val dato = (get("doedsfall") as GenericRecord?)?.get("doedsdato")
 
             // Integrasjonstester bruker EmbeddedKafka, der en datoverdi tolkes direkte som en LocalDate.
             // I prod tolkes datoer som en Integer.
             if (dato is LocalDate) {
-                return dato
+                dato
             } else {
-                return LocalDate.ofEpochDay((dato as Int).toLong())
+                LocalDate.ofEpochDay((dato as Int).toLong())
             }
 
         } catch (exception: Exception) {
@@ -157,13 +157,13 @@ class LeesahConsumer(val taskRepository: TaskRepository, val hendelsesloggReposi
     }
 
     private fun GenericRecord.hentFødselsdato(): LocalDate {
-        try {
+        return try {
             val dato = (get("foedsel") as GenericRecord?)?.get("foedselsdato")
 
             if (dato is LocalDate) {
-                return dato
+                dato
             } else {
-                return LocalDate.ofEpochDay((dato as Int).toLong())
+                LocalDate.ofEpochDay((dato as Int).toLong())
             }
         } catch (exception: Exception) {
             log.error("Deserialisering av fødselsdato feiler")

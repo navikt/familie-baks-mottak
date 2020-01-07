@@ -19,7 +19,7 @@ class NaisProxyCustomizer : RestTemplateCustomizer {
                     @Throws(HttpException::class)
                     override fun determineProxy(target: HttpHost,
                                        request: HttpRequest?, context: HttpContext?): HttpHost? {
-                        return if (target.getHostName().contains("microsoft")) {
+                        return if (target.hostName.contains("microsoft")) {
                             super.determineProxy(target, request, context)
                         } else null
                     }

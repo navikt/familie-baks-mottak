@@ -57,7 +57,7 @@ class LeesahConsumerTest {
     fun `Dødshendelse skal prosesseres uten feil`() {
         val producer = buildKafkaProducer()
 
-        var personhendelse = GenericRecordBuilder(Personhendelse.`SCHEMA$`)
+        val personhendelse = GenericRecordBuilder(Personhendelse.`SCHEMA$`)
         personhendelse.set("hendelseId", "1")
         val personidenter = ArrayList<String>()
         personidenter.add("1234567890123")
@@ -67,7 +67,7 @@ class LeesahConsumerTest {
         personhendelse.set("opplysningstype", "DOEDSFALL_V1")
         personhendelse.set("endringstype", Endringstype.OPPRETTET)
 
-        var dødsfall = GenericRecordBuilder(Doedsfall.`SCHEMA$`)
+        val dødsfall = GenericRecordBuilder(Doedsfall.`SCHEMA$`)
         dødsfall.set("doedsdato", 1)
         personhendelse.set("doedsfall", dødsfall.build())
 
@@ -79,7 +79,7 @@ class LeesahConsumerTest {
     fun `Fødselshendelse skal prosesseres uten feil`() {
         val producer = buildKafkaProducer()
 
-        var personhendelse = GenericRecordBuilder(Personhendelse.`SCHEMA$`)
+        val personhendelse = GenericRecordBuilder(Personhendelse.`SCHEMA$`)
         personhendelse.set("hendelseId", "1")
         val personidenter = ArrayList<String>()
         personidenter.add("1234567890123")
@@ -90,7 +90,7 @@ class LeesahConsumerTest {
         personhendelse.set("opplysningstype", "FOEDSEL_V1")
         personhendelse.set("endringstype", Endringstype.OPPRETTET)
 
-        var fødsel = GenericRecordBuilder(Foedsel.`SCHEMA$`)
+        val fødsel = GenericRecordBuilder(Foedsel.`SCHEMA$`)
         fødsel.set("foedselsdato", 1)
         personhendelse.set("foedsel", fødsel.build())
 

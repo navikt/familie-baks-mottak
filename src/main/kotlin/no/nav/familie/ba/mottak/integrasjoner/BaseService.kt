@@ -41,10 +41,10 @@ open class BaseService(clientConfigKey: String, restTemplateBuilder: RestTemplat
     protected inline fun <reified T, U> request(uri: URI, method: HttpMethod, httpEntity: HttpEntity<U>) : ResponseEntity<T>? {
         val ressursResponse = restOperations.exchange<T>(uri, method, httpEntity)
 
-        if (ressursResponse.getBody() == null) {
-            throw RuntimeException("Response kan ikke være tom: " + uri)
+        if (ressursResponse.body == null) {
+            throw RuntimeException("Response kan ikke være tom: $uri")
         }
-        return ResponseEntity.status(ressursResponse.getStatusCode()).body(ressursResponse.getBody())
+        return ResponseEntity.status(ressursResponse.statusCode).body(ressursResponse.body)
     }
 
     protected inline fun <reified T> request(uri: URI): ResponseEntity<T>? {
