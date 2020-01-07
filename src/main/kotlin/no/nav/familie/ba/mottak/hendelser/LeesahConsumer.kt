@@ -122,11 +122,13 @@ class LeesahConsumer(val taskRepository: TaskRepository, val hendelsesloggReposi
     private fun GenericRecord.hentOpplysningstype() =
             get("opplysningstype").toString()
 
+    // TODO: Skal gjøres tydeligere og mer robust.
     private fun GenericRecord.hentAktørId() =
             (get("personidenter") as GenericData.Array<*>)
                     .map { it.toString() }
                     .first { it.length == 13 }
 
+    // TODO: Ditto.
     private fun GenericRecord.hentPersonident() =
             (get("personidenter") as GenericData.Array<*>)
                     .map { it.toString() }
