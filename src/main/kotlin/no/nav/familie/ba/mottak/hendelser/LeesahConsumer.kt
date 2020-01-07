@@ -123,13 +123,11 @@ class LeesahConsumer(val taskRepository: TaskRepository, val hendelsesloggReposi
             get("opplysningstype").toString()
 
     private fun GenericRecord.hentAktørId() =
-            (get("personidenter") as GenericData.Array<*>)
-                    .map { it.toString() }
+            (get("personidenter") as GenericData.Array<String>)
                     .first { it.length == 13 }
 
     private fun GenericRecord.hentPersonident() =
-            (get("personidenter") as GenericData.Array<*>)
-                    .map { it.toString() }
+            (get("personidenter") as GenericData.Array<String>)
                     .first { it.length == 11 }
 
     private fun GenericRecord.hentEndringstype() =
