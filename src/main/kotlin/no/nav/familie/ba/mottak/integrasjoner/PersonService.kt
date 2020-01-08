@@ -20,9 +20,9 @@ private const val OAUTH2_CLIENT_CONFIG_KEY = "integrasjoner-clientcredentials"
 
 @Component
 class PersonService @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonerServiceUri: URI,
-                                                 restTemplateBuilderMedProxy: RestTemplateBuilder?,
-                                                 clientConfigurationProperties: ClientConfigurationProperties?,
-                                                 oAuth2AccessTokenService: OAuth2AccessTokenService?) : BaseService(OAUTH2_CLIENT_CONFIG_KEY, restTemplateBuilderMedProxy!!, clientConfigurationProperties!!, oAuth2AccessTokenService!!) {
+                                                 restTemplateBuilderMedProxy: RestTemplateBuilder,
+                                                 clientConfigurationProperties: ClientConfigurationProperties,
+                                                 oAuth2AccessTokenService: OAuth2AccessTokenService) : BaseService(OAUTH2_CLIENT_CONFIG_KEY, restTemplateBuilderMedProxy, clientConfigurationProperties, oAuth2AccessTokenService) {
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
     fun hentPersonMedRelasjoner(personIdent: String): Personinfo {
