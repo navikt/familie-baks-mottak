@@ -29,7 +29,6 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository, priv
 
     override fun doTask(task: Task) {
         try {
-            log.info("MottaFødselshendelseTask kjører.")
             val personMedRelasjoner = personService.hentPersonMedRelasjoner(task.payload)
             log.info("kjønn: ${personMedRelasjoner.kjønn} fdato: ${personMedRelasjoner.fødselsdato}")
 
@@ -37,19 +36,14 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository, priv
                     SendTilSakTask.TASK_STEP_TYPE,
                     jacksonObjectMapper().writeValueAsString(NyBehandling (hentForsørger(personMedRelasjoner).id!!, arrayOf(task.payload), BehandlingType.FØRSTEGANGSBEHANDLING, null))
             )
+
             taskRepository.save(nesteTask)
 
-
         } catch (ex: RuntimeException) {
-            log.info("Feil ved uthenting av personinfo.")
             task.triggerTid = LocalDateTime.now().plusMinutes(rekjøringsintervall.toLong())
             taskRepository.save(task)
             throw ex
         }
-    }
-
-    override fun onCompletion(task: Task) {
-        log.info("MottaFødselshendelseTask er ferdig.")
     }
 
     fun hentForsørger(personinfo: Personinfo): PersonIdent {
