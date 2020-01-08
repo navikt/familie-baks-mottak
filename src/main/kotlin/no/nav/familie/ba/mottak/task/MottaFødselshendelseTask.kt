@@ -42,6 +42,7 @@ class MottaFødselshendelseTask(
             taskRepository.save(nesteTask)
 
         } catch (ex: RuntimeException) {
+            log.info("MottaFødselshendelseTask feilet.")
             task.triggerTid = LocalDateTime.now().plusMinutes(rekjøringsintervall)
             taskRepository.save(task)
             throw ex
