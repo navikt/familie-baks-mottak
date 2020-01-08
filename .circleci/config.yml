@@ -25,7 +25,7 @@ jobs:
             - "75:c6:0f:c5:6c:c6:e6:47:14:2f:01:62:d4:f7:b0:ec"
       - checkout
       - setup_remote_docker:
-          docker_layer_caching: true
+          docker_layer_caching: false
       - run:
           name: Generate version number and docker image tags
           command: |
@@ -47,7 +47,7 @@ jobs:
       - run:
           name: Bygger produksjon
           command: |
-            mvn clean package
+            mvn clean package -DexcludedGroups="integration"
       - persist_to_workspace:
           root: /home/circleci/project
           paths:
@@ -71,7 +71,7 @@ jobs:
       - attach_workspace:
           at: /home/circleci/project
       - setup_remote_docker:
-          docker_layer_caching: true
+          docker_layer_caching: false
       - run:
           name: Set up environment variables
           command: cat /home/circleci/project/properties.env >> $BASH_ENV

@@ -15,11 +15,11 @@ class ProsesseringConfig {
     @Bean(name = ["taskExecutor"])
     fun threadPoolTaskExecutor(): TaskExecutor {
         val executor = ThreadPoolTaskExecutor()
-        executor.corePoolSize = 4
-        executor.maxPoolSize = 4
+        executor.corePoolSize = 2
+        executor.maxPoolSize = 2
         executor.threadNamePrefix = "TaskWorker-"
         executor.setWaitForTasksToCompleteOnShutdown(true)
-        executor.setQueueCapacity(20)
+        executor.setQueueCapacity(10)
         executor.initialize()
         return executor
     }

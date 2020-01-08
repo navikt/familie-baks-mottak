@@ -1,0 +1,4 @@
+spring:
+  kafka:
+    consumer:
+      bootstrap-servers: ${spring.embedded.kafka.brokers}
