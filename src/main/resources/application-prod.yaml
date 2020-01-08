@@ -34,5 +34,8 @@ spring:
   datasource:
     url: jdbc:postgresql://A01DBVL010.adeo.no:5432/familie-ba-mottak
 
+FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1440
+FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 180
+
 #Brukes til tilgangskontroll av familie-ks-mottak-frontend
 MOTTAK_ROLLE: ${MOTTAK_ROLLE}

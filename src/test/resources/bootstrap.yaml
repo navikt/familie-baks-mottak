@@ -1,0 +1,10 @@
+spring:
+  cloud:
+    vault:
+      enabled: false
+      database:
+        role: postgres
+    discovery:
+      client:
+        composite-indicator:
+          enabled: false
