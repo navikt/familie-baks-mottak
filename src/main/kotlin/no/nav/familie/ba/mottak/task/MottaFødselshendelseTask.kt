@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 class MottaFødselshendelseTask(
         private val taskRepository: TaskRepository,
         private val personService: PersonService,
-        @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: String
+        @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: Long
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
@@ -42,7 +42,7 @@ class MottaFødselshendelseTask(
             taskRepository.save(nesteTask)
 
         } catch (ex: RuntimeException) {
-            task.triggerTid = LocalDateTime.now().plusMinutes(rekjøringsintervall.toLong())
+            task.triggerTid = LocalDateTime.now().plusMinutes(rekjøringsintervall)
             taskRepository.save(task)
             throw ex
         }

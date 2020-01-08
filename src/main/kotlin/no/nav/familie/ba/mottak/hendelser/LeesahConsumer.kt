@@ -28,7 +28,7 @@ private const val OPPLYSNINGSTYPE_FØDSEL = "FOEDSEL_V1"
 @Service
 class LeesahConsumer(val taskRepository: TaskRepository,
                      val hendelsesloggRepository: HendelsesloggRepository,
-                     @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") val triggerTidForTps: String
+                     @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") val triggerTidForTps: Long
 ) {
     val dødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall")
     val leesahFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesha.feilet")
@@ -80,7 +80,7 @@ class LeesahConsumer(val taskRepository: TaskRepository,
 
                         val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE,
                                                             cr.value().hentPersonident(),
-                                                            LocalDateTime.now().plusMinutes(triggerTidForTps.toLong()))
+                                                            LocalDateTime.now().plusMinutes(triggerTidForTps))
                         taskRepository.save(task)
 
                     }
