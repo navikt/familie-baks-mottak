@@ -16,7 +16,6 @@ import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestOperations
 import org.springframework.web.client.exchange
 import java.net.URI
-import java.util.*
 
 class BearerAuthorizationInterceptor(private val oAuth2AccessTokenService: OAuth2AccessTokenService, private val clientProperties: ClientProperties) : ClientHttpRequestInterceptor {
     override fun intercept(request: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
@@ -30,28 +29,19 @@ class BearerAuthorizationInterceptor(private val oAuth2AccessTokenService: OAuth
 open class BaseService(clientConfigKey: String, restTemplateBuilder: RestTemplateBuilder,
                        clientConfigurationProperties: ClientConfigurationProperties,
                        oAuth2AccessTokenService: OAuth2AccessTokenService) {
-    private val clientProperties: ClientProperties = Optional.ofNullable(
-            clientConfigurationProperties.registration[clientConfigKey])
-            .orElseThrow { RuntimeException("could not find oauth2 client config for key=$clientConfigKey") }
+
+    private val clientProperties: ClientProperties = clientConfigurationProperties.registration[clientConfigKey] ?:
+            throw RuntimeException("could not find oauth2 client config for key=$clientConfigKey")
 
     val restOperations: RestOperations = restTemplateBuilder
             .additionalInterceptors(BearerAuthorizationInterceptor(oAuth2AccessTokenService, clientProperties))
             .build()
 
-    protected inline fun <reified T, U> request(uri: URI, method: HttpMethod, httpEntity: HttpEntity<U>) : ResponseEntity<T>? {
-        val ressursResponse = restOperations.exchange<T>(uri, method, httpEntity)
-
-        if (ressursResponse.body == null) {
-            throw RuntimeException("Response kan ikke være tom: $uri")
-        }
-        return ResponseEntity.status(ressursResponse.statusCode).body(ressursResponse.body)
-    }
-
-    protected inline fun <reified T> request(uri: URI): ResponseEntity<T>? {
+    protected inline fun <reified T> getRequest(uri: URI): ResponseEntity<T>? {
         val headers: MultiValueMap<String, String> = LinkedMultiValueMap()
         headers.add(NavHttpHeaders.NAV_CALL_ID.asString(), MDC.get(MDCConstants.MDC_CALL_ID))
         val httpEntity: HttpEntity<*> = HttpEntity<Any?>(headers)
-        return request(uri, HttpMethod.GET, httpEntity)
+        return restOperations.exchange<T>(uri, HttpMethod.GET, httpEntity)
     }
 
     protected inline fun <reified T, U> postRequest(uri: URI, requestBody: U): ResponseEntity<T>? {
@@ -59,7 +49,7 @@ open class BaseService(clientConfigKey: String, restTemplateBuilder: RestTemplat
         headers.add("Content-Type", "application/json;charset=UTF-8")
         headers.add(NavHttpHeaders.NAV_CALL_ID.asString(), MDC.get(MDCConstants.MDC_CALL_ID))
         val httpEntity: HttpEntity<U> = HttpEntity(requestBody, headers)
-        return request(uri, HttpMethod.POST, httpEntity)
+        return restOperations.exchange<T>(uri, HttpMethod.POST, httpEntity)
     }
 
     protected inline fun <reified T> requestMedPersonIdent(uri: URI, personident: String): ResponseEntity<T>? {
@@ -67,6 +57,6 @@ open class BaseService(clientConfigKey: String, restTemplateBuilder: RestTemplat
         headers.add(NavHttpHeaders.NAV_CALL_ID.asString(), MDC.get(MDCConstants.MDC_CALL_ID))
         headers.add(NavHttpHeaders.NAV_PERSONIDENT.asString(), personident)
         val httpEntity: HttpEntity<*> = HttpEntity<Any?>(headers)
-        return request(uri, HttpMethod.GET, httpEntity)
+        return restOperations.exchange<T>(uri, HttpMethod.GET, httpEntity)
     }
 }
