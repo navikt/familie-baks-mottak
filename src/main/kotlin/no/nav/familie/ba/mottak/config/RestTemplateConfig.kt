@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.config
 
+import no.nav.familie.http.interceptor.MdcValuesPropagatingClientInterceptor
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -15,6 +16,7 @@ class RestTemplateConfig {
                 .setConnectTimeout(Duration.ofSeconds(5))
                 .setReadTimeout(Duration.ofSeconds(5))
                 .additionalCustomizers(NaisProxyCustomizer())
+                .additionalInterceptors(MdcValuesPropagatingClientInterceptor())
     }
 
     @Profile("dev")
