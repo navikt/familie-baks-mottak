@@ -26,17 +26,16 @@ private const val OPPLYSNINGSTYPE_DØDSFALL = "DOEDSFALL_V1"
 private const val OPPLYSNINGSTYPE_FØDSEL = "FOEDSEL_V1"
 
 @Service
-class LeesahConsumer(val taskRepository: TaskRepository, val hendelsesloggRepository: HendelsesloggRepository) {
-
+class LeesahConsumer(val taskRepository: TaskRepository,
+                     val hendelsesloggRepository: HendelsesloggRepository,
+                     @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") val triggerTidForTps: String
+) {
     val dødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall")
     val leesahFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesha.feilet")
     val fødselOpprettetCounter: Counter = Metrics.counter("barnetrygd.fodsel.opprettet")
     val fødselKorrigertCounter: Counter = Metrics.counter("barnetrygd.fodsel.korrigert")
     val log: Logger = LoggerFactory.getLogger(LeesahConsumer::class.java)
     val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
-
-    @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER:1}")
-    lateinit var triggerTidForTps: String
 
     @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"], id = "personhendelse", idIsGroup = false, containerFactory = "kafkaListenerContainerFactory")
     @Transactional

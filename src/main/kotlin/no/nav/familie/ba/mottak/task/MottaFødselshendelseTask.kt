@@ -21,11 +21,13 @@ import java.time.LocalDateTime
 
 @Service
 @TaskStepBeskrivelse(taskStepType = MottaFødselshendelseTask.TASK_STEP_TYPE, beskrivelse = "Motta fødselshendelse", maxAntallFeil = 3)
-class MottaFødselshendelseTask(private val taskRepository: TaskRepository, private val personService: PersonService) : AsyncTaskStep {
-    val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
+class MottaFødselshendelseTask(
+        private val taskRepository: TaskRepository,
+        private val personService: PersonService,
+        @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: String
+) : AsyncTaskStep {
 
-    @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER:1}")
-    lateinit var rekjøringsintervall: String
+    val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
 
     override fun doTask(task: Task) {
         try {
