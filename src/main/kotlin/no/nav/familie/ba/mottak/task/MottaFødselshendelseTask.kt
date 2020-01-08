@@ -28,11 +28,12 @@ class MottaFødselshendelseTask(
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
+    val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
 
     override fun doTask(task: Task) {
         try {
             val personMedRelasjoner = personService.hentPersonMedRelasjoner(task.payload)
-            log.info("kjønn: ${personMedRelasjoner.kjønn} fdato: ${personMedRelasjoner.fødselsdato}")
+            secureLogger.info("kjønn: ${personMedRelasjoner.kjønn} fdato: ${personMedRelasjoner.fødselsdato}")
 
             val nesteTask = Task.nyTask(
                     SendTilSakTask.TASK_STEP_TYPE,
