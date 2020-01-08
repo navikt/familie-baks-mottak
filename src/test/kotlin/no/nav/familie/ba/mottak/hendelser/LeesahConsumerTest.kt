@@ -102,7 +102,7 @@ class LeesahConsumerTest {
         }
 
         assertThat(fantTask).isTrue() // Tester at fødselshendelsen generer en task.
-        assertThat(hendelsesloggRepository.existsByHendelseId("1")).isTrue() // Tester at vi får logget hendelsesIden som brukes i idempotenssjekken.
+        assertThat(hendelsesloggRepository.existsByHendelseId("2")).isTrue() // Tester at vi får logget hendelsesIden som brukes i idempotenssjekken.
     }
 }
 
