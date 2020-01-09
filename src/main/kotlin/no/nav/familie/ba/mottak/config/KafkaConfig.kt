@@ -21,8 +21,8 @@ class KafkaConfig {
     }
 
     @Bean
-    fun restartingErrorHandler(taskScheduler: TaskScheduler?): RestartingErrorHandler? {
-        return RestartingErrorHandler(taskScheduler!!)
+    fun restartingErrorHandler(taskScheduler: TaskScheduler): RestartingErrorHandler? {
+        return RestartingErrorHandler(taskScheduler)
     }
 
     @Bean
