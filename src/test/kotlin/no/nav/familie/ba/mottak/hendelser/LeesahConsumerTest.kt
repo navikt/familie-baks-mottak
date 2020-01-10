@@ -34,7 +34,7 @@ import java.time.LocalDate
 @SpringBootTest(properties = ["spring.kafka.bootstrap-servers=\${spring.embedded.kafka.brokers}"])
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(initializers = [DbContainerInitializer::class])
-@ActiveProfiles("postgres")
+@ActiveProfiles("integrasjonstest")
 @EmbeddedKafka(partitions = 1, topics = ["aapen-person-pdl-leesah-v1"])
 @Tag("integration")
 class LeesahConsumerTest {

@@ -1,0 +1,66 @@
+no.nav.security.jwt:
+  issuer.azuread:
+    discoveryurl: https://login.microsoftonline.com/navq.onmicrosoft.com/v2.0/.well-known/openid-configuration
+    accepted_audience: ${CLIENT_ID}
+    cookie_name: azure_token
+  client:
+    registration:
+      ba-sak-clientcredentials:
+        resource-url: ${FAMILIE_BA_SAK_API_URL}
+        token-endpoint-url: https://login.microsoftonline.com/navq.onmicrosoft.com/oauth2/v2.0/token
+        grant-type: client_credentials
+        scope: ${BA_SAK_SCOPE}
+        authentication:
+          client-id: ${CLIENT_ID}
+          client-secret: ${CLIENT_SECRET}
+          client-auth-method: client_secret_basic
+      integrasjoner-clientcredentials:
+        resource-url: ${FAMILIE_INTEGRASJONER_API_URL}
+        token-endpoint-url: https://login.microsoftonline.com/navq.onmicrosoft.com/oauth2/v2.0/token
+        grant-type: client_credentials
+        scope: ${FAMILIE_INTEGRASJONER_SCOPE}
+        authentication:
+          client-id: ${CLIENT_ID}
+          client-secret: ${CLIENT_SECRET}
+          client-auth-method: client_secret_basic
+
+credential:
+  username: "srv-ba-mottak"
+  password: "not-a-real-password"
+
+logging:
+  config: "classpath:logback-test.xml"
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    hikari:
+      password: postgres
+      username: postgres
+  flyway:
+    enabled: true
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql=false
+    hibernate:
+      ddl-auto: none
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKERS}
+    properties:
+      security.protocol: SASL_PLAINTEXT
+      sasl:
+        mechanism: PLAIN
+        jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="igroup" password="itest";
+      schema.registry.url: ${KAFKA_BROKERS}
+    consumer:
+      group-id: srvc01
+
+FAMILIE_INTEGRASJONER_API_URL: http://localhost:8085/api
+FAMILIE_BA_SAK_API_URL: http://localhost:8090/api
+
+FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1
+FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 1
+
+KAFKA_BROKERS: http://localhost:9092

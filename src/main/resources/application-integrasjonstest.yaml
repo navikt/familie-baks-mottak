@@ -48,6 +48,7 @@ spring:
       ddl-auto: none
   kafka:
     properties:
+      security.protocol: PLAINTEXT
       schema.registry.url: dummy
     consumer:
       value-deserializer: no.nav.familie.ba.mottak.hendelser.CustomKafkaAvroDeserializer
