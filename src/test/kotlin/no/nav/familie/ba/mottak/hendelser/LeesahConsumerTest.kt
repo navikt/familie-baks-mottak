@@ -28,6 +28,8 @@ import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import java.time.Instant
+import java.time.LocalDate
 
 @SpringBootTest(properties = ["spring.kafka.bootstrap-servers=\${spring.embedded.kafka.brokers}"])
 @ExtendWith(SpringExtension::class)
@@ -85,7 +87,7 @@ class LeesahConsumerTest {
         personhendelse.set("endringstype", Endringstype.OPPRETTET)
 
         val fødsel = GenericRecordBuilder(Foedsel.`SCHEMA$`)
-        fødsel.set("foedselsdato", 1)
+        fødsel.set("foedselsdato", (Instant.now().toEpochMilli() / (1000 * 3600 * 24)).toInt()) //Setter dagens dato på avroformat
         personhendelse.set("foedsel", fødsel.build())
 
         val producer = buildKafkaProducer()
