@@ -18,6 +18,7 @@ import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Period
 import javax.transaction.Transactional
 
 private const val OPPRETTET = "OPPRETTET"
@@ -34,6 +35,7 @@ class LeesahConsumer(val taskRepository: TaskRepository,
     val leesahFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesha.feilet")
     val fødselOpprettetCounter: Counter = Metrics.counter("barnetrygd.fodsel.opprettet")
     val fødselKorrigertCounter: Counter = Metrics.counter("barnetrygd.fodsel.korrigert")
+    val fødselIgnorertCounter: Counter = Metrics.counter("barnetrygd.fodsel.ignorert")
     val log: Logger = LoggerFactory.getLogger(LeesahConsumer::class.java)
     val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
 
@@ -72,16 +74,20 @@ class LeesahConsumer(val taskRepository: TaskRepository,
                                  cr.value().hentEndringstype(),
                                  cr.value().hentFødselsdato())
 
-                        if (cr.value().hentEndringstype() == OPPRETTET) {
-                            fødselOpprettetCounter.increment()
-                        } else if (cr.value().hentEndringstype() == KORRIGERT) {
-                            fødselKorrigertCounter.increment()
-                        }
+                        if(erUnder18År(cr.value().hentFødselsdato())) {
+                            if (cr.value().hentEndringstype() == OPPRETTET) {
+                                fødselOpprettetCounter.increment()
+                            } else if (cr.value().hentEndringstype() == KORRIGERT) {
+                                fødselKorrigertCounter.increment()
+                            }
 
-                        val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE,
-                                                            cr.value().hentPersonident(),
-                                                            LocalDateTime.now().plusMinutes(triggerTidForTps))
-                        taskRepository.save(task)
+                            val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE,
+                                                                cr.value().hentPersonident(),
+                                                                LocalDateTime.now().plusMinutes(triggerTidForTps))
+                            taskRepository.save(task)
+                        } else {
+                            fødselIgnorertCounter.increment()
+                        }
 
                     }
 
@@ -110,6 +116,13 @@ class LeesahConsumer(val taskRepository: TaskRepository,
         }
 
         ack.acknowledge()
+    }
+
+    private fun erUnder18År(fødselsDato: LocalDate): Boolean {
+        return Period.between(
+                fødselsDato,
+                LocalDate.now()
+        ).getYears() < 18
     }
 
     private fun GenericRecord.erDødsfall() =
