@@ -49,7 +49,7 @@ jobs:
       - name: Push Docker image
         run: docker push $IMAGE:$TAG
       - name: Deploy til dev-fss
-        uses: navikt/deploy/actions/deploy@v1
+        uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.GITHUB_ACCESS_TOKEN }}
           CLUSTER: dev-fss
