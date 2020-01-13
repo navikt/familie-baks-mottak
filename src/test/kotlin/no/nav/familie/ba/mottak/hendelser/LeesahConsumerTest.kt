@@ -6,7 +6,9 @@ import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroSerializer
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.util.DbContainerInitializer
+import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.rest.RestTaskService
 import no.nav.person.pdl.leesah.Endringstype
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.doedsfall.Doedsfall
@@ -28,23 +30,20 @@ import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import java.time.Instant
 
 @SpringBootTest(properties = ["spring.kafka.bootstrap-servers=\${spring.embedded.kafka.brokers}"])
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(initializers = [DbContainerInitializer::class])
-@ActiveProfiles("postgres")
+@ActiveProfiles("integrasjonstest")
 @EmbeddedKafka(partitions = 1, topics = ["aapen-person-pdl-leesah-v1"])
 @Tag("integration")
-class LeesahConsumerTest {
-    @Autowired
-    lateinit var hendelsesloggRepository: HendelsesloggRepository
 
-    @Autowired
-    lateinit var kafkaProperties: KafkaProperties
-
-    @Autowired
-    lateinit var taskRepository: TaskRepository
-
+class LeesahConsumerTest(@Autowired val hendelsesloggRepository: HendelsesloggRepository,
+                         @Autowired val kafkaProperties: KafkaProperties,
+                         @Autowired val taskRepository: TaskRepository,
+                         @Autowired val restTaskService: RestTaskService
+) {
     private fun buildKafkaProducer(): Producer<Int, GenericRecord> {
         val senderProps = kafkaProperties.buildProducerProperties()
         return KafkaProducer(senderProps)
@@ -85,7 +84,7 @@ class LeesahConsumerTest {
         personhendelse.set("endringstype", Endringstype.OPPRETTET)
 
         val fødsel = GenericRecordBuilder(Foedsel.`SCHEMA$`)
-        fødsel.set("foedselsdato", 1)
+        fødsel.set("foedselsdato", (Instant.now().toEpochMilli() / (1000 * 3600 * 24)).toInt()) //Setter dagens dato på avroformat
         personhendelse.set("foedsel", fødsel.build())
 
         val producer = buildKafkaProducer()
@@ -100,9 +99,12 @@ class LeesahConsumerTest {
                 Thread.sleep(1000)
             }
         }
+        assertThat(fantTask).isTrue() // Det skal finnes en task i taskrepositoriet
 
-        assertThat(fantTask).isTrue() // Tester at fødselshendelsen generer en task.
-        assertThat(hendelsesloggRepository.existsByHendelseId("2")).isTrue() // Tester at vi får logget hendelsesIden som brukes i idempotenssjekken.
+        val fødselshendelsetasks = restTaskService.hentTasks(Status.UBEHANDLET, "", 0).data!!.filter { it.task.taskStepType == "mottaFødselshendelse" }
+        assertThat(fødselshendelsetasks).isNotEmpty // Den skal være tilgjengelig via RestTaskService
+
+        assertThat(hendelsesloggRepository.existsByHendelseId("2")).isTrue() // Hendelsen skal ha blitt lagret.
     }
 }
 
