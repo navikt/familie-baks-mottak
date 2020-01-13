@@ -6,7 +6,7 @@ on:
       - '*/*'
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/familie-ba-mottak
-  TAG: $(date "+%Y.%m.%d")-${{ github.sha }}
+  TAG: ${{ github.sha }}
 jobs:
   deploy-to-dev:
     name: Build, push and deploy to dev-fss
