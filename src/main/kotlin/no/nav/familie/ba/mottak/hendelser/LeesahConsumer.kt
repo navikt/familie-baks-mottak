@@ -18,7 +18,6 @@ import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.Period
 import javax.transaction.Transactional
 
 private const val OPPRETTET = "OPPRETTET"
@@ -119,10 +118,7 @@ class LeesahConsumer(val taskRepository: TaskRepository,
     }
 
     private fun erUnder18År(fødselsDato: LocalDate): Boolean {
-        return Period.between(
-                fødselsDato,
-                LocalDate.now()
-        ).getYears() < 18
+        return LocalDate.now().isBefore(fødselsDato.plusYears(18))
     }
 
     private fun GenericRecord.erDødsfall() =
