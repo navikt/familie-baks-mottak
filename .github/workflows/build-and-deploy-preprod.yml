@@ -4,6 +4,9 @@ on:
     branches:
       - '*'
       - '*/*'
+env:
+  IMAGE: docker.pkg.github.com/${{ github.repository }}/familie-ba-mottak
+  TAG: $(date "+%Y.%m.%d")-${{ github.sha }}
 jobs:
   deploy-to-dev:
     name: Build, push and deploy to dev-fss
@@ -34,15 +37,9 @@ jobs:
           SONAR_PROJECTKEY: ${{ secrets.SONAR_PROJECTKEY }}
           SONAR_LOGIN: ${{ secrets.SONAR_LOGIN }}
         run: mvn verify sonar:sonar --settings .m2/maven-settings.xml --file pom.xml
-      - name: Lag Docker tag
-        env:
-          NAME: familie-ba-mottak
-        run: |
-          echo "docker.pkg.github.com"/"$GITHUB_REPOSITORY"/"$NAME" > .docker_image
-          echo "$(date "+%Y.%m.%d")-$(git rev-parse --short HEAD)" > .docker_tag
       - name: Bygg Docker image
         run: |
-          docker build -t $(cat .docker_image):$(cat .docker_tag) .
+          docker build -t $IMAGE:$TAG .
       - name: Login to Github Package Registry
         env:
           DOCKER_USERNAME: x-access-token
@@ -50,12 +47,10 @@ jobs:
         run: |
           echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin docker.pkg.github.com
       - name: Push Docker image
-        run: "docker push $(cat .docker_image):$(cat .docker_tag)"
+        run: docker push $IMAGE:$TAG
       - name: Deploy til dev-fss
-        uses: navikt/deployment-cli/action@b60ef91
+        uses: navikt/deploy/actions/deploy@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
-        with:
-          cluster: dev-fss
-          team: teamfamilie
-          resource: app-preprod.yaml
+          APIKEY: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          CLUSTER: dev-fss
+          RESOURCE: app-preprod.yaml

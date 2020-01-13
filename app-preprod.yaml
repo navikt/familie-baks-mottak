@@ -7,7 +7,7 @@ metadata:
     team: teamfamilie
 
 spec:
-  image: docker.pkg.github.com/navikt/familie-ba-mottak/familie-ba-mottak:2020.01.13-42b6291
+  image: {{ IMAGE }}:{{ TAG }}
   port: 8090
   liveness:
     path: /internal/health
