@@ -4,7 +4,7 @@ on:
     tags:
       - 'v*'
 env:
-  IMAGE: docker.pkg.github.com/${{ github.repository }}/familie-ba-mottak:${{ github.ref }}
+  REF: ${{ github.ref }} # refs/tags/<tag>
 jobs:
   deploy-to-prod:
     name: Bygg app/image, push til github, deploy til prod-fss og dev-fss
@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v1
+      - name: Set IMAGE env
+        run: echo ::set-env name=IMAGE::$(docker.pkg.github.com/familie-ba-mottak/familie-ba-mottak:"${REF:10}")
       - name: Read/save .m2 cache
         uses: actions/cache@v1
         with:
