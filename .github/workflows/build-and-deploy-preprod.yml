@@ -8,7 +8,7 @@ env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/familie-ba-mottak:${{ github.sha }}
 jobs:
   deploy-to-dev:
-    name: Build, push and deploy to dev-fss
+    name: Bygg app/image, push til github, deploy til dev-fss
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

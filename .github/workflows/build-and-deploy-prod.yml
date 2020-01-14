@@ -7,7 +7,7 @@ env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/familie-ba-mottak:${{ github.sha }}
 jobs:
   deploy-to-prod:
-    name: Deploy tag til prod-fss
+    name: Bygg app/image, push til github, deploy til prod-fss og dev-fss
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
