@@ -4,7 +4,7 @@ on:
     tags:
       - 'v*'
 env:
-  IMAGE: docker.pkg.github.com/${{ github.repository }}/familie-ba-mottak:${{ github.sha }}
+  IMAGE: docker.pkg.github.com/${{ github.repository }}/familie-ba-mottak:${{ github.ref }}
 jobs:
   deploy-to-prod:
     name: Bygg app/image, push til github, deploy til prod-fss og dev-fss
