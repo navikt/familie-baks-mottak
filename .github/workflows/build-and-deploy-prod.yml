@@ -13,7 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v1
       - name: Set IMAGE env
-        run: echo ::set-env name=IMAGE::$(docker.pkg.github.com/familie-ba-mottak/familie-ba-mottak:"${REF:10}")
+        run: echo ::set-env name=IMAGE::$(echo docker.pkg.github.com/familie-ba-mottak/familie-ba-mottak:"${REF:10}")
       - name: Read/save .m2 cache
         uses: actions/cache@v1
         with:
