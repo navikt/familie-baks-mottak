@@ -24,6 +24,14 @@ For å kjøre mot lokal postgress så kan man kjøre DevLauncherPostgress.
 docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -d postgres
 ```
 
+
+## Produksjonssetting
+Appen blir produksjonssatt ved å kjøre `tag.sh` som ligger i `.github`. Dette scriptet tagger den seneste commiten i master med det neste versjonsnummeret, og pusher tagen til github-repositoriet.
+
+Hvis den siste tagen er `v0.5`, vil `tag.sh -M` pushe tagen `v1.0`, og `tag.sh -m` pushe tagen `v0.6`.
+
+Ved push av en tag på formen `v*` vil Github Action-workflown `Deploy-Prod` trigges, som bygger en ny versjon av appen, lagrer imaget i Github Packages, og deployer appen til prod-fss.
+
 ## Henvendelser
 For NAV-interne kan henvendelser rettes til #team-familie på slack. Ellers kan henvendelser rettes via et issue her på github-repoet. 
 
