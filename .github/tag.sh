@@ -22,7 +22,7 @@ remote_master_SHA=$(git rev-parse origin/master)
 master_SHA=$(git rev-parse HEAD)
 
 if ! [ $remote_master_SHA == $master_SHA ]; then
-    printf "Commiten du tagger må være den samme som seneste commit på master i hovedrepoet.\n"
+    printf "Du kan ikke tagge denne commiten: den er ikke lik origin/master.\n"
     exit 1
 fi
 
