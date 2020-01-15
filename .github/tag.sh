@@ -9,6 +9,8 @@ if ! [ "$current_branch" == "$master_branch" ]; then
     exit 1
 fi
 
+remoteMasterSHA=`git ls-remote -h git@github.com:navikt/familie-ba-mottak.git master`
+
 #1: Hent nåværende versjon/tag
 git fetch --prune --tags
 
