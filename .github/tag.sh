@@ -26,6 +26,8 @@ if ! [ $remote_master_SHA == $master_SHA ]; then
     exit 1
 fi
 
+echo "fjern meg"
+
 #3: Hent major/minor-flagg fra kommandolinjen og bump i henhold til det
 while getopts ":Mm" opt
 do
