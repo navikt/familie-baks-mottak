@@ -9,7 +9,14 @@ if ! [ "$current_branch" == "$master_branch" ]; then
     exit 1
 fi
 
-remoteMasterSHA=`git ls-remote -h git@github.com:navikt/familie-ba-mottak.git master`
+remote_master_SHA=$(git ls-remote -h git@github.com:navikt/familie-ba-mottak.git master)
+remote_master_SHA=${remote_master_SHA::40}
+master_SHA=$(git rev-parse HEAD)
+
+if ! [ $remote_master_SHA == $master_SHA ]; then
+    printf "Commiten du tagger må være den samme som seneste commit på master i hovedrepoet.\n"
+    exit 1
+fi
 
 #1: Hent nåværende versjon/tag
 git fetch --prune --tags
