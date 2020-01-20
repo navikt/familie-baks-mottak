@@ -35,12 +35,16 @@ class MottaFødselshendelseTask(
             val personMedRelasjoner = personService.hentPersonMedRelasjoner(task.payload)
             secureLogger.info("kjønn: ${personMedRelasjoner.kjønn} fdato: ${personMedRelasjoner.fødselsdato}")
 
-            val nesteTask = Task.nyTask(
-                    SendTilSakTask.TASK_STEP_TYPE,
-                    jacksonObjectMapper().writeValueAsString(NyBehandling (hentForsørger(personMedRelasjoner).id!!, arrayOf(task.payload), BehandlingType.FØRSTEGANGSBEHANDLING, null))
-            )
+            if (personMedRelasjoner.statsborgerskap?.erNorge() == true){
+                val nesteTask = Task.nyTask(
+                        SendTilSakTask.TASK_STEP_TYPE,
+                        jacksonObjectMapper().writeValueAsString(NyBehandling (hentForsørger(personMedRelasjoner).id!!, arrayOf(task.payload), BehandlingType.FØRSTEGANGSBEHANDLING, null))
+                )
 
-            taskRepository.save(nesteTask)
+                taskRepository.save(nesteTask)
+            } else {
+                log.info("Ignorerer fødselshendelse pga. ikke norsk statsborgerskap")
+            }
 
         } catch (ex: RuntimeException) {
             log.info("MottaFødselshendelseTask feilet.")
