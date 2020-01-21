@@ -38,7 +38,8 @@ class MottaFødselshendelseTask(
             if (personMedRelasjoner.statsborgerskap?.erNorge() == true){
                 val nesteTask = Task.nyTask(
                         SendTilSakTask.TASK_STEP_TYPE,
-                        jacksonObjectMapper().writeValueAsString(NyBehandling (hentForsørger(personMedRelasjoner).id!!, arrayOf(task.payload), BehandlingType.FØRSTEGANGSBEHANDLING, null))
+                        jacksonObjectMapper().writeValueAsString(NyBehandling (hentForsørger(personMedRelasjoner).id!!, arrayOf(task.payload), BehandlingType.FØRSTEGANGSBEHANDLING, null)),
+                        task.metadata
                 )
 
                 taskRepository.save(nesteTask)

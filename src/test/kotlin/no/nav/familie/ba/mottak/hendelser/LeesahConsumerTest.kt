@@ -101,7 +101,7 @@ class LeesahConsumerTest(@Autowired val hendelsesloggRepository: HendelsesloggRe
         }
         assertThat(fantTask).isTrue() // Det skal finnes en task i taskrepositoriet
 
-        val fødselshendelsetasks = restTaskService.hentTasks(Status.UBEHANDLET, "", 0).data!!.filter { it.task.taskStepType == "mottaFødselshendelse" }
+        val fødselshendelsetasks = restTaskService.hentTasks(Status.UBEHANDLET, "", 0).data!!.filter { it.taskStepType == "mottaFødselshendelse" }
         assertThat(fødselshendelsetasks).isNotEmpty // Den skal være tilgjengelig via RestTaskService
 
         assertThat(hendelsesloggRepository.existsByHendelseId("2")).isTrue() // Hendelsen skal ha blitt lagret.
