@@ -18,6 +18,7 @@ import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.Properties
 import javax.transaction.Transactional
 
 private const val OPPRETTET = "OPPRETTET"
@@ -82,7 +83,10 @@ class LeesahConsumer(val taskRepository: TaskRepository,
 
                             val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE,
                                                                 cr.value().hentPersonident(),
-                                                                LocalDateTime.now().plusMinutes(triggerTidForTps))
+                                                                LocalDateTime.now().plusMinutes(triggerTidForTps),
+                                                                Properties().apply {
+                                                                    this["ident"] = cr.value().hentPersonident()
+                                                                })
                             taskRepository.save(task)
                         } else {
                             fødselIgnorertCounter.increment()
