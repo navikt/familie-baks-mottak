@@ -35,7 +35,8 @@ class MottaFødselshendelseTask(
             val personMedRelasjoner = personService.hentPersonMedRelasjoner(task.payload)
             secureLogger.info("kjønn: ${personMedRelasjoner.kjønn} fdato: ${personMedRelasjoner.fødselsdato}")
 
-            if (personMedRelasjoner.statsborgerskap?.erNorge() == true){
+            // Kun barn med norsk statsborgerskap og forsørger uten dnr
+            if (personMedRelasjoner.statsborgerskap?.erNorge() == true && !erDnummer(hentForsørger(personMedRelasjoner))){
                 val nesteTask = Task.nyTask(
                         SendTilSakTask.TASK_STEP_TYPE,
                         jacksonObjectMapper().writeValueAsString(NyBehandling (hentForsørger(personMedRelasjoner).id!!, arrayOf(task.payload), BehandlingType.FØRSTEGANGSBEHANDLING, null)),
@@ -44,7 +45,7 @@ class MottaFødselshendelseTask(
 
                 taskRepository.save(nesteTask)
             } else {
-                log.info("Ignorerer fødselshendelse pga. ikke norsk statsborgerskap")
+                log.info("Ignorerer fødselshendelse pga. ikke norsk statsborgerskap eller DNR")
             }
 
         } catch (ex: RuntimeException) {
@@ -74,4 +75,9 @@ class MottaFødselshendelseTask(
     companion object {
         const val TASK_STEP_TYPE = "mottaFødselshendelse"
     }
+
+    fun erDnummer(personIdent: PersonIdent): Boolean {
+        return personIdent.id?.substring(0, 1)?.toInt()!! > 3
+    }
+
 }
