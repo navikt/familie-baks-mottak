@@ -35,12 +35,13 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
         try {
             val personMedRelasjoner = personService.hentPersonMedRelasjoner(task.payload)
             secureLogger.info("kjønn: ${personMedRelasjoner.kjønn} fdato: ${personMedRelasjoner.fødselsdato}")
+            val forsørger = hentForsørger(personMedRelasjoner)
 
             // Kun barn med norsk statsborgerskap og forsørger uten dnr
-            if (personMedRelasjoner.statsborgerskap?.erNorge() == true && !erDnummer(hentForsørger(personMedRelasjoner))) {
+            if (personMedRelasjoner.statsborgerskap?.erNorge() == true && !erDnummer(forsørger) && !erFDatnummer(forsørger)) {
                 val nesteTask = Task.nyTask(
                         SendTilSakTask.TASK_STEP_TYPE,
-                        jacksonObjectMapper().writeValueAsString(NyBehandling(hentForsørger(personMedRelasjoner).id!!,
+                        jacksonObjectMapper().writeValueAsString(NyBehandling(forsørger.id!!,
                                                                               arrayOf(task.payload),
                                                                               BehandlingType.FØRSTEGANGSBEHANDLING,
                                                                               null)),
@@ -76,12 +77,16 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
         throw IllegalStateException("Fant hverken mor eller far. Må behandles manuellt")
     }
 
-    companion object {
-        const val TASK_STEP_TYPE = "mottaFødselshendelse"
-    }
-
     fun erDnummer(personIdent: PersonIdent): Boolean {
         return personIdent.id?.substring(0, 1)?.toInt()!! > 3
+    }
+
+    fun erFDatnummer(personIdent: PersonIdent): Boolean {
+        return personIdent.id?.substring(6)?.toInt()!! == 0
+    }
+
+    companion object {
+        const val TASK_STEP_TYPE = "mottaFødselshendelse"
     }
 
 }
