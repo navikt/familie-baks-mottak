@@ -15,7 +15,9 @@ import org.springframework.web.client.RestOperations
 import org.springframework.web.client.exchange
 import java.net.URI
 
-class BearerAuthorizationInterceptor(private val oAuth2AccessTokenService: OAuth2AccessTokenService, private val clientProperties: ClientProperties) : ClientHttpRequestInterceptor {
+class BearerAuthorizationInterceptor(private val oAuth2AccessTokenService: OAuth2AccessTokenService,
+                                     private val clientProperties: ClientProperties) : ClientHttpRequestInterceptor {
+
     override fun intercept(request: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
 
@@ -28,8 +30,9 @@ open class BaseService(clientConfigKey: String, restTemplateBuilder: RestTemplat
                        clientConfigurationProperties: ClientConfigurationProperties,
                        oAuth2AccessTokenService: OAuth2AccessTokenService) {
 
-    private val clientProperties: ClientProperties = clientConfigurationProperties.registration[clientConfigKey] ?:
-            throw RuntimeException("could not find oauth2 client config for key=$clientConfigKey")
+    private val clientProperties: ClientProperties =
+            clientConfigurationProperties.registration[clientConfigKey]
+            ?: throw RuntimeException("could not find oauth2 client config for key=$clientConfigKey")
 
     val restOperations: RestOperations = restTemplateBuilder
             .additionalInterceptors(BearerAuthorizationInterceptor(oAuth2AccessTokenService, clientProperties))

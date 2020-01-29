@@ -20,12 +20,13 @@ import java.time.LocalDateTime
 
 
 @Service
-@TaskStepBeskrivelse(taskStepType = MottaFødselshendelseTask.TASK_STEP_TYPE, beskrivelse = "Motta fødselshendelse", maxAntallFeil = 3)
-class MottaFødselshendelseTask(
-        private val taskRepository: TaskRepository,
-        private val personService: PersonService,
-        @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: Long
-) : AsyncTaskStep {
+@TaskStepBeskrivelse(taskStepType = MottaFødselshendelseTask.TASK_STEP_TYPE,
+                     beskrivelse = "Motta fødselshendelse",
+                     maxAntallFeil = 3)
+class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
+                               private val personService: PersonService,
+                               @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: Long)
+    : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
     val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
@@ -36,10 +37,13 @@ class MottaFødselshendelseTask(
             secureLogger.info("kjønn: ${personMedRelasjoner.kjønn} fdato: ${personMedRelasjoner.fødselsdato}")
 
             // Kun barn med norsk statsborgerskap og forsørger uten dnr
-            if (personMedRelasjoner.statsborgerskap?.erNorge() == true && !erDnummer(hentForsørger(personMedRelasjoner))){
+            if (personMedRelasjoner.statsborgerskap?.erNorge() == true && !erDnummer(hentForsørger(personMedRelasjoner))) {
                 val nesteTask = Task.nyTask(
                         SendTilSakTask.TASK_STEP_TYPE,
-                        jacksonObjectMapper().writeValueAsString(NyBehandling (hentForsørger(personMedRelasjoner).id!!, arrayOf(task.payload), BehandlingType.FØRSTEGANGSBEHANDLING, null)),
+                        jacksonObjectMapper().writeValueAsString(NyBehandling(hentForsørger(personMedRelasjoner).id!!,
+                                                                              arrayOf(task.payload),
+                                                                              BehandlingType.FØRSTEGANGSBEHANDLING,
+                                                                              null)),
                         task.metadata
                 )
 
@@ -57,12 +61,12 @@ class MottaFødselshendelseTask(
     }
 
     fun hentForsørger(personinfo: Personinfo): PersonIdent {
-       for (familierelasjon: Familierelasjon in personinfo.familierelasjoner!!) {
-           if (familierelasjon.relasjonsrolle == RelasjonsRolleType.MORA) {
-               return familierelasjon.personIdent
-           }
-       }
-       // hvis vi ikke fant mora returner fara
+        for (familierelasjon: Familierelasjon in personinfo.familierelasjoner!!) {
+            if (familierelasjon.relasjonsrolle == RelasjonsRolleType.MORA) {
+                return familierelasjon.personIdent
+            }
+        }
+        // hvis vi ikke fant mora returner fara
         for (familierelasjon: Familierelasjon in personinfo.familierelasjoner!!) {
             if (familierelasjon.relasjonsrolle == RelasjonsRolleType.FARA) {
                 return familierelasjon.personIdent

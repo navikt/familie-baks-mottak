@@ -6,7 +6,7 @@ import javax.persistence.*
 @Entity
 @Table(name = "HENDELSESLOGG")
 data class Hendelseslogg(
-        @Column(name="kafka_offset")
+        @Column(name = "kafka_offset")
         val offset: Long,
 
         @Column(name = "hendelse_id")

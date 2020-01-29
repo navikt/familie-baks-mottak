@@ -18,7 +18,7 @@ import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.Properties
+import java.util.*
 import javax.transaction.Transactional
 
 private const val OPPRETTET = "OPPRETTET"
@@ -29,8 +29,8 @@ private const val OPPLYSNINGSTYPE_FØDSEL = "FOEDSEL_V1"
 @Service
 class LeesahConsumer(val taskRepository: TaskRepository,
                      val hendelsesloggRepository: HendelsesloggRepository,
-                     @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") val triggerTidForTps: Long
-) {
+                     @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") val triggerTidForTps: Long) {
+
     val dødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall")
     val leesahFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesha.feilet")
     val fødselOpprettetCounter: Counter = Metrics.counter("barnetrygd.fodsel.opprettet")
@@ -39,11 +39,14 @@ class LeesahConsumer(val taskRepository: TaskRepository,
     val log: Logger = LoggerFactory.getLogger(LeesahConsumer::class.java)
     val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
 
-    @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"], id = "personhendelse", idIsGroup = false, containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"],
+                   id = "personhendelse",
+                   idIsGroup = false,
+                   containerFactory = "kafkaListenerContainerFactory")
     @Transactional
     fun listen(cr: ConsumerRecord<Int, GenericRecord>, ack: Acknowledgment) {
         try {
-            if (hendelsesloggRepository.existsByHendelseId(cr.value().hentHendelseId())){
+            if (hendelsesloggRepository.existsByHendelseId(cr.value().hentHendelseId())) {
                 ack.acknowledge()
                 return
             }
@@ -52,20 +55,37 @@ class LeesahConsumer(val taskRepository: TaskRepository,
 
                 when (cr.value().hentEndringstype()) {
                     OPPRETTET, KORRIGERT -> {
-                        log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}, dødsdato: {}",
-                                cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktørId(),
-                                cr.value().hentEndringstype(), cr.value().hentDødsdato())
+                        log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, " +
+                                 "endringstype: {}, dødsdato: {}",
+                                 cr.topic(),
+                                 cr.partition(),
+                                 cr.offset(),
+                                 cr.value().hentOpplysningstype(),
+                                 cr.value().hentAktørId(),
+                                 cr.value().hentEndringstype(),
+                                 cr.value().hentDødsdato())
                     }
                     else -> {
-                        log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}",
-                                cr.topic(), cr.partition(), cr.offset(), cr.value().hentOpplysningstype(), cr.value().hentAktørId(), cr.value().hentEndringstype())
+                        log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, " +
+                                 "endringstype: {}",
+                                 cr.topic(),
+                                 cr.partition(),
+                                 cr.offset(),
+                                 cr.value().hentOpplysningstype(),
+                                 cr.value().hentAktørId(),
+                                 cr.value().hentEndringstype())
                     }
                 }
-                hendelsesloggRepository.save(Hendelseslogg(cr.offset(),cr.value().hentHendelseId(),cr.value().hentAktørId(),cr.value().hentOpplysningstype(),cr.value().hentEndringstype()))
+                hendelsesloggRepository.save(Hendelseslogg(cr.offset(),
+                                                           cr.value().hentHendelseId(),
+                                                           cr.value().hentAktørId(),
+                                                           cr.value().hentOpplysningstype(),
+                                                           cr.value().hentEndringstype()))
             } else if (cr.value().erFødsel()) {
                 when (cr.value().hentEndringstype()) {
                     OPPRETTET, KORRIGERT -> {
-                        log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}, fødselsdato: {}",
+                        log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, " +
+                                 "endringstype: {}, fødselsdato: {}",
                                  cr.topic(),
                                  cr.partition(),
                                  cr.offset(),
@@ -74,7 +94,7 @@ class LeesahConsumer(val taskRepository: TaskRepository,
                                  cr.value().hentEndringstype(),
                                  cr.value().hentFødselsdato())
 
-                        if(erUnder18År(cr.value().hentFødselsdato())) {
+                        if (erUnder18År(cr.value().hentFødselsdato())) {
                             if (cr.value().hentEndringstype() == OPPRETTET) {
                                 fødselOpprettetCounter.increment()
                             } else if (cr.value().hentEndringstype() == KORRIGERT) {
@@ -95,7 +115,8 @@ class LeesahConsumer(val taskRepository: TaskRepository,
                     }
 
                     else -> {
-                        log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, endringstype: {}",
+                        log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, " +
+                                 "endringstype: {}",
                                  cr.topic(),
                                  cr.partition(),
                                  cr.key(),
@@ -105,7 +126,11 @@ class LeesahConsumer(val taskRepository: TaskRepository,
                                  cr.value().hentEndringstype())
                     }
                 }
-                hendelsesloggRepository.save(Hendelseslogg(cr.offset(),cr.value().hentHendelseId(),cr.value().hentAktørId(),cr.value().hentOpplysningstype(),cr.value().hentEndringstype()))
+                hendelsesloggRepository.save(Hendelseslogg(cr.offset(),
+                                                           cr.value().hentHendelseId(),
+                                                           cr.value().hentAktørId(),
+                                                           cr.value().hentOpplysningstype(),
+                                                           cr.value().hentEndringstype()))
             }
         } catch (e: RuntimeException) {
             leesahFeiletCounter.increment()

@@ -16,7 +16,7 @@ import org.springframework.scheduling.TaskScheduler
 class KafkaConfig {
 
     @Bean
-    fun consumerFactory(properties : KafkaProperties) : ConsumerFactory<Int, GenericRecord> {
+    fun consumerFactory(properties: KafkaProperties): ConsumerFactory<Int, GenericRecord> {
         return DefaultKafkaConsumerFactory(properties.buildConsumerProperties())
     }
 
@@ -26,7 +26,8 @@ class KafkaConfig {
     }
 
     @Bean
-    fun kafkaListenerContainerFactory(consumerFactory: ConsumerFactory<Int, GenericRecord>) : ConcurrentKafkaListenerContainerFactory<Int, GenericRecord> {
+    fun kafkaListenerContainerFactory(consumerFactory: ConsumerFactory<Int, GenericRecord>)
+            : ConcurrentKafkaListenerContainerFactory<Int, GenericRecord> {
         val factory = ConcurrentKafkaListenerContainerFactory<Int, GenericRecord>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
         factory.consumerFactory = consumerFactory

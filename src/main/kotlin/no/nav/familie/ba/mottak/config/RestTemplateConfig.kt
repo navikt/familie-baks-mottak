@@ -9,6 +9,7 @@ import java.time.Duration
 
 @Configuration
 class RestTemplateConfig {
+
     @Profile("!dev")
     @Bean
     fun restTemplateBuilderMedProxy(): RestTemplateBuilder {
