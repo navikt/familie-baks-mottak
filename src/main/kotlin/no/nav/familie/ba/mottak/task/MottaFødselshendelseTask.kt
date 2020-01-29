@@ -37,7 +37,7 @@ class MottaFødselshendelseTask(
 
             // Kun barn med norsk statsborgerskap og forsørger uten dnr
             if (personMedRelasjoner.statsborgerskap?.erNorge() == true && !erDnummer(hentForsørger(personMedRelasjoner))){
-                task.metadata.put("forsørger",hentForsørger(personMedRelasjoner).id!!)
+                task.metadata["forsørger"] = hentForsørger(personMedRelasjoner).id!!
                 val nesteTask = Task.nyTask(
                         SendTilSakTask.TASK_STEP_TYPE,
                         jacksonObjectMapper().writeValueAsString(NyBehandling (hentForsørger(personMedRelasjoner).id!!, arrayOf(task.payload), BehandlingType.FØRSTEGANGSBEHANDLING, null)),
