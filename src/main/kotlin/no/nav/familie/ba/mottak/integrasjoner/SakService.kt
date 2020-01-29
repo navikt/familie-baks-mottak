@@ -20,9 +20,13 @@ private const val OAUTH2_CLIENT_CONFIG_KEY = "ba-sak-clientcredentials"
 
 @Component
 class SakService @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}") private val sakServiceUri: String,
-                                           restTemplateBuilderMedProxy: RestTemplateBuilder,
-                                           clientConfigurationProperties: ClientConfigurationProperties,
-                                           oAuth2AccessTokenService: OAuth2AccessTokenService) : BaseService(OAUTH2_CLIENT_CONFIG_KEY, restTemplateBuilderMedProxy, clientConfigurationProperties, oAuth2AccessTokenService) {
+                                        restTemplateBuilderMedProxy: RestTemplateBuilder,
+                                        clientConfigurationProperties: ClientConfigurationProperties,
+                                        oAuth2AccessTokenService: OAuth2AccessTokenService)
+    : BaseService(OAUTH2_CLIENT_CONFIG_KEY,
+                  restTemplateBuilderMedProxy,
+                  clientConfigurationProperties,
+                  oAuth2AccessTokenService) {
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
     fun sendTilSak(nyBehandling: NyBehandling) {
@@ -33,7 +37,8 @@ class SakService @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}
             logger.info("Søknad sendt til sak. Status=${response?.statusCode}")
         } catch (e: RestClientResponseException) {
             logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
-            throw IllegalStateException("Innsending til sak feilet. Status: " + e.rawStatusCode + ", body: " + e.responseBodyAsString, e)
+            throw IllegalStateException("Innsending til sak feilet. Status: " + e.rawStatusCode
+                                        + ", body: " + e.responseBodyAsString, e)
         } catch (e: RestClientException) {
             throw IllegalStateException("Innsending til sak feilet.", e)
         }

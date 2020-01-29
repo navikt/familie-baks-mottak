@@ -18,7 +18,7 @@ class NaisProxyCustomizer : RestTemplateCustomizer {
                 .setRoutePlanner(object : DefaultProxyRoutePlanner(proxy) {
                     @Throws(HttpException::class)
                     override fun determineProxy(target: HttpHost,
-                                       request: HttpRequest?, context: HttpContext?): HttpHost? {
+                                                request: HttpRequest?, context: HttpContext?): HttpHost? {
                         return if (target.hostName.contains("microsoft")) {
                             super.determineProxy(target, request, context)
                         } else null

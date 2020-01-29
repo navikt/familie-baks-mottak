@@ -19,7 +19,7 @@ class RestartingErrorHandler(private val taskScheduler: TaskScheduler) : Contain
         STOPPER.handle(thrownException, data, consumer, container)
     }
 
-    private class Restarter(val container : MessageListenerContainer) : Runnable {
+    private class Restarter(val container: MessageListenerContainer) : Runnable {
         override fun run() {
             container.start()
         }
