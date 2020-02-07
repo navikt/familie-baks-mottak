@@ -1,6 +1,8 @@
 package no.nav.familie.ba.mottak.task
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.micrometer.core.instrument.Counter
+import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.domene.BehandlingType
 import no.nav.familie.ba.mottak.domene.NyBehandling
 import no.nav.familie.ba.mottak.domene.personopplysning.Familierelasjon
@@ -29,31 +31,47 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
     : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
-    val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
+    val barnHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.barn.har.dnr.eller.fdatnr")
+    val barnErIkkeNorskStatsborgerCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.barn.ikke.norsk.statsborger")
+    val forsørgerHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.forsørger.har.dnr.eller.fdatnr")
 
     override fun doTask(task: Task) {
+        val barnetsId = task.payload
+
+        if (erDnummer(PersonIdent(barnetsId)) || erFDatnummer(PersonIdent(barnetsId))) {
+            log.info("Ignorer fødselshendelse: Barnet har DNR/FDAT-nummer")
+            barnHarDnrCounter.increment()
+            return
+        }
+
         try {
-            val personMedRelasjoner = personService.hentPersonMedRelasjoner(task.payload)
-            secureLogger.info("kjønn: ${personMedRelasjoner.kjønn} fdato: ${personMedRelasjoner.fødselsdato}")
+            val personMedRelasjoner = personService.hentPersonMedRelasjoner(barnetsId)
+
+            if (personMedRelasjoner.statsborgerskap?.erNorge() == false) {
+                log.info("Ignorer fødselshendelse: Barnet har ikke norsk statsborgerskap")
+                barnErIkkeNorskStatsborgerCounter.increment()
+                return
+            }
+
             val forsørger = hentForsørger(personMedRelasjoner)
 
-            // Kun barn med norsk statsborgerskap og forsørger uten dnr
-
-            if (personMedRelasjoner.statsborgerskap?.erNorge() == true && !erDnummer(forsørger) && !erFDatnummer(forsørger)) {
-                task.metadata["forsørger"] = forsørger.id!!
-                val nesteTask = Task.nyTask(
-                        SendTilSakTask.TASK_STEP_TYPE,
-                        jacksonObjectMapper().writeValueAsString(NyBehandling(forsørger.id!!,
-                                                                              arrayOf(task.payload),
-                                                                              BehandlingType.FØRSTEGANGSBEHANDLING,
-                                                                              null)),
-                        task.metadata
-                )
-
-                taskRepository.save(nesteTask)
-            } else {
-                log.info("Ignorerer fødselshendelse pga. ikke norsk statsborgerskap eller DNR")
+            if (erDnummer(forsørger) || erFDatnummer(forsørger)) {
+                log.info("Ignorer fødselshendelse: Barnets forsørger har DNR/FDAT-nummer")
+                forsørgerHarDnrCounter.increment()
+                return
             }
+
+            task.metadata["forsørger"] = forsørger.id!!
+            val nesteTask = Task.nyTask(
+                    SendTilSakTask.TASK_STEP_TYPE,
+                    jacksonObjectMapper().writeValueAsString(NyBehandling(forsørger.id!!,
+                            arrayOf(barnetsId),
+                            BehandlingType.FØRSTEGANGSBEHANDLING,
+                            null)),
+                    task.metadata
+            )
+
+            taskRepository.save(nesteTask)
 
         } catch (ex: RuntimeException) {
             log.info("MottaFødselshendelseTask feilet.")
@@ -76,7 +94,7 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
             }
         }
         log.warn("Fant hverken far eller mor...")
-        throw IllegalStateException("Fant hverken mor eller far. Må behandles manuellt")
+        throw IllegalStateException("Fant hverken mor eller far. Må behandles manuelt")
     }
 
     fun erDnummer(personIdent: PersonIdent): Boolean {
@@ -90,5 +108,4 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
     companion object {
         const val TASK_STEP_TYPE = "mottaFødselshendelse"
     }
-
 }
