@@ -30,7 +30,7 @@ class SakService @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
     fun sendTilSak(nyBehandling: NyBehandling) {
-        val uri = URI.create("$sakServiceUri/behandling/opprett")
+        val uri = URI.create("$sakServiceUri/behandling/opprettfrahendelse")
         logger.info("Sender søknad til {}", uri)
         try {
             val response: ResponseEntity<String>? = postRequest(uri, nyBehandling)
