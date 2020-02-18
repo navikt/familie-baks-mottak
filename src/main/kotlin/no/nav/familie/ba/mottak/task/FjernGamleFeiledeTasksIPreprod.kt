@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 @Profile("!prod")
 class FjernGamleFeiledeTasksIPreprod(val taskRepository: TaskRepository){
 
-    @Scheduled(cron = "5 8 * * Sun")
+    @Scheduled(cron = "0 0 9 * * 7")
     fun fjernGamleFeiledeTasksIPreprod() {
         LOG.info("Fjerner gamle feilede tasks")
 

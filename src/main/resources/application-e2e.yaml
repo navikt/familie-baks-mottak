@@ -1,0 +1,57 @@
+no.nav.security.jwt:
+  issuer.azuread:
+    discoveryurl: http://vtp:8060/rest/isso/oauth2/.well-known/openid-configuration
+    accepted_audience: dummy
+    cookie_name: azure_token
+  client:
+    registration:
+      ks-oppslag-onbehalfof:
+        resource-url: ${FAMILIE_INTEGRASJONER_API_URL}
+        token-endpoint-url: http://vtp:8060/rest/isso/oauth2/access_token
+        grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
+        scope: dummy
+        authentication:
+          client-id: dummy
+          client-secret: dummy
+          client-auth-method: client_secret_basic
+      ks-oppslag-clientcredentials:
+        resource-url: ${FAMILIE_INTEGRASJONER_API_URL}
+        token-endpoint-url: http://vtp:8060/rest/isso/oauth2/access_token
+        grant-type: client_credentials
+        scope: dummy
+        authentication:
+          client-id: dummy
+          client-secret: dummy
+          client-auth-method: client_secret_basic
+
+
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKERS}
+    properties:
+      security.protocol: SASL_PLAINTEXT
+      sasl:
+        jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="igroup" password="itest";
+      schema.registry.url: ${KAFKA_BROKERS}
+    consumer:
+      group-id: srvc01
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql=false
+    hibernate:
+      ddl-auto: create
+  flyway:
+    enabled: false
+
+logging:
+  config: "classpath:logback-test.xml"
+
+FAMILIE_BA_SAK_API_URL: http://familie-ba-sak:8089/api
+FAMILIE_INTEGRASJONER_API_URL: http://familie-integrasjoner:8085/api
+
+FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1
+FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 1
+
+KAFKA_BROKERS: http://kafka:9092
