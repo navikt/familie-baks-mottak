@@ -3,7 +3,6 @@ package no.nav.familie.ba.mottak.task
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.ba.mottak.domene.BehandlingType
 import no.nav.familie.ba.mottak.domene.NyBehandling
 import no.nav.familie.ba.mottak.domene.personopplysning.Familierelasjon
 import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
@@ -65,9 +64,7 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
             val nesteTask = Task.nyTask(
                     SendTilSakTask.TASK_STEP_TYPE,
                     jacksonObjectMapper().writeValueAsString(NyBehandling(forsørger.id!!,
-                            arrayOf(barnetsId),
-                            BehandlingType.FØRSTEGANGSBEHANDLING,
-                            null)),
+                            arrayOf(barnetsId))),
                     task.metadata
             )
 
