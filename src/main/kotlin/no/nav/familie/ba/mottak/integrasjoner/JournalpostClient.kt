@@ -20,7 +20,7 @@ private const val OAUTH2_CLIENT_CONFIG_KEY = "integrasjoner-clientcredentials"
 
 @Component
 class JournalpostClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONER_API_URL}")
-                                                private val integrasjonerServiceUri: URI,
+                                               private val integrasjonerServiceUri: URI,
                                                restTemplateBuilderMedProxy: RestTemplateBuilder,
                                                clientConfigurationProperties: ClientConfigurationProperties,
                                                oAuth2AccessTokenService: OAuth2AccessTokenService)
