@@ -3,7 +3,7 @@ package no.nav.familie.ba.mottak
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 
-@SpringBootApplication(scanBasePackages = ["no.nav.familie.ba.mottak"])
+@SpringBootApplication
 class Launcher
 
 fun main(args: Array<String>) {
