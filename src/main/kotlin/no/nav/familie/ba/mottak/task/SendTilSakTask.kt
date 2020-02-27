@@ -19,7 +19,7 @@ class SendTilSakTask(private val sakService: SakService, private val featureTogg
 
 
     override fun doTask(task: Task) {
-        if (featureToggleService.isEnabled("familie-ba-mottak.behandle-fødselshendelse")) {
+        if (featureToggleService.isEnabled("familie-ba-mottak.behandle-fodselshendelse")) {
             sakService.sendTilSak(jacksonObjectMapper().readValue(task.payload, NyBehandling::class.java))
         } else {
             logger.info("Behandler ikke fødselshendelse, feature er skrudd av i Unleash")
