@@ -83,6 +83,12 @@
             <version>${kotlin.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>no.finn.unleash</groupId>
+            <artifactId>unleash-client-java</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+
         <!-- NAV interne avhengigheter-->
         <dependency>
             <groupId>no.nav.familie.felles</groupId>
