@@ -29,12 +29,12 @@ class JournalpostService @Autowired constructor(@param:Value("\${FAMILIE_INTEGRA
                   oAuth2AccessTokenService) {
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
-    fun hentJournalpost(journalpostId: String): Journalpost? {
+    fun hentJournalpost(journalpostId: String): Journalpost {
         val uri = URI.create("$integrasjonerServiceUri/journalpost?journalpostId=$journalpostId")
         logger.info("henter journalpost med id {}", journalpostId)
         return try {
             val response: ResponseEntity<Journalpost>? = getRequest(uri)
-            response?.body
+            response?.body ?: error("Fant ikke journalpost")
         } catch (e: RestClientResponseException) {
             logger.warn("Henting av journalpost feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
             throw IllegalStateException("Henting av journalpost med id $journalpostId feilet. Status: " + e.rawStatusCode
