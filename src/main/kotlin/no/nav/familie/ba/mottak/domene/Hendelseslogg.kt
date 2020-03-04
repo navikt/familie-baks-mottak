@@ -1,6 +1,8 @@
 package no.nav.familie.ba.mottak.domene
 
+import no.nav.familie.prosessering.domene.PropertiesToStringConverter
 import java.time.LocalDateTime
+import java.util.*
 import javax.persistence.*
 
 @Entity
@@ -12,6 +14,9 @@ data class Hendelseslogg(
         @Column(name = "hendelse_id")
         val hendelseId: String,
 
+        @Column(name = "consumer")
+        val consumer: String,
+
         @Column(name = "aktor_id")
         val aktørid: String,
 
@@ -20,6 +25,10 @@ data class Hendelseslogg(
 
         @Column(name = "endringstype")
         val endringstype: String,
+
+        @Convert(converter = PropertiesToStringConverter::class)
+        @Column(name = "metadata")
+        val metadata: Properties = Properties(),
 
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hendelseslogg_seq")

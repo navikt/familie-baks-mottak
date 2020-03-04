@@ -78,6 +78,7 @@ class LeesahConsumer(val taskRepository: TaskRepository,
                 }
                 hendelsesloggRepository.save(Hendelseslogg(cr.offset(),
                                                            cr.value().hentHendelseId(),
+                                                           "LEESAH",
                                                            cr.value().hentAktørId(),
                                                            cr.value().hentOpplysningstype(),
                                                            cr.value().hentEndringstype()))
@@ -128,6 +129,7 @@ class LeesahConsumer(val taskRepository: TaskRepository,
                 }
                 hendelsesloggRepository.save(Hendelseslogg(cr.offset(),
                                                            cr.value().hentHendelseId(),
+                                                           "LEESAH",
                                                            cr.value().hentAktørId(),
                                                            cr.value().hentOpplysningstype(),
                                                            cr.value().hentEndringstype()))
