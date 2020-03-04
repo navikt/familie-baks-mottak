@@ -11,5 +11,5 @@ interface HendelsesloggRepository : JpaRepository<Hendelseslogg, Long> {
     @Lock(LockModeType.PESSIMISTIC_FORCE_INCREMENT)
     fun save(hendelseslogg: Hendelseslogg): Hendelseslogg
 
-    fun existsByHendelseId(hendelseId: String): Boolean
+    fun existsByHendelseIdAndConsumer(hendelseId: String, consumer: HendelseConsumer): Boolean
 }

@@ -2,6 +2,7 @@ package no.nav.familie.ba.mottak.hendelser
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
+import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.Hendelseslogg
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
@@ -46,7 +47,7 @@ class LeesahConsumer(val taskRepository: TaskRepository,
     @Transactional
     fun listen(cr: ConsumerRecord<Int, GenericRecord>, ack: Acknowledgment) {
         try {
-            if (hendelsesloggRepository.existsByHendelseId(cr.value().hentHendelseId())) {
+            if (hendelsesloggRepository.existsByHendelseIdAndConsumer(cr.value().hentHendelseId(), CONSUMER_PDL)) {
                 ack.acknowledge()
                 return
             }
@@ -76,12 +77,13 @@ class LeesahConsumer(val taskRepository: TaskRepository,
                                  cr.value().hentEndringstype())
                     }
                 }
+
                 hendelsesloggRepository.save(Hendelseslogg(cr.offset(),
                                                            cr.value().hentHendelseId(),
-                                                           "LEESAH",
-                                                           cr.value().hentAktørId(),
-                                                           cr.value().hentOpplysningstype(),
-                                                           cr.value().hentEndringstype()))
+                                                           CONSUMER_PDL,
+                                                           mapOf("aktørId" to cr.value().hentAktørId(),
+                                                                 "opplysningstype" to cr.value().hentOpplysningstype(),
+                                                                 "endringstype" to cr.value().hentEndringstype()).toProperties()))
             } else if (cr.value().erFødsel()) {
                 when (cr.value().hentEndringstype()) {
                     OPPRETTET, KORRIGERT -> {
@@ -129,10 +131,10 @@ class LeesahConsumer(val taskRepository: TaskRepository,
                 }
                 hendelsesloggRepository.save(Hendelseslogg(cr.offset(),
                                                            cr.value().hentHendelseId(),
-                                                           "LEESAH",
-                                                           cr.value().hentAktørId(),
-                                                           cr.value().hentOpplysningstype(),
-                                                           cr.value().hentEndringstype()))
+                                                           CONSUMER_PDL,
+                                                           mapOf("aktørId" to cr.value().hentAktørId(),
+                                                                 "opplysningstype" to cr.value().hentOpplysningstype(),
+                                                                 "endringstype" to cr.value().hentEndringstype()).toProperties()))
             }
         } catch (e: RuntimeException) {
             leesahFeiletCounter.increment()
@@ -210,5 +212,9 @@ class LeesahConsumer(val taskRepository: TaskRepository,
             log.error("Deserialisering av fødselsdato feiler")
             throw exception
         }
+    }
+
+    companion object {
+        private val CONSUMER_PDL = HendelseConsumer.PDL
     }
 }

@@ -14,17 +14,9 @@ data class Hendelseslogg(
         @Column(name = "hendelse_id")
         val hendelseId: String,
 
+        @Enumerated(EnumType.STRING)
         @Column(name = "consumer")
-        val consumer: String,
-
-        @Column(name = "aktor_id")
-        val aktørid: String,
-
-        @Column(name = "opplysningstype")
-        val opplysningstype: String,
-
-        @Column(name = "endringstype")
-        val endringstype: String,
+        val consumer: HendelseConsumer,
 
         @Convert(converter = PropertiesToStringConverter::class)
         @Column(name = "metadata")
@@ -38,3 +30,7 @@ data class Hendelseslogg(
         @Column(name = "opprettet_tid", nullable = false, updatable = false)
         val opprettetTidspunkt: LocalDateTime = LocalDateTime.now()
 )
+
+enum class HendelseConsumer {
+    PDL
+}
