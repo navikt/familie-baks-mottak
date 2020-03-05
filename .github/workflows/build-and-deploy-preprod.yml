@@ -50,6 +50,8 @@ jobs:
           repository: navikt/familie-ba-e2e
           token: ${{ secrets.FAMILIE_BA_E2E_SECRET }} # `GitHub_PAT` is a secret that contains your PAT
           path: ba-e2e
+      - name: update etc/hosts
+        run: sudo echo "127.0.0.1  kafka" >> /etc/hosts
       - name: Start alle apper (e2e)
         run: cd ba-e2e/e2e; ./e2e.sh
       - name: Kjør tester (e2e)
