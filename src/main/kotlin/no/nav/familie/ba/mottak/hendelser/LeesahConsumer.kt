@@ -8,9 +8,8 @@ import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
-import no.nav.person.pdl.leesah.Endringstype.KORRIGERT
-import no.nav.person.pdl.leesah.Endringstype.OPPRETTET
-import no.nav.person.pdl.leesah.Personhendelse
+import org.apache.avro.generic.GenericData
+import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -23,6 +22,8 @@ import java.time.LocalDateTime
 import java.util.*
 import javax.transaction.Transactional
 
+private const val OPPRETTET = "OPPRETTET"
+private const val KORRIGERT = "KORRIGERT"
 private const val OPPLYSNINGSTYPE_DØDSFALL = "DOEDSFALL_V1"
 private const val OPPLYSNINGSTYPE_FØDSEL = "FOEDSEL_V1"
 
@@ -36,7 +37,6 @@ class LeesahConsumer(val taskRepository: TaskRepository,
     val fødselOpprettetCounter: Counter = Metrics.counter("barnetrygd.fodsel.opprettet")
     val fødselKorrigertCounter: Counter = Metrics.counter("barnetrygd.fodsel.korrigert")
     val fødselIgnorertCounter: Counter = Metrics.counter("barnetrygd.fodsel.ignorert")
-    val fødselIgnorertUnder18årCounter: Counter = Metrics.counter("barnetrygd.fodsel.ignorertunder18")
     val log: Logger = LoggerFactory.getLogger(LeesahConsumer::class.java)
     val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
 
@@ -45,18 +45,96 @@ class LeesahConsumer(val taskRepository: TaskRepository,
                    idIsGroup = false,
                    containerFactory = "kafkaListenerContainerFactory")
     @Transactional
-    fun listen(cr: ConsumerRecord<Int, Personhendelse>, ack: Acknowledgment) {
+    fun listen(cr: ConsumerRecord<Int, GenericRecord>, ack: Acknowledgment) {
         try {
-            val hendelse = cr.value()
-            if (hendelsesloggRepository.existsByHendelseIdAndConsumer(hendelse.getHendelseId(), CONSUMER_PDL)) {
+            if (hendelsesloggRepository.existsByHendelseIdAndConsumer(cr.value().hentHendelseId(), CONSUMER_PDL)) {
                 ack.acknowledge()
                 return
             }
+            if (cr.value().erDødsfall()) {
+                dødsfallCounter.increment()
 
-            if (hendelse.getOpplysningstype() == OPPLYSNINGSTYPE_DØDSFALL) {
-                behandleDødsfallHendelser(hendelse, cr)
-            } else if (hendelse.getOpplysningstype() == OPPLYSNINGSTYPE_FØDSEL) {
-                behandleFødselshendelser(hendelse, cr)
+                when (cr.value().hentEndringstype()) {
+                    OPPRETTET, KORRIGERT -> {
+                        log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, " +
+                                 "endringstype: {}, dødsdato: {}",
+                                 cr.topic(),
+                                 cr.partition(),
+                                 cr.offset(),
+                                 cr.value().hentOpplysningstype(),
+                                 cr.value().hentAktørId(),
+                                 cr.value().hentEndringstype(),
+                                 cr.value().hentDødsdato())
+                    }
+                    else -> {
+                        log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, " +
+                                 "endringstype: {}",
+                                 cr.topic(),
+                                 cr.partition(),
+                                 cr.offset(),
+                                 cr.value().hentOpplysningstype(),
+                                 cr.value().hentAktørId(),
+                                 cr.value().hentEndringstype())
+                    }
+                }
+
+                hendelsesloggRepository.save(Hendelseslogg(cr.offset(),
+                                                           cr.value().hentHendelseId(),
+                                                           CONSUMER_PDL,
+                                                           mapOf("aktørId" to cr.value().hentAktørId(),
+                                                                 "opplysningstype" to cr.value().hentOpplysningstype(),
+                                                                 "endringstype" to cr.value().hentEndringstype()).toProperties()))
+            } else if (cr.value().erFødsel()) {
+                when (cr.value().hentEndringstype()) {
+                    OPPRETTET, KORRIGERT -> {
+                        log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, " +
+                                 "endringstype: {}, fødselsdato: {}",
+                                 cr.topic(),
+                                 cr.partition(),
+                                 cr.offset(),
+                                 cr.value().hentOpplysningstype(),
+                                 cr.value().hentAktørId(),
+                                 cr.value().hentEndringstype(),
+                                 cr.value().hentFødselsdato())
+
+                        if (erUnder18År(cr.value().hentFødselsdato())) {
+                            if (cr.value().hentEndringstype() == OPPRETTET) {
+                                fødselOpprettetCounter.increment()
+                            } else if (cr.value().hentEndringstype() == KORRIGERT) {
+                                fødselKorrigertCounter.increment()
+                            }
+
+                            val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE,
+                                                                cr.value().hentPersonident(),
+                                                                LocalDateTime.now().plusMinutes(triggerTidForTps),
+                                                                Properties().apply {
+                                                                    this["ident"] = cr.value().hentPersonident()
+                                                                })
+                            taskRepository.save(task)
+                        } else {
+                            fødselIgnorertCounter.increment()
+                        }
+
+                    }
+
+                    else -> {
+                        log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, " +
+                                 "endringstype: {}",
+                                 cr.topic(),
+                                 cr.partition(),
+                                 cr.key(),
+                                 cr.offset(),
+                                 cr.value().hentOpplysningstype(),
+                                 cr.value().hentAktørId(),
+                                 cr.value().hentEndringstype())
+                    }
+                }
+                hendelsesloggRepository.save(Hendelseslogg(cr.offset(),
+                                                           cr.value().hentHendelseId(),
+                                                           CONSUMER_PDL,
+                                                           mapOf("aktørId" to cr.value().hentAktørId(),
+                                                                 "opplysningstype" to cr.value().hentOpplysningstype(),
+                                                                 "endringstype" to cr.value().hentEndringstype()).toProperties()))
             }
         } catch (e: RuntimeException) {
             leesahFeiletCounter.increment()
@@ -72,94 +150,69 @@ class LeesahConsumer(val taskRepository: TaskRepository,
         ack.acknowledge()
     }
 
-    private fun behandleFødselshendelser(hendelse: Personhendelse,
-                                         cr: ConsumerRecord<Int, Personhendelse>) {
-        when (hendelse.getEndringstype()) {
-            OPPRETTET, KORRIGERT -> {
-                logHendelse(cr, hendelse, "fødselsdato: ${hendelse.getFoedsel().getFoedselsdato()}")
-
-                if (erUnder6måneder(hendelse.getFoedsel().getFoedselsdato())) {
-                    if (hendelse.getEndringstype() == OPPRETTET) {
-                        fødselOpprettetCounter.increment()
-                    } else if (hendelse.getEndringstype() == KORRIGERT) {
-                        fødselKorrigertCounter.increment()
-                    }
-
-                    val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE,
-                                                        cr.value().hentPersonident(),
-                                                        LocalDateTime.now().plusMinutes(triggerTidForTps),
-                                                        Properties().apply {
-                                                            this["ident"] = cr.value().hentPersonident()
-                                                        })
-                    taskRepository.save(task)
-                } else if (erUnder18år(hendelse.getFoedsel().getFoedselsdato())) {
-                    fødselIgnorertUnder18årCounter.increment()
-                } else {
-                    fødselIgnorertCounter.increment()
-                }
-
-            }
-
-            else -> {
-                logHendelse(cr, hendelse)
-            }
-        }
-        hendelsesloggRepository.save(Hendelseslogg(cr.offset(),
-                                                   hendelse.getHendelseId(),
-                                                   CONSUMER_PDL,
-                                                   mapOf("aktørId" to hendelse.hentAktørId(),
-                                                         "opplysningstype" to hendelse.getOpplysningstype(),
-                                                         "endringstype" to hendelse.getEndringstype().name).toProperties()))
-    }
-
-    private fun logHendelse(cr: ConsumerRecord<Int, Personhendelse>,
-                            hendelse: Personhendelse, ekstraInfo: String = "") {
-        log.info("Melding mottatt på topic: {}, partisjon: {}, offset: {}, opplysningstype: {}, aktørid: {}, " +
-                 "endringstype: {}, $ekstraInfo",
-                 cr.topic(),
-                 cr.partition(),
-                 cr.offset(),
-                 hendelse.getOpplysningstype(),
-                 hendelse.hentAktørId(),
-                 hendelse.getEndringstype())
-    }
-
-    private fun behandleDødsfallHendelser(hendelse: Personhendelse,
-                                          cr: ConsumerRecord<Int, Personhendelse>) {
-        dødsfallCounter.increment()
-
-        when (hendelse.getEndringstype()) {
-            OPPRETTET, KORRIGERT -> {
-                logHendelse(cr, hendelse, "dødsdato: ${hendelse.getDoedsfall().getDoedsdato()}")
-            }
-            else -> {
-                logHendelse(cr, hendelse)
-            }
-        }
-
-        hendelsesloggRepository.save(Hendelseslogg(cr.offset(),
-                                                   hendelse.getHendelseId(),
-                                                   CONSUMER_PDL,
-                                                   mapOf("aktørId" to hendelse.hentAktørId(),
-                                                         "opplysningstype" to hendelse.getOpplysningstype(),
-                                                         "endringstype" to hendelse.getEndringstype().name).toProperties()))
-    }
-
-    private fun erUnder18år(fødselsDato: LocalDate): Boolean {
+    private fun erUnder18År(fødselsDato: LocalDate): Boolean {
         return LocalDate.now().isBefore(fødselsDato.plusYears(18))
     }
 
-    private fun erUnder6måneder(fødselsDato: LocalDate): Boolean {
-        return LocalDate.now().isBefore(fødselsDato.plusMonths(6))
-    }
+    private fun GenericRecord.erDødsfall() =
+            get("opplysningstype").toString() == OPPLYSNINGSTYPE_DØDSFALL
+
+    private fun GenericRecord.erFødsel() =
+            get("opplysningstype").toString() == OPPLYSNINGSTYPE_FØDSEL
+
+    private fun GenericRecord.hentOpplysningstype() =
+            get("opplysningstype").toString()
 
     // TODO: Skal gjøres tydeligere og mer robust.
-    private fun Personhendelse.hentAktørId() =
-            this.getPersonidenter().first { it.length == 13 }
+    private fun GenericRecord.hentAktørId() =
+            (get("personidenter") as GenericData.Array<*>)
+                    .map { it.toString() }
+                    .first { it.length == 13 }
 
     // TODO: Ditto.
-    private fun Personhendelse.hentPersonident() =
-            this.getPersonidenter().first { it.length == 11 }
+    private fun GenericRecord.hentPersonident() =
+            (get("personidenter") as GenericData.Array<*>)
+                    .map { it.toString() }
+                    .first { it.length == 11 }
+
+    private fun GenericRecord.hentEndringstype() =
+            get("endringstype").toString()
+
+    private fun GenericRecord.hentHendelseId() =
+            get("hendelseId").toString()
+
+    private fun GenericRecord.hentDødsdato(): LocalDate {
+        return try {
+            val dato = (get("doedsfall") as GenericRecord?)?.get("doedsdato")
+
+            // Integrasjonstester bruker EmbeddedKafka, der en datoverdi tolkes direkte som en LocalDate.
+            // I prod tolkes datoer som en Integer.
+            if (dato is LocalDate) {
+                dato
+            } else {
+                LocalDate.ofEpochDay((dato as Int).toLong())
+            }
+
+        } catch (exception: Exception) {
+            log.error("Deserialisering av dødsdato feiler")
+            throw exception
+        }
+    }
+
+    private fun GenericRecord.hentFødselsdato(): LocalDate {
+        return try {
+            val dato = (get("foedsel") as GenericRecord?)?.get("foedselsdato")
+
+            if (dato is LocalDate) {
+                dato
+            } else {
+                LocalDate.ofEpochDay((dato as Int).toLong())
+            }
+        } catch (exception: Exception) {
+            log.error("Deserialisering av fødselsdato feiler")
+            throw exception
+        }
+    }
 
     companion object {
         private val CONSUMER_PDL = HendelseConsumer.PDL
