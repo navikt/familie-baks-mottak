@@ -15,7 +15,7 @@ import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
 import java.net.URI
 
-private val logger = LoggerFactory.getLogger(PersonService::class.java)
+private val logger = LoggerFactory.getLogger(SakService::class.java)
 private const val OAUTH2_CLIENT_CONFIG_KEY = "ba-sak-clientcredentials"
 
 @Component
@@ -30,10 +30,10 @@ class SakService @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
     fun sendTilSak(nyBehandling: NyBehandling) {
-        val uri = URI.create("$sakServiceUri/behandling/opprettfrahendelse")
+        val uri = URI.create("$sakServiceUri/behandling")
         logger.info("Sender søknad til {}", uri)
         try {
-            val response: ResponseEntity<String>? = postRequest(uri, nyBehandling)
+            val response: ResponseEntity<String>? = putRequest(uri, nyBehandling)
             logger.info("Søknad sendt til sak. Status=${response?.statusCode}")
         } catch (e: RestClientResponseException) {
             logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
