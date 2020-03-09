@@ -24,6 +24,9 @@ For å kjøre mot lokal postgress så kan man kjøre DevLauncherPostgress.
 docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -d postgres
 ```
 
+## Kjøring av e2e tester
+Ende til ende tester kjøres av GHA ved push. Ønsker du å hoppe over dise må du ha `[e2e skip]` i commit melding for å kunne deploye til dev uten at testene kjører.
+Ende til ende testene ligger her: https://github.com/navikt/familie-ba-e2e/tree/master/autotest
 
 ## Produksjonssetting
 Appen blir produksjonssatt ved å kjøre `tag.sh` som ligger i `.github`. Dette scriptet tagger den seneste commiten i master med det neste versjonsnummeret, og pusher tagen til github-repositoriet.
