@@ -4,6 +4,7 @@ import io.confluent.kafka.schemaregistry.client.MockSchemaRegistryClient
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroSerializer
+import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.util.DbContainerInitializer
 import no.nav.familie.prosessering.domene.Status
@@ -44,6 +45,7 @@ class LeesahConsumerTest(@Autowired val hendelsesloggRepository: HendelsesloggRe
                          @Autowired val taskRepository: TaskRepository,
                          @Autowired val restTaskService: RestTaskService
 ) {
+
     private fun buildKafkaProducer(): Producer<Int, GenericRecord> {
         val senderProps = kafkaProperties.buildProducerProperties()
         return KafkaProducer(senderProps)
@@ -91,7 +93,7 @@ class LeesahConsumerTest(@Autowired val hendelsesloggRepository: HendelsesloggRe
         producer.send(ProducerRecord("aapen-person-pdl-leesah-v1", personhendelse.build()))
 
         var fantTask = false
-        for (i in  1..30) {
+        for (i in 1..30) {
             if (taskRepository.count() > 0) {
                 fantTask = true
                 break
@@ -101,10 +103,12 @@ class LeesahConsumerTest(@Autowired val hendelsesloggRepository: HendelsesloggRe
         }
         assertThat(fantTask).isTrue() // Det skal finnes en task i taskrepositoriet
 
-        val fødselshendelsetasks = restTaskService.hentTasks(Status.UBEHANDLET, "", 0).data!!.filter { it.taskStepType == "mottaFødselshendelse" }
+        val fødselshendelsetasks =
+                restTaskService.hentTasks(Status.UBEHANDLET, "", 0).data!!.filter { it.taskStepType == "mottaFødselshendelse" }
         assertThat(fødselshendelsetasks).isNotEmpty // Den skal være tilgjengelig via RestTaskService
 
-        assertThat(hendelsesloggRepository.existsByHendelseId("2")).isTrue() // Hendelsen skal ha blitt lagret.
+        assertThat(hendelsesloggRepository.existsByHendelseIdAndConsumer("2",
+                                                                         HendelseConsumer.PDL)).isTrue() // Hendelsen skal ha blitt lagret.
     }
 }
 
@@ -118,7 +122,7 @@ class CustomKafkaAvroSerializer : KafkaAvroSerializer {
 }
 
 class CustomKafkaAvroDeserializer : KafkaAvroDeserializer() {
-    override fun deserialize(topic: String?, bytes: ByteArray) : Any {
+    override fun deserialize(topic: String?, bytes: ByteArray): Any {
         if (topic.equals("aapen-person-pdl-leesah-v1")) {
             this.schemaRegistry = getMockClient(Personhendelse.`SCHEMA$`)
         }

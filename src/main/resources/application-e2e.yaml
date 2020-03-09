@@ -5,16 +5,16 @@ no.nav.security.jwt:
     cookie_name: azure_token
   client:
     registration:
-      ks-oppslag-onbehalfof:
-        resource-url: ${FAMILIE_INTEGRASJONER_API_URL}
+      ba-sak-clientcredentials:
+        resource-url: ${FAMILIE_BA_SAK_API_URL}
         token-endpoint-url: http://vtp:8060/rest/isso/oauth2/access_token
-        grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
+        grant-type: client_credentials
         scope: dummy
         authentication:
           client-id: dummy
           client-secret: dummy
           client-auth-method: client_secret_basic
-      ks-oppslag-clientcredentials:
+      integrasjoner-clientcredentials:
         resource-url: ${FAMILIE_INTEGRASJONER_API_URL}
         token-endpoint-url: http://vtp:8060/rest/isso/oauth2/access_token
         grant-type: client_credentials
@@ -26,6 +26,17 @@ no.nav.security.jwt:
 
 
 spring:
+  cloud:
+    vault:
+      database:
+        role: familie
+  datasource:
+    url: jdbc:postgresql://postgres-mottak:5432/familiebamottak
+    hikari:
+      username: familie
+      password: familie-pwd
+  flyway:
+    enabled: true
   kafka:
     bootstrap-servers: ${KAFKA_BROKERS}
     properties:
@@ -35,16 +46,6 @@ spring:
       schema.registry.url: ${KAFKA_BROKERS}
     consumer:
       group-id: srvc01
-  jpa:
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql=false
-    hibernate:
-      ddl-auto: create
-  flyway:
-    enabled: false
-
 funksjonsbrytere:
   enabled: false
   unleash:
@@ -52,8 +53,8 @@ funksjonsbrytere:
     cluster: localhost
     applicationName: familie-ba-sak
 
-logging:
-  config: "classpath:logback-test.xml"
+#logging:
+#  config: "classpath:logback-test.xml"
 
 FAMILIE_BA_SAK_API_URL: http://familie-ba-sak:8089/api
 FAMILIE_INTEGRASJONER_API_URL: http://familie-integrasjoner:8085/api
