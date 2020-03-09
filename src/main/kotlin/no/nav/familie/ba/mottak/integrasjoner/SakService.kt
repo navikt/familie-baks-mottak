@@ -15,7 +15,7 @@ import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
 import java.net.URI
 
-private val logger = LoggerFactory.getLogger(PersonService::class.java)
+private val logger = LoggerFactory.getLogger(SakService::class.java)
 private const val OAUTH2_CLIENT_CONFIG_KEY = "ba-sak-clientcredentials"
 
 @Component

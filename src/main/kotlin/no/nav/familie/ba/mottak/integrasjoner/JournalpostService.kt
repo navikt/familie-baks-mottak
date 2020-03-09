@@ -29,12 +29,12 @@ class JournalpostService @Autowired constructor(@param:Value("\${FAMILIE_INTEGRA
                   oAuth2AccessTokenService) {
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
-    fun hentJournalpost(journalpostId: String): Journalpost? {
+    fun hentJournalpost(journalpostId: String): Journalpost {
         val uri = URI.create("$integrasjonerServiceUri/journalpost?journalpostId=$journalpostId")
         logger.info("henter journalpost med id {}", journalpostId)
         return try {
             val response: ResponseEntity<Journalpost>? = getRequest(uri)
-            response?.body
+            response?.body ?: error("Fant ikke journalpost")
         } catch (e: RestClientResponseException) {
             logger.warn("Henting av journalpost feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
             throw IllegalStateException("Henting av journalpost med id $journalpostId feilet. Status: " + e.rawStatusCode
@@ -46,13 +46,14 @@ class JournalpostService @Autowired constructor(@param:Value("\${FAMILIE_INTEGRA
 }
 
 data class Journalpost(val journalpostId: String,
-                       val journalpostype: Journalposttype?,
-                       val journalstatus: Journalstatus?,
-                       val tema: Tema?,
+                       val journalposttype: Journalposttype,
+                       val journalstatus: Journalstatus,
+                       val tema: String?,
                        val behandlingstema: String?,
                        val sak: Sak?,
+                       val bruker: Bruker?,
                        val journalforendeEnhet: String?,
-                       val kanal: Kanal?,
+                       val kanal: String?,
                        val dokumenter: List<DokumentInfo>?)
 
 data class Sak(val arkivsaksnummer: String?,
@@ -60,12 +61,15 @@ data class Sak(val arkivsaksnummer: String?,
                val fagsakId: String?,
                val fagsaksystem: String?)
 
+data class Bruker(val id: String,
+                  val type: BrukerIdType)
+
 data class DokumentInfo(val tittel: String?,
                         val brevkode: String?,
                         val dokumentstatus: Dokumentstatus?,
                         val dokumentvarianter: List<Dokumentvariant>?)
 
-data class Dokumentvariant(val variantformat: Variantformat?)
+data class Dokumentvariant(val variantformat: String)
 
 enum class Journalposttype {
     I,
@@ -88,80 +92,6 @@ enum class Journalstatus {
     UKJENT
 }
 
-enum class Tema {
-    AAR,
-    AGR,
-    BAR,
-    BID,
-    BIL,
-    DAG,
-    ENF,
-    ERS,
-    FAR,
-    FEI,
-    FOR,
-    FOS,
-    FUL,
-    GEN,
-    GRA,
-    GRU,
-    HEL,
-    HJE,
-    IAR,
-    IND,
-    KON,
-    KTR,
-    MED,
-    MOB,
-    OMS,
-    OPA,
-    OPP,
-    PEN,
-    PER,
-    REH,
-    REK,
-    RPO,
-    RVE,
-    SAA,
-    SAK,
-    SAP,
-    SER,
-    SIK,
-    STO,
-    SUP,
-    SYK,
-    SYM,
-    TIL,
-    TRK,
-    TRY,
-    TSO,
-    TSR,
-    UFM,
-    UFO,
-    UKJ,
-    VEN,
-    YRA,
-    YRK
-}
-
-enum class Kanal {
-    ALTINN,
-    EIA,
-    NAV_NO,
-    NAV_NO_UINNLOGGET,
-    SKAN_NETS,
-    SKAN_PEN,
-    EESSI,
-    EKST_OPPS,
-    SENTRAL_UTSKRIFT,
-    LOKAL_UTSKRIFT,
-    SDP,
-    TRYGDERETTEN,
-    HELSENETTET,
-    INGEN_DISTRIBUSJON,
-    UKJENT
-}
-
 enum class Dokumentstatus {
     FERDIGSTILT,
     AVBRUTT,
@@ -169,11 +99,8 @@ enum class Dokumentstatus {
     KASSERT
 }
 
-enum class Variantformat {
-    ARKIV,
-    FULLVERSJON,
-    PRODUKSJON,
-    PRODUKSJON_DLF,
-    SLADDET,
-    ORIGINAL
+enum class BrukerIdType {
+    AKTOERID,
+    FNR,
+    ORGNR
 }
