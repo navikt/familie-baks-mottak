@@ -1,3 +1,6 @@
+application:
+  name: familie-ba-mottak
+
 server:
   servlet:
     context-path: /
