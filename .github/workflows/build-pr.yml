@@ -10,11 +10,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/cache@v1
-          with:
-            path: ~/.m2/repository
-            key: ${{ runner.os }}-maven-cache-${{ hashFiles('pom.xml') }}
-            restore-keys: |
-              ${{ runner.os }}-maven-cache-
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-cache-${{ hashFiles('pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-cache-
       - name: SonarCloud
         env:
           GITHUB_USERNAME: x-access-token
