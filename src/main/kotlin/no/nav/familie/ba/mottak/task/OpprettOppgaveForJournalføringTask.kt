@@ -18,8 +18,10 @@ class OpprettOppgaveForJournalføringTask(private val journalpostService: Journa
     override fun doTask(task: Task) {
         val journalpost = journalpostService.hentJournalpost(task.payload)
 
-        if (journalpost.journalstatus.equals(Journalstatus.MOTTATT)) {
+        if (journalpost.journalstatus == Journalstatus.MOTTATT) {
             task.metadata["oppgaveId"] = "${oppgaveClient.opprettJournalføringsoppgave(journalpost).oppgaveId}"
+            task.metadata["personIdent"] = journalpost.bruker?.id
+            task.metadata["journalpostId"] = journalpost.journalpostId
             taskRepository.saveAndFlush(task)
         }
     }

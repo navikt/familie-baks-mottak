@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.test.context.ActiveProfiles
+import java.time.LocalDate
 
 @SpringBootTest(classes = [ApplicationConfig::class], properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api"])
 @ActiveProfiles("dev", "mock-oauth")
@@ -50,13 +51,13 @@ class OppgaveClientTest {
                 .withBody(
                     objectMapper.writeValueAsString(Ressurs.success(OppgaveResponse(oppgaveId = 1234))))))
 
-        val opprettOppgaveResponse = oppgaveClient.opprettJournalføringsoppgave("1234567")
+        val opprettOppgaveResponse = oppgaveClient.opprettJournalføringsoppgave(journalPost)
 
         assertThat(opprettOppgaveResponse.oppgaveId).isEqualTo(1234)
         verify(anyRequestedFor(anyUrl())
             .withHeader(NavHttpHeaders.NAV_CALL_ID.asString(), equalTo("opprettJournalføringsoppgave"))
             .withHeader(NavHttpHeaders.NAV_CONSUMER_ID.asString(), equalTo("familie-ba-mottak"))
-            .withRequestBody(equalToJson(forventetOpprettOppgaveJRequestJson("1234567"), true, true)))
+            .withRequestBody(equalToJson(forventetOpprettOppgaveJRequestJson("1234567"))))
     }
 
     @Test
@@ -68,7 +69,7 @@ class OppgaveClientTest {
                 .withBody(objectMapper.writeValueAsString(Ressurs.failure<String>("test")))))
 
         Assertions.assertThatThrownBy {
-            oppgaveClient.opprettJournalføringsoppgave("1234567")
+            oppgaveClient.opprettJournalføringsoppgave(journalPost)
         }.isInstanceOf(IntegrasjonException::class.java)
             .hasMessageContaining("Kall mot integrasjon feilet ved opprettelse av oppgave")
 
@@ -77,17 +78,23 @@ class OppgaveClientTest {
     private fun forventetOpprettOppgaveJRequestJson(journalpostId: String): String {
         return "{\n" +
             "  \"ident\": {\n" +
-            "    \"ident\": \"\",\n" +
+            "    \"ident\": \"1234567891011\",\n" +
             "    \"type\": \"Aktør\"\n" +
             "  },\n" +
-            "  \"enhetsnummer\": null,\n" +
+            "  \"enhetsnummer\": \"9999\",\n" +
             "  \"saksId\": null,\n" +
             "  \"journalpostId\": \"$journalpostId\",\n" +
             "  \"tema\": \"BAR\",\n" +
             "  \"oppgavetype\": \"Journalføring\",\n" +
             "  \"behandlingstema\": \"ab0180\",\n" +
-            "  \"fristFerdigstillelse\": \"2020-03-06\",\n" +
-            "  \"aktivFra\": \"2020-03-05\"\n" +
+            "  \"fristFerdigstillelse\": \"${LocalDate.now().plusDays(2)}\",\n" +
+            "  \"aktivFra\": \"${LocalDate.now()}\",\n" +
+            "  \"beskrivelse\": \"\"\n" +
             "}"
+    }
+
+    companion object {
+        private val journalPost = Journalpost("1234567", Journalposttype.I, Journalstatus.MOTTATT, "tema",
+            "behandlingstema", null, Bruker("1234567891011", BrukerIdType.AKTOERID), "9999", "kanal", listOf())
     }
 }
