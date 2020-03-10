@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.integrasjoner
 
+import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import org.slf4j.LoggerFactory
@@ -14,15 +15,15 @@ import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
 import java.net.URI
 
-private val logger = LoggerFactory.getLogger(SakService::class.java)
-private const val OAUTH2_CLIENT_CONFIG_KEY = "ba-sak-clientcredentials"
+private val logger = LoggerFactory.getLogger(JournalpostClient::class.java)
+private const val OAUTH2_CLIENT_CONFIG_KEY = "integrasjoner-clientcredentials"
 
 @Component
-class JournalpostService @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONER_API_URL}")
+class JournalpostClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONER_API_URL}")
                                                 private val integrasjonerServiceUri: URI,
-                                                restTemplateBuilderMedProxy: RestTemplateBuilder,
-                                                clientConfigurationProperties: ClientConfigurationProperties,
-                                                oAuth2AccessTokenService: OAuth2AccessTokenService)
+                                               restTemplateBuilderMedProxy: RestTemplateBuilder,
+                                               clientConfigurationProperties: ClientConfigurationProperties,
+                                               oAuth2AccessTokenService: OAuth2AccessTokenService)
     : BaseService(OAUTH2_CLIENT_CONFIG_KEY,
                   restTemplateBuilderMedProxy,
                   clientConfigurationProperties,
@@ -33,8 +34,8 @@ class JournalpostService @Autowired constructor(@param:Value("\${FAMILIE_INTEGRA
         val uri = URI.create("$integrasjonerServiceUri/journalpost?journalpostId=$journalpostId")
         logger.info("henter journalpost med id {}", journalpostId)
         return try {
-            val response: ResponseEntity<Journalpost>? = getRequest(uri)
-            response?.body ?: error("Fant ikke journalpost")
+            val response: ResponseEntity<Ressurs<Journalpost>>? = getRequest(uri)
+            response?.body?.data ?: error("Fant ikke journalpost")
         } catch (e: RestClientResponseException) {
             logger.warn("Henting av journalpost feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
             throw IllegalStateException("Henting av journalpost med id $journalpostId feilet. Status: " + e.rawStatusCode
