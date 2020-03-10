@@ -9,7 +9,7 @@ import org.springframework.kafka.listener.ErrorHandler
 
 
 class CustomKafkaLoggingErrorHandler : ErrorHandler {
-    override fun handle(thrownException: Exception, record: ConsumerRecord<*, *>) {
+    override fun handle(thrownException: Exception, record: ConsumerRecord<*, *>?) {
         LOGGER.error("Problemer med prosessering")
         SECURE_LOGGER.error("Problemer med prosessering av $record", thrownException)
     }
