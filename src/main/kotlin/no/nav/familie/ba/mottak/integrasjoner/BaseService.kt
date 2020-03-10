@@ -51,6 +51,13 @@ open class BaseService(clientConfigKey: String, restTemplateBuilder: RestTemplat
         return restOperations.exchange<T>(uri, HttpMethod.POST, httpEntity)
     }
 
+    protected inline fun <reified T, U> putRequest(uri: URI, requestBody: U): ResponseEntity<T>? {
+        val headers = HttpHeaders()
+        headers.add("Content-Type", "application/json;charset=UTF-8")
+        val httpEntity: HttpEntity<U> = HttpEntity(requestBody, headers)
+        return restOperations.exchange<T>(uri, HttpMethod.PUT, httpEntity)
+    }
+
     protected inline fun <reified T> requestMedPersonIdent(uri: URI, personident: String): ResponseEntity<T>? {
         val headers: MultiValueMap<String, String> = LinkedMultiValueMap()
         headers.add(NavHttpHeaders.NAV_PERSONIDENT.asString(), personident)

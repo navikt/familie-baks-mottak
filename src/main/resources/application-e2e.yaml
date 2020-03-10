@@ -43,7 +43,7 @@ spring:
       security.protocol: SASL_PLAINTEXT
       sasl:
         jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="igroup" password="itest";
-      schema.registry.url: ${KAFKA_BROKERS}
+      schema.registry.url: http://schema-registry:8081
     consumer:
       group-id: srvc01
 funksjonsbrytere:
@@ -62,4 +62,4 @@ FAMILIE_INTEGRASJONER_API_URL: http://familie-integrasjoner:8085/api
 FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1
 FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 1
 
-KAFKA_BROKERS: http://kafka:9092
+KAFKA_BROKERS: http://kafka:9093
