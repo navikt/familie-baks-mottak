@@ -1,0 +1,31 @@
+{
+  "data": {
+    "journalpostId": "466992182",
+    "journalposttype": "I",
+    "journalstatus": "MOTTATT",
+    "tema": "BAR",
+    "behandlingstema": "ab0001",
+    "sak": null,
+    "bruker": {
+      "id": "12345678910",
+      "type": "FNR"
+    },
+    "journalforendeEnhet": "9999",
+    "kanal": "NAV_NO",
+    "dokumenter": [
+      {
+        "tittel": "Søknad om foreldrepenger ved fødsel",
+        "brevkode": "NAV 14-05.09",
+        "dokumentstatus": null,
+        "dokumentvarianter": [
+          {
+            "variantformat": "ARKIV"
+          }
+        ]
+      }
+    ]
+  },
+  "status": "SUKSESS",
+  "melding": "OK",
+  "stacktrace": null
+}

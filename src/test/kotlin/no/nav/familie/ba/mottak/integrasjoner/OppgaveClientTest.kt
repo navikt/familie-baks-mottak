@@ -38,7 +38,7 @@ class OppgaveClientTest {
     @AfterEach
     fun cleanUp() {
         MDC.clear()
-        WireMock.resetAllRequests()
+        resetAllRequests()
     }
 
     @Test
