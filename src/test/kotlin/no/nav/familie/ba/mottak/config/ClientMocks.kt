@@ -2,6 +2,7 @@ package no.nav.familie.ba.mottak.config
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.familie.ba.mottak.integrasjoner.AktørClient
 import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import org.springframework.context.annotation.Bean
@@ -23,6 +24,21 @@ class ClientMocks {
 
         return mockOppgaveClient
     }
+
+
+    @Bean
+    @Primary
+    fun mockAktørClient(): AktørClient {
+
+        val mockAktørClient = mockk<AktørClient>(relaxed = true)
+
+        every {
+            mockAktørClient.hentAktørId(any())
+        } returns "42"
+
+        return mockAktørClient
+    }
+
 
 }
 
