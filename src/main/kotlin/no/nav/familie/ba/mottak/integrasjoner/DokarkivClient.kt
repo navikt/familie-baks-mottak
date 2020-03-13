@@ -20,28 +20,33 @@ class DokarkivClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJON
 
     fun oppdaterJournalpostSak(journalpostId: String, fagsakId: String, fnr: String) {
         logger.info("Oppdaterer journalpost $journalpostId med fagsaktilknytning $fagsakId ")
-        val uri = URI.create("$integrasjonUri/$journalpostId")
+        val uri = URI.create("$integrasjonUri/v2/$journalpostId")
         val request = TilknyttFagsakRequest(bruker = Bruker(idType = IdType.FNR, id = fnr),
                                             tema = "BAR",
                                             sak = Sak(fagsakId, "BA"))
-        return Result.runCatching {
-            putForEntity<Ressurs<OppdaterJournalpostResponse>>(uri, request)
-        }.fold(
-            onSuccess = { response -> assertGyldig(response) },
-            onFailure = {
-                throw IntegrasjonException("Oppdatering av journalpost $journalpostId med fagsak $fagsakId feilet", it, uri, null)
-            }
-        )
+
+        when (val response = utførRequest(uri, request)) {
+            is Throwable ->
+                throw IntegrasjonException("Oppdatering av journalpost $journalpostId med fagsak $fagsakId feilet", response, uri, null)
+        }
     }
 
     fun ferdigstillJournalpost(journalpostId: String) {
         logger.info("Forsøker å ferdigstille journalpost $journalpostId")
-        val uri = URI.create("$integrasjonUri/$journalpostId/ferdigstill?journalfoerendeEnhet=9999")
-        Result.runCatching {
-            putForEntity<Ressurs<Map<String, String>>>(uri, "")
+        val uri = URI.create("$integrasjonUri/v2/$journalpostId/ferdigstill?journalfoerendeEnhet=9999")
+
+        when (val response = utførRequest(uri)) {
+            is Throwable ->
+                throw IntegrasjonException("Ferdigstilling av journalpost $journalpostId feilet", response, uri, null)
+        }
+    }
+
+    private fun utførRequest(uri: URI, request: Any = ""): Any {
+        return Result.runCatching {
+            putForEntity<Ressurs<Any>>(uri, request)
         }.fold(
             onSuccess = { response -> assertGyldig(response) },
-            onFailure = { throw IntegrasjonException("Ferdigstilling av journalpost $journalpostId feilet", it, uri, null) }
+            onFailure = { it }
         )
     }
 
@@ -54,10 +59,6 @@ class DokarkivClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJON
             else -> ressurs.data!!
         }
     }
-
-    data class OppdaterJournalpostResponse (
-        val journalpostId: String
-    )
 
     data class TilknyttFagsakRequest (val bruker: Bruker,
                                  val tema: String,
