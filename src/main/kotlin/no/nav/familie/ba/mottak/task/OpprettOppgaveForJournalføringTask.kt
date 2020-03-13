@@ -7,6 +7,8 @@ import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Service
 class OpprettOppgaveForJournalføringTask(private val journalpostClient: JournalpostClient,
                                          private val oppgaveClient: OppgaveClient,
                                          private val taskRepository: TaskRepository) : AsyncTaskStep {
+
+    val log: Logger = LoggerFactory.getLogger(OpprettOppgaveForJournalføringTask::class.java)
 
     override fun doTask(task: Task) {
         val journalpost = journalpostClient.hentJournalpost(task.payload)
@@ -23,6 +27,8 @@ class OpprettOppgaveForJournalføringTask(private val journalpostClient: Journal
             task.metadata["personIdent"] = journalpost.bruker?.id
             task.metadata["journalpostId"] = journalpost.journalpostId
             taskRepository.saveAndFlush(task)
+        } else {
+            log.info("Ingen oppgave opprettet da journalpost ${journalpost.journalpostId} ikke har status MOTTATT lenger.")
         }
     }
 

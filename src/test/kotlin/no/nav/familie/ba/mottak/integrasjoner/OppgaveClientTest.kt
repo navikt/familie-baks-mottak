@@ -1,6 +1,5 @@
 package no.nav.familie.ba.mottak.integrasjoner
 
-import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import no.nav.familie.ba.mottak.config.ApplicationConfig
 import no.nav.familie.kontrakter.felles.Ressurs
@@ -57,12 +56,35 @@ class OppgaveClientTest {
         verify(anyRequestedFor(anyUrl())
             .withHeader(NavHttpHeaders.NAV_CALL_ID.asString(), equalTo("opprettJournalføringsoppgave"))
             .withHeader(NavHttpHeaders.NAV_CONSUMER_ID.asString(), equalTo("familie-ba-mottak"))
-            .withRequestBody(equalToJson(forventetOpprettOppgaveJRequestJson("1234567"))))
+            .withRequestBody(equalToJson(forventetOpprettOppgaveJRequestJson(journalpostId = "1234567",
+                                                                             oppgavetype = "Journalføring",
+                                                                             behandlingstema = "ab0180"))))
     }
 
     @Test
     @Tag("integration")
-    fun `Opprett journalføringsoppgave skal kaste feil hvis response er ugyldig`() {
+    fun `Opprett behandleSak-oppgave skal returnere oppgave id`() {
+        MDC.put("callId", "opprettJournalføringsoppgave")
+        stubFor(post(urlEqualTo("/api/oppgave"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withBody(
+                    objectMapper.writeValueAsString(Ressurs.success(OppgaveResponse(oppgaveId = 1234))))))
+
+        val opprettOppgaveResponse = oppgaveClient.opprettBehandleSakOppgave(journalPost)
+
+        assertThat(opprettOppgaveResponse.oppgaveId).isEqualTo(1234)
+        verify(anyRequestedFor(anyUrl())
+            .withHeader(NavHttpHeaders.NAV_CALL_ID.asString(), equalTo("opprettJournalføringsoppgave"))
+            .withHeader(NavHttpHeaders.NAV_CONSUMER_ID.asString(), equalTo("familie-ba-mottak"))
+            .withRequestBody(equalToJson(forventetOpprettOppgaveJRequestJson(journalpostId = "1234567",
+                                                                             oppgavetype = "BehandleSak",
+                                                                             behandlingstema = "behandlingstemaFraJournalpost"))))
+    }
+
+    @Test
+    @Tag("integration")
+    fun `Opprett oppgave skal kaste feil hvis response er ugyldig`() {
         stubFor(post(urlEqualTo("/api/oppgave"))
             .willReturn(aResponse()
                 .withStatus(500)
@@ -73,9 +95,15 @@ class OppgaveClientTest {
         }.isInstanceOf(IntegrasjonException::class.java)
             .hasMessageContaining("Kall mot integrasjon feilet ved opprettelse av oppgave")
 
+        Assertions.assertThatThrownBy {
+            oppgaveClient.opprettBehandleSakOppgave(journalPost)
+        }.isInstanceOf(IntegrasjonException::class.java)
+            .hasMessageContaining("Kall mot integrasjon feilet ved opprettelse av oppgave")
     }
 
-    private fun forventetOpprettOppgaveJRequestJson(journalpostId: String): String {
+    private fun forventetOpprettOppgaveJRequestJson(journalpostId: String,
+                                                    oppgavetype: String,
+                                                    behandlingstema: String): String {
         return "{\n" +
             "  \"ident\": {\n" +
             "    \"ident\": \"1234567891011\",\n" +
@@ -85,8 +113,8 @@ class OppgaveClientTest {
             "  \"saksId\": null,\n" +
             "  \"journalpostId\": \"$journalpostId\",\n" +
             "  \"tema\": \"BAR\",\n" +
-            "  \"oppgavetype\": \"Journalføring\",\n" +
-            "  \"behandlingstema\": \"ab0180\",\n" +
+            "  \"oppgavetype\": \"$oppgavetype\",\n" +
+            "  \"behandlingstema\": \"$behandlingstema\",\n" +
             "  \"fristFerdigstillelse\": \"${LocalDate.now().plusDays(2)}\",\n" +
             "  \"aktivFra\": \"${LocalDate.now()}\",\n" +
             "  \"beskrivelse\": \"\"\n" +
@@ -94,7 +122,8 @@ class OppgaveClientTest {
     }
 
     companion object {
-        private val journalPost = Journalpost("1234567", Journalposttype.I, Journalstatus.MOTTATT, "tema",
-            "behandlingstema", null, Bruker("1234567891011", BrukerIdType.AKTOERID), "9999", "kanal", listOf())
+        private val journalPost = Journalpost("1234567",Journalposttype.I, Journalstatus.MOTTATT, "tema",
+            "behandlingstemaFraJournalpost", null, Bruker("1234567891011", BrukerIdType.AKTOERID),
+            "9999", "kanal", listOf())
     }
 }
