@@ -9,6 +9,7 @@ import no.nav.familie.ba.mottak.integrasjoner.Journalpost
 import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.ba.mottak.integrasjoner.Journalposttype
 import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
+import no.nav.familie.ba.mottak.task.OpprettBehandleSakOppgaveTask
 import no.nav.familie.ba.mottak.task.OpprettOppgaveForJournalføringTask
 import no.nav.familie.log.IdUtils
 import no.nav.familie.log.mdc.MDCConstants
@@ -32,8 +33,8 @@ class JournalføringHendelseConsumer(val hendelsesloggRepository: HendelsesloggR
                                     val taskRepository: TaskRepository) {
 
     val kanalNavnoCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.navno")
-    val kanalSkannetsCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skannnets")
-    val kanalAnnetCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skannnets")
+    val kanalSkannetsCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skannets")
+    val kanalAnnetCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.annet")
     val feilCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.feilet")
     val ignorerteCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.ignorerte")
 
@@ -56,8 +57,8 @@ class JournalføringHendelseConsumer(val hendelsesloggRepository: HendelsesloggR
                 val callId = hendelseRecord.kanalReferanseId.toStringOrNull() ?: IdUtils.generateId()
                 MDC.put(MDCConstants.MDC_CALL_ID, callId)
                 //hent journalpost fra saf
-                val journalpostId = hendelseRecord.journalpostId
-                val journalpost = journalpostClient.hentJournalpost(journalpostId.toString())
+                val journalpostId = hendelseRecord.journalpostId.toString()
+                val journalpost = journalpostClient.hentJournalpost(journalpostId)
                 if (skalBehandleJournalpost(journalpost)) {
                     when (journalpost.journalstatus) {
                         Journalstatus.MOTTATT -> {
@@ -66,7 +67,7 @@ class JournalføringHendelseConsumer(val hendelsesloggRepository: HendelsesloggR
                                     LOG.info("Ny Journalhendelse med journalpostId=$journalpostId med status MOTTATT og kanal SKAN_NETS")
                                     val metadata = opprettMetadata(journalpost, callId)
                                     val journalføringsTask = Task.nyTask(OpprettOppgaveForJournalføringTask.TASK_STEP_TYPE,
-                                                                         journalpostId.toString(),
+                                                                         journalpostId,
                                                                          metadata)
                                     taskRepository.save(journalføringsTask)
                                     kanalSkannetsCounter.increment()
@@ -75,7 +76,11 @@ class JournalføringHendelseConsumer(val hendelsesloggRepository: HendelsesloggR
                                 "NAV_NO" -> {
                                     LOG.info("Ny Journalhendelse med journalpostId=$journalpostId med status MOTTATT og kanal NAV_NO")
                                     val metadata = opprettMetadata(journalpost, callId)
-                                    // TODO opprett en eller annen task
+                                    //TODO bytte til ferdigstillTask når den blir opprettet
+                                    val behandleSakTask =
+                                            Task.nyTask(OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE, journalpostId, metadata)
+                                    taskRepository.save(behandleSakTask)
+
                                     kanalNavnoCounter.increment()
                                 }
 

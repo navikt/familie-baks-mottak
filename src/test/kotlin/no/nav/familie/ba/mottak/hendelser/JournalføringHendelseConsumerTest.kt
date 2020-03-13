@@ -5,6 +5,7 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.integrasjoner.*
+import no.nav.familie.ba.mottak.task.OpprettBehandleSakOppgaveTask
 import no.nav.familie.ba.mottak.task.OpprettOppgaveForJournalføringTask
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
@@ -142,17 +143,15 @@ class JournalføringHendelseConsumerTest {
 
         consumer.listen(consumerRecord, ack)
 
-        //TODO kan kommenteres inn når man får OpprettBehandleSakOppgaveTask
-//        val taskSlot = slot<Task>()
-//        verify {
-//            mockTaskRepository.save(capture(taskSlot))
-//        }
-//
-//        assertThat(taskSlot.captured).isNotNull
-//        assertThat(taskSlot.captured.payload).isEqualTo(JOURNALPOST_ID_DIGITALSØKNAD)
-//        assertThat(taskSlot.captured.metadata.getProperty("callId")).isEqualTo("kanalReferanseId")
-//        assertThat(taskSlot.captured.taskStepType).isEqualTo(OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE)
-//        verify { ack.acknowledge() }
+        val taskSlot = slot<Task>()
+        verify {
+            mockTaskRepository.save(capture(taskSlot))
+        }
+
+        assertThat(taskSlot.captured).isNotNull
+        assertThat(taskSlot.captured.payload).isEqualTo(JOURNALPOST_DIGITALSØKNAD)
+        assertThat(taskSlot.captured.metadata.getProperty("callId")).isEqualTo("kanalReferanseId")
+        assertThat(taskSlot.captured.taskStepType).isEqualTo(OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE)
 
 
         verify { ack.acknowledge() }
