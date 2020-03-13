@@ -25,7 +25,7 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
     fun opprettJournalføringsoppgave(journalpost: Journalpost): OppgaveResponse {
         logger.info("Oppretter journalføringsoppgave for papirsøknad")
-        val uri = URI.create("$integrasjonUri/oppgave")
+        val uri = URI.create("$integrasjonUri/oppgave/")
         val request = opprettOppgaveRequest(Oppgavetype.Journalføring, journalpost, behandlingstema = "ab0180")
 
         return responseFra(uri, request)
@@ -34,7 +34,7 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
     fun opprettBehandleSakOppgave(journalpost: Journalpost): OppgaveResponse {
         logger.info("Oppretter \"Behandle sak\"-oppgave for digital søknad")
-        val uri = URI.create("$integrasjonUri/oppgave")
+        val uri = URI.create("$integrasjonUri/oppgave/")
         val request = opprettOppgaveRequest(Oppgavetype.BehandleSak, journalpost)
 
         return responseFra(uri, request)
