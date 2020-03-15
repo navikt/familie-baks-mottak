@@ -2,6 +2,7 @@ package no.nav.familie.ba.mottak.hendelser
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
+import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.Hendelseslogg
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
@@ -30,7 +31,8 @@ import javax.transaction.Transactional
 @Service
 class JournalføringHendelseConsumer(val hendelsesloggRepository: HendelsesloggRepository,
                                     val journalpostClient: JournalpostClient,
-                                    val taskRepository: TaskRepository) {
+                                    val taskRepository: TaskRepository,
+                                    val featureToggleService: FeatureToggleService) {
 
     val kanalNavnoCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.navno")
     val kanalSkannetsCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skannets")
@@ -66,20 +68,31 @@ class JournalføringHendelseConsumer(val hendelsesloggRepository: HendelsesloggR
                                 "SKAN_NETS" -> {
                                     LOG.info("Ny Journalhendelse med journalpostId=$journalpostId med status MOTTATT og kanal SKAN_NETS")
                                     val metadata = opprettMetadata(journalpost, callId)
-                                    val journalføringsTask = Task.nyTask(OpprettOppgaveForJournalføringTask.TASK_STEP_TYPE,
-                                                                         journalpostId,
-                                                                         metadata)
-                                    taskRepository.save(journalføringsTask)
+                                    if (featureToggleService.isEnabled("familie-ba-mottak.journalhendelse", false)) {
+                                        val journalføringsTask = Task.nyTask(OpprettOppgaveForJournalføringTask.TASK_STEP_TYPE,
+                                                                             journalpostId,
+                                                                             metadata)
+                                        taskRepository.save(journalføringsTask)
+                                    } else {
+                                        LOG.info("Behandler ikke journalhendelse, feature er skrudd av i Unleash")
+                                    }
+
                                     kanalSkannetsCounter.increment()
                                 }
 
                                 "NAV_NO" -> {
-                                    LOG.info("Ny Journalhendelse med journalpostId=$journalpostId med status MOTTATT og kanal NAV_NO")
+
                                     val metadata = opprettMetadata(journalpost, callId)
                                     //TODO bytte til ferdigstillTask når den blir opprettet
-                                    val behandleSakTask =
-                                            Task.nyTask(OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE, journalpostId, metadata)
-                                    taskRepository.save(behandleSakTask)
+
+                                    if (featureToggleService.isEnabled("familie-ba-mottak.journalhendelse", false)) {
+                                        val behandleSakTask =
+                                                Task.nyTask(OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE, journalpostId, metadata)
+                                        taskRepository.save(behandleSakTask)
+                                    } else {
+                                        LOG.info("Behandler ikke journalhendelse, feature er skrudd av i Unleash")
+                                    }
+
 
                                     kanalNavnoCounter.increment()
                                 }
@@ -120,12 +133,11 @@ class JournalføringHendelseConsumer(val hendelsesloggRepository: HendelsesloggR
 
     private fun opprettMetadata(journalpost: Journalpost,
                                 callId: String?): Properties {
-        val metadata = Properties().apply {
+        return Properties().apply {
             this["personIdent"] = journalpost.bruker?.id
             this["journalpostId"] = journalpost.journalpostId
             this["callId"] = callId
         }
-        return metadata
     }
 
     private fun erGyldigHendelsetype(hendelseRecord: JournalfoeringHendelseRecord): Boolean {
@@ -133,7 +145,7 @@ class JournalføringHendelseConsumer(val hendelsesloggRepository: HendelsesloggR
     }
 
     fun CharSequence.toStringOrNull(): String? {
-        if (!this.isNullOrBlank()) return this.toString() else return null
+        return if (!this.isBlank()) this.toString() else null
     }
 
     companion object {

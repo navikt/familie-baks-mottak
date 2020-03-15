@@ -4,7 +4,6 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.ba.mottak.integrasjoner.AktørClient
 import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
-import io.mockk.slot
 import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import org.springframework.context.annotation.Bean
@@ -47,10 +46,6 @@ class ClientMocks {
 
         val mockJournalpostClient = mockk<JournalpostClient>(relaxed = true)
 
-        val slot = slot<String>()
-
-
-
         every {
             mockJournalpostClient.hentJournalpost("123")
         } returns Journalpost(journalpostId = "123",
@@ -66,6 +61,22 @@ class ClientMocks {
         )
 
         return mockJournalpostClient
+    }
+
+    @Bean
+    @Primary
+    fun mockFeatureToggleService(): FeatureToggleService {
+        val mockFeatureToggleClient = mockk<FeatureToggleService>(relaxed = true)
+
+        every {
+            mockFeatureToggleClient.isEnabled(any())
+        } returns true
+
+        every {
+            mockFeatureToggleClient.isEnabled(any(), any())
+        } returns true
+
+        return mockFeatureToggleClient
     }
 
 }

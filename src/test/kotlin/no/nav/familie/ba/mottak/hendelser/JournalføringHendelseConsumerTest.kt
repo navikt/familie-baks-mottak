@@ -3,6 +3,7 @@ package no.nav.familie.ba.mottak.hendelser
 import io.mockk.*
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
+import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.ba.mottak.task.OpprettBehandleSakOppgaveTask
@@ -32,6 +33,8 @@ class JournalføringHendelseConsumerTest {
     @MockK(relaxed = true)
     lateinit var ack: Acknowledgment
 
+    @MockK(relaxed = true)
+    lateinit var mockFeatureToggleService: FeatureToggleService
 
     @InjectMockKs
     lateinit var consumer: JournalføringHendelseConsumer
@@ -110,11 +113,13 @@ class JournalføringHendelseConsumerTest {
                               dokumenter = null,
                               journalforendeEnhet = null,
                               sak = null)
+
+        every { mockFeatureToggleService.isEnabled(any(), any()) } returns true
     }
 
     @Test
     fun `Mottak av papirsøknader skal opprette OpprettOppgaveForJournalføringTask`() {
-        var record = opprettRecord(JOURNALPOST_PAPIRSØKNAD)
+        val record = opprettRecord(JOURNALPOST_PAPIRSØKNAD)
 
         val consumerRecord = ConsumerRecord("topic", 1, 1, 1, record)
 
@@ -137,7 +142,7 @@ class JournalføringHendelseConsumerTest {
 
     @Test
     fun `Mottak av digital søknader skal opprette task`() {
-        var record = opprettRecord(JOURNALPOST_DIGITALSØKNAD)
+        val record = opprettRecord(JOURNALPOST_DIGITALSØKNAD)
 
         val consumerRecord = ConsumerRecord("topic", 1, 1, 1, record)
 
@@ -160,7 +165,7 @@ class JournalføringHendelseConsumerTest {
 
     @Test
     fun `Ikke gyldige hendelsetyper skal ignoreres`() {
-        var record = opprettRecord(JOURNALPOST_PAPIRSØKNAD, "UgyldigType")
+        val record = opprettRecord(JOURNALPOST_PAPIRSØKNAD, "UgyldigType")
 
         val consumerRecord = ConsumerRecord("topic", 1, 1, 1, record)
 
@@ -177,7 +182,7 @@ class JournalføringHendelseConsumerTest {
 
     @Test
     fun `Hendelser hvor journalpost ikke har tema for Barnetrygd skal ignoreres`() {
-        var record = opprettRecord(JOURNALPOST_IKKE_BARNETRYGD)
+        val record = opprettRecord(JOURNALPOST_IKKE_BARNETRYGD)
 
         val consumerRecord = ConsumerRecord("topic", 1, 1, 1, record)
 
@@ -194,7 +199,7 @@ class JournalføringHendelseConsumerTest {
 
     @Test
     fun `Hendelser hvor journalpost er alt FERDIGSTILT skal ignoreres`() {
-        var record = opprettRecord(JOURNALPOST_FERDIGSTILT)
+        val record = opprettRecord(JOURNALPOST_FERDIGSTILT)
 
         val consumerRecord = ConsumerRecord("topic", 1, 1, 1, record)
 
@@ -211,7 +216,7 @@ class JournalføringHendelseConsumerTest {
 
     @Test
     fun `Utgående journalposter skal ignoreres`() {
-        var record = opprettRecord(JOURNALPOST_UTGÅENDE_DOKUMENT)
+        val record = opprettRecord(JOURNALPOST_UTGÅENDE_DOKUMENT)
 
         val consumerRecord = ConsumerRecord("topic", 1, 1, 1, record)
 
@@ -229,17 +234,16 @@ class JournalføringHendelseConsumerTest {
 
     private fun opprettRecord(journalpostId: String,
                               hendelseType: String = "MidlertidigJournalført"): JournalfoeringHendelseRecord {
-        var record = JournalfoeringHendelseRecord("hendelseId",
-                                                  1,
-                                                  hendelseType,
-                                                  journalpostId.toLong(),
-                                                  "M",
-                                                  "BAR",
-                                                  "BAR",
-                                                  "SKAN_NETS",
-                                                  "kanalReferanseId",
-                                                  "BAR")
-        return record
+        return JournalfoeringHendelseRecord("hendelseId",
+                                            1,
+                                            hendelseType,
+                                            journalpostId.toLong(),
+                                            "M",
+                                            "BAR",
+                                            "BAR",
+                                            "SKAN_NETS",
+                                            "kanalReferanseId",
+                                            "BAR")
     }
 
     companion object {
