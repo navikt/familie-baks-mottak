@@ -44,9 +44,10 @@ class LeesahConsumer(val taskRepository: TaskRepository,
     @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"],
                    id = "personhendelse",
                    idIsGroup = false,
-                   containerFactory = "kafkaListenerContainerFactory")
+                   containerFactory = "kafkaLeesahListenerContainerFactory")
     @Transactional
     fun listen(cr: ConsumerRecord<Int, GenericRecord>, ack: Acknowledgment) {
+        cr.value().schema
         try {
             if (hendelsesloggRepository.existsByHendelseIdAndConsumer(cr.value().hentHendelseId(), CONSUMER_PDL)) {
                 ack.acknowledge()
