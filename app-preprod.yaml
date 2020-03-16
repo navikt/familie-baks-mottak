@@ -24,7 +24,7 @@ spec:
     enabled: true
   replicas:
     min: 2
-    max: 4
+    max: 2
     cpuThresholdPercentage: 50
   resources:
     limits:
