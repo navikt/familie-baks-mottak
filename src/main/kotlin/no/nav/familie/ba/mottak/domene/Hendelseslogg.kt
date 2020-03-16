@@ -32,6 +32,5 @@ data class Hendelseslogg(
 )
 
 enum class HendelseConsumer {
-    PDL,
-    JOURNAL
+    PDL
 }
