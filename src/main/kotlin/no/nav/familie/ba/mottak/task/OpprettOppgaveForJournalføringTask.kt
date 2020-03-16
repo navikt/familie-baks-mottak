@@ -12,7 +12,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
-@TaskStepBeskrivelse(taskStepType = OpprettOppgaveForJournalføringTask.TASK_STEP_TYPE, beskrivelse = "Opprett journalføringsoppgave")
+@TaskStepBeskrivelse(taskStepType = OpprettOppgaveForJournalføringTask.TASK_STEP_TYPE,
+                     beskrivelse = "Opprett journalføringsoppgave")
 class OpprettOppgaveForJournalføringTask(private val journalpostClient: JournalpostClient,
                                          private val oppgaveClient: OppgaveClient,
                                          private val taskRepository: TaskRepository) : AsyncTaskStep {
@@ -20,10 +21,12 @@ class OpprettOppgaveForJournalføringTask(private val journalpostClient: Journal
     val log: Logger = LoggerFactory.getLogger(OpprettOppgaveForJournalføringTask::class.java)
 
     override fun doTask(task: Task) {
+
         val journalpost = journalpostClient.hentJournalpost(task.payload)
 
         if (journalpost.journalstatus == Journalstatus.MOTTATT) {
-            task.metadata["oppgaveId"] = "${oppgaveClient.opprettJournalføringsoppgave(journalpost).oppgaveId}"
+            task.metadata["oppgaveId"] =
+                    "${oppgaveClient.opprettJournalføringsoppgave(journalpost).oppgaveId}"
             task.metadata["personIdent"] = journalpost.bruker?.id
             task.metadata["journalpostId"] = journalpost.journalpostId
             taskRepository.saveAndFlush(task)
@@ -36,3 +39,4 @@ class OpprettOppgaveForJournalføringTask(private val journalpostClient: Journal
         const val TASK_STEP_TYPE = "opprettJournalføringsoppgave"
     }
 }
+

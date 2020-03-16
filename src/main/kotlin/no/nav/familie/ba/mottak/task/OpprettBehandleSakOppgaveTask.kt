@@ -23,7 +23,8 @@ class OpprettBehandleSakOppgaveTask(private val journalpostClient: JournalpostCl
         val journalpost = journalpostClient.hentJournalpost(task.payload)
 
         if (journalpost.journalstatus == Journalstatus.FERDIGSTILT) {
-            task.metadata["oppgaveId"] = "${oppgaveClient.opprettBehandleSakOppgave(journalpost).oppgaveId}"
+            task.metadata["oppgaveId"] =
+                    "${oppgaveClient.opprettBehandleSakOppgave(journalpost).oppgaveId}"
             task.metadata["personIdent"] = journalpost.bruker?.id
             task.metadata["journalpostId"] = journalpost.journalpostId
             task.metadata["fagsakId"] = journalpost.sak?.fagsakId
