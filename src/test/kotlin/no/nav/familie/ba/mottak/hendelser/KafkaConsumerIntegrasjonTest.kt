@@ -10,6 +10,7 @@ import no.nav.familie.ba.mottak.util.DbContainerInitializer
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.rest.RestTaskService
+import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import no.nav.person.pdl.leesah.Endringstype
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.doedsfall.Doedsfall
@@ -21,6 +22,7 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -32,18 +34,18 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 @SpringBootTest(properties = ["spring.kafka.bootstrap-servers=\${spring.embedded.kafka.brokers}"])
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(initializers = [DbContainerInitializer::class])
 @ActiveProfiles("integrasjonstest")
-@EmbeddedKafka(partitions = 1, topics = ["aapen-person-pdl-leesah-v1"])
+@EmbeddedKafka(partitions = 1, topics = ["aapen-person-pdl-leesah-v1", "aapen-dok-journalfoering-v1-integrasjonstest"], count = 1)
 @Tag("integration")
-
-class LeesahConsumerTest(@Autowired val hendelsesloggRepository: HendelsesloggRepository,
-                         @Autowired val kafkaProperties: KafkaProperties,
-                         @Autowired val taskRepository: TaskRepository,
-                         @Autowired val restTaskService: RestTaskService
+class KafkaConsumerIntegrasjonTest(@Autowired val hendelsesloggRepository: HendelsesloggRepository,
+                                   @Autowired val kafkaProperties: KafkaProperties,
+                                   @Autowired val taskRepository: TaskRepository,
+                                   @Autowired val restTaskService: RestTaskService
 ) {
 
     private fun buildKafkaProducer(): Producer<Int, GenericRecord> {
@@ -87,6 +89,7 @@ class LeesahConsumerTest(@Autowired val hendelsesloggRepository: HendelsesloggRe
 
         val fødsel = GenericRecordBuilder(Foedsel.`SCHEMA$`)
         fødsel.set("foedselsdato", (Instant.now().toEpochMilli() / (1000 * 3600 * 24)).toInt()) //Setter dagens dato på avroformat
+
         personhendelse.set("foedsel", fødsel.build())
 
         val producer = buildKafkaProducer()
@@ -110,6 +113,31 @@ class LeesahConsumerTest(@Autowired val hendelsesloggRepository: HendelsesloggRe
         assertThat(hendelsesloggRepository.existsByHendelseIdAndConsumer("2",
                                                                          HendelseConsumer.PDL)).isTrue() // Hendelsen skal ha blitt lagret.
     }
+
+
+    @Test
+    fun `Skal lese journalfoeringshendelser`() {
+        val journalHendelse = GenericRecordBuilder(JournalfoeringHendelseRecord.`SCHEMA$`)
+        journalHendelse.set("hendelsesId", "100")
+        journalHendelse.set("versjon", 1)
+        journalHendelse.set("hendelsesType", "MidlertidigJournalført")
+        journalHendelse.set("journalpostId", 123L)
+        journalHendelse.set("journalpostStatus", "M")
+        journalHendelse.set("temaGammelt", "BAR")
+        journalHendelse.set("temaNytt", "BAR")
+        journalHendelse.set("mottaksKanal", "NAV_NO")
+        journalHendelse.set("kanalReferanseId", "callId")
+        val producer = buildKafkaProducer()
+
+        producer.send(ProducerRecord("aapen-dok-journalfoering-v1-integrasjonstest", journalHendelse.build()))
+
+        await().atMost(10, TimeUnit.SECONDS)
+                .untilAsserted() {
+                    assertThat(hendelsesloggRepository.existsByHendelseIdAndConsumer("100",
+                                                                                     HendelseConsumer.JOURNAL)).isTrue()
+                }
+    }
+
 }
 
 class CustomKafkaAvroSerializer : KafkaAvroSerializer {
@@ -125,7 +153,10 @@ class CustomKafkaAvroDeserializer : KafkaAvroDeserializer() {
     override fun deserialize(topic: String?, bytes: ByteArray): Any {
         if (topic.equals("aapen-person-pdl-leesah-v1")) {
             this.schemaRegistry = getMockClient(Personhendelse.`SCHEMA$`)
+        } else if (topic.equals("aapen-dok-journalfoering-v1-integrasjonstest")) {
+            this.schemaRegistry = getMockClient(JournalfoeringHendelseRecord.`SCHEMA$`)
         }
+
 
         return super.deserialize(topic, bytes)
     }
