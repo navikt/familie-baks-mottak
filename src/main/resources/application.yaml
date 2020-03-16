@@ -11,6 +11,9 @@ spring:
   kafka:
     client-id: familie-ba-mottak
     properties:
+      specific:
+        avro:
+          reader: true
       security.protocol: SASL_SSL
       sasl:
         mechanism: PLAIN

@@ -20,7 +20,7 @@ private const val OAUTH2_CLIENT_CONFIG_KEY = "integrasjoner-clientcredentials"
 
 @Component
 class JournalpostClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONER_API_URL}")
-                                                private val integrasjonerServiceUri: URI,
+                                               private val integrasjonerServiceUri: URI,
                                                restTemplateBuilderMedProxy: RestTemplateBuilder,
                                                clientConfigurationProperties: ClientConfigurationProperties,
                                                oAuth2AccessTokenService: OAuth2AccessTokenService)
@@ -32,7 +32,7 @@ class JournalpostClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRAS
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
     fun hentJournalpost(journalpostId: String): Journalpost {
         val uri = URI.create("$integrasjonerServiceUri/journalpost?journalpostId=$journalpostId")
-        logger.info("henter journalpost med id {}", journalpostId)
+        logger.debug("henter journalpost med id {}", journalpostId)
         return try {
             val response: ResponseEntity<Ressurs<Journalpost>>? = getRequest(uri)
             response?.body?.data ?: error("Fant ikke journalpost")
