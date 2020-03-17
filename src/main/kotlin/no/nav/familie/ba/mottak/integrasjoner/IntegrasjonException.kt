@@ -13,14 +13,16 @@ class IntegrasjonException(msg: String,
                            ident: String? = null) : RuntimeException(msg, throwable) {
 
     init {
-        val message = if (throwable is RestClientResponseException) throwable.responseBodyAsString else ""
-
-        secureLogger.info("Ukjent feil ved integrasjon mot {}. ident={} {} {}",
+        val response = when { throwable is RestClientResponseException
+            -> "Responsekode: ${throwable.getRawStatusCode()}, body: ${throwable.responseBodyAsString}" else
+            -> ""
+        }
+        secureLogger.info("$msg. ident={} {} {}",
                           uri,
                           ident,
-                          message,
+                          response,
                           throwable)
-        logger.warn("Ukjent feil ved integrasjon mot '{}'.", uri)
+        logger.warn("$msg. {} {}", uri, response)
     }
 
     companion object {
