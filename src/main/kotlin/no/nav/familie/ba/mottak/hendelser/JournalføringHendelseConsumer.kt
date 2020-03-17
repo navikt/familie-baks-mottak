@@ -3,6 +3,7 @@ package no.nav.familie.ba.mottak.hendelser
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.config.FeatureToggleService
+import no.nav.familie.ba.mottak.config.KafkaErrorHandler
 import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.Hendelseslogg
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
@@ -10,6 +11,7 @@ import no.nav.familie.ba.mottak.integrasjoner.Journalpost
 import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.ba.mottak.integrasjoner.Journalposttype
 import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
+import no.nav.familie.ba.mottak.task.OppdaterOgFerdigstillJournalpostTask
 import no.nav.familie.ba.mottak.task.OpprettBehandleSakOppgaveTask
 import no.nav.familie.ba.mottak.task.OpprettOppgaveForJournalføringTask
 import no.nav.familie.log.IdUtils
@@ -24,6 +26,7 @@ import org.slf4j.MDC
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Service
+import java.lang.RuntimeException
 import java.util.*
 import javax.transaction.Transactional
 
@@ -40,11 +43,13 @@ class JournalføringHendelseConsumer(val hendelsesloggRepository: HendelsesloggR
     val feilCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.feilet")
     val ignorerteCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.ignorerte")
 
-    val LOG: Logger = LoggerFactory.getLogger(LeesahConsumer::class.java)
+    val LOG: Logger = LoggerFactory.getLogger(JournalføringHendelseConsumer::class.java)
 
     @KafkaListener(id = "familie-ba-mottak",
                    topics = ["\${JOURNALFOERINGHENDELSE_V1_TOPIC_URL}"],
-                   containerFactory = "kafkaJournalføringHendelseListenerContainerFactory")
+                   containerFactory = "kafkaJournalføringHendelseListenerContainerFactory",
+                   idIsGroup = false
+    )
     @Transactional
     fun listen(consumerRecord: ConsumerRecord<Int, JournalfoeringHendelseRecord>, ack: Acknowledgment) {
         try {
@@ -68,11 +73,12 @@ class JournalføringHendelseConsumer(val hendelsesloggRepository: HendelsesloggR
                                 "SKAN_NETS" -> {
                                     LOG.info("Ny Journalhendelse med journalpostId=$journalpostId med status MOTTATT og kanal SKAN_NETS")
                                     val metadata = opprettMetadata(journalpost, callId)
-                                    if (featureToggleService.isEnabled("familie-ba-mottak.journalhendelse", false)) {
+                                    if (featureToggleService.isEnabled("familie-ba-mottak.journalhendelse")) {
                                         val journalføringsTask = Task.nyTask(OpprettOppgaveForJournalføringTask.TASK_STEP_TYPE,
                                                                              journalpostId,
                                                                              metadata)
-                                        taskRepository.save(journalføringsTask)
+//                                        taskRepository.save(journalføringsTask)
+                                        LOG.info("Skal opprette journalføringsTask")
                                     } else {
                                         LOG.info("Behandler ikke journalhendelse, feature er skrudd av i Unleash")
                                     }
@@ -81,14 +87,13 @@ class JournalføringHendelseConsumer(val hendelsesloggRepository: HendelsesloggR
                                 }
 
                                 "NAV_NO" -> {
-
                                     val metadata = opprettMetadata(journalpost, callId)
-                                    //TODO bytte til ferdigstillTask når den blir opprettet
 
-                                    if (featureToggleService.isEnabled("familie-ba-mottak.journalhendelse", false)) {
-                                        val behandleSakTask =
-                                                Task.nyTask(OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE, journalpostId, metadata)
-                                        taskRepository.save(behandleSakTask)
+                                    if (featureToggleService.isEnabled("familie-ba-mottak.journalhendelse")) {
+                                        val ferdigstillTask =
+                                                Task.nyTask(OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE, journalpostId, metadata)
+//                                        taskRepository.save(behandleSakTask)
+                                        LOG.info("Oppretter task OppdaterOgFerdigstillJournalpostTask, feature skrudd på")
                                     } else {
                                         LOG.info("Behandler ikke journalhendelse, feature er skrudd av i Unleash")
                                     }
@@ -118,14 +123,14 @@ class JournalføringHendelseConsumer(val hendelsesloggRepository: HendelsesloggR
                                                        mapOf("journalpostId" to hendelseRecord.journalpostId.toString(),
                                                              "hendelsetype" to hendelseRecord.hendelsesType.toString()).toProperties()
             ))
+            ack.acknowledge()
         } catch (e: Exception) {
             LOG.error("Feil ved lesing av journalhendelser ", e)
             feilCounter.count()
+            throw e
         } finally {
             MDC.clear()
         }
-
-        ack.acknowledge()
     }
 
     private fun skalBehandleJournalpost(journalpost: Journalpost) =

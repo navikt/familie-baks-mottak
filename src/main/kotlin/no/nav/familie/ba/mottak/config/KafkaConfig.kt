@@ -16,26 +16,22 @@ import org.springframework.scheduling.TaskScheduler
 class KafkaConfig {
 
     @Bean
-    fun restartingErrorHandler(taskScheduler: TaskScheduler): RestartingErrorHandler? {
-        return RestartingErrorHandler(taskScheduler)
-    }
-
-    @Bean
-    fun kafkaLeesahListenerContainerFactory(properties: KafkaProperties)
+    fun kafkaLeesahListenerContainerFactory(properties: KafkaProperties, kafkaErrorHandler: KafkaErrorHandler)
             : ConcurrentKafkaListenerContainerFactory<Int, GenericRecord> {
         val factory = ConcurrentKafkaListenerContainerFactory<Int, GenericRecord>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
         factory.consumerFactory = DefaultKafkaConsumerFactory(properties.buildConsumerProperties())
-        factory.setErrorHandler(CustomKafkaLoggingErrorHandler())
+        factory.setErrorHandler(kafkaErrorHandler)
         return factory
     }
 
     @Bean
-    fun kafkaJournalføringHendelseListenerContainerFactory(properties: KafkaProperties)
+    fun kafkaJournalføringHendelseListenerContainerFactory(properties: KafkaProperties, kafkaErrorHandler: KafkaErrorHandler)
             : ConcurrentKafkaListenerContainerFactory<Int, JournalfoeringHendelseRecord> {
         val factory = ConcurrentKafkaListenerContainerFactory<Int, JournalfoeringHendelseRecord>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
         factory.consumerFactory = DefaultKafkaConsumerFactory(properties.buildConsumerProperties())
+        factory.setErrorHandler(kafkaErrorHandler)
         return factory
     }
 }

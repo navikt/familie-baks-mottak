@@ -61,11 +61,6 @@ class LeesahConsumer(val taskRepository: TaskRepository,
             }
         } catch (e: RuntimeException) {
             leesahFeiletCounter.increment()
-            log.error("Feil ved konsumering av melding fra aapen-person-pdl-leesah-v1 . id {}, offset: {}, partition: {}",
-                      cr.key(),
-                      cr.offset(),
-                      cr.partition()
-            )
             secureLogger.error("Feil i prosessering av leesah-hendelser", e)
             throw RuntimeException("Feil i prosessering av leesah-hendelser")
         }
