@@ -49,13 +49,13 @@ class JournalpostClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRAS
 data class Journalpost(val journalpostId: String,
                        val journalposttype: Journalposttype,
                        val journalstatus: Journalstatus,
-                       val tema: String?,
-                       val behandlingstema: String?,
-                       val sak: Sak?,
-                       val bruker: Bruker?,
-                       val journalforendeEnhet: String?,
-                       val kanal: String?,
-                       val dokumenter: List<DokumentInfo>?)
+                       val tema: String? = null,
+                       val behandlingstema: String? = null,
+                       val sak: Sak? = null,
+                       val bruker: Bruker? = null,
+                       val journalforendeEnhet: String? = null,
+                       val kanal: String? = null,
+                       val dokumenter: List<DokumentInfo>? = null)
 
 data class Sak(val arkivsaksnummer: String?,
                var arkivsaksystem: String?,
