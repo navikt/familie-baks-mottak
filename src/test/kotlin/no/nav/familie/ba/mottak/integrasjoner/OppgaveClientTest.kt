@@ -1,11 +1,11 @@
 package no.nav.familie.ba.mottak.integrasjoner
 
-import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import no.nav.familie.ba.mottak.config.ApplicationConfig
 import no.nav.familie.kontrakter.felles.Ressurs
+import no.nav.familie.kontrakter.felles.Ressurs.Companion.success
 import no.nav.familie.kontrakter.felles.objectMapper
-import no.nav.familie.kontrakter.felles.oppgave.*
+import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.log.NavHttpHeaders
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
@@ -16,7 +16,6 @@ import org.junit.jupiter.api.TestInstance
 import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.test.context.ActiveProfiles
@@ -32,9 +31,6 @@ class OppgaveClientTest {
     @Qualifier("oppgaveClient")
     lateinit var oppgaveClient: OppgaveClient
 
-    @Value("\${FAMILIE_INTEGRASJONER_API_URL}")
-    lateinit var integrasjonerUri: String
-
     @AfterEach
     fun cleanUp() {
         MDC.clear()
@@ -45,56 +41,96 @@ class OppgaveClientTest {
     @Tag("integration")
     fun `Opprett journalføringsoppgave skal returnere oppgave id`() {
         MDC.put("callId", "opprettJournalføringsoppgave")
-        stubFor(post(urlEqualTo("/api/oppgave"))
-            .willReturn(aResponse()
-                .withHeader("Content-Type", "application/json")
-                .withBody(
-                    objectMapper.writeValueAsString(Ressurs.success(OppgaveResponse(oppgaveId = 1234))))))
+        stubFor(post(urlEqualTo("/api/oppgave/"))
+                        .willReturn(aResponse()
+                                            .withHeader("Content-Type", "application/json")
+                                            .withBody(
+                                                    objectMapper.writeValueAsString(success(OppgaveResponse(oppgaveId = 1234))))))
 
-        val opprettOppgaveResponse = oppgaveClient.opprettJournalføringsoppgave(journalPost)
+        val opprettOppgaveResponse =
+                oppgaveClient.opprettJournalføringsoppgave(journalPost)
 
         assertThat(opprettOppgaveResponse.oppgaveId).isEqualTo(1234)
         verify(anyRequestedFor(anyUrl())
-            .withHeader(NavHttpHeaders.NAV_CALL_ID.asString(), equalTo("opprettJournalføringsoppgave"))
-            .withHeader(NavHttpHeaders.NAV_CONSUMER_ID.asString(), equalTo("familie-ba-mottak"))
-            .withRequestBody(equalToJson(forventetOpprettOppgaveJRequestJson("1234567"))))
+                       .withHeader(NavHttpHeaders.NAV_CALL_ID.asString(), equalTo("opprettJournalføringsoppgave"))
+                       .withHeader(NavHttpHeaders.NAV_CONSUMER_ID.asString(), equalTo("familie-ba-mottak"))
+                       .withRequestBody(equalToJson(forventetOpprettOppgaveRequestJson(journalpostId = "1234567",
+                                                                                       oppgavetype = "Journalføring",
+                                                                                       behandlingstema = "ab0180"))))
     }
 
     @Test
     @Tag("integration")
-    fun `Opprett journalføringsoppgave skal kaste feil hvis response er ugyldig`() {
-        stubFor(post(urlEqualTo("/api/oppgave"))
-            .willReturn(aResponse()
-                .withStatus(500)
-                .withBody(objectMapper.writeValueAsString(Ressurs.failure<String>("test")))))
+    fun `Opprett behandleSak-oppgave skal returnere oppgave id`() {
+        MDC.put("callId", "opprettJournalføringsoppgave")
+        stubFor(post(urlEqualTo("/api/oppgave/"))
+                        .willReturn(aResponse()
+                                            .withHeader("Content-Type", "application/json")
+                                            .withBody(
+                                                    objectMapper.writeValueAsString(success(OppgaveResponse(oppgaveId = 1234))))))
 
-        Assertions.assertThatThrownBy {
-            oppgaveClient.opprettJournalføringsoppgave(journalPost)
-        }.isInstanceOf(IntegrasjonException::class.java)
-            .hasMessageContaining("Kall mot integrasjon feilet ved opprettelse av oppgave")
+        val opprettOppgaveResponse =
+                oppgaveClient.opprettBehandleSakOppgave(journalPost)
 
+        assertThat(opprettOppgaveResponse.oppgaveId).isEqualTo(1234)
+        verify(anyRequestedFor(anyUrl())
+                       .withHeader(NavHttpHeaders.NAV_CALL_ID.asString(), equalTo("opprettJournalføringsoppgave"))
+                       .withHeader(NavHttpHeaders.NAV_CONSUMER_ID.asString(), equalTo("familie-ba-mottak"))
+                       .withRequestBody(equalToJson(
+                               forventetOpprettOppgaveRequestJson(journalpostId = "1234567",
+                                                                  oppgavetype = "BehandleSak",
+                                                                  behandlingstema = "behandlingstemaFraJournalpost"))))
     }
 
-    private fun forventetOpprettOppgaveJRequestJson(journalpostId: String): String {
+    @Test
+    @Tag("integration")
+    fun `Opprett oppgave skal kaste feil hvis response er ugyldig`() {
+        stubFor(post(urlEqualTo("/api/oppgave/"))
+                        .willReturn(aResponse()
+                                            .withStatus(500)
+                                            .withBody(objectMapper.writeValueAsString(Ressurs.failure<String>("test")))))
+
+        Assertions.assertThatThrownBy {
+                    oppgaveClient.opprettJournalføringsoppgave(journalPost)
+                }.isInstanceOf(IntegrasjonException::class.java)
+                .hasMessageContaining("Kall mot integrasjon feilet ved opprettelse av oppgave")
+
+        Assertions.assertThatThrownBy {
+                    oppgaveClient.opprettBehandleSakOppgave(journalPost)
+                }.isInstanceOf(IntegrasjonException::class.java)
+                .hasMessageContaining("Kall mot integrasjon feilet ved opprettelse av oppgave")
+    }
+
+    private fun forventetOpprettOppgaveRequestJson(journalpostId: String,
+                                                   oppgavetype: String,
+                                                   behandlingstema: String): String {
         return "{\n" +
-            "  \"ident\": {\n" +
-            "    \"ident\": \"1234567891011\",\n" +
-            "    \"type\": \"Aktør\"\n" +
-            "  },\n" +
-            "  \"enhetsnummer\": \"9999\",\n" +
-            "  \"saksId\": null,\n" +
-            "  \"journalpostId\": \"$journalpostId\",\n" +
-            "  \"tema\": \"BAR\",\n" +
-            "  \"oppgavetype\": \"Journalføring\",\n" +
-            "  \"behandlingstema\": \"ab0180\",\n" +
-            "  \"fristFerdigstillelse\": \"${LocalDate.now().plusDays(2)}\",\n" +
-            "  \"aktivFra\": \"${LocalDate.now()}\",\n" +
-            "  \"beskrivelse\": \"\"\n" +
-            "}"
+               "  \"ident\": {\n" +
+               "    \"ident\": \"1234567891011\",\n" +
+               "    \"type\": \"Aktør\"\n" +
+               "  },\n" +
+               "  \"enhetsnummer\": \"9999\",\n" +
+               "  \"saksId\": null,\n" +
+               "  \"journalpostId\": \"$journalpostId\",\n" +
+               "  \"tema\": \"BAR\",\n" +
+               "  \"oppgavetype\": \"$oppgavetype\",\n" +
+               "  \"behandlingstema\": \"$behandlingstema\",\n" +
+               "  \"fristFerdigstillelse\": \"${LocalDate.now().plusDays(2)}\",\n" +
+               "  \"aktivFra\": \"${LocalDate.now()}\",\n" +
+               "  \"beskrivelse\": \"\"\n" +
+               "}"
     }
 
     companion object {
-        private val journalPost = Journalpost("1234567", Journalposttype.I, Journalstatus.MOTTATT, "tema",
-            "behandlingstema", null, Bruker("1234567891011", BrukerIdType.AKTOERID), "9999", "kanal", listOf())
+        private val journalPost = Journalpost("1234567",
+                                              Journalposttype.I,
+                                              Journalstatus.MOTTATT,
+                                              "tema",
+                                              "behandlingstemaFraJournalpost",
+                                              null,
+                                              Bruker("1234567891011", BrukerIdType.AKTOERID),
+                                              "9999",
+                                              "kanal",
+                                              listOf())
     }
 }

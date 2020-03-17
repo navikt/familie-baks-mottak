@@ -52,7 +52,7 @@ class LeesahConsumer(val taskRepository: TaskRepository,
                 ack.acknowledge()
                 return
             }
-            SECURE_LOGGER.info("Har mottatt leesah-hendelse: $cr")
+            SECURE_LOGGER.info("Har mottatt leesah-hendelse: schema:${cr.value().schema} record:$cr")
             if (cr.value().erDødsfall()) {
                 behandleDødsfallHendelse(cr)
             } else if (cr.value().erFødsel()) {

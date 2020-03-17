@@ -12,31 +12,29 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
-@TaskStepBeskrivelse(taskStepType = OpprettOppgaveForJournalføringTask.TASK_STEP_TYPE,
-                     beskrivelse = "Opprett journalføringsoppgave")
-class OpprettOppgaveForJournalføringTask(private val journalpostClient: JournalpostClient,
-                                         private val oppgaveClient: OppgaveClient,
-                                         private val taskRepository: TaskRepository) : AsyncTaskStep {
+@TaskStepBeskrivelse(taskStepType = OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE, beskrivelse = "Opprett \"BehandleSak\"-oppgave")
+class OpprettBehandleSakOppgaveTask(private val journalpostClient: JournalpostClient,
+                                    private val oppgaveClient: OppgaveClient,
+                                    private val taskRepository: TaskRepository) : AsyncTaskStep {
 
-    val log: Logger = LoggerFactory.getLogger(OpprettOppgaveForJournalføringTask::class.java)
+    val log: Logger = LoggerFactory.getLogger(OpprettBehandleSakOppgaveTask::class.java)
 
     override fun doTask(task: Task) {
-
         val journalpost = journalpostClient.hentJournalpost(task.payload)
 
-        if (journalpost.journalstatus == Journalstatus.MOTTATT) {
+        if (journalpost.journalstatus == Journalstatus.FERDIGSTILT) {
             task.metadata["oppgaveId"] =
-                    "${oppgaveClient.opprettJournalføringsoppgave(journalpost).oppgaveId}"
+                    "${oppgaveClient.opprettBehandleSakOppgave(journalpost).oppgaveId}"
             task.metadata["personIdent"] = journalpost.bruker?.id
             task.metadata["journalpostId"] = journalpost.journalpostId
+            task.metadata["fagsakId"] = journalpost.sak?.fagsakId
             taskRepository.saveAndFlush(task)
         } else {
-            log.info("Ingen oppgave opprettet da journalpost ${journalpost.journalpostId} ikke har status MOTTATT lenger.")
+            throw error("Kan ikke opprette oppgave før tilhørende journalpost ${journalpost.journalpostId} er ferdigstilt")
         }
     }
 
     companion object {
-        const val TASK_STEP_TYPE = "opprettJournalføringsoppgave"
+        const val TASK_STEP_TYPE = "opprettBehandleSakoppgave"
     }
 }
-
