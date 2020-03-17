@@ -27,7 +27,7 @@ class IntegrasjonException(msg: String,
 
         fun responseFra(uri: URI?, e: Throwable?): String? {
             return when (e) { is RestClientResponseException
-                -> "Feil mot $uri status=${e.getRawStatusCode()} body=${e.responseBodyAsString}" else
+                -> "Error mot $uri status=${e.getRawStatusCode()} body=${e.responseBodyAsString}" else
                 -> null
             }
         }

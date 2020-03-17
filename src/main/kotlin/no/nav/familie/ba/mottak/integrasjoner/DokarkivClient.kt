@@ -19,7 +19,7 @@ class DokarkivClient(@param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private v
 
     fun oppdaterJournalpostSak(journalpostId: String, fagsakId: String, fnr: String) {
         logger.info("Oppdaterer journalpost $journalpostId med fagsaktilknytning $fagsakId ")
-        val uri = URI.create("$integrasjonUri/api/arkiv/v2/$journalpostId")
+        val uri = URI.create("$integrasjonUri/arkiv/v2/$journalpostId")
         val request = TilknyttFagsakRequest(bruker = Bruker(idType = IdType.FNR, id = fnr),
                                             tema = "BAR",
                                             sak = Sak(fagsakId, "BA"))
@@ -32,7 +32,7 @@ class DokarkivClient(@param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private v
 
     fun ferdigstillJournalpost(journalpostId: String) {
         logger.info("Forsøker å ferdigstille journalpost $journalpostId")
-        val uri = URI.create("$integrasjonUri/api/arkiv/v2/$journalpostId/ferdigstill?journalfoerendeEnhet=9999")
+        val uri = URI.create("$integrasjonUri/arkiv/v2/$journalpostId/ferdigstill?journalfoerendeEnhet=9999")
 
         when (val response = utførRequest(uri)) {
             is Throwable ->

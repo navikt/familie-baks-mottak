@@ -93,12 +93,12 @@ class OppgaveClientTest {
         Assertions.assertThatThrownBy {
                     oppgaveClient.opprettJournalføringsoppgave(journalPost)
                 }.isInstanceOf(IntegrasjonException::class.java)
-                .hasMessageContaining("Kall mot integrasjon feilet ved opprettelse av oppgave")
+                .hasMessageContaining("Error mot http://localhost:28085/api/oppgave/ status=500 body={")
 
         Assertions.assertThatThrownBy {
                     oppgaveClient.opprettBehandleSakOppgave(journalPost)
                 }.isInstanceOf(IntegrasjonException::class.java)
-                .hasMessageContaining("Kall mot integrasjon feilet ved opprettelse av oppgave")
+                .hasMessageContaining("Error mot http://localhost:28085/api/oppgave/ status=500 body={")
     }
 
     private fun forventetOpprettOppgaveRequestJson(journalpostId: String,

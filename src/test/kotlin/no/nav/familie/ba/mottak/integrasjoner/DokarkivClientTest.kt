@@ -28,7 +28,7 @@ class DokarkivClientTest {
     @Tag("integration")
     fun `oppdaterJournalpost skal kjøre OK`() {
         val journalpostId = "12345678"
-        stubFor(put(urlEqualTo("/api/v2/$journalpostId"))
+        stubFor(put(urlEqualTo("/api/arkiv/v2/$journalpostId"))
             .withRequestBody(equalToJson(forventetRequestJson()))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
@@ -42,7 +42,7 @@ class DokarkivClientTest {
     @Tag("integration")
     fun `ferdigstillJournalpost skal kjøre OK`() {
         val journalpostId = "12345678"
-        stubFor(put(urlEqualTo("/api/v2/$journalpostId/ferdigstill?journalfoerendeEnhet=9999"))
+        stubFor(put(urlEqualTo("/api/arkiv/v2/$journalpostId/ferdigstill?journalfoerendeEnhet=9999"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withBody(response)))
@@ -55,7 +55,7 @@ class DokarkivClientTest {
     @Tag("integration")
     fun `DokarkivClient skal kaste feil hvis response er ugyldig`() {
         val journalpostId = "12345678"
-        stubFor(put(urlEqualTo("/api/v2/$journalpostId/ferdigstill?journalfoerendeEnhet=9999"))
+        stubFor(put(urlEqualTo("/api/arkiv/v2/$journalpostId/ferdigstill?journalfoerendeEnhet=9999"))
             .willReturn(aResponse()
                 .withStatus(500)
                 .withBody(objectMapper.writeValueAsString(Ressurs.failure<String>("test")))))
@@ -63,7 +63,7 @@ class DokarkivClientTest {
         Assertions.assertThatThrownBy {
             dokarkivClient.ferdigstillJournalpost("12345678")
         }.isInstanceOf(IntegrasjonException::class.java)
-            .hasMessageContaining("Ferdigstilling av journalpost $journalpostId feilet")
+            .hasMessageContaining("status=500 body={\"data\":null,\"status\":\"FEILET\",\"melding\":\"test\",\"stacktrace\":")
     }
 
     fun forventetRequestJson(): String {
