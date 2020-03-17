@@ -20,7 +20,7 @@ class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: Journa
         val journalpost = journalpostClient.hentJournalpost(task.payload)
         val fagsakId = "111111111" // TODO: Løses med favro-oppgaven "Lage fagsak fra Joark-hendelser". Kan vurdere om den heller skal følge med i payload'en til tasken
 
-        dokarkivClient.oppdaterJournalpostSak(journalpost.journalpostId, fagsakId, journalpost.bruker?.id!!) //TODO: konvertere fra aktørId til fnr om nødvendig
+        dokarkivClient.oppdaterJournalpostSak(journalpost, fagsakId)
         dokarkivClient.ferdigstillJournalpost(journalpost.journalpostId)
 
         task.metadata["fagsakId"] = fagsakId

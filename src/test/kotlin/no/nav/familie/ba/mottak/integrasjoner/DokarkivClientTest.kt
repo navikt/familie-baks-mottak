@@ -27,14 +27,13 @@ class DokarkivClientTest {
     @Test
     @Tag("integration")
     fun `oppdaterJournalpost skal kjøre OK`() {
-        val journalpostId = "12345678"
-        stubFor(put(urlEqualTo("/api/arkiv/v2/$journalpostId"))
+        stubFor(put(urlEqualTo("/api/arkiv/v2/${jp.journalpostId}"))
             .withRequestBody(equalToJson(forventetRequestJson()))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withBody(response)))
 
-        dokarkivClient.oppdaterJournalpostSak("12345678", "11111111", "12345678910")
+        dokarkivClient.oppdaterJournalpostSak(jp, "11111111")
 
     }
 
@@ -82,5 +81,9 @@ class DokarkivClientTest {
 
     companion object {
         private val response = objectMapper.writeValueAsString(Ressurs.success(mapOf("journalpostId" to "12345678"),"test"))
+        private val jp = Journalpost(journalpostId = "12345678",
+                                     journalposttype = Journalposttype.I,
+                                     journalstatus = Journalstatus.MOTTATT,
+                                     bruker = Bruker("12345678910", BrukerIdType.FNR))
     }
 }

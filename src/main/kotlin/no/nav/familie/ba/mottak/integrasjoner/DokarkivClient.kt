@@ -17,16 +17,18 @@ class DokarkivClient(@param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private v
                      @Qualifier("clientCredentials") restOperations: RestOperations)
     : AbstractRestClient(restOperations, "integrasjon") {
 
-    fun oppdaterJournalpostSak(journalpostId: String, fagsakId: String, fnr: String) {
-        logger.info("Oppdaterer journalpost $journalpostId med fagsaktilknytning $fagsakId ")
-        val uri = URI.create("$integrasjonUri/arkiv/v2/$journalpostId")
-        val request = TilknyttFagsakRequest(bruker = Bruker(idType = IdType.FNR, id = fnr),
+    fun oppdaterJournalpostSak(jp: Journalpost, fagsakId: String) {
+        logger.info("Oppdaterer journalpost ${jp.journalpostId} med fagsaktilknytning $fagsakId ")
+        val uri = URI.create("$integrasjonUri/arkiv/v2/${jp.journalpostId}")
+        val request = TilknyttFagsakRequest(bruker = Bruker(idType = IdType.valueOf(jp.bruker!!.type.name), id = jp.bruker.id),
                                             tema = "BAR",
                                             sak = Sak(fagsakId, "BA"))
 
         when (val response = utførRequest(uri, request)) {
-            is Throwable ->
-                throw IntegrasjonException("Oppdatering av journalpost $journalpostId med fagsak $fagsakId feilet", response, uri, fnr)
+            is Throwable -> throw IntegrasjonException("Oppdatering av journalpost ${jp.journalpostId} med fagsak $fagsakId feilet",
+                                                       response,
+                                                       uri,
+                                                       jp.bruker.id)
         }
     }
 
@@ -35,8 +37,7 @@ class DokarkivClient(@param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private v
         val uri = URI.create("$integrasjonUri/arkiv/v2/$journalpostId/ferdigstill?journalfoerendeEnhet=9999")
 
         when (val response = utførRequest(uri)) {
-            is Throwable ->
-                throw IntegrasjonException("Ferdigstilling av journalpost $journalpostId feilet", response, uri, null)
+            is Throwable -> throw IntegrasjonException("Ferdigstilling av journalpost $journalpostId feilet", response, uri, null)
         }
     }
 
@@ -60,17 +61,17 @@ class DokarkivClient(@param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private v
     }
 
     data class TilknyttFagsakRequest (val bruker: Bruker,
-                                 val tema: String,
-                                 val sak: Sak)
+                                      val tema: String,
+                                      val sak: Sak)
 
     data class Sak(val fagsakId: String,
-              val fagsaksystem: String)
+                   val fagsaksystem: String)
 
     data class Bruker(val idType: IdType,
-                 val id: String)
+                      val id: String)
 
     enum class IdType {
-        FNR, ORGNR
+        FNR, ORGNR, AKTOERID
     }
 }
 
