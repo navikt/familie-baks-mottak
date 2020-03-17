@@ -48,7 +48,7 @@ jobs:
           path: ba-e2e
       - name: Setter riktig ba-mottak versjon i e2e tester
         if: "!contains(github.event.head_commit.message, 'e2e skip')"
-        run: sed -i 's/familie-ba-mottak:latest/familie-ba-mottak:'$GITHUB_SHA'/g' ba-e2e/e2e/familie-ba-apps.yml
+        run: sed -i 's/familie-ba-mottak:latest/familie-ba-mottak:'$GITHUB_SHA'/g' ba-e2e/e2e/docker-compose.yml
       - name: Start alle apper (e2e)
         if: "!contains(github.event.head_commit.message, 'e2e skip')"
         run: cd ba-e2e/e2e; ./e2e.sh
