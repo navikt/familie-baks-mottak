@@ -10,23 +10,26 @@ import java.net.URI
 class IntegrasjonException(msg: String,
                            throwable: Throwable? = null,
                            uri: URI? = null,
-                           ident: String? = null) : RuntimeException(msg, throwable) {
+                           ident: String? = null) : RuntimeException(responseFra(uri, throwable) ?: msg, throwable) {
 
     init {
-        val response = when { throwable is RestClientResponseException
-            -> "Responsekode: ${throwable.getRawStatusCode()}, body: ${throwable.responseBodyAsString}" else
-            -> ""
-        }
+        val detaljertMelding = responseFra(uri, throwable)
         secureLogger.info("$msg. ident={} {} {}",
-                          uri,
                           ident,
-                          response,
+                          detaljertMelding ?: uri,
                           throwable)
-        logger.warn("$msg. {} {}", uri, response)
+        logger.warn("$msg. {}", detaljertMelding ?: uri)
     }
 
     companion object {
         private val logger = LoggerFactory.getLogger(IntegrasjonException::class.java)
         private val secureLogger = LoggerFactory.getLogger("secureLogger")
+
+        fun responseFra(uri: URI?, e: Throwable?): String? {
+            return when (e) { is RestClientResponseException
+                -> "Feil mot $uri status=${e.getRawStatusCode()} body=${e.responseBodyAsString}" else
+                -> null
+            }
+        }
     }
 }
