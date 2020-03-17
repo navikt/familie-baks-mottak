@@ -50,6 +50,16 @@ jobs:
         if: "!contains(github.event.head_commit.message, 'e2e skip')"
         run: sed -i 's/familie-ba-mottak:latest/familie-ba-mottak:'$GITHUB_SHA'/g' ba-e2e/e2e/docker-compose.yml
       - name: Start alle apper (e2e)
+        env:
+          MOTTAK_CLIENT_ID: ${{ secrets.MOTTAK_CLIENT_ID }}
+          MOTTAK_FRONTEND_CLIENT_ID: ${{ secrets.MOTTAK_FRONTEND_CLIENT_ID }}
+          MOTTAK_CLIENT_SECRET: ${{ secrets.MOTTAK_CLIENT_SECRET }}
+          MOTTAK_BA_SAK_SCOPE: ${{ secrets.MOTTAK_BA_SAK_SCOPE }}
+          MOTTAK_FAMILIE_INTEGRASJONER_SCOPE: ${{ secrets.MOTTAK_FAMILIE_INTEGRASJONER_SCOPE }}
+          INTEGRASJONER_CLIENT_ID: ${{ secrets.INTEGRASJONER_CLIENT_ID }}
+          INTEGRASJONER_CLIENT_SECRET: ${{ secrets.INTEGRASJONER_CLIENT_SECRET }}
+          INTEGRASJONER_INFOTRYGD_KS_SCOPE: ${{ secrets.INTEGRASJONER_INFOTRYGD_KS_SCOPE }}
+          INTEGRASJONER_AAD_GRAPH_SCOPE: ${{ secrets.INTEGRASJONER_AAD_GRAPH_SCOPE }}
         if: "!contains(github.event.head_commit.message, 'e2e skip')"
         run: cd ba-e2e/e2e; ./e2e.sh
       - name: Kjør tester (e2e)
