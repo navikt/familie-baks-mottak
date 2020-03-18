@@ -6,7 +6,7 @@ import io.mockk.impl.annotations.MockK
 import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.integrasjoner.*
-import no.nav.familie.ba.mottak.task.OpprettBehandleSakOppgaveTask
+import no.nav.familie.ba.mottak.task.OppdaterOgFerdigstillJournalpostTask
 import no.nav.familie.ba.mottak.task.OpprettOppgaveForJournalføringTask
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
@@ -14,13 +14,11 @@ import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.kafka.support.Acknowledgment
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Disabled
 class JournalføringHendelseConsumerTest {
 
     @MockK(relaxed = true)
@@ -116,7 +114,7 @@ class JournalføringHendelseConsumerTest {
                               journalforendeEnhet = null,
                               sak = null)
 
-        every { mockFeatureToggleService.isEnabled(any(), any()) } returns true
+        every { mockFeatureToggleService.isEnabled(any()) } returns true
     }
 
     @Test
@@ -128,15 +126,15 @@ class JournalføringHendelseConsumerTest {
         consumer.listen(consumerRecord, ack)
 
 
-//        val taskSlot = slot<Task>()
-//        verify {
-//            mockTaskRepository.save(capture(taskSlot))
-//        }
-//
-//        assertThat(taskSlot.captured).isNotNull
-//        assertThat(taskSlot.captured.payload).isEqualTo(JOURNALPOST_PAPIRSØKNAD)
-//        assertThat(taskSlot.captured.metadata.getProperty("callId")).isEqualTo("kanalReferanseId")
-//        assertThat(taskSlot.captured.taskStepType).isEqualTo(OpprettOppgaveForJournalføringTask.TASK_STEP_TYPE)
+        val taskSlot = slot<Task>()
+        verify {
+            mockTaskRepository.save(capture(taskSlot))
+        }
+
+        assertThat(taskSlot.captured).isNotNull
+        assertThat(taskSlot.captured.payload).isEqualTo(JOURNALPOST_PAPIRSØKNAD)
+        assertThat(taskSlot.captured.metadata.getProperty("callId")).isEqualTo("kanalReferanseId")
+        assertThat(taskSlot.captured.taskStepType).isEqualTo(OpprettOppgaveForJournalføringTask.TASK_STEP_TYPE)
         verify { ack.acknowledge() }
         verify(exactly = 1) { mockHendelsesloggRepository.save(any()) }
     }
@@ -150,15 +148,15 @@ class JournalføringHendelseConsumerTest {
 
         consumer.listen(consumerRecord, ack)
 
-//        val taskSlot = slot<Task>()
-//        verify {
-//            mockTaskRepository.save(capture(taskSlot))
-//        }
-//
-//        assertThat(taskSlot.captured).isNotNull
-//        assertThat(taskSlot.captured.payload).isEqualTo(JOURNALPOST_DIGITALSØKNAD)
-//        assertThat(taskSlot.captured.metadata.getProperty("callId")).isEqualTo("kanalReferanseId")
-//        assertThat(taskSlot.captured.taskStepType).isEqualTo(OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE)
+        val taskSlot = slot<Task>()
+        verify {
+            mockTaskRepository.save(capture(taskSlot))
+        }
+
+        assertThat(taskSlot.captured).isNotNull
+        assertThat(taskSlot.captured.payload).isEqualTo(JOURNALPOST_DIGITALSØKNAD)
+        assertThat(taskSlot.captured.metadata.getProperty("callId")).isEqualTo("kanalReferanseId")
+        assertThat(taskSlot.captured.taskStepType).isEqualTo(OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE)
 
 
         verify { ack.acknowledge() }
