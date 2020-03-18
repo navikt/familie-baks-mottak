@@ -44,9 +44,10 @@ class LeesahConsumer(val taskRepository: TaskRepository,
     @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"],
                    id = "personhendelse",
                    idIsGroup = false,
-                   containerFactory = "kafkaListenerContainerFactory")
+                   containerFactory = "kafkaLeesahListenerContainerFactory")
     @Transactional
     fun listen(cr: ConsumerRecord<Int, GenericRecord>, ack: Acknowledgment) {
+        cr.value().schema
         try {
             if (hendelsesloggRepository.existsByHendelseIdAndConsumer(cr.value().hentHendelseId(), CONSUMER_PDL)) {
                 ack.acknowledge()
@@ -60,11 +61,6 @@ class LeesahConsumer(val taskRepository: TaskRepository,
             }
         } catch (e: RuntimeException) {
             leesahFeiletCounter.increment()
-            log.error("Feil ved konsumering av melding fra aapen-person-pdl-leesah-v1 . id {}, offset: {}, partition: {}",
-                      cr.key(),
-                      cr.offset(),
-                      cr.partition()
-            )
             secureLogger.error("Feil i prosessering av leesah-hendelser", e)
             throw RuntimeException("Feil i prosessering av leesah-hendelser")
         }

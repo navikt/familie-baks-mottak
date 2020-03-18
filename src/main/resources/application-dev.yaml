@@ -65,3 +65,5 @@ KAFKA_BROKERS: http://localhost:9092
 
 #Brukes til tilgangskontroll av familie-ks-mottak-frontend
 MOTTAK_ROLLE: group1
+
+JOURNALFOERINGHENDELSE_V1_TOPIC_URL: aapen-dok-journalfoering-v1-q1

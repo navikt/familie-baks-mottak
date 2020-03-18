@@ -39,3 +39,5 @@ FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 180
 
 #Brukes til tilgangskontroll av familie-ks-mottak-frontend
 MOTTAK_ROLLE: ${MOTTAK_ROLLE}
+
+JOURNALFOERINGHENDELSE_V1_TOPIC_URL: aapen-dok-journalfoering-v1-p
