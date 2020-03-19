@@ -1,7 +1,6 @@
 package no.nav.familie.ba.mottak.task
 
-import no.nav.familie.ba.mottak.integrasjoner.DokarkivClient
-import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
+import no.nav.familie.ba.mottak.integrasjoner.*
 
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -14,13 +13,16 @@ import org.springframework.stereotype.Service
 @TaskStepBeskrivelse(taskStepType = OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE, beskrivelse = "Legger til Sak og ferdigstiller journalpost")
 class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: JournalpostClient,
                                            private val dokarkivClient: DokarkivClient,
+                                           private val sakClient: SakClient,
+                                           private val aktørClient: AktørClient,
                                            private val taskRepository: TaskRepository) : AsyncTaskStep {
 
     override fun doTask(task: Task) {
         val journalpost = journalpostClient.hentJournalpost(task.payload)
-        val fagsakId = "111111111" // TODO: Løses med favro-oppgaven "Lage fagsak fra Joark-hendelser". Kan vurdere om den heller skal følge med i payload'en til tasken
+            .takeUnless { it.bruker == null } ?: throw error("Journalpost ${task.payload} mangler bruker")
+        val fagsakId = sakClient.hentSaksnummer(tilPersonIdent(journalpost.bruker!!))
 
-        dokarkivClient.oppdaterJournalpostSak(journalpost, fagsakId)
+        dokarkivClient.oppdaterJournalpostSak(journalpost, fagsakId.toString())
         dokarkivClient.ferdigstillJournalpost(journalpost.journalpostId)
 
         task.metadata["fagsakId"] = fagsakId
@@ -36,6 +38,13 @@ class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: Journa
             properties = task.metadata
         )
         taskRepository.save(nyTask)
+    }
+
+    private fun tilPersonIdent(bruker: Bruker): String {
+        return when (bruker.type) {
+            BrukerIdType.AKTOERID -> aktørClient.hentPersonident(bruker.id)
+            else -> bruker.id
+        }
     }
 
     companion object {

@@ -37,6 +37,10 @@ class ClientMocks {
             mockAktørClient.hentAktørId(any())
         } returns "42"
 
+        every {
+            mockAktørClient.hentPersonident(any())
+        } returns "12345678910"
+
         return mockAktørClient
     }
 

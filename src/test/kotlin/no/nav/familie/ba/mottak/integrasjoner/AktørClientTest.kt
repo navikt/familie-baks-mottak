@@ -41,4 +41,20 @@ class AktørClientTest {
                        .withHeader("Nav-Personident", equalTo("12")))
     }
 
+    @Test
+    @Tag("integration")
+    fun `hentPersonident returnerer OK`() {
+        stubFor(get(urlEqualTo("/api/aktoer/v1/fraaktorid"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(objectMapper.writeValueAsString(success(mapOf("personIdent" to 1L))))))
+
+        val personIdent = aktørClient.hentPersonident("12")
+        assertThat(personIdent).isEqualTo("1")
+
+        verify(getRequestedFor(urlEqualTo("/api/aktoer/v1/fraaktorid"))
+            .withHeader("Nav-Aktorid", equalTo("12")))
+    }
+
 }
