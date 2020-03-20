@@ -149,7 +149,7 @@ class JournalføringHendelseConsumer(val hendelsesloggRepository: HendelsesloggR
     }
 
     private fun erGyldigHendelsetype(hendelseRecord: JournalfoeringHendelseRecord): Boolean {
-        return GYLDIGE_HENDELSE_TYPER.contains(hendelseRecord.hendelsesType.toString())
+        return GYLDIGE_HENDELSE_TYPER.contains(hendelseRecord.hendelsesType.toString()) && hendelseRecord.temaNytt == "BAR"
     }
 
     fun CharSequence.toStringOrNull(): String? {
