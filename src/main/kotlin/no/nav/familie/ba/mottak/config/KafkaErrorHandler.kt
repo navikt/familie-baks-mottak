@@ -26,28 +26,34 @@ class KafkaErrorHandler : ContainerStoppingErrorHandler() {
     private val counter = AtomicInteger(0)
     private val lastError = AtomicLong(0)
     override fun handle(e: Exception,
-                        records: List<ConsumerRecord<*, *>>,
+                        records: List<ConsumerRecord<*, *>>?,
                         consumer: Consumer<*, *>,
                         container: MessageListenerContainer) {
+        Thread.sleep(1000)
 
-
-        records.asSequence()
-                .mapNotNull { it }
-                .first()
-                .run {
-                    LOGGER.error("Feil ved konsumering av melding fra ${this.topic()}. id ${this.key()}, " +
-                                 "offset: ${this.offset()}, partition: ${this.partition()}")
-                    SECURE_LOGGER.error("${this.topic()} - Problemer med prosessering av $records", e)
-                    scheduleRestart(e,
-                                    records,
-                                    consumer,
-                                    container,
-                                    this.topic())
-                }
+        if (records.isNullOrEmpty()) {
+            LOGGER.error("Feil ved konsumering av melding. Ingen records. ${consumer.subscription()}", e)
+            scheduleRestart(e,
+                            records,
+                            consumer,
+                            container,
+                            "Ukjent topic")
+        } else {
+            records.first().run {
+                LOGGER.error("Feil ved konsumering av melding fra ${this.topic()}. id ${this.key()}, " +
+                             "offset: ${this.offset()}, partition: ${this.partition()}")
+                SECURE_LOGGER.error("${this.topic()} - Problemer med prosessering av $records", e)
+                scheduleRestart(e,
+                                records,
+                                consumer,
+                                container,
+                                this.topic())
+            }
+        }
     }
 
     private fun scheduleRestart(e: Exception,
-                                records: List<ConsumerRecord<*, *>>,
+                                records: List<ConsumerRecord<*, *>>? = null,
                                 consumer: Consumer<*, *>,
                                 container: MessageListenerContainer,
                                 topic: String) {
