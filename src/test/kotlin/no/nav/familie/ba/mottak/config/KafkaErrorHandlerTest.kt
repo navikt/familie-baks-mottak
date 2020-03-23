@@ -4,7 +4,6 @@ import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -36,8 +35,6 @@ class KafkaErrorHandlerTest {
         assertThatThrownBy { errorHandler.handle(RuntimeException("Feil i test"), emptyList(), consumer, container) }
                 .hasMessageContaining("Feil i test")
                 .hasCauseExactlyInstanceOf(RuntimeException::class.java)
-
-        verify(exactly = 1) { container.stop() }
     }
 
     @Test
@@ -46,8 +43,6 @@ class KafkaErrorHandlerTest {
         assertThatThrownBy { errorHandler.handle(RuntimeException("Feil i test"), listOf(consumerRecord), consumer, container) }
                 .hasMessageContaining("Feil i test")
                 .hasCauseExactlyInstanceOf(RuntimeException::class.java)
-
-        verify(exactly = 1) { container.stop() }
     }
 
     @Test
@@ -56,7 +51,5 @@ class KafkaErrorHandlerTest {
         assertThatThrownBy { errorHandler.handle(RuntimeException("Feil i test"), null, consumer, container) }
                 .hasMessageContaining("Feil i test")
                 .hasCauseExactlyInstanceOf(RuntimeException::class.java)
-
-        verify(exactly = 1) { container.stop() }
     }
 }
