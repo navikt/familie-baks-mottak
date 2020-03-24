@@ -299,7 +299,6 @@
                             <sourceDirectory>src/main/resources/avro/leesah</sourceDirectory>
 
                             <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
-                            <stringType>String</stringType>
                         </configuration>
                     </execution>
                 </executions>
