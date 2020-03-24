@@ -28,6 +28,7 @@ class KafkaConfig {
     @Bean
     fun kafkaJournalføringHendelseListenerContainerFactory(properties: KafkaProperties, kafkaErrorHandler: KafkaErrorHandler)
             : ConcurrentKafkaListenerContainerFactory<Int, JournalfoeringHendelseRecord> {
+        properties.properties.put("specific.avro.reader", "true")
         val factory = ConcurrentKafkaListenerContainerFactory<Int, JournalfoeringHendelseRecord>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
         factory.consumerFactory = DefaultKafkaConsumerFactory(properties.buildConsumerProperties())
