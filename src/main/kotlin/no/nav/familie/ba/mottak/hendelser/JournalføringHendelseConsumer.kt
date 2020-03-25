@@ -43,9 +43,9 @@ class JournalføringHendelseConsumer(val hendelsesloggRepository: HendelsesloggR
                 ack.acknowledge()
                 return
             }
-            secureLogger.info("journalhendelse: $consumerRecord")
+
             if (erGyldigHendelsetype(hendelseRecord)) {
-                logger.info("Mottatt gyldig hendelse $hendelseRecord")
+                secureLogger.info("Mottatt gyldig hendelse: $hendelseRecord")
                 journalhendelseService.behandleJournalhendelse(hendelseRecord)
             }
 
@@ -64,13 +64,15 @@ class JournalføringHendelseConsumer(val hendelsesloggRepository: HendelsesloggR
             MDC.clear()
         }
     }
+
     fun CharSequence.toStringOrNull(): String? {
         return if (!this.isBlank()) this.toString() else null
     }
 
 
     private fun erGyldigHendelsetype(hendelseRecord: JournalfoeringHendelseRecord): Boolean {
-        return GYLDIGE_HENDELSE_TYPER.contains(hendelseRecord.hendelsesType.toString()) && hendelseRecord.temaNytt == "BAR"
+        return GYLDIGE_HENDELSE_TYPER.contains(hendelseRecord.hendelsesType.toString())
+               && (hendelseRecord.temaNytt != null && hendelseRecord.temaNytt.toString() == "BAR")
     }
 
     companion object {
