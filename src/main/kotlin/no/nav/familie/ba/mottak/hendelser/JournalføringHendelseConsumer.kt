@@ -43,9 +43,9 @@ class JournalføringHendelseConsumer(val hendelsesloggRepository: HendelsesloggR
                 ack.acknowledge()
                 return
             }
-
+            secureLogger.info("journalhendelse: $consumerRecord")
             if (erGyldigHendelsetype(hendelseRecord)) {
-                secureLogger.info("journalhendelse barnetrygd $consumerRecord")
+                logger.info("Mottatt gyldig hendelse $hendelseRecord")
                 journalhendelseService.behandleJournalhendelse(hendelseRecord)
             }
 
