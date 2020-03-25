@@ -39,8 +39,32 @@ class AktørClient(@Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integ
         }
     }
 
+    fun hentPersonident(aktørId: String): String {
+        if (aktørId.isEmpty()) {
+            throw IntegrasjonException("Ved henting av personident er aktør id null eller tom")
+        }
+        val uri = URI.create("$integrasjonUri/aktoer/v1/fraaktorid")
+        return try {
+            val response = getForEntity<Ressurs<MutableMap<*, *>>>(uri, HttpHeaders().medAktørId(aktørId))
+            secureLogger.info("Vekslet inn aktørId: {} til fnr: {}", aktørId, response)
+            val personident = response.data?.get("personIdent").toString()
+            if (personident.isEmpty()) {
+                throw IntegrasjonException(msg = "Kan ikke finne personident for aktørId", ident = aktørId)
+            } else {
+                personident
+            }
+        } catch (e: RestClientException) {
+            throw IntegrasjonException("Ukjent feil ved henting av personident", e, uri, aktørId)
+        }
+    }
+
     private fun HttpHeaders.medPersonident(personident: String): HttpHeaders {
         this.add(NavHttpHeaders.NAV_PERSONIDENT.asString(), personident)
+        return this
+    }
+
+    private fun HttpHeaders.medAktørId(aktørId: String): HttpHeaders {
+        this.add("Nav-Aktorid", aktørId)
         return this
     }
 }
