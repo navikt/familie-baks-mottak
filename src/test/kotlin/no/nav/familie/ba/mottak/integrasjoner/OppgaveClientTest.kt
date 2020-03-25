@@ -7,8 +7,8 @@ import no.nav.familie.kontrakter.felles.Ressurs.Companion.success
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.log.NavHttpHeaders
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -41,7 +41,7 @@ class OppgaveClientTest {
     @Tag("integration")
     fun `Opprett journalføringsoppgave skal returnere oppgave id`() {
         MDC.put("callId", "opprettJournalføringsoppgave")
-        stubFor(post(urlEqualTo("/api/oppgave/"))
+        stubFor(post(urlEqualTo("/api/oppgave"))
                         .willReturn(aResponse()
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(
@@ -63,7 +63,7 @@ class OppgaveClientTest {
     @Tag("integration")
     fun `Opprett behandleSak-oppgave skal returnere oppgave id`() {
         MDC.put("callId", "opprettJournalføringsoppgave")
-        stubFor(post(urlEqualTo("/api/oppgave/"))
+        stubFor(post(urlEqualTo("/api/oppgave"))
                         .willReturn(aResponse()
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(
@@ -85,20 +85,20 @@ class OppgaveClientTest {
     @Test
     @Tag("integration")
     fun `Opprett oppgave skal kaste feil hvis response er ugyldig`() {
-        stubFor(post(urlEqualTo("/api/oppgave/"))
+        stubFor(post(urlEqualTo("/api/oppgave"))
                         .willReturn(aResponse()
                                             .withStatus(500)
                                             .withBody(objectMapper.writeValueAsString(Ressurs.failure<String>("test")))))
 
-        Assertions.assertThatThrownBy {
-                    oppgaveClient.opprettJournalføringsoppgave(journalPost)
-                }.isInstanceOf(IntegrasjonException::class.java)
-                .hasMessageContaining("Error mot http://localhost:28085/api/oppgave/ status=500 body={")
+        assertThatThrownBy {
+            oppgaveClient.opprettJournalføringsoppgave(journalPost)
+        }.isInstanceOf(IntegrasjonException::class.java)
+                .hasMessageContaining("Error mot http://localhost:28085/api/oppgave status=500 body={")
 
-        Assertions.assertThatThrownBy {
-                    oppgaveClient.opprettBehandleSakOppgave(journalPost)
-                }.isInstanceOf(IntegrasjonException::class.java)
-                .hasMessageContaining("Error mot http://localhost:28085/api/oppgave/ status=500 body={")
+        assertThatThrownBy {
+            oppgaveClient.opprettBehandleSakOppgave(journalPost)
+        }.isInstanceOf(IntegrasjonException::class.java)
+                .hasMessageContaining("Error mot http://localhost:28085/api/oppgave status=500 body={")
     }
 
     private fun forventetOpprettOppgaveRequestJson(journalpostId: String,
