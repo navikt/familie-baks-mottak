@@ -23,6 +23,7 @@ import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility.await
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -42,6 +43,7 @@ import java.util.concurrent.TimeUnit
 @ActiveProfiles("integrasjonstest")
 @EmbeddedKafka(partitions = 1, topics = ["aapen-person-pdl-leesah-v1", "aapen-dok-journalfoering-v1-integrasjonstest"], count = 1)
 @Tag("integration")
+@Disabled
 class KafkaConsumerIntegrasjonTest(@Autowired val hendelsesloggRepository: HendelsesloggRepository,
                                    @Autowired val kafkaProperties: KafkaProperties,
                                    @Autowired val taskRepository: TaskRepository,
