@@ -28,7 +28,10 @@ data class Hendelseslogg(
         val id: Long? = null,
 
         @Column(name = "opprettet_tid", nullable = false, updatable = false)
-        val opprettetTidspunkt: LocalDateTime = LocalDateTime.now()
+        val opprettetTidspunkt: LocalDateTime = LocalDateTime.now(),
+
+        @Column(name = "ident", nullable = true)
+        val ident: String? = null
 )
 
 enum class HendelseConsumer {
