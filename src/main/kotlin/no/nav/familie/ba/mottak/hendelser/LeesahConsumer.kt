@@ -122,7 +122,8 @@ class LeesahConsumer(val taskRepository: TaskRepository,
                                                    CONSUMER_PDL,
                                                    mapOf("aktørId" to cr.value().hentAktørId(),
                                                          "opplysningstype" to cr.value().hentOpplysningstype(),
-                                                         "endringstype" to cr.value().hentEndringstype()).toProperties()))
+                                                         "endringstype" to cr.value().hentEndringstype()).toProperties(),
+                                                   ident = cr.value().hentPersonident()))
     }
 
     private fun logHendelse(cr: ConsumerRecord<Int, GenericRecord>, ekstraInfo: String = "") {
