@@ -6,7 +6,7 @@ import io.mockk.impl.annotations.MockK
 import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.ba.mottak.task.OppdaterOgFerdigstillJournalpostTask
-import no.nav.familie.ba.mottak.task.OpprettOppgaveForJournalføringTask
+import no.nav.familie.ba.mottak.task.OpprettJournalføringOppgaveTask
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
@@ -125,7 +125,7 @@ class JournalføringHendelseServiceTest {
         assertThat(taskSlot.captured).isNotNull
         assertThat(taskSlot.captured.payload).isEqualTo(JOURNALPOST_PAPIRSØKNAD)
         assertThat(taskSlot.captured.metadata.getProperty("callId")).isEqualTo("papir")
-        assertThat(taskSlot.captured.taskStepType).isEqualTo(OpprettOppgaveForJournalføringTask.TASK_STEP_TYPE)
+        assertThat(taskSlot.captured.taskStepType).isEqualTo(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE)
     }
 
 

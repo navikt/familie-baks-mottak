@@ -10,28 +10,31 @@ import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.lang.IllegalStateException
 
 @Service
-@TaskStepBeskrivelse(taskStepType = OpprettOppgaveForJournalføringTask.TASK_STEP_TYPE,
+@TaskStepBeskrivelse(taskStepType = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
                      beskrivelse = "Opprett journalføringsoppgave")
-class OpprettOppgaveForJournalføringTask(private val journalpostClient: JournalpostClient,
-                                         private val oppgaveClient: OppgaveClient,
-                                         private val taskRepository: TaskRepository) : AsyncTaskStep {
+class OpprettJournalføringOppgaveTask(private val journalpostClient: JournalpostClient,
+                                      private val oppgaveClient: OppgaveClient,
+                                      private val taskRepository: TaskRepository) : AsyncTaskStep {
 
-    val log: Logger = LoggerFactory.getLogger(OpprettOppgaveForJournalføringTask::class.java)
+    val log: Logger = LoggerFactory.getLogger(OpprettJournalføringOppgaveTask::class.java)
 
     override fun doTask(task: Task) {
 
         val journalpost = journalpostClient.hentJournalpost(task.payload)
 
         if (journalpost.journalstatus == Journalstatus.MOTTATT) {
-            task.metadata["oppgaveId"] =
-                    "${oppgaveClient.opprettJournalføringsoppgave(journalpost).oppgaveId}"
-            task.metadata["personIdent"] = journalpost.bruker?.id
-            task.metadata["journalpostId"] = journalpost.journalpostId
+            val nyOppgave = oppgaveClient.opprettJournalføringsoppgave(journalpost)
+            task.metadata["oppgaveId"] = "${nyOppgave.oppgaveId}"
             taskRepository.saveAndFlush(task)
         } else {
-            log.info("Ingen oppgave opprettet da journalpost ${journalpost.journalpostId} ikke har status MOTTATT lenger.")
+            val error = IllegalStateException(
+                "Journalpost ${journalpost.journalpostId} har endret status fra MOTTATT til ${journalpost.journalstatus.name}"
+            )
+            log.info("OpprettJournalføringOppgaveTask feilet.", error)
+            throw error
         }
     }
 
