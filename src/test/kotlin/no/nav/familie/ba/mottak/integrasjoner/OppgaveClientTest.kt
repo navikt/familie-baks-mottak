@@ -56,7 +56,7 @@ class OppgaveClientTest {
                        .withHeader(NavHttpHeaders.NAV_CONSUMER_ID.asString(), equalTo("familie-ba-mottak"))
                        .withRequestBody(equalToJson(forventetOpprettOppgaveRequestJson(journalpostId = "1234567",
                                                                                        oppgavetype = "Journalføring",
-                                                                                       behandlingstema = "ab0180"))))
+                                                                                       behandlingstema = "behandlingstemaFraJournalpost"))))
     }
 
     @Test
