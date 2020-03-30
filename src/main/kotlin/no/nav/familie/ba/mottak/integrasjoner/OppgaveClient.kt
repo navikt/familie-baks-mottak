@@ -27,7 +27,7 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
     fun opprettJournalføringsoppgave(journalpost: Journalpost): OppgaveResponse {
         logger.info("Oppretter journalføringsoppgave for papirsøknad")
         val uri = URI.create("$integrasjonUri/oppgave")
-        val request = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring, journalpost, behandlingstema = "ab0180")
+        val request = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring, journalpost)
 
         return responseFra(uri, request)
     }

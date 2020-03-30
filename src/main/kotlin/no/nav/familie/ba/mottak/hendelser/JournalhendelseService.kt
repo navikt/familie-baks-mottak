@@ -72,7 +72,7 @@ class JournalhendelseService(val journalpostClient: JournalpostClient,
             taskRepository.save(ferdigstillTask)
             logger.info("Oppretter task OppdaterOgFerdigstillJournalpostTask, feature skrudd på")
         } else {
-            logger.info("Behandler ikke journalhendelse, feature er skrudd av i Unleash")
+            logger.info("Behandler ikke journalhendelse, feature familie-ba-mottak.journalhendelse.behsak er skrudd av i Unleash")
         }
 
         kanalNavnoCounter.increment()
@@ -88,7 +88,7 @@ class JournalhendelseService(val journalpostClient: JournalpostClient,
                                                  metadata)
             taskRepository.save(journalføringsTask)
         } else {
-            logger.info("Behandler ikke journalhendelse, feature er skrudd av i Unleash")
+            logger.info("Behandler ikke journalhendelse, feature familie-ba-mottak.journalhendelse.jfr er skrudd av i Unleash")
         }
 
         kanalSkannetsCounter.increment()
@@ -96,7 +96,6 @@ class JournalhendelseService(val journalpostClient: JournalpostClient,
 
     private fun skalBehandleJournalpost(journalpost: Journalpost) =
             journalpost.tema == "BAR" && journalpost.journalposttype == Journalposttype.I
-
 
 
     private fun opprettMetadata(journalpost: Journalpost): Properties {
