@@ -8,7 +8,7 @@ import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.ba.mottak.integrasjoner.Journalposttype
 import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
 import no.nav.familie.ba.mottak.task.OppdaterOgFerdigstillJournalpostTask
-import no.nav.familie.ba.mottak.task.OpprettOppgaveForJournalføringTask
+import no.nav.familie.ba.mottak.task.OpprettJournalføringOppgaveTask
 import no.nav.familie.log.IdUtils
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.domene.Task
@@ -83,7 +83,7 @@ class JournalhendelseService(val journalpostClient: JournalpostClient,
 
         if (featureToggleService.isEnabled("familie-ba-mottak.journalhendelse.jfr")) {
             val metadata = opprettMetadata(journalpost)
-            val journalføringsTask = Task.nyTask(OpprettOppgaveForJournalføringTask.TASK_STEP_TYPE,
+            val journalføringsTask = Task.nyTask(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
                                                  journalpost.journalpostId,
                                                  metadata)
             taskRepository.save(journalføringsTask)
