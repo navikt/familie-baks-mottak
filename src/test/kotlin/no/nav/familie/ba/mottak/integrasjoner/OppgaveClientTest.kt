@@ -1,3 +1,5 @@
+@file:Suppress("LongLine")
+
 package no.nav.familie.ba.mottak.integrasjoner
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
@@ -6,6 +8,7 @@ import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Ressurs.Companion.success
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
+import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.log.NavHttpHeaders
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -100,6 +103,36 @@ class OppgaveClientTest {
         }.isInstanceOf(IntegrasjonException::class.java)
                 .hasMessageContaining("Error mot http://localhost:28085/api/oppgave status=500 body={")
     }
+
+    @Test
+    @Tag("integration")
+    fun `Finn oppgaver skal returnere liste med 1 oppgave`() {
+        stubFor(get(urlEqualTo("/api/oppgave?tema=BAR&oppgavetype=JFR&journalpostId=${journalPost.journalpostId}"))
+                        .willReturn(aResponse()
+                                            .withHeader("Content-Type", "application/json")
+                                            .withBody(
+                                                    objectMapper.writeValueAsString(success(listOf(OppgaveDto(id = 1234)))))))
+
+        val oppgaveListe = oppgaveClient.finnOppgaver(journalPost.journalpostId, Oppgavetype.Journalføring)
+
+        assertThat(oppgaveListe).hasSize(1)
+        assertThat(oppgaveListe.first().id).isEqualTo(1234)
+    }
+
+    @Test
+    @Tag("integration")
+    fun `Finn oppgaver skal returnere tom liste`() {
+        stubFor(get(urlEqualTo("/api/oppgave?tema=BAR&oppgavetype=JFR&journalpostId=${journalPost.journalpostId}"))
+                        .willReturn(aResponse()
+                                            .withHeader("Content-Type", "application/json")
+                                            .withBody(
+                                                    objectMapper.writeValueAsString(success(emptyList<OppgaveDto>())))))
+
+        val oppgaveListe = oppgaveClient.finnOppgaver(journalPost.journalpostId, Oppgavetype.Journalføring)
+
+        assertThat(oppgaveListe).isEmpty()
+    }
+
 
     private fun forventetOpprettOppgaveRequestJson(journalpostId: String,
                                                    oppgavetype: String,
