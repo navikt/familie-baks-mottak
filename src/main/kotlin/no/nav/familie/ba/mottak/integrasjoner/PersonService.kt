@@ -40,7 +40,7 @@ class PersonService @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
         } catch (e: HttpStatusCodeException) {
             logger.info("Feil mot TPS. status=${e.statusCode}, stacktrace=${e.stackTrace.toList()}")
             secureLogger.info("Feil mot TPS. msg=${e.message}, body=${e.responseBodyAsString}")
-            throw RuntimeException("Kall mot integrasjon feilet ved uthenting av personinfo.")
+            throw RuntimeException("Kall mot integrasjon feilet ved uthenting av personinfo. ${e.statusCode} ${e.responseBodyAsString}")
         }
     }
 }
