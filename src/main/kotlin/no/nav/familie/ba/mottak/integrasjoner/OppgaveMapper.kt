@@ -1,8 +1,8 @@
 package no.nav.familie.ba.mottak.integrasjoner
 
+import no.nav.familie.ba.mottak.util.fristFerdigstillelse
 import no.nav.familie.kontrakter.felles.oppgave.*
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class OppgaveMapper(private val aktørClient: AktørClient) {
@@ -16,8 +16,7 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
                               journalpostId = journalpost.journalpostId,
                               tema = Tema.BAR,
                               oppgavetype = oppgavetype,
-                              fristFerdigstillelse = LocalDate.now()
-                                      .plusDays(2), //TODO få denne til å funke på helg og eventuellle andre helligdager
+                              fristFerdigstillelse = fristFerdigstillelse(),
                               beskrivelse = "",
                               enhetsnummer = journalpost.journalforendeEnhet,
                               behandlingstema = behandlingstema ?: journalpost.behandlingstema)
