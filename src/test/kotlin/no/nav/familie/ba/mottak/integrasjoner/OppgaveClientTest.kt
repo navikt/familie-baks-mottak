@@ -3,6 +3,8 @@
 package no.nav.familie.ba.mottak.integrasjoner
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
+import io.mockk.every
+import io.mockk.mockkStatic
 import no.nav.familie.ba.mottak.config.ApplicationConfig
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Ressurs.Companion.success
@@ -23,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @SpringBootTest(classes = [ApplicationConfig::class], properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api"])
 @ActiveProfiles("dev", "mock-oauth")
@@ -49,6 +52,8 @@ class OppgaveClientTest {
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(
                                                     objectMapper.writeValueAsString(success(OppgaveResponse(oppgaveId = 1234))))))
+        mockkStatic(LocalDateTime::class)
+        every { LocalDateTime.now() } returns LocalDateTime.of(2020,4,1,0,0)
 
         val opprettOppgaveResponse =
                 oppgaveClient.opprettJournalføringsoppgave(journalPost)
@@ -71,6 +76,8 @@ class OppgaveClientTest {
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(
                                                     objectMapper.writeValueAsString(success(OppgaveResponse(oppgaveId = 1234))))))
+        mockkStatic(LocalDateTime::class)
+        every { LocalDateTime.now() } returns LocalDateTime.of(2020,4,1,0,0)
 
         val opprettOppgaveResponse =
                 oppgaveClient.opprettBehandleSakOppgave(journalPost)
@@ -148,7 +155,7 @@ class OppgaveClientTest {
                "  \"tema\": \"BAR\",\n" +
                "  \"oppgavetype\": \"$oppgavetype\",\n" +
                "  \"behandlingstema\": \"$behandlingstema\",\n" +
-               "  \"fristFerdigstillelse\": \"${LocalDate.now().plusDays(2)}\",\n" +
+               "  \"fristFerdigstillelse\": \"2020-04-01\",\n" +
                "  \"aktivFra\": \"${LocalDate.now()}\",\n" +
                "  \"beskrivelse\": \"\"\n" +
                "}"
