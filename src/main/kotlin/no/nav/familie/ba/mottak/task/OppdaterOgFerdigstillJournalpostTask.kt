@@ -6,36 +6,46 @@ import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import org.springframework.stereotype.Service
 
 @Service
-@TaskStepBeskrivelse(taskStepType = OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE, beskrivelse = "Legger til Sak og ferdigstiller journalpost")
+@TaskStepBeskrivelse(taskStepType = OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE,
+                     beskrivelse = "Legger til Sak og ferdigstiller journalpost")
 class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: JournalpostClient,
                                            private val dokarkivClient: DokarkivClient,
                                            private val sakClient: SakClient,
                                            private val aktørClient: AktørClient,
                                            private val taskRepository: TaskRepository) : AsyncTaskStep {
 
+    val log: Logger = LoggerFactory.getLogger(OppdaterOgFerdigstillJournalpostTask::class.java)
+
     override fun doTask(task: Task) {
         val journalpost = journalpostClient.hentJournalpost(task.payload)
-            .takeUnless { it.bruker == null } ?: throw error("Journalpost ${task.payload} mangler bruker")
-        val fagsakId = sakClient.hentSaksnummer(tilPersonIdent(journalpost.bruker!!))
+                                  .takeUnless { it.bruker == null } ?: throw error("Journalpost ${task.payload} mangler bruker")
 
-        dokarkivClient.oppdaterJournalpostSak(journalpost, fagsakId.toString())
-        dokarkivClient.ferdigstillJournalpost(journalpost.journalpostId)
-
-        task.metadata["fagsakId"] = fagsakId
-        task.metadata["personIdent"] = journalpost.bruker?.id
-        task.metadata["journalpostId"] = journalpost.journalpostId
-        taskRepository.saveAndFlush(task)
+        when (journalpost.journalstatus) {
+            Journalstatus.MOTTATT -> {
+                val fagsakId = sakClient.hentSaksnummer(tilPersonIdent(journalpost.bruker!!))
+                dokarkivClient.oppdaterJournalpostSak(journalpost, fagsakId)
+                dokarkivClient.ferdigstillJournalpost(journalpost.journalpostId)
+                task.metadata["fagsakId"] = fagsakId
+                log.info("Har oppdatert og ferdigstilt journalpost ${journalpost.journalpostId}")
+                taskRepository.saveAndFlush(task)
+            }
+            Journalstatus.JOURNALFOERT -> log.info("Skipper oppdatering og ferdigstilling av " +
+                                                   "journalpost ${journalpost.journalpostId} som alt er ferdig journalført")
+            else -> error("Uventet journalstatus ${journalpost.journalstatus} for journalpost ${journalpost.journalpostId}")
+        }
     }
 
     override fun onCompletion(task: Task) {
         val nyTask = Task.nyTask(
-            type = OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE,
-            payload = task.payload,
-            properties = task.metadata
+                type = OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE,
+                payload = task.payload,
+                properties = task.metadata
         )
         taskRepository.save(nyTask)
     }

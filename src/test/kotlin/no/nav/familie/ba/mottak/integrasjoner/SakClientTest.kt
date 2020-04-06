@@ -32,7 +32,7 @@ class SakClientTest {
                                             .withBody(gyldigResponse())))
 
         val response = sakClient.hentSaksnummer(personIdent)
-        Assertions.assertThat(response).isEqualTo(fagsakId)
+        Assertions.assertThat(response).isEqualTo(fagsakId.toString())
     }
 
     @Throws(IOException::class) private fun gyldigResponse(): String {

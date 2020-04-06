@@ -39,12 +39,12 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
         }
     }
 
-    fun hentSaksnummer(personIdent: String): Long {
+    fun hentSaksnummer(personIdent: String): String {
         val uri = URI.create("$sakServiceUri/fagsaker")
         return runCatching {
             postForEntity<Ressurs<RestFagsak>>(uri, mapOf("personIdent" to personIdent))!!
         }.fold(
-            onSuccess = { it.data?.id ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
+            onSuccess = { it.data?.id?.toString() ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
             onFailure = { throw IntegrasjonException("Feil ved henting av saksnummer fra ba-sak.", it, uri, personIdent) }
         )
     }
