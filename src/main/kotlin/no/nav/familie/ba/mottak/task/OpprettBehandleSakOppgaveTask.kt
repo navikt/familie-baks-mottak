@@ -22,12 +22,9 @@ class OpprettBehandleSakOppgaveTask(private val journalpostClient: JournalpostCl
     override fun doTask(task: Task) {
         val journalpost = journalpostClient.hentJournalpost(task.payload)
 
-        if (journalpost.journalstatus == Journalstatus.FERDIGSTILT) {
+        if (journalpost.journalstatus == Journalstatus.JOURNALFOERT) {
             task.metadata["oppgaveId"] =
                     "${oppgaveClient.opprettBehandleSakOppgave(journalpost).oppgaveId}"
-            task.metadata["personIdent"] = journalpost.bruker?.id
-            task.metadata["journalpostId"] = journalpost.journalpostId
-            task.metadata["fagsakId"] = journalpost.sak?.fagsakId
             taskRepository.saveAndFlush(task)
         } else {
             throw error("Kan ikke opprette oppgave før tilhørende journalpost ${journalpost.journalpostId} er ferdigstilt")
