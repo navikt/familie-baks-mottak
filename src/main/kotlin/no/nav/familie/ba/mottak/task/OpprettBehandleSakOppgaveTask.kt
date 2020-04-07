@@ -23,9 +23,14 @@ class OpprettBehandleSakOppgaveTask(private val journalpostClient: JournalpostCl
         val journalpost = journalpostClient.hentJournalpost(task.payload)
 
         if (journalpost.journalstatus == Journalstatus.JOURNALFOERT) {
-            task.metadata["oppgaveId"] =
-                    "${oppgaveClient.opprettBehandleSakOppgave(journalpost).oppgaveId}"
-            taskRepository.saveAndFlush(task)
+            val oppgaver = oppgaveClient.finnOppgaver(journalpost.journalpostId, null)
+            if (oppgaver.isNullOrEmpty()) {
+                task.metadata["oppgaveId"] =
+                        "${oppgaveClient.opprettBehandleSakOppgave(journalpost).oppgaveId}"
+                taskRepository.saveAndFlush(task)
+            } else {
+                throw error("Det eksister minst 1 åpen oppgave på journalpost ${task.payload}")
+            }
         } else {
             throw error("Kan ikke opprette oppgave før tilhørende journalpost ${journalpost.journalpostId} er ferdigstilt")
         }
