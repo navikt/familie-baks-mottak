@@ -114,7 +114,7 @@ class OppgaveClientTest {
     @Test
     @Tag("integration")
     fun `Finn oppgaver skal returnere liste med 1 oppgave`() {
-        stubFor(get(urlEqualTo("/api/oppgave?tema=BAR&oppgavetype=JFR&journalpostId=${journalPost.journalpostId}"))
+        stubFor(get(urlEqualTo("/api/oppgave?tema=BAR&journalpostId=1234567&oppgavetype=JFR"))
                         .willReturn(aResponse()
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(
@@ -129,7 +129,7 @@ class OppgaveClientTest {
     @Test
     @Tag("integration")
     fun `Finn oppgaver skal returnere tom liste`() {
-        stubFor(get(urlEqualTo("/api/oppgave?tema=BAR&oppgavetype=JFR&journalpostId=${journalPost.journalpostId}"))
+        stubFor(get(urlEqualTo("/api/oppgave?tema=BAR&journalpostId=1234567&oppgavetype=JFR"))
                         .willReturn(aResponse()
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(

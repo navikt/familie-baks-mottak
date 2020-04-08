@@ -41,13 +41,17 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
     }
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
-    fun finnOppgaver(journalpostId: String, oppgavetype: Oppgavetype): List<OppgaveDto> {
-        val uri = UriComponentsBuilder.fromUri(integrasjonUri)
+    fun finnOppgaver(journalpostId: String, oppgavetype: Oppgavetype?): List<OppgaveDto> {
+        val uriBuilder = UriComponentsBuilder.fromUri(integrasjonUri)
                 .pathSegment("oppgave")
                 .queryParam("tema", "BAR")
-                .queryParam("oppgavetype", oppgavetype.value)
                 .queryParam("journalpostId", journalpostId)
-                .build().toUri()
+
+        if (oppgavetype != null){
+            uriBuilder.queryParam("oppgavetype", oppgavetype.value)
+        }
+
+        val uri = uriBuilder.build().toUri()
         logger.info("Søker etter aktive oppgaver for $journalpostId")
 
         return Result.runCatching {
