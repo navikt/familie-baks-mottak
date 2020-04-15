@@ -46,12 +46,6 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
         try {
             val personMedRelasjoner = personService.hentPersonMedRelasjoner(barnetsId)
 
-            if (personMedRelasjoner.statsborgerskap?.erNorge() == false) {
-                log.info("Ignorer fødselshendelse: Barnet har ikke norsk statsborgerskap")
-                barnErIkkeNorskStatsborgerCounter.increment()
-                return
-            }
-
             val forsørger = hentForsørger(personMedRelasjoner)
 
             if (erDnummer(forsørger) || erFDatnummer(forsørger)) {
