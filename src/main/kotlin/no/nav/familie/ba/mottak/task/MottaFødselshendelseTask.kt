@@ -31,7 +31,6 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
 
     val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
     val barnHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.barn.har.dnr.eller.fdatnr")
-    val barnErIkkeNorskStatsborgerCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.barn.ikke.norsk.statsborger")
     val forsørgerHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.forsørger.har.dnr.eller.fdatnr")
 
     override fun doTask(task: Task) {
@@ -45,12 +44,6 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
 
         try {
             val personMedRelasjoner = personService.hentPersonMedRelasjoner(barnetsId)
-
-            if (personMedRelasjoner.statsborgerskap?.erNorge() == false) {
-                log.info("Ignorer fødselshendelse: Barnet har ikke norsk statsborgerskap")
-                barnErIkkeNorskStatsborgerCounter.increment()
-                return
-            }
 
             val forsørger = hentForsørger(personMedRelasjoner)
 
