@@ -39,17 +39,17 @@ class JournalhendelseService(val journalpostClient: JournalpostClient,
 
             when (journalpost.journalstatus) {
                 Journalstatus.MOTTATT -> {
-                    when (journalpost.kanal) {
-                        "SKAN_NETS" -> {
+                    when {
+                        "SKAN_" == journalpost.kanal?.substring(0, 5) -> {
                             behandleSkanningHendelser(journalpost)
                         }
 
-                        "NAV_NO" -> {
+                        "NAV_NO" == journalpost.kanal -> {
                             behandleNavnoHendelser(journalpost)
                         }
 
                         else -> {
-                            logger.info("Ny Journalhendelse med journalpostId=$journalpostId med status MOTTATT og kanal ${journalpost.kanal}")
+                            logger.info("Ny journalhendelse med journalpostId=$journalpostId med status MOTTATT og kanal ${journalpost.kanal}")
                             kanalAnnetCounter.count()
                         }
                     }
