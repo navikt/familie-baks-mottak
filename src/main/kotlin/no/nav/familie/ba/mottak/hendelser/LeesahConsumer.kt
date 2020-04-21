@@ -194,7 +194,7 @@ class LeesahConsumer(val taskRepository: TaskRepository,
             val dato = (get("foedsel") as GenericRecord?)?.get("foedselsdato")
 
             when (dato) {
-                null -> { log.error("Fødselsdato mangler."); throw Exception() }
+                null -> { log.error("Fødselsdato mangler."); error("Fødselsdato mangler.") }
                 is LocalDate -> dato
                 else -> LocalDate.ofEpochDay((dato as Int).toLong())
             }
