@@ -49,7 +49,7 @@ class JournalhendelseService(val journalpostClient: JournalpostClient,
                         }
 
                         else -> {
-                            logger.info("Ny Journalhendelse med journalpostId=$journalpostId med status MOTTATT og kanal ${journalpost.kanal}")
+                            logger.info("Ny journalhendelse med journalpostId=$journalpostId med status MOTTATT og kanal ${journalpost.kanal}")
                             kanalAnnetCounter.count()
                         }
                     }
