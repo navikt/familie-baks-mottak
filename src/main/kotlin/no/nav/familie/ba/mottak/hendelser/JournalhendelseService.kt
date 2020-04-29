@@ -79,7 +79,7 @@ class JournalhendelseService(val journalpostClient: JournalpostClient,
     }
 
     private fun behandleSkanningHendelser(journalpost: Journalpost) {
-        logger.info("Ny Journalhendelse med [journalpostId=${journalpost.journalpostId}, status=MOTTATT, tema=${journalpost.tema}, kanal=SKAN_NETS]")
+        logger.info("Ny Journalhendelse med [journalpostId=${journalpost.journalpostId}, status=${journalpost.journalstatus}, tema=${journalpost.tema}, kanal=${journalpost.kanal}]")
 
         if (featureToggleService.isEnabled("familie-ba-mottak.journalhendelse.jfr")) {
             val metadata = opprettMetadata(journalpost)
