@@ -157,7 +157,8 @@ class OppgaveClientTest {
                "  \"behandlingstema\": \"$behandlingstema\",\n" +
                "  \"fristFerdigstillelse\": \"2020-04-01\",\n" +
                "  \"aktivFra\": \"${LocalDate.now()}\",\n" +
-               "  \"beskrivelse\": \"\"\n" +
+               "  \"beskrivelse\": \"\",\n" +
+               "  \"prioritet\": \"NORM\"\n" +
                "}"
     }
 
