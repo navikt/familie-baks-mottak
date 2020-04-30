@@ -19,7 +19,7 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
                               fristFerdigstillelse = fristFerdigstillelse(),
                               beskrivelse = "",
                               enhetsnummer = journalpost.journalforendeEnhet,
-                              behandlingstema = if (erDnummer(ident.ident)) Behandlingstema.BarnetrygdEØS.value else journalpost.behandlingstema)
+                              behandlingstema = hentBehandlingstema(ident, journalpost))
 
     }
 
@@ -32,5 +32,19 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
             BrukerIdType.ORGNR -> OppgaveIdent(ident = journalpost.bruker.id, type = IdentType.Organisasjon)
             BrukerIdType.AKTOERID -> OppgaveIdent(ident = journalpost.bruker.id, type = IdentType.Aktør)
         }
+    }
+
+    private fun hentBehandlingstema(ident: OppgaveIdent, journalpost: Journalpost): String? {
+        if (journalpost.dokumenter.isNullOrEmpty()) throw error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
+
+        if (erDnummer(ident.ident)) return Behandlingstema.BarnetrygdEØS.value
+
+        // TODO: Foreløpig implementasjon i påvente av ytterligere funksjonelle avklaringer. 
+        return when(journalpost.dokumenter.firstOrNull { it.brevkode != null }?.brevkode) {
+            "NAV 33-00.07" -> Behandlingstema.OrdinærBarnetrygd.value
+            "NAV 33-00.09" -> Behandlingstema.UtvidetBarnetrygd.value
+            else -> journalpost.behandlingstema
+        }
+
     }
 }
