@@ -39,7 +39,6 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
 
         if (erDnummer(ident.ident)) return Behandlingstema.BarnetrygdEØS.value
 
-        // TODO: Foreløpig implementasjon i påvente av ytterligere funksjonelle avklaringer. 
         return when(journalpost.dokumenter.firstOrNull { it.brevkode != null }?.brevkode) {
             "NAV 33-00.07" -> Behandlingstema.OrdinærBarnetrygd.value
             "NAV 33-00.09" -> Behandlingstema.UtvidetBarnetrygd.value
