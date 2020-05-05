@@ -7,13 +7,18 @@ import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.ba.mottak.task.OppdaterOgFerdigstillJournalpostTask
 import no.nav.familie.ba.mottak.task.OpprettJournalføringOppgaveTask
+import no.nav.familie.ba.mottak.task.SendTilSakTask
+import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
+import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.internal.matchers.Any
 import org.slf4j.MDC
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -21,6 +26,9 @@ class JournalføringHendelseServiceTest {
 
     @MockK
     lateinit var mockJournalpostClient: JournalpostClient
+
+    @MockK
+    lateinit var mockOppgaveClient: OppgaveClient
 
     @MockK(relaxed = true)
     lateinit var mockTaskRepository: TaskRepository
@@ -184,6 +192,67 @@ class JournalføringHendelseServiceTest {
 
     }
 
+    @Test
+    fun `Oppretter oppgave dersom det ikke eksisterer en allerede`() {
+        every {
+            mockOppgaveClient.finnOppgaver(any(), any())
+        } returns listOf()
+
+        every {
+            mockOppgaveClient.opprettJournalføringsoppgave(any())
+        } returns OppgaveResponse(1)
+
+        every {
+            mockTaskRepository.saveAndFlush(any<Task>())
+        } returns null
+
+        val task = OpprettJournalføringOppgaveTask(
+                mockJournalpostClient,
+                mockOppgaveClient,
+                mockTaskRepository)
+
+        task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT))
+
+        verify(exactly = 1) {
+            mockTaskRepository.saveAndFlush(any<Task>())
+        }
+    }
+
+    @Test
+    fun `Oppretter ikke oppgave dersom det eksisterer en allerede`() {
+        every {
+            mockOppgaveClient.finnOppgaver(any(), Oppgavetype.Journalføring)
+        } returns listOf()
+        every {
+            mockOppgaveClient.finnOppgaver(JOURNALPOST_UTGÅENDE_DOKUMENT, Oppgavetype.Journalføring)
+        } returns listOf(OppgaveDto(123))
+        every {
+            mockOppgaveClient.finnOppgaver(JOURNALPOST_PAPIRSØKNAD, Oppgavetype.Fordeling)
+        } returns listOf(OppgaveDto(123))
+
+        val task = OpprettJournalføringOppgaveTask(
+                mockJournalpostClient,
+                mockOppgaveClient,
+                mockTaskRepository)
+        task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT))
+        task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_PAPIRSØKNAD))
+
+        verify(exactly = 0) {
+            mockTaskRepository.saveAndFlush(any<Task>())
+        }
+    }
+
+    @Test
+    fun `Kaster exception dersom journalstatus annet enn MOTTATT`() {
+        val task = OpprettJournalføringOppgaveTask(
+                mockJournalpostClient,
+                mockOppgaveClient,
+                mockTaskRepository)
+
+        Assertions.assertThrows(IllegalStateException::class.java) {
+            task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_FERDIGSTILT))
+        }
+    }
 
     private fun opprettRecord(journalpostId: String,
                               hendelseType: String = "MidlertidigJournalført"): JournalfoeringHendelseRecord {

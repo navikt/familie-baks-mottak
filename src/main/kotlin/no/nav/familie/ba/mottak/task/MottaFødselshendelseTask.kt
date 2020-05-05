@@ -9,6 +9,7 @@ import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
 import no.nav.familie.ba.mottak.domene.personopplysning.Personinfo
 import no.nav.familie.ba.mottak.domene.personopplysning.RelasjonsRolleType
 import no.nav.familie.ba.mottak.integrasjoner.PersonService
+import no.nav.familie.ba.mottak.util.erDnummer
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -85,10 +86,6 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
         }
         log.warn("Fant hverken far eller mor...")
         throw IllegalStateException("Fant hverken mor eller far. Må behandles manuelt")
-    }
-
-    fun erDnummer(personIdent: PersonIdent): Boolean {
-        return personIdent.id?.substring(0, 1)?.toInt()!! > 3
     }
 
     fun erFDatnummer(personIdent: PersonIdent): Boolean {

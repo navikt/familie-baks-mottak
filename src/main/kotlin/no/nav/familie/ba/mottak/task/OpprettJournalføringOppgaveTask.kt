@@ -25,12 +25,20 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
 
         val journalpost = journalpostClient.hentJournalpost(task.payload)
         if (journalpost.journalstatus == Journalstatus.MOTTATT) {
-            if (oppgaveClient.finnOppgaver(journalpost.journalpostId, Oppgavetype.Journalføring).isNullOrEmpty()) {
+            val oppgaveTypeForEksisterendeOppgave: Oppgavetype? =
+                    if (oppgaveClient.finnOppgaver(journalpost.journalpostId, Oppgavetype.Journalføring).isNotEmpty()) {
+                        Oppgavetype.Journalføring
+                    } else if (oppgaveClient.finnOppgaver(journalpost.journalpostId, Oppgavetype.Fordeling).isNotEmpty()) {
+                        Oppgavetype.Fordeling
+                    } else null
+
+            if (oppgaveTypeForEksisterendeOppgave == null) {
                 val nyOppgave = oppgaveClient.opprettJournalføringsoppgave(journalpost)
                 task.metadata["oppgaveId"] = "${nyOppgave.oppgaveId}"
                 taskRepository.saveAndFlush(task)
+                log.info("Oppretter ny journalførings-oppgave med id ${nyOppgave.oppgaveId} for journalpost ${journalpost.journalpostId}")
             } else {
-                log.info("Skipper oppretting av journalførings-oppgave. Fant åpen oppgave for ${journalpost.journalpostId}")
+                log.info("Skipper oppretting av journalførings-oppgave. Fant åpen oppgave av type $oppgaveTypeForEksisterendeOppgave for ${journalpost.journalpostId}")
             }
         } else {
             val error = IllegalStateException(

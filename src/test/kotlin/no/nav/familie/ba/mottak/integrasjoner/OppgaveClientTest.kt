@@ -113,6 +113,16 @@ class OppgaveClientTest {
 
     @Test
     @Tag("integration")
+    fun `Opprett oppgave skal kaste feil hvis journalposten ikke inneholder noen dokumenter`() {
+        val journalpostUtenDokumenter = journalPost.copy(dokumenter = listOf())
+        assertThatThrownBy {
+            oppgaveClient.opprettJournalføringsoppgave(journalpostUtenDokumenter)
+        }.isInstanceOf(IllegalStateException::class.java)
+                .hasMessageContaining("Journalpost ${journalpostUtenDokumenter.journalpostId} mangler dokumenter")
+    }
+
+    @Test
+    @Tag("integration")
     fun `Finn oppgaver skal returnere liste med 1 oppgave`() {
         stubFor(get(urlEqualTo("/api/oppgave?tema=BAR&journalpostId=1234567&oppgavetype=JFR"))
                         .willReturn(aResponse()
@@ -155,9 +165,11 @@ class OppgaveClientTest {
                "  \"tema\": \"BAR\",\n" +
                "  \"oppgavetype\": \"$oppgavetype\",\n" +
                "  \"behandlingstema\": \"$behandlingstema\",\n" +
+               "  \"tilordnetRessurs\": null,\n" +
                "  \"fristFerdigstillelse\": \"2020-04-01\",\n" +
                "  \"aktivFra\": \"${LocalDate.now()}\",\n" +
-               "  \"beskrivelse\": \"\"\n" +
+               "  \"beskrivelse\": \"\",\n" +
+               "  \"prioritet\": \"NORM\"\n" +
                "}"
     }
 
@@ -171,6 +183,11 @@ class OppgaveClientTest {
                                               Bruker("1234567891011", BrukerIdType.AKTOERID),
                                               "9999",
                                               "kanal",
-                                              listOf())
+                                              listOf(
+                                                      DokumentInfo("Tittel",
+                                                      "NAV- 99.00.07",
+                                                      null,
+                                                      null)
+                                              ))
     }
 }
