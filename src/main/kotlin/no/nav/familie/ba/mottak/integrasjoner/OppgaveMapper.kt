@@ -19,8 +19,8 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
                               fristFerdigstillelse = fristFerdigstillelse(),
                               beskrivelse = "",
                               enhetsnummer = journalpost.journalforendeEnhet,
-                              behandlingstema = hentBehandlingstema(ident, journalpost))
-
+                              behandlingstema = hentBehandlingstema(ident, journalpost),
+                              behandlingstype = hentBehandlingstype(journalpost))
     }
 
     private fun tilOppgaveIdent(journalpost: Journalpost): OppgaveIdent {
@@ -39,11 +39,16 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
 
         if (erDnummer(ident.ident)) return Behandlingstema.BarnetrygdEØS.value
 
-        return when(journalpost.dokumenter.firstOrNull { it.brevkode != null }?.brevkode) {
+        return when (journalpost.dokumenter.firstOrNull { it.brevkode != null }?.brevkode) {
             "NAV 33-00.07" -> Behandlingstema.OrdinærBarnetrygd.value
             "NAV 33-00.09" -> Behandlingstema.UtvidetBarnetrygd.value
             else -> journalpost.behandlingstema
         }
+    }
 
+    private fun hentBehandlingstype(journalpost: Journalpost): String? {
+        if (journalpost.dokumenter.isNullOrEmpty()) throw error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
+
+        return if (journalpost.dokumenter.any { it.brevkode == "NAV 33-00.15" }) Behandlingstype.Utland.value else null
     }
 }

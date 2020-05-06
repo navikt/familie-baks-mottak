@@ -169,7 +169,8 @@ class OppgaveClientTest {
                "  \"fristFerdigstillelse\": \"2020-04-01\",\n" +
                "  \"aktivFra\": \"${LocalDate.now()}\",\n" +
                "  \"beskrivelse\": \"\",\n" +
-               "  \"prioritet\": \"NORM\"\n" +
+               "  \"prioritet\": \"NORM\",\n" +
+               "  \"behandlingstype\": null\n" +
                "}"
     }
 
