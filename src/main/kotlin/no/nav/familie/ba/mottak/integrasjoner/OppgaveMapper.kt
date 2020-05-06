@@ -48,7 +48,6 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
 
     private fun hentBehandlingstype(journalpost: Journalpost): String? {
         if (journalpost.dokumenter.isNullOrEmpty()) throw error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
-
         return if (journalpost.dokumenter.any { it.brevkode == "NAV 33-00.15" }) Behandlingstype.Utland.value else null
     }
 }
