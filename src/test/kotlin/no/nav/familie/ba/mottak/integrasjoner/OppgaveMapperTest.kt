@@ -7,7 +7,6 @@ import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import kotlin.test.assertEquals
@@ -18,8 +17,7 @@ import kotlin.test.assertNull
 class OppgaveMapperTest(
 
         @Autowired
-        @Qualifier("aktørClient")
-        private val aktørClient: AktørClient,
+        private val mockAktørClient: AktørClient,
 
         @Autowired
         private val journalpostClient: JournalpostClient
@@ -28,7 +26,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal kaste exception dersom dokumentlisten er tom`() {
-        val oppgaveMapper = OppgaveMapper(aktørClient)
+        val oppgaveMapper = OppgaveMapper(mockAktørClient)
         Assertions.assertThrows(IllegalStateException::class.java) {
             oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                journalpostClient.hentJournalpost("123")
@@ -39,7 +37,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal kaste exception dersom brukerid ikke er satt`() {
-        val oppgaveMapper = OppgaveMapper(aktørClient)
+        val oppgaveMapper = OppgaveMapper(mockAktørClient)
         Assertions.assertThrows(IllegalStateException::class.java) {
             oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                journalpostClient.hentJournalpost("123")
@@ -55,7 +53,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette behandlingstema Ordinær`() {
-        val oppgaveMapper = OppgaveMapper(aktørClient)
+        val oppgaveMapper = OppgaveMapper(mockAktørClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
                                                                  .copy(dokumenter = listOf(DokumentInfo(
@@ -70,7 +68,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette behandlingstema Utvidet`() {
-        val oppgaveMapper = OppgaveMapper(aktørClient)
+        val oppgaveMapper = OppgaveMapper(mockAktørClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
                                                                  .copy(dokumenter = listOf(DokumentInfo(
@@ -86,7 +84,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette behandlingstema fra journalpost`() {
-        val oppgaveMapper = OppgaveMapper(aktørClient)
+        val oppgaveMapper = OppgaveMapper(mockAktørClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
                                                                  .copy(dokumenter = listOf(DokumentInfo(
@@ -102,7 +100,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette behandlingstema EØS`() {
-        val oppgaveMapper = OppgaveMapper(aktørClient)
+        val oppgaveMapper = OppgaveMapper(mockAktørClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
                                                                  .copy(dokumenter = listOf(DokumentInfo(
@@ -111,7 +109,7 @@ class OppgaveMapperTest(
                                                                          dokumentstatus = null,
                                                                          dokumentvarianter = null)),
                                                                        bruker = Bruker(id = "42345678910",
-                                                                                       type = BrukerIdType.ORGNR)
+                                                                                       type = BrukerIdType.FNR)
                                                                  )
         )
         assertNull(oppgave.behandlingstype)
@@ -120,7 +118,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette behandlingstype Utland`() {
-        val oppgaveMapper = OppgaveMapper(aktørClient)
+        val oppgaveMapper = OppgaveMapper(mockAktørClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
                                                                  .copy(dokumenter = listOf(
@@ -133,7 +131,8 @@ class OppgaveMapperTest(
                                                                                  tittel = null,
                                                                                  brevkode = "NAV 33-00.15",
                                                                                  dokumentstatus = null,
-                                                                                 dokumentvarianter = null))
+                                                                                 dokumentvarianter = null)),
+                                                                       behandlingstema = Behandlingstema.OrdinærBarnetrygd.value
                                                                  )
         )
         assertNull(oppgave.behandlingstema)
