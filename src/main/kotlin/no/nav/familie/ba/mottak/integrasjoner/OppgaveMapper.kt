@@ -19,8 +19,8 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
                               fristFerdigstillelse = fristFerdigstillelse(),
                               beskrivelse = "",
                               enhetsnummer = journalpost.journalforendeEnhet,
-                              behandlingstema = hentBehandlingstema(ident, journalpost))
-
+                              behandlingstema = hentBehandlingstema(journalpost),
+                              behandlingstype = hentBehandlingstype(journalpost))
     }
 
     private fun tilOppgaveIdent(journalpost: Journalpost): OppgaveIdent {
@@ -34,16 +34,23 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
         }
     }
 
-    private fun hentBehandlingstema(ident: OppgaveIdent, journalpost: Journalpost): String? {
+    private fun hentBehandlingstema(journalpost: Journalpost): String? {
         if (journalpost.dokumenter.isNullOrEmpty()) throw error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
 
-        if (erDnummer(ident.ident)) return Behandlingstema.BarnetrygdEØS.value
-
-        return when(journalpost.dokumenter.firstOrNull { it.brevkode != null }?.brevkode) {
-            "NAV 33-00.07" -> Behandlingstema.OrdinærBarnetrygd.value
-            "NAV 33-00.09" -> Behandlingstema.UtvidetBarnetrygd.value
-            else -> journalpost.behandlingstema
+        if (journalpost.bruker?.type == BrukerIdType.FNR && erDnummer(journalpost.bruker.id)) {
+            return Behandlingstema.BarnetrygdEØS.value
         }
 
+        return when (journalpost.dokumenter.firstOrNull { it.brevkode != null }?.brevkode) {
+            "NAV 33-00.07" -> Behandlingstema.OrdinærBarnetrygd.value
+            "NAV 33-00.09" -> Behandlingstema.UtvidetBarnetrygd.value
+            "NAV 33-00.15" -> null
+            else -> journalpost.behandlingstema
+        }
+    }
+
+    private fun hentBehandlingstype(journalpost: Journalpost): String? {
+        if (journalpost.dokumenter.isNullOrEmpty()) throw error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
+        return if (journalpost.dokumenter.any { it.brevkode == "NAV 33-00.15" }) Behandlingstype.Utland.value else null
     }
 }
