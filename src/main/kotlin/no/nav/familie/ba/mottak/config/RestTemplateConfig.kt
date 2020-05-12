@@ -1,6 +1,6 @@
 package no.nav.familie.ba.mottak.config
 
-import no.nav.familie.http.interceptor.ClientCredentialsInterceptor
+import no.nav.familie.http.interceptor.BearerTokenClientInterceptor
 import no.nav.familie.http.interceptor.ConsumerIdClientInterceptor
 import no.nav.familie.http.interceptor.MdcValuesPropagatingClientInterceptor
 import no.nav.familie.kontrakter.felles.objectMapper
@@ -14,7 +14,7 @@ import org.springframework.web.client.RestOperations
 import java.time.Duration
 
 @Configuration
-@Import(ConsumerIdClientInterceptor::class, ClientCredentialsInterceptor::class)
+@Import(ConsumerIdClientInterceptor::class, BearerTokenClientInterceptor::class)
 class RestTemplateConfig {
 
     @Profile("!dev || !e2e")
@@ -38,11 +38,11 @@ class RestTemplateConfig {
     @Profile("!dev || !e2e")
     @Bean("clientCredentials")
     fun restTemplateClientCredentials(consumerIdClientInterceptor: ConsumerIdClientInterceptor,
-                                      clientCredentialsInterceptor: ClientCredentialsInterceptor): RestOperations {
+                                      bearerTokenClientInterceptor: BearerTokenClientInterceptor): RestOperations {
         return RestTemplateBuilder()
             .additionalCustomizers(NaisProxyCustomizer())
             .interceptors(consumerIdClientInterceptor,
-                clientCredentialsInterceptor,
+                bearerTokenClientInterceptor,
                 MdcValuesPropagatingClientInterceptor())
             .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
             .build()
