@@ -16,7 +16,7 @@ class UserAuthorizationFilter(@Value("\${MOTTAK_ROLLE:group1}") val påkrevdRoll
         when {
             ourIssuer() == null -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No value for `ourIssuer`")
             currentUserGroups() == null -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No user-groups in JWT")
-            !currentUserGroups().contains(påkrevdRolle) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+            !currentUserGroups()!!.contains(påkrevdRolle) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
                                                                               "Missing group $påkrevdRolle in JWT")
             else -> filterChain.doFilter(request, response)
         }
