@@ -1,13 +1,13 @@
 no.nav.security.jwt:
   issuer.azuread:
-    discoveryurl: https://login.microsoftonline.com/navq.onmicrosoft.com/v2.0/.well-known/openid-configuration
+    discoveryurl: http://mock-oauth2-server:1111/v2.0/.well-known/openid-configuration
     accepted_audience: ${MOTTAK_CLIENT_ID}
     cookie_name: azure_token
   client:
     registration:
       ba-sak-clientcredentials:
         resource-url: ${FAMILIE_BA_SAK_API_URL}
-        token-endpoint-url: https://login.microsoftonline.com/navq.onmicrosoft.com/oauth2/v2.0/token
+        token-endpoint-url: http://mock-oauth2-server:1111/v2.0/token
         grant-type: client_credentials
         scope: ${MOTTAK_BA_SAK_SCOPE}
         authentication:
@@ -16,7 +16,7 @@ no.nav.security.jwt:
           client-auth-method: client_secret_basic
       integrasjoner-clientcredentials:
         resource-url: ${FAMILIE_INTEGRASJONER_API_URL}
-        token-endpoint-url: https://login.microsoftonline.com/navq.onmicrosoft.com/oauth2/v2.0/token
+        token-endpoint-url: http://mock-oauth2-server:1111/v2.0/token
         grant-type: client_credentials
         scope: ${MOTTAK_FAMILIE_INTEGRASJONER_SCOPE}
         authentication:
