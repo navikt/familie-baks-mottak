@@ -53,7 +53,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal opprette oppgave selv om bruker mangler når oppgavetype er Journalføring`() {
-        val oppgaveMapper = OppgaveMapper(aktørClient)
+        val oppgaveMapper = OppgaveMapper(mockAktørClient)
         Assertions.assertDoesNotThrow {
             oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                 journalpostClient.hentJournalpost("123")
