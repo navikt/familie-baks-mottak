@@ -10,7 +10,7 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
 
     fun mapTilOpprettOppgave(oppgavetype: Oppgavetype,
                              journalpost: Journalpost): OpprettOppgave {
-        val ident = tilOppgaveIdent(journalpost)
+        val ident = tilOppgaveIdent(journalpost, oppgavetype)
         return OpprettOppgave(ident = ident,
                               saksId = journalpost.sak?.fagsakId,
                               journalpostId = journalpost.journalpostId,
@@ -23,8 +23,14 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
 
     }
 
-    private fun tilOppgaveIdent(journalpost: Journalpost): OppgaveIdent {
-        journalpost.bruker?.id ?: throw error("Journalpost ${journalpost.journalpostId} mangler bruker")
+    private fun tilOppgaveIdent(journalpost: Journalpost, oppgavetype: Oppgavetype): OppgaveIdent? {
+        if (journalpost.bruker == null) {
+            when (oppgavetype) {
+                Oppgavetype.BehandleSak -> throw error("Journalpost ${journalpost.journalpostId} mangler bruker")
+                Oppgavetype.Journalføring -> return null
+            }
+        }
+
         return when (journalpost.bruker.type) {
             BrukerIdType.FNR -> {
                 OppgaveIdent(ident = aktørClient.hentAktørId(journalpost.bruker.id), type = IdentType.Aktør)
@@ -34,10 +40,10 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
         }
     }
 
-    private fun hentBehandlingstema(ident: OppgaveIdent, journalpost: Journalpost): String? {
+    private fun hentBehandlingstema(ident: OppgaveIdent?, journalpost: Journalpost): String? {
         if (journalpost.dokumenter.isNullOrEmpty()) throw error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
 
-        if (erDnummer(ident.ident)) return Behandlingstema.BarnetrygdEØS.value
+        if (ident != null && erDnummer(ident.ident)) return Behandlingstema.BarnetrygdEØS.value
 
         return when(journalpost.dokumenter.firstOrNull { it.brevkode != null }?.brevkode) {
             "NAV 33-00.07" -> Behandlingstema.OrdinærBarnetrygd.value
