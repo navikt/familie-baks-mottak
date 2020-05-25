@@ -18,8 +18,12 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @SpringBootConfiguration
 @EnableJpaAuditing
 @EnableJpaRepositories("no.nav.familie")
+@ComponentScan("no.nav.familie.prosessering",
+        "no.nav.familie.sikkerhet",
+        "no.nav.familie.ba.mottak"
+)
+
 @EntityScan("no.nav.familie")
-@ComponentScan("no.nav.familie")
 @ConfigurationPropertiesScan("no.nav.familie")
 @EnableScheduling
 @EnableJwtTokenValidation

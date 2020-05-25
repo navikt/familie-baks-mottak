@@ -109,7 +109,7 @@ class KafkaConsumerIntegrasjonTest(@Autowired val hendelsesloggRepository: Hende
         assertThat(fantTask).isTrue() // Det skal finnes en task i taskrepositoriet
 
         val fødselshendelsetasks =
-                restTaskService.hentTasks(Status.UBEHANDLET, "", 0).data!!.filter { it.taskStepType == "mottaFødselshendelse" }
+                restTaskService.hentTasks(listOf(Status.UBEHANDLET), "", 0).data!!.filter { it.taskStepType == "mottaFødselshendelse" }
         assertThat(fødselshendelsetasks).isNotEmpty // Den skal være tilgjengelig via RestTaskService
 
         assertThat(hendelsesloggRepository.existsByHendelseIdAndConsumer("2",

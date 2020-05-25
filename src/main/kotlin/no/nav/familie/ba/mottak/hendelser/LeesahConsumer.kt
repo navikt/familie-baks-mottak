@@ -73,7 +73,12 @@ class LeesahConsumer(val taskRepository: TaskRepository,
             OPPRETTET, KORRIGERT -> {
                 logHendelse(cr, "fødselsdato: ${cr.value().hentFødselsdato()}")
 
-                if (erUnder6mnd(cr.value().hentFødselsdato())) {
+                val fødselsDato = cr.value().hentFødselsdato()
+
+                if (fødselsDato == null) {
+                    log.error("Mangler fødselsdato. Ignorerer hendelse ${cr.value().hentHendelseId()}")
+                    fødselIgnorertCounter.increment()
+                } else if (erUnder6mnd(fødselsDato)) {
                     if (cr.value().hentEndringstype() == OPPRETTET) {
                         fødselOpprettetCounter.increment()
                     } else if (cr.value().hentEndringstype() == KORRIGERT) {
@@ -87,7 +92,7 @@ class LeesahConsumer(val taskRepository: TaskRepository,
                                                             this["ident"] = cr.value().hentPersonident()
                                                         })
                     taskRepository.save(task)
-                } else if (erUnder18år(cr.value().hentFødselsdato())) {
+                } else if (erUnder18år(fødselsDato)) {
                     fødselIgnorertUnder18årCounter.increment()
                 } else {
                     fødselIgnorertCounter.increment()
@@ -189,12 +194,12 @@ class LeesahConsumer(val taskRepository: TaskRepository,
         }
     }
 
-    private fun GenericRecord.hentFødselsdato(): LocalDate {
+    private fun GenericRecord.hentFødselsdato(): LocalDate? {
         return try {
             val dato = (get("foedsel") as GenericRecord?)?.get("foedselsdato")
 
             when (dato) {
-                null -> { log.error("Fødselsdato mangler."); error("Fødselsdato mangler.") }
+                null -> null
                 is LocalDate -> dato
                 else -> LocalDate.ofEpochDay((dato as Int).toLong())
             }
