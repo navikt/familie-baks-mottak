@@ -52,7 +52,7 @@ class OppgaveMapperTest(
     }
 
     @Test
-    fun `skal opprette oppgave selv om bruker mangler når oppgavetype er Journalføring`() {
+    fun `skal ikke kaste exception selv om brukerid mangler når oppgavetype er Journalføring`() {
         val oppgaveMapper = OppgaveMapper(mockAktørClient)
         Assertions.assertDoesNotThrow {
             oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
