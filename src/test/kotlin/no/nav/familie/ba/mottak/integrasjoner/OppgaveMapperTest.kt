@@ -177,5 +177,6 @@ class OppgaveMapperTest(
                         )
         )
         assertEquals("", oppgaveUtenBeskrivelse2.beskrivelse)
+
     }
 }
