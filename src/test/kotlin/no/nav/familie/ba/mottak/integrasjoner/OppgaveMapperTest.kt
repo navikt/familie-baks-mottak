@@ -138,4 +138,44 @@ class OppgaveMapperTest(
         assertNull(oppgave.behandlingstema)
         assertEquals(Behandlingstype.Utland.value, oppgave.behandlingstype)
     }
+
+    @Test
+    fun `skal sette beskrivelse fra journalpost`() {
+        val oppgaveMapper = OppgaveMapper(mockAktørClient)
+        val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
+                journalpostClient.hentJournalpost("123")
+                        .copy(dokumenter = listOf(DokumentInfo(
+                                tittel = "Whatever",
+                                brevkode = "kode",
+                                dokumentstatus = null,
+                                dokumentvarianter = null)),
+                                behandlingstema = "btema"
+                        )
+        )
+        assertEquals("Whatever", oppgave.beskrivelse)
+
+        val oppgaveUtenBeskrivelse1 = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
+                journalpostClient.hentJournalpost("123")
+                        .copy(dokumenter = listOf(DokumentInfo(
+                                tittel = "Whatever",
+                                brevkode = null,
+                                dokumentstatus = null,
+                                dokumentvarianter = null)),
+                                behandlingstema = "btema"
+                        )
+        )
+        assertEquals("", oppgaveUtenBeskrivelse1.beskrivelse)
+
+        val oppgaveUtenBeskrivelse2 = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
+                journalpostClient.hentJournalpost("123")
+                        .copy(dokumenter = listOf(DokumentInfo(
+                                tittel = null,
+                                brevkode = "kode",
+                                dokumentstatus = null,
+                                dokumentvarianter = null)),
+                                behandlingstema = "btema"
+                        )
+        )
+        assertEquals("", oppgaveUtenBeskrivelse2.beskrivelse)
+    }
 }
