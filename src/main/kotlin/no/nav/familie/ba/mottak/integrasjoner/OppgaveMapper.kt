@@ -10,7 +10,7 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
 
     fun mapTilOpprettOppgave(oppgavetype: Oppgavetype,
                              journalpost: Journalpost): OpprettOppgave {
-        val ident = tilOppgaveIdent(journalpost)
+        val ident = tilOppgaveIdent(journalpost, oppgavetype)
         return OpprettOppgave(ident = ident,
                 saksId = journalpost.sak?.fagsakId,
                 journalpostId = journalpost.journalpostId,
@@ -23,8 +23,14 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
                 behandlingstype = hentBehandlingstype(journalpost))
     }
 
-    private fun tilOppgaveIdent(journalpost: Journalpost): OppgaveIdent {
-        journalpost.bruker?.id ?: throw error("Journalpost ${journalpost.journalpostId} mangler bruker")
+    private fun tilOppgaveIdent(journalpost: Journalpost, oppgavetype: Oppgavetype): OppgaveIdent? {
+        if (journalpost.bruker == null) {
+            when (oppgavetype) {
+                Oppgavetype.BehandleSak -> throw error("Journalpost ${journalpost.journalpostId} mangler bruker")
+                Oppgavetype.Journalføring -> return null
+            }
+        }
+
         return when (journalpost.bruker.type) {
             BrukerIdType.FNR -> {
                 OppgaveIdent(ident = aktørClient.hentAktørId(journalpost.bruker.id), type = IdentType.Aktør)

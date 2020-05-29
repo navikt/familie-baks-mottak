@@ -62,7 +62,7 @@ class DokarkivClientTest {
         Assertions.assertThatThrownBy {
             dokarkivClient.ferdigstillJournalpost("12345678")
         }.isInstanceOf(IntegrasjonException::class.java)
-            .hasMessageContaining("status=500 body={\"data\":null,\"status\":\"FEILET\",\"melding\":\"test\",\"stacktrace\":")
+            .hasMessageContaining("status=500 body={\"data\":null,\"status\":\"FEILET\",\"melding\":\"test\",\"frontendFeilmelding\":null,\"stacktrace\":")
     }
 
     fun forventetRequestJson(): String {

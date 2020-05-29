@@ -36,10 +36,10 @@ class OppgaveMapperTest(
     }
 
     @Test
-    fun `skal kaste exception dersom brukerid ikke er satt`() {
+    fun `skal kaste exception dersom brukerid ikke er satt når oppgavetype er BehandleSak`() {
         val oppgaveMapper = OppgaveMapper(mockAktørClient)
         Assertions.assertThrows(IllegalStateException::class.java) {
-            oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
+            oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.BehandleSak,
                                                journalpostClient.hentJournalpost("123")
                                                        .copy(dokumenter = listOf(DokumentInfo(
                                                                tittel = null,
@@ -47,6 +47,22 @@ class OppgaveMapperTest(
                                                                dokumentstatus = null,
                                                                dokumentvarianter = null)),
                                                              bruker = null)
+            )
+        }
+    }
+
+    @Test
+    fun `skal ikke kaste exception selvom brukerid mangler når oppgavetype er Journalføring`() {
+        val oppgaveMapper = OppgaveMapper(mockAktørClient)
+        Assertions.assertDoesNotThrow {
+            oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
+                journalpostClient.hentJournalpost("123")
+                    .copy(dokumenter = listOf(DokumentInfo(
+                        tittel = null,
+                        brevkode = "",
+                        dokumentstatus = null,
+                        dokumentvarianter = null)),
+                        bruker = null)
             )
         }
     }
