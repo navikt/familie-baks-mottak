@@ -12,15 +12,15 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
                              journalpost: Journalpost): OpprettOppgave {
         val ident = tilOppgaveIdent(journalpost, oppgavetype)
         return OpprettOppgave(ident = ident,
-                              saksId = journalpost.sak?.fagsakId,
-                              journalpostId = journalpost.journalpostId,
-                              tema = Tema.BAR,
-                              oppgavetype = oppgavetype,
-                              fristFerdigstillelse = fristFerdigstillelse(),
-                              beskrivelse = "",
-                              enhetsnummer = journalpost.journalforendeEnhet,
-                              behandlingstema = hentBehandlingstema(journalpost),
-                              behandlingstype = hentBehandlingstype(journalpost))
+                saksId = journalpost.sak?.fagsakId,
+                journalpostId = journalpost.journalpostId,
+                tema = Tema.BAR,
+                oppgavetype = oppgavetype,
+                fristFerdigstillelse = fristFerdigstillelse(),
+                beskrivelse = hentHovedDokumentTittel(journalpost) ?: "",
+                enhetsnummer = journalpost.journalforendeEnhet,
+                behandlingstema = hentBehandlingstema(journalpost),
+                behandlingstype = hentBehandlingstype(journalpost))
     }
 
     private fun tilOppgaveIdent(journalpost: Journalpost, oppgavetype: Oppgavetype): OppgaveIdent? {
@@ -41,7 +41,7 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
     }
 
     private fun hentBehandlingstema(journalpost: Journalpost): String? {
-        if (journalpost.dokumenter.isNullOrEmpty()) throw error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
+        if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
 
         if (journalpost.bruker?.type == BrukerIdType.FNR && erDnummer(journalpost.bruker.id)) {
             return Behandlingstema.BarnetrygdEØS.value
@@ -56,7 +56,12 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
     }
 
     private fun hentBehandlingstype(journalpost: Journalpost): String? {
-        if (journalpost.dokumenter.isNullOrEmpty()) throw error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
+        if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
         return if (journalpost.dokumenter.any { it.brevkode == "NAV 33-00.15" }) Behandlingstype.Utland.value else null
+    }
+
+    private fun hentHovedDokumentTittel(journalpost: Journalpost): String? {
+        if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
+        return journalpost.dokumenter.firstOrNull { it.brevkode != null }?.tittel
     }
 }

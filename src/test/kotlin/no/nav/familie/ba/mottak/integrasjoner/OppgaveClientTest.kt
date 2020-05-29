@@ -48,23 +48,24 @@ class OppgaveClientTest {
     fun `Opprett journalføringsoppgave skal returnere oppgave id`() {
         MDC.put("callId", "opprettJournalføringsoppgave")
         stubFor(post(urlEqualTo("/api/oppgave"))
-                        .willReturn(aResponse()
-                                            .withHeader("Content-Type", "application/json")
-                                            .withBody(
-                                                    objectMapper.writeValueAsString(success(OppgaveResponse(oppgaveId = 1234))))))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                                objectMapper.writeValueAsString(success(OppgaveResponse(oppgaveId = 1234))))))
         mockkStatic(LocalDateTime::class)
-        every { LocalDateTime.now() } returns LocalDateTime.of(2020,4,1,0,0)
+        every { LocalDateTime.now() } returns LocalDateTime.of(2020, 4, 1, 0, 0)
 
         val opprettOppgaveResponse =
                 oppgaveClient.opprettJournalføringsoppgave(journalPost)
 
         assertThat(opprettOppgaveResponse.oppgaveId).isEqualTo(1234)
         verify(anyRequestedFor(anyUrl())
-                       .withHeader(NavHttpHeaders.NAV_CALL_ID.asString(), equalTo("opprettJournalføringsoppgave"))
-                       .withHeader(NavHttpHeaders.NAV_CONSUMER_ID.asString(), equalTo("familie-ba-mottak"))
-                       .withRequestBody(equalToJson(forventetOpprettOppgaveRequestJson(journalpostId = "1234567",
-                                                                                       oppgavetype = "Journalføring",
-                                                                                       behandlingstema = "behandlingstemaFraJournalpost"))))
+                .withHeader(NavHttpHeaders.NAV_CALL_ID.asString(), equalTo("opprettJournalføringsoppgave"))
+                .withHeader(NavHttpHeaders.NAV_CONSUMER_ID.asString(), equalTo("familie-ba-mottak"))
+                .withRequestBody(equalToJson(forventetOpprettOppgaveRequestJson(journalpostId = "1234567",
+                        oppgavetype = "Journalføring",
+                        behandlingstema = "behandlingstemaFraJournalpost",
+                        beskrivelse = "Tittel"))))
     }
 
     @Test
@@ -72,33 +73,34 @@ class OppgaveClientTest {
     fun `Opprett behandleSak-oppgave skal returnere oppgave id`() {
         MDC.put("callId", "opprettJournalføringsoppgave")
         stubFor(post(urlEqualTo("/api/oppgave"))
-                        .willReturn(aResponse()
-                                            .withHeader("Content-Type", "application/json")
-                                            .withBody(
-                                                    objectMapper.writeValueAsString(success(OppgaveResponse(oppgaveId = 1234))))))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                                objectMapper.writeValueAsString(success(OppgaveResponse(oppgaveId = 1234))))))
         mockkStatic(LocalDateTime::class)
-        every { LocalDateTime.now() } returns LocalDateTime.of(2020,4,1,0,0)
+        every { LocalDateTime.now() } returns LocalDateTime.of(2020, 4, 1, 0, 0)
 
         val opprettOppgaveResponse =
                 oppgaveClient.opprettBehandleSakOppgave(journalPost)
 
         assertThat(opprettOppgaveResponse.oppgaveId).isEqualTo(1234)
         verify(anyRequestedFor(anyUrl())
-                       .withHeader(NavHttpHeaders.NAV_CALL_ID.asString(), equalTo("opprettJournalføringsoppgave"))
-                       .withHeader(NavHttpHeaders.NAV_CONSUMER_ID.asString(), equalTo("familie-ba-mottak"))
-                       .withRequestBody(equalToJson(
-                               forventetOpprettOppgaveRequestJson(journalpostId = "1234567",
-                                                                  oppgavetype = "BehandleSak",
-                                                                  behandlingstema = "behandlingstemaFraJournalpost"))))
+                .withHeader(NavHttpHeaders.NAV_CALL_ID.asString(), equalTo("opprettJournalføringsoppgave"))
+                .withHeader(NavHttpHeaders.NAV_CONSUMER_ID.asString(), equalTo("familie-ba-mottak"))
+                .withRequestBody(equalToJson(
+                        forventetOpprettOppgaveRequestJson(journalpostId = "1234567",
+                                oppgavetype = "BehandleSak",
+                                behandlingstema = "behandlingstemaFraJournalpost",
+                                beskrivelse = "Tittel"))))
     }
 
     @Test
     @Tag("integration")
     fun `Opprett oppgave skal kaste feil hvis response er ugyldig`() {
         stubFor(post(urlEqualTo("/api/oppgave"))
-                        .willReturn(aResponse()
-                                            .withStatus(500)
-                                            .withBody(objectMapper.writeValueAsString(Ressurs.failure<String>("test")))))
+                .willReturn(aResponse()
+                        .withStatus(500)
+                        .withBody(objectMapper.writeValueAsString(Ressurs.failure<String>("test")))))
 
         assertThatThrownBy {
             oppgaveClient.opprettJournalføringsoppgave(journalPost)
@@ -125,10 +127,10 @@ class OppgaveClientTest {
     @Tag("integration")
     fun `Finn oppgaver skal returnere liste med 1 oppgave`() {
         stubFor(get(urlEqualTo("/api/oppgave?tema=BAR&journalpostId=1234567&oppgavetype=JFR"))
-                        .willReturn(aResponse()
-                                            .withHeader("Content-Type", "application/json")
-                                            .withBody(
-                                                    objectMapper.writeValueAsString(success(listOf(OppgaveDto(id = 1234)))))))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                                objectMapper.writeValueAsString(success(listOf(OppgaveDto(id = 1234)))))))
 
         val oppgaveListe = oppgaveClient.finnOppgaver(journalPost.journalpostId, Oppgavetype.Journalføring)
 
@@ -140,10 +142,10 @@ class OppgaveClientTest {
     @Tag("integration")
     fun `Finn oppgaver skal returnere tom liste`() {
         stubFor(get(urlEqualTo("/api/oppgave?tema=BAR&journalpostId=1234567&oppgavetype=JFR"))
-                        .willReturn(aResponse()
-                                            .withHeader("Content-Type", "application/json")
-                                            .withBody(
-                                                    objectMapper.writeValueAsString(success(emptyList<OppgaveDto>())))))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                                objectMapper.writeValueAsString(success(emptyList<OppgaveDto>())))))
 
         val oppgaveListe = oppgaveClient.finnOppgaver(journalPost.journalpostId, Oppgavetype.Journalføring)
 
@@ -153,42 +155,43 @@ class OppgaveClientTest {
 
     private fun forventetOpprettOppgaveRequestJson(journalpostId: String,
                                                    oppgavetype: String,
-                                                   behandlingstema: String): String {
+                                                   behandlingstema: String,
+                                                   beskrivelse: String): String {
         return "{\n" +
-               "  \"ident\": {\n" +
-               "    \"ident\": \"1234567891011\",\n" +
-               "    \"type\": \"Aktør\"\n" +
-               "  },\n" +
-               "  \"enhetsnummer\": \"9999\",\n" +
-               "  \"saksId\": null,\n" +
-               "  \"journalpostId\": \"$journalpostId\",\n" +
-               "  \"tema\": \"BAR\",\n" +
-               "  \"oppgavetype\": \"$oppgavetype\",\n" +
-               "  \"behandlingstema\": \"$behandlingstema\",\n" +
-               "  \"tilordnetRessurs\": null,\n" +
-               "  \"fristFerdigstillelse\": \"2020-04-01\",\n" +
-               "  \"aktivFra\": \"${LocalDate.now()}\",\n" +
-               "  \"beskrivelse\": \"\",\n" +
-               "  \"prioritet\": \"NORM\",\n" +
-               "  \"behandlingstype\": null\n" +
-               "}"
+                "  \"ident\": {\n" +
+                "    \"ident\": \"1234567891011\",\n" +
+                "    \"type\": \"Aktør\"\n" +
+                "  },\n" +
+                "  \"enhetsnummer\": \"9999\",\n" +
+                "  \"saksId\": null,\n" +
+                "  \"journalpostId\": \"$journalpostId\",\n" +
+                "  \"tema\": \"BAR\",\n" +
+                "  \"oppgavetype\": \"$oppgavetype\",\n" +
+                "  \"behandlingstema\": \"$behandlingstema\",\n" +
+                "  \"tilordnetRessurs\": null,\n" +
+                "  \"fristFerdigstillelse\": \"2020-04-01\",\n" +
+                "  \"aktivFra\": \"${LocalDate.now()}\",\n" +
+                "  \"beskrivelse\": \"${beskrivelse}\",\n" +
+                "  \"prioritet\": \"NORM\",\n" +
+                "  \"behandlingstype\": null\n" +
+                "}"
     }
 
     companion object {
         private val journalPost = Journalpost("1234567",
-                                              Journalposttype.I,
-                                              Journalstatus.MOTTATT,
-                                              "tema",
-                                              "behandlingstemaFraJournalpost",
-                                              null,
-                                              Bruker("1234567891011", BrukerIdType.AKTOERID),
-                                              "9999",
-                                              "kanal",
-                                              listOf(
-                                                      DokumentInfo("Tittel",
-                                                      "NAV- 99.00.07",
-                                                      null,
-                                                      null)
-                                              ))
+                Journalposttype.I,
+                Journalstatus.MOTTATT,
+                "tema",
+                "behandlingstemaFraJournalpost",
+                null,
+                Bruker("1234567891011", BrukerIdType.AKTOERID),
+                "9999",
+                "kanal",
+                listOf(
+                        DokumentInfo("Tittel",
+                                "NAV- 99.00.07",
+                                null,
+                                null)
+                ))
     }
 }
