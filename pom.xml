@@ -16,7 +16,7 @@
 
     <properties>
         <revision>1.0</revision>
-        <sha1></sha1>
+        <sha1/>
         <changelist>-SNAPSHOT</changelist>
         <jvmTarget>11</jvmTarget>
         <kotlin.version>1.3.71</kotlin.version>
@@ -86,7 +86,7 @@
         <dependency>
             <groupId>no.finn.unleash</groupId>
             <artifactId>unleash-client-java</artifactId>
-            <version>3.3.0</version>
+            <version>3.3.3</version>
         </dependency>
 
         <!-- NAV interne avhengigheter-->
