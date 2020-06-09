@@ -82,24 +82,9 @@ class OppgaveMapperTest(
         assertEquals(Behandlingstema.OrdinærBarnetrygd.value, oppgave.behandlingstema)
     }
 
-    @Test
-    fun `skal sette behandlingstema Utvidet`() {
-        val oppgaveMapper = OppgaveMapper(mockAktørClient)
-        val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                                         journalpostClient.hentJournalpost("123")
-                                                                 .copy(dokumenter = listOf(DokumentInfo(
-                                                                         tittel = null,
-                                                                         brevkode = "NAV 33-00.09",
-                                                                         dokumentstatus = null,
-                                                                         dokumentvarianter = null))
-                                                                 )
-        )
-        assertNull(oppgave.behandlingstype)
-        assertEquals(Behandlingstema.UtvidetBarnetrygd.value, oppgave.behandlingstema)
-    }
 
     @Test
-    fun `skal sette behandlingstema fra journalpost`() {
+    fun `skal sette behandlingstema Ordinær uavhengig av journalpost`() {
         val oppgaveMapper = OppgaveMapper(mockAktørClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
@@ -111,7 +96,7 @@ class OppgaveMapperTest(
                                                                        behandlingstema = "btema"
                                                                  )
         )
-        assertEquals("btema", oppgave.behandlingstema)
+        assertEquals(Behandlingstema.OrdinærBarnetrygd.value, oppgave.behandlingstema)
     }
 
     @Test
