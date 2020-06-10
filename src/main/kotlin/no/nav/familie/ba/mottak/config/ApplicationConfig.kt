@@ -26,7 +26,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @EntityScan("no.nav.familie")
 @ConfigurationPropertiesScan("no.nav.familie")
 @EnableScheduling
-@EnableJwtTokenValidation
+@EnableJwtTokenValidation(ignore = ["org.springframework", "no.nav.familie.ba.mottak.hendelser.HendelseController"])
 @EnableOAuth2Client(cacheEnabled = true)
 class ApplicationConfig {
 
