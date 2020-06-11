@@ -5,6 +5,7 @@ import org.apache.avro.generic.GenericRecord
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.EnableKafka
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
@@ -13,6 +14,7 @@ import java.time.Duration
 
 @EnableKafka
 @Configuration
+@Profile("!e2e")
 class KafkaConfig {
 
     @Bean
