@@ -7,6 +7,7 @@ import no.nav.familie.ba.mottak.domene.Hendelseslogg
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
 import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
+import no.nav.familie.ba.mottak.util.nesteGyldigeArbeidsdag
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
@@ -68,7 +69,7 @@ class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository
 
                     val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE,
                                                         pdlHendelse.hentPersonident(),
-                                                        LocalDateTime.now().plusMinutes(triggerTidForTps),
+                                                        nesteGyldigeArbeidsdag(triggerTidForTps),
                                                         Properties().apply {
                                                             this["ident"] = pdlHendelse.hentPersonident()
                                                         })

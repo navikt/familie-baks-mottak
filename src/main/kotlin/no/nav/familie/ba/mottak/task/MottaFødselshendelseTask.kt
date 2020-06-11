@@ -10,6 +10,7 @@ import no.nav.familie.ba.mottak.domene.personopplysning.Personinfo
 import no.nav.familie.ba.mottak.domene.personopplysning.RelasjonsRolleType
 import no.nav.familie.ba.mottak.integrasjoner.PersonService
 import no.nav.familie.ba.mottak.util.erDnummer
+import no.nav.familie.ba.mottak.util.nesteGyldigeArbeidsdag
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -66,7 +67,7 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
 
         } catch (ex: RuntimeException) {
             log.info("MottaFødselshendelseTask feilet.")
-            task.triggerTid = LocalDateTime.now().plusMinutes(rekjøringsintervall)
+            task.triggerTid = nesteGyldigeArbeidsdag(rekjøringsintervall)
             taskRepository.save(task)
             throw ex
         }
