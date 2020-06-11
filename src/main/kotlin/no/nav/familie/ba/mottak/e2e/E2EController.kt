@@ -1,14 +1,20 @@
-package no.nav.familie.ba.mottak.hendelser
+package no.nav.familie.ba.mottak.e2e
 
+import no.nav.familie.ba.mottak.domene.HendelseConsumer
+import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
+import no.nav.familie.ba.mottak.hendelser.JournalhendelseService
+import no.nav.familie.ba.mottak.hendelser.LeesahService
+import no.nav.familie.kontrakter.felles.Ressurs
+import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
-import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.security.token.support.core.api.Unprotected
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.util.Assert
 import org.springframework.web.bind.annotation.*
@@ -21,43 +27,50 @@ import kotlin.random.nextUInt
 @RestController
 @RequestMapping("/internal/e2e")
 @Profile(value = ["dev", "postgres", "e2e"])
-class HendelseController(private val leesahService: LeesahService,
-                         private val journalhendelseService: JournalhendelseService) {
+class E2EController(private val leesahService: LeesahService,
+                    private val journalhendelseService: JournalhendelseService,
+                    private val hendelsesloggRepository: HendelsesloggRepository,
+                    private val taskRepository: TaskRepository,
+                    private val databaseCleanupService: DatabaseCleanupService) {
 
-    val logger: Logger = LoggerFactory.getLogger(HendelseController::class.java)
+    val logger: Logger = LoggerFactory.getLogger(E2EController::class.java)
 
 
     @PostMapping(path = ["/pdl/foedsel"], consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun pdlHendelseFødsel(@RequestBody personIdenter: List<String>) {
+    fun pdlHendelseFødsel(@RequestBody personIdenter: List<String>): String {
         logger.info("Oppretter fødselshendelse e2e")
+        val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse = PdlHendelse(
                 offset = Random.nextUInt().toLong(),
-                hendelseId = UUID.randomUUID().toString(),
+                hendelseId = hendelseId,
                 personIdenter = personIdenter,
                 endringstype = LeesahService.OPPRETTET,
                 opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
                 fødselsdato = LocalDate.now())
 
         leesahService.prosesserNyHendelse(pdlHendelse)
+        return hendelseId
     }
 
     @PostMapping(path = ["/pdl/doedsfall"], consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun pdlHendelseDødsfall(@RequestBody personIdenter: List<String>) {
+    fun pdlHendelseDødsfall(@RequestBody personIdenter: List<String>): String {
         logger.info("Oppretter dødshendelse e2e")
+        val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse = PdlHendelse(
                 offset = Random.nextUInt().toLong(),
-                hendelseId = UUID.randomUUID().toString(),
+                hendelseId = hendelseId,
                 personIdenter = personIdenter,
                 endringstype = LeesahService.OPPRETTET,
                 opplysningstype = LeesahService.OPPLYSNINGSTYPE_DØDSFALL,
                 dødsdato = LocalDate.now())
 
         leesahService.prosesserNyHendelse(pdlHendelse)
+        return hendelseId
     }
 
 
     @PostMapping(path = ["/journal/{journalpostId}"])
-    fun opprettJournalHendelse(@PathVariable(name = "journalpostId", required = true) journalpostId: Long) {
+    fun opprettJournalHendelse(@PathVariable(name = "journalpostId", required = true) journalpostId: Long): String {
         logger.info("Oppretter journalhendelse e2e")
         val hendelseid = UUID.randomUUID().toString()
         var journalHendelse = JournalfoeringHendelseRecord(
@@ -76,10 +89,30 @@ class HendelseController(private val leesahService: LeesahService,
         val acknowledgment = E2EAcknowledgment()
         journalhendelseService.prosesserNyHendelse(cr, acknowledgment)
         Assert.isTrue(acknowledgment.ack, "Melding med $hendelseid ikke kjørt ok")
+        return hendelseid
     }
 
-    class E2EAcknowledgment: Acknowledgment {
-        var ack:Boolean = false
+    @GetMapping(path = ["/hendelselogg/{hendelseId}/{consumer}"])
+    fun hentHendelselogg(@PathVariable(name = "hendelseId", required = true) hendelseId: String,
+                         @PathVariable(name = "consumer", required = true) consumer: HendelseConsumer): Boolean {
+        return hendelsesloggRepository.existsByHendelseIdAndConsumer(hendelseId, consumer)
+    }
+
+    @GetMapping(path = ["/task/{key}/{value}"])
+    fun hentTaskMedProperty(@PathVariable(name = "key", required = true) key: String,
+                            @PathVariable(name = "value", required = true) value: String): List<Task> {
+        return taskRepository.findAll().filter { it.metadata[key] == value }
+    }
+
+    @GetMapping(path = ["/truncate"])
+    fun truncate(): ResponseEntity<Ressurs<String>> {
+        databaseCleanupService.truncate()
+
+        return ResponseEntity.ok(Ressurs.success("Truncate fullført"))
+    }
+
+    class E2EAcknowledgment : Acknowledgment {
+        var ack: Boolean = false
 
         override fun acknowledge() {
             ack = true
