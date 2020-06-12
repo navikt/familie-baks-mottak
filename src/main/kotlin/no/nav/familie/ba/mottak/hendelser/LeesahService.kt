@@ -7,21 +7,22 @@ import no.nav.familie.ba.mottak.domene.Hendelseslogg
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
 import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
-import no.nav.familie.ba.mottak.util.nesteGyldigeArbeidsdag
+import no.nav.familie.ba.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.*
 
 @Service
 class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository,
                     private val taskRepository: TaskRepository,
-                    @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") val triggerTidForTps: Long) {
+                    @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") private val triggerTidForTps: Long,
+                    private val environment: Environment) {
 
     val dødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall")
     val fødselOpprettetCounter: Counter = Metrics.counter("barnetrygd.fodsel.opprettet")
@@ -69,7 +70,7 @@ class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository
 
                     val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE,
                                                         pdlHendelse.hentPersonident(),
-                                                        nesteGyldigeArbeidsdag(triggerTidForTps),
+                                                        nesteGyldigeTriggertidFødselshendelser(triggerTidForTps, environment),
                                                         Properties().apply {
                                                             this["ident"] = pdlHendelse.hentPersonident()
                                                         })

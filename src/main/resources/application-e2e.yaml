@@ -24,6 +24,8 @@ no.nav.security.jwt:
           client-secret: ${MOTTAK_CLIENT_SECRET}
           client-auth-method: client_secret_basic
 
+prosessering:
+  fixedDelayString.in.milliseconds: 3000
 
 spring:
   cloud:
@@ -54,7 +56,7 @@ logging:
 FAMILIE_BA_SAK_API_URL: http://familie-ba-sak:8089/api
 FAMILIE_INTEGRASJONER_API_URL: http://familie-integrasjoner:8085/api
 
-FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1
-FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 1
+FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 0
+FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 0
 
 JOURNALFOERINGHENDELSE_V1_TOPIC_URL: aapen-dok-journalfoering-v1-e2e

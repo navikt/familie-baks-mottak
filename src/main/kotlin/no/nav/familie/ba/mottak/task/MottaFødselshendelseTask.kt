@@ -10,7 +10,7 @@ import no.nav.familie.ba.mottak.domene.personopplysning.Personinfo
 import no.nav.familie.ba.mottak.domene.personopplysning.RelasjonsRolleType
 import no.nav.familie.ba.mottak.integrasjoner.PersonService
 import no.nav.familie.ba.mottak.util.erDnummer
-import no.nav.familie.ba.mottak.util.nesteGyldigeArbeidsdag
+import no.nav.familie.ba.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -18,8 +18,8 @@ import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 
 @Service
@@ -28,7 +28,8 @@ import java.time.LocalDateTime
                      maxAntallFeil = 3)
 class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
                                private val personService: PersonService,
-                               @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: Long)
+                               @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: Long,
+                               private val environment: Environment)
     : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
@@ -59,7 +60,7 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
             val nesteTask = Task.nyTask(
                     SendTilSakTask.TASK_STEP_TYPE,
                     jacksonObjectMapper().writeValueAsString(NyBehandling(forsørger.id!!,
-                            arrayOf(barnetsId))),
+                                                                          arrayOf(barnetsId))),
                     task.metadata
             )
 
@@ -67,7 +68,7 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
 
         } catch (ex: RuntimeException) {
             log.info("MottaFødselshendelseTask feilet.")
-            task.triggerTid = nesteGyldigeArbeidsdag(rekjøringsintervall)
+            task.triggerTid = nesteGyldigeTriggertidFødselshendelser(rekjøringsintervall, environment)
             taskRepository.save(task)
             throw ex
         }

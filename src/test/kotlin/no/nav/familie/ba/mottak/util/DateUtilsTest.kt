@@ -1,10 +1,13 @@
 package no.nav.familie.ba.mottak.util
 
 import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import io.mockk.mockkStatic
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import org.springframework.core.env.Environment
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -42,10 +45,12 @@ class DateUtilsTest {
     )
     fun `skal returnere neste arbeidsdag `(input: LocalDateTime, expected: LocalDateTime) {
         mockkStatic(LocalDateTime::class)
+        mockk<Environment>(relaxed = true)
+
 
         every { LocalDateTime.now() } returns input
 
-        assertThat(nesteGyldigeArbeidsdag(1440)).isEqualTo(expected)
+        assertThat(nesteGyldigeTriggertidFødselshendelser(1440, mockk<Environment>(relaxed = true))).isEqualTo(expected)
     }
 
 
