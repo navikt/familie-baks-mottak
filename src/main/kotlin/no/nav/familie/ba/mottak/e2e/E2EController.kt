@@ -69,15 +69,15 @@ class E2EController(private val leesahService: LeesahService,
     }
 
 
-    @PostMapping(path = ["/journal/{journalpostId}"])
-    fun opprettJournalHendelse(@PathVariable(name = "journalpostId", required = true) journalpostId: Long): String {
+    @PostMapping(path = ["/journal"])
+    fun opprettJournalHendelse(@RequestBody journalpost: Journalpost): String {
         logger.info("Oppretter journalhendelse e2e")
         val hendelseid = UUID.randomUUID().toString()
         var journalHendelse = JournalfoeringHendelseRecord(
                 hendelseid,
                 1,
                 "MidlertidigJournalført",
-                journalpostId,
+                journalpost.journalpostId,
                 null, //Må settes på selve journalposten
                 "BAR",
                 "BAR",
@@ -119,4 +119,6 @@ class E2EController(private val leesahService: LeesahService,
         }
 
     }
+
+    data class Journalpost(val journalpostId: Long)
 }
