@@ -16,7 +16,6 @@ import org.springframework.context.annotation.Profile
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.kafka.support.Acknowledgment
-import org.springframework.util.Assert
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 import java.util.*
@@ -87,8 +86,14 @@ class E2EController(private val leesahService: LeesahService,
 
         val cr = ConsumerRecord("topic", 1, 1, 1L, journalHendelse)
         val acknowledgment = E2EAcknowledgment()
-        journalhendelseService.prosesserNyHendelse(cr, acknowledgment)
-        Assert.isTrue(acknowledgment.ack, "Melding med $hendelseid ikke kjørt ok")
+        try {
+            journalhendelseService.prosesserNyHendelse(cr, acknowledgment)
+        } catch (e: Exception) {
+            throw IllegalStateException("Feil ved prosessering av ny hendelse ", e)
+        }
+        if (!acknowledgment.ack) {
+            throw error("Melding med $hendelseid ikke kjørt ok")
+        }
         return hendelseid
     }
 
