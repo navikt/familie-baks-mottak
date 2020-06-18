@@ -9,7 +9,9 @@ import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
 import no.nav.familie.ba.mottak.domene.personopplysning.Personinfo
 import no.nav.familie.ba.mottak.domene.personopplysning.RelasjonsRolleType
 import no.nav.familie.ba.mottak.integrasjoner.PersonService
+import no.nav.familie.ba.mottak.util.erBostNummer
 import no.nav.familie.ba.mottak.util.erDnummer
+import no.nav.familie.ba.mottak.util.erFDatnummer
 import no.nav.familie.ba.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -39,7 +41,7 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
     override fun doTask(task: Task) {
         val barnetsId = task.payload
 
-        if (erDnummer(PersonIdent(barnetsId)) || erFDatnummer(PersonIdent(barnetsId))) {
+        if (erDnummer(PersonIdent(barnetsId)) || erFDatnummer(PersonIdent(barnetsId)) || erBostNummer(PersonIdent(barnetsId))) {
             log.info("Ignorer fødselshendelse: Barnet har DNR/FDAT-nummer")
             barnHarDnrCounter.increment()
             return
@@ -50,7 +52,7 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
 
             val forsørger = hentForsørger(personMedRelasjoner)
 
-            if (erDnummer(forsørger) || erFDatnummer(forsørger)) {
+            if (erDnummer(forsørger) || erFDatnummer(forsørger) || erBostNummer(forsørger)) {
                 log.info("Ignorer fødselshendelse: Barnets forsørger har DNR/FDAT-nummer")
                 forsørgerHarDnrCounter.increment()
                 return
@@ -90,9 +92,7 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
         throw IllegalStateException("Fant hverken mor eller far. Må behandles manuelt")
     }
 
-    fun erFDatnummer(personIdent: PersonIdent): Boolean {
-        return personIdent.id?.substring(6)?.toInt()!! == 0
-    }
+
 
     companion object {
         const val TASK_STEP_TYPE = "mottaFødselshendelse"
