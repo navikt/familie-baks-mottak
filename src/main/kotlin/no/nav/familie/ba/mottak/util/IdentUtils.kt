@@ -19,7 +19,7 @@ fun erFDatnummer(personIdent: PersonIdent): Boolean {
 }
 
 fun erBostNummer(personIdent: String): Boolean {
-    return personIdent.substring(1, 2)?.toInt()!! > 1
+    return personIdent.substring(2, 3)?.toInt()!! > 1
 }
 
 fun erBostNummer(personIdent: PersonIdent): Boolean {

@@ -42,7 +42,7 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
         val barnetsId = task.payload
 
         if (erDnummer(PersonIdent(barnetsId)) || erFDatnummer(PersonIdent(barnetsId)) || erBostNummer(PersonIdent(barnetsId))) {
-            log.info("Ignorer fødselshendelse: Barnet har DNR/FDAT-nummer")
+            log.info("Ignorer fødselshendelse: Barnet har DNR/FDAT/BOST-nummer")
             barnHarDnrCounter.increment()
             return
         }
@@ -53,7 +53,7 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
             val forsørger = hentForsørger(personMedRelasjoner)
 
             if (erDnummer(forsørger) || erFDatnummer(forsørger) || erBostNummer(forsørger)) {
-                log.info("Ignorer fødselshendelse: Barnets forsørger har DNR/FDAT-nummer")
+                log.info("Ignorer fødselshendelse: Barnets forsørger har DNR/FDAT/BOST-nummer")
                 forsørgerHarDnrCounter.increment()
                 return
             }
