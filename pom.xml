@@ -25,7 +25,7 @@
         <felles.version>1.20200511201614_685f629</felles.version>
         <kontrakter.version>2.0_20200525150032_379ff30</kontrakter.version>
         <main-class>no.nav.familie.ba.mottak.LauncherKt</main-class>
-        <spring.cloud.version>2.2.2.RELEASE</spring.cloud.version>
+        <spring.cloud.version>2.2.3.RELEASE</spring.cloud.version>
         <token-validation-spring.version>1.1.5</token-validation-spring.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
