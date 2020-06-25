@@ -29,11 +29,7 @@ Ende til ende tester kjøres av GHA ved push. Ønsker du å hoppe over dise må 
 Ende til ende testene ligger her: https://github.com/navikt/familie-ba-e2e/tree/master/autotest
 
 ## Produksjonssetting
-Appen blir produksjonssatt ved å kjøre `tag.sh` som ligger i `.github`. Dette scriptet tagger den seneste commiten i master med det neste versjonsnummeret, og pusher tagen til github-repositoriet.
-
-Hvis den siste tagen er `v0.5`, vil `tag.sh -M` pushe tagen `v1.0`, og `tag.sh -m` pushe tagen `v0.6`.
-
-Ved push av en tag på formen `v*` vil Github Action-workflown `Deploy-Prod` trigges, som bygger en ny versjon av appen, lagrer imaget i Github Packages, og deployer appen til prod-fss.
+Appen blir produksjonssatt ved push til master
 
 ## Henvendelser
 For NAV-interne kan henvendelser rettes til #team-familie på slack. Ellers kan henvendelser rettes via et issue her på github-repoet. 
