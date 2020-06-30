@@ -5,6 +5,7 @@ import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
 import no.nav.familie.ba.mottak.domene.personopplysning.Personinfo
 import no.nav.familie.ba.mottak.domene.personopplysning.RelasjonsRolleType
 import no.nav.familie.kontrakter.felles.Ressurs
+import no.nav.familie.kontrakter.felles.personinfo.Ident
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import org.slf4j.LoggerFactory
@@ -40,10 +41,10 @@ class PersonService @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
         if (environment.activeProfiles.contains("e2e")) {
             return mockData(personIdent)
         }
-        val uri = URI.create("$integrasjonerServiceUri/personopplysning/v1/info")
+        val uri = URI.create("$integrasjonerServiceUri/personopplysning/v2/info")
         logger.info("Henter personinfo fra $uri")
         return try {
-            val response = requestMedPersonIdent<Ressurs<Personinfo>>(uri, personIdent)
+            val response = postRequest<Ressurs<Personinfo>, Ident>(uri, Ident(personIdent))
             secureLogger.info("Personinfo for {}: {}", personIdent, response?.body)
             response?.body?.data ?: throw RuntimeException("Response, body eller data er null.")
         } catch (e: HttpStatusCodeException) {
