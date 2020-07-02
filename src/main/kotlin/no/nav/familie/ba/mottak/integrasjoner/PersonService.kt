@@ -56,12 +56,18 @@ class PersonService @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
 
     private fun mockData(personIdent: String): Personinfo {
 
-        val mor = Familierelasjon(
-                personIdent = PersonIdent("12345678901"),
-                fødselsdato = LocalDate.of(1980, 9, 10),
-                relasjonsrolle = RelasjonsRolleType.MORA,
-                harSammeBosted = true
-        )
+        val mor = when (personIdent) {
+            "01062000001" -> Familierelasjon(
+                    personIdent = PersonIdent("01129400001"),
+                    fødselsdato = LocalDate.of(1994, 12, 1),
+                    relasjonsrolle = RelasjonsRolleType.MORA,
+                    harSammeBosted = true)
+            else -> Familierelasjon(
+                    personIdent = PersonIdent("12345678901"),
+                    fødselsdato = LocalDate.of(1980, 9, 10),
+                    relasjonsrolle = RelasjonsRolleType.MORA,
+                    harSammeBosted = true)
+        }
 
         return Personinfo(
                 personIdent = PersonIdent(personIdent),
