@@ -17,7 +17,7 @@ import kotlin.reflect.full.findAnnotation
  * @author Sebastien Dubois
  */
 @Service
-@Profile("dev", "e2e")
+@Profile("dev", "e2e", "postgres")
 class DatabaseCleanupService(
         private val entityManager: EntityManager,
         private val environment: Environment
