@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.e2e
 
+import main.kotlin.no.nav.familie.ba.søknad.Søknad
 import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
@@ -114,6 +115,11 @@ class E2EController(private val leesahService: LeesahService,
         databaseCleanupService.truncate()
 
         return ResponseEntity.ok(Ressurs.success("Truncate fullført"))
+    }
+
+    @PostMapping(path=["/soeknad"])
+    fun taImotSøknad(@RequestBody(required = true) søknad: Søknad): ResponseEntity<Ressurs<String>> {
+        return ResponseEntity.ok(Ressurs.success("Søknad mottatt OK"))
     }
 
     class E2EAcknowledgment : Acknowledgment {
