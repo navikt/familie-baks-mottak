@@ -117,11 +117,6 @@ class E2EController(private val leesahService: LeesahService,
         return ResponseEntity.ok(Ressurs.success("Truncate fullført"))
     }
 
-    @PostMapping(path=["/soeknad"])
-    fun taImotSøknad(@RequestBody(required = true) søknad: Søknad): ResponseEntity<Ressurs<String>> {
-        return ResponseEntity.ok(Ressurs.success("Søknad mottatt OK"))
-    }
-
     class E2EAcknowledgment : Acknowledgment {
         var ack: Boolean = false
 
