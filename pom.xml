@@ -225,6 +225,12 @@
             <version>4.0.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>no.nav.security</groupId>
+            <artifactId>token-validation-test-support</artifactId>
+            <version>${token-validation-spring.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <repositories>
