@@ -5,8 +5,11 @@ import no.nav.security.token.support.test.spring.TokenGeneratorConfiguration
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.annotation.Import
 
-@Import(TokenGeneratorConfiguration::class)
+@Import(TokenGeneratorConfiguration::class, ApplicationConfig::class)
 class DevLauncherPostgres
-    fun main(args: Array<String>) {
-        SpringApplicationBuilder(ApplicationConfig::class.java).profiles("postgres").run(*args)
-    }
+
+fun main(args: Array<String>) {
+    val app = SpringApplicationBuilder(DevLauncherPostgres::class.java)
+            .profiles("postgres")
+    app.run(*args)
+}
