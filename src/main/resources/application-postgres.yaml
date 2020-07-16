@@ -40,7 +40,7 @@ logging:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5432/familie-ba-mottak
     hikari:
       password: postgres
       username: postgres

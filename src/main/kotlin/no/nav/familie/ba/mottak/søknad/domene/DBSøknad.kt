@@ -1,13 +1,13 @@
 package no.nav.familie.ba.mottak.søknad.domene
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import main.kotlin.no.nav.familie.ba.søknad.Søknad
 import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.LocalDateTime
 import javax.persistence.*
 
-@Entity
-@Table(name = "soknad")
-
+@Entity(name = "Soknad")
+@Table(name = "Soknad")
 data class DBSøknad(@Id
                     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "soknad_seq_generator")
                     @SequenceGenerator(name = "soknad_seq_generator", sequenceName = "soknad_seq", allocationSize = 50)
@@ -17,6 +17,10 @@ data class DBSøknad(@Id
                     val fnr: String,
                     @Column(name = "opprettet_tid")
                     val opprettetTid: LocalDateTime = LocalDateTime.now()) {
+
+    fun hentSøknad(): Søknad {
+        return objectMapper.readValue(søknadJson)
+    }
 
 }
 
