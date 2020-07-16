@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.e2e
 
+import main.kotlin.no.nav.familie.ba.søknad.Søknad
 import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
