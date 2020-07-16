@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*
 @ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
 class SøknadController {
     @PostMapping(value= ["/soknad"], consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun taImotSøknad(@RequestPart("søknad") søknad: Søknad): ResponseEntity<String> {
-        return ResponseEntity.ok("Søknad mottatt OK")
+    fun taImotSøknad(@RequestPart("søknad") søknad: Søknad): ResponseEntity<Kvittering> {
+        return ResponseEntity.ok(Kvittering("", "Søknad er registrert mottatt"))
     }
 }
