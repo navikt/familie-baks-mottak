@@ -15,12 +15,6 @@ import kotlin.reflect.full.primaryConstructor
 
 // SøknadTreeWalker er hentet fra familie-ef-mottak
 object SøknadTreeWalker {
-
-    private val søknadskoder = mapOf(
-            Søknadstype.ORDINÆR to "33-00.07",
-            Søknadstype.UTVIDET to "33-00.09",
-            Søknadstype.EØS to "34-00.15")
-
     private val endNodes =
             setOf<KClass<*>>(String::class,
                              Int::class,
@@ -33,7 +27,8 @@ object SøknadTreeWalker {
 
     fun mapSøknadsfelter(søknad: Søknad): Map<String, Any> {
         val finnFelter = finnFelter(søknad)  // TODO: Bruk enum values når det går an
-        return feltlisteMap("Søknad barnetrygd - " + søknadskoder[søknad.søknadstype.verdi], finnFelter)
+        val søknadskode = søknad.søknadstype.verdi.søknadskode
+        return feltlisteMap("Søknad barnetrygd - $søknadskode", finnFelter)
     }
 
     private fun finnFelter(entitet: Any): List<Map<String, *>> {
