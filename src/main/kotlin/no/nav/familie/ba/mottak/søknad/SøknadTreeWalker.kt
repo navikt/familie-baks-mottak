@@ -28,10 +28,11 @@ object SøknadTreeWalker {
                              LocalDate::class,
                              LocalDateTime::class,
                              Month::class,
-                             Long::class)
+                             Long::class,
+                             Søknadstype::class)
 
     fun mapSøknadsfelter(søknad: Søknad): Map<String, Any> {
-        val finnFelter = finnFelter(søknad)
+        val finnFelter = finnFelter(søknad)  // TODO: Bruk enum values når det går an
         return feltlisteMap("Søknad barnetrygd - " + søknadskoder[søknad.søknadstype.verdi], finnFelter)
     }
 
