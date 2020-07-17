@@ -5,7 +5,7 @@ package no.nav.familie.ba.mottak.integrasjoner
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.mockk.every
 import io.mockk.mockkStatic
-import no.nav.familie.ba.mottak.config.ApplicationConfig
+import no.nav.familie.ba.mottak.DevLauncher
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Ressurs.Companion.success
 import no.nav.familie.kontrakter.felles.objectMapper
@@ -28,7 +28,7 @@ import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-@SpringBootTest(classes = [ApplicationConfig::class], properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api"])
+@SpringBootTest(classes = [DevLauncher::class], properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api"])
 @ActiveProfiles("dev", "mock-oauth")
 @AutoConfigureWireMock(port = 28085)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

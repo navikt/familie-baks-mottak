@@ -4,6 +4,11 @@ no.nav.security.jwt:
     accepted_audience: ${CLIENT_ID}
     proxyurl: http://webproxy-nais.nav.no:8088
     cookie_name: azure_token
+  issuer.selvbetjening:
+    discoveryurl: https://login.microsoftonline.com/navnob2c.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1A_idporten
+    accepted_audience: ${ACCEPTEDAUDIENCE}
+    cookie_name: selvbetjening-idtoken
+    proxyurl: http://webproxy-nais.nav.no:8088
   client:
     registration:
       ba-sak-clientcredentials:

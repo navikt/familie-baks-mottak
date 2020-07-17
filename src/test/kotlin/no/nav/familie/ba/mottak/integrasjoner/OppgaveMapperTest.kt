@@ -1,6 +1,6 @@
 package no.nav.familie.ba.mottak.integrasjoner
 
-import no.nav.familie.ba.mottak.config.ApplicationConfig
+import no.nav.familie.ba.mottak.DevLauncher
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstema
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
@@ -12,7 +12,7 @@ import org.springframework.test.context.ActiveProfiles
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-@SpringBootTest(classes = [ApplicationConfig::class], properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api"])
+@SpringBootTest(classes = [DevLauncher::class], properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api"])
 @ActiveProfiles("dev")
 class OppgaveMapperTest(
 
