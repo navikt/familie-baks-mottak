@@ -63,5 +63,3 @@ management:
 FAMILIE_INTEGRASJONER_API_URL: http://familie-integrasjoner/api
 FAMILIE_BA_SAK_API_URL: http://familie-ba-sak/api
 ACCEPTEDAUDIENCE: dummy
-
-logging.level.no.nav.security: DEBUG
