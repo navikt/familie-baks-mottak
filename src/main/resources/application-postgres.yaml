@@ -70,6 +70,9 @@ spring:
     consumer:
       group-id: srvc01
 
+#Brukes til tilgangskontroll av familie-ks-mottak-frontend
+MOTTAK_ROLLE: group1
+
 FAMILIE_INTEGRASJONER_API_URL: http://localhost:8085/api
 FAMILIE_BA_SAK_API_URL: http://localhost:8090/api
 
