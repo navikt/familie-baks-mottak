@@ -1,3 +1,5 @@
 package no.nav.familie.ba.mottak.søknad
 
-data class Kvittering(val id: String, val tekst: String)
+import java.time.LocalDateTime
+
+data class Kvittering(val tekst: String, val mottattDato: LocalDateTime)
