@@ -6,6 +6,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.annotation.Import
 
 @Import(TokenGeneratorConfiguration::class, ApplicationConfig::class)
+
 class DevLauncherPostgres
 
 fun main(args: Array<String>) {

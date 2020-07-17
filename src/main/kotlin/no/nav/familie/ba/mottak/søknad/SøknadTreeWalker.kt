@@ -26,14 +26,13 @@ object SøknadTreeWalker {
                              Søknadstype::class)
 
     fun mapSøknadsfelter(søknad: Søknad): Map<String, Any> {
-        val finnFelter = finnFelter(søknad)  // TODO: Bruk enum values når det går an
+        val finnFelter = finnFelter(søknad)
         val søknadskode = søknad.søknadstype.verdi.søknadskode
         return feltlisteMap("Søknad barnetrygd - $søknadskode", finnFelter)
     }
 
     private fun finnFelter(entitet: Any): List<Map<String, *>> {
 
-        // Det går ikke å hente elementene i en liste med reflection, så vi traverserer den som vanlig.
         if (entitet is List<Any?>) {
             return entitet.filterNotNull()
                     .map { finnFelter(it) }
