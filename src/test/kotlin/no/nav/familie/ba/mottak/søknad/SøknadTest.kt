@@ -1,5 +1,7 @@
 package no.nav.familie.ba.mottak.søknad
 
+
+import no.nav.familie.ba.mottak.DevLauncherPostgres
 import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
 import no.nav.familie.ba.mottak.util.DbContainerInitializer
 import org.junit.jupiter.api.Tag
@@ -17,12 +19,12 @@ import kotlin.test.assertEquals
 @ContextConfiguration(initializers = [DbContainerInitializer::class])
 @ActiveProfiles("postgres")
 @Tag("integration")
-@SpringBootTest
+@SpringBootTest(classes = [DevLauncherPostgres::class])
 class SøknadTest(
         @Autowired
         val søknadService: SøknadService) {
-    val søknad = SøknadTestData.søknad()
 
+    val søknad = SøknadTestData.søknad()
 
     @Test
     fun `Lagring av søknad`() {

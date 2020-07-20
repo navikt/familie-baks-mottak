@@ -7,8 +7,7 @@ import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity(name = "Soknad")
-@Table(name = "soknad")
-
+@Table(name = "Soknad")
 data class DBSøknad(@Id
                     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "soknad_seq_generator")
                     @SequenceGenerator(name = "soknad_seq_generator", sequenceName = "soknad_seq", allocationSize = 50)
@@ -25,9 +24,15 @@ data class DBSøknad(@Id
 }
 
 fun Søknad.tilDBSøknad(): DBSøknad {
-    return DBSøknad(søknadJson = objectMapper.writeValueAsString(this),
-            fnr = this.søker.fødselsnummer!!.verdi
-    )
+    try {
+        return DBSøknad(søknadJson = objectMapper.writeValueAsString(this),
+                        fnr = this.søker.fødselsnummer!!.verdi
+        )
+    } catch (e: KotlinNullPointerException) {
+        throw FødselsnummerErNullException()
+    }
+
 }
 
+class FødselsnummerErNullException : Exception()
 

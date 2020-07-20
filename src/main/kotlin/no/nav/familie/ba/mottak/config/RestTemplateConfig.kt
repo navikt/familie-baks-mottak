@@ -17,7 +17,7 @@ import java.time.Duration
 @Import(ConsumerIdClientInterceptor::class, BearerTokenClientInterceptor::class)
 class RestTemplateConfig {
 
-    @Profile("!dev || !e2e")
+    @Profile("!dev || !e2e || !postgres")
     @Bean
     fun restTemplateBuilderMedProxy(): RestTemplateBuilder {
         return RestTemplateBuilder()
@@ -27,7 +27,7 @@ class RestTemplateConfig {
                 .additionalInterceptors(MdcValuesPropagatingClientInterceptor())
     }
 
-    @Profile("dev || e2e")
+    @Profile("dev || e2e || postgres")
     @Bean
     fun restTemplateBuilder(): RestTemplateBuilder {
         return RestTemplateBuilder()
@@ -35,7 +35,7 @@ class RestTemplateConfig {
                 .setReadTimeout(Duration.ofSeconds(5))
     }
 
-    @Profile("!dev || !e2e")
+    @Profile("!dev || !e2e || !postgres")
     @Bean("clientCredentials")
     fun restTemplateClientCredentials(consumerIdClientInterceptor: ConsumerIdClientInterceptor,
                                       bearerTokenClientInterceptor: BearerTokenClientInterceptor): RestOperations {

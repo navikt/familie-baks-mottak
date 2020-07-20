@@ -1,12 +1,15 @@
 no.nav.security.jwt:
-#  issuer.azuread:
-#    discoveryurl: https://login.microsoftonline.com/navq.onmicrosoft.com/v2.0/.well-known/openid-configuration
-#    accepted_audience: ${CLIENT_ID}
-#    cookie_name: azure_token
-  issuer.selvbetjening:
-    discoveryurl: https://login.microsoftonline.com/NAVtestB2C.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1A_idporten_ver1
-    accepted_audience: ${ACCEPTEDAUDIENCE}
-    cookie_name: selvbetjening-idtoken
+  issuer:
+    selvbetjening:
+      discoveryurl: http://metadata
+      accepted_audience: aud-localhost
+      cookie_name: localhost-idtoken
+      # Kommenteres ut ved lokal testing av innsending av søknad
+    #    azuread:
+    #      discoveryurl: https://login.microsoftonline.com/navq.onmicrosoft.com/v2.0/.well-known/openid-configuration
+    #      accepted_audience: ${CLIENT_ID}
+    #      cookie_name: azure_token
+
   client:
     registration:
       ba-sak-clientcredentials:
@@ -44,7 +47,7 @@ logging:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5432/familie-ba-mottak
     hikari:
       password: postgres
       username: postgres
@@ -67,6 +70,9 @@ spring:
       schema.registry.url: ${KAFKA_BROKERS}
     consumer:
       group-id: srvc01
+
+#Brukes til tilgangskontroll av familie-ks-mottak-frontend
+MOTTAK_ROLLE: group1
 
 FAMILIE_INTEGRASJONER_API_URL: http://localhost:8085/api
 FAMILIE_BA_SAK_API_URL: http://localhost:8090/api
