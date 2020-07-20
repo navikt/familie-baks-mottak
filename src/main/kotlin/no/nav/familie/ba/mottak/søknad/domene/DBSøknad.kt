@@ -16,7 +16,9 @@ data class DBSøknad(@Id
                     val søknadJson: String,
                     val fnr: String,
                     @Column(name = "opprettet_tid")
-                    val opprettetTid: LocalDateTime = LocalDateTime.now()) {
+                    val opprettetTid: LocalDateTime = LocalDateTime.now(),
+                    @Column(name = "journalpost_id")
+                    val journalpostId: String? = null) {
 
     fun hentSøknad(): Søknad {
         return objectMapper.readValue(søknadJson)
