@@ -15,13 +15,11 @@ import java.util.*
 @Service
 class SøknadService(private val soknadRepository: SoknadRepository, private val taskRepository: TaskRepository) {
 
-    private val logger = LoggerFactory.getLogger(this::class.java)
-
     @Transactional
     fun motta(søknad: Søknad): String {
         val dbSøknad = soknadRepository.save(søknad.tilDBSøknad())
-        val properties =
-                Properties().apply { this["søkersFødselsnummer"] = dbSøknad.fnr }
+        val properties = Properties().apply { this["søkersFødselsnummer"] = dbSøknad.fnr }
+
         taskRepository.save(Task.nyTask(JournalførSøknadTask.JOURNALFØR_SØKNAD,
                                         dbSøknad.id.toString(),
                                         properties))

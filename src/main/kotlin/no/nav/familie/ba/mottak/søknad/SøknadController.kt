@@ -1,6 +1,7 @@
 package no.nav.familie.ba.mottak.søknad
 
 import main.kotlin.no.nav.familie.ba.søknad.Søknad
+import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
@@ -16,9 +17,13 @@ import java.time.LocalDateTime
 @ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
 class SøknadController(private val søknadService: SøknadService) {
 
-    @PostMapping(value= ["/soknad"], consumes = [MULTIPART_FORM_DATA_VALUE])
+    @PostMapping(value = ["/soknad"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(@RequestPart("søknad") søknad: Søknad): ResponseEntity<Ressurs<Kvittering>> {
-        søknadService.motta(søknad)
-        return ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt", LocalDateTime.now())))
+        return try {
+            søknadService.motta(søknad)
+            ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt", LocalDateTime.now())))
+        } catch (e: FødselsnummerErNullException) {
+            ResponseEntity.status(500).body(Ressurs.failure("Lagring av søknad feilet"))
+        }
     }
 }
