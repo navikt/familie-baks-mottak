@@ -9,6 +9,7 @@ import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
 import no.nav.familie.ba.mottak.task.JournalførSøknadTask
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
+import java.time.LocalDateTime
 import java.util.*
 
 
@@ -16,14 +17,14 @@ import java.util.*
 class SøknadService(private val soknadRepository: SoknadRepository, private val taskRepository: TaskRepository) {
 
     @Transactional
-    fun motta(søknad: Søknad): String {
+    fun motta(søknad: Søknad): DBSøknad {
         val dbSøknad = soknadRepository.save(søknad.tilDBSøknad())
         val properties = Properties().apply { this["søkersFødselsnummer"] = dbSøknad.fnr }
 
         taskRepository.save(Task.nyTask(JournalførSøknadTask.JOURNALFØR_SØKNAD,
                                         dbSøknad.id.toString(),
                                         properties))
-        return "Søknad lagret med id ${dbSøknad.id} er registrert mottatt."
+        return dbSøknad
     }
 
 }
