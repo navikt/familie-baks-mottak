@@ -6,7 +6,7 @@ import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.LocalDateTime
 import javax.persistence.*
 
-@Entity
+@Entity(name = "Soknad")
 @Table(name = "soknad")
 
 data class DBSøknad(@Id
