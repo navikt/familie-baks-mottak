@@ -27,11 +27,11 @@ class SøknadController(private val featureToggleService: FeatureToggleService,
         log.info("Lagring av søknad = $lagreSøknad")
 
         return if (lagreSøknad) {
-            return try {
+             try {
                 val dbSøknad = søknadService.motta(søknad)
                 ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt", dbSøknad.opprettetTid)))
             } catch (e: FødselsnummerErNullException) {
-                ResponseEntity.status(500).body(Ressurs.failure("Lagring av søknad feilet"))
+                 return ResponseEntity.status(500).body(Ressurs.failure("Lagring av søknad feilet"))
             }
         } else {
              ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt. Lagring er deaktivert.", LocalDateTime.now())))
