@@ -35,3 +35,4 @@ fun Søknad.tilDBSøknad(): DBSøknad {
 }
 
 class FødselsnummerErNullException : Exception()
+

@@ -25,6 +25,7 @@ class SøknadService(private val søknadRepository: SøknadRepository, private v
                                         dbSøknad.id.toString(),
                                         properties))
         return dbSøknad
+
     }
 
     fun lagreSøknad(søknad: Søknad): DBSøknad {
