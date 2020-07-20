@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.søknad
 
+
 import no.nav.familie.ba.mottak.DevLauncherPostgres
 import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
 import no.nav.familie.ba.mottak.util.DbContainerInitializer
