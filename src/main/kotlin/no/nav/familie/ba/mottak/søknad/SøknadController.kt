@@ -17,7 +17,8 @@ import java.time.LocalDateTime
 @RequestMapping(path = ["/api"], produces = [APPLICATION_JSON_VALUE])
 @ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
 
-class SøknadController(val featureToggleService: FeatureToggleService) {
+class SøknadController(private val featureToggleService: FeatureToggleService,
+                       private val søknadService: SøknadService) {
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     @PostMapping(value = ["/soknad"], consumes = [MULTIPART_FORM_DATA_VALUE])
@@ -25,14 +26,15 @@ class SøknadController(val featureToggleService: FeatureToggleService) {
         val lagreSøknad = featureToggleService.isEnabled("familie-ba-mottak.lagre-soknad")
         log.info("Lagring av søknad = $lagreSøknad")
 
-        return if (lagreSøknad) {
+        if (lagreSøknad) {
             return try {
                 søknadService.motta(søknad)
                 ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt", LocalDateTime.now())))
             } catch (e: FødselsnummerErNullException) {
                 ResponseEntity.status(500).body(Ressurs.failure("Lagring av søknad feilet"))
+            }
         } else {
-            ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt. Lagring er deaktivert.", LocalDateTime.now())))
+            return ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt. Lagring er deaktivert.", LocalDateTime.now())))
         }
     }
 }
