@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 class JournalførSøknadTask(private val pdfService: PdfService) : AsyncTaskStep {
 
     override fun doTask(task: Task) {
-        log.info("Lager task: $task")
+        log.info("Kjører task")
         pdfService.lagPdf(task.payload)
     }
 
