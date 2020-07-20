@@ -21,7 +21,6 @@ data class DBSøknad(@Id
     fun hentSøknad(): Søknad {
         return objectMapper.readValue(søknadJson)
     }
-
 }
 
 fun Søknad.tilDBSøknad(): DBSøknad {
@@ -32,6 +31,7 @@ fun Søknad.tilDBSøknad(): DBSøknad {
     } catch (e: KotlinNullPointerException) {
         throw FødselsnummerErNullException()
     }
+
 }
 
 class FødselsnummerErNullException : Exception()
