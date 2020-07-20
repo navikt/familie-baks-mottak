@@ -21,12 +21,13 @@ class SøknadController(val featureToggleService: FeatureToggleService) {
     @PostMapping(value = ["/soknad"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(@RequestPart("søknad") søknad: Søknad): ResponseEntity<Ressurs<Kvittering>> {
 
-        return if (featureToggleService.isEnabled("familie-ba-mottak.lagre-soknad")) {
-            log.info("Lagring av søknad er aktivert")
-            ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er lagret", LocalDateTime.now())))
+        val lagreSøknad = featureToggleService.isEnabled("familie-ba-mottak.lagre-soknad")
+        log.info("Lagring av søknad = $lagreSøknad")
+
+        return if (lagreSøknad) {
+            ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt", LocalDateTime.now())))
         } else {
-            log.info("Lagring av søknad er deaktivert")
-            ResponseEntity.ok(Ressurs.success(Kvittering("Lagring av søknad er deaktivert", LocalDateTime.now())))
+            ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt. Lagring er deaktivert.", LocalDateTime.now())))
         }
     }
 }
