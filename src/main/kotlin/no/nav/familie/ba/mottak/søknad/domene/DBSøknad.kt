@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.søknad.domene
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import main.kotlin.no.nav.familie.ba.søknad.Søknad
 import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.LocalDateTime
@@ -18,6 +19,9 @@ data class DBSøknad(@Id
                     @Column(name = "opprettet_tid")
                     val opprettetTid: LocalDateTime = LocalDateTime.now()) {
 
+    fun hentSøknad(): Søknad {
+        return objectMapper.readValue(søknadJson)
+    }
 }
 
 fun Søknad.tilDBSøknad(): DBSøknad {
