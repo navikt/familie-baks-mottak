@@ -1,11 +1,12 @@
 package no.nav.familie.ba.mottak.søknad
 
 
+import no.nav.familie.ba.mottak.integrasjoner.DokarkivClient
 import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
 import org.springframework.stereotype.Service
 
 @Service
-class JournalføringService(private val integrasjonerClient: IntegrasjonerClient,
+class JournalføringService(private val dokarkivClient: DokarkivClient,
                            private val søknadService: SøknadService) {
 
     fun journalførSøknad(søknadId: String): String {
@@ -18,7 +19,7 @@ class JournalføringService(private val integrasjonerClient: IntegrasjonerClient
 
     private fun send(søknad: DBSøknad): String {
         val arkiverDokumentRequest = ArkiverDokumentRequestMapper.toDto(søknad)
-        val ressurs = integrasjonerClient.arkiver(arkiverDokumentRequest)
+        val ressurs = dokarkivClient.arkiver(arkiverDokumentRequest)
         return ressurs.journalpostId
     }
 }
