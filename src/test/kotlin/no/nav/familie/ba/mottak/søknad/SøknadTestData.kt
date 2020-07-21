@@ -35,8 +35,8 @@ object SøknadTestData {
 
     fun søknad(): Søknad {
         return Søknad(
-                søker = søker(),
-                barn = barn(),
+                søker = Søknadsfelt("søker", søker()),
+                barn = Søknadsfelt("barn", barn()),
                 søknadstype = Søknadsfelt("Søknadstype", Søknadstype.ORDINÆR)
         )
     }

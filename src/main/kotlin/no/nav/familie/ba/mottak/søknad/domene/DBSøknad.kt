@@ -26,7 +26,7 @@ data class DBSøknad(@Id
 fun Søknad.tilDBSøknad(): DBSøknad {
     try {
         return DBSøknad(søknadJson = objectMapper.writeValueAsString(this),
-                        fnr = this.søker.fødselsnummer!!.verdi
+                        fnr = this.søker.verdi.fødselsnummer!!.verdi
         )
     } catch (e: KotlinNullPointerException) {
         throw FødselsnummerErNullException()
