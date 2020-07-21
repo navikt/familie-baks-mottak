@@ -1,6 +1,5 @@
 package no.nav.familie.ba.mottak.søknad
 
-
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -15,7 +14,7 @@ class SøknadTreeWalkerTest {
     fun `mapSøknadsfelter returnerer en map-struktur med feltene fra søknaden`() {
         assertTrue(mapSøknadsfelter.isNotEmpty())
         assertEquals("Søknad barnetrygd - 33-00.07", mapSøknadsfelter["label"])
-        assertEquals(15, verdiliste.size)
+        assertEquals(3, verdiliste.size) // tre verdilister: søker, barn1 og barn2
     }
 
     @Test
@@ -27,11 +26,13 @@ class SøknadTreeWalkerTest {
 
     @Test
     fun `Test at verdier bevares og holdes sammen`() {
-        val navn = verdiliste.filter { it["label"] == "Barnets fulle navn" }.map { it["verdi"] }
-        val alder = verdiliste.filter { it["label"] == "alder" }.map { it["verdi"] }
+        val barneliste = verdiliste[2]["verdiliste"] as List<Map<String, Any?>>
+        val navn = barneliste.filter { it["label"] == "Barnets fulle navn" }.map { it["verdi"] }.toList()
+        val alder = barneliste.filter { it["label"] == "alder" }.map { it["verdi"] }.toList()
         assertTrue(
                 (navn[0] == "barn1" && alder[0] == "4 år")
                         && (navn[1] == "barn2" && alder[1] == "1 år")
         )
+
     }
 }

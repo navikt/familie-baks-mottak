@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
 import org.springframework.web.util.DefaultUriBuilderFactory
 
+/*
 @Service
 class PdfClient(@Qualifier("restTemplateUnsecured") operations: RestOperations,
                 private val pdfgeneratorConfig: PdfgeneratorConfig) : AbstractRestClient(operations, "pdf") {
@@ -17,4 +18,4 @@ class PdfClient(@Qualifier("restTemplateUnsecured") operations: RestOperations,
         val byteArray = postForEntity<ByteArray>(sendInnUri, labelValueJson)
         return Fil(byteArray)
     }
-}
+}*/
