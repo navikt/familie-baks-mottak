@@ -60,10 +60,8 @@ management:
     db:
       enabled: true
 
-familie:
-  ba:
-    pdfgenerator: dummy
 
+FAMILIE_BA_DOKGEN_API_URL: http://localhost:5914
 FAMILIE_INTEGRASJONER_API_URL: http://familie-integrasjoner/api
 FAMILIE_BA_SAK_API_URL: http://familie-ba-sak/api
 ACCEPTEDAUDIENCE: dummy

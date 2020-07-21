@@ -13,17 +13,18 @@ import java.util.*
 
 
 @Service
-class SøknadService(private val søknadRepository: SøknadRepository, private val taskRepository: TaskRepository) {
+class SøknadService(private val søknadRepository: SøknadRepository, private val taskRepository: TaskRepository, private val pdfService: PdfService) {
 
     @Transactional
     @Throws(FødselsnummerErNullException::class)
     fun motta(søknad: Søknad): DBSøknad {
         val dbSøknad = lagreSøknad(søknad)
         val properties = Properties().apply { this["søkersFødselsnummer"] = dbSøknad.fnr }
+        pdfService.lagPdf(dbSøknad.id.toString())
 
-        taskRepository.save(Task.nyTask(JournalførSøknadTask.JOURNALFØR_SØKNAD,
+       /* taskRepository.save(Task.nyTask(JournalførSøknadTask.JOURNALFØR_SØKNAD,
                                         dbSøknad.id.toString(),
-                                        properties))
+                                        properties))*/
         return dbSøknad
 
     }
@@ -35,6 +36,5 @@ class SøknadService(private val søknadRepository: SøknadRepository, private v
     fun hentDBSøknad(søknadId: Long): DBSøknad? {
         return søknadRepository.hentDBSøknad(søknadId)
     }
-
 }
 

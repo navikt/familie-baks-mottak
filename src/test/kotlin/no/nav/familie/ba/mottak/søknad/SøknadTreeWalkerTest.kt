@@ -12,9 +12,10 @@ class SøknadTreeWalkerTest {
 
     @Test
     fun `mapSøknadsfelter returnerer en map-struktur med feltene fra søknaden`() {
+        assertEquals("", mapSøknadsfelter.toString())
         assertTrue(mapSøknadsfelter.isNotEmpty())
         assertEquals("Søknad barnetrygd - 33-00.07", mapSøknadsfelter["label"])
-        assertEquals(3, verdiliste.size) // tre verdilister: søker, barn1 og barn2
+        assertEquals(3, verdiliste.size) // tre verdilister: søker, barn og søknadstype
     }
 
     @Test
@@ -33,6 +34,5 @@ class SøknadTreeWalkerTest {
                 (navn[0] == "barn1" && alder[0] == "4 år")
                         && (navn[1] == "barn2" && alder[1] == "1 år")
         )
-
     }
 }
