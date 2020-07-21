@@ -11,7 +11,7 @@ object ArkiverDokumentRequestMapper {
 
     fun toDto(dbSøknad: DBSøknad, pdf: ByteArray): ArkiverDokumentRequest {
         val søknad = dbSøknad.hentSøknad()
-        val dokumenttype = "BARNETRYGD_${søknad.søknadstype}"
+        val dokumenttype = "BARNETRYGD_${søknad.søknadstype.verdi}"
         val log: Logger = LoggerFactory.getLogger(this::class.java)
         log.info(dokumenttype)
 
