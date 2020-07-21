@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.task
 
+import no.nav.familie.ba.mottak.søknad.JournalføringService
 import no.nav.familie.ba.mottak.søknad.PdfService
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -10,11 +11,13 @@ import org.springframework.stereotype.Service
 
 @Service
 @TaskStepBeskrivelse(taskStepType = JournalførSøknadTask.JOURNALFØR_SØKNAD, beskrivelse = "Journalfør søknad")
-class JournalførSøknadTask(private val pdfService: PdfService) : AsyncTaskStep {
+class JournalførSøknadTask(private val pdfService: PdfService,
+                           private val journalføringService: JournalføringService) : AsyncTaskStep {
 
     override fun doTask(task: Task) {
-        log.info("Kjører task")
-        pdfService.lagPdf(task.payload)
+        log.info("Generer pdf og journalfør søknad")
+        val pdf = pdfService.lagPdf(task.payload)
+        journalføringService.journalførSøknad(task.payload, pdf)
     }
 
     companion object {

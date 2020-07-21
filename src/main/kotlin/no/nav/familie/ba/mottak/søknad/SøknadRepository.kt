@@ -10,6 +10,4 @@ interface SøknadRepository : JpaRepository<DBSøknad, String> {
 
     @Query(value = "SELECT s FROM Soknad s WHERE s.id = :soknadId")
     fun hentDBSøknad(soknadId: Long): DBSøknad?
-
-    fun get(id: String): DBSøknad
 }

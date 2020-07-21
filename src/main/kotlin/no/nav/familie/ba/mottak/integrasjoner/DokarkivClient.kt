@@ -2,6 +2,9 @@ package no.nav.familie.ba.mottak.integrasjoner
 
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
+import no.nav.familie.kontrakter.felles.arkivering.ArkiverDokumentResponse
+import no.nav.familie.kontrakter.felles.arkivering.v2.ArkiverDokumentRequest
+import no.nav.familie.kontrakter.felles.getDataOrThrow
 
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
@@ -9,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestOperations
 import java.net.URI
+import java.sql.Struct
 
 private val logger = LoggerFactory.getLogger(DokarkivClient::class.java)
 
@@ -30,6 +34,13 @@ class DokarkivClient(@param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private v
                                                        uri,
                                                        jp.bruker.id)
         }
+    }
+
+    fun arkiver(arkiverDokumentRequest: ArkiverDokumentRequest): ArkiverDokumentResponse {
+        val uri = URI.create("$integrasjonUri/arkiv/v3")
+        val response =
+                postForEntity<Ressurs<ArkiverDokumentResponse>>(uri, arkiverDokumentRequest)
+        return response.getDataOrThrow()
     }
 
     fun ferdigstillJournalpost(journalpostId: String) {

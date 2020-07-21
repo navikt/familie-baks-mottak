@@ -31,7 +31,7 @@ class SøknadTest(
         val dbSøknadFraMapper = søknad.tilDBSøknad()
         assertEquals(søknad, dbSøknadFraMapper.hentSøknad())
 
-        val dbSøknadFraDB = søknadService.lagreDBSøknad(søknad)
+        val dbSøknadFraDB = søknadService.lagreDBSøknad(dbSøknadFraMapper)
         val hentetSøknad = søknadService.hentDBSøknad(dbSøknadFraDB.id)
         assertEquals(dbSøknadFraDB.id, hentetSøknad!!.id)
         assertEquals(
