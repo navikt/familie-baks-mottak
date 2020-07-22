@@ -19,7 +19,7 @@ class JournalføringService(private val dokarkivClient: DokarkivClient,
             val dbSøknadMedJournalpostId = dbSøknad.copy(journalpostId = journalpostId)
             søknadService.lagreDBSøknad(dbSøknadMedJournalpostId)
         } else {
-            log.warn("JournalpostId finnes allerede")
+            log.warn("Søknaden har allerede blitt journalført med journalpostId: ${dbSøknad.journalpostId}")
         }
     }
 

@@ -3,6 +3,10 @@ package no.nav.familie.ba.mottak.integrasjoner
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import no.nav.familie.ba.mottak.DevLauncher
 import no.nav.familie.kontrakter.felles.Ressurs
+import no.nav.familie.kontrakter.felles.arkivering.ArkiverDokumentResponse
+import no.nav.familie.kontrakter.felles.arkivering.Dokument
+import no.nav.familie.kontrakter.felles.arkivering.FilType
+import no.nav.familie.kontrakter.felles.arkivering.v2.ArkiverDokumentRequest
 import no.nav.familie.kontrakter.felles.objectMapper
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Tag
@@ -35,6 +39,22 @@ class DokarkivClientTest {
 
         dokarkivClient.oppdaterJournalpostSak(jp, "11111111")
 
+    }
+
+    @Test
+    @Tag("integration")
+    fun `arkiver skal kjøre OK`() {
+        val søknadsdokumentJson =
+                Dokument("test123".toByteArray(), FilType.JSON, null, "TEST_JSON", "BARNETRYGD_ORDINÆR")
+        val søknadsdokumentPdf =
+                Dokument("test321".toByteArray(), FilType.PDFA, null, "TEST_PDF", "BARNETRYGD_ORDINÆR")
+        val hoveddokumentvarianter = listOf(søknadsdokumentPdf, søknadsdokumentJson)
+        stubFor(post(urlEqualTo("/api/arkiv/v3"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(200)
+                .withBody(objectMapper.writeValueAsString(Ressurs.success(ArkiverDokumentResponse ("123456", false))))))
+        dokarkivClient.arkiver(ArkiverDokumentRequest( jp.bruker!!.id, false, hoveddokumentvarianter))
     }
 
     @Test

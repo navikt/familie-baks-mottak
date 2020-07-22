@@ -39,7 +39,7 @@ class JournalføringTest(
     }
 
     @Test
-    fun `dbSøknad uten id skal kaste gi error`() {
+    fun `dbSøknad med feil id skal gi error`() {
         assertFails {
             journalføringService.journalførSøknad("-1", testPDF)
         }
