@@ -87,7 +87,6 @@ class ClientMocks {
     @Bean
     @Primary
     fun mockPdfClient(): PdfClient {
-
         val mockPdfClient = mockk<PdfClient>()
 
         every {
