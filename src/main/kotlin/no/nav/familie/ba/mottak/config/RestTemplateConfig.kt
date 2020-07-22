@@ -11,7 +11,7 @@ import org.springframework.web.client.RestOperations
 import java.time.Duration
 
 @Configuration
-@Import(ConsumerIdClientInterceptor::class, BearerTokenClientInterceptor::class)
+@Import(ConsumerIdClientInterceptor::class, BearerTokenClientInterceptor::class, MdcValuesPropagatingClientInterceptor::class)
 class RestTemplateConfig {
 
     @Profile("!dev || !e2e || !postgres")
