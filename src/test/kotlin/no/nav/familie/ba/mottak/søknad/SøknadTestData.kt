@@ -14,29 +14,29 @@ object SøknadTestData {
         )
     }
 
-    fun barn(): List<Barn> {
+    fun barn(): List<Søknadsfelt<Barn>> {
         return listOf(
-                Barn(
+                Søknadsfelt("barn", Barn(
                         navn = Søknadsfelt("Barnets fulle navn", "barn1"),
                         ident = Søknadsfelt("Fødselsnummer", "12345678999"),
                         borMedSøker = Søknadsfelt("Skal ha samme adresse", "bor med søker"),
                         medISøknad = Søknadsfelt("Jeg søker for dette barnet", true),
                         alder = Søknadsfelt("alder", "4 år")
-                ),
-                Barn(
+                )),
+                Søknadsfelt("barn", Barn(
                         navn = Søknadsfelt("Barnets fulle navn", "barn2"),
                         ident = Søknadsfelt("Fødselsnummer", "12345678987"),
                         borMedSøker = Søknadsfelt("Skal ha samme adresse", "bor med søker"),
                         medISøknad = Søknadsfelt("Jeg søker for dette barnet", false),
                         alder = Søknadsfelt("alder", "1 år")
-                )
+                ))
         )
     }
 
     fun søknad(): Søknad {
         return Søknad(
                 søker = Søknadsfelt("søker", søker()),
-                barn = Søknadsfelt("barn", barn()),
+                barn = Søknadsfelt("barna dine", barn()),
                 søknadstype = Søknadsfelt("Søknadstype", Søknadstype.ORDINÆR)
         )
     }
