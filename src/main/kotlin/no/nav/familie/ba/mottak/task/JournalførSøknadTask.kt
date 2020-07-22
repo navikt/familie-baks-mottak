@@ -17,7 +17,7 @@ class JournalførSøknadTask(private val pdfService: PdfService,
     override fun doTask(task: Task) {
         log.info("Generer pdf og journalfør søknad")
         val pdf = pdfService.lagPdf(task.payload)
-        log.info("\n\n ${task.payload} \n\n")
+        log.info("\n\n ${task.payload} |||| $pdf \n\n")
         journalføringService.journalførSøknad(task.payload, pdf)
     }
 
