@@ -16,10 +16,10 @@ object ArkiverDokumentRequestMapper {
         log.info(dokumenttype)
 
         val søknadsdokumentJson =
-                Dokument(dbSøknad.søknadJson.toByteArray(), FilType.JSON, null, "hoveddokument", dokumenttype)
+                Dokument(dbSøknad.søknadJson.toByteArray(), FilType.JSON, null, "SØKNAD_${dokumenttype}_JSON", dokumenttype)
         // TODO: Fiks pdf
         val søknadsdokumentPdf =
-                Dokument(pdf, FilType.PDFA, null, "hoveddokument", dokumenttype)
+                Dokument(pdf, FilType.PDFA, null, "SØKNAD_${dokumenttype}_PDF", dokumenttype)
         val hoveddokumentvarianter = listOf(søknadsdokumentPdf, søknadsdokumentJson)
         return ArkiverDokumentRequest(dbSøknad.fnr, false, hoveddokumentvarianter)
     }

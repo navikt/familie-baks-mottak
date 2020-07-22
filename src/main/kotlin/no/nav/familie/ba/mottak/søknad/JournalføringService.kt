@@ -13,8 +13,8 @@ class JournalføringService(private val dokarkivClient: DokarkivClient,
 
     fun journalførSøknad(søknadId: String, pdf: ByteArray){
         val dbSøknad: DBSøknad = søknadService.hentDBSøknad(søknadId.toLong()) ?: error("Fant ingen søknad i databasen med ID: $søknadId")
-        log.info("\n\n sjekker jpid ${dbSøknad?.journalpostId}\n\n")
-        if (dbSøknad?.journalpostId == null) {
+        log.info("\n\n sjekker jpid ${dbSøknad}\n\n")
+        if (dbSøknad.journalpostId == null) {
             val journalpostId: String = arkiverSøknad(dbSøknad, pdf)
             val dbSøknadMedJournalpostId = dbSøknad.copy(journalpostId = journalpostId)
             log.info("\n\n $dbSøknadMedJournalpostId \n\n")
