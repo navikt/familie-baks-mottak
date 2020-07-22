@@ -2,7 +2,6 @@ package no.nav.familie.ba.mottak.config
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.ba.mottak.domene.Fil
 import no.nav.familie.ba.mottak.integrasjoner.AktørClient
 import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.ba.mottak.integrasjoner.*
@@ -91,7 +90,7 @@ class ClientMocks {
 
         every {
             mockPdfClient.lagPdf(any())
-        } returns Fil("abc".toByteArray())
+        } returns "abc".toByteArray()
 
         return mockPdfClient
     }
