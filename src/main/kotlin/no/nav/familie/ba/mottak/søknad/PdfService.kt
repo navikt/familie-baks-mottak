@@ -16,11 +16,6 @@ class PdfService(private val søknadRepository: SøknadRepository, private val p
         log.info("Hentet felt fra treewalker, lager pdf...")
         val søknadPdf = pdfClient.lagPdf(feltMap)
         log.info("PDF laget!")
-
-        val out: OutputStream = FileOutputStream("out.pdf")
-        out.write(søknadPdf.bytes)
-        out.close()
-        log.info("PDF lagret til out.pdf!")
     }
 
     companion object {
