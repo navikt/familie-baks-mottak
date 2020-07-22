@@ -13,12 +13,6 @@ class PdfService(private val søknadRepository: SøknadRepository, private val p
     fun lagPdf(id: String) {
         val dbSøknad = søknadRepository.hentDBSøknad(id.toLong()) ?: error("Kunne ikke finne søknad ($id) i database")
         val feltMap = SøknadTreeWalker.mapSøknadsfelter(dbSøknad.hentSøknad())
-        log.info("Hentet søknadsfelt fra Treewalker, sender til dokgen...")
         val søknadPdf = pdfClient.lagPdf(feltMap)
-        log.info("PDF mottatt!")
-    }
-
-    companion object {
-        private val log = LoggerFactory.getLogger(this::class.java)
     }
 }
