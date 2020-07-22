@@ -11,8 +11,9 @@ import org.springframework.stereotype.Service
 class JournalføringService(private val dokarkivClient: DokarkivClient,
                            private val søknadService: SøknadService) {
 
-    fun journalførSøknad(søknadId: String, pdf: ByteArray){
-        val dbSøknad: DBSøknad = søknadService.hentDBSøknad(søknadId.toLong()) ?: error("Fant ingen søknad i databasen med ID: $søknadId")
+    fun journalførSøknad(søknadId: String, pdf: ByteArray) {
+        val dbSøknad: DBSøknad = søknadService.hentDBSøknad(søknadId.toLong())
+                ?: error("Fant ingen søknad i databasen med ID: $søknadId")
         if (dbSøknad.journalpostId == null) {
             val journalpostId: String = arkiverSøknad(dbSøknad, pdf)
             val dbSøknadMedJournalpostId = dbSøknad.copy(journalpostId = journalpostId)

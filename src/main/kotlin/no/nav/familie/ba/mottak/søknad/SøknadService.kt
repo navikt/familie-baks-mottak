@@ -9,7 +9,6 @@ import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
 import no.nav.familie.ba.mottak.task.JournalførSøknadTask
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
-import org.springframework.data.repository.findByIdOrNull
 import java.util.*
 
 
@@ -23,14 +22,10 @@ class SøknadService(private val søknadRepository: SøknadRepository, private v
         val properties = Properties().apply { this["søkersFødselsnummer"] = dbSøknad.fnr }
 
         taskRepository.save(Task.nyTask(JournalførSøknadTask.JOURNALFØR_SØKNAD,
-                                        dbSøknad.id.toString(),
-                                        properties))
+                dbSøknad.id.toString(),
+                properties))
         return dbSøknad
 
-    }
-
-    fun get(id: String): DBSøknad {
-        return søknadRepository.findByIdOrNull(id) ?: error("Ugyldig primærnøkkel")
     }
 
     fun lagreDBSøknad(dbSøknad: DBSøknad): DBSøknad {

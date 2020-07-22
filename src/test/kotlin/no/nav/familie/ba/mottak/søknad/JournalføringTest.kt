@@ -6,7 +6,6 @@ import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
 import no.nav.familie.ba.mottak.util.DbContainerInitializer
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -54,5 +53,16 @@ class JournalføringTest(
         val overskrevetDBSøknad = søknadService.hentDBSøknad(dbSøknadFraDB.id)
 
         assertEquals("123", overskrevetDBSøknad!!.journalpostId)
+    }
+
+    @Test
+    fun `journalPostId skal ikke bli satt hvis den allerede finnes`() {
+        val dbSøknadMedJournalpostId = dbSøknad.copy(journalpostId = "1")
+        val dbSøknadFraDB = søknadService.lagreDBSøknad(dbSøknadMedJournalpostId)
+
+        journalføringService.journalførSøknad(dbSøknadFraDB.id.toString(), testPDF)
+        val ikkeOverskrevetDBSøknad = søknadService.hentDBSøknad(dbSøknadFraDB.id)
+
+        assertEquals("1", ikkeOverskrevetDBSøknad!!.journalpostId)
     }
 }
