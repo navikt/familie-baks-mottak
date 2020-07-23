@@ -28,7 +28,7 @@ object SøknadTreeWalker {
     fun mapSøknadsfelter(søknad: Søknad): Map<String, Any> {
         val finnFelter = finnFelter(søknad)
         val søknadstype = søknad.søknadstype.verdi
-        return feltlisteMap("${søknadstype.tittel} - ${søknadstype.søknadskode}", finnFelter)
+        return feltlisteMap(søknadstype.run{"$tittel - $søknadskode"}, finnFelter)
     }
 
     private fun finnFelter(entitet: Any): List<Map<String, *>> {
