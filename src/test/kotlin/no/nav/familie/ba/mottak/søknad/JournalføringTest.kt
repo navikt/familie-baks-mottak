@@ -46,9 +46,9 @@ class JournalføringTest(
     }
 
     @Test
-    fun `journalPostId er lagt på dbSøknaden`() {
+    fun `journalPostId blir lagt på dbSøknaden`() {
         val dbSøknadFraDB = søknadService.lagreDBSøknad(dbSøknad)
-
+        assertEquals(null, dbSøknadFraDB.journalpostId)
         journalføringService.journalførSøknad(dbSøknadFraDB.id.toString(), testPDF)
         val overskrevetDBSøknad = søknadService.hentDBSøknad(dbSøknadFraDB.id)
 
