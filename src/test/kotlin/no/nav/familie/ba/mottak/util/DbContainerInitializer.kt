@@ -26,7 +26,7 @@ class DbContainerInitializer : ApplicationContextInitializer<ConfigurableApplica
             KPostgreSQLContainer("postgres:11.1")
                     .withDatabaseName("postgres")
                     .withUsername("postgres")
-                    .withPassword("postgres")
+                    .withPassword("test")
         }
     }
 }

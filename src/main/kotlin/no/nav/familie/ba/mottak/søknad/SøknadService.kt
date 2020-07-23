@@ -18,18 +18,18 @@ class SøknadService(private val søknadRepository: SøknadRepository, private v
     @Transactional
     @Throws(FødselsnummerErNullException::class)
     fun motta(søknad: Søknad): DBSøknad {
-        val dbSøknad = lagreSøknad(søknad)
+        val dbSøknad = lagreDBSøknad(søknad.tilDBSøknad())
         val properties = Properties().apply { this["søkersFødselsnummer"] = dbSøknad.fnr }
 
         taskRepository.save(Task.nyTask(JournalførSøknadTask.JOURNALFØR_SØKNAD,
-                                        dbSøknad.id.toString(),
-                                        properties))
+                dbSøknad.id.toString(),
+                properties))
         return dbSøknad
 
     }
 
-    fun lagreSøknad(søknad: Søknad): DBSøknad {
-        return søknadRepository.save(søknad.tilDBSøknad())
+    fun lagreDBSøknad(dbSøknad: DBSøknad): DBSøknad {
+        return søknadRepository.save(dbSøknad)
     }
 
     fun hentDBSøknad(søknadId: Long): DBSøknad? {
