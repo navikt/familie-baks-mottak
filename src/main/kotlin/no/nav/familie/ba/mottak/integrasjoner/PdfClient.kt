@@ -11,8 +11,7 @@ import java.net.URI
 class PdfClient(@Qualifier("restTemplateUnsecured") operations: RestOperations,
                 @Value("\${FAMILIE_BA_DOKGEN_API_URL}") private val dokgenUri: String) : AbstractRestClient(operations, "pdf") {
     fun lagPdf(labelValueJson: Map<String, Any>): ByteArray {
-        val sendInnUri = URI.create("$dokgenUri/template/soknad/download-pdf")
-        val byteArray = postForEntity<ByteArray>(sendInnUri, labelValueJson)
-        return byteArray
+        val sendInnUri = URI.create("$dokgenUri/template/Soknad/download-pdf")
+        return postForEntity(sendInnUri, labelValueJson)
     }
 }
