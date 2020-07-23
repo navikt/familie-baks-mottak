@@ -2,8 +2,8 @@ package no.nav.familie.ba.mottak.integrasjoner
 
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
-import no.nav.familie.kontrakter.felles.arkivering.ArkiverDokumentResponse
-import no.nav.familie.kontrakter.felles.arkivering.v2.ArkiverDokumentRequest
+import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentResponse
+import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentRequest
 import no.nav.familie.kontrakter.felles.getDataOrThrow
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
