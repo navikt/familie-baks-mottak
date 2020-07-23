@@ -1,6 +1,5 @@
 package no.nav.familie.ba.mottak.søknad
 
-
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -15,7 +14,7 @@ class SøknadTreeWalkerTest {
     fun `mapSøknadsfelter returnerer en map-struktur med feltene fra søknaden`() {
         assertTrue(mapSøknadsfelter.isNotEmpty())
         assertEquals("Søknad barnetrygd - 33-00.07", mapSøknadsfelter["label"])
-        assertEquals(13, verdiliste.size)
+        assertEquals(3, verdiliste.size) // tre verdilister: søker, barn og søknadstype
     }
 
     @Test
@@ -27,11 +26,21 @@ class SøknadTreeWalkerTest {
 
     @Test
     fun `Test at verdier bevares og holdes sammen`() {
-        val navn = verdiliste.filter { it["label"] == "Barnets fulle navn" }.map { it["verdi"] }
-        val alder = verdiliste.filter { it["label"] == "alder" }.map { it["verdi"] }
-        assertTrue(
-                (navn[0] == "barn1" && alder[0] == "4 år")
-                        && (navn[1] == "barn2" && alder[1] == "1 år")
+        val barneliste = verdiliste[2]["verdiliste"] as List<Map<String, Any?>>
+        val barn1 = toMap(barneliste[0]["verdiliste"])
+        val barn2 = toMap(barneliste[1]["verdiliste"])
+        assertEquals(
+                Pair("barn1", "4 år"),
+                Pair(barn1["Barnets fulle navn"], barn1["alder"])
         )
+        assertEquals(
+                Pair("barn2", "1 år"),
+                Pair(barn2["Barnets fulle navn"], barn2["alder"])
+        )
+    }
+
+    /** Gjør om liste av maps med nøkler: ("label", "verdi") til én map: ("label"-verdi -> "verdi"-verdi) */
+    fun toMap(list: Any?): Map<String, Any?> {
+        return (list as List<Map<String, Any?>>).map { it["label"] as String to it["verdi"] }.toMap() // Må ha liste av par for å kjøpre toMap
     }
 }

@@ -61,6 +61,7 @@ funksjonsbrytere:
 logging:
   config: "classpath:logback-test.xml"
 
+FAMILIE_BA_DOKGEN_API_URL: http://localhost:5914
 FAMILIE_BA_SAK_API_URL: http://localhost:8089/api
 FAMILIE_INTEGRASJONER_API_URL: http://localhost:8085/api
 
