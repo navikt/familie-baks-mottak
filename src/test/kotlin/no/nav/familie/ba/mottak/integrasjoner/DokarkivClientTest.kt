@@ -55,7 +55,9 @@ class DokarkivClientTest {
                 .withStatus(200)
                 .withBody(objectMapper.writeValueAsString(Ressurs.success(ArkiverDokumentResponse ("123456", false))))))
         dokarkivClient.arkiver(ArkiverDokumentRequest( jp.bruker!!.id, false, hoveddokumentvarianter))
+
     }
+
 
     @Test
     @Tag("integration")
