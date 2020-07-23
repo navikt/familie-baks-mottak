@@ -1,9 +1,9 @@
 package no.nav.familie.ba.mottak.søknad
 
 import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
-import no.nav.familie.kontrakter.felles.arkivering.Dokument
-import no.nav.familie.kontrakter.felles.arkivering.FilType
-import no.nav.familie.kontrakter.felles.arkivering.v2.ArkiverDokumentRequest
+import no.nav.familie.kontrakter.felles.dokarkiv.Dokument
+import no.nav.familie.kontrakter.felles.dokarkiv.FilType
+import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentRequest
 
 object ArkiverDokumentRequestMapper {
 
