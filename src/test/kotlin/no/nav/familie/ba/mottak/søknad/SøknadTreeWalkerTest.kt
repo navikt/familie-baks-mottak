@@ -13,7 +13,7 @@ class SøknadTreeWalkerTest {
     @Test
     fun `mapSøknadsfelter returnerer en map-struktur med feltene fra søknaden`() {
         assertTrue(mapSøknadsfelter.isNotEmpty())
-        assertEquals("Søknad barnetrygd - 33-00.07", mapSøknadsfelter["label"])
+        assertEquals("Søknad barnetrygd - NAV 33-00.07", mapSøknadsfelter["label"])
         assertEquals(3, verdiliste.size) // tre verdilister: søker, barn og søknadstype
     }
 
