@@ -15,7 +15,7 @@ class PdfService(private val søknadRepository: SøknadRepository, private val p
     fun lagPdf(id: String): ByteArray {
         val dbSøknad = søknadRepository.hentDBSøknad(id.toLong()) ?: error("Kunne ikke finne søknad ($id) i database")
         val feltMap = SøknadTreeWalker.mapSøknadsfelter(dbSøknad.hentSøknad())
-        val utvidetFeltMap = feltMap + hentEkstraFelter(dbSøknad)
+        val utvidetFeltMap = feltMap + hentEkstraFelter(dbSøknad) - "Søker"
         val søknadPdf = pdfClient.lagPdf(utvidetFeltMap)
         // TODO: fjern out, return pdfClient.lagPdf()
         val out = FileOutputStream("out.pdf")
