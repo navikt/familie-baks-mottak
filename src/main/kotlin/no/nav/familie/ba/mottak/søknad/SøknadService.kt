@@ -13,7 +13,7 @@ import java.util.*
 
 
 @Service
-class SøknadService(private val søknadRepository: SøknadRepository, private val taskRepository: TaskRepository) {
+class SøknadService(private val søknadRepository: SøknadRepository, private val taskRepository: TaskRepository, private val pdfService: PdfService) {
 
     @Transactional
     @Throws(FødselsnummerErNullException::class)
@@ -35,6 +35,5 @@ class SøknadService(private val søknadRepository: SøknadRepository, private v
     fun hentDBSøknad(søknadId: Long): DBSøknad? {
         return søknadRepository.hentDBSøknad(søknadId)
     }
-
 }
 

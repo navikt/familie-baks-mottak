@@ -17,13 +17,13 @@ import kotlin.reflect.full.primaryConstructor
 object SøknadTreeWalker {
     private val endNodes =
             setOf<KClass<*>>(String::class,
-                             Int::class,
-                             Boolean::class,
-                             LocalDate::class,
-                             LocalDateTime::class,
-                             Month::class,
-                             Long::class,
-                             Søknadstype::class)
+                    Int::class,
+                    Boolean::class,
+                    LocalDate::class,
+                    LocalDateTime::class,
+                    Month::class,
+                    Long::class,
+                    Søknadstype::class)
 
     fun mapSøknadsfelter(søknad: Søknad): Map<String, Any> {
         val finnFelter = finnFelter(søknad)
