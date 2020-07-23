@@ -18,6 +18,7 @@ class JournalføringService(private val dokarkivClient: DokarkivClient,
             val journalpostId: String = arkiverSøknad(dbSøknad, pdf)
             val dbSøknadMedJournalpostId = dbSøknad.copy(journalpostId = journalpostId)
             søknadService.lagreDBSøknad(dbSøknadMedJournalpostId)
+            log.info("Søknaden er journalført og lagret til database")
         } else {
             log.warn("Søknaden har allerede blitt journalført med journalpostId: ${dbSøknad.journalpostId}")
         }
