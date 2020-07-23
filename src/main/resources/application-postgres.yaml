@@ -49,7 +49,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/familie-ba-mottak
     hikari:
-      password: postgres
+      password: test
       username: postgres
   flyway:
     enabled: true
