@@ -13,12 +13,9 @@ object ArkiverDokumentRequestMapper {
 
         val søknadsdokumentJson =
                 Dokument(dbSøknad.søknadJson.toByteArray(), FilType.JSON, null, "SØKNAD_${dokumenttype}_JSON", dokumenttype)
-        // TODO: Fjern dummy-pdf
         val søknadsdokumentPdf =
                 Dokument(pdf, FilType.PDFA, null, "SØKNAD_${dokumenttype}_PDF", dokumenttype)
         val hoveddokumentvarianter = listOf(søknadsdokumentPdf, søknadsdokumentJson)
         return ArkiverDokumentRequest(dbSøknad.fnr, false, hoveddokumentvarianter)
     }
-
-
 }
