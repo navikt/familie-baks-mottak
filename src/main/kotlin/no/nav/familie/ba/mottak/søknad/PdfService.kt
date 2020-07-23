@@ -3,7 +3,6 @@ package no.nav.familie.ba.mottak.søknad
 import no.nav.familie.ba.mottak.integrasjoner.PdfClient
 import org.springframework.stereotype.Service
 import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
-import java.io.FileOutputStream
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.*
