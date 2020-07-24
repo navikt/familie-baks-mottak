@@ -13,8 +13,8 @@ class SøknadTreeWalkerTest {
     @Test
     fun `mapSøknadsfelter returnerer en map-struktur med feltene fra søknaden`() {
         assertTrue(mapSøknadsfelter.isNotEmpty())
-        assertEquals("Søknad barnetrygd - 33-00.07", mapSøknadsfelter["label"])
-        assertEquals(3, verdiliste.size) // tre verdilister: søker, barn og søknadstype
+        assertEquals("Søknad om barnetrygd ordinær - NAV 33-00.07", mapSøknadsfelter["label"])
+        assertEquals(3, verdiliste.size)
     }
 
     @Test
@@ -41,6 +41,6 @@ class SøknadTreeWalkerTest {
 
     /** Gjør om liste av maps med nøkler: ("label", "verdi") til én map: ("label"-verdi -> "verdi"-verdi) */
     fun toMap(list: Any?): Map<String, Any?> {
-        return (list as List<Map<String, Any?>>).map { it["label"] as String to it["verdi"] }.toMap() // Må ha liste av par for å kjøpre toMap
+        return (list as List<Map<String, Any?>>).map { it["label"] as String to it["verdi"] }.toMap()
     }
 }
