@@ -97,10 +97,12 @@ class ClientMocks {
         return mockFeatureToggleClient
     }
 
+
     @Bean
-    @Primary
+    @Profile("mock-dokgen")
     fun mockPdfClient(): PdfClient {
         val mockPdfClient = mockk<PdfClient>()
+
 
         every {
             mockPdfClient.lagPdf(any())

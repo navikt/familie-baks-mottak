@@ -41,6 +41,6 @@ class SøknadTreeWalkerTest {
 
     /** Gjør om liste av maps med nøkler: ("label", "verdi") til én map: ("label"-verdi -> "verdi"-verdi) */
     fun toMap(list: Any?): Map<String, Any?> {
-        return (list as List<Map<String, Any?>>).map { it["label"] as String to it["verdi"] }.toMap() // Må ha liste av par for å kjøpre toMap
+        return (list as List<Map<String, Any?>>).map { it["label"] as String to it["verdi"] }.toMap()
     }
 }
