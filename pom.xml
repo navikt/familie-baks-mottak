@@ -23,11 +23,11 @@
         <mockk.version>1.9.3</mockk.version>
         <confluent.version>5.3.1</confluent.version>
         <felles.version>1.20200624154125_0d8ff39</felles.version>
-        <kontrakter.version>2.0_20200625154602_9f6d526</kontrakter.version>
+        <kontrakter.version>2.0_20200723115650_db71799</kontrakter.version>
         <main-class>no.nav.familie.ba.mottak.LauncherKt</main-class>
         <spring.vault.version>2.2.2.RELEASE</spring.vault.version>
         <spring.cloud.version>2.2.3.RELEASE</spring.cloud.version>
-        <token-validation-spring.version>1.1.6</token-validation-spring.version>
+        <token-validation-spring.version>1.2.0</token-validation-spring.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
@@ -115,6 +115,11 @@
             <groupId>no.nav.security</groupId>
             <artifactId>token-client-spring</artifactId>
             <version>${token-validation-spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.familie.kontrakter</groupId>
+            <artifactId>barnetrygd</artifactId>
+            <version>${kontrakter.version}</version>
         </dependency>
 
         <!-- Kafka -->
@@ -218,6 +223,12 @@
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility-kotlin</artifactId>
             <version>4.0.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.security</groupId>
+            <artifactId>token-validation-test-support</artifactId>
+            <version>${token-validation-spring.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

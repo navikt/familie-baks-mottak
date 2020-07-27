@@ -1,7 +1,7 @@
 package no.nav.familie.ba.mottak.integrasjoner
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import no.nav.familie.ba.mottak.config.ApplicationConfig
+import no.nav.familie.ba.mottak.DevLauncher
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
 
-@SpringBootTest(classes = [ApplicationConfig::class], properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api"])
+@SpringBootTest(classes = [DevLauncher::class], properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api"])
 @ActiveProfiles("dev", "mock-oauth")
 @AutoConfigureWireMock(port = 28085)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

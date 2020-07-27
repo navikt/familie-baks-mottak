@@ -1,7 +1,7 @@
 package no.nav.familie.ba.mottak.integrasjoner
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import no.nav.familie.ba.mottak.config.ApplicationConfig
+import no.nav.familie.ba.mottak.DevLauncher
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -13,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles
 import java.io.IOException
 
 
-@SpringBootTest(classes = [ApplicationConfig::class], properties = ["FAMILIE_BA_SAK_API_URL=http://localhost:28085/api"])
+@SpringBootTest(classes = [DevLauncher::class], properties = ["FAMILIE_BA_SAK_API_URL=http://localhost:28085/api"])
 @ActiveProfiles("dev", "mock-oauth")
 @AutoConfigureWireMock(port = 28085)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

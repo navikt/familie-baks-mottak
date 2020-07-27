@@ -3,6 +3,10 @@ no.nav.security.jwt:
     discoveryurl: http://mock-oauth2-server:1111/v2.0/.well-known/openid-configuration
     accepted_audience: api://${MOTTAK_CLIENT_ID}/.default
     cookie_name: azure_token
+  issuer.selvbetjening:
+    discoveryurl: https://login.microsoftonline.com/NAVtestB2C.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1A_idporten_ver1
+    accepted_audience: ${ACCEPTEDAUDIENCE}
+    cookie_name: selvbetjening-idtoken
   client:
     registration:
       ba-sak-clientcredentials:
@@ -53,6 +57,7 @@ logging:
     no.nav: DEBUG
 #  config: "classpath:logback-test.xml"
 
+FAMILIE_BA_DOKGEN_API_URL: http://familie-ba-dokgen:8080
 FAMILIE_BA_SAK_API_URL: http://familie-ba-sak:8089/api
 FAMILIE_INTEGRASJONER_API_URL: http://familie-integrasjoner:8085/api
 
