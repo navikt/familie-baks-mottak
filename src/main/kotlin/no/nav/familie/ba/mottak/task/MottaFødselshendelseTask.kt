@@ -4,11 +4,8 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.domene.NyBehandling
-import no.nav.familie.ba.mottak.domene.personopplysning.Familierelasjon
-import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
-import no.nav.familie.ba.mottak.domene.personopplysning.Personinfo
-import no.nav.familie.ba.mottak.domene.personopplysning.RelasjonsRolleType
-import no.nav.familie.ba.mottak.integrasjoner.PersonService
+import no.nav.familie.ba.mottak.domene.personopplysning.*
+import no.nav.familie.ba.mottak.integrasjoner.PersonClient
 import no.nav.familie.ba.mottak.util.erBostNummer
 import no.nav.familie.ba.mottak.util.erDnummer
 import no.nav.familie.ba.mottak.util.erFDatnummer
@@ -29,7 +26,7 @@ import org.springframework.stereotype.Service
                      beskrivelse = "Motta fødselshendelse",
                      maxAntallFeil = 3)
 class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
-                               private val personService: PersonService,
+                               private val personClient: PersonClient,
                                @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: Long,
                                private val environment: Environment)
     : AsyncTaskStep {
@@ -41,14 +38,14 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
     override fun doTask(task: Task) {
         val barnetsId = task.payload
 
-        if (erDnummer(PersonIdent(barnetsId)) || erFDatnummer(PersonIdent(barnetsId)) || erBostNummer(PersonIdent(barnetsId))) {
+        if (erDnummer(barnetsId) || erFDatnummer(barnetsId) || erBostNummer(barnetsId)) {
             log.info("Ignorer fødselshendelse: Barnet har DNR/FDAT/BOST-nummer")
             barnHarDnrCounter.increment()
             return
         }
 
         try {
-            val personMedRelasjoner = personService.hentPersonMedRelasjoner(barnetsId)
+            val personMedRelasjoner = personClient.hentPersonMedRelasjoner(barnetsId)
 
             val forsørger = hentForsørger(personMedRelasjoner)
 
@@ -76,15 +73,15 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
         }
     }
 
-    fun hentForsørger(personinfo: Personinfo): PersonIdent {
+    fun hentForsørger(personinfo: Person): PersonIdent {
         for (familierelasjon: Familierelasjon in personinfo.familierelasjoner!!) {
-            if (familierelasjon.relasjonsrolle == RelasjonsRolleType.MORA) {
+            if (familierelasjon.relasjonsrolle == "MOR") {
                 return familierelasjon.personIdent
             }
         }
         // hvis vi ikke fant mora returner fara
         for (familierelasjon: Familierelasjon in personinfo.familierelasjoner!!) {
-            if (familierelasjon.relasjonsrolle == RelasjonsRolleType.FARA) {
+            if (familierelasjon.relasjonsrolle == "FAR") {
                 return familierelasjon.personIdent
             }
         }
