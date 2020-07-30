@@ -3,6 +3,7 @@ package no.nav.familie.ba.mottak.integrasjoner
 import no.nav.familie.ba.mottak.domene.personopplysning.Person
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
+import no.nav.familie.kontrakter.felles.getDataOrThrow
 import no.nav.familie.log.NavHttpHeaders
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -35,7 +36,7 @@ class PersonClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONER
             val response = getForEntity<Ressurs<Person>>(uri, headers)
 
             secureLogger.info("Personinfo for {}: {}", personIdent, response)
-            response?.data ?: throw RuntimeException("Response eller data er null.")
+            response?.getDataOrThrow()
         } catch (e: HttpStatusCodeException) {
             logger.info("Feil mot TPS. status=${e.statusCode}, stacktrace=${e.stackTrace.toList()}")
             secureLogger.info("Feil mot TPS. msg=${e.message}, body=${e.responseBodyAsString}")
