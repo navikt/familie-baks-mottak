@@ -4,7 +4,9 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.domene.NyBehandling
-import no.nav.familie.ba.mottak.domene.personopplysning.*
+import no.nav.familie.ba.mottak.domene.personopplysning.Familierelasjon
+import no.nav.familie.ba.mottak.domene.personopplysning.Person
+import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
 import no.nav.familie.ba.mottak.integrasjoner.PersonClient
 import no.nav.familie.ba.mottak.util.erBostNummer
 import no.nav.familie.ba.mottak.util.erDnummer
@@ -47,24 +49,27 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
         try {
             val personMedRelasjoner = personClient.hentPersonMedRelasjoner(barnetsId)
 
-            val forsørger = hentForsørger(personMedRelasjoner)
+            val morsIdent = hentMor(personMedRelasjoner)
 
-            if (erDnummer(forsørger) || erFDatnummer(forsørger) || erBostNummer(forsørger)) {
-                log.info("Ignorer fødselshendelse: Barnets forsørger har DNR/FDAT/BOST-nummer")
-                forsørgerHarDnrCounter.increment()
-                return
+            if (morsIdent != null) {
+                if (erDnummer(morsIdent) || erFDatnummer(morsIdent) || erBostNummer(morsIdent)) {
+                    log.info("Ignorer fødselshendelse: Barnets forsørger har DNR/FDAT/BOST-nummer")
+                    forsørgerHarDnrCounter.increment()
+                    return
+                }
+
+                task.metadata["morsIdent"] = morsIdent.id
+                val nesteTask = Task.nyTask(
+                        SendTilSakTask.TASK_STEP_TYPE,
+                        jacksonObjectMapper().writeValueAsString(NyBehandling(morsIdent = morsIdent.id,
+                                                                              barnasIdenter = arrayOf(barnetsId))),
+                        task.metadata
+                )
+
+                taskRepository.save(nesteTask)
+            } else {
+                log.info("Skipper fødselshendelse fordi man ikke fant en mor")
             }
-
-            task.metadata["forsørger"] = forsørger.id!!
-            val nesteTask = Task.nyTask(
-                    SendTilSakTask.TASK_STEP_TYPE,
-                    jacksonObjectMapper().writeValueAsString(NyBehandling(forsørger.id!!,
-                                                                          arrayOf(barnetsId))),
-                    task.metadata
-            )
-
-            taskRepository.save(nesteTask)
-
         } catch (ex: RuntimeException) {
             log.info("MottaFødselshendelseTask feilet.")
             task.triggerTid = nesteGyldigeTriggertidFødselshendelser(rekjøringsintervall, environment)
@@ -73,22 +78,14 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
         }
     }
 
-    fun hentForsørger(personinfo: Person): PersonIdent {
-        for (familierelasjon: Familierelasjon in personinfo.familierelasjoner!!) {
+    fun hentMor(personinfo: Person): PersonIdent? {
+        for (familierelasjon: Familierelasjon in personinfo.familierelasjoner) {
             if (familierelasjon.relasjonsrolle == "MOR") {
                 return familierelasjon.personIdent
             }
         }
-        // hvis vi ikke fant mora returner fara
-        for (familierelasjon: Familierelasjon in personinfo.familierelasjoner!!) {
-            if (familierelasjon.relasjonsrolle == "FAR") {
-                return familierelasjon.personIdent
-            }
-        }
-        log.warn("Fant hverken far eller mor...")
-        throw IllegalStateException("Fant hverken mor eller far. Må behandles manuelt")
+        return null
     }
-
 
 
     companion object {

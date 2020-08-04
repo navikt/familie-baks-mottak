@@ -25,7 +25,6 @@ class SendTilSakTask(private val sakClient: SakClient, private val featureToggle
         } else {
             logger.info("Behandler ikke fødselshendelse, feature er skrudd av i Unleash")
         }
-
     }
 
     override fun onCompletion(task: Task) {
