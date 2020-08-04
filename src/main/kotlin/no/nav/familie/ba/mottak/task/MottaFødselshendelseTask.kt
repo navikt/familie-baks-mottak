@@ -11,7 +11,6 @@ import no.nav.familie.ba.mottak.integrasjoner.PersonClient
 import no.nav.familie.ba.mottak.util.erBostNummer
 import no.nav.familie.ba.mottak.util.erDnummer
 import no.nav.familie.ba.mottak.util.erFDatnummer
-import no.nav.familie.ba.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -19,8 +18,8 @@ import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 
 @Service
@@ -29,8 +28,7 @@ import org.springframework.stereotype.Service
                      maxAntallFeil = 3)
 class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
                                private val personClient: PersonClient,
-                               @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: Long,
-                               private val environment: Environment)
+                               @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: Long)
     : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
@@ -72,7 +70,7 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
             }
         } catch (ex: RuntimeException) {
             log.info("MottaFødselshendelseTask feilet.")
-            task.triggerTid = nesteGyldigeTriggertidFødselshendelser(rekjøringsintervall, environment)
+            task.triggerTid = LocalDateTime.now().plusMinutes(rekjøringsintervall)
             taskRepository.save(task)
             throw ex
         }
