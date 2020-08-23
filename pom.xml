@@ -26,7 +26,7 @@
         <kontrakter.version>2.0_20200723115650_db71799</kontrakter.version>
         <main-class>no.nav.familie.ba.mottak.LauncherKt</main-class>
         <spring.vault.version>2.2.2.RELEASE</spring.vault.version>
-        <spring.cloud.version>2.2.3.RELEASE</spring.cloud.version>
+        <spring.cloud.version>2.2.4.RELEASE</spring.cloud.version>
         <token-validation-spring.version>1.2.0</token-validation-spring.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
