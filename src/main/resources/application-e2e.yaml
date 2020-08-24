@@ -3,6 +3,10 @@ no.nav.security.jwt:
     discoveryurl: http://mock-oauth2-server:1111/v2.0/.well-known/openid-configuration
     accepted_audience: api://${MOTTAK_CLIENT_ID}/.default
     cookie_name: azure_token
+  issuer.selvbetjening:
+    discoveryurl: https://login.microsoftonline.com/NAVtestB2C.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1A_idporten_ver1
+    accepted_audience: ${ACCEPTEDAUDIENCE}
+    cookie_name: selvbetjening-idtoken
   client:
     registration:
       ba-sak-clientcredentials:
@@ -24,6 +28,8 @@ no.nav.security.jwt:
           client-secret: ${MOTTAK_CLIENT_SECRET}
           client-auth-method: client_secret_basic
 
+prosessering:
+  fixedDelayString.in.milliseconds: 3000
 
 spring:
   cloud:
@@ -37,21 +43,13 @@ spring:
       password: familie-pwd
   flyway:
     enabled: true
-  kafka:
-    bootstrap-servers: ${KAFKA_BROKERS}
-    properties:
-      security.protocol: SASL_PLAINTEXT
-      sasl:
-        jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="igroup" password="itest";
-      schema.registry.url: http://schema-registry:8081
-    consumer:
-      group-id: srvc01
+
 funksjonsbrytere:
   enabled: false
   unleash:
     uri: http://dummy/api/
-    cluster: localhost
-    applicationName: familie-ba-sak
+    cluster: lokalutvikling
+    applicationName: familie-ba-mottak
 
 logging:
   level:
@@ -59,12 +57,11 @@ logging:
     no.nav: DEBUG
 #  config: "classpath:logback-test.xml"
 
+FAMILIE_BA_DOKGEN_API_URL: http://familie-ba-dokgen:8080
 FAMILIE_BA_SAK_API_URL: http://familie-ba-sak:8089/api
 FAMILIE_INTEGRASJONER_API_URL: http://familie-integrasjoner:8085/api
 
-FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1
-FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 1
-
-KAFKA_BROKERS: http://kafka:9093
+FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 0
+FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 0
 
 JOURNALFOERINGHENDELSE_V1_TOPIC_URL: aapen-dok-journalfoering-v1-e2e

@@ -1,8 +1,15 @@
 no.nav.security.jwt:
-  issuer.azuread:
-    discoveryurl: https://login.microsoftonline.com/navq.onmicrosoft.com/v2.0/.well-known/openid-configuration
-    accepted_audience: ${CLIENT_ID}
-    cookie_name: azure_token
+  issuer:
+    selvbetjening:
+      discoveryurl: http://metadata
+      accepted_audience: aud-localhost
+      cookie_name: localhost-idtoken
+      # Kommenteres ut ved lokal testing av innsending av søknad
+    #    azuread:
+    #      discoveryurl: https://login.microsoftonline.com/navq.onmicrosoft.com/v2.0/.well-known/openid-configuration
+    #      accepted_audience: ${CLIENT_ID}
+    #      cookie_name: azure_token
+
   client:
     registration:
       ba-sak-clientcredentials:
@@ -40,9 +47,9 @@ logging:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5432/familie-ba-mottak
     hikari:
-      password: postgres
+      password: test
       username: postgres
   flyway:
     enabled: true
@@ -64,6 +71,10 @@ spring:
     consumer:
       group-id: srvc01
 
+#Brukes til tilgangskontroll av familie-ks-mottak-frontend
+MOTTAK_ROLLE: group1
+
+FAMILIE_BA_DOKGEN_API_URL: http://localhost:5914
 FAMILIE_INTEGRASJONER_API_URL: http://localhost:8085/api
 FAMILIE_BA_SAK_API_URL: http://localhost:8090/api
 
@@ -71,3 +82,5 @@ FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1
 FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 1
 
 KAFKA_BROKERS: http://localhost:9092
+
+JOURNALFOERINGHENDELSE_V1_TOPIC_URL: aapen-dok-journalfoering-v1-q1

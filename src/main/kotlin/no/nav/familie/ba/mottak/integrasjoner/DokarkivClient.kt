@@ -2,7 +2,9 @@ package no.nav.familie.ba.mottak.integrasjoner
 
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
-
+import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentResponse
+import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentRequest
+import no.nav.familie.kontrakter.felles.getDataOrThrow
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -21,15 +23,22 @@ class DokarkivClient(@param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private v
         logger.info("Oppdaterer journalpost ${jp.journalpostId} med fagsaktilknytning $fagsakId ")
         val uri = URI.create("$integrasjonUri/arkiv/v2/${jp.journalpostId}")
         val request = TilknyttFagsakRequest(bruker = Bruker(idType = IdType.valueOf(jp.bruker!!.type.name), id = jp.bruker.id),
-                                            tema = "BAR",
-                                            sak = Sak(fagsakId, "BA"))
+                tema = "BAR",
+                sak = Sak(fagsakId, "BA"))
 
         when (val response = utførRequest(uri, request)) {
             is Throwable -> throw IntegrasjonException("Oppdatering av journalpost ${jp.journalpostId} med fagsak $fagsakId feilet",
-                                                       response,
-                                                       uri,
-                                                       jp.bruker.id)
+                    response,
+                    uri,
+                    jp.bruker.id)
         }
+    }
+
+    fun arkiver(arkiverDokumentRequest: ArkiverDokumentRequest): ArkiverDokumentResponse {
+        val uri = URI.create("$integrasjonUri/arkiv/v3")
+        val response =
+                postForEntity<Ressurs<ArkiverDokumentResponse>>(uri, arkiverDokumentRequest)
+        return response.getDataOrThrow()
     }
 
     fun ferdigstillJournalpost(journalpostId: String) {
@@ -45,8 +54,8 @@ class DokarkivClient(@param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private v
         return Result.runCatching {
             putForEntity<Ressurs<Any>>(uri, request)
         }.fold(
-            onSuccess = { response -> assertGyldig(response) },
-            onFailure = { it }
+                onSuccess = { response -> assertGyldig(response) },
+                onFailure = { it }
         )
     }
 
@@ -60,9 +69,9 @@ class DokarkivClient(@param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private v
         }
     }
 
-    data class TilknyttFagsakRequest (val bruker: Bruker,
-                                      val tema: String,
-                                      val sak: Sak)
+    data class TilknyttFagsakRequest(val bruker: Bruker,
+                                     val tema: String,
+                                     val sak: Sak)
 
     data class Sak(val fagsakId: String,
                    val fagsaksystem: String)

@@ -22,7 +22,7 @@ class DateUtilsTest {
             "2020-12-26T00:00:00, 2020-12-28", //første arbeidsdag er mandag 28
             "2020-01-01T00:00:00, 2020-01-02"
     )
-    fun `skal returnere neste arbeidsdag`(input: LocalDateTime, expected: LocalDate) {
+    fun `fristFerdigstillelese skal returnere neste arbeidsdag`(input: LocalDateTime, expected: LocalDate) {
         mockkStatic(LocalDateTime::class)
 
         every { LocalDateTime.now() } returns input

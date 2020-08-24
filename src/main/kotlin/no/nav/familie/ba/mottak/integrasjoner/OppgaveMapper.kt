@@ -48,10 +48,8 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
         }
 
         return when (journalpost.dokumenter.firstOrNull { it.brevkode != null }?.brevkode) {
-            "NAV 33-00.07" -> Behandlingstema.OrdinærBarnetrygd.value
-            "NAV 33-00.09" -> Behandlingstema.UtvidetBarnetrygd.value
             "NAV 33-00.15" -> null
-            else -> journalpost.behandlingstema
+            else -> Behandlingstema.OrdinærBarnetrygd.value
         }
     }
 

@@ -1,6 +1,6 @@
 package no.nav.familie.ba.mottak.integrasjoner
 
-import no.nav.familie.ba.mottak.config.ApplicationConfig
+import no.nav.familie.ba.mottak.DevLauncher
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstema
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
@@ -12,7 +12,7 @@ import org.springframework.test.context.ActiveProfiles
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-@SpringBootTest(classes = [ApplicationConfig::class], properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api"])
+@SpringBootTest(classes = [DevLauncher::class], properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api"])
 @ActiveProfiles("dev")
 class OppgaveMapperTest(
 
@@ -82,24 +82,9 @@ class OppgaveMapperTest(
         assertEquals(Behandlingstema.OrdinærBarnetrygd.value, oppgave.behandlingstema)
     }
 
-    @Test
-    fun `skal sette behandlingstema Utvidet`() {
-        val oppgaveMapper = OppgaveMapper(mockAktørClient)
-        val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                                         journalpostClient.hentJournalpost("123")
-                                                                 .copy(dokumenter = listOf(DokumentInfo(
-                                                                         tittel = null,
-                                                                         brevkode = "NAV 33-00.09",
-                                                                         dokumentstatus = null,
-                                                                         dokumentvarianter = null))
-                                                                 )
-        )
-        assertNull(oppgave.behandlingstype)
-        assertEquals(Behandlingstema.UtvidetBarnetrygd.value, oppgave.behandlingstema)
-    }
 
     @Test
-    fun `skal sette behandlingstema fra journalpost`() {
+    fun `skal sette behandlingstema Ordinær uavhengig av journalpost`() {
         val oppgaveMapper = OppgaveMapper(mockAktørClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
@@ -111,7 +96,7 @@ class OppgaveMapperTest(
                                                                        behandlingstema = "btema"
                                                                  )
         )
-        assertEquals("btema", oppgave.behandlingstema)
+        assertEquals(Behandlingstema.OrdinærBarnetrygd.value, oppgave.behandlingstema)
     }
 
     @Test

@@ -16,17 +16,18 @@
 
     <properties>
         <revision>1.0</revision>
-        <sha1></sha1>
+        <sha1/>
         <changelist>-SNAPSHOT</changelist>
         <jvmTarget>11</jvmTarget>
-        <kotlin.version>1.3.71</kotlin.version>
+        <kotlin.version>1.3.72</kotlin.version>
         <mockk.version>1.9.3</mockk.version>
         <confluent.version>5.3.1</confluent.version>
-        <felles.version>1.20200511201614_685f629</felles.version>
-        <kontrakter.version>2.0_20200525150032_379ff30</kontrakter.version>
+        <felles.version>1.20200624154125_0d8ff39</felles.version>
+        <kontrakter.version>2.0_20200723115650_db71799</kontrakter.version>
         <main-class>no.nav.familie.ba.mottak.LauncherKt</main-class>
-        <spring.cloud.version>2.2.2.RELEASE</spring.cloud.version>
-        <token-validation-spring.version>1.1.4</token-validation-spring.version>
+        <spring.vault.version>2.2.2.RELEASE</spring.vault.version>
+        <spring.cloud.version>2.2.4.RELEASE</spring.cloud.version>
+        <token-validation-spring.version>1.2.0</token-validation-spring.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
@@ -86,7 +87,7 @@
         <dependency>
             <groupId>no.finn.unleash</groupId>
             <artifactId>unleash-client-java</artifactId>
-            <version>3.3.0</version>
+            <version>3.3.3</version>
         </dependency>
 
         <!-- NAV interne avhengigheter-->
@@ -115,12 +116,17 @@
             <artifactId>token-client-spring</artifactId>
             <version>${token-validation-spring.version}</version>
         </dependency>
+        <dependency>
+            <groupId>no.nav.familie.kontrakter</groupId>
+            <artifactId>barnetrygd</artifactId>
+            <version>${kontrakter.version}</version>
+        </dependency>
 
         <!-- Kafka -->
         <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
-            <version>1.9.1</version>
+            <version>1.10.0</version>
         </dependency>
         <dependency>
             <groupId>io.confluent</groupId>
@@ -150,7 +156,7 @@
         <dependency>
             <groupId>org.springframework.vault</groupId>
             <artifactId>spring-vault-core</artifactId>
-            <version>${spring.cloud.version}</version>
+            <version>${spring.vault.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -160,7 +166,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.2.11</version>
+            <version>42.2.14</version>
         </dependency>
         <dependency>
             <groupId>com.papertrailapp</groupId>
@@ -217,6 +223,12 @@
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility-kotlin</artifactId>
             <version>4.0.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.security</groupId>
+            <artifactId>token-validation-test-support</artifactId>
+            <version>${token-validation-spring.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

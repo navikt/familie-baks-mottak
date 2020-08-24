@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS soknad(
+  id             bigint NOT NULL PRIMARY KEY,
+  soknad_json    TEXT NOT NULL,
+  fnr            VARCHAR,
+  opprettet_tid  TIMESTAMP(3) DEFAULT LOCALTIMESTAMP NOT NULL
+);
+
+CREATE SEQUENCE soknad_seq INCREMENT BY 50 START WITH 1000000 NO CYCLE;

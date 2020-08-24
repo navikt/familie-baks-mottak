@@ -1,18 +1,18 @@
 package no.nav.familie.ba.mottak.integrasjoner
 
+import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
-import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
-import no.nav.security.token.support.client.spring.ClientConfigurationProperties
+import no.nav.familie.kontrakter.felles.getDataOrThrow
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.web.client.RestTemplateBuilder
-import org.springframework.http.ResponseEntity
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
+import org.springframework.web.client.RestOperations
 import java.net.URI
 
 private val logger = LoggerFactory.getLogger(JournalpostClient::class.java)
@@ -21,21 +21,16 @@ private const val OAUTH2_CLIENT_CONFIG_KEY = "integrasjoner-clientcredentials"
 @Component
 class JournalpostClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONER_API_URL}")
                                                private val integrasjonerServiceUri: URI,
-                                               restTemplateBuilderMedProxy: RestTemplateBuilder,
-                                               clientConfigurationProperties: ClientConfigurationProperties,
-                                               oAuth2AccessTokenService: OAuth2AccessTokenService)
-    : BaseService(OAUTH2_CLIENT_CONFIG_KEY,
-                  restTemplateBuilderMedProxy,
-                  clientConfigurationProperties,
-                  oAuth2AccessTokenService) {
+                                               @Qualifier("clientCredentials") restOperations: RestOperations)
+    : AbstractRestClient(restOperations, "integrasjon.saf") {
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
     fun hentJournalpost(journalpostId: String): Journalpost {
         val uri = URI.create("$integrasjonerServiceUri/journalpost?journalpostId=$journalpostId")
         logger.debug("henter journalpost med id {}", journalpostId)
         return try {
-            val response: ResponseEntity<Ressurs<Journalpost>>? = getRequest(uri)
-            response?.body?.data ?: error("Fant ikke journalpost")
+            val response = getForEntity<Ressurs<Journalpost>>(uri)
+            response?.getDataOrThrow()
         } catch (e: RestClientResponseException) {
             logger.warn("Henting av journalpost feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
             throw IllegalStateException("Henting av journalpost med id $journalpostId feilet. Status: " + e.rawStatusCode

@@ -44,4 +44,11 @@ class RestTemplateConfig {
                 .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
                 .build()
     }
+
+    @Bean("restTemplateUnsecured")
+    fun restTemplate(restTemplateBuilder: RestTemplateBuilder,
+                     mdcInterceptor: MdcValuesPropagatingClientInterceptor,
+                     consumerIdClientInterceptor: ConsumerIdClientInterceptor): RestOperations {
+        return restTemplateBuilder.interceptors(mdcInterceptor, consumerIdClientInterceptor).build()
+    }
 }
