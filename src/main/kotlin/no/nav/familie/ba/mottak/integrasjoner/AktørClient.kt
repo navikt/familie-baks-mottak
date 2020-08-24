@@ -27,8 +27,8 @@ class AktørClient(@Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integ
         val uri = URI.create("$integrasjonUri/aktoer/v1")
         return try {
             val response = getForEntity<Ressurs<MutableMap<*, *>>>(uri, HttpHeaders().medPersonident(personident))
-            secureLogger.info("Vekslet inn fnr: {} til aktørId: {}", personident, response)
             val aktørId = response.data?.get("aktørId").toString()
+            secureLogger.info("Vekslet inn fnr: {} til aktørId: {}", personident, aktørId)
             if (aktørId.isEmpty()) {
                 throw IntegrasjonException(msg = "Kan ikke finne aktørId for ident", ident = personident)
             } else {
