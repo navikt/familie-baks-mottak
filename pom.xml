@@ -19,7 +19,7 @@
         <sha1/>
         <changelist>-SNAPSHOT</changelist>
         <jvmTarget>11</jvmTarget>
-        <kotlin.version>1.3.72</kotlin.version>
+        <kotlin.version>1.4.0</kotlin.version>
         <mockk.version>1.9.3</mockk.version>
         <confluent.version>5.3.1</confluent.version>
         <felles.version>1.20200624154125_0d8ff39</felles.version>
