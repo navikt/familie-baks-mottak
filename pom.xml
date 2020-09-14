@@ -19,7 +19,7 @@
         <sha1/>
         <changelist>-SNAPSHOT</changelist>
         <jvmTarget>11</jvmTarget>
-        <kotlin.version>1.4.0</kotlin.version>
+        <kotlin.version>1.4.10</kotlin.version>
         <mockk.version>1.9.3</mockk.version>
         <confluent.version>5.3.1</confluent.version>
         <felles.version>1.20200624154125_0d8ff39</felles.version>
@@ -166,7 +166,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.2.14</version>
+            <version>42.2.16</version>
         </dependency>
         <dependency>
             <groupId>com.papertrailapp</groupId>
