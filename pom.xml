@@ -21,7 +21,7 @@
         <jvmTarget>11</jvmTarget>
         <kotlin.version>1.4.10</kotlin.version>
         <mockk.version>1.9.3</mockk.version>
-        <confluent.version>5.3.1</confluent.version>
+        <confluent.version>5.5.1</confluent.version>
         <felles.version>1.20200915151146_ce9bfbc</felles.version>
         <kontrakter.version>2.0_20200915114026_cc396ea</kontrakter.version>
         <main-class>no.nav.familie.ba.mottak.LauncherKt</main-class>
