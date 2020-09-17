@@ -21,9 +21,9 @@
         <jvmTarget>11</jvmTarget>
         <kotlin.version>1.4.10</kotlin.version>
         <mockk.version>1.9.3</mockk.version>
-        <confluent.version>5.3.1</confluent.version>
-        <felles.version>1.20200915104309_df7b188</felles.version>
-        <kontrakter.version>2.0_20200723115650_db71799</kontrakter.version>
+        <confluent.version>5.5.1</confluent.version>
+        <felles.version>1.20200916153803_f78097a</felles.version>
+        <kontrakter.version>2.0_20200915114026_cc396ea</kontrakter.version>
         <main-class>no.nav.familie.ba.mottak.LauncherKt</main-class>
         <spring.vault.version>2.2.2.RELEASE</spring.vault.version>
         <spring.cloud.version>2.2.4.RELEASE</spring.cloud.version>
@@ -110,6 +110,11 @@
             <groupId>no.nav.familie.kontrakter</groupId>
             <artifactId>felles</artifactId>
             <version>${kontrakter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.familie.felles</groupId>
+            <artifactId>leader</artifactId>
+            <version>${felles.version}</version>
         </dependency>
         <dependency>
             <groupId>no.nav.security</groupId>
@@ -222,7 +227,7 @@
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility-kotlin</artifactId>
-            <version>4.0.2</version>
+            <version>4.0.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
