@@ -34,6 +34,8 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
     val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
     val barnHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.barn.har.dnr.eller.fdatnr")
     val forsørgerHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.forsørger.har.dnr.eller.fdatnr")
+    val barnetManglerBostedsadresse: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.bostedsadresse.null")
+
 
     override fun doTask(task: Task) {
         val barnetsId = task.payload
@@ -53,6 +55,12 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
                 if (erDnummer(morsIdent) || erFDatnummer(morsIdent) || erBostNummer(morsIdent)) {
                     log.info("Ignorer fødselshendelse: Barnets forsørger har DNR/FDAT/BOST-nummer")
                     forsørgerHarDnrCounter.increment()
+                    return
+                }
+
+                if (personMedRelasjoner.bostedsadresse == null || personMedRelasjoner.bostedsadresse.ukjentBosted != null) {
+                    log.info("Ignorer fødselshendelse: Barnet har ukjent bostedsadresse. task=${task.id}")
+                    barnetManglerBostedsadresse.increment()
                     return
                 }
 
@@ -87,6 +95,7 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
 
 
     companion object {
+
         const val TASK_STEP_TYPE = "mottaFødselshendelse"
     }
 }

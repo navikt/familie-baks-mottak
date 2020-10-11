@@ -3,13 +3,14 @@ package no.nav.familie.ba.mottak.task
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.mockk.clearAllMocks
 import no.nav.familie.ba.mottak.DevLauncher
-import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.NyBehandling
 import no.nav.familie.ba.mottak.domene.personopplysning.Familierelasjon
 import no.nav.familie.ba.mottak.domene.personopplysning.Person
 import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
 import no.nav.familie.kontrakter.felles.Ressurs.Companion.success
 import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
+import no.nav.familie.kontrakter.felles.personopplysning.Matrikkeladresse
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
@@ -19,14 +20,12 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertThrows
 import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.data.domain.Pageable
 import org.springframework.test.context.ActiveProfiles
-import java.lang.RuntimeException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -57,15 +56,8 @@ class MottaFødselshendelseTaskTest {
         stubFor(get(urlEqualTo("/api/personopplysning/v1/info/BAR"))
                         .willReturn(aResponse()
                                             .withHeader("Content-Type", "application/json")
-                                            .withBody(
-                                                    objectMapper.writeValueAsString(
-                                                            success(
-                                                                    Person("Test Person",
-                                                                           setOf(Familierelasjon(
-                                                                                   PersonIdent(
-                                                                                           "20107678901"),
-                                                                                   "MOR"))
-                                                                    ))))))
+                                            .withBody(objectMapper.writeValueAsString(
+                                                    success(lagTestPerson())))))
 
         taskService.doTask(Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
 
@@ -82,7 +74,7 @@ class MottaFødselshendelseTaskTest {
     @Test
     fun `Skal filtrere bort fdat, bost og dnr på barn`() {
         MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
-
+        val barnHarDnrCountFørTest = taskService.barnHarDnrCounter.count()
         val task = Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, "02062000000")
 
         taskService.doTask(task)
@@ -91,25 +83,25 @@ class MottaFødselshendelseTaskTest {
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).isEmpty()
+        assertThat(taskService.barnHarDnrCounter.count()).isGreaterThan(barnHarDnrCountFørTest)
     }
 
     @Test
     fun `Skal filtrere bort fdat, bost og dnr på mor`() {
         MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
         val fnrBarn = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyy")) + "54321"
+        val forsørgerHarDnrCountFørTest = taskService.forsørgerHarDnrCounter.count()
 
         stubFor(get(urlEqualTo("/api/personopplysning/v1/info/BAR"))
                         .willReturn(aResponse()
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(
                                                     objectMapper.writeValueAsString(
-                                                            success(
-                                                                    Person("Test Person",
-                                                                           setOf(Familierelasjon(
-                                                                                   PersonIdent(
-                                                                                           "40107678901"),
-                                                                                   "MOR"))
-                                                                    ))))))
+                                                            success(lagTestPerson().copy(familierelasjoner = setOf(
+                                                                    Familierelasjon(
+                                                                            PersonIdent(
+                                                                                    "40107678901"),
+                                                                            "MOR"))))))))
 
         val task = Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn)
 
@@ -119,6 +111,7 @@ class MottaFødselshendelseTaskTest {
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).isEmpty()
+        assertThat(taskService.forsørgerHarDnrCounter.count()).isGreaterThan(forsørgerHarDnrCountFørTest)
     }
 
     @Test
@@ -131,13 +124,12 @@ class MottaFødselshendelseTaskTest {
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(
                                                     objectMapper.writeValueAsString(
-                                                            success(
-                                                                    Person("Test Person",
-                                                                           setOf(Familierelasjon(
-                                                                                   PersonIdent(
-                                                                                           "20107678901"),
-                                                                                   "FAR"))
-                                                                    ))))))
+                                                            success(lagTestPerson().copy(familierelasjoner =
+                                                                                         setOf(Familierelasjon(
+                                                                                                 PersonIdent(
+                                                                                                         "20107678901"),
+                                                                                                 "FAR"))
+                                                            ))))))
 
         val task = Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn)
 
@@ -147,6 +139,29 @@ class MottaFødselshendelseTaskTest {
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).isEmpty()
+    }
+
+    @Test
+    fun `Skal filtrere bort hendelse hvis barn ikke har registrert bostedsadresse`() {
+        MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
+        val fnrBarn = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyy")) + "13331"
+        val barnetManglerBostedsadresseCountFørTest = taskService.barnetManglerBostedsadresse.count()
+
+        stubFor(get(urlEqualTo("/api/personopplysning/v1/info/BAR"))
+                        .willReturn(aResponse()
+                                            .withHeader("Content-Type", "application/json")
+                                            .withBody(objectMapper.writeValueAsString(
+                                                    success(lagTestPerson().copy(bostedsadresse = null))))))
+
+        val task = Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn)
+
+        taskService.doTask(task)
+
+        val taskerMedCallId = taskRepository.finnTasksMedStatus(listOf(Status.UBEHANDLET), Pageable.unpaged())
+                .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
+
+        assertThat(taskerMedCallId).isEmpty()
+        assertThat(taskService.barnetManglerBostedsadresse.count()).isGreaterThan(barnetManglerBostedsadresseCountFørTest)
     }
 
     @Test
@@ -161,7 +176,8 @@ class MottaFødselshendelseTaskTest {
 
         val task = Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, "02091901252")
 
-        assertThatThrownBy { taskService.doTask(task)}.isInstanceOf(RuntimeException::class.java).hasMessage("Kall mot integrasjon feilet ved uthenting av personinfo. 500 INTERNAL_SERVER_ERROR ")
+        assertThatThrownBy { taskService.doTask(task) }.isInstanceOf(RuntimeException::class.java)
+                .hasMessage("Kall mot integrasjon feilet ved uthenting av personinfo. 500 INTERNAL_SERVER_ERROR ")
 
         val taskerMedCallId = taskRepository.finnTasksMedStatus(listOf(Status.UBEHANDLET), Pageable.unpaged())
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
@@ -169,5 +185,15 @@ class MottaFødselshendelseTaskTest {
         assertThat(taskerMedCallId).hasSize(1)
         assertThat(taskerMedCallId.first().taskStepType).isEqualTo(MottaFødselshendelseTask.TASK_STEP_TYPE)
         assertThat(taskerMedCallId.first().triggerTid).isAfter(taskerMedCallId.first().opprettetTidspunkt)
+    }
+
+    private fun lagTestPerson(): Person {
+        return Person("Test Person",
+                      setOf(Familierelasjon(
+                              PersonIdent(
+                                      "20107678901"),
+                              "MOR")),
+                      Bostedsadresse(matrikkeladresse = Matrikkeladresse(1, "1", null, "0576", "3000"))
+        )
     }
 }
