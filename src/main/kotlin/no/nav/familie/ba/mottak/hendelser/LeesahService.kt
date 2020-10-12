@@ -97,12 +97,18 @@ class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository
     }
 
     private fun oppdaterHendelseslogg(pdlHendelse: PdlHendelse) {
+        val metadata = mutableMapOf("aktørId" to pdlHendelse.hentAktørId(),
+                                    "opplysningstype" to pdlHendelse.opplysningstype,
+                                    "endringstype" to pdlHendelse.endringstype)
+
+        if (pdlHendelse.fødeland != null) {
+            metadata["fødeland"] = pdlHendelse.fødeland
+        }
+
         hendelsesloggRepository.save(Hendelseslogg(pdlHendelse.offset,
                                                    pdlHendelse.hendelseId,
                                                    CONSUMER_PDL,
-                                                   mapOf("aktørId" to pdlHendelse.hentAktørId(),
-                                                         "opplysningstype" to pdlHendelse.opplysningstype,
-                                                         "endringstype" to pdlHendelse.endringstype).toProperties(),
+                                                   metadata.toProperties(),
                                                    ident = pdlHendelse.hentPersonident()))
     }
 
@@ -115,6 +121,7 @@ class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository
     }
 
     companion object {
+
         private val CONSUMER_PDL = HendelseConsumer.PDL
         val log: Logger = LoggerFactory.getLogger(LeesahService::class.java)
         const val OPPRETTET = "OPPRETTET"

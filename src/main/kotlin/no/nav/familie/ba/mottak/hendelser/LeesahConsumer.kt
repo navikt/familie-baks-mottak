@@ -38,7 +38,8 @@ class LeesahConsumer(val hendelsesloggRepository: HendelsesloggRepository,
                                       cr.value().hentEndringstype(),
                                       cr.value().hentPersonidenter(),
                                       cr.value().hentDødsdato(),
-                                      cr.value().hentFødselsdato()
+                                      cr.value().hentFødselsdato(),
+                                      cr.value().hentFødeland()
         )
 
         try {
@@ -101,6 +102,10 @@ class LeesahConsumer(val hendelsesloggRepository: HendelsesloggRepository,
             log.error("Deserialisering av fødselsdato feiler")
             throw exception
         }
+    }
+
+    private fun GenericRecord.hentFødeland(): String? {
+        return (get("foedsel") as GenericRecord?)?.get("foedeland")?.toString()
     }
 
     companion object {
