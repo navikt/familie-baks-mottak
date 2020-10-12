@@ -65,7 +65,8 @@ class LeesahServiceTest {
                 personIdenter = listOf("12345678901", "1234567890123"),
                 endringstype = LeesahService.OPPRETTET,
                 opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
-                fødselsdato = LocalDate.now())
+                fødselsdato = LocalDate.now(),
+                fødeland = "NOR")
 
         service.prosesserNyHendelse(pdlHendelse)
 
