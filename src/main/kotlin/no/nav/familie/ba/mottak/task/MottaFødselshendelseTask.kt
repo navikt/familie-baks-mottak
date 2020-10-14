@@ -8,6 +8,7 @@ import no.nav.familie.ba.mottak.domene.personopplysning.Familierelasjon
 import no.nav.familie.ba.mottak.domene.personopplysning.Person
 import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
 import no.nav.familie.ba.mottak.integrasjoner.PersonClient
+import no.nav.familie.ba.mottak.integrasjoner.TPSPersonClient
 import no.nav.familie.ba.mottak.util.erBostNummer
 import no.nav.familie.ba.mottak.util.erDnummer
 import no.nav.familie.ba.mottak.util.erFDatnummer
@@ -25,8 +26,9 @@ import java.time.LocalDateTime
 @Service
 @TaskStepBeskrivelse(taskStepType = MottaFødselshendelseTask.TASK_STEP_TYPE,
                      beskrivelse = "Motta fødselshendelse",
-                     maxAntallFeil = 3)
+                     maxAntallFeil = 10)
 class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
+                               private val tpsPersonClient: TPSPersonClient,
                                private val personClient: PersonClient,
                                @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: Long)
     : AsyncTaskStep {
@@ -48,6 +50,11 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
 
         try {
             val personMedRelasjoner = personClient.hentPersonMedRelasjoner(barnetsId)
+
+            // denne kreves for at infotrygd ikke skal få fødselshendelser som ikke ligger i TPS
+            // vil feile ved forsinkelse i TPS feks i helger og helligdager.
+            // TODO fjerne når barnetrygd er ute av infotrygd
+            tpsPersonClient.hentPersonMedRelasjoner(barnetsId)
 
             val morsIdent = hentMor(personMedRelasjoner)
 
