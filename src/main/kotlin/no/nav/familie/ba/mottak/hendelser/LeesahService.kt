@@ -27,6 +27,7 @@ class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository
     val fødselKorrigertCounter: Counter = Metrics.counter("barnetrygd.fodsel.korrigert")
     val fødselIgnorertCounter: Counter = Metrics.counter("barnetrygd.fodsel.ignorert")
     val fødselIgnorertUnder18årCounter: Counter = Metrics.counter("barnetrygd.fodsel.ignorert.under18")
+    val fødselIgnorertFødelandCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.fodeland.nor")
 
 
     fun prosesserNyHendelse(pdlHendelse: PdlHendelse) {
@@ -60,6 +61,9 @@ class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository
                 if (fødselsdato == null) {
                     log.error("Mangler fødselsdato. Ignorerer hendelse ${pdlHendelse.hendelseId}")
                     fødselIgnorertCounter.increment()
+                } else if (erUtenforNorge(pdlHendelse.fødeland)) {
+                    log.info("Fødeland er ikke Norge. Ignorerer hendelse ${pdlHendelse.hendelseId}")
+                    fødselIgnorertFødelandCounter.increment()
                 } else if (erUnder6mnd(fødselsdato)) {
                     when (pdlHendelse.endringstype) {
                         OPPRETTET -> fødselOpprettetCounter.increment()
@@ -118,6 +122,13 @@ class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository
 
     private fun erUnder6mnd(fødselsDato: LocalDate): Boolean {
         return LocalDate.now().isBefore(fødselsDato.plusMonths(6))
+    }
+
+    private fun erUtenforNorge(fødeland: String?): Boolean {
+        return when (fødeland) {
+            null, "NOR" ->  false
+            else -> true
+        }
     }
 
     companion object {
