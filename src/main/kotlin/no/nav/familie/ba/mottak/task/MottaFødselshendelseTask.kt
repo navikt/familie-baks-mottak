@@ -33,7 +33,7 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
 
     val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
     val barnHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.barn.har.dnr.eller.fdatnr")
-    val forsørgerHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.forsørger.har.dnr.eller.fdatnr")
+    val forsørgerHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.forsorger.har.dnr.eller.fdatnr")
     val barnetManglerBostedsadresse: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.bostedsadresse.null")
 
 
