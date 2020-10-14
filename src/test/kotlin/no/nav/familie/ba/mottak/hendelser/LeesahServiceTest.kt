@@ -83,4 +83,29 @@ class LeesahServiceTest {
             mockHendelsesloggRepository.save(any())
         }
     }
+
+    @Test
+    fun `Skal ignorere fødselshendelser utenfor norge`() {
+        val hendelseId = UUID.randomUUID().toString()
+        val pdlHendelse = PdlHendelse(
+                offset = Random.nextUInt().toLong(),
+                hendelseId = hendelseId,
+                personIdenter = listOf("12345678901", "1234567890123"),
+                endringstype = LeesahService.OPPRETTET,
+                opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
+                fødselsdato = LocalDate.now(),
+                fødeland = "POL")
+
+        service.prosesserNyHendelse(pdlHendelse)
+
+        verify(exactly = 0) { mockTaskRepository.save(any()) }
+
+        service.prosesserNyHendelse(pdlHendelse.copy(fødeland = "NOR"))
+
+        verify(exactly = 1) { mockTaskRepository.save(any()) }
+
+        service.prosesserNyHendelse(pdlHendelse.copy(fødeland = null))
+
+        verify(exactly = 2) { mockTaskRepository.save(any()) }
+    }
 }
