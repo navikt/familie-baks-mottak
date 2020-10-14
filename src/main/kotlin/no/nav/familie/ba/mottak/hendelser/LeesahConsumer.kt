@@ -5,6 +5,7 @@ import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
+import no.nav.familie.ba.mottak.hendelser.LeesahService.Companion.OPPLYSNINGSTYPE_FØDSEL
 import no.nav.person.pdl.leesah.Personhendelse
 import org.apache.avro.generic.GenericData
 import org.apache.avro.generic.GenericRecord
@@ -24,6 +25,7 @@ class LeesahConsumer(val hendelsesloggRepository: HendelsesloggRepository,
                      val leesahService: LeesahService) {
 
     val leesahFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesha.feilet")
+    val leesahFeilFødelandCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.fodeland.nor")
 
 
     @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"],
@@ -32,7 +34,14 @@ class LeesahConsumer(val hendelsesloggRepository: HendelsesloggRepository,
                    containerFactory = "kafkaLeesahListenerContainerFactory")
     @Transactional
     fun listen(cr: ConsumerRecord<Int, Personhendelse>, ack: Acknowledgment) {
-        var pdlHendelse = PdlHendelse(cr.value().hentHendelseId(),
+        if (cr.value().gjelderFødselUtenforNorge()) {
+            log.info("Ignorerer leesah-hendelse for fødsel utenfor norge. offset: ${cr.offset()} key: ${cr.key()}")
+            leesahFeilFødelandCounter.increment()
+            ack.acknowledge()
+            return
+        }
+
+        val pdlHendelse = PdlHendelse(cr.value().hentHendelseId(),
                                       cr.offset(),
                                       cr.value().hentOpplysningstype(),
                                       cr.value().hentEndringstype(),
@@ -71,6 +80,9 @@ class LeesahConsumer(val hendelsesloggRepository: HendelsesloggRepository,
     private fun GenericRecord.hentHendelseId() =
             get("hendelseId").toString()
 
+    private fun GenericRecord.hentFødeland() =
+            (get("foedsel") as GenericRecord?)?.get("foedeland")?.toString()
+
     private fun GenericRecord.hentDødsdato(): LocalDate? {
         return try {
             val dato = (get("doedsfall") as GenericRecord?)?.get("doedsdato")
@@ -100,6 +112,13 @@ class LeesahConsumer(val hendelsesloggRepository: HendelsesloggRepository,
         } catch (exception: Exception) {
             log.error("Deserialisering av fødselsdato feiler")
             throw exception
+        }
+    }
+
+    private fun GenericRecord.gjelderFødselUtenforNorge(): Boolean {
+        when (this.hentFødeland()) {
+            null, "NOR" -> return false
+            else -> return this.hentOpplysningstype() == OPPLYSNINGSTYPE_FØDSEL
         }
     }
 
