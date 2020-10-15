@@ -15,14 +15,13 @@ import org.springframework.core.env.Environment
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.HttpStatusCodeException
 import org.springframework.web.client.RestOperations
 import java.net.URI
 import java.time.LocalDate
 
 private val logger = LoggerFactory.getLogger(TPSPersonClient::class.java)
-private val secureLogger = LoggerFactory.getLogger("secureLogger")
-private const val OAUTH2_CLIENT_CONFIG_KEY = "integrasjoner-clientcredentials"
 
 @Deprecated("Fjernes når barnetrygd er ute av infotrygd")
 @Component
@@ -32,7 +31,7 @@ class TPSPersonClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJO
                                              private val environment: Environment)
     : AbstractRestClient(restOperations, "integrasjon.tps") {
 
-    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
+    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000), exclude = [HttpClientErrorException.NotFound::class])
     fun hentPersonMedRelasjoner(personIdent: String): Personinfo {
         if (environment.activeProfiles.contains("e2e")) {
             return mockData(personIdent)
@@ -44,6 +43,9 @@ class TPSPersonClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJO
             secureLogger.info("Personinfo for {}: {}", personIdent, response)
             response.getDataOrThrow()
         } catch (e: HttpStatusCodeException) {
+            if (e is HttpClientErrorException.NotFound) {
+                throw e
+            }
             logger.info("Feil mot TPS. status=${e.statusCode}, stacktrace=${e.stackTrace.toList()}")
             secureLogger.info("Feil mot TPS. msg=${e.message}, body=${e.responseBodyAsString}")
             throw RuntimeException("Kall mot integrasjon feilet ved uthenting av personinfo. ${e.statusCode} ${e.responseBodyAsString}")

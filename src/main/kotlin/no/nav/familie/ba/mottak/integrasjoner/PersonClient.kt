@@ -38,7 +38,7 @@ class PersonClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONER
             secureLogger.info("Personinfo for {}: {}", personIdent, response)
             response?.getDataOrThrow()
         } catch (e: HttpStatusCodeException) {
-            logger.info("Feil mot TPS. status=${e.statusCode}, stacktrace=${e.stackTrace.toList()}")
+            logger.info("Feil mot PDL. status=${e.statusCode}, stacktrace=${e.stackTrace.toList()}")
             secureLogger.info("Feil mot TPS. msg=${e.message}, body=${e.responseBodyAsString}")
             throw RuntimeException("Kall mot integrasjon feilet ved uthenting av personinfo. ${e.statusCode} ${e.responseBodyAsString}")
         }
