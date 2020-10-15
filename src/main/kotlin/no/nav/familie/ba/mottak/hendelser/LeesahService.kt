@@ -61,22 +61,24 @@ class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository
                 if (fødselsdato == null) {
                     log.error("Mangler fødselsdato. Ignorerer hendelse ${pdlHendelse.hendelseId}")
                     fødselIgnorertCounter.increment()
-                } else if (erUtenforNorge(pdlHendelse.fødeland)) {
-                    log.info("Fødeland er ikke Norge. Ignorerer hendelse ${pdlHendelse.hendelseId}")
-                    fødselIgnorertFødelandCounter.increment()
                 } else if (erUnder6mnd(fødselsdato)) {
-                    when (pdlHendelse.endringstype) {
-                        OPPRETTET -> fødselOpprettetCounter.increment()
-                        KORRIGERT -> fødselKorrigertCounter.increment()
-                    }
+                    if (erUtenforNorge(pdlHendelse.fødeland)) {
+                        log.info("Fødeland er ikke Norge. Ignorerer hendelse ${pdlHendelse.hendelseId}")
+                        fødselIgnorertFødelandCounter.increment()
+                    } else {
+                        when (pdlHendelse.endringstype) {
+                            OPPRETTET -> fødselOpprettetCounter.increment()
+                            KORRIGERT -> fødselKorrigertCounter.increment()
+                        }
 
-                    val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE,
-                                                        pdlHendelse.hentPersonident(),
-                                                        LocalDateTime.now().plusMinutes(triggerTidForTps),
-                                                        Properties().apply {
-                                                            this["ident"] = pdlHendelse.hentPersonident()
-                                                        })
-                    taskRepository.save(task)
+                        val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE,
+                                                            pdlHendelse.hentPersonident(),
+                                                            LocalDateTime.now().plusMinutes(triggerTidForTps),
+                                                            Properties().apply {
+                                                                this["ident"] = pdlHendelse.hentPersonident()
+                                                            })
+                        taskRepository.save(task)
+                    }
                 } else if (erUnder18år(fødselsdato)) {
                     fødselIgnorertUnder18årCounter.increment()
                 } else {
