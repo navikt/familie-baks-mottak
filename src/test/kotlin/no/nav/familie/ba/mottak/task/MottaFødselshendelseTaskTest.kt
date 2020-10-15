@@ -4,9 +4,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.mockk.clearAllMocks
 import no.nav.familie.ba.mottak.DevLauncher
 import no.nav.familie.ba.mottak.domene.NyBehandling
-import no.nav.familie.ba.mottak.domene.personopplysning.Familierelasjon
-import no.nav.familie.ba.mottak.domene.personopplysning.Person
-import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
+import no.nav.familie.ba.mottak.domene.personopplysning.*
 import no.nav.familie.kontrakter.felles.Ressurs.Companion.success
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
@@ -50,7 +48,7 @@ class MottaFødselshendelseTaskTest {
     }
 
     @Test
-    fun `Skal opprette SendTilSak task med NyBehandling som payload hvis barnet har gyldig fnr og har mor`() {
+    fun `Skal opprette SendTilSak task med NyBehandling som payload hvis barnet har gyldig fnr, har mor, ugradert og barn har bostedsadresse`() {
         MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
         val fnrBarn = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyy")) + "12345"
 
@@ -59,6 +57,29 @@ class MottaFødselshendelseTaskTest {
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(objectMapper.writeValueAsString(
                                                     success(lagTestPerson())))))
+
+        taskService.doTask(Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
+
+        val taskerMedCallId = taskRepository.finnTasksMedStatus(listOf(Status.UBEHANDLET), Pageable.unpaged())
+                .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
+
+        assertThat(taskerMedCallId).hasSize(1).extracting("taskStepType").containsOnly(SendTilSakTask.TASK_STEP_TYPE)
+        assertThat(objectMapper.readValue(taskerMedCallId.first().payload, NyBehandling::class.java))
+                .hasFieldOrPropertyWithValue("morsIdent", "20107678901")
+                .hasFieldOrPropertyWithValue("barnasIdenter", arrayOf(fnrBarn))
+    }
+
+    @Test
+    fun `Skal opprette SendTilSak task med NyBehandling som payload hvis barnet har gyldig fnr, har mor, barn har addresseGradering og bostedsadresse null`() {
+        MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
+        val fnrBarn = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyy")) + "12345"
+
+        stubFor(get(urlEqualTo("/api/personopplysning/v1/info/BAR"))
+                        .willReturn(aResponse()
+                                            .withHeader("Content-Type", "application/json")
+                                            .withBody(objectMapper.writeValueAsString(
+                                                    success(lagTestPerson().copy(bostedsadresse = null,
+                                                                                 adressebeskyttelseGradering = "STRENGT_FORTROLIG"))))))
 
         taskService.doTask(Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
 
@@ -200,7 +221,6 @@ class MottaFødselshendelseTaskTest {
     @Test
     fun `Skal kaste Feil og sette rekjøringsintervall frem i tid for mottaFødselshendelseTask`() {
         MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
-        val fnrBarn = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyy")) + "12123"
 
         stubFor(get(urlEqualTo("/api/personopplysning/v1/info/BAR"))
                         .willReturn(aResponse()

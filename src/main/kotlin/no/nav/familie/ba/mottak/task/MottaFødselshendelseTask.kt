@@ -4,9 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.domene.NyBehandling
-import no.nav.familie.ba.mottak.domene.personopplysning.Familierelasjon
-import no.nav.familie.ba.mottak.domene.personopplysning.Person
-import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
+import no.nav.familie.ba.mottak.domene.personopplysning.*
 import no.nav.familie.ba.mottak.integrasjoner.PersonClient
 import no.nav.familie.ba.mottak.integrasjoner.TPSPersonClient
 import no.nav.familie.ba.mottak.util.erBostNummer
@@ -67,11 +65,13 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
                     return
                 }
 
-                if (personMedRelasjoner.bostedsadresse == null || personMedRelasjoner.bostedsadresse.ukjentBosted != null) {
+
+                if (skalFiltrerePåBostedsadresse(personMedRelasjoner)) {
                     log.info("Ignorer fødselshendelse: Barnet har ukjent bostedsadresse. task=${task.id}")
                     barnetManglerBostedsadresse.increment()
                     return
                 }
+
 
                 task.metadata["morsIdent"] = morsIdent.id
                 val nesteTask = Task.nyTask(
@@ -100,6 +100,11 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
             }
         }
         return null
+    }
+
+    fun skalFiltrerePåBostedsadresse(person: Person): Boolean {
+        return if (person.harAdresseGradering()) false
+        else !person.harBostedsadresse()
     }
 
 
