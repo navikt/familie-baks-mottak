@@ -4,7 +4,9 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.mockk.clearAllMocks
 import no.nav.familie.ba.mottak.DevLauncher
 import no.nav.familie.ba.mottak.domene.NyBehandling
-import no.nav.familie.ba.mottak.domene.personopplysning.*
+import no.nav.familie.ba.mottak.domene.personopplysning.Familierelasjon
+import no.nav.familie.ba.mottak.domene.personopplysning.Person
+import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
 import no.nav.familie.kontrakter.felles.Ressurs.Companion.success
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
@@ -57,6 +59,13 @@ class MottaFødselshendelseTaskTest {
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(objectMapper.writeValueAsString(
                                                     success(lagTestPerson())))))
+        //TODO fjernes når barnetrygd er ute av infotrygd
+        stubFor(post(urlEqualTo("/api/personopplysning/v2/info"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(objectMapper.writeValueAsString(
+                                success(lagTestPerson().copy(bostedsadresse = null))))))
+
 
         taskService.doTask(Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
 
@@ -80,6 +89,13 @@ class MottaFødselshendelseTaskTest {
                                             .withBody(objectMapper.writeValueAsString(
                                                     success(lagTestPerson().copy(bostedsadresse = null,
                                                                                  adressebeskyttelseGradering = "STRENGT_FORTROLIG"))))))
+        //TODO fjernes når barnetrygd er ute av infotrygd
+        stubFor(post(urlEqualTo("/api/personopplysning/v2/info"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(objectMapper.writeValueAsString(
+                                success(lagTestPerson().copy(bostedsadresse = null))))))
+
 
         taskService.doTask(Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
 
