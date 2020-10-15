@@ -4,7 +4,9 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.mockk.clearAllMocks
 import no.nav.familie.ba.mottak.DevLauncher
 import no.nav.familie.ba.mottak.domene.NyBehandling
-import no.nav.familie.ba.mottak.domene.personopplysning.*
+import no.nav.familie.ba.mottak.domene.personopplysning.Familierelasjon
+import no.nav.familie.ba.mottak.domene.personopplysning.Person
+import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
 import no.nav.familie.kontrakter.felles.Ressurs.Companion.success
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
@@ -27,6 +29,7 @@ import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.test.assertFailsWith
 
 @SpringBootTest(classes = [DevLauncher::class], properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api"])
 @ActiveProfiles("dev", "mock-oauth")
@@ -56,6 +59,13 @@ class MottaFødselshendelseTaskTest {
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(objectMapper.writeValueAsString(
                                                     success(lagTestPerson())))))
+        //TODO fjernes når barnetrygd er ute av infotrygd
+        stubFor(post(urlEqualTo("/api/personopplysning/v2/info"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(objectMapper.writeValueAsString(
+                                success(lagTestPerson().copy(bostedsadresse = null))))))
+
 
         taskService.doTask(Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
 
@@ -79,6 +89,13 @@ class MottaFødselshendelseTaskTest {
                                             .withBody(objectMapper.writeValueAsString(
                                                     success(lagTestPerson().copy(bostedsadresse = null,
                                                                                  adressebeskyttelseGradering = "STRENGT_FORTROLIG"))))))
+        //TODO fjernes når barnetrygd er ute av infotrygd
+        stubFor(post(urlEqualTo("/api/personopplysning/v2/info"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(objectMapper.writeValueAsString(
+                                success(lagTestPerson().copy(bostedsadresse = null))))))
+
 
         taskService.doTask(Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
 
@@ -91,6 +108,31 @@ class MottaFødselshendelseTaskTest {
                 .hasFieldOrPropertyWithValue("barnasIdenter", arrayOf(fnrBarn))
     }
 
+
+    @Test
+    fun `Skal ikke opprette SendTilSak task hvis personen ikke finnes i TPS`() {
+        MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
+        val fnrBarn = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyy")) + "12345"
+
+        stubFor(get(urlEqualTo("/api/personopplysning/v1/info/BAR"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(objectMapper.writeValueAsString(
+                                success(lagTestPerson())))))
+
+        //TODO fjernes når barnetrygd er ute av infotrygd
+        stubFor(post(urlEqualTo("/api/personopplysning/v2/info"))
+                .willReturn(aResponse().withStatus(404)))
+
+        assertFailsWith<RuntimeException>("Kall mot integrasjon feilet ved uthenting av personinfo. 404 NOT_FOUND") {
+            taskService.doTask(Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
+        }
+
+        val taskerMedCallId = taskRepository.finnTasksMedStatus(listOf(Status.UBEHANDLET), Pageable.unpaged())
+                .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
+
+        assertThat(taskerMedCallId).hasSize(1).extracting("taskStepType").containsOnly(MottaFødselshendelseTask.TASK_STEP_TYPE)
+    }
 
     @Test
     fun `Skal filtrere bort fdat, bost og dnr på barn`() {
@@ -173,6 +215,13 @@ class MottaFødselshendelseTaskTest {
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(objectMapper.writeValueAsString(
                                                     success(lagTestPerson().copy(bostedsadresse = null))))))
+
+        //TODO fjernes når barnetrygd er ute av infotrygd
+        stubFor(post(urlEqualTo("/api/personopplysning/v2/info"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(objectMapper.writeValueAsString(
+                                success(lagTestPerson().copy(bostedsadresse = null))))))
 
         val task = Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn)
 
