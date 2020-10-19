@@ -9,11 +9,11 @@ import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
 import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.springframework.core.env.Environment
 import java.time.LocalDate
 import java.util.*
 import kotlin.random.Random
@@ -24,13 +24,15 @@ class LeesahServiceTest {
 
     lateinit var mockHendelsesloggRepository: HendelsesloggRepository
     lateinit var mockTaskRepository: TaskRepository
+    lateinit var mockenv: Environment
     lateinit var service: LeesahService
 
     @BeforeEach
     internal fun setUp() {
         mockHendelsesloggRepository = mockk(relaxed = true)
         mockTaskRepository = mockk(relaxed = true)
-        service = LeesahService(mockHendelsesloggRepository, mockTaskRepository, 1)
+        mockenv = mockk<Environment>(relaxed = true)
+        service = LeesahService(mockHendelsesloggRepository, mockTaskRepository, 1, mockenv)
         clearAllMocks()
     }
 
