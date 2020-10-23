@@ -9,21 +9,22 @@ import org.springframework.stereotype.Service
 class OppgaveMapper(private val aktørClient: AktørClient) {
 
     fun mapTilOpprettOppgave(oppgavetype: Oppgavetype,
-                             journalpost: Journalpost): OpprettOppgave {
+                             journalpost: Journalpost,
+                             beskrivelse: String? = null): OpprettOppgaveRequest {
         val ident = tilOppgaveIdent(journalpost, oppgavetype)
-        return OpprettOppgave(ident = ident,
+        return OpprettOppgaveRequest(ident = ident,
                 saksId = journalpost.sak?.fagsakId,
                 journalpostId = journalpost.journalpostId,
                 tema = Tema.BAR,
                 oppgavetype = oppgavetype,
                 fristFerdigstillelse = fristFerdigstillelse(),
-                beskrivelse = hentHovedDokumentTittel(journalpost) ?: "",
+                beskrivelse = beskrivelse ?: hentHovedDokumentTittel(journalpost) ?: "",
                 enhetsnummer = journalpost.journalforendeEnhet,
                 behandlingstema = hentBehandlingstema(journalpost),
                 behandlingstype = hentBehandlingstype(journalpost))
     }
 
-    private fun tilOppgaveIdent(journalpost: Journalpost, oppgavetype: Oppgavetype): OppgaveIdent? {
+    private fun tilOppgaveIdent(journalpost: Journalpost, oppgavetype: Oppgavetype): OppgaveIdentV2? {
         if (journalpost.bruker == null) {
             when (oppgavetype) {
                 Oppgavetype.BehandleSak -> throw error("Journalpost ${journalpost.journalpostId} mangler bruker")
@@ -33,10 +34,10 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
 
         return when (journalpost.bruker.type) {
             BrukerIdType.FNR -> {
-                OppgaveIdent(ident = aktørClient.hentAktørId(journalpost.bruker.id), type = IdentType.Aktør)
+                OppgaveIdentV2(ident = aktørClient.hentAktørId(journalpost.bruker.id), gruppe = IdentGruppe.AKTOERID)
             }
-            BrukerIdType.ORGNR -> OppgaveIdent(ident = journalpost.bruker.id, type = IdentType.Organisasjon)
-            BrukerIdType.AKTOERID -> OppgaveIdent(ident = journalpost.bruker.id, type = IdentType.Aktør)
+            BrukerIdType.ORGNR -> OppgaveIdentV2(ident = journalpost.bruker.id, gruppe = IdentGruppe.ORGNR)
+            BrukerIdType.AKTOERID -> OppgaveIdentV2(ident = journalpost.bruker.id, gruppe = IdentGruppe.AKTOERID)
         }
     }
 

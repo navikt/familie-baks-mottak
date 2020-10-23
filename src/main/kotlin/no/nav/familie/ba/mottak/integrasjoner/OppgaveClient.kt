@@ -4,7 +4,7 @@ import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
-import no.nav.familie.kontrakter.felles.oppgave.OpprettOppgave
+import no.nav.familie.kontrakter.felles.oppgave.OpprettOppgaveRequest
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -24,10 +24,10 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
                                            private val oppgaveMapper: OppgaveMapper)
     : AbstractRestClient(restOperations, "integrasjon") {
 
-    fun opprettJournalføringsoppgave(journalpost: Journalpost): OppgaveResponse {
+    fun opprettJournalføringsoppgave(journalpost: Journalpost, beskrivelse: String? = null): OppgaveResponse {
         logger.info("Oppretter journalføringsoppgave for papirsøknad")
         val uri = URI.create("$integrasjonUri/oppgave")
-        val request = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring, journalpost)
+        val request = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring, journalpost, beskrivelse)
 
         return responseFra(uri, request)
     }
@@ -68,7 +68,7 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
     }
 
 
-    private fun responseFra(uri: URI, request: OpprettOppgave): OppgaveResponse {
+    private fun responseFra(uri: URI, request: OpprettOppgaveRequest): OppgaveResponse {
         return Result.runCatching {
             postForEntity<Ressurs<OppgaveResponse>>(uri, request)
         }.fold(

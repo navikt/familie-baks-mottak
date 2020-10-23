@@ -26,22 +26,38 @@ class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: Journa
         val journalpost = journalpostClient.hentJournalpost(task.payload)
                                   .takeUnless { it.bruker == null } ?: throw error("Journalpost ${task.payload} mangler bruker")
 
+        sakClient.hentPågåendeSakStatus(tilPersonIdent(journalpost.bruker!!)).apply {
+            if (!harPågåendeSakIBaSak) return // trenger ikke gjøre noe i denne omgang (Ref. Tea-2000)
+        }
+
         when (journalpost.journalstatus) {
             Journalstatus.MOTTATT -> {
                 val fagsakId = sakClient.hentSaksnummer(tilPersonIdent(journalpost.bruker!!))
-                dokarkivClient.oppdaterJournalpostSak(journalpost, fagsakId)
-                dokarkivClient.ferdigstillJournalpost(journalpost.journalpostId)
-                task.metadata["fagsakId"] = fagsakId
-                log.info("Har oppdatert og ferdigstilt journalpost ${journalpost.journalpostId}")
-                taskRepository.saveAndFlush(task)
+                runCatching { // forsøk å journalføre automatisk
+                    dokarkivClient.oppdaterJournalpostSak(journalpost, fagsakId)
+                    dokarkivClient.ferdigstillJournalpost(journalpost.journalpostId)
+                }.fold(
+                        onSuccess = {
+                            task.metadata["fagsakId"] = fagsakId
+                            log.info("Har oppdatert og ferdigstilt journalpost ${journalpost.journalpostId}")
+                            taskRepository.saveAndFlush(task)
+                        },
+                        onFailure = {
+                            log.warn("Automatisk ferdigstilling feilet. Oppretter ny journalføringsoppgave for journalpost " +
+                                     "${journalpost.journalpostId}.")
+                            Task.nyTask(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
+                                        journalpost.journalpostId,
+                                        task.metadata).also { taskRepository.save(it) }
+                            return
+                        }
+                )
+
             }
             Journalstatus.JOURNALFOERT -> log.info("Skipper oppdatering og ferdigstilling av " +
                                                    "journalpost ${journalpost.journalpostId} som alt er ferdig journalført")
             else -> error("Uventet journalstatus ${journalpost.journalstatus} for journalpost ${journalpost.journalpostId}")
         }
-    }
 
-    override fun onCompletion(task: Task) {
         val nyTask = Task.nyTask(
                 type = OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE,
                 payload = task.payload,

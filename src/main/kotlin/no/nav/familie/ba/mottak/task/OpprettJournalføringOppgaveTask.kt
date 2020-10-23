@@ -1,8 +1,6 @@
 package no.nav.familie.ba.mottak.task
 
-import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
-import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
-import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
+import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -17,6 +15,8 @@ import org.springframework.stereotype.Service
                      beskrivelse = "Opprett journalføringsoppgave")
 class OpprettJournalføringOppgaveTask(private val journalpostClient: JournalpostClient,
                                       private val oppgaveClient: OppgaveClient,
+                                      private val sakClient: SakClient,
+                                      private val aktørClient: AktørClient,
                                       private val taskRepository: TaskRepository) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(OpprettJournalføringOppgaveTask::class.java)
@@ -34,7 +34,8 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
                         } else null
 
                 if (oppgaveTypeForEksisterendeOppgave == null) {
-                    val nyOppgave = oppgaveClient.opprettJournalføringsoppgave(journalpost)
+                    val nyOppgave = oppgaveClient.opprettJournalføringsoppgave(journalpost = journalpost,
+                                                                               beskrivelse = sakssystemMarkering(journalpost))
                     task.metadata["oppgaveId"] = "${nyOppgave.oppgaveId}"
                     taskRepository.saveAndFlush(task)
                     log.info("Oppretter ny journalførings-oppgave med id ${nyOppgave.oppgaveId} for journalpost ${journalpost.journalpostId}")
@@ -52,6 +53,23 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
                 log.info("OpprettJournalføringOppgaveTask feilet.", error)
                 throw error
             }
+        }
+    }
+
+    private fun sakssystemMarkering(journalpost: Journalpost): String? {
+        return sakClient.hentPågåendeSakStatus(tilPersonIdent(journalpost.bruker!!)).let { bruker ->
+            when {
+                bruker.harPågåendeSakIBaSak -> "Må løses i BA-sak. Bruker har en pågående sak i BA-sak.".also { assert(!bruker.harPågåendeSakIInfotrygd) }
+                bruker.harPågåendeSakIInfotrygd -> "Må løses i Gosys. Bruker har en pågående sak i Infotrygd"
+                else -> null // trenger ingen form for markering. Kan løses av begge systemer
+            }
+        }
+    }
+
+    private fun tilPersonIdent(bruker: Bruker): String {
+        return when (bruker.type) {
+            BrukerIdType.AKTOERID -> aktørClient.hentPersonident(bruker.id)
+            else -> bruker.id
         }
     }
 
