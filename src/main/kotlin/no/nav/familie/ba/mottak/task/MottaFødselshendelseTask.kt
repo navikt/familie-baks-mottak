@@ -25,7 +25,8 @@ import org.springframework.stereotype.Service
 @Service
 @TaskStepBeskrivelse(taskStepType = MottaFødselshendelseTask.TASK_STEP_TYPE,
                      beskrivelse = "Motta fødselshendelse",
-                     maxAntallFeil = 10)
+                     maxAntallFeil = 10,
+                     triggerTidVedFeilISekunder = 60 * 60 * 24)
 class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
                                private val tpsPersonClient: TPSPersonClient,
                                private val environment: Environment,
