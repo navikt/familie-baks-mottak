@@ -34,6 +34,12 @@ class JournalføringHendelseServiceTest {
     @MockK
     lateinit var mockOppgaveClient: OppgaveClient
 
+    @MockK
+    lateinit var sakClient: SakClient
+
+    @MockK
+    lateinit var aktørClient: AktørClient
+
     @MockK(relaxed = true)
     lateinit var mockTaskRepository: TaskRepository
 
@@ -204,9 +210,20 @@ class JournalføringHendelseServiceTest {
             mockTaskRepository.saveAndFlush(any<Task>())
         } returns null
 
+        every {
+            aktørClient.hentPersonident(any())
+        } returns "12345678910"
+
+        every {
+            sakClient.hentPågåendeSakStatus(any())
+        } returns RestPågåendeSakSøk(harPågåendeSakIBaSak = false,
+                                     harPågåendeSakIInfotrygd = false)
+
         val task = OpprettJournalføringOppgaveTask(
                 mockJournalpostClient,
                 mockOppgaveClient,
+                sakClient,
+                aktørClient,
                 mockTaskRepository)
 
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT))
@@ -231,6 +248,8 @@ class JournalføringHendelseServiceTest {
         val task = OpprettJournalføringOppgaveTask(
                 mockJournalpostClient,
                 mockOppgaveClient,
+                sakClient,
+                aktørClient,
                 mockTaskRepository)
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT))
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_PAPIRSØKNAD))
@@ -245,6 +264,8 @@ class JournalføringHendelseServiceTest {
         val task = OpprettJournalføringOppgaveTask(
                 mockJournalpostClient,
                 mockOppgaveClient,
+                sakClient,
+                aktørClient,
                 mockTaskRepository)
 
         Assertions.assertThrows(IllegalStateException::class.java) {

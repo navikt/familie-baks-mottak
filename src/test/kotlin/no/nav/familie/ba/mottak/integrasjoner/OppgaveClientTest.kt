@@ -161,7 +161,7 @@ class OppgaveClientTest {
         return "{\n" +
                "  \"ident\": {\n" +
                "    \"ident\": \"1234567891011\",\n" +
-               "    \"type\": \"Aktør\"\n" +
+               "    \"gruppe\": \"AKTOERID\"\n" +
                "  },\n" +
                "  \"enhetsnummer\": \"9999\",\n" +
                "  \"saksId\": null,\n" +
