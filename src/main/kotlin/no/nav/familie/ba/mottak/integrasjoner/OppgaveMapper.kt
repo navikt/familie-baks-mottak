@@ -18,7 +18,7 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
                 oppgavetype = oppgavetype,
                 fristFerdigstillelse = fristFerdigstillelse(),
                 beskrivelse = hentHovedDokumentTittel(journalpost) ?: "",
-                enhetsnummer = journalpost.journalforendeEnhet,
+                enhetsnummer = if (journalpost.journalforendeEnhet == "2101") "4806" else journalpost.journalforendeEnhet, //Enhet 2101 er nedlagt. Rutes til 4806
                 behandlingstema = hentBehandlingstema(journalpost),
                 behandlingstype = hentBehandlingstype(journalpost))
     }
@@ -33,10 +33,10 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
 
         return when (journalpost.bruker.type) {
             BrukerIdType.FNR -> {
-                OppgaveIdent(ident = aktørClient.hentAktørId(journalpost.bruker.id), type = IdentType.Aktør)
+                OppgaveIdent(ident = aktørClient.hentAktørId(journalpost.bruker.id.trim()), type = IdentType.Aktør)
             }
-            BrukerIdType.ORGNR -> OppgaveIdent(ident = journalpost.bruker.id, type = IdentType.Organisasjon)
-            BrukerIdType.AKTOERID -> OppgaveIdent(ident = journalpost.bruker.id, type = IdentType.Aktør)
+            BrukerIdType.ORGNR -> OppgaveIdent(ident = journalpost.bruker.id.trim(), type = IdentType.Organisasjon)
+            BrukerIdType.AKTOERID -> OppgaveIdent(ident = journalpost.bruker.id.trim(), type = IdentType.Aktør)
         }
     }
 
