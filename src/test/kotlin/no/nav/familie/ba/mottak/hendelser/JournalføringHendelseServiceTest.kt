@@ -202,8 +202,9 @@ class JournalføringHendelseServiceTest {
             mockOppgaveClient.finnOppgaver(any(), any())
         } returns listOf()
 
+        val sakssystemMarkering = slot<String>()
         every {
-            mockOppgaveClient.opprettJournalføringsoppgave(any())
+            mockOppgaveClient.opprettJournalføringsoppgave(any(), capture(sakssystemMarkering))
         } returns OppgaveResponse(1)
 
         every {
@@ -216,7 +217,7 @@ class JournalføringHendelseServiceTest {
 
         every {
             sakClient.hentPågåendeSakStatus(any())
-        } returns RestPågåendeSakSøk(harPågåendeSakIBaSak = false,
+        } returns RestPågåendeSakSøk(harPågåendeSakIBaSak = true,
                                      harPågåendeSakIInfotrygd = false)
 
         val task = OpprettJournalføringOppgaveTask(
@@ -231,6 +232,7 @@ class JournalføringHendelseServiceTest {
         verify(exactly = 1) {
             mockTaskRepository.saveAndFlush(any<Task>())
         }
+        assertThat(sakssystemMarkering.captured).contains("Må løses i BA-sak")
     }
 
     @Test

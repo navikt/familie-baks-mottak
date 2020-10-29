@@ -27,7 +27,16 @@ class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: Journa
                                   .takeUnless { it.bruker == null } ?: throw error("Journalpost ${task.payload} mangler bruker")
 
         sakClient.hentPågåendeSakStatus(tilPersonIdent(journalpost.bruker!!)).apply {
-            if (!harPågåendeSakIBaSak) return // trenger ikke gjøre noe i denne omgang (Ref. Tea-2000)
+            if (harPågåendeSakIInfotrygd) {
+                assert(!harPågåendeSakIBaSak)
+                log.info("Bruker har sak i Infotrygd. Overlater journalføring til BRUT001 og skipper opprettelse av BehandleSak-" +
+                         "oppgave for journalpost ${journalpost.journalpostId}")
+                return
+            } else if (!harPågåendeSakIBaSak){
+                log.info("Bruker på journalpost ${journalpost.journalpostId} har ikke pågående sak i BA-sak. Skipper derfor " +
+                         "journalføring og opprettelse av BehandleSak-oppgave mot ny løsning i denne omgang.")
+                return
+            }
         }
 
         when (journalpost.journalstatus) {
