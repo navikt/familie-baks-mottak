@@ -28,7 +28,6 @@ class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: Journa
 
         sakClient.hentPågåendeSakStatus(tilPersonIdent(journalpost.bruker!!)).apply {
             if (harPågåendeSakIInfotrygd) {
-                assert(!harPågåendeSakIBaSak)
                 log.info("Bruker har sak i Infotrygd. Overlater journalføring til BRUT001 og skipper opprettelse av BehandleSak-" +
                          "oppgave for journalpost ${journalpost.journalpostId}")
                 return

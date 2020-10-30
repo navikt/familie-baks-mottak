@@ -54,10 +54,15 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
         return runCatching {
             postForEntity<Ressurs<RestPågåendeSakSøk>>(uri, mapOf("personIdent" to personIdent))!!
         }.fold(
-                onSuccess = {it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
+                onSuccess = { it.data?.let(this::valider) ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av sak opplysninger fra ba-sak.", it, uri, personIdent) }
         )
     }
+
+    private fun valider(resultat: RestPågåendeSakSøk) =
+            resultat.takeUnless { bruker -> bruker.harPågåendeSakIBaSak && bruker.harPågåendeSakIInfotrygd }
+            ?: throw  error("Bruker har pågående sak i både ny og gammel løsning!")
+
 }
 
 data class RestFagsak(val id: Long)

@@ -59,7 +59,7 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
     private fun sakssystemMarkering(journalpost: Journalpost): String? {
         return sakClient.hentPågåendeSakStatus(tilPersonIdent(journalpost.bruker!!)).let { bruker ->
             when {
-                bruker.harPågåendeSakIBaSak -> "Må løses i BA-sak. Bruker har en pågående sak i BA-sak.".also { assert(!bruker.harPågåendeSakIInfotrygd) }
+                bruker.harPågåendeSakIBaSak -> "Må løses i BA-sak. Bruker har en pågående sak i BA-sak."
                 bruker.harPågåendeSakIInfotrygd -> "Må løses i Gosys. Bruker har en pågående sak i Infotrygd"
                 else -> null // trenger ingen form for markering. Kan løses av begge systemer
             }
