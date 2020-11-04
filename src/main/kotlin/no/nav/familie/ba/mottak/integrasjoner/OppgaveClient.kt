@@ -23,7 +23,7 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
 
     fun opprettJournalføringsoppgave(journalpost: Journalpost, beskrivelse: String? = null): OppgaveResponse {
         logger.info("Oppretter journalføringsoppgave for papirsøknad")
-        val uri = URI.create("$integrasjonUri/oppgave")
+        val uri = URI.create("$integrasjonUri/oppgave/opprett")
         val request = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring, journalpost, beskrivelse)
 
         return responseFra(uri, request)
@@ -31,7 +31,7 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
 
     fun opprettBehandleSakOppgave(journalpost: Journalpost): OppgaveResponse {
         logger.info("Oppretter \"Behandle sak\"-oppgave for digital søknad")
-        val uri = URI.create("$integrasjonUri/oppgave")
+        val uri = URI.create("$integrasjonUri/oppgave/opprett")
         val request = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.BehandleSak, journalpost)
 
         return responseFra(uri, request)

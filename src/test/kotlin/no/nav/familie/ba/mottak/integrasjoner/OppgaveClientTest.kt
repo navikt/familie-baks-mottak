@@ -46,7 +46,7 @@ class OppgaveClientTest {
     @Tag("integration")
     fun `Opprett journalføringsoppgave skal returnere oppgave id`() {
         MDC.put("callId", "opprettJournalføringsoppgave")
-        stubFor(post(urlEqualTo("/api/oppgave"))
+        stubFor(post(urlEqualTo("/api/oppgave/opprett"))
                         .willReturn(aResponse()
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(
@@ -71,7 +71,7 @@ class OppgaveClientTest {
     @Tag("integration")
     fun `Opprett behandleSak-oppgave skal returnere oppgave id`() {
         MDC.put("callId", "opprettJournalføringsoppgave")
-        stubFor(post(urlEqualTo("/api/oppgave"))
+        stubFor(post(urlEqualTo("/api/oppgave/opprett"))
                         .willReturn(aResponse()
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(
@@ -96,7 +96,7 @@ class OppgaveClientTest {
     @Test
     @Tag("integration")
     fun `Opprett oppgave skal kaste feil hvis response er ugyldig`() {
-        stubFor(post(urlEqualTo("/api/oppgave"))
+        stubFor(post(urlEqualTo("/api/oppgave/opprett"))
                         .willReturn(aResponse()
                                             .withStatus(500)
                                             .withBody(objectMapper.writeValueAsString(Ressurs.failure<String>("test")))))
@@ -104,12 +104,12 @@ class OppgaveClientTest {
         assertThatThrownBy {
             oppgaveClient.opprettJournalføringsoppgave(journalPost)
         }.isInstanceOf(IntegrasjonException::class.java)
-                .hasMessageContaining("Error mot http://localhost:28085/api/oppgave status=500 body={")
+                .hasMessageContaining("Error mot http://localhost:28085/api/oppgave/opprett status=500 body={")
 
         assertThatThrownBy {
             oppgaveClient.opprettBehandleSakOppgave(journalPost)
         }.isInstanceOf(IntegrasjonException::class.java)
-                .hasMessageContaining("Error mot http://localhost:28085/api/oppgave status=500 body={")
+                .hasMessageContaining("Error mot http://localhost:28085/api/oppgave/opprett status=500 body={")
     }
 
     @Test
