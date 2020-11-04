@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.task
 
+import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.prosessering.AsyncTaskStep
@@ -17,7 +18,8 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
                                       private val oppgaveClient: OppgaveClient,
                                       private val sakClient: SakClient,
                                       private val aktørClient: AktørClient,
-                                      private val taskRepository: TaskRepository) : AsyncTaskStep {
+                                      private val taskRepository: TaskRepository,
+                                      private val feature: FeatureToggleService) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(OpprettJournalføringOppgaveTask::class.java)
 
@@ -57,6 +59,8 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
     }
 
     private fun sakssystemMarkering(journalpost: Journalpost): String? {
+        if (!feature.isEnabled("familie-ba-mottak.journalhendelse.fagsystem.fordeling", true)) return null
+
         return sakClient.hentPågåendeSakStatus(tilPersonIdent(journalpost.bruker!!)).let { bruker ->
             when {
                 bruker.harPågåendeSakIBaSak -> "Må løses i BA-sak. Bruker har en pågående sak i BA-sak."

@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.task
 
+import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.integrasjoner.*
 
 import no.nav.familie.prosessering.AsyncTaskStep
@@ -18,7 +19,8 @@ class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: Journa
                                            private val dokarkivClient: DokarkivClient,
                                            private val sakClient: SakClient,
                                            private val aktørClient: AktørClient,
-                                           private val taskRepository: TaskRepository) : AsyncTaskStep {
+                                           private val taskRepository: TaskRepository,
+                                           private val feature: FeatureToggleService) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(OppdaterOgFerdigstillJournalpostTask::class.java)
 
@@ -26,15 +28,17 @@ class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: Journa
         val journalpost = journalpostClient.hentJournalpost(task.payload)
                                   .takeUnless { it.bruker == null } ?: throw error("Journalpost ${task.payload} mangler bruker")
 
-        sakClient.hentPågåendeSakStatus(tilPersonIdent(journalpost.bruker!!)).apply {
-            if (harPågåendeSakIInfotrygd) {
-                log.info("Bruker har sak i Infotrygd. Overlater journalføring til BRUT001 og skipper opprettelse av BehandleSak-" +
-                         "oppgave for journalpost ${journalpost.journalpostId}")
-                return
-            } else if (!harPågåendeSakIBaSak){
-                log.info("Bruker på journalpost ${journalpost.journalpostId} har ikke pågående sak i BA-sak. Skipper derfor " +
-                         "journalføring og opprettelse av BehandleSak-oppgave mot ny løsning i denne omgang.")
-                return
+        if (feature.isEnabled("familie-ba-mottak.journalhendelse.fagsystem.fordeling", true)) {
+            sakClient.hentPågåendeSakStatus(tilPersonIdent(journalpost.bruker!!)).apply {
+                if (harPågåendeSakIInfotrygd) {
+                    log.info("Bruker har sak i Infotrygd. Overlater journalføring til BRUT001 og skipper opprettelse av BehandleSak-" +
+                             "oppgave for journalpost ${journalpost.journalpostId}")
+                    return
+                } else if (!harPågåendeSakIBaSak) {
+                    log.info("Bruker på journalpost ${journalpost.journalpostId} har ikke pågående sak i BA-sak. Skipper derfor " +
+                             "journalføring og opprettelse av BehandleSak-oppgave mot ny løsning i denne omgang.")
+                    return
+                }
             }
         }
 

@@ -1,6 +1,7 @@
 package no.nav.familie.ba.mottak.task
 
 import io.mockk.*
+import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.ba.mottak.task.OppdaterOgFerdigstillJournalpostTask.Companion.TASK_STEP_TYPE
 import no.nav.familie.prosessering.domene.Task
@@ -21,12 +22,14 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
     private val mockSakClient: SakClient = mockk()
     private val mockAktørClient: AktørClient = mockk()
     private val mockTaskRepository: TaskRepository = mockk(relaxed = true)
+    private val mockFeatureToggleService: FeatureToggleService = mockk(relaxed = true)
 
     private val taskStep = OppdaterOgFerdigstillJournalpostTask(mockJournalpostClient,
                                                                 mockDokarkivClient,
                                                                 mockSakClient,
                                                                 mockAktørClient,
-                                                                mockTaskRepository)
+                                                                mockTaskRepository,
+                                                                mockFeatureToggleService)
 
 
     @BeforeEach
@@ -53,6 +56,10 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
         every {
             mockAktørClient.hentPersonident(any())
         } returns "12345678910"
+
+        every {
+            mockFeatureToggleService.isEnabled(any(), true)
+        } returns true
     }
 
     @Test

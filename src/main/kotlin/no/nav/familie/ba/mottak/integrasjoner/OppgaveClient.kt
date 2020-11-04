@@ -2,9 +2,7 @@ package no.nav.familie.ba.mottak.integrasjoner
 
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
-import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
-import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
-import no.nav.familie.kontrakter.felles.oppgave.OpprettOppgaveRequest
+import no.nav.familie.kontrakter.felles.oppgave.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -13,7 +11,6 @@ import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestOperations
-import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 
 private val logger = LoggerFactory.getLogger(OppgaveClient::class.java)
@@ -41,23 +38,17 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
     }
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
-    fun finnOppgaver(journalpostId: String, oppgavetype: Oppgavetype?): List<OppgaveDto> {
-        val uriBuilder = UriComponentsBuilder.fromUri(integrasjonUri)
-                .pathSegment("oppgave")
-                .queryParam("tema", "BAR")
-                .queryParam("journalpostId", journalpostId)
-
-        if (oppgavetype != null){
-            uriBuilder.queryParam("oppgavetype", oppgavetype.value)
-        }
-
-        val uri = uriBuilder.build().toUri()
+    fun finnOppgaver(journalpostId: String, oppgavetype: Oppgavetype?): List<Oppgave> {
         logger.info("Søker etter aktive oppgaver for $journalpostId")
+        val uri = URI.create("$integrasjonUri/oppgave/v4")
+        val request = FinnOppgaveRequest(journalpostId = journalpostId,
+                                         tema = Tema.BAR,
+                                         oppgavetype = oppgavetype)
 
         return Result.runCatching {
-            getForEntity<Ressurs<List<OppgaveDto>>>(uri)
+            postForEntity<Ressurs<FinnOppgaveResponseDto>>(uri, request)
         }.fold(
-                onSuccess = { response -> assertGyldig(response) },
+                onSuccess = { response -> assertGyldig(response).oppgaver },
                 onFailure = {
                     throw IntegrasjonException("GET $uri feilet ved henting av oppgaver",
                                                it,
@@ -70,6 +61,7 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
 
     private fun responseFra(uri: URI, request: OpprettOppgaveRequest): OppgaveResponse {
         return Result.runCatching {
+            logger.info("Sender OpprettOppgaveRequest med beskrivelse: ${request.beskrivelse}")
             postForEntity<Ressurs<OppgaveResponse>>(uri, request)
         }.fold(
                 onSuccess = { response -> assertGyldig(response) },

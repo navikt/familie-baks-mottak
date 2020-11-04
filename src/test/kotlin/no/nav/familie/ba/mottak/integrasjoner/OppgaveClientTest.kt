@@ -9,9 +9,7 @@ import no.nav.familie.ba.mottak.DevLauncher
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Ressurs.Companion.success
 import no.nav.familie.kontrakter.felles.objectMapper
-import no.nav.familie.kontrakter.felles.oppgave.Behandlingstema
-import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
-import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
+import no.nav.familie.kontrakter.felles.oppgave.*
 import no.nav.familie.log.NavHttpHeaders
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -127,11 +125,14 @@ class OppgaveClientTest {
     @Test
     @Tag("integration")
     fun `Finn oppgaver skal returnere liste med 1 oppgave`() {
-        stubFor(get(urlEqualTo("/api/oppgave?tema=BAR&journalpostId=1234567&oppgavetype=JFR"))
+        stubFor(post(urlEqualTo("/api/oppgave/v4"))
                         .willReturn(aResponse()
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(
-                                                    objectMapper.writeValueAsString(success(listOf(OppgaveDto(id = 1234)))))))
+                                                    objectMapper.writeValueAsString(success(
+                                                            FinnOppgaveResponseDto(antallTreffTotalt = 1,
+                                                                                   oppgaver = listOf(Oppgave(id = 1234)))
+                                                    )))))
 
         val oppgaveListe = oppgaveClient.finnOppgaver(journalPost.journalpostId, Oppgavetype.Journalføring)
 
@@ -142,11 +143,14 @@ class OppgaveClientTest {
     @Test
     @Tag("integration")
     fun `Finn oppgaver skal returnere tom liste`() {
-        stubFor(get(urlEqualTo("/api/oppgave?tema=BAR&journalpostId=1234567&oppgavetype=JFR"))
+        stubFor(post(urlEqualTo("/api/oppgave/v4"))
                         .willReturn(aResponse()
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(
-                                                    objectMapper.writeValueAsString(success(emptyList<OppgaveDto>())))))
+                                                    objectMapper.writeValueAsString(success(
+                                                            FinnOppgaveResponseDto(antallTreffTotalt = 0,
+                                                                                   oppgaver = emptyList())
+                                                    )))))
 
         val oppgaveListe = oppgaveClient.finnOppgaver(journalPost.journalpostId, Oppgavetype.Journalføring)
 

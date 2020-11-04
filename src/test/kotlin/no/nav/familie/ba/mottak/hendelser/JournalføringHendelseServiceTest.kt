@@ -11,6 +11,7 @@ import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.ba.mottak.task.OppdaterOgFerdigstillJournalpostTask
 import no.nav.familie.ba.mottak.task.OpprettJournalføringOppgaveTask
 import no.nav.familie.ba.mottak.task.SendTilSakTask
+import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.prosessering.domene.Task
@@ -131,6 +132,7 @@ class JournalføringHendelseServiceTest {
                               sak = null)
 
         every { mockFeatureToggleService.isEnabled(any()) } returns true
+        every { mockFeatureToggleService.isEnabled(any(), true) } returns true
     }
 
     @Test
@@ -225,7 +227,8 @@ class JournalføringHendelseServiceTest {
                 mockOppgaveClient,
                 sakClient,
                 aktørClient,
-                mockTaskRepository)
+                mockTaskRepository,
+                mockFeatureToggleService)
 
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT))
 
@@ -242,17 +245,18 @@ class JournalføringHendelseServiceTest {
         } returns listOf()
         every {
             mockOppgaveClient.finnOppgaver(JOURNALPOST_UTGÅENDE_DOKUMENT, Oppgavetype.Journalføring)
-        } returns listOf(OppgaveDto(123))
+        } returns listOf(Oppgave(123))
         every {
             mockOppgaveClient.finnOppgaver(JOURNALPOST_PAPIRSØKNAD, Oppgavetype.Fordeling)
-        } returns listOf(OppgaveDto(123))
+        } returns listOf(Oppgave(123))
 
         val task = OpprettJournalføringOppgaveTask(
                 mockJournalpostClient,
                 mockOppgaveClient,
                 sakClient,
                 aktørClient,
-                mockTaskRepository)
+                mockTaskRepository,
+                mockFeatureToggleService)
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT))
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_PAPIRSØKNAD))
 
@@ -268,7 +272,8 @@ class JournalføringHendelseServiceTest {
                 mockOppgaveClient,
                 sakClient,
                 aktørClient,
-                mockTaskRepository)
+                mockTaskRepository,
+                mockFeatureToggleService)
 
         Assertions.assertThrows(IllegalStateException::class.java) {
             task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_FERDIGSTILT))
