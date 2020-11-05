@@ -24,6 +24,7 @@ class LeesahConsumer(val hendelsesloggRepository: HendelsesloggRepository,
                      val leesahService: LeesahService) {
 
     val leesahFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesha.feilet")
+    val leesahDuplikatCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesah.duplikat")
 
 
     @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"],
@@ -44,6 +45,7 @@ class LeesahConsumer(val hendelsesloggRepository: HendelsesloggRepository,
 
         try {
             if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
+                leesahDuplikatCounter.increment()
                 ack.acknowledge()
                 return
             }
