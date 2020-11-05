@@ -20,7 +20,7 @@ spring:
       value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
       group-id: srvfamilie-ba-mottak
       max-poll-records: 1
-      auto-offset-reset: latest
+      auto-offset-reset: none
       enable-auto-commit: false
   datasource:
     hikari:
