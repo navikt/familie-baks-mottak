@@ -11,6 +11,7 @@ import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.ba.mottak.task.OppdaterOgFerdigstillJournalpostTask
 import no.nav.familie.ba.mottak.task.OpprettJournalføringOppgaveTask
 import no.nav.familie.ba.mottak.task.SendTilSakTask
+import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.prosessering.domene.Task
@@ -33,6 +34,12 @@ class JournalføringHendelseServiceTest {
 
     @MockK
     lateinit var mockOppgaveClient: OppgaveClient
+
+    @MockK
+    lateinit var sakClient: SakClient
+
+    @MockK
+    lateinit var aktørClient: AktørClient
 
     @MockK(relaxed = true)
     lateinit var mockTaskRepository: TaskRepository
@@ -125,6 +132,7 @@ class JournalføringHendelseServiceTest {
                               sak = null)
 
         every { mockFeatureToggleService.isEnabled(any()) } returns true
+        every { mockFeatureToggleService.isEnabled(any(), true) } returns true
     }
 
     @Test
@@ -196,24 +204,38 @@ class JournalføringHendelseServiceTest {
             mockOppgaveClient.finnOppgaver(any(), any())
         } returns listOf()
 
+        val sakssystemMarkering = slot<String>()
         every {
-            mockOppgaveClient.opprettJournalføringsoppgave(any())
+            mockOppgaveClient.opprettJournalføringsoppgave(any(), capture(sakssystemMarkering))
         } returns OppgaveResponse(1)
 
         every {
             mockTaskRepository.saveAndFlush(any<Task>())
         } returns null
 
+        every {
+            aktørClient.hentPersonident(any())
+        } returns "12345678910"
+
+        every {
+            sakClient.hentPågåendeSakStatus(any())
+        } returns RestPågåendeSakSøk(harPågåendeSakIBaSak = true,
+                                     harPågåendeSakIInfotrygd = false)
+
         val task = OpprettJournalføringOppgaveTask(
                 mockJournalpostClient,
                 mockOppgaveClient,
-                mockTaskRepository)
+                sakClient,
+                aktørClient,
+                mockTaskRepository,
+                mockFeatureToggleService)
 
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT))
 
         verify(exactly = 1) {
             mockTaskRepository.saveAndFlush(any<Task>())
         }
+        assertThat(sakssystemMarkering.captured).contains("Må løses i BA-sak")
     }
 
     @Test
@@ -223,15 +245,18 @@ class JournalføringHendelseServiceTest {
         } returns listOf()
         every {
             mockOppgaveClient.finnOppgaver(JOURNALPOST_UTGÅENDE_DOKUMENT, Oppgavetype.Journalføring)
-        } returns listOf(OppgaveDto(123))
+        } returns listOf(Oppgave(123))
         every {
             mockOppgaveClient.finnOppgaver(JOURNALPOST_PAPIRSØKNAD, Oppgavetype.Fordeling)
-        } returns listOf(OppgaveDto(123))
+        } returns listOf(Oppgave(123))
 
         val task = OpprettJournalføringOppgaveTask(
                 mockJournalpostClient,
                 mockOppgaveClient,
-                mockTaskRepository)
+                sakClient,
+                aktørClient,
+                mockTaskRepository,
+                mockFeatureToggleService)
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT))
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_PAPIRSØKNAD))
 
@@ -245,7 +270,10 @@ class JournalføringHendelseServiceTest {
         val task = OpprettJournalføringOppgaveTask(
                 mockJournalpostClient,
                 mockOppgaveClient,
-                mockTaskRepository)
+                sakClient,
+                aktørClient,
+                mockTaskRepository,
+                mockFeatureToggleService)
 
         Assertions.assertThrows(IllegalStateException::class.java) {
             task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_FERDIGSTILT))

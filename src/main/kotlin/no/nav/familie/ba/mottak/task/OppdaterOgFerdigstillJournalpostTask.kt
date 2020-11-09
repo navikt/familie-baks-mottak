@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.task
 
+import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.integrasjoner.*
 
 import no.nav.familie.prosessering.AsyncTaskStep
@@ -18,7 +19,8 @@ class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: Journa
                                            private val dokarkivClient: DokarkivClient,
                                            private val sakClient: SakClient,
                                            private val aktørClient: AktørClient,
-                                           private val taskRepository: TaskRepository) : AsyncTaskStep {
+                                           private val taskRepository: TaskRepository,
+                                           private val feature: FeatureToggleService) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(OppdaterOgFerdigstillJournalpostTask::class.java)
 
@@ -26,22 +28,48 @@ class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: Journa
         val journalpost = journalpostClient.hentJournalpost(task.payload)
                                   .takeUnless { it.bruker == null } ?: throw error("Journalpost ${task.payload} mangler bruker")
 
+        if (feature.isEnabled("familie-ba-mottak.journalhendelse.fagsystem.fordeling", true)) {
+            sakClient.hentPågåendeSakStatus(tilPersonIdent(journalpost.bruker!!)).apply {
+                if (harPågåendeSakIInfotrygd) {
+                    log.info("Bruker har sak i Infotrygd. Overlater journalføring til BRUT001 og skipper opprettelse av BehandleSak-" +
+                             "oppgave for journalpost ${journalpost.journalpostId}")
+                    return
+                } else if (!harPågåendeSakIBaSak) {
+                    log.info("Bruker på journalpost ${journalpost.journalpostId} har ikke pågående sak i BA-sak. Skipper derfor " +
+                             "journalføring og opprettelse av BehandleSak-oppgave mot ny løsning i denne omgang.")
+                    return
+                }
+            }
+        }
+
         when (journalpost.journalstatus) {
             Journalstatus.MOTTATT -> {
                 val fagsakId = sakClient.hentSaksnummer(tilPersonIdent(journalpost.bruker!!))
-                dokarkivClient.oppdaterJournalpostSak(journalpost, fagsakId)
-                dokarkivClient.ferdigstillJournalpost(journalpost.journalpostId)
-                task.metadata["fagsakId"] = fagsakId
-                log.info("Har oppdatert og ferdigstilt journalpost ${journalpost.journalpostId}")
-                taskRepository.saveAndFlush(task)
+                runCatching { // forsøk å journalføre automatisk
+                    dokarkivClient.oppdaterJournalpostSak(journalpost, fagsakId)
+                    dokarkivClient.ferdigstillJournalpost(journalpost.journalpostId)
+                }.fold(
+                        onSuccess = {
+                            task.metadata["fagsakId"] = fagsakId
+                            log.info("Har oppdatert og ferdigstilt journalpost ${journalpost.journalpostId}")
+                            taskRepository.saveAndFlush(task)
+                        },
+                        onFailure = {
+                            log.warn("Automatisk ferdigstilling feilet. Oppretter ny journalføringsoppgave for journalpost " +
+                                     "${journalpost.journalpostId}.")
+                            Task.nyTask(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
+                                        journalpost.journalpostId,
+                                        task.metadata).also { taskRepository.save(it) }
+                            return
+                        }
+                )
+
             }
             Journalstatus.JOURNALFOERT -> log.info("Skipper oppdatering og ferdigstilling av " +
                                                    "journalpost ${journalpost.journalpostId} som alt er ferdig journalført")
             else -> error("Uventet journalstatus ${journalpost.journalstatus} for journalpost ${journalpost.journalpostId}")
         }
-    }
 
-    override fun onCompletion(task: Task) {
         val nyTask = Task.nyTask(
                 type = OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE,
                 payload = task.payload,
