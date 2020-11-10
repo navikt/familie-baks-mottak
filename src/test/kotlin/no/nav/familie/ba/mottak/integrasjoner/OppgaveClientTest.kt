@@ -9,9 +9,7 @@ import no.nav.familie.ba.mottak.DevLauncher
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Ressurs.Companion.success
 import no.nav.familie.kontrakter.felles.objectMapper
-import no.nav.familie.kontrakter.felles.oppgave.Behandlingstema
-import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
-import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
+import no.nav.familie.kontrakter.felles.oppgave.*
 import no.nav.familie.log.NavHttpHeaders
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -48,7 +46,7 @@ class OppgaveClientTest {
     @Tag("integration")
     fun `Opprett journalføringsoppgave skal returnere oppgave id`() {
         MDC.put("callId", "opprettJournalføringsoppgave")
-        stubFor(post(urlEqualTo("/api/oppgave"))
+        stubFor(post(urlEqualTo("/api/oppgave/opprett"))
                         .willReturn(aResponse()
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(
@@ -73,7 +71,7 @@ class OppgaveClientTest {
     @Tag("integration")
     fun `Opprett behandleSak-oppgave skal returnere oppgave id`() {
         MDC.put("callId", "opprettJournalføringsoppgave")
-        stubFor(post(urlEqualTo("/api/oppgave"))
+        stubFor(post(urlEqualTo("/api/oppgave/opprett"))
                         .willReturn(aResponse()
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(
@@ -98,7 +96,7 @@ class OppgaveClientTest {
     @Test
     @Tag("integration")
     fun `Opprett oppgave skal kaste feil hvis response er ugyldig`() {
-        stubFor(post(urlEqualTo("/api/oppgave"))
+        stubFor(post(urlEqualTo("/api/oppgave/opprett"))
                         .willReturn(aResponse()
                                             .withStatus(500)
                                             .withBody(objectMapper.writeValueAsString(Ressurs.failure<String>("test")))))
@@ -106,12 +104,12 @@ class OppgaveClientTest {
         assertThatThrownBy {
             oppgaveClient.opprettJournalføringsoppgave(journalPost)
         }.isInstanceOf(IntegrasjonException::class.java)
-                .hasMessageContaining("Error mot http://localhost:28085/api/oppgave status=500 body={")
+                .hasMessageContaining("Error mot http://localhost:28085/api/oppgave/opprett status=500 body={")
 
         assertThatThrownBy {
             oppgaveClient.opprettBehandleSakOppgave(journalPost)
         }.isInstanceOf(IntegrasjonException::class.java)
-                .hasMessageContaining("Error mot http://localhost:28085/api/oppgave status=500 body={")
+                .hasMessageContaining("Error mot http://localhost:28085/api/oppgave/opprett status=500 body={")
     }
 
     @Test
@@ -127,11 +125,14 @@ class OppgaveClientTest {
     @Test
     @Tag("integration")
     fun `Finn oppgaver skal returnere liste med 1 oppgave`() {
-        stubFor(get(urlEqualTo("/api/oppgave?tema=BAR&journalpostId=1234567&oppgavetype=JFR"))
+        stubFor(post(urlEqualTo("/api/oppgave/v4"))
                         .willReturn(aResponse()
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(
-                                                    objectMapper.writeValueAsString(success(listOf(OppgaveDto(id = 1234)))))))
+                                                    objectMapper.writeValueAsString(success(
+                                                            FinnOppgaveResponseDto(antallTreffTotalt = 1,
+                                                                                   oppgaver = listOf(Oppgave(id = 1234)))
+                                                    )))))
 
         val oppgaveListe = oppgaveClient.finnOppgaver(journalPost.journalpostId, Oppgavetype.Journalføring)
 
@@ -142,11 +143,14 @@ class OppgaveClientTest {
     @Test
     @Tag("integration")
     fun `Finn oppgaver skal returnere tom liste`() {
-        stubFor(get(urlEqualTo("/api/oppgave?tema=BAR&journalpostId=1234567&oppgavetype=JFR"))
+        stubFor(post(urlEqualTo("/api/oppgave/v4"))
                         .willReturn(aResponse()
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(
-                                                    objectMapper.writeValueAsString(success(emptyList<OppgaveDto>())))))
+                                                    objectMapper.writeValueAsString(success(
+                                                            FinnOppgaveResponseDto(antallTreffTotalt = 0,
+                                                                                   oppgaver = emptyList())
+                                                    )))))
 
         val oppgaveListe = oppgaveClient.finnOppgaver(journalPost.journalpostId, Oppgavetype.Journalføring)
 
@@ -161,7 +165,7 @@ class OppgaveClientTest {
         return "{\n" +
                "  \"ident\": {\n" +
                "    \"ident\": \"1234567891011\",\n" +
-               "    \"type\": \"Aktør\"\n" +
+               "    \"gruppe\": \"AKTOERID\"\n" +
                "  },\n" +
                "  \"enhetsnummer\": \"9999\",\n" +
                "  \"saksId\": null,\n" +
