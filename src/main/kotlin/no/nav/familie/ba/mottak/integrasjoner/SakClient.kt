@@ -7,9 +7,11 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatus
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
+import org.springframework.web.client.HttpStatusCodeException
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.RestOperations
@@ -55,7 +57,12 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
             postForEntity<Ressurs<RestPågåendeSakSøk>>(uri, mapOf("personIdent" to personIdent))
         }.fold(
                 onSuccess = { it.data?.let(this::valider) ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
-                onFailure = { throw IntegrasjonException("Feil ved henting av sak opplysninger fra ba-sak.", it, uri, personIdent) }
+                onFailure = {
+                    if (it is HttpStatusCodeException && it.statusCode == HttpStatus.NOT_FOUND)
+                        return RestPågåendeSakSøk(false, false)
+                    else
+                        throw IntegrasjonException("Feil ved henting av sak opplysninger fra ba-sak.", it, uri, personIdent)
+                }
         )
     }
 

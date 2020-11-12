@@ -59,9 +59,9 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
     }
 
     private fun sakssystemMarkering(journalpost: Journalpost): String? {
-        if (!feature.isEnabled("familie-ba-mottak.journalhendelse.fagsystem.fordeling", true)) return null
+        if (journalpost.bruker == null) return null
 
-        return sakClient.hentPågåendeSakStatus(tilPersonIdent(journalpost.bruker!!)).let { bruker ->
+        return sakClient.hentPågåendeSakStatus(tilPersonIdent(journalpost.bruker)).let { bruker ->
             when {
                 bruker.harPågåendeSakIBaSak -> "Må løses i BA-sak. Bruker har en pågående sak i BA-sak."
                 bruker.harPågåendeSakIInfotrygd -> "Må løses i Gosys. Bruker har en pågående sak i Infotrygd"
