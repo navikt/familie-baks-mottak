@@ -59,7 +59,7 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
     }
 
     private fun sakssystemMarkering(journalpost: Journalpost): String? {
-        if (journalpost.bruker == null || erFeatureDeaktivert()) return null
+        if (journalpost.bruker == null) return null
 
         return sakClient.hentPågåendeSakStatus(tilPersonIdent(journalpost.bruker)).let { bruker ->
             when {
@@ -75,10 +75,6 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
             BrukerIdType.AKTOERID -> aktørClient.hentPersonident(bruker.id)
             else -> bruker.id
         }
-    }
-
-    private fun erFeatureDeaktivert(): Boolean {
-        return !feature.isEnabled("familie-ba-mottak.journalhendelse.fagsystem.fordeling", true)
     }
 
     companion object {
