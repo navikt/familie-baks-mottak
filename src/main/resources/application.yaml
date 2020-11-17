@@ -46,7 +46,7 @@ logging:
 funksjonsbrytere:
   enabled: true
   unleash:
-    uri: https://unleash.nais.adeo.no/api/
+    uri: https://unleash.nais.io/api/
     cluster: ${NAIS_CLUSTER_NAME}
     applicationName: ${NAIS_APP_NAME}
 
