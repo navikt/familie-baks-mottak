@@ -51,22 +51,22 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
         )
     }
 
-    fun hentPågåendeSakStatus(personIdent: String): RestPågåendeSakSøk {
+    fun hentPågåendeSakStatus(personIdent: String, barna: List<String>): RestPågåendeSakResponse {
         val uri = URI.create("$sakServiceUri/fagsaker/sok/ba-sak-og-infotrygd")
         return runCatching {
-            postForEntity<Ressurs<RestPågåendeSakSøk>>(uri, mapOf("personIdent" to personIdent))
+            postForEntity<Ressurs<RestPågåendeSakResponse>>(uri, RestPågåendeSakRequest(personIdent, barna))
         }.fold(
                 onSuccess = { it.data?.let(this::valider) ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
                 onFailure = {
                     if (it is HttpStatusCodeException && it.statusCode == HttpStatus.NOT_FOUND)
-                        return RestPågåendeSakSøk(false, false)
+                        return RestPågåendeSakResponse(false, false)
                     else
                         throw IntegrasjonException("Feil ved henting av sak opplysninger fra ba-sak.", it, uri, personIdent)
                 }
         )
     }
 
-    private fun valider(resultat: RestPågåendeSakSøk) =
+    private fun valider(resultat: RestPågåendeSakResponse) =
             resultat.takeUnless { bruker -> bruker.harPågåendeSakIBaSak && bruker.harPågåendeSakIInfotrygd }
             ?: throw  error("Bruker har pågående sak i både ny og gammel løsning!")
 
@@ -74,7 +74,12 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
 
 data class RestFagsak(val id: Long)
 
-data class RestPågåendeSakSøk(
+data class RestPågåendeSakRequest(
+        var personIdent: String,
+        val barnasIdenter: List<String> = emptyList(),
+)
+
+data class RestPågåendeSakResponse(
         val harPågåendeSakIBaSak: Boolean,
         val harPågåendeSakIInfotrygd: Boolean
 )

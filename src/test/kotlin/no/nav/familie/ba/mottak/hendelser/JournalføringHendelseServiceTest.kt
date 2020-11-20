@@ -45,6 +45,9 @@ class JournalføringHendelseServiceTest {
     lateinit var mockTaskRepository: TaskRepository
 
     @MockK(relaxed = true)
+    lateinit var mockPersonClient: PersonClient
+
+    @MockK(relaxed = true)
     lateinit var mockFeatureToggleService: FeatureToggleService
 
     @MockK(relaxed = true)
@@ -218,9 +221,9 @@ class JournalføringHendelseServiceTest {
         } returns "12345678910"
 
         every {
-            sakClient.hentPågåendeSakStatus(any())
-        } returns RestPågåendeSakSøk(harPågåendeSakIBaSak = true,
-                                     harPågåendeSakIInfotrygd = false)
+            sakClient.hentPågåendeSakStatus(any(), emptyList())
+        } returns RestPågåendeSakResponse(harPågåendeSakIBaSak = true,
+                                          harPågåendeSakIInfotrygd = false)
 
         val task = OpprettJournalføringOppgaveTask(
                 mockJournalpostClient,
@@ -228,7 +231,7 @@ class JournalføringHendelseServiceTest {
                 sakClient,
                 aktørClient,
                 mockTaskRepository,
-                mockFeatureToggleService)
+                mockPersonClient)
 
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT))
 
@@ -256,7 +259,7 @@ class JournalføringHendelseServiceTest {
                 sakClient,
                 aktørClient,
                 mockTaskRepository,
-                mockFeatureToggleService)
+                mockPersonClient)
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT))
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_PAPIRSØKNAD))
 
@@ -273,7 +276,7 @@ class JournalføringHendelseServiceTest {
                 sakClient,
                 aktørClient,
                 mockTaskRepository,
-                mockFeatureToggleService)
+                mockPersonClient)
 
         Assertions.assertThrows(IllegalStateException::class.java) {
             task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_FERDIGSTILT))
