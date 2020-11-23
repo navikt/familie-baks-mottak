@@ -5,12 +5,14 @@ import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
+import no.nav.familie.log.mdc.MDCConstants
 import no.nav.person.pdl.leesah.Personhendelse
 import org.apache.avro.generic.GenericData
 import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
@@ -33,7 +35,7 @@ class LeesahConsumer(val hendelsesloggRepository: HendelsesloggRepository,
                    containerFactory = "kafkaLeesahListenerContainerFactory")
     @Transactional
     fun listen(cr: ConsumerRecord<Int, Personhendelse>, ack: Acknowledgment) {
-        var pdlHendelse = PdlHendelse(cr.value().hentHendelseId(),
+        val pdlHendelse = PdlHendelse(cr.value().hentHendelseId(),
                                       cr.offset(),
                                       cr.value().hentOpplysningstype(),
                                       cr.value().hentEndringstype(),
@@ -44,6 +46,7 @@ class LeesahConsumer(val hendelsesloggRepository: HendelsesloggRepository,
         )
 
         try {
+            MDC.put(MDCConstants.MDC_CALL_ID, pdlHendelse.hendelseId)
             if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
                 leesahDuplikatCounter.increment()
                 ack.acknowledge()
@@ -55,6 +58,8 @@ class LeesahConsumer(val hendelsesloggRepository: HendelsesloggRepository,
             leesahFeiletCounter.increment()
             SECURE_LOGGER.error("Feil i prosessering av leesah-hendelser", e)
             throw RuntimeException("Feil i prosessering av leesah-hendelser")
+        } finally {
+            MDC.clear()
         }
 
         ack.acknowledge()

@@ -78,6 +78,7 @@ class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository
                                                             nesteGyldigeTriggertidFødselshendelser(triggerTidForTps, environment),
                                                             Properties().apply {
                                                                 this["ident"] = pdlHendelse.hentPersonident()
+                                                                this["callId"] = pdlHendelse.hendelseId
                                                             })
                         taskRepository.save(task)
                     }
@@ -96,12 +97,13 @@ class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository
     }
 
     private fun logHendelse(pdlHendelse: PdlHendelse, ekstraInfo: String = "") {
-        log.info("person-pdl-leesah melding mottatt: offset: {}, opplysningstype: {}, aktørid: {}, " +
-                 "endringstype: {}, $ekstraInfo",
-                 pdlHendelse.offset,
-                 pdlHendelse.opplysningstype,
-                 pdlHendelse.hentAktørId(),
-                 pdlHendelse.endringstype)
+        log.info("person-pdl-leesah melding mottatt: " +
+                 "hendelseId: ${pdlHendelse.hendelseId} " +
+                 "offset: ${pdlHendelse.offset}, " +
+                 "opplysningstype: ${pdlHendelse.opplysningstype}, " +
+                 "aktørid: ${pdlHendelse.hentAktørId()}, " +
+                 "endringstype: ${pdlHendelse.endringstype}, $ekstraInfo"
+        )
     }
 
     private fun oppdaterHendelseslogg(pdlHendelse: PdlHendelse) {
@@ -130,7 +132,7 @@ class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository
 
     private fun erUtenforNorge(fødeland: String?): Boolean {
         return when (fødeland) {
-            null, "NOR" ->  false
+            null, "NOR" -> false
             else -> true
         }
     }

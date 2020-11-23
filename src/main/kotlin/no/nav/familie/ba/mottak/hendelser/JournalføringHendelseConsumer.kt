@@ -1,12 +1,7 @@
 package no.nav.familie.ba.mottak.hendelser
 
-import io.micrometer.core.instrument.Counter
-import io.micrometer.core.instrument.Metrics
-import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import org.apache.kafka.clients.consumer.ConsumerRecord
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
