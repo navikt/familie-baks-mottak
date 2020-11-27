@@ -61,7 +61,7 @@ class OpprettJournalføringOppgaveTaskTest {
     }
 
     @Test
-    fun `Oppretter oppgave med beskrivelse "Må løses i BA-sak" hvis bruker på journalpost har sak der fra før`() {
+    fun `Oppretter oppgave med beskrivelse som sier at bruker på journalpost har sak i ba-sak`() {
         val sakssystemMarkering = slot<String>()
         every {
             mockOppgaveClient.opprettJournalføringsoppgave(any(), capture(sakssystemMarkering))
@@ -69,16 +69,15 @@ class OpprettJournalføringOppgaveTaskTest {
 
         every {
             mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(harPågåendeSakIBaSak = true,
-                                          harPågåendeSakIInfotrygd = false)
+        } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
 
         taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
 
-        Assertions.assertThat(sakssystemMarkering.captured).contains("Må løses i BA-sak")
+        Assertions.assertThat(sakssystemMarkering.captured).contains("Bruker har sak i BA-sak")
     }
 
     @Test
-    fun `Oppretter oppgave med beskrivelse "Må løses i Gosys" hvis bruker har sak i Infotrygd fra før`() {
+    fun `Oppretter oppgave med beskrivelse som sier at søsken har sak i ba-sak`() {
         val sakssystemMarkering = slot<String>()
         every {
             mockOppgaveClient.opprettJournalføringsoppgave(any(), capture(sakssystemMarkering))
@@ -86,12 +85,43 @@ class OpprettJournalføringOppgaveTaskTest {
 
         every {
             mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(harPågåendeSakIBaSak = false,
-                                          harPågåendeSakIInfotrygd = true)
+        } returns RestPågåendeSakResponse(baSak = Sakspart.ANNEN)
 
         taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
 
-        Assertions.assertThat(sakssystemMarkering.captured).contains("Må løses i Gosys")
+        Assertions.assertThat(sakssystemMarkering.captured).contains("Søsken har sak i BA-sak")
+    }
+
+    @Test
+    fun `Oppretter oppgave med beskrivelse som sier at bruker har sak i Infotrygd`() {
+        val sakssystemMarkering = slot<String>()
+        every {
+            mockOppgaveClient.opprettJournalføringsoppgave(any(), capture(sakssystemMarkering))
+        } returns OppgaveResponse(1)
+
+        every {
+            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
+        } returns RestPågåendeSakResponse(infotrygd = Sakspart.SØKER)
+
+        taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
+
+        Assertions.assertThat(sakssystemMarkering.captured).contains("Bruker har sak i Infotrygd")
+    }
+
+    @Test
+    fun `Oppretter oppgave med beskrivelse som sier at søsken har sak i Infotrygd`() {
+        val sakssystemMarkering = slot<String>()
+        every {
+            mockOppgaveClient.opprettJournalføringsoppgave(any(), capture(sakssystemMarkering))
+        } returns OppgaveResponse(1)
+
+        every {
+            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
+        } returns RestPågåendeSakResponse(infotrygd = Sakspart.ANNEN)
+
+        taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
+
+        Assertions.assertThat(sakssystemMarkering.captured).contains("Søsken har sak i Infotrygd")
     }
 
     @Test
@@ -102,8 +132,7 @@ class OpprettJournalføringOppgaveTaskTest {
 
         every {
             mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(harPågåendeSakIBaSak = false,
-                                          harPågåendeSakIInfotrygd = false)
+        } returns RestPågåendeSakResponse()
 
         taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
 

@@ -31,12 +31,20 @@ class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: Journa
                 .filter { it.relasjonsrolle == "BARN" }
                 .map { it.personIdent.id }
 
-        sakClient.hentPågåendeSakStatus(brukersIdent, barnasIdenter).apply {
-            if (harPågåendeSakIInfotrygd) {
+        sakClient.hentPågåendeSakStatus(brukersIdent, barnasIdenter).also { sak ->
+            if (sak.infotrygd != null && sak.baSak != null) {
+                log.info("Bruker har sak i både Infotrygd og BA-sak. Dropper automatisk ferdigstilling og oppretter istedet " +
+                         "manuell journalføringsoppgave for journalpost ${journalpost.journalpostId}")
+                Task.nyTask(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
+                            journalpost.journalpostId,
+                            task.metadata).also { taskRepository.save(it) }
+                return
+            }
+            if (sak.infotrygd != null) {
                 log.info("Bruker har sak i Infotrygd. Overlater journalføring til BRUT001 og skipper opprettelse av BehandleSak-" +
                          "oppgave for journalpost ${journalpost.journalpostId}")
                 return
-            } else if (!harPågåendeSakIBaSak) {
+            } else if (sak.baSak == null) {
                 log.info("Bruker på journalpost ${journalpost.journalpostId} har ikke pågående sak i BA-sak. Skipper derfor " +
                          "journalføring og opprettelse av BehandleSak-oppgave mot ny løsning i denne omgang.")
                 return

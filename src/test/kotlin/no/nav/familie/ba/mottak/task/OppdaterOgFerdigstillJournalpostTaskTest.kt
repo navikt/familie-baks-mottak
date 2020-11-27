@@ -61,8 +61,7 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
     fun `Skal oppdatere og ferdigstille journalpost og deretter lagre ny OpprettBehandleSakOppgaveTask`() {
         every {
             mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(harPågåendeSakIBaSak = true,
-                                          harPågåendeSakIInfotrygd = false)
+        } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
 
         every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
 
@@ -82,8 +81,7 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
     fun `Skal returnere uten å journalføre når bruker ikke har sak i BA-sak`() {
         every {
             mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(harPågåendeSakIBaSak = false,
-                                          harPågåendeSakIInfotrygd = false)
+        } returns RestPågåendeSakResponse()
 
         taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
 
@@ -98,8 +96,7 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
     fun `Skal returnere uten å journalføre når bruker har sak i Infotrygd`() {
         every {
             mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(harPågåendeSakIBaSak = true,
-                                          harPågåendeSakIInfotrygd = true)
+        } returns RestPågåendeSakResponse(infotrygd = Sakspart.SØKER)
 
         taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
 
@@ -114,8 +111,7 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
     fun `Skal lagre ny OpprettJournalføringOppgaveTask hvis automatisk journalføring feiler`() {
         every {
             mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(harPågåendeSakIBaSak = true,
-                                          harPågåendeSakIInfotrygd = false)
+        } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
 
         every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
 

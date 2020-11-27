@@ -56,19 +56,15 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
         return runCatching {
             postForEntity<Ressurs<RestPågåendeSakResponse>>(uri, RestPågåendeSakRequest(personIdent, barna))
         }.fold(
-                onSuccess = { it.data?.let(this::valider) ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
+                onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
                 onFailure = {
                     if (it is HttpStatusCodeException && it.statusCode == HttpStatus.NOT_FOUND)
-                        return RestPågåendeSakResponse(false, false)
+                        return RestPågåendeSakResponse()
                     else
                         throw IntegrasjonException("Feil ved henting av sak opplysninger fra ba-sak.", it, uri, personIdent)
                 }
         )
     }
-
-    private fun valider(resultat: RestPågåendeSakResponse) =
-            resultat.takeUnless { bruker -> bruker.harPågåendeSakIBaSak && bruker.harPågåendeSakIInfotrygd }
-            ?: throw  error("Bruker har pågående sak i både ny og gammel løsning!")
 
 }
 
@@ -80,6 +76,11 @@ data class RestPågåendeSakRequest(
 )
 
 data class RestPågåendeSakResponse(
-        val harPågåendeSakIBaSak: Boolean,
-        val harPågåendeSakIInfotrygd: Boolean
+        val baSak: Sakspart? = null,
+        val infotrygd: Sakspart? = null,
 )
+
+enum class Sakspart(val part: String) {
+    SØKER("Bruker"),
+    ANNEN("Søsken"),
+}

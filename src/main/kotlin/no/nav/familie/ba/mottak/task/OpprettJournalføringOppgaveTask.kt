@@ -65,10 +65,11 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
                 .filter { it.relasjonsrolle == "BARN" }
                 .map { it.personIdent.id }
 
-        return sakClient.hentPågåendeSakStatus(brukersIdent, barnasIdenter).let {
+        return sakClient.hentPågåendeSakStatus(brukersIdent, barnasIdenter).let { sak ->
             when {
-                it.harPågåendeSakIBaSak -> "Må løses i BA-sak. Bruker har en pågående sak i BA-sak."
-                it.harPågåendeSakIInfotrygd -> "Må løses i Gosys. Bruker har en pågående sak i Infotrygd"
+                sak.baSak != null && sak.infotrygd != null -> "Bruker har sak i både Infotrygd og BA-sak"
+                sak.baSak != null -> "${sak.baSak.part} har sak i BA-sak"
+                sak.infotrygd != null -> "${sak.infotrygd.part} har sak i Infotrygd"
                 else -> null // trenger ingen form for markering. Kan løses av begge systemer
             }
         }

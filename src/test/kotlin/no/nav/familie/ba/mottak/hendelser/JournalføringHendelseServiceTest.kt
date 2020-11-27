@@ -222,8 +222,7 @@ class JournalføringHendelseServiceTest {
 
         every {
             sakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(harPågåendeSakIBaSak = true,
-                                          harPågåendeSakIInfotrygd = false)
+        } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
 
         val task = OpprettJournalføringOppgaveTask(
                 mockJournalpostClient,
