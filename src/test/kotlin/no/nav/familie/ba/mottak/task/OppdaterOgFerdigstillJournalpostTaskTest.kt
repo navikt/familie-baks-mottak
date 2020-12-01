@@ -108,6 +108,24 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
     }
 
     @Test
+    fun `Skal droppe automatisk journalføring og lagre ny OpprettJournalføringOppgaveTask hvis bruker har sak begge steder`() {
+        every {
+            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
+        } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER, infotrygd = Sakspart.SØKER)
+
+        every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
+
+        taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
+
+        val task = slot<Task>()
+
+        verify(exactly = 1) {
+            mockTaskRepository.save(capture(task))
+        }
+        Assertions.assertThat(task.captured.taskStepType).isEqualTo(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE)
+    }
+
+    @Test
     fun `Skal lagre ny OpprettJournalføringOppgaveTask hvis automatisk journalføring feiler`() {
         every {
             mockSakClient.hentPågåendeSakStatus(any(), emptyList())

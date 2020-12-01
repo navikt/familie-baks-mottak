@@ -237,7 +237,7 @@ class JournalføringHendelseServiceTest {
         verify(exactly = 1) {
             mockTaskRepository.saveAndFlush(any<Task>())
         }
-        assertThat(sakssystemMarkering.captured).contains("Må løses i BA-sak")
+        assertThat(sakssystemMarkering.captured).contains("Bruker har sak i BA-sak")
     }
 
     @Test
