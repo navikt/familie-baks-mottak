@@ -1,7 +1,6 @@
 package no.nav.familie.ba.mottak.task
 
 import io.mockk.*
-import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.ba.mottak.task.OppdaterOgFerdigstillJournalpostTask.Companion.TASK_STEP_TYPE
 import no.nav.familie.prosessering.domene.Task
@@ -22,14 +21,14 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
     private val mockSakClient: SakClient = mockk()
     private val mockAktørClient: AktørClient = mockk()
     private val mockTaskRepository: TaskRepository = mockk(relaxed = true)
-    private val mockFeatureToggleService: FeatureToggleService = mockk(relaxed = true)
+    private val mockPersonClient: PersonClient = mockk(relaxed = true)
 
     private val taskStep = OppdaterOgFerdigstillJournalpostTask(mockJournalpostClient,
                                                                 mockDokarkivClient,
                                                                 mockSakClient,
                                                                 mockAktørClient,
                                                                 mockTaskRepository,
-                                                                mockFeatureToggleService)
+                                                                mockPersonClient)
 
 
     @BeforeEach
@@ -56,18 +55,13 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
         every {
             mockAktørClient.hentPersonident(any())
         } returns "12345678910"
-
-        every {
-            mockFeatureToggleService.isEnabled(any(), true)
-        } returns true
     }
 
     @Test
     fun `Skal oppdatere og ferdigstille journalpost og deretter lagre ny OpprettBehandleSakOppgaveTask`() {
         every {
-            mockSakClient.hentPågåendeSakStatus(any())
-        } returns RestPågåendeSakSøk(harPågåendeSakIBaSak = true,
-                                     harPågåendeSakIInfotrygd = false)
+            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
+        } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
 
         every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
 
@@ -86,9 +80,8 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
     @Test
     fun `Skal returnere uten å journalføre når bruker ikke har sak i BA-sak`() {
         every {
-            mockSakClient.hentPågåendeSakStatus(any())
-        } returns RestPågåendeSakSøk(harPågåendeSakIBaSak = false,
-                                     harPågåendeSakIInfotrygd = false)
+            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
+        } returns RestPågåendeSakResponse()
 
         taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
 
@@ -102,9 +95,8 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
     @Test
     fun `Skal returnere uten å journalføre når bruker har sak i Infotrygd`() {
         every {
-            mockSakClient.hentPågåendeSakStatus(any())
-        } returns RestPågåendeSakSøk(harPågåendeSakIBaSak = true,
-                                     harPågåendeSakIInfotrygd = true)
+            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
+        } returns RestPågåendeSakResponse(infotrygd = Sakspart.SØKER)
 
         taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
 
@@ -116,11 +108,28 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
     }
 
     @Test
+    fun `Skal droppe automatisk journalføring og lagre ny OpprettJournalføringOppgaveTask hvis bruker har sak begge steder`() {
+        every {
+            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
+        } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER, infotrygd = Sakspart.SØKER)
+
+        every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
+
+        taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
+
+        val task = slot<Task>()
+
+        verify(exactly = 1) {
+            mockTaskRepository.save(capture(task))
+        }
+        Assertions.assertThat(task.captured.taskStepType).isEqualTo(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE)
+    }
+
+    @Test
     fun `Skal lagre ny OpprettJournalføringOppgaveTask hvis automatisk journalføring feiler`() {
         every {
-            mockSakClient.hentPågåendeSakStatus(any())
-        } returns RestPågåendeSakSøk(harPågåendeSakIBaSak = true,
-                                     harPågåendeSakIInfotrygd = false)
+            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
+        } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
 
         every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
 

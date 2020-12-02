@@ -45,6 +45,9 @@ class JournalføringHendelseServiceTest {
     lateinit var mockTaskRepository: TaskRepository
 
     @MockK(relaxed = true)
+    lateinit var mockPersonClient: PersonClient
+
+    @MockK(relaxed = true)
     lateinit var mockFeatureToggleService: FeatureToggleService
 
     @MockK(relaxed = true)
@@ -218,9 +221,8 @@ class JournalføringHendelseServiceTest {
         } returns "12345678910"
 
         every {
-            sakClient.hentPågåendeSakStatus(any())
-        } returns RestPågåendeSakSøk(harPågåendeSakIBaSak = true,
-                                     harPågåendeSakIInfotrygd = false)
+            sakClient.hentPågåendeSakStatus(any(), emptyList())
+        } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
 
         val task = OpprettJournalføringOppgaveTask(
                 mockJournalpostClient,
@@ -228,14 +230,14 @@ class JournalføringHendelseServiceTest {
                 sakClient,
                 aktørClient,
                 mockTaskRepository,
-                mockFeatureToggleService)
+                mockPersonClient)
 
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT))
 
         verify(exactly = 1) {
             mockTaskRepository.saveAndFlush(any<Task>())
         }
-        assertThat(sakssystemMarkering.captured).contains("Må løses i BA-sak")
+        assertThat(sakssystemMarkering.captured).contains("Bruker har sak i BA-sak")
     }
 
     @Test
@@ -256,7 +258,7 @@ class JournalføringHendelseServiceTest {
                 sakClient,
                 aktørClient,
                 mockTaskRepository,
-                mockFeatureToggleService)
+                mockPersonClient)
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT))
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_PAPIRSØKNAD))
 
@@ -273,7 +275,7 @@ class JournalføringHendelseServiceTest {
                 sakClient,
                 aktørClient,
                 mockTaskRepository,
-                mockFeatureToggleService)
+                mockPersonClient)
 
         Assertions.assertThrows(IllegalStateException::class.java) {
             task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_FERDIGSTILT))

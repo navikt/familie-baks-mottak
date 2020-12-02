@@ -1,6 +1,5 @@
 package no.nav.familie.ba.mottak.task
 
-import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.prosessering.AsyncTaskStep
@@ -19,7 +18,7 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
                                       private val sakClient: SakClient,
                                       private val aktørClient: AktørClient,
                                       private val taskRepository: TaskRepository,
-                                      private val feature: FeatureToggleService) : AsyncTaskStep {
+                                      private val personClient: PersonClient) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(OpprettJournalføringOppgaveTask::class.java)
 
@@ -61,10 +60,16 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
     private fun sakssystemMarkering(journalpost: Journalpost): String? {
         if (journalpost.bruker == null) return null
 
-        return sakClient.hentPågåendeSakStatus(tilPersonIdent(journalpost.bruker)).let { bruker ->
+        val brukersIdent = tilPersonIdent(journalpost.bruker)
+        val barnasIdenter = personClient.hentPersonMedRelasjoner(brukersIdent).familierelasjoner
+                .filter { it.relasjonsrolle == "BARN" }
+                .map { it.personIdent.id }
+
+        return sakClient.hentPågåendeSakStatus(brukersIdent, barnasIdenter).let { sak ->
             when {
-                bruker.harPågåendeSakIBaSak -> "Må løses i BA-sak. Bruker har en pågående sak i BA-sak."
-                bruker.harPågåendeSakIInfotrygd -> "Må løses i Gosys. Bruker har en pågående sak i Infotrygd"
+                sak.baSak != null && sak.infotrygd != null -> "Bruker har sak i både Infotrygd og BA-sak"
+                sak.baSak != null -> "${sak.baSak.part} har sak i BA-sak"
+                sak.infotrygd != null -> "${sak.infotrygd.part} har sak i Infotrygd"
                 else -> null // trenger ingen form for markering. Kan løses av begge systemer
             }
         }
