@@ -74,7 +74,7 @@ class JournalhendelseService(val journalpostClient: JournalpostClient,
     }
 
     fun CharSequence.toStringOrNull(): String? {
-        return if (!this.isBlank()) this.toString() else null
+        return if (this.isNotBlank()) this.toString() else null
     }
 
 
@@ -115,7 +115,7 @@ class JournalhendelseService(val journalpostClient: JournalpostClient,
     }
 
     private fun behandleNavnoHendelser(journalpost: Journalpost) {
-        if (featureToggleService.isEnabled("familie-ba-mottak.journalhendelse.behsak")) {
+        if (featureToggleService.isEnabled("familie-ba-mottak.journalhendelse.behsak", true)) {
             val metadata = opprettMetadata(journalpost)
             val ferdigstillTask =
                     Task.nyTask(OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE,

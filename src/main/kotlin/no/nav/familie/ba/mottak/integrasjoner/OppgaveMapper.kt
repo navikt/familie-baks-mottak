@@ -18,7 +18,7 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
                 tema = Tema.BAR,
                 oppgavetype = oppgavetype,
                 fristFerdigstillelse = fristFerdigstillelse(),
-                beskrivelse = beskrivelse ?: hentHovedDokumentTittel(journalpost) ?: "",
+                beskrivelse = beskrivelse ?: journalpost.hentHovedDokumentTittel() ?: "",
                 enhetsnummer = if (journalpost.journalforendeEnhet == "2101") "4806" else journalpost.journalforendeEnhet, //Enhet 2101 er nedlagt. Rutes til 4806
                 behandlingstema = hentBehandlingstema(journalpost),
                 behandlingstype = hentBehandlingstype(journalpost))
@@ -57,10 +57,5 @@ class OppgaveMapper(private val aktørClient: AktørClient) {
     private fun hentBehandlingstype(journalpost: Journalpost): String? {
         if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
         return if (journalpost.dokumenter.any { it.brevkode == "NAV 33-00.15" }) Behandlingstype.Utland.value else null
-    }
-
-    private fun hentHovedDokumentTittel(journalpost: Journalpost): String? {
-        if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
-        return journalpost.dokumenter.firstOrNull { it.brevkode != null }?.tittel
     }
 }

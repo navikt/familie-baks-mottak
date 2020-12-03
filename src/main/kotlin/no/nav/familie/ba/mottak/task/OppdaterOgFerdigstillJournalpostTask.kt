@@ -82,7 +82,9 @@ class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: Journa
         val nyTask = Task.nyTask(
                 type = OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE,
                 payload = task.payload,
-                properties = task.metadata
+                properties = task.metadata.apply {
+                    this["fagsystem"] = "BA"
+                }
         )
         taskRepository.save(nyTask)
     }

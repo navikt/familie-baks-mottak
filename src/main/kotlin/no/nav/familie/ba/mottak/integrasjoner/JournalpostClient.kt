@@ -30,7 +30,7 @@ class JournalpostClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRAS
         logger.debug("henter journalpost med id {}", journalpostId)
         return try {
             val response = getForEntity<Ressurs<Journalpost>>(uri)
-            response?.getDataOrThrow()
+            response.getDataOrThrow()
         } catch (e: RestClientResponseException) {
             logger.warn("Henting av journalpost feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
             throw IllegalStateException("Henting av journalpost med id $journalpostId feilet. Status: " + e.rawStatusCode
@@ -50,7 +50,13 @@ data class Journalpost(val journalpostId: String,
                        val bruker: Bruker? = null,
                        val journalforendeEnhet: String? = null,
                        val kanal: String? = null,
-                       val dokumenter: List<DokumentInfo>? = null)
+                       val dokumenter: List<DokumentInfo>? = null) {
+
+    fun hentHovedDokumentTittel(): String? {
+        if (dokumenter.isNullOrEmpty()) error("Journalpost $journalpostId mangler dokumenter")
+        return dokumenter.firstOrNull { it.brevkode != null }?.tittel
+    }
+}
 
 data class Sak(val arkivsaksnummer: String?,
                var arkivsaksystem: String?,
