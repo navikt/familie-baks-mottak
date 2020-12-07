@@ -25,8 +25,12 @@ class OpprettBehandleSakOppgaveTask(private val journalpostClient: JournalpostCl
         if (journalpost.journalstatus == Journalstatus.JOURNALFOERT) {
             val oppgaver = oppgaveClient.finnOppgaver(journalpost.journalpostId, null)
             if (oppgaver.isNullOrEmpty()) {
+                var beskrivelse = journalpost.hentHovedDokumentTittel()
+                if (task.metadata["fagsystem"] == "BA") {
+                    beskrivelse = "Må behandles i BA-sak.\n $beskrivelse"
+                }
                 task.metadata["oppgaveId"] =
-                        "${oppgaveClient.opprettBehandleSakOppgave(journalpost).oppgaveId}"
+                        "${oppgaveClient.opprettBehandleSakOppgave(journalpost, beskrivelse).oppgaveId}"
                 taskRepository.saveAndFlush(task)
             } else {
                 throw error("Det eksister minst 1 åpen oppgave på journalpost ${task.payload}")

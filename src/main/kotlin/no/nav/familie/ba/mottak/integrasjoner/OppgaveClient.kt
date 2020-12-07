@@ -29,10 +29,10 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
         return responseFra(uri, request)
     }
 
-    fun opprettBehandleSakOppgave(journalpost: Journalpost): OppgaveResponse {
+    fun opprettBehandleSakOppgave(journalpost: Journalpost, beskrivelse: String? = null): OppgaveResponse {
         logger.info("Oppretter \"Behandle sak\"-oppgave for digital søknad")
         val uri = URI.create("$integrasjonUri/oppgave/opprett")
-        val request = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.BehandleSak, journalpost)
+        val request = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.BehandleSak, journalpost, beskrivelse)
 
         return responseFra(uri, request)
     }
