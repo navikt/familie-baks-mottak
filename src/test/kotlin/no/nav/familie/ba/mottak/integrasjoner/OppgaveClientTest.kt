@@ -13,10 +13,7 @@ import no.nav.familie.kontrakter.felles.oppgave.*
 import no.nav.familie.log.NavHttpHeaders
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Tag
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -26,7 +23,7 @@ import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-@SpringBootTest(classes = [DevLauncher::class], properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api"])
+@SpringBootTest(classes = [DevLauncher::class], properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api", "NORG2_API_URL=http://localhost:28085/norg2/"])
 @ActiveProfiles("dev", "mock-oauth")
 @AutoConfigureWireMock(port = 28085)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -35,6 +32,14 @@ class OppgaveClientTest {
     @Autowired
     @Qualifier("oppgaveClient")
     lateinit var oppgaveClient: OppgaveClient
+
+    @BeforeEach
+    fun setUp() {
+        stubFor(get(urlEqualTo("/norg2/api/v1/enhet/9999"))
+                        .willReturn(aResponse()
+                                            .withHeader("Content-Type", "application/json")
+                                            .withBody(objectMapper.writeValueAsString(Enhet("9999", "enhetNavn", true)))))
+    }
 
     @AfterEach
     fun cleanUp() {

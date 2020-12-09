@@ -110,6 +110,5 @@ class ClientMocks {
 
         return mockPdfClient
     }
-
 }
 
