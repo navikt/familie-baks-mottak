@@ -66,6 +66,7 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
         }.fold(
                 onSuccess = { response -> assertGyldig(response) },
                 onFailure = {
+                    log.warn("Post-kall mot $uri feilet ved opprettelse av oppgave", it)
                     throw IntegrasjonException("Post-kall mot $uri feilet ved opprettelse av oppgave",
                                                it,
                                                uri,

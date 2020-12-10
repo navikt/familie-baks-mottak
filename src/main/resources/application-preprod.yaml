@@ -46,3 +46,5 @@ FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 1
 #Brukes til tilgangskontroll av familie-ks-mottak-frontend
 MOTTAK_ROLLE: ${MOTTAK_ROLLE}
 JOURNALFOERINGHENDELSE_V1_TOPIC_URL: aapen-dok-journalfoering-v1-q2
+
+NORG2_API_URL: https://app-q1.adeo.no/norg2

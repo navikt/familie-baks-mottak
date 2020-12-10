@@ -33,9 +33,11 @@ class OpprettBehandleSakOppgaveTask(private val journalpostClient: JournalpostCl
                         "${oppgaveClient.opprettBehandleSakOppgave(journalpost, beskrivelse).oppgaveId}"
                 taskRepository.saveAndFlush(task)
             } else {
+                log.error("Det eksister minst 1 åpen oppgave på journalpost ${task.payload}")
                 throw error("Det eksister minst 1 åpen oppgave på journalpost ${task.payload}")
             }
         } else {
+            log.error("Kan ikke opprette oppgave før tilhørende journalpost ${journalpost.journalpostId} er ferdigstilt")
             throw error("Kan ikke opprette oppgave før tilhørende journalpost ${journalpost.journalpostId} er ferdigstilt")
         }
     }
