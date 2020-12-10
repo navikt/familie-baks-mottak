@@ -59,14 +59,14 @@ class HentEnhetClientTest {
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(objectMapper.writeValueAsString(Enhet("1234", "gammeltNavn", true)))))
 
-        assertThat(client.hentEnhet("1111").enhetNavn).isEqualTo("gammeltNavn")
+        assertThat(client.hentEnhet("1111").navn).isEqualTo("gammeltNavn")
 
         stubFor(get(urlEqualTo("/norg2/api/v1/enhet/1111"))
                         .willReturn(aResponse()
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(objectMapper.writeValueAsString(Enhet("1234", "Nytt navn", true)))))
 
-        assertThat(client.hentEnhet("1111").enhetNavn).isEqualTo("gammeltNavn")
+        assertThat(client.hentEnhet("1111").navn).isEqualTo("gammeltNavn")
 
     }
 }

@@ -38,5 +38,5 @@ class HentEnhetClient(@param:Value("\${NORG2_API_URL}") private val norg2Uri: UR
 }
 
 data class Enhet(val enhetId: String,
-                 val enhetNavn: String,
+                 val navn: String,
                  val oppgavebehandler: Boolean)
