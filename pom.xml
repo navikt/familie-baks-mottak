@@ -130,6 +130,11 @@
             <artifactId>barnetrygd</artifactId>
             <version>${kontrakter.version}</version>
         </dependency>
+        <dependency>
+            <groupId>nav-foedselsnummer</groupId>
+            <artifactId>core</artifactId>
+            <version>1.0-SNAPSHOT.5</version>
+        </dependency>
 
         <!-- Kafka -->
         <dependency>
