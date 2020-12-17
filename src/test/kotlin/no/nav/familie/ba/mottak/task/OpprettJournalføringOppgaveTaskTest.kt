@@ -8,7 +8,7 @@ import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.assertj.core.api.Assertions
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
@@ -21,16 +21,18 @@ class OpprettJournalføringOppgaveTaskTest {
     private val mockAktørClient: AktørClient = mockk()
     private val mockTaskRepository: TaskRepository = mockk(relaxed = true)
     private val mockPersonClient: PersonClient = mockk(relaxed = true)
+    private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
 
     private val taskStep = OpprettJournalføringOppgaveTask(mockJournalpostClient,
                                                            mockOppgaveClient,
                                                            mockSakClient,
                                                            mockAktørClient,
                                                            mockTaskRepository,
-                                                           mockPersonClient)
+                                                           mockPersonClient,
+                                                           mockInfotrygdBarnetrygdClient)
 
 
-    @BeforeAll
+    @BeforeEach
     internal fun setUp() {
         //Inngående papirsøknad, Mottatt
         every {
@@ -57,6 +59,18 @@ class OpprettJournalføringOppgaveTaskTest {
         every {
             mockAktørClient.hentPersonident(any())
         } returns "12345678910"
+
+        every {
+            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
+        } returns RestPågåendeSakResponse()
+
+        every {
+            mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
+        } returns InfotrygdSøkResult(emptyList(), emptyList())
+
+        every {
+            mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
+        } returns InfotrygdSøkResult(emptyList(), emptyList())
 
     }
 
@@ -100,8 +114,8 @@ class OpprettJournalføringOppgaveTaskTest {
         } returns OppgaveResponse(1)
 
         every {
-            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(infotrygd = Sakspart.SØKER)
+            mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
+        } returns InfotrygdSøkResult(listOf(StønadDto(1)), listOf(StønadDto(2)))
 
         taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
 
@@ -116,8 +130,8 @@ class OpprettJournalføringOppgaveTaskTest {
         } returns OppgaveResponse(1)
 
         every {
-            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(infotrygd = Sakspart.ANNEN)
+            mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
+        } returns InfotrygdSøkResult(emptyList(), listOf(SakDto(status = "UB")))
 
         taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
 
@@ -129,10 +143,6 @@ class OpprettJournalføringOppgaveTaskTest {
         every {
             mockOppgaveClient.opprettJournalføringsoppgave(any())
         } returns OppgaveResponse(1)
-
-        every {
-            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse()
 
         taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
 

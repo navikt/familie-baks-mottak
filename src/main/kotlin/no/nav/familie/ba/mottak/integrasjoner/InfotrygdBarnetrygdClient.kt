@@ -76,8 +76,8 @@ private fun List<SakDto>.harSak(): Boolean {
 
 data class StønadDto(
         val stønadId: Long,
-        val sakNr: String,
-        val opphørtFom: String?,
+        val sakNr: String? = null,
+        val opphørtFom: String? = null,
         val opphørsgrunn: String? = null,
 )
 
