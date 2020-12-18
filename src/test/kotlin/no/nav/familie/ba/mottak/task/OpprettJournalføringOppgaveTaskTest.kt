@@ -66,11 +66,11 @@ class OpprettJournalføringOppgaveTaskTest {
 
         every {
             mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
-        } returns InfotrygdSøkResult(emptyList(), emptyList())
+        } returns InfotrygdSøkResponse(emptyList(), emptyList())
 
         every {
             mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
-        } returns InfotrygdSøkResult(emptyList(), emptyList())
+        } returns InfotrygdSøkResponse(emptyList(), emptyList())
 
     }
 
@@ -115,7 +115,7 @@ class OpprettJournalføringOppgaveTaskTest {
 
         every {
             mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
-        } returns InfotrygdSøkResult(listOf(StønadDto(1)), listOf(StønadDto(2)))
+        } returns InfotrygdSøkResponse(listOf(StønadDto(1)), listOf(StønadDto(2)))
 
         taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
 
@@ -131,7 +131,7 @@ class OpprettJournalføringOppgaveTaskTest {
 
         every {
             mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
-        } returns InfotrygdSøkResult(emptyList(), listOf(SakDto(status = "UB")))
+        } returns InfotrygdSøkResponse(emptyList(), listOf(SakDto(status = "UB")))
 
         taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
 

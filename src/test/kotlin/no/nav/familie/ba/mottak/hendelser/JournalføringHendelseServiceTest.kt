@@ -229,11 +229,11 @@ class JournalføringHendelseServiceTest {
 
         every {
             infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
-        } returns InfotrygdSøkResult(emptyList(), emptyList())
+        } returns InfotrygdSøkResponse(emptyList(), emptyList())
 
         every {
             infotrygdBarnetrygdClient.hentSaker(any(), any())
-        } returns InfotrygdSøkResult(emptyList(), emptyList())
+        } returns InfotrygdSøkResponse(emptyList(), emptyList())
 
 
         val task = OpprettJournalføringOppgaveTask(

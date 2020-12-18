@@ -4,8 +4,6 @@ import io.swagger.annotations.ApiModelProperty
 import no.nav.commons.foedselsnummer.FoedselsNr
 import no.nav.familie.ba.mottak.integrasjoner.Sakspart.*
 import no.nav.familie.http.client.AbstractRestClient
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.env.Environment
@@ -21,50 +19,47 @@ class InfotrygdBarnetrygdClient(@Value("\${FAMILIE_BA_INFOTRYGD_BARNETRYGD_API_U
                                 private val environment: Environment)
     : AbstractRestClient(restOperations, "infotrygd_barnetrygd_replika") {
 
-    fun hentLøpendeUtbetalinger(søkersIdenter: List<String>, barnasIdenter: List<String> = emptyList()): InfotrygdSøkResult<StønadDto> {
-        return infotrygdSøkResult(URI.create("$clientUri/stonad"), søkersIdenter, barnasIdenter,
-                                  meldingVedFeil = "Feil ved søk etter stønad i infotrygd.")
+    fun hentLøpendeUtbetalinger(søkersIdenter: List<String>, barnasIdenter: List<String>): InfotrygdSøkResponse<StønadDto> {
+        return infotrygdResponseFra(
+                postRequest = { postForEntity(uri("stonad"), mapTilInfotrygdSøkRequest(søkersIdenter, barnasIdenter)) },
+                onFailure = { ex -> IntegrasjonException("Feil ved søk etter stønad i infotrygd.", ex, uri("stonad")) }
+        )
     }
 
-    fun hentSaker(søkersIdenter: List<String>, barnasIdenter: List<String> = emptyList()): InfotrygdSøkResult<SakDto> {
-        return infotrygdSøkResult(URI.create("$clientUri/stonad"), søkersIdenter, barnasIdenter,
-                                  meldingVedFeil = "Feil ved uthenting av saker fra infotrygd.")
+    fun hentSaker(søkersIdenter: List<String>, barnasIdenter: List<String>): InfotrygdSøkResponse<SakDto> {
+        return infotrygdResponseFra(
+                postRequest = { postForEntity(uri("saker"), mapTilInfotrygdSøkRequest(søkersIdenter, barnasIdenter)) },
+                onFailure = { ex -> IntegrasjonException("Feil ved uthenting av saker fra infotrygd.", ex, uri("saker")) }
+        )
     }
 
-    private fun <T> infotrygdSøkResult(uri: URI,
-                                       søkersIdenter: List<String>,
-                                       barnasIdenter: List<String>,
-                                       meldingVedFeil: String): InfotrygdSøkResult<T> {
-
-        if (environment.activeProfiles.contains("e2e")) {
-            return InfotrygdSøkResult(emptyList(), emptyList())
-        }
-
-        return try {
-            postForEntity(uri, InfotrygdSøkRequest(søkersIdenter.map { FoedselsNr(it) }, barnasIdenter.map { FoedselsNr(it) }))
-        } catch (ex: Exception) {
-            throw IntegrasjonException(msg = meldingVedFeil, ex, uri, søkersIdenter.firstOrNull())
-        }
+    private fun <T> infotrygdResponseFra(postRequest: () -> InfotrygdSøkResponse<T>,
+                                         onFailure: (Throwable) -> RuntimeException): InfotrygdSøkResponse<T> {
+        return if (environment.activeProfiles.contains("e2e"))  InfotrygdSøkResponse(emptyList(), emptyList())
+        else runCatching(postRequest).getOrElse { throw onFailure(it) }
     }
 
-    companion object {
-        val logger: Logger = LoggerFactory.getLogger(this::class.java)
+    private fun uri(endepunkt: String) = URI.create("$clientUri/$endepunkt")
+
+    private fun mapTilInfotrygdSøkRequest(søkersIdenter: List<String>,
+                                          barnasIdenter: List<String>): InfotrygdSøkRequest {
+        return InfotrygdSøkRequest(søkersIdenter.map { FoedselsNr(it) }, barnasIdenter.map { FoedselsNr(it) })
     }
 }
 
 data class InfotrygdSøkRequest(val brukere: List<FoedselsNr>,
                                val barn: List<FoedselsNr>? = null)
 
-data class InfotrygdSøkResult<T> (
+data class InfotrygdSøkResponse<T> (
         val bruker: List<T>,
         val barn: List<T>,
 )
 
 
-val InfotrygdSøkResult<StønadDto>.part: Sakspart?
+val InfotrygdSøkResponse<StønadDto>.resultat: Sakspart?
     get() = if (bruker.isNotEmpty()) SØKER else if (barn.isNotEmpty()) ANNEN else null
 
-val InfotrygdSøkResult<SakDto>.part: Sakspart? @JvmName("getSakspart")
+val InfotrygdSøkResponse<SakDto>.resultat: Sakspart? @JvmName("getSakspart")
     get() = if (bruker.harSak()) SØKER else if (barn.harSak()) ANNEN else null
 
 private fun List<SakDto>.harSak(): Boolean {
