@@ -13,7 +13,7 @@ import java.time.LocalDate
 @Component
 class InfotrygdBarnetrygdClient(@Value("\${FAMILIE_BA_INFOTRYGD_BARNETRYGD_API_URL}/infotrygd/barnetrygd")
                                 private val clientUri: URI,
-                                @Qualifier("jwtBearer") restOperations: RestOperations,
+                                @Qualifier("clientCredentials") restOperations: RestOperations,
                                 private val environment: Environment)
     : AbstractRestClient(restOperations, "infotrygd_barnetrygd_replika") {
 
