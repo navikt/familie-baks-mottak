@@ -68,8 +68,8 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
                 .map { it.personIdent.id }
 
         val baSak = sakClient.hentPågåendeSakStatus(brukersIdent, barnasIdenter).baSak
-        var infotrygdSak = infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(listOf("20097647438"), barnasIdenter).resultat
-        infotrygdSak = infotrygdBarnetrygdClient.hentSaker(listOf("20097647438"), barnasIdenter).resultat
+        val infotrygdSak = infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, barnasIdenter).resultat ?:
+                           infotrygdBarnetrygdClient.hentSaker(brukersIdenter, barnasIdenter).resultat
 
         return when {
             baSak.finnes() && infotrygdSak.finnes() -> "Bruker har sak i både Infotrygd og BA-sak"
