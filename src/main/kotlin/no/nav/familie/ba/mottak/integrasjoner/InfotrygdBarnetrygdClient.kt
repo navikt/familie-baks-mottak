@@ -73,14 +73,14 @@ data class SakDto(
         val saksnr: String? = null,
         val kapittelnr: String? = null,
         val valg: String? = null,
-        val Type: String? = null,
-        val Aarsakskode: String? = null,
+        val type: String? = null,
+        val årsakskode: String? = null,
         val vedtak: StønadDto? = null,
-        val Vedtaksdato: LocalDate? = null,
+        val vedtaksdato: LocalDate? = null,
         val mottattdato: LocalDate? = null,
         val regDato: LocalDate? = null,
-        val RegAvEnhet: String? = null,
-        val BehenEnhet: String? = null,
+        val regAvEnhet: String? = null,
+        val behenEnhet: String? = null,
         val status: String,         // S15_STATUS
 )
 

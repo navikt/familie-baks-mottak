@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.core.io.ClassPathResource
 import org.springframework.test.context.ActiveProfiles
-import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
