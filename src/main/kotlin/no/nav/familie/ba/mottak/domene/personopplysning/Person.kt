@@ -4,7 +4,7 @@ import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 
 
 data class Person(
-        val navn: String?,
+        val navn: String,
         val familierelasjoner: Set<Familierelasjon>,
         val bostedsadresse: Bostedsadresse? = null,
         val adressebeskyttelseGradering: String? = null,

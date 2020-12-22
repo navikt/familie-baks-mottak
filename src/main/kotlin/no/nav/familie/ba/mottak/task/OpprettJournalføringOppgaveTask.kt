@@ -18,7 +18,7 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
                                       private val sakClient: SakClient,
                                       private val aktørClient: AktørClient,
                                       private val taskRepository: TaskRepository,
-                                      private val pdlClient: PdlClient,
+                                      private val personClient: PersonClient,
                                       private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(OpprettJournalføringOppgaveTask::class.java)
@@ -62,17 +62,14 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
         if (journalpost.bruker == null) return null
 
         val brukersIdent = tilPersonIdent(journalpost.bruker)
-        val brukersIdenter = pdlClient.hentIdenter(brukersIdent).filter { it.gruppe == "FOLKEREGISTERIDENT" }.map { it.ident }
-        val barnasIdenter = pdlClient.hentPersonMedRelasjoner(brukersIdent).familierelasjoner
+        val brukersIdenter = listOf(brukersIdent) // TODO: Legge til historiske identer
+        val barnasIdenter = personClient.hentPersonMedRelasjoner(brukersIdent).familierelasjoner // TODO: Legge til historiske identer
                 .filter { it.relasjonsrolle == "BARN" }
                 .map { it.personIdent.id }
-        val alleBarnasIdenter = barnasIdenter.flatMap { pdlClient.hentIdenter(it) }
-                .filter { it.gruppe == "FOLKEREGISTERIDENT" }
-                .map { it.ident }
 
         val baSak = sakClient.hentPågåendeSakStatus(brukersIdent, barnasIdenter).baSak
-        val infotrygdSak = infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, alleBarnasIdenter).resultat ?:
-                           infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).resultat
+        val infotrygdSak = infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, barnasIdenter).resultat ?:
+                           infotrygdBarnetrygdClient.hentSaker(brukersIdenter, barnasIdenter).resultat
 
         return when {
             baSak.finnes() && infotrygdSak.finnes() -> "Bruker har sak i både Infotrygd og BA-sak"

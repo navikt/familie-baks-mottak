@@ -20,7 +20,7 @@ class OpprettJournalføringOppgaveTaskTest {
     private val mockSakClient: SakClient = mockk()
     private val mockAktørClient: AktørClient = mockk()
     private val mockTaskRepository: TaskRepository = mockk(relaxed = true)
-    private val mockPdlClient: PdlClient = mockk(relaxed = true)
+    private val mockPersonClient: PersonClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
 
     private val taskStep = OpprettJournalføringOppgaveTask(mockJournalpostClient,
@@ -28,7 +28,7 @@ class OpprettJournalføringOppgaveTaskTest {
                                                            mockSakClient,
                                                            mockAktørClient,
                                                            mockTaskRepository,
-                                                           mockPdlClient,
+                                                           mockPersonClient,
                                                            mockInfotrygdBarnetrygdClient)
 
 
