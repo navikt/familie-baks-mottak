@@ -11,6 +11,7 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import kotlin.test.Ignore
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OpprettJournalføringOppgaveTaskTest {
@@ -106,6 +107,7 @@ class OpprettJournalføringOppgaveTaskTest {
         Assertions.assertThat(sakssystemMarkering.captured).contains("Søsken har sak i BA-sak")
     }
 
+    @Ignore
     @Test
     fun `Oppretter oppgave med beskrivelse som sier at bruker har sak i Infotrygd`() {
         val sakssystemMarkering = slot<String>()
