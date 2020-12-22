@@ -19,7 +19,7 @@ class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: Journa
                                            private val sakClient: SakClient,
                                            private val aktørClient: AktørClient,
                                            private val taskRepository: TaskRepository,
-                                           private val personClient: PersonClient,
+                                           private val pdlClient: PdlClient,
                                            private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(OppdaterOgFerdigstillJournalpostTask::class.java)
@@ -28,14 +28,17 @@ class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: Journa
         val journalpost = journalpostClient.hentJournalpost(task.payload)
                                   .takeUnless { it.bruker == null } ?: throw error("Journalpost ${task.payload} mangler bruker")
         val brukersIdent = tilPersonIdent(journalpost.bruker!!)
-        val brukersIdenter = listOf(brukersIdent) // TODO: Legge til historiske identer
-        val barnasIdenter = personClient.hentPersonMedRelasjoner(brukersIdent).familierelasjoner // TODO: Legge til historiske identer
+        val brukersIdenter = pdlClient.hentIdenter(brukersIdent).filter { it.gruppe == "FOLKEREGISTERIDENT" }.map { it.ident }
+        val barnasIdenter = pdlClient.hentPersonMedRelasjoner(brukersIdent).familierelasjoner
                 .filter { it.relasjonsrolle == "BARN" }
                 .map { it.personIdent.id }
+        val alleBarnasIdenter = barnasIdenter.flatMap { pdlClient.hentIdenter(it) }
+                .filter { it.gruppe == "FOLKEREGISTERIDENT" }
+                .map { it.ident }
 
         val baSak = sakClient.hentPågåendeSakStatus(brukersIdent, barnasIdenter).baSak
-        val infotrygdSak = infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, barnasIdenter).resultat ?:
-                           infotrygdBarnetrygdClient.hentSaker(brukersIdenter, barnasIdenter).resultat
+        val infotrygdSak = infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, alleBarnasIdenter).resultat ?:
+                           infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).resultat
 
         if (infotrygdSak.finnes() && baSak.finnes()) {
             log.info("Bruker har sak i både Infotrygd og BA-sak. Dropper automatisk ferdigstilling og oppretter istedet " +
