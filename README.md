@@ -46,6 +46,6 @@ Ende til ende testene ligger her: https://github.com/navikt/familie-ba-e2e/tree/
 Appen blir produksjonssatt ved push til master
 
 ## Henvendelser
-For NAV-interne kan henvendelser rettes til #team-familie på slack. Ellers kan henvendelser rettes via et issue her på github-repoet. 
+For NAV-interne kan henvendelser rettes til #team-familie på slack. Ellers kan henvendelser rettes via et issue her på github-repoet.
 
 [1]: https://github.com/navikt/navkafka-docker-compose
