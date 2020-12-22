@@ -48,7 +48,7 @@ class JournalføringHendelseServiceTest {
     lateinit var mockTaskRepository: TaskRepository
 
     @MockK(relaxed = true)
-    lateinit var mockPersonClient: PersonClient
+    lateinit var mockPdlClient: PdlClient
 
     @MockK(relaxed = true)
     lateinit var mockFeatureToggleService: FeatureToggleService
@@ -242,7 +242,7 @@ class JournalføringHendelseServiceTest {
                 sakClient,
                 aktørClient,
                 mockTaskRepository,
-                mockPersonClient,
+                mockPdlClient,
                 infotrygdBarnetrygdClient)
 
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT))
@@ -271,7 +271,7 @@ class JournalføringHendelseServiceTest {
                 sakClient,
                 aktørClient,
                 mockTaskRepository,
-                mockPersonClient,
+                mockPdlClient,
                 infotrygdBarnetrygdClient)
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT))
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_PAPIRSØKNAD))
@@ -289,7 +289,7 @@ class JournalføringHendelseServiceTest {
                 sakClient,
                 aktørClient,
                 mockTaskRepository,
-                mockPersonClient,
+                mockPdlClient,
                 infotrygdBarnetrygdClient)
 
         Assertions.assertThrows(IllegalStateException::class.java) {
