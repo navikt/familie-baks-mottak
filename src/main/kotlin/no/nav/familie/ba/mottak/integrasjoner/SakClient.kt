@@ -84,3 +84,5 @@ enum class Sakspart(val part: String) {
     SØKER("Bruker"),
     ANNEN("Søsken"),
 }
+
+fun Sakspart?.finnes(): Boolean = this != null

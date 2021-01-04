@@ -18,7 +18,8 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
                                       private val sakClient: SakClient,
                                       private val aktørClient: AktørClient,
                                       private val taskRepository: TaskRepository,
-                                      private val personClient: PersonClient) : AsyncTaskStep {
+                                      private val personClient: PersonClient,
+                                      private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(OpprettJournalføringOppgaveTask::class.java)
 
@@ -61,18 +62,22 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
         if (journalpost.bruker == null) return null
 
         val brukersIdent = tilPersonIdent(journalpost.bruker)
-        val barnasIdenter = personClient.hentPersonMedRelasjoner(brukersIdent).familierelasjoner
+        val brukersIdenter = listOf(brukersIdent) // TODO: Legge til historiske identer
+        val barnasIdenter = personClient.hentPersonMedRelasjoner(brukersIdent).familierelasjoner // TODO: Legge til historiske identer
                 .filter { it.relasjonsrolle == "BARN" }
                 .map { it.personIdent.id }
 
-        return sakClient.hentPågåendeSakStatus(brukersIdent, barnasIdenter).let { sak ->
-            when {
-                sak.baSak != null && sak.infotrygd != null -> "Bruker har sak i både Infotrygd og BA-sak"
-                sak.baSak != null -> "${sak.baSak.part} har sak i BA-sak"
-                sak.infotrygd != null -> "${sak.infotrygd.part} har sak i Infotrygd"
-                else -> null // trenger ingen form for markering. Kan løses av begge systemer
-            }
+        val baSak = sakClient.hentPågåendeSakStatus(brukersIdent, barnasIdenter).baSak
+        val infotrygdSak = infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, barnasIdenter).resultat ?:
+                           infotrygdBarnetrygdClient.hentSaker(brukersIdenter, barnasIdenter).resultat
+
+        return when {
+            baSak.finnes() && infotrygdSak.finnes() -> "Bruker har sak i både Infotrygd og BA-sak"
+            baSak.finnes() -> "${baSak!!.part} har sak i BA-sak"
+            infotrygdSak.finnes() -> "${infotrygdSak!!.part} har sak i Infotrygd"
+            else -> null // trenger ingen form for markering. Kan løses av begge systemer
         }
+
     }
 
     private fun tilPersonIdent(bruker: Bruker): String {
