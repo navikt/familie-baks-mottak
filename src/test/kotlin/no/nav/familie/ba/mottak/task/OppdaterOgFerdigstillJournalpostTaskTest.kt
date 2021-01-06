@@ -22,13 +22,15 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
     private val mockAktørClient: AktørClient = mockk()
     private val mockTaskRepository: TaskRepository = mockk(relaxed = true)
     private val mockPersonClient: PersonClient = mockk(relaxed = true)
+    private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
 
     private val taskStep = OppdaterOgFerdigstillJournalpostTask(mockJournalpostClient,
                                                                 mockDokarkivClient,
                                                                 mockSakClient,
                                                                 mockAktørClient,
                                                                 mockTaskRepository,
-                                                                mockPersonClient)
+                                                                mockPersonClient,
+                                                                mockInfotrygdBarnetrygdClient)
 
 
     @BeforeEach
@@ -55,6 +57,14 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
         every {
             mockAktørClient.hentPersonident(any())
         } returns "12345678910"
+
+        every {
+            mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
+        } returns InfotrygdSøkResponse(emptyList(), emptyList())
+
+        every {
+            mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
+        } returns InfotrygdSøkResponse(emptyList(), emptyList())
     }
 
     @Test
@@ -114,6 +124,10 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
         } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER, infotrygd = Sakspart.SØKER)
 
         every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
+
+        every {
+            mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
+        } returns InfotrygdSøkResponse(listOf(StønadDto(1)), listOf(StønadDto(2)))
 
         taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
 

@@ -39,6 +39,9 @@ class JournalføringHendelseServiceTest {
     lateinit var sakClient: SakClient
 
     @MockK
+    lateinit var infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient
+
+    @MockK
     lateinit var aktørClient: AktørClient
 
     @MockK(relaxed = true)
@@ -224,13 +227,23 @@ class JournalføringHendelseServiceTest {
             sakClient.hentPågåendeSakStatus(any(), emptyList())
         } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
 
+        every {
+            infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
+        } returns InfotrygdSøkResponse(emptyList(), emptyList())
+
+        every {
+            infotrygdBarnetrygdClient.hentSaker(any(), any())
+        } returns InfotrygdSøkResponse(emptyList(), emptyList())
+
+
         val task = OpprettJournalføringOppgaveTask(
                 mockJournalpostClient,
                 mockOppgaveClient,
                 sakClient,
                 aktørClient,
                 mockTaskRepository,
-                mockPersonClient)
+                mockPersonClient,
+                infotrygdBarnetrygdClient)
 
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT))
 
@@ -258,7 +271,8 @@ class JournalføringHendelseServiceTest {
                 sakClient,
                 aktørClient,
                 mockTaskRepository,
-                mockPersonClient)
+                mockPersonClient,
+                infotrygdBarnetrygdClient)
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT))
         task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_PAPIRSØKNAD))
 
@@ -275,7 +289,8 @@ class JournalføringHendelseServiceTest {
                 sakClient,
                 aktørClient,
                 mockTaskRepository,
-                mockPersonClient)
+                mockPersonClient,
+                infotrygdBarnetrygdClient)
 
         Assertions.assertThrows(IllegalStateException::class.java) {
             task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_FERDIGSTILT))
