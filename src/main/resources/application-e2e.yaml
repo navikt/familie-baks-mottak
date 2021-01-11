@@ -54,8 +54,8 @@ funksjonsbrytere:
 logging:
   level:
     org: INFO
-    no.nav: DEBUG
-#  config: "classpath:logback-test.xml"
+    no.nav.familie: DEBUG
+  config: "classpath:logback-e2e.xml"
 
 FAMILIE_BA_DOKGEN_API_URL: http://familie-ba-dokgen:8080
 FAMILIE_BA_SAK_API_URL: http://familie-ba-sak:8089/api
