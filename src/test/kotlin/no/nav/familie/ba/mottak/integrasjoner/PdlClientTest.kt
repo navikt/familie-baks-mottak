@@ -32,7 +32,7 @@ class PdlClientTest {
     }
 
     @Test
-    fun `hentPersonMedRelasjoner`() {
+    fun hentPersonMedRelasjoner() {
         mockResponseForPdlQuery(pdlRequestBody = gyldigRequest("hentperson-med-relasjoner.graphql", testIdent),
                                 mockResponse = readfile("mockPersonResponse.json"))
 

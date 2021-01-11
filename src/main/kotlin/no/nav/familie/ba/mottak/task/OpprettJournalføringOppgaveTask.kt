@@ -15,17 +15,13 @@ import org.springframework.stereotype.Service
                      beskrivelse = "Opprett journalføringsoppgave")
 class OpprettJournalføringOppgaveTask(private val journalpostClient: JournalpostClient,
                                       private val oppgaveClient: OppgaveClient,
-                                      private val sakClient: SakClient,
-                                      private val aktørClient: AktørClient,
-                                      private val taskRepository: TaskRepository,
-                                      private val pdlClient: PdlClient,
-                                      private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient) : AsyncTaskStep {
+                                      private val taskRepository: TaskRepository) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(OpprettJournalføringOppgaveTask::class.java)
 
     override fun doTask(task: Task) {
 
-        val journalpost = journalpostClient.hentJournalpost(task.payload)
+        val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
         when (journalpost.journalstatus) {
             Journalstatus.MOTTATT -> {
                 val oppgaveTypeForEksisterendeOppgave: Oppgavetype? =
@@ -37,7 +33,7 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
 
                 if (oppgaveTypeForEksisterendeOppgave == null) {
                     val nyOppgave = oppgaveClient.opprettJournalføringsoppgave(journalpost = journalpost,
-                                                                               beskrivelse = sakssystemMarkering(journalpost))
+                                                                               beskrivelse = task.payload.takeIf { it.isNotEmpty() })
                     task.metadata["oppgaveId"] = "${nyOppgave.oppgaveId}"
                     taskRepository.saveAndFlush(task)
                     log.info("Oppretter ny journalførings-oppgave med id ${nyOppgave.oppgaveId} for journalpost ${journalpost.journalpostId}")
@@ -58,40 +54,7 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
         }
     }
 
-    private fun sakssystemMarkering(journalpost: Journalpost): String? {
-        if (journalpost.bruker == null) return null
-
-        val brukersIdent = tilPersonIdent(journalpost.bruker)
-        val brukersIdenter = pdlClient.hentIdenter(brukersIdent).filter { it.gruppe == "FOLKEREGISTERIDENT" }.map { it.ident }
-        val barnasIdenter = pdlClient.hentPersonMedRelasjoner(brukersIdent).familierelasjoner
-                .filter { it.relasjonsrolle == "BARN" }
-                .map { it.personIdent.id }
-        val alleBarnasIdenter = barnasIdenter.flatMap { pdlClient.hentIdenter(it) }
-                .filter { it.gruppe == "FOLKEREGISTERIDENT" }
-                .map { it.ident }
-
-        val baSak = sakClient.hentPågåendeSakStatus(brukersIdent, barnasIdenter).baSak
-        val infotrygdSak = infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, alleBarnasIdenter).resultat ?:
-                           infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).resultat
-
-        return when {
-            baSak.finnes() && infotrygdSak.finnes() -> "Bruker har sak i både Infotrygd og BA-sak"
-            baSak.finnes() -> "${baSak!!.part} har sak i BA-sak"
-            infotrygdSak.finnes() -> "${infotrygdSak!!.part} har sak i Infotrygd"
-            else -> null // trenger ingen form for markering. Kan løses av begge systemer
-        }
-
-    }
-
-    private fun tilPersonIdent(bruker: Bruker): String {
-        return when (bruker.type) {
-            BrukerIdType.AKTOERID -> aktørClient.hentPersonident(bruker.id)
-            else -> bruker.id
-        }
-    }
-
     companion object {
-
         const val TASK_STEP_TYPE = "opprettJournalføringsoppgave"
     }
 }

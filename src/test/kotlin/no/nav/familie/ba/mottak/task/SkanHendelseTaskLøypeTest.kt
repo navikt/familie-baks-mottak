@@ -3,17 +3,16 @@ package no.nav.familie.ba.mottak.task
 import io.mockk.*
 import no.nav.familie.ba.mottak.hendelser.JournalføringHendelseServiceTest
 import no.nav.familie.ba.mottak.integrasjoner.*
-import no.nav.familie.ba.mottak.task.OpprettJournalføringOppgaveTask.Companion.TASK_STEP_TYPE
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class OpprettJournalføringOppgaveTaskTest {
+class SkanHendelseTaskLøypeTest {
 
     private val mockJournalpostClient: JournalpostClient = mockk()
     private val mockOppgaveClient: OppgaveClient = mockk()
@@ -23,17 +22,19 @@ class OpprettJournalføringOppgaveTaskTest {
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
 
-    private val taskStep = OpprettJournalføringOppgaveTask(mockJournalpostClient,
-                                                           mockOppgaveClient,
-                                                           mockSakClient,
-                                                           mockAktørClient,
-                                                           mockTaskRepository,
-                                                           mockPdlClient,
-                                                           mockInfotrygdBarnetrygdClient)
+    private val taskStep1 = JournalhendelseRutingTask(mockPdlClient,
+                                                      mockSakClient,
+                                                      mockInfotrygdBarnetrygdClient,
+                                                      mockTaskRepository)
+
+    private val taskStep2 = OpprettJournalføringOppgaveTask(mockJournalpostClient,
+                                                            mockOppgaveClient,
+                                                            mockTaskRepository)
 
 
     @BeforeEach
     internal fun setUp() {
+        clearMocks(mockTaskRepository)
         //Inngående papirsøknad, Mottatt
         every {
             mockJournalpostClient.hentJournalpost(any())
@@ -42,7 +43,7 @@ class OpprettJournalføringOppgaveTaskTest {
                               journalstatus = Journalstatus.MOTTATT,
                               bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
                               tema = "BAR",
-                              kanal = "SKAN_NETS",
+                              kanal = MOTTAK_KANAL,
                               behandlingstema = null,
                               dokumenter = null,
                               journalforendeEnhet = null,
@@ -85,9 +86,10 @@ class OpprettJournalføringOppgaveTaskTest {
             mockSakClient.hentPågåendeSakStatus(any(), emptyList())
         } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
 
-        taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
-
-        Assertions.assertThat(sakssystemMarkering.captured).contains("Bruker har sak i BA-sak")
+        kjørRutingTaskOgReturnerNesteTask().run {
+            taskStep2.doTask(this)
+        }
+        assertThat(sakssystemMarkering.captured).contains("Bruker har sak i BA-sak")
     }
 
     @Test
@@ -101,9 +103,10 @@ class OpprettJournalføringOppgaveTaskTest {
             mockSakClient.hentPågåendeSakStatus(any(), emptyList())
         } returns RestPågåendeSakResponse(baSak = Sakspart.ANNEN)
 
-        taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
-
-        Assertions.assertThat(sakssystemMarkering.captured).contains("Søsken har sak i BA-sak")
+        kjørRutingTaskOgReturnerNesteTask().run {
+            taskStep2.doTask(this)
+        }
+        assertThat(sakssystemMarkering.captured).contains("Søsken har sak i BA-sak")
     }
 
     @Test
@@ -117,9 +120,10 @@ class OpprettJournalføringOppgaveTaskTest {
             mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
         } returns InfotrygdSøkResponse(listOf(StønadDto(1)), listOf(StønadDto(2)))
 
-        taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
-
-        Assertions.assertThat(sakssystemMarkering.captured).contains("Bruker har sak i Infotrygd")
+        kjørRutingTaskOgReturnerNesteTask().run {
+            taskStep2.doTask(this)
+        }
+        assertThat(sakssystemMarkering.captured).contains("Bruker har sak i Infotrygd")
     }
 
     @Test
@@ -133,9 +137,10 @@ class OpprettJournalføringOppgaveTaskTest {
             mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
         } returns InfotrygdSøkResponse(emptyList(), listOf(SakDto(status = "UB")))
 
-        taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
-
-        Assertions.assertThat(sakssystemMarkering.captured).contains("Søsken har sak i Infotrygd")
+        kjørRutingTaskOgReturnerNesteTask().run {
+            taskStep2.doTask(this)
+        }
+        assertThat(sakssystemMarkering.captured).contains("Søsken har sak i Infotrygd")
     }
 
     @Test
@@ -144,10 +149,31 @@ class OpprettJournalføringOppgaveTaskTest {
             mockOppgaveClient.opprettJournalføringsoppgave(any())
         } returns OppgaveResponse(1)
 
-        taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
-
+        kjørRutingTaskOgReturnerNesteTask().run {
+            taskStep2.doTask(this)
+        }
         verify(exactly = 1) {
             mockOppgaveClient.opprettJournalføringsoppgave(any(), beskrivelse = null)
         }
+    }
+
+    private fun kjørRutingTaskOgReturnerNesteTask(): Task {
+        taskStep1.doTask(Task.nyTask(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+                                     payload = MOTTAK_KANAL).apply {
+            this.metadata["personIdent"] = "12345678901"
+            this.metadata["journalpostId"] = "mockJournalpostId"
+        })
+
+        val nesteTask = slot<Task>().let { nyTask ->
+            verify(exactly = 1) {
+                mockTaskRepository.save(capture(nyTask))
+            }
+            nyTask.captured
+        }
+        return nesteTask
+    }
+
+    companion object {
+        private val MOTTAK_KANAL = "SKAN_NETS"
     }
 }
