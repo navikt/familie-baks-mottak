@@ -68,6 +68,7 @@ JOURNALFOERINGHENDELSE_V1_TOPIC_URL: aapen-dok-journalfoering-v1-e2e
 NORG2_API_URL: http://familie-mock-server:1337/rest/api/norg2
 
 FAMILIE_BA_INFOTRYGD_BARNETRYGD_API_URL: dummy
+STS_URL: http://nav-auth-mock:8200/nais-sts/token
 PDL_URL: http://familie-mock-server:1337/rest/api/pdl
 
 CREDENTIAL_USERNAME: not-a-real-srvuser
