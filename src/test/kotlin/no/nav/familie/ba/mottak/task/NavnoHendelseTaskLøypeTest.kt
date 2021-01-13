@@ -23,16 +23,16 @@ class NavnoHendelseTaskLøypeTest {
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
 
-    private val taskStep1 = JournalhendelseRutingTask(mockPdlClient,
-                                                      mockSakClient,
-                                                      mockInfotrygdBarnetrygdClient,
-                                                      mockTaskRepository)
+    private val rutingSteg = JournalhendelseRutingTask(mockPdlClient,
+                                                       mockSakClient,
+                                                       mockInfotrygdBarnetrygdClient,
+                                                       mockTaskRepository)
 
-    private val taskStep2 = OppdaterOgFerdigstillJournalpostTask(mockJournalpostClient,
-                                                                 mockDokarkivClient,
-                                                                 mockSakClient,
-                                                                 mockAktørClient,
-                                                                 mockTaskRepository)
+    private val journalføringSteg = OppdaterOgFerdigstillJournalpostTask(mockJournalpostClient,
+                                                                         mockDokarkivClient,
+                                                                         mockSakClient,
+                                                                         mockAktørClient,
+                                                                         mockTaskRepository)
 
 
     @BeforeEach
@@ -81,7 +81,7 @@ class NavnoHendelseTaskLøypeTest {
 
         every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
 
-        taskStep2.doTask(Task.nyTask(OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE, payload = "mockJournalpostId"))
+        journalføringSteg.doTask(Task.nyTask(OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE, payload = "mockJournalpostId"))
 
         val task = slot<Task>()
 
@@ -99,8 +99,8 @@ class NavnoHendelseTaskLøypeTest {
             mockSakClient.hentPågåendeSakStatus(any(), emptyList())
         } returns RestPågåendeSakResponse()
 
-        taskStep1.doTask(Task.nyTask(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
-                                     payload = MOTTAK_KANAL).apply {
+        rutingSteg.doTask(Task.nyTask(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+                                      payload = MOTTAK_KANAL).apply {
             this.metadata["personIdent"] = "12345678901"
             this.metadata["journalpostId"] = "mockJournalpostId"
         })
@@ -116,8 +116,8 @@ class NavnoHendelseTaskLøypeTest {
             mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
         } returns InfotrygdSøkResponse(listOf(StønadDto(1)), emptyList())
 
-        taskStep1.doTask(Task.nyTask(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
-                                     payload = MOTTAK_KANAL).apply {
+        rutingSteg.doTask(Task.nyTask(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+                                      payload = MOTTAK_KANAL).apply {
             this.metadata["personIdent"] = "12345678901"
             this.metadata["journalpostId"] = "mockJournalpostId"
         })
@@ -156,7 +156,7 @@ class NavnoHendelseTaskLøypeTest {
             mockDokarkivClient.ferdigstillJournalpost(any())
         } throws (HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR))
 
-        taskStep2.doTask(Task.nyTask(OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE, payload = "mockJournalpostId"))
+        journalføringSteg.doTask(Task.nyTask(OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE, payload = "mockJournalpostId"))
 
         val task = slot<Task>()
 
@@ -167,8 +167,8 @@ class NavnoHendelseTaskLøypeTest {
     }
 
     private fun kjørRutingTaskOgReturnerNesteTask(): Task {
-        taskStep1.doTask(Task.nyTask(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
-                                     payload = MOTTAK_KANAL).apply {
+        rutingSteg.doTask(Task.nyTask(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+                                      payload = MOTTAK_KANAL).apply {
             this.metadata["personIdent"] = "12345678901"
             this.metadata["journalpostId"] = "mockJournalpostId"
         })

@@ -139,23 +139,29 @@ data class PdlPersonData( val familierelasjoner: List<PdlFamilierelasjon> = empt
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PdlFamilierelasjon(val relatertPersonsIdent: String,
-                              val relatertPersonsRolle: FAMILIERELASJONSROLLE)
+                              val relatertPersonsRolle: Familierelasjonsrolle)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Adressebeskyttelse(
-        val gradering: ADRESSEBESKYTTELSEGRADERING
+        val gradering: Adressebeskyttelsesgradering
 )
 
-enum class FAMILIERELASJONSROLLE {
+enum class Familierelasjonsrolle {
     BARN,
     FAR,
     MEDMOR,
     MOR
 }
 
-enum class ADRESSEBESKYTTELSEGRADERING {
+enum class Adressebeskyttelsesgradering {
     STRENGT_FORTROLIG_UTLAND, // Kode 19
     FORTROLIG, // Kode 7
     STRENGT_FORTROLIG, // Kode 6
     UGRADERT
+}
+
+enum class Identgruppe {
+    AKTOERID,
+    FOLKEREGISTERIDENT,
+    ORGNR,
 }

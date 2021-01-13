@@ -37,7 +37,7 @@ class PdlClientTest {
                                 mockResponse = readfile("mockPersonResponse.json"))
 
         val personInfo = pdlClient.hentPersonMedRelasjoner(testIdent)
-        assertThat(personInfo.adressebeskyttelseGradering).isEqualTo(ADRESSEBESKYTTELSEGRADERING.UGRADERT.name)
+        assertThat(personInfo.adressebeskyttelseGradering).isEqualTo(Adressebeskyttelsesgradering.UGRADERT.name)
         assertThat(personInfo.familierelasjoner.size).isEqualTo(2)
         assertThat(personInfo.bostedsadresse?.vegadresse).isNotNull
     }

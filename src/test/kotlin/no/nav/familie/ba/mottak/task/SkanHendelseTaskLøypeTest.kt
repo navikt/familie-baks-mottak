@@ -22,14 +22,14 @@ class SkanHendelseTaskLøypeTest {
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
 
-    private val taskStep1 = JournalhendelseRutingTask(mockPdlClient,
-                                                      mockSakClient,
-                                                      mockInfotrygdBarnetrygdClient,
-                                                      mockTaskRepository)
+    private val rutingSteg = JournalhendelseRutingTask(mockPdlClient,
+                                                       mockSakClient,
+                                                       mockInfotrygdBarnetrygdClient,
+                                                       mockTaskRepository)
 
-    private val taskStep2 = OpprettJournalføringOppgaveTask(mockJournalpostClient,
-                                                            mockOppgaveClient,
-                                                            mockTaskRepository)
+    private val journalføringSteg = OpprettJournalføringOppgaveTask(mockJournalpostClient,
+                                                                    mockOppgaveClient,
+                                                                    mockTaskRepository)
 
 
     @BeforeEach
@@ -87,7 +87,7 @@ class SkanHendelseTaskLøypeTest {
         } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
 
         kjørRutingTaskOgReturnerNesteTask().run {
-            taskStep2.doTask(this)
+            journalføringSteg.doTask(this)
         }
         assertThat(sakssystemMarkering.captured).contains("Bruker har sak i BA-sak")
     }
@@ -104,7 +104,7 @@ class SkanHendelseTaskLøypeTest {
         } returns RestPågåendeSakResponse(baSak = Sakspart.ANNEN)
 
         kjørRutingTaskOgReturnerNesteTask().run {
-            taskStep2.doTask(this)
+            journalføringSteg.doTask(this)
         }
         assertThat(sakssystemMarkering.captured).contains("Søsken har sak i BA-sak")
     }
@@ -121,7 +121,7 @@ class SkanHendelseTaskLøypeTest {
         } returns InfotrygdSøkResponse(listOf(StønadDto(1)), listOf(StønadDto(2)))
 
         kjørRutingTaskOgReturnerNesteTask().run {
-            taskStep2.doTask(this)
+            journalføringSteg.doTask(this)
         }
         assertThat(sakssystemMarkering.captured).contains("Bruker har sak i Infotrygd")
     }
@@ -138,7 +138,7 @@ class SkanHendelseTaskLøypeTest {
         } returns InfotrygdSøkResponse(emptyList(), listOf(SakDto(status = "UB")))
 
         kjørRutingTaskOgReturnerNesteTask().run {
-            taskStep2.doTask(this)
+            journalføringSteg.doTask(this)
         }
         assertThat(sakssystemMarkering.captured).contains("Søsken har sak i Infotrygd")
     }
@@ -150,7 +150,7 @@ class SkanHendelseTaskLøypeTest {
         } returns OppgaveResponse(1)
 
         kjørRutingTaskOgReturnerNesteTask().run {
-            taskStep2.doTask(this)
+            journalføringSteg.doTask(this)
         }
         verify(exactly = 1) {
             mockOppgaveClient.opprettJournalføringsoppgave(any(), beskrivelse = null)
@@ -158,8 +158,8 @@ class SkanHendelseTaskLøypeTest {
     }
 
     private fun kjørRutingTaskOgReturnerNesteTask(): Task {
-        taskStep1.doTask(Task.nyTask(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
-                                     payload = MOTTAK_KANAL).apply {
+        rutingSteg.doTask(Task.nyTask(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+                                      payload = MOTTAK_KANAL).apply {
             this.metadata["personIdent"] = "12345678901"
             this.metadata["journalpostId"] = "mockJournalpostId"
         })

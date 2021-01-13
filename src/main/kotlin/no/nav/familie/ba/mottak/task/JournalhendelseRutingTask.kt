@@ -23,12 +23,12 @@ class JournalhendelseRutingTask(private val pdlClient: PdlClient,
         val journalpostId = task.metadata["journalpostId"] as String
         val brukersIdent = task.metadata["personIdent"] as String
 
-        val brukersIdenter = pdlClient.hentIdenter(brukersIdent).filter { it.gruppe == "FOLKEREGISTERIDENT" }.map { it.ident }
+        val brukersIdenter = pdlClient.hentIdenter(brukersIdent).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }.map { it.ident }
         val barnasIdenter = pdlClient.hentPersonMedRelasjoner(brukersIdent).familierelasjoner
-                .filter { it.relasjonsrolle == "BARN" }
+                .filter { it.relasjonsrolle == Familierelasjonsrolle.BARN.name }
                 .map { it.personIdent.id }
         val alleBarnasIdenter = barnasIdenter.flatMap { pdlClient.hentIdenter(it) }
-                .filter { it.gruppe == "FOLKEREGISTERIDENT" }
+                .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
                 .map { it.ident }
 
         val baSak = sakClient.hentPågåendeSakStatus(brukersIdent, barnasIdenter).baSak
