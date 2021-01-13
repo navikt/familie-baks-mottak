@@ -8,6 +8,7 @@ import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.Hendelseslogg
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.integrasjoner.*
+import no.nav.familie.ba.mottak.task.JournalhendelseRutingTask
 import no.nav.familie.ba.mottak.task.OppdaterOgFerdigstillJournalpostTask
 import no.nav.familie.ba.mottak.task.OpprettJournalføringOppgaveTask
 import no.nav.familie.ba.mottak.task.SendTilSakTask
@@ -48,7 +49,7 @@ class JournalføringHendelseServiceTest {
     lateinit var mockTaskRepository: TaskRepository
 
     @MockK(relaxed = true)
-    lateinit var mockPersonClient: PersonClient
+    lateinit var mockPdlClient: PdlClient
 
     @MockK(relaxed = true)
     lateinit var mockFeatureToggleService: FeatureToggleService
@@ -142,7 +143,7 @@ class JournalføringHendelseServiceTest {
     }
 
     @Test
-    fun `Mottak av papirsøknader skal opprette OpprettOppgaveForJournalføringTask`() {
+    fun `Mottak av papirsøknader skal opprette JournalhendelseRutingTask`() {
         MDC.put("callId", "papir")
         val record = opprettRecord(JOURNALPOST_PAPIRSØKNAD)
 
@@ -155,9 +156,9 @@ class JournalføringHendelseServiceTest {
         }
 
         assertThat(taskSlot.captured).isNotNull
-        assertThat(taskSlot.captured.payload).isEqualTo(JOURNALPOST_PAPIRSØKNAD)
+        assertThat(taskSlot.captured.payload).isEqualTo("SKAN_NETS")
         assertThat(taskSlot.captured.metadata.getProperty("callId")).isEqualTo("papir")
-        assertThat(taskSlot.captured.taskStepType).isEqualTo(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE)
+        assertThat(taskSlot.captured.taskStepType).isEqualTo(JournalhendelseRutingTask.TASK_STEP_TYPE)
     }
 
 
@@ -175,9 +176,9 @@ class JournalføringHendelseServiceTest {
         }
 
         assertThat(taskSlot.captured).isNotNull
-        assertThat(taskSlot.captured.payload).isEqualTo(JOURNALPOST_DIGITALSØKNAD)
+        assertThat(taskSlot.captured.payload).isEqualTo("NAV_NO")
         assertThat(taskSlot.captured.metadata.getProperty("callId")).isEqualTo("digital")
-        assertThat(taskSlot.captured.taskStepType).isEqualTo(OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE)
+        assertThat(taskSlot.captured.taskStepType).isEqualTo(JournalhendelseRutingTask.TASK_STEP_TYPE)
     }
 
     @Test
@@ -239,18 +240,16 @@ class JournalføringHendelseServiceTest {
         val task = OpprettJournalføringOppgaveTask(
                 mockJournalpostClient,
                 mockOppgaveClient,
-                sakClient,
-                aktørClient,
-                mockTaskRepository,
-                mockPersonClient,
-                infotrygdBarnetrygdClient)
+                mockTaskRepository)
 
-        task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT))
+        task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, "oppgavebeskrivelse").apply {
+            this.metadata["journalpostId"] = JOURNALPOST_UTGÅENDE_DOKUMENT
+        })
 
         verify(exactly = 1) {
-            mockTaskRepository.saveAndFlush(any<Task>())
+            mockTaskRepository.saveAndFlush(any())
         }
-        assertThat(sakssystemMarkering.captured).contains("Bruker har sak i BA-sak")
+        assertThat(sakssystemMarkering.captured).contains("oppgavebeskrivelse")
     }
 
     @Test
@@ -268,13 +267,13 @@ class JournalføringHendelseServiceTest {
         val task = OpprettJournalføringOppgaveTask(
                 mockJournalpostClient,
                 mockOppgaveClient,
-                sakClient,
-                aktørClient,
-                mockTaskRepository,
-                mockPersonClient,
-                infotrygdBarnetrygdClient)
-        task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT))
-        task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_PAPIRSØKNAD))
+                mockTaskRepository)
+        task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT).apply {
+            this.metadata["journalpostId"] = JOURNALPOST_UTGÅENDE_DOKUMENT
+        })
+        task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_PAPIRSØKNAD).apply {
+            this.metadata["journalpostId"] = JOURNALPOST_PAPIRSØKNAD
+        })
 
         verify(exactly = 0) {
             mockTaskRepository.saveAndFlush(any<Task>())
@@ -286,14 +285,12 @@ class JournalføringHendelseServiceTest {
         val task = OpprettJournalføringOppgaveTask(
                 mockJournalpostClient,
                 mockOppgaveClient,
-                sakClient,
-                aktørClient,
-                mockTaskRepository,
-                mockPersonClient,
-                infotrygdBarnetrygdClient)
+                mockTaskRepository)
 
         Assertions.assertThrows(IllegalStateException::class.java) {
-            task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_FERDIGSTILT))
+            task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_FERDIGSTILT).apply {
+                this.metadata["journalpostId"] = JOURNALPOST_FERDIGSTILT
+            })
         }
     }
 

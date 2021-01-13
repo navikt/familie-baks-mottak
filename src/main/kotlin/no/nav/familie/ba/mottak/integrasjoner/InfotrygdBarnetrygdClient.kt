@@ -48,20 +48,6 @@ data class InfotrygdSøkResponse<T> (
         val barn: List<T>,
 )
 
-
-val InfotrygdSøkResponse<StønadDto>.resultat: Sakspart?
-    get() = if (bruker.isNotEmpty()) SØKER else if (barn.isNotEmpty()) ANNEN else null
-
-val InfotrygdSøkResponse<SakDto>.resultat: Sakspart? @JvmName("getSakspart")
-    get() = if (bruker.harSak()) SØKER else if (barn.harSak()) ANNEN else null
-
-private fun List<SakDto>.harSak(): Boolean {
-    val (sakerMedVedtak, sakerUtenVedtak) = this.partition { it.vedtak != null }
-
-    return sakerMedVedtak.let { it.all { it.vedtak!!.opphørsgrunn != Opphørsgrunn.MIGRERT.kode } && it.isNotEmpty() }
-           || sakerUtenVedtak.any { it.status != StatusKode.FB.name }
-}
-
 data class StønadDto(
         val stønadId: Long,
         val sakNr: String? = null,

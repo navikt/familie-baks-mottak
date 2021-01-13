@@ -2,7 +2,6 @@ package no.nav.familie.ba.mottak.task
 
 import io.mockk.*
 import no.nav.familie.ba.mottak.integrasjoner.*
-import no.nav.familie.ba.mottak.task.OppdaterOgFerdigstillJournalpostTask.Companion.TASK_STEP_TYPE
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.assertj.core.api.Assertions
@@ -14,23 +13,26 @@ import org.springframework.web.client.HttpServerErrorException
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class OppdaterOgFerdigstillJournalpostTaskTest {
+class NavnoHendelseTaskLøypeTest {
 
     private val mockJournalpostClient: JournalpostClient = mockk()
     private val mockDokarkivClient: DokarkivClient = mockk(relaxed = true)
     private val mockSakClient: SakClient = mockk()
     private val mockAktørClient: AktørClient = mockk()
     private val mockTaskRepository: TaskRepository = mockk(relaxed = true)
-    private val mockPersonClient: PersonClient = mockk(relaxed = true)
+    private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
 
-    private val taskStep = OppdaterOgFerdigstillJournalpostTask(mockJournalpostClient,
-                                                                mockDokarkivClient,
-                                                                mockSakClient,
-                                                                mockAktørClient,
-                                                                mockTaskRepository,
-                                                                mockPersonClient,
-                                                                mockInfotrygdBarnetrygdClient)
+    private val rutingSteg = JournalhendelseRutingTask(mockPdlClient,
+                                                       mockSakClient,
+                                                       mockInfotrygdBarnetrygdClient,
+                                                       mockTaskRepository)
+
+    private val journalføringSteg = OppdaterOgFerdigstillJournalpostTask(mockJournalpostClient,
+                                                                         mockDokarkivClient,
+                                                                         mockSakClient,
+                                                                         mockAktørClient,
+                                                                         mockTaskRepository)
 
 
     @BeforeEach
@@ -44,7 +46,7 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
                               journalstatus = Journalstatus.MOTTATT,
                               bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
                               tema = "BAR",
-                              kanal = "NAV_NO",
+                              kanal = MOTTAK_KANAL,
                               behandlingstema = null,
                               dokumenter = null,
                               journalforendeEnhet = null,
@@ -57,6 +59,10 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
         every {
             mockAktørClient.hentPersonident(any())
         } returns "12345678910"
+
+        every {
+            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
+        } returns RestPågåendeSakResponse()
 
         every {
             mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
@@ -75,7 +81,7 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
 
         every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
 
-        taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
+        journalføringSteg.doTask(Task.nyTask(OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE, payload = "mockJournalpostId"))
 
         val task = slot<Task>()
 
@@ -93,11 +99,13 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
             mockSakClient.hentPågåendeSakStatus(any(), emptyList())
         } returns RestPågåendeSakResponse()
 
-        taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
+        rutingSteg.doTask(Task.nyTask(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+                                      payload = MOTTAK_KANAL).apply {
+            this.metadata["personIdent"] = "12345678901"
+            this.metadata["journalpostId"] = "mockJournalpostId"
+        })
 
         verify(exactly = 0) {
-            mockDokarkivClient.oppdaterJournalpostSak(any(), any())
-            mockDokarkivClient.ferdigstillJournalpost(any())
             mockTaskRepository.save(any())
         }
     }
@@ -105,14 +113,16 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
     @Test
     fun `Skal returnere uten å journalføre når bruker har sak i Infotrygd`() {
         every {
-            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(infotrygd = Sakspart.SØKER)
+            mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
+        } returns InfotrygdSøkResponse(listOf(StønadDto(1)), emptyList())
 
-        taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
+        rutingSteg.doTask(Task.nyTask(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+                                      payload = MOTTAK_KANAL).apply {
+            this.metadata["personIdent"] = "12345678901"
+            this.metadata["journalpostId"] = "mockJournalpostId"
+        })
 
         verify(exactly = 0) {
-            mockDokarkivClient.oppdaterJournalpostSak(any(), any())
-            mockDokarkivClient.ferdigstillJournalpost(any())
             mockTaskRepository.save(any())
         }
     }
@@ -121,7 +131,7 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
     fun `Skal droppe automatisk journalføring og lagre ny OpprettJournalføringOppgaveTask hvis bruker har sak begge steder`() {
         every {
             mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER, infotrygd = Sakspart.SØKER)
+        } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
 
         every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
 
@@ -129,14 +139,9 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
             mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
         } returns InfotrygdSøkResponse(listOf(StønadDto(1)), listOf(StønadDto(2)))
 
-        taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
+        val task = kjørRutingTaskOgReturnerNesteTask()
 
-        val task = slot<Task>()
-
-        verify(exactly = 1) {
-            mockTaskRepository.save(capture(task))
-        }
-        Assertions.assertThat(task.captured.taskStepType).isEqualTo(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE)
+        Assertions.assertThat(task.taskStepType).isEqualTo(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE)
     }
 
     @Test
@@ -151,7 +156,7 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
             mockDokarkivClient.ferdigstillJournalpost(any())
         } throws (HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR))
 
-        taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
+        journalføringSteg.doTask(Task.nyTask(OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE, payload = "mockJournalpostId"))
 
         val task = slot<Task>()
 
@@ -161,9 +166,27 @@ class OppdaterOgFerdigstillJournalpostTaskTest {
         Assertions.assertThat(task.captured.taskStepType).isEqualTo(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE)
     }
 
+    private fun kjørRutingTaskOgReturnerNesteTask(): Task {
+        rutingSteg.doTask(Task.nyTask(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+                                      payload = MOTTAK_KANAL).apply {
+            this.metadata["personIdent"] = "12345678901"
+            this.metadata["journalpostId"] = "mockJournalpostId"
+        })
+
+        val nesteTask = slot<Task>().let { nyTask ->
+            verify(atMost = 1) {
+                mockTaskRepository.save(capture(nyTask))
+            }
+            nyTask.captured
+        }
+        return nesteTask
+    }
+
+
     companion object {
         private const val JOURNALPOST_ID = "222"
         private const val FAGSAK_ID = "1"
+        private const val MOTTAK_KANAL = "NAV_NO"
     }
 
 }

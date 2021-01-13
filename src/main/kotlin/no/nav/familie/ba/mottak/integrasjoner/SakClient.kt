@@ -77,7 +77,6 @@ data class RestPågåendeSakRequest(
 
 data class RestPågåendeSakResponse(
         val baSak: Sakspart? = null,
-        val infotrygd: Sakspart? = null,
 )
 
 enum class Sakspart(val part: String) {

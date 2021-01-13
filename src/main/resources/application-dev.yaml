@@ -87,3 +87,7 @@ MOTTAK_ROLLE: group1
 JOURNALFOERINGHENDELSE_V1_TOPIC_URL: aapen-dok-journalfoering-v1-q1
 
 NORG2_API_URL: #mockes ut i test
+
+PDL_URL: dummy
+CREDENTIAL_USERNAME: not-a-real-srvuser
+CREDENTIAL_PASSWORD: not-a-real-pw

@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.config
 
+import no.nav.familie.http.config.RestTemplateSts
 import no.nav.familie.http.interceptor.BearerTokenClientInterceptor
 import no.nav.familie.http.interceptor.ConsumerIdClientInterceptor
 import no.nav.familie.http.interceptor.MdcValuesPropagatingClientInterceptor
@@ -8,29 +9,12 @@ import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.*
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.web.client.RestOperations
-import java.time.Duration
 
 @Configuration
-@Import(ConsumerIdClientInterceptor::class, BearerTokenClientInterceptor::class, MdcValuesPropagatingClientInterceptor::class)
+@Import(BearerTokenClientInterceptor::class,
+        MdcValuesPropagatingClientInterceptor::class,
+        RestTemplateSts::class)
 class RestTemplateConfig {
-
-    @Profile("!dev || !e2e || !postgres")
-    @Bean
-    fun restTemplateBuilderMedProxy(): RestTemplateBuilder {
-        return RestTemplateBuilder()
-                .setConnectTimeout(Duration.ofSeconds(5))
-                .setReadTimeout(Duration.ofSeconds(5))
-                .additionalCustomizers(NaisProxyCustomizer())
-                .additionalInterceptors(MdcValuesPropagatingClientInterceptor())
-    }
-
-    @Profile("dev || e2e || postgres")
-    @Bean
-    fun restTemplateBuilder(): RestTemplateBuilder {
-        return RestTemplateBuilder()
-                .setConnectTimeout(Duration.ofSeconds(5))
-                .setReadTimeout(Duration.ofSeconds(5))
-    }
 
     @Profile("!dev || !e2e || !postgres")
     @Bean("clientCredentials")
@@ -51,4 +35,5 @@ class RestTemplateConfig {
                      consumerIdClientInterceptor: ConsumerIdClientInterceptor): RestOperations {
         return restTemplateBuilder.interceptors(mdcInterceptor, consumerIdClientInterceptor).build()
     }
+
 }
