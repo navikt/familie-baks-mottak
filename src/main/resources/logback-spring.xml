@@ -36,5 +36,6 @@
     </root>
 
     <logger name="no.nav.familie" level="INFO"/>
+    <logger name="org.apache.kafka.clients.consumer" level="WARN"/>
 
 </configuration>
