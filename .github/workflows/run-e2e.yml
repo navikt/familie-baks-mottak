@@ -6,7 +6,7 @@ env:
   IMAGE_UTEN_TAG: docker.pkg.github.com/navikt/familie-ba-mottak/familie-ba-mottak
 jobs:
   run-e2e:
-    name: Bygg app/image, push til github, deploy til dev-fss
+    name: Run e2e
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
