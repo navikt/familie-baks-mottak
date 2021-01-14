@@ -52,9 +52,6 @@ funksjonsbrytere:
     applicationName: familie-ba-mottak
 
 logging:
-  level:
-    org: INFO
-    no.nav.familie: DEBUG
   config: "classpath:logback-e2e.xml"
 
 FAMILIE_BA_DOKGEN_API_URL: http://familie-ba-dokgen:8080
