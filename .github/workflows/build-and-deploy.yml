@@ -90,12 +90,12 @@ jobs:
         with:
           dest: './logs'
       - name: Tar logs
-        run: tar cvzf ./logs.tgz ./logs
+        run: tar cvzf ./logs-${{ github.run_number }}.tgz ./logs
       - name: Upload logs to GitHub
         uses: actions/upload-artifact@master
         with:
-          name: logs.tgz
-          path: ./logs.tgz
+          name: docker-logs.tgz
+          path: ./logs-${{ github.run_number }}.tgz
           retention-days: 2
       - name: Deploy til dev-fss
         uses: nais/deploy/actions/deploy@v1
