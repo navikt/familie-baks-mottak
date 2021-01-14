@@ -6,6 +6,7 @@ import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
+import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
@@ -24,6 +25,7 @@ class LeesahServiceTest {
 
     lateinit var mockHendelsesloggRepository: HendelsesloggRepository
     lateinit var mockTaskRepository: TaskRepository
+    lateinit var mockSakClient: SakClient
     lateinit var mockenv: Environment
     lateinit var service: LeesahService
 
@@ -31,8 +33,9 @@ class LeesahServiceTest {
     internal fun setUp() {
         mockHendelsesloggRepository = mockk(relaxed = true)
         mockTaskRepository = mockk(relaxed = true)
+        mockSakClient = mockk(relaxed = true)
         mockenv = mockk<Environment>(relaxed = true)
-        service = LeesahService(mockHendelsesloggRepository, mockTaskRepository, 1, mockenv)
+        service = LeesahService(mockHendelsesloggRepository, mockTaskRepository, 1, mockSakClient, mockenv)
         clearAllMocks()
     }
 
