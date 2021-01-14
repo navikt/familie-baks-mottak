@@ -79,6 +79,12 @@ jobs:
           SRVUSER_BA_SAK_SECRET: ${{ secrets.SRVUSER_BA_SAK_SECRET }}
         if: "!contains(github.event.head_commit.message, 'e2e skip')"
         run: cd ba-e2e/e2e; ./e2e.sh
+      - name: Kjør tester (e2e)
+        env:
+          GITHUB_USERNAME: x-access-token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: "!contains(github.event.head_commit.message, 'e2e skip')"
+        run: cd ba-e2e/autotest; mvn --settings .m2/maven-settings.xml -Dtest="**" test
       - name: Collect docker logs
         uses: jwalton/gh-docker-logs@v1
         with:
@@ -90,12 +96,7 @@ jobs:
         with:
           name: logs.tgz
           path: ./logs.tgz
-      - name: Kjør tester (e2e)
-        env:
-          GITHUB_USERNAME: x-access-token
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: "!contains(github.event.head_commit.message, 'e2e skip')"
-        run: cd ba-e2e/autotest; mvn --settings .m2/maven-settings.xml -Dtest="**" test
+          retention-days: 2
       - name: Deploy til dev-fss
         uses: nais/deploy/actions/deploy@v1
         env:
