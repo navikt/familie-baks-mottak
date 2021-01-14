@@ -25,7 +25,7 @@ class PersonClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONER
                                           @Qualifier("clientCredentials") restOperations: RestOperations)
     : AbstractRestClient(restOperations, "integrasjon.pdl") {
 
-    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
+    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
     fun hentPersonMedRelasjoner(personIdent: String): Person {
         val uri = URI.create("$integrasjonerServiceUri/personopplysning/v1/info/BAR")
         logger.info("Henter personinfo fra $uri")
