@@ -6,8 +6,13 @@ import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.Hendelseslogg
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
+import no.nav.familie.ba.mottak.integrasjoner.SakClient
+import no.nav.familie.ba.mottak.integrasjoner.finnes
 import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
+import no.nav.familie.ba.mottak.task.VurderLivshendelseTask
+import no.nav.familie.ba.mottak.task.VurderLivshendelseTaskDTO
 import no.nav.familie.ba.mottak.util.nesteGyldigeTriggertidFødselshendelser
+import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
@@ -22,6 +27,7 @@ import java.util.*
 class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository,
                     private val taskRepository: TaskRepository,
                     @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") private val triggerTidForTps: Long,
+                    private val sakClient: SakClient,
                     private val environment: Environment) {
 
     val dødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall")
@@ -43,15 +49,30 @@ class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository
         dødsfallCounter.increment()
 
         when (pdlHendelse.endringstype) {
-            OPPRETTET, KORRIGERT -> {
+            OPPRETTET -> {
                 logHendelse(pdlHendelse, "dødsdato: ${pdlHendelse.dødsdato}")
+                // sjekk løpende sak i ba-sak for barn og forelder (foreldre?)
+                if (sakClient.hentPågåendeSakStatus(pdlHendelse.hentPersonident(), listOf()).baSak.finnes()) {
+                    Task.nyTask(
+                            VurderLivshendelseTask.TASK_STEP_TYPE,
+                            objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), "dødsfall")),
+                            Properties().apply {
+                                this["ident"] = pdlHendelse.hentPersonident()
+                                this["callId"] = pdlHendelse.hendelseId
+                                this["type"] = "dødsfall"
+                            }).also {
+                        taskRepository.save(it)
+                    }
+                }
             }
-            else -> {
-                logHendelse(pdlHendelse)
+                else -> {
+                    logHendelse(pdlHendelse)
+                    logHendelse(pdlHendelse, "Ikke av type OPPRETTET. Dødsdato: ${pdlHendelse.dødsdato}")
+                }
+
             }
+            oppdaterHendelseslogg(pdlHendelse)
         }
-        oppdaterHendelseslogg(pdlHendelse)
-    }
 
     private fun behandleFødselsHendelse(pdlHendelse: PdlHendelse) {
         when (pdlHendelse.endringstype) {

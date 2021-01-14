@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.integrasjoner
 
+import no.nav.familie.ba.mottak.util.fristFerdigstillelse
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.oppgave.*
@@ -33,6 +34,24 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
         logger.info("Oppretter \"Behandle sak\"-oppgave for digital søknad")
         val uri = URI.create("$integrasjonUri/oppgave/opprett")
         val request = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.BehandleSak, journalpost, beskrivelse)
+
+        return responseFra(uri, request)
+    }
+
+    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
+    fun opprettVurderLivshendelseOppgave(ident: String, beskrivelse: String? = null): OppgaveResponse {
+        logger.info("Oppretter \"Vurder livshendelse\"-oppgave")
+        val uri = URI.create("$integrasjonUri/oppgave/opprett")
+        val request = OpprettOppgaveRequest(ident = OppgaveIdentV2(ident, IdentGruppe.FOLKEREGISTERIDENT),
+                saksId = null,
+                journalpostId = null,
+                tema = Tema.BAR,
+                oppgavetype = Oppgavetype.VurderHenvendelse,//midlertidig
+                fristFerdigstillelse = fristFerdigstillelse(),
+                beskrivelse = "beskrivelse av oppgave",
+                enhetsnummer = null,
+                behandlingstema = null,
+                behandlingstype = null)
 
         return responseFra(uri, request)
     }
