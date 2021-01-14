@@ -79,8 +79,17 @@ jobs:
           SRVUSER_BA_SAK_SECRET: ${{ secrets.SRVUSER_BA_SAK_SECRET }}
         if: "!contains(github.event.head_commit.message, 'e2e skip')"
         run: cd ba-e2e/e2e; ./e2e.sh
-      - name: Dump docker logs
+      - name: Collect docker logs
         uses: jwalton/gh-docker-logs@v1
+        with:
+          dest: './logs'
+      - name: Tar logs
+        run: tar cvzf ./logs.tgz ./logs
+      - name: Upload logs to GitHub
+        uses: actions/upload-artifact@master
+        with:
+          name: logs.tgz
+          path: ./logs.tgz
       - name: Kjør tester (e2e)
         env:
           GITHUB_USERNAME: x-access-token
