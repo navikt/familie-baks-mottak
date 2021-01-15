@@ -36,7 +36,7 @@ class JournalhendelseRutingTask(private val pdlClient: PdlClient,
                 } else if (infotrygdSak.finnes()) {
                     log.info("Bruker har sak i Infotrygd. Overlater journalføring til BRUT001 og skipper opprettelse av BehandleSak-" +
                              "oppgave for journalpost $journalpostId")
-                } else if (!baSak.finnes()) {
+                } else if (!baSak.finnes() && brukersIdent != null) {
                     log.info("Bruker på journalpost $journalpostId har ikke pågående sak i BA-sak. Skipper derfor " +
                              "journalføring og opprettelse av BehandleSak-oppgave mot ny løsning i denne omgang.")
                 } else {
