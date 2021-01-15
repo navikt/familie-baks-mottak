@@ -21,19 +21,9 @@ class JournalhendelseRutingTask(private val pdlClient: PdlClient,
 
     override fun doTask(task: Task) {
         val journalpostId = task.metadata["journalpostId"] as String
-        val brukersIdent = task.metadata["personIdent"] as String
+        val brukersIdent = task.metadata["personIdent"] as String?
 
-        val brukersIdenter = pdlClient.hentIdenter(brukersIdent).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }.map { it.ident }
-        val barnasIdenter = pdlClient.hentPersonMedRelasjoner(brukersIdent).familierelasjoner
-                .filter { it.relasjonsrolle == Familierelasjonsrolle.BARN.name }
-                .map { it.personIdent.id }
-        val alleBarnasIdenter = barnasIdenter.flatMap { pdlClient.hentIdenter(it) }
-                .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
-                .map { it.ident }
-
-        val baSak = sakClient.hentPågåendeSakStatus(brukersIdent, barnasIdenter).baSak
-        val infotrygdSak = infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, alleBarnasIdenter).resultat
-                           ?: infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).resultat
+        val (baSak, infotrygdSak) = brukersIdent?.run { søkEtterSakIBaSakOgInfotrygd(this) } ?: Pair(null, null)
 
         when (task.payload) {
             "NAV_NO" -> {
@@ -46,7 +36,7 @@ class JournalhendelseRutingTask(private val pdlClient: PdlClient,
                 } else if (infotrygdSak.finnes()) {
                     log.info("Bruker har sak i Infotrygd. Overlater journalføring til BRUT001 og skipper opprettelse av BehandleSak-" +
                              "oppgave for journalpost $journalpostId")
-                } else if (!baSak.finnes()) {
+                } else if (!baSak.finnes() && brukersIdent != null) {
                     log.info("Bruker på journalpost $journalpostId har ikke pågående sak i BA-sak. Skipper derfor " +
                              "journalføring og opprettelse av BehandleSak-oppgave mot ny løsning i denne omgang.")
                 } else {
@@ -68,6 +58,21 @@ class JournalhendelseRutingTask(private val pdlClient: PdlClient,
 
             }
         }
+    }
+
+    private fun søkEtterSakIBaSakOgInfotrygd(brukersIdent: String): Pair<Sakspart?, Sakspart?> {
+        val brukersIdenter =
+                pdlClient.hentIdenter(brukersIdent).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }.map { it.ident }
+        val barnasIdenter = pdlClient.hentPersonMedRelasjoner(brukersIdent).familierelasjoner
+                .filter { it.relasjonsrolle == Familierelasjonsrolle.BARN.name }
+                .map { it.personIdent.id }
+        val alleBarnasIdenter = barnasIdenter.flatMap { pdlClient.hentIdenter(it) }
+                .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
+                .map { it.ident }
+
+        return Pair(first = sakClient.hentPågåendeSakStatus(brukersIdent, barnasIdenter).baSak,
+                    second = infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, alleBarnasIdenter).resultat
+                             ?: infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).resultat)
     }
 
     companion object {
