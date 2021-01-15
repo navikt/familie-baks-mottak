@@ -34,7 +34,7 @@ class SkanHendelseTaskLøypeTest {
 
     @BeforeEach
     internal fun setUp() {
-        clearMocks(mockTaskRepository)
+        clearAllMocks()
         //Inngående papirsøknad, Mottatt
         every {
             mockJournalpostClient.hentJournalpost(any())
@@ -158,7 +158,7 @@ class SkanHendelseTaskLøypeTest {
     }
 
     @Test
-    fun `Oppretter oppgave uten markering av sakssytem når når journalpost mangler bruker`() {
+    fun `Oppretter oppgave uten markering av sakssytem når journalpost mangler bruker`() {
         every {
             mockOppgaveClient.opprettJournalføringsoppgave(any())
         } returns OppgaveResponse(1)
