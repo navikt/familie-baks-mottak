@@ -157,10 +157,26 @@ class SkanHendelseTaskLøypeTest {
         }
     }
 
-    private fun kjørRutingTaskOgReturnerNesteTask(): Task {
+    @Test
+    fun `Oppretter oppgave uten markering av sakssytem når når journalpost mangler bruker`() {
+        every {
+            mockOppgaveClient.opprettJournalføringsoppgave(any())
+        } returns OppgaveResponse(1)
+
+        kjørRutingTaskOgReturnerNesteTask(brukerId = null).run {
+            journalføringSteg.doTask(this)
+        }
+        verify(exactly = 1) {
+            mockOppgaveClient.opprettJournalføringsoppgave(any(), beskrivelse = null)
+        }
+    }
+
+    private fun kjørRutingTaskOgReturnerNesteTask(brukerId: String? = "12345678901"): Task {
         rutingSteg.doTask(Task.nyTask(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
                                       payload = MOTTAK_KANAL).apply {
-            this.metadata["personIdent"] = "12345678901"
+            if (brukerId != null) {
+                this.metadata["personIdent"] = brukerId
+            }
             this.metadata["journalpostId"] = "mockJournalpostId"
         })
 
