@@ -144,7 +144,7 @@ class SkanHendelseTaskLøypeTest {
     }
 
     @Test
-    fun `Oppretter oppgave uten markering av sakssytem når bruker ikke har sak fra før`() {
+    fun `Oppretter oppgave uten markering av sakssystem når bruker ikke har sak fra før`() {
         every {
             mockOppgaveClient.opprettJournalføringsoppgave(any())
         } returns OppgaveResponse(1)
@@ -158,7 +158,7 @@ class SkanHendelseTaskLøypeTest {
     }
 
     @Test
-    fun `Oppretter oppgave uten markering av sakssytem når journalpost mangler bruker`() {
+    fun `Oppretter oppgave uten markering av sakssystem når journalpost mangler bruker`() {
         every {
             mockOppgaveClient.opprettJournalføringsoppgave(any())
         } returns OppgaveResponse(1)
