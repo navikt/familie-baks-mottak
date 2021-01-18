@@ -19,6 +19,8 @@ class VurderLivshendelseTask(private val oppgaveClient: OppgaveClient,
 
     override fun doTask(task: Task) {
         val payload = objectMapper.readValue(task.payload, VurderLivshendelseTaskDTO::class.java)
+        //hent familierelasjoner
+
 
         //val oppgaver = oppgaveClient.finnOppgaver(journalpost.journalpostId, null)
         task.metadata["oppgaveId"] = "${oppgaveClient.opprettVurderLivshendelseOppgave(payload.personIdent).oppgaveId}"

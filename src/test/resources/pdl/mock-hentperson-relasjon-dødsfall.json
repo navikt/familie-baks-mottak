@@ -1,0 +1,18 @@
+{
+  "data": {
+    "person": {
+      "familierelasjoner": [
+        {
+          "relatertPersonsIdent": "32345678901",
+          "relatertPersonsRolle": "BARN",
+          "minRolleForPerson": "MOR"
+        }
+      ],
+      "doedsfall": [
+        {
+          "doedsdato": "2021-01-14"
+        }
+      ]
+    }
+  }
+}

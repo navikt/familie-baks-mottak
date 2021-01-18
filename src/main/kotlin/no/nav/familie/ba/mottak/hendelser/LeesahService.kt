@@ -24,11 +24,13 @@ import java.time.LocalDate
 import java.util.*
 
 @Service
-class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository,
-                    private val taskRepository: TaskRepository,
-                    @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") private val triggerTidForTps: Long,
-                    private val sakClient: SakClient,
-                    private val environment: Environment) {
+class LeesahService(
+    private val hendelsesloggRepository: HendelsesloggRepository,
+    private val taskRepository: TaskRepository,
+    @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") private val triggerTidForTps: Long,
+    private val sakClient: SakClient,
+    private val environment: Environment
+) {
 
     val dødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall")
     val fødselOpprettetCounter: Counter = Metrics.counter("barnetrygd.fodsel.opprettet")
@@ -54,25 +56,25 @@ class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository
                 // sjekk løpende sak i ba-sak for barn og forelder (foreldre?)
                 if (sakClient.hentPågåendeSakStatus(pdlHendelse.hentPersonident(), listOf()).baSak.finnes()) {
                     Task.nyTask(
-                            VurderLivshendelseTask.TASK_STEP_TYPE,
-                            objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), "dødsfall")),
-                            Properties().apply {
-                                this["ident"] = pdlHendelse.hentPersonident()
-                                this["callId"] = pdlHendelse.hendelseId
-                                this["type"] = "dødsfall"
-                            }).also {
+                        VurderLivshendelseTask.TASK_STEP_TYPE,
+                        objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), "dødsfall")),
+                        Properties().apply {
+                            this["ident"] = pdlHendelse.hentPersonident()
+                            this["callId"] = pdlHendelse.hendelseId
+                            this["type"] = "dødsfall"
+                        }).also {
                         taskRepository.save(it)
                     }
                 }
             }
-                else -> {
-                    logHendelse(pdlHendelse)
-                    logHendelse(pdlHendelse, "Ikke av type OPPRETTET. Dødsdato: ${pdlHendelse.dødsdato}")
-                }
-
+            else -> {
+                logHendelse(pdlHendelse)
+                logHendelse(pdlHendelse, "Ikke av type OPPRETTET. Dødsdato: ${pdlHendelse.dødsdato}")
             }
-            oppdaterHendelseslogg(pdlHendelse)
+
         }
+        oppdaterHendelseslogg(pdlHendelse)
+    }
 
     private fun behandleFødselsHendelse(pdlHendelse: PdlHendelse) {
         when (pdlHendelse.endringstype) {
@@ -118,29 +120,36 @@ class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository
     }
 
     private fun logHendelse(pdlHendelse: PdlHendelse, ekstraInfo: String = "") {
-        log.info("person-pdl-leesah melding mottatt: " +
-                 "hendelseId: ${pdlHendelse.hendelseId} " +
-                 "offset: ${pdlHendelse.offset}, " +
-                 "opplysningstype: ${pdlHendelse.opplysningstype}, " +
-                 "aktørid: ${pdlHendelse.hentAktørId()}, " +
-                 "endringstype: ${pdlHendelse.endringstype}, $ekstraInfo"
+        log.info(
+            "person-pdl-leesah melding mottatt: " +
+                    "hendelseId: ${pdlHendelse.hendelseId} " +
+                    "offset: ${pdlHendelse.offset}, " +
+                    "opplysningstype: ${pdlHendelse.opplysningstype}, " +
+                    "aktørid: ${pdlHendelse.hentAktørId()}, " +
+                    "endringstype: ${pdlHendelse.endringstype}, $ekstraInfo"
         )
     }
 
     private fun oppdaterHendelseslogg(pdlHendelse: PdlHendelse) {
-        val metadata = mutableMapOf("aktørId" to pdlHendelse.hentAktørId(),
-                                    "opplysningstype" to pdlHendelse.opplysningstype,
-                                    "endringstype" to pdlHendelse.endringstype)
+        val metadata = mutableMapOf(
+            "aktørId" to pdlHendelse.hentAktørId(),
+            "opplysningstype" to pdlHendelse.opplysningstype,
+            "endringstype" to pdlHendelse.endringstype
+        )
 
         if (pdlHendelse.fødeland != null) {
             metadata["fødeland"] = pdlHendelse.fødeland
         }
 
-        hendelsesloggRepository.save(Hendelseslogg(pdlHendelse.offset,
-                                                   pdlHendelse.hendelseId,
-                                                   CONSUMER_PDL,
-                                                   metadata.toProperties(),
-                                                   ident = pdlHendelse.hentPersonident()))
+        hendelsesloggRepository.save(
+            Hendelseslogg(
+                pdlHendelse.offset,
+                pdlHendelse.hendelseId,
+                CONSUMER_PDL,
+                metadata.toProperties(),
+                ident = pdlHendelse.hentPersonident()
+            )
+        )
     }
 
     private fun erUnder18år(fødselsDato: LocalDate): Boolean {
