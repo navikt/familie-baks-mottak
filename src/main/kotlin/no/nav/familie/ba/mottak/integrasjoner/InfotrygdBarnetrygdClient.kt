@@ -61,7 +61,7 @@ data class SakDto(
         val valg: String? = null,
         val type: String? = null,
         val årsakskode: String? = null,
-        val vedtak: StønadDto? = null,
+        val stønadList: List<StønadDto> = emptyList(),
         val vedtaksdato: LocalDate? = null,
         val mottattdato: LocalDate? = null,
         val regDato: LocalDate? = null,
