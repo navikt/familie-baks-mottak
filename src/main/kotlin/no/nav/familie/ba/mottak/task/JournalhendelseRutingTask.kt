@@ -90,7 +90,8 @@ val InfotrygdSøkResponse<SakDto>.resultat: Sakspart?
 private fun List<SakDto>.harSak(): Boolean {
     val (sakerMedVedtak, sakerUtenVedtak) = this.partition { it.stønadList.isNotEmpty() }
 
-    return sakerMedVedtak.let { saker -> saker.all { it.stønadList.none { it.opphørsgrunn != Opphørsgrunn.MIGRERT.kode } } && saker.isNotEmpty() }
-           || sakerUtenVedtak.any { it.status != StatusKode.FB.name }
+    return sakerMedVedtak.let { saker -> saker.all { it.stønadList.none { it.opphørsgrunn == Opphørsgrunn.MIGRERT.kode } } &&
+                                         saker.isNotEmpty() } ||
+           sakerUtenVedtak.any { it.status != StatusKode.FB.name }
 }
 
