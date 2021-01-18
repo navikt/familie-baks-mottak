@@ -26,36 +26,50 @@ class VurderLivshendelseTask(
         //hent familierelasjoner
         val pdlPersonData = pdlClient.hentPerson(payload.personIdent, "hentperson-relasjon-dødsfall")
         val familierelasjon = pdlPersonData.familierelasjoner
-        if (pdlPersonData.dødsfall?.first().dødsdato != null) {
-            //Skal man gjøre spesifikk filtrering med OR for å sikre at det ikke kommer en ny relasjonstype
-            val listeMedBarn = familierelasjon.filter { it.minRolleForPerson != Familierelasjonsrolle.BARN }.map { it.relatertPersonsIdent }
-            if (listeMedBarn.isNotEmpty()) {
-                val sak = sakClient.hentPågåendeSakStatus(payload.personIdent, listeMedBarn)
-                if (sak.baSak == Sakspart.SØKER) {
-                    oppgaveClient.opprettVurderLivshendelseOppgave(payload.personIdent, "Søker har aktiv sak")
+        when(payload.type) {
+            VurderLivshendelseType.DØDSFALL -> {
+                if (pdlPersonData.dødsfall?.first().dødsdato != null) {
+                    //Skal man gjøre spesifikk filtrering med OR for å sikre at det ikke kommer en ny relasjonstype
+                    val listeMedBarn =
+                        familierelasjon.filter { it.minRolleForPerson != Familierelasjonsrolle.BARN }.map { it.relatertPersonsIdent }
+                    if (listeMedBarn.isNotEmpty()) {
+                        //Her er vi kun interessert i om den som dør er SØKER. Er Sakspart ANNEN, så er det annen part som har
+                        //søkt og er mest sannsynlig levende
+                        val sak = sakClient.hentPågåendeSakStatus(payload.personIdent, listeMedBarn)
+                        if (sak.baSak == Sakspart.SØKER) {
+                            val oppgave = oppgaveClient.opprettVurderLivshendelseOppgave(payload.personIdent, "Søker har aktiv sak")
+                            task.metadata["oppgaveId"] = oppgave.oppgaveId
+                            taskRepository.saveAndFlush(task)
+                        }
+                    }
+
+                    val listeMedForeldre =
+                        familierelasjon.filter { it.minRolleForPerson == Familierelasjonsrolle.BARN }.map { it.relatertPersonsIdent }
+
+                    listeMedForeldre.forEach {
+                        val sak = sakClient.hentPågåendeSakStatus(it, listOf(payload.personIdent))
+                        if (sak.baSak == Sakspart.SØKER) {
+                            val oppgave = oppgaveClient.opprettVurderLivshendelseOppgave(it, "Barn har aktiv sak")
+                            task.metadata["oppgaveId"] = oppgave.oppgaveId
+                            taskRepository.saveAndFlush(task)
+                        }
+                    }
                 }
             }
-
-            val listeMedForeldre = familierelasjon.filter { it.minRolleForPerson == Familierelasjonsrolle.BARN }.map { it.relatertPersonsIdent }
-
-            listeMedForeldre.forEach {
-                val sak = sakClient.hentPågåendeSakStatus(it, listOf(payload.personIdent))
-                if (sak.baSak == Sakspart.SØKER) {
-                    oppgaveClient.opprettVurderLivshendelseOppgave(it, "Barn har aktiv sak")
-                }
-            }
+            else -> log.debug("Ikke behandlet livshendelse ${payload.type}")
         }
-
-
-        //val oppgaver = oppgaveClient.finnOppgaver(journalpost.journalpostId, null)
-        task.metadata["oppgaveId"] = "${oppgaveClient.opprettVurderLivshendelseOppgave(payload.personIdent).oppgaveId}"
-        taskRepository.saveAndFlush(task)
     }
 
     companion object {
 
-        const val TASK_STEP_TYPE = "opprettBehandleSakoppgave"
+        const val TASK_STEP_TYPE = "vurderLivshendelseTask"
     }
 }
 
-data class VurderLivshendelseTaskDTO(val personIdent: String, val type: String)
+data class VurderLivshendelseTaskDTO(val personIdent: String, val type: VurderLivshendelseType)
+
+enum class VurderLivshendelseType {
+    DØDSFALL,
+    SIVILSTAND,
+    ADDRESSE
+}

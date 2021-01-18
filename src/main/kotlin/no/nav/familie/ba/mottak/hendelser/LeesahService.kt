@@ -11,6 +11,8 @@ import no.nav.familie.ba.mottak.integrasjoner.finnes
 import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.ba.mottak.task.VurderLivshendelseTask
 import no.nav.familie.ba.mottak.task.VurderLivshendelseTaskDTO
+import no.nav.familie.ba.mottak.task.VurderLivshendelseType
+import no.nav.familie.ba.mottak.task.VurderLivshendelseType.DØDSFALL
 import no.nav.familie.ba.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.prosessering.domene.Task
@@ -57,7 +59,7 @@ class LeesahService(
                 if (sakClient.hentPågåendeSakStatus(pdlHendelse.hentPersonident(), listOf()).baSak.finnes()) {
                     Task.nyTask(
                         VurderLivshendelseTask.TASK_STEP_TYPE,
-                        objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), "dødsfall")),
+                        objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), DØDSFALL)),
                         Properties().apply {
                             this["ident"] = pdlHendelse.hentPersonident()
                             this["callId"] = pdlHendelse.hendelseId
