@@ -31,7 +31,7 @@ class TPSPersonClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJO
                                              private val environment: Environment)
     : AbstractRestClient(restOperations, "integrasjon.tps") {
 
-    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000), exclude = [HttpClientErrorException.NotFound::class])
+    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"), exclude = [HttpClientErrorException.NotFound::class])
     fun hentPersonMedRelasjoner(personIdent: String): Personinfo {
         if (environment.activeProfiles.contains("e2e")) {
             return mockData(personIdent)

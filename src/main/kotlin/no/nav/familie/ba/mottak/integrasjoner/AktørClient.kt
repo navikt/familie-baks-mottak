@@ -19,7 +19,7 @@ class AktørClient(@Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integ
                   @Qualifier("clientCredentials") restOperations: RestOperations)
     : AbstractRestClient(restOperations, "aktør") {
 
-    @Retryable(value = [IntegrasjonException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
+    @Retryable(value = [IntegrasjonException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
     fun hentAktørId(personident: String): String {
         if (personident.isEmpty()) {
             throw IntegrasjonException("Ved henting av aktør id er personident null eller tom")

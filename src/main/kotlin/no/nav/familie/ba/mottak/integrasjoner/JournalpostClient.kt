@@ -24,7 +24,7 @@ class JournalpostClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRAS
                                                @Qualifier("clientCredentials") restOperations: RestOperations)
     : AbstractRestClient(restOperations, "integrasjon.saf") {
 
-    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
+    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
     fun hentJournalpost(journalpostId: String): Journalpost {
         val uri = URI.create("$integrasjonerServiceUri/journalpost?journalpostId=$journalpostId")
         logger.debug("henter journalpost med id {}", journalpostId)
