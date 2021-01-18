@@ -8,6 +8,7 @@ import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
+import no.nav.familie.ba.mottak.task.VurderLivshendelseTask
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -52,9 +53,13 @@ class LeesahServiceTest {
 
         service.prosesserNyHendelse(pdlHendelse)
 
-        verify(exactly = 0) {
-            mockTaskRepository.save(any())
+        val taskSlot = slot<Task>()
+        verify {
+            mockTaskRepository.save(capture(taskSlot))
         }
+        assertThat(taskSlot.captured).isNotNull
+        assertThat(taskSlot.captured.payload).isEqualTo("{\"personIdent\":\"12345678901\",\"type\":\"DØDSFALL\"}")
+        assertThat(taskSlot.captured.taskStepType).isEqualTo(VurderLivshendelseTask.TASK_STEP_TYPE)
 
         verify(exactly = 1) {
             mockHendelsesloggRepository.save(any())

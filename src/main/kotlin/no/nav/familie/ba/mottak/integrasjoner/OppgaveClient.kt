@@ -38,19 +38,20 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
         return responseFra(uri, request)
     }
 
+
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
-    fun opprettVurderLivshendelseOppgave(ident: String, beskrivelse: String): OppgaveResponse {
+    fun opprettVurderLivshendelseOppgave(ident: String, beskrivelse: String, saksId: String, behandlingstema: String): OppgaveResponse {
         logger.info("Oppretter \"Vurder livshendelse\"-oppgave")
         val uri = URI.create("$integrasjonUri/oppgave/opprett")
         val request = OpprettOppgaveRequest(ident = OppgaveIdentV2(ident, IdentGruppe.FOLKEREGISTERIDENT),
-                saksId = null, //TODO hent saksid
+                saksId = saksId,
                 journalpostId = null,
                 tema = Tema.BAR,
                 oppgavetype = Oppgavetype.VurderHenvendelse,//TODO bytt til vurder livshendelse type
                 fristFerdigstillelse = fristFerdigstillelse(),
                 beskrivelse = beskrivelse,
                 enhetsnummer = null,
-                behandlingstema = null, //TODO hent fra sak
+                behandlingstema = behandlingstema,
                 behandlingstype = null)
 
         return responseFra(uri, request)
