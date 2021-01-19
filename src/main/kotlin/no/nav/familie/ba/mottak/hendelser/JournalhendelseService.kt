@@ -10,6 +10,7 @@ import no.nav.familie.ba.mottak.integrasjoner.Journalpost
 import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.ba.mottak.integrasjoner.Journalposttype
 import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
+import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType.ORGNR
 import no.nav.familie.ba.mottak.task.JournalhendelseRutingTask
 import no.nav.familie.log.IdUtils
 import no.nav.familie.log.mdc.MDCConstants
@@ -148,7 +149,7 @@ class JournalhendelseService(val journalpostClient: JournalpostClient,
 
     private fun opprettMetadata(journalpost: Journalpost): Properties {
         return Properties().apply {
-            if (journalpost.bruker != null) {
+            if (journalpost.bruker != null && journalpost.bruker.type != ORGNR) {
                 this["personIdent"] = journalpost.bruker.id
             }
             this["journalpostId"] = journalpost.journalpostId
