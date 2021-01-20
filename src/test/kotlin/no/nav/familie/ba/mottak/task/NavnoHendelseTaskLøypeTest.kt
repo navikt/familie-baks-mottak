@@ -2,6 +2,7 @@ package no.nav.familie.ba.mottak.task
 
 import io.mockk.*
 import no.nav.familie.ba.mottak.integrasjoner.*
+import no.nav.familie.ba.mottak.integrasjoner.Opphørsgrunn.MIGRERT
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.assertj.core.api.Assertions
@@ -142,6 +143,28 @@ class NavnoHendelseTaskLøypeTest {
         val task = kjørRutingTaskOgReturnerNesteTask()
 
         Assertions.assertThat(task.taskStepType).isEqualTo(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE)
+    }
+
+    @Test
+    fun `Skal automatisk journalføre mot ny løsning når bruker er migrert fra Infotrygd`() {
+        every {
+            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
+        } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
+
+        every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
+
+        every {
+            mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
+        } returns InfotrygdSøkResponse(listOf(SakDto(status = StatusKode.FB.name,
+                                                     stønadList = listOf(StønadDto(1, opphørsgrunn = MIGRERT.kode)))),
+                                       emptyList())
+
+        kjørRutingTaskOgReturnerNesteTask().run { journalføringSteg.doTask(this) }
+
+        verify(exactly = 1) {
+            mockDokarkivClient.oppdaterJournalpostSak(any(), FAGSAK_ID)
+            mockDokarkivClient.ferdigstillJournalpost(JOURNALPOST_ID)
+        }
     }
 
     @Test
