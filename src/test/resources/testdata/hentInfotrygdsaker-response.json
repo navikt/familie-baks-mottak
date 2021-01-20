@@ -13,16 +13,18 @@
       "innstilling": null,
       "resultat": "I",
       "vedtaksdato": "2020-09-07",
-      "vedtak": {
-        "stønadId": 293587,
-        "sakNr": "01",
-        "saksblokk": "A",
-        "fNr": "20086600000",
-        "tkNr": "0315",
-        "region": "2",
-        "opphørtFom": "000000",
-        "opphørsgrunn": "0"
-      },
+      "stønadList": [
+        {
+          "stønadId": 293587,
+          "sakNr": "01",
+          "saksblokk": "A",
+          "fNr": "20086600000",
+          "tkNr": "0315",
+          "region": "2",
+          "opphørtFom": "000000",
+          "opphørsgrunn": "0"
+        }
+      ],
       "nivå": "TK ",
       "innstilldato": null,
       "iverksattdato": "2020-01-01",

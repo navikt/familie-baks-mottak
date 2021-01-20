@@ -37,7 +37,7 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
         return responseFra(uri, request)
     }
 
-    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
+    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
     fun finnOppgaver(journalpostId: String, oppgavetype: Oppgavetype?): List<Oppgave> {
         logger.info("Søker etter aktive oppgaver for $journalpostId")
         val uri = URI.create("$integrasjonUri/oppgave/v4")

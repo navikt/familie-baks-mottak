@@ -25,7 +25,7 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
                                         : AbstractRestClient(restOperations, "integrasjon") {
 
 
-    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delay = 5000))
+    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
     fun sendTilSak(nyBehandling: NyBehandling) {
         val uri = URI.create("$sakServiceUri/behandlinger")
         logger.info("Sender søknad til {}", uri)
