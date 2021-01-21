@@ -200,7 +200,8 @@ data class PdlPersonData(
     val familierelasjoner: List<PdlFamilierelasjon> = emptyList(),
     val adressebeskyttelse: List<Adressebeskyttelse> = emptyList(),
     val bostedsadresse: List<Bostedsadresse?> = emptyList(),
-    @JsonProperty(value = "doedsfall") val dødsfall: List<Dødsfall> = emptyList()
+    @JsonProperty(value = "doedsfall") val dødsfall: List<Dødsfall> = emptyList(),
+    @JsonProperty(value = "foedsel") val fødsel: List<Fødsel> = emptyList(),
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -218,6 +219,11 @@ data class Adressebeskyttelse(
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Dødsfall(
     @JsonProperty(value = "doedsdato") val dødsdato: LocalDate
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Fødsel(
+        @JsonProperty(value = "foedselsdato") val fødselsdato: LocalDate
 )
 
 enum class Familierelasjonsrolle {

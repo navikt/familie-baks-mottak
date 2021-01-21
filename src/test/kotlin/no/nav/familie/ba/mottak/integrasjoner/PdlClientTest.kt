@@ -61,6 +61,7 @@ class PdlClientTest {
         assertThat(pdlPersonData.familierelasjoner.first().minRolleForPerson).isEqualTo(Familierelasjonsrolle.MOR)
         assertThat(pdlPersonData.familierelasjoner.first().relatertPersonsRolle).isEqualTo(Familierelasjonsrolle.BARN)
         assertThat(pdlPersonData.dødsfall.first().dødsdato).isEqualTo(LocalDate.of(2021, 1, 14))
+        assertThat(pdlPersonData.fødsel.first().fødselsdato).isEqualTo(LocalDate.of(1998, 5, 9))
     }
 
 
