@@ -1,5 +1,7 @@
 package no.nav.familie.ba.mottak.task
 
+import io.micrometer.core.instrument.Counter
+import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.kontrakter.felles.objectMapper
@@ -24,6 +26,8 @@ class VurderLivshendelseTask(
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(OpprettBehandleSakOppgaveTask::class.java)
+    val oppgaveOpprettetDødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall.oppgave.opprettet")
+    val oppgaveIgnorerteDødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall.oppgave.ignorert")
 
     override fun doTask(task: Task) {
         val payload = objectMapper.readValue(task.payload, VurderLivshendelseTaskDTO::class.java)
@@ -48,6 +52,9 @@ class VurderLivshendelseTask(
                                 val oppgave = oppgaveClient.opprettVurderLivshendelseOppgave(OppgaveVurderLivshendelseDto(payload.personIdent, "Søker har aktiv sak", fagsak.id.toString(), tilBehandlingstema(restUtvidetBehandling)))
                                 task.metadata["oppgaveId"] = oppgave.oppgaveId
                                 taskRepository.saveAndFlush(task)
+                                oppgaveOpprettetDødsfallCounter.increment()
+                            } else {
+                                oppgaveIgnorerteDødsfallCounter.increment()
                             }
                         }
                     }
@@ -66,6 +73,9 @@ class VurderLivshendelseTask(
                                     val oppgave = oppgaveClient.opprettVurderLivshendelseOppgave(OppgaveVurderLivshendelseDto(it, "Barn har aktiv sak", fagsak.id.toString(), tilBehandlingstema(restUtvidetBehandling)))
                                     task.metadata["oppgaveId"] = oppgave.oppgaveId
                                     taskRepository.saveAndFlush(task)
+                                    oppgaveOpprettetDødsfallCounter.increment()
+                                } else {
+                                    oppgaveIgnorerteDødsfallCounter.increment()
                                 }
                             }
                         }
@@ -73,7 +83,7 @@ class VurderLivshendelseTask(
 
                 }
             }
-            else -> log.debug("Ikke behandlet livshendelse ${payload.type}")
+            else -> log.debug("Behandlinger enda ikke livshendelse av type ${payload.type}")
         }
     }
 
