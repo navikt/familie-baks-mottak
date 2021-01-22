@@ -27,11 +27,11 @@ import java.util.*
 
 @Service
 class LeesahService(
-    private val hendelsesloggRepository: HendelsesloggRepository,
-    private val taskRepository: TaskRepository,
-    @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") private val triggerTidForTps: Long,
-    private val sakClient: SakClient,
-    private val environment: Environment
+        private val hendelsesloggRepository: HendelsesloggRepository,
+        private val taskRepository: TaskRepository,
+        @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") private val triggerTidForTps: Long,
+        private val sakClient: SakClient,
+        private val environment: Environment
 ) {
 
     val dødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall")
@@ -51,23 +51,22 @@ class LeesahService(
 
     private fun behandleDødsfallHendelse(pdlHendelse: PdlHendelse) {
         dødsfallCounter.increment()
+        logHendelse(pdlHendelse, "dødsdato: ${pdlHendelse.dødsdato}")
 
         when (pdlHendelse.endringstype) {
             OPPRETTET -> {
-                logHendelse(pdlHendelse, "dødsdato: ${pdlHendelse.dødsdato}")
-                // sjekk løpende sak i ba-sak for barn og forelder (foreldre?)
-                if (sakClient.hentPågåendeSakStatus(pdlHendelse.hentPersonident(), listOf()).baSak.finnes()) {
-                    Task.nyTask(
+
+                Task.nyTask(
                         VurderLivshendelseTask.TASK_STEP_TYPE,
                         objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), DØDSFALL)),
                         Properties().apply {
                             this["ident"] = pdlHendelse.hentPersonident()
                             this["callId"] = pdlHendelse.hendelseId
-                            this["type"] = "dødsfall"
+                            this["type"] = VurderLivshendelseType.DØDSFALL.name
                         }).also {
-                        taskRepository.save(it)
-                    }
+                    taskRepository.save(it)
                 }
+
             }
             else -> {
                 logHendelse(pdlHendelse)
@@ -123,20 +122,20 @@ class LeesahService(
 
     private fun logHendelse(pdlHendelse: PdlHendelse, ekstraInfo: String = "") {
         log.info(
-            "person-pdl-leesah melding mottatt: " +
-                    "hendelseId: ${pdlHendelse.hendelseId} " +
-                    "offset: ${pdlHendelse.offset}, " +
-                    "opplysningstype: ${pdlHendelse.opplysningstype}, " +
-                    "aktørid: ${pdlHendelse.hentAktørId()}, " +
-                    "endringstype: ${pdlHendelse.endringstype}, $ekstraInfo"
+                "person-pdl-leesah melding mottatt: " +
+                "hendelseId: ${pdlHendelse.hendelseId} " +
+                "offset: ${pdlHendelse.offset}, " +
+                "opplysningstype: ${pdlHendelse.opplysningstype}, " +
+                "aktørid: ${pdlHendelse.hentAktørId()}, " +
+                "endringstype: ${pdlHendelse.endringstype}, $ekstraInfo"
         )
     }
 
     private fun oppdaterHendelseslogg(pdlHendelse: PdlHendelse) {
         val metadata = mutableMapOf(
-            "aktørId" to pdlHendelse.hentAktørId(),
-            "opplysningstype" to pdlHendelse.opplysningstype,
-            "endringstype" to pdlHendelse.endringstype
+                "aktørId" to pdlHendelse.hentAktørId(),
+                "opplysningstype" to pdlHendelse.opplysningstype,
+                "endringstype" to pdlHendelse.endringstype
         )
 
         if (pdlHendelse.fødeland != null) {
@@ -144,13 +143,13 @@ class LeesahService(
         }
 
         hendelsesloggRepository.save(
-            Hendelseslogg(
-                pdlHendelse.offset,
-                pdlHendelse.hendelseId,
-                CONSUMER_PDL,
-                metadata.toProperties(),
-                ident = pdlHendelse.hentPersonident()
-            )
+                Hendelseslogg(
+                        pdlHendelse.offset,
+                        pdlHendelse.hendelseId,
+                        CONSUMER_PDL,
+                        metadata.toProperties(),
+                        ident = pdlHendelse.hentPersonident()
+                )
         )
     }
 
