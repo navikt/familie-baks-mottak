@@ -62,7 +62,7 @@ class LeesahService(
                         Properties().apply {
                             this["ident"] = pdlHendelse.hentPersonident()
                             this["callId"] = pdlHendelse.hendelseId
-                            this["type"] = VurderLivshendelseType.DØDSFALL.name
+                            this["type"] = DØDSFALL.name
                         }).also {
                     taskRepository.save(it)
                 }

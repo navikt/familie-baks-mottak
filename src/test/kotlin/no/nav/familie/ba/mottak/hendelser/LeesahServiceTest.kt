@@ -41,7 +41,7 @@ class LeesahServiceTest {
     }
 
     @Test
-    fun `Skal logge dødsfallhendelser`() {
+    fun `Skal opprette VurderLivshendelseTask for dødsfallhendelse`() {
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse = PdlHendelse(
                 offset = Random.nextUInt().toLong(),
