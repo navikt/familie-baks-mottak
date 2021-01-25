@@ -28,7 +28,7 @@ class VurderLivshendelseTaskTest {
 
 
     private val vurderLivshendelseTask =
-            VurderLivshendelseTask(mockOppgaveClient, mockTaskRepository, mockPdlClient, mockSakClient, mockFeatureToggleService)
+            VurderLivshendelseTask(mockOppgaveClient, mockTaskRepository, mockPdlClient, mockSakClient, mockFeatureToggleService, mockAktørClient)
 
 
     @BeforeEach
@@ -44,8 +44,16 @@ class VurderLivshendelseTaskTest {
         } returns null
 
         every {
-            mockAktørClient.hentPersonident(any())
-        } returns "12345678910"
+            mockAktørClient.hentAktørId(PERSONIDENT_MOR)
+        } returns PERSONIDENT_MOR + "00"
+
+        every {
+            mockAktørClient.hentAktørId(PERSONIDENT_FAR)
+        } returns PERSONIDENT_FAR + "00"
+
+        every {
+            mockAktørClient.hentAktørId(PERSONIDENT_BARN)
+        } returns PERSONIDENT_BARN + "00"
 
         every {
             mockFeatureToggleService.isEnabled(any(), any())
@@ -168,9 +176,10 @@ class VurderLivshendelseTaskTest {
             mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDtoSlot))
         }
 
-        assertThat(oppgaveDtoSlot.captured.ident).isEqualTo(PERSONIDENT_MOR)
+        assertThat(oppgaveDtoSlot.captured.aktørId).contains(PERSONIDENT_MOR)
         assertThat(oppgaveDtoSlot.captured.saksId).isEqualTo(SAKS_ID)
         assertThat(oppgaveDtoSlot.captured.beskrivelse).isEqualTo("Søker har aktiv sak")
+        assertThat(oppgaveDtoSlot.captured.enhetsId).isEqualTo(ENHET_ID)
         assertThat(oppgaveDtoSlot.captured.behandlingstema).isEqualTo(Behandlingstema.OrdinærBarnetrygd.value)
     }
 
@@ -209,21 +218,24 @@ class VurderLivshendelseTaskTest {
             mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDtoSlot))
         }
 
-        assertThat(oppgaveDtoSlot.captured.ident).isEqualTo(PERSONIDENT_MOR)
+        assertThat(oppgaveDtoSlot.captured.aktørId).contains(PERSONIDENT_MOR)
         assertThat(oppgaveDtoSlot.captured.saksId).isEqualTo(SAKS_ID)
         assertThat(oppgaveDtoSlot.captured.beskrivelse).isEqualTo("Barn har aktiv sak")
+        assertThat(oppgaveDtoSlot.captured.enhetsId).isEqualTo(ENHET_ID)
         assertThat(oppgaveDtoSlot.captured.behandlingstema).isEqualTo(Behandlingstema.UtvidetBarnetrygd.value)
     }
 
 
     private fun lagAktivOrdinær() = RestFagsak(SAKS_ID.toLong(),
                                                listOf(RestUtvidetBehandling(true,
+                                                                            RestArbeidsfordelingPåBehandling(ENHET_ID),
                                                                             321,
                                                                             BehandlingKategori.NASJONAL,
                                                                             LocalDateTime.now(),
                                                                             BehandlingUnderkategori.ORDINÆR)))
     private fun lagAktivUtvidet() = RestFagsak(SAKS_ID.toLong(),
                                                listOf(RestUtvidetBehandling(true,
+                                                                            RestArbeidsfordelingPåBehandling(ENHET_ID),
                                                                             321,
                                                                             BehandlingKategori.NASJONAL,
                                                                             LocalDateTime.now(),
@@ -236,5 +248,6 @@ class VurderLivshendelseTaskTest {
         private val PERSONIDENT_MOR = "12345678901"
         private val PERSONIDENT_FAR = "12345678888"
         private val SAKS_ID = "123"
+        private val ENHET_ID = "3049"
     }
 }

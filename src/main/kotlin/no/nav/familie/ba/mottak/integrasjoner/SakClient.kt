@@ -82,10 +82,14 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
 data class RestFagsak(val id: Long,
                       val behandlinger: List<RestUtvidetBehandling>)
 data class RestUtvidetBehandling(val aktiv: Boolean,
+                                 val arbeidsfordelingPåBehandling: RestArbeidsfordelingPåBehandling,
                                  val behandlingId: Long,
                                  val kategori: BehandlingKategori,
                                  val opprettetTidspunkt: LocalDateTime,
                                  val underkategori: BehandlingUnderkategori,)
+data class RestArbeidsfordelingPåBehandling(
+        val behandlendeEnhetId: String,
+)
 
 enum class BehandlingKategori {
     EØS,
@@ -102,6 +106,8 @@ data class RestPågåendeSakRequest(
         var personIdent: String,
         val barnasIdenter: List<String> = emptyList(),
 )
+
+
 
 data class RestPågåendeSakResponse(
         val baSak: Sakspart? = null,

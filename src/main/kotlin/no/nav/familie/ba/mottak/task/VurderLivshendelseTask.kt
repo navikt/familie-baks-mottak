@@ -18,11 +18,12 @@ import java.time.LocalDate
 @Service
 @TaskStepBeskrivelse(taskStepType = VurderLivshendelseTask.TASK_STEP_TYPE, beskrivelse = "Vurder livshendelse")
 class VurderLivshendelseTask(
-    private val oppgaveClient: OppgaveClient,
-    private val taskRepository: TaskRepository,
-    private val pdlClient: PdlClient,
-    private val sakClient: SakClient,
-    private val featureToggleService: FeatureToggleService
+        private val oppgaveClient: OppgaveClient,
+        private val taskRepository: TaskRepository,
+        private val pdlClient: PdlClient,
+        private val sakClient: SakClient,
+        private val featureToggleService: FeatureToggleService,
+        private val aktørClient: AktørClient
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -35,55 +36,31 @@ class VurderLivshendelseTask(
         //hent familierelasjoner
         val pdlPersonData = pdlClient.hentPerson(payload.personIdent, "hentperson-relasjon-dødsfall")
         val familierelasjon = pdlPersonData.familierelasjoner
-        when(payload.type) {
+        when (payload.type) {
             VurderLivshendelseType.DØDSFALL -> {
                 if (pdlPersonData.dødsfall?.firstOrNull()?.dødsdato != null) {
 
                     //Skal man gjøre spesifikk filtrering med OR for å sikre at det ikke kommer en ny relasjonstype
                     val listeMedBarn =
-                        familierelasjon.filter { it.minRolleForPerson != Familierelasjonsrolle.BARN }.map { it.relatertPersonsIdent }
+                            familierelasjon.filter { it.minRolleForPerson != Familierelasjonsrolle.BARN }
+                                    .map { it.relatertPersonsIdent }
                     if (listeMedBarn.isNotEmpty()) {
                         //Her er vi kun interessert i om den som dør er SØKER. Er Sakspart ANNEN, så er det annen part som har
                         //søkt og er mest sannsynlig levende
                         val sak = sakClient.hentPågåendeSakStatus(payload.personIdent, listeMedBarn)
-                        if (sak.baSak == Sakspart.SØKER) {
-                            log.info("Søker har en pågående sak")
-                            SECURE_LOGGER.info("Søker har en pågående sak $payload")
-                            val fagsak = sakClient.hentRestFagsak(payload.personIdent)
-                            val restUtvidetBehandling = fagsak.behandlinger.first { it.aktiv }
-                            if (featureToggleService.isEnabled("familie-ba-mottak.opprettLivshendelseOppgave", false)) {
-                                //TODO beskrivelse????
-                                val oppgave = oppgaveClient.opprettVurderLivshendelseOppgave(OppgaveVurderLivshendelseDto(payload.personIdent, "Søker har aktiv sak", fagsak.id.toString(), tilBehandlingstema(restUtvidetBehandling)))
-                                task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
-                                taskRepository.saveAndFlush(task)
-                                oppgaveOpprettetDødsfallCounter.increment()
-                            } else {
-                                oppgaveIgnorerteDødsfallCounter.increment()
-                            }
-                        }
+                        opprettOppgaveHvisRolleSøker(sak.baSak, payload.personIdent, task, "Søker har aktiv sak")
                     }
 
 
-                    if (pdlPersonData.fødsel.isEmpty() || pdlPersonData.fødsel.first().fødselsdato.isAfter(LocalDate.now().minusYears(19))) {
+                    if (pdlPersonData.fødsel.isEmpty() || pdlPersonData.fødsel.first().fødselsdato.isAfter(LocalDate.now()
+                                                                                                                   .minusYears(19))) {
                         val listeMedForeldreForBarn =
-                                familierelasjon.filter { it.minRolleForPerson == Familierelasjonsrolle.BARN }.map { it.relatertPersonsIdent }
+                                familierelasjon.filter { it.minRolleForPerson == Familierelasjonsrolle.BARN }
+                                        .map { it.relatertPersonsIdent }
 
                         listeMedForeldreForBarn.forEach {
                             val sak = sakClient.hentPågåendeSakStatus(it, listOf(payload.personIdent))
-                            if (sak.baSak == Sakspart.SØKER) {
-                                log.info("Barn har en pågående sak")
-                                SECURE_LOGGER.info("Barn har en pågående sak $payload")
-                                val fagsak = sakClient.hentRestFagsak(it)
-                                val restUtvidetBehandling = fagsak.behandlinger.first { it.aktiv }
-                                if (featureToggleService.isEnabled("familie-ba-mottak.opprettLivshendelseOppgave", false)) {
-                                    val oppgave = oppgaveClient.opprettVurderLivshendelseOppgave(OppgaveVurderLivshendelseDto(it, "Barn har aktiv sak", fagsak.id.toString(), tilBehandlingstema(restUtvidetBehandling)))
-                                    task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
-                                    taskRepository.saveAndFlush(task)
-                                    oppgaveOpprettetDødsfallCounter.increment()
-                                } else {
-                                    oppgaveIgnorerteDødsfallCounter.increment()
-                                }
-                            }
+                            opprettOppgaveHvisRolleSøker(sak.baSak, it, task, "Barn har aktiv sak")
                         }
                     }
 
@@ -93,7 +70,35 @@ class VurderLivshendelseTask(
         }
     }
 
-    private fun tilBehandlingstema(restUtvidetBehandling: RestUtvidetBehandling ): String {
+    private fun opprettOppgaveHvisRolleSøker(saksPart: Sakspart?,
+                                             personIdent: String,
+                                             task: Task,
+                                             beskrivelse: String) {
+        if (saksPart == Sakspart.SØKER) {
+            log.info("Fant løpende sak for person")
+            SECURE_LOGGER.info("Fant løpende sak for person $personIdent")
+            val fagsak = sakClient.hentRestFagsak(personIdent)
+            val restUtvidetBehandling = fagsak.behandlinger.first { it.aktiv }
+            if (featureToggleService.isEnabled("familie-ba-mottak.opprettLivshendelseOppgave", false)) {
+                //TODO beskrivelse???
+                val oppgave =
+                        oppgaveClient.opprettVurderLivshendelseOppgave(
+                                OppgaveVurderLivshendelseDto(aktørClient.hentAktørId(personIdent.trim()),
+                                                             beskrivelse,
+                                                             fagsak.id.toString(),
+                                                             tilBehandlingstema(
+                                                                     restUtvidetBehandling),
+                                                             restUtvidetBehandling.arbeidsfordelingPåBehandling.behandlendeEnhetId))
+                task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
+                taskRepository.saveAndFlush(task)
+                oppgaveOpprettetDødsfallCounter.increment()
+            } else {
+                oppgaveIgnorerteDødsfallCounter.increment()
+            }
+        }
+    }
+
+    private fun tilBehandlingstema(restUtvidetBehandling: RestUtvidetBehandling): String {
         return when {
             restUtvidetBehandling.kategori == BehandlingKategori.EØS -> Behandlingstema.BarnetrygdEØS.value
             restUtvidetBehandling.kategori == BehandlingKategori.NASJONAL && restUtvidetBehandling.underkategori == BehandlingUnderkategori.ORDINÆR -> Behandlingstema.OrdinærBarnetrygd.value

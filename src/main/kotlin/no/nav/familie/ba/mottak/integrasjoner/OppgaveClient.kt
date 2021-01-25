@@ -45,15 +45,16 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
     fun opprettVurderLivshendelseOppgave(dto: OppgaveVurderLivshendelseDto): OppgaveResponse {
         logger.info("Oppretter \"Vurder livshendelse\"-oppgave")
+
         val uri = URI.create("$integrasjonUri/oppgave/opprett")
-        val request = OpprettOppgaveRequest(ident = OppgaveIdentV2(dto.ident, IdentGruppe.FOLKEREGISTERIDENT),
+        val request = OpprettOppgaveRequest(ident = OppgaveIdentV2(dto.toString(), IdentGruppe.AKTOERID),
                 saksId = dto.saksId,
                 journalpostId = null,
                 tema = Tema.BAR,
                 oppgavetype = Oppgavetype.VurderHenvendelse,//TODO bytt til vurder livshendelse type
                 fristFerdigstillelse = fristFerdigstillelse(),
                 beskrivelse = dto.beskrivelse,
-                enhetsnummer = null,
+                enhetsnummer = dto.enhetsId,
                 behandlingstema = dto.behandlingstema,
                 behandlingstype = null)
 
@@ -111,4 +112,8 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
     }
 }
 
-data class OppgaveVurderLivshendelseDto(val ident: String, val beskrivelse: String, val saksId: String, val behandlingstema: String)
+data class OppgaveVurderLivshendelseDto(val aktørId: String,
+                                        val beskrivelse: String,
+                                        val saksId: String,
+                                        val behandlingstema: String,
+                                        val enhetsId: String)
