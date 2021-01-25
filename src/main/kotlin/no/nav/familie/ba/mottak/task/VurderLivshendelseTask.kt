@@ -6,6 +6,8 @@ import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstema
+import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
+import no.nav.familie.kontrakter.felles.oppgave.StatusEnum
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -48,7 +50,7 @@ class VurderLivshendelseTask(
                         //Her er vi kun interessert i om den som dør er SØKER. Er Sakspart ANNEN, så er det annen part som har
                         //søkt og er mest sannsynlig levende
                         val sak = sakClient.hentPågåendeSakStatus(payload.personIdent, listeMedBarn)
-                        opprettOppgaveHvisRolleSøker(sak.baSak, payload.personIdent, task, "Søker har aktiv sak")
+                        opprettOppgaveHvisRolleSøker(sak.baSak, payload.personIdent, task, BESKRIVELSE_DØDSFALL)
                     }
 
 
@@ -60,7 +62,7 @@ class VurderLivshendelseTask(
 
                         listeMedForeldreForBarn.forEach {
                             val sak = sakClient.hentPågåendeSakStatus(it, listOf(payload.personIdent))
-                            opprettOppgaveHvisRolleSøker(sak.baSak, it, task, "Barn har aktiv sak")
+                            opprettOppgaveHvisRolleSøker(sak.baSak, it, task, BESKRIVELSE_DØDSFALL)
                         }
                     }
 
@@ -81,17 +83,29 @@ class VurderLivshendelseTask(
             val restUtvidetBehandling = fagsak.behandlinger.first { it.aktiv }
             if (featureToggleService.isEnabled("familie-ba-mottak.opprettLivshendelseOppgave", false)) {
                 //TODO beskrivelse???
-                val oppgave =
-                        oppgaveClient.opprettVurderLivshendelseOppgave(
-                                OppgaveVurderLivshendelseDto(aktørClient.hentAktørId(personIdent.trim()),
-                                                             beskrivelse,
-                                                             fagsak.id.toString(),
-                                                             tilBehandlingstema(
-                                                                     restUtvidetBehandling),
-                                                             restUtvidetBehandling.arbeidsfordelingPåBehandling.behandlendeEnhetId))
-                task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
-                taskRepository.saveAndFlush(task)
-                oppgaveOpprettetDødsfallCounter.increment()
+                val aktørId = aktørClient.hentAktørId(personIdent.trim())
+                val vurderLivshendelseOppgaver = oppgaveClient.finnOppgaverPåAktørId(aktørId, Oppgavetype.VurderHenvendelse)   //TODO Bytt ut til rett OppgaveType
+
+                val oppgave = vurderLivshendelseOppgaver.firstOrNull{ it.beskrivelse?.contains("dødsfallshendelse") == true && (
+                        it.status != StatusEnum.FERDIGSTILT || it.status != StatusEnum.FEILREGISTRERT) }
+
+                if (oppgave == null) {
+                    val oppgave =
+                            oppgaveClient.opprettVurderLivshendelseOppgave(
+                                    OppgaveVurderLivshendelseDto(aktørClient.hentAktørId(personIdent.trim()),
+                                                                 beskrivelse,
+                                                                 fagsak.id.toString(),
+                                                                 tilBehandlingstema(
+                                                                         restUtvidetBehandling),
+                                                                 restUtvidetBehandling.arbeidsfordelingPåBehandling.behandlendeEnhetId))
+                    task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
+                    taskRepository.saveAndFlush(task)
+                    oppgaveOpprettetDødsfallCounter.increment()
+                } else {
+                    log.info("Fant åpen oppgave på aktørId $aktørId")
+                    SECURE_LOGGER.info("Fant åpen oppgave: $oppgave")
+                }
+
             } else {
                 oppgaveIgnorerteDødsfallCounter.increment()
             }
@@ -110,6 +124,7 @@ class VurderLivshendelseTask(
     companion object {
 
         const val TASK_STEP_TYPE = "vurderLivshendelseTask"
+        const val BESKRIVELSE_DØDSFALL = "Har mottatt dødsfallshendelse på ident som har aktiv sak i ba-sak"
     }
 }
 

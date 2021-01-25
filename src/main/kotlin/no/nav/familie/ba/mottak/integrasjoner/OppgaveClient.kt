@@ -47,7 +47,7 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
         logger.info("Oppretter \"Vurder livshendelse\"-oppgave")
 
         val uri = URI.create("$integrasjonUri/oppgave/opprett")
-        val request = OpprettOppgaveRequest(ident = OppgaveIdentV2(dto.toString(), IdentGruppe.AKTOERID),
+        val request = OpprettOppgaveRequest(ident = OppgaveIdentV2(dto.aktørId, IdentGruppe.AKTOERID),
                 saksId = dto.saksId,
                 journalpostId = null,
                 tema = Tema.BAR,
@@ -68,6 +68,27 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
         logger.info("Søker etter aktive oppgaver for $journalpostId")
         val uri = URI.create("$integrasjonUri/oppgave/v4")
         val request = FinnOppgaveRequest(journalpostId = journalpostId,
+                                         tema = Tema.BAR,
+                                         oppgavetype = oppgavetype)
+
+        return Result.runCatching {
+            postForEntity<Ressurs<FinnOppgaveResponseDto>>(uri, request)
+        }.fold(
+                onSuccess = { response -> assertGyldig(response).oppgaver },
+                onFailure = {
+                    throw IntegrasjonException("GET $uri feilet ved henting av oppgaver",
+                                               it,
+                                               uri,
+                                               null)
+                }
+        )
+    }
+
+    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
+    fun finnOppgaverPåAktørId(aktørId: String, oppgavetype: Oppgavetype): List<Oppgave> {
+        logger.info("Søker etter aktive oppgaver for aktørId $aktørId")
+        val uri = URI.create("$integrasjonUri/oppgave/v4")
+        val request = FinnOppgaveRequest(aktørId = aktørId,
                                          tema = Tema.BAR,
                                          oppgavetype = oppgavetype)
 

@@ -59,6 +59,8 @@ class VurderLivshendelseTaskTest {
             mockFeatureToggleService.isEnabled(any(), any())
         } returns true
 
+        every { mockOppgaveClient.finnOppgaverPåAktørId(any(), any()) } returns emptyList()
+
         every { mockOppgaveClient.opprettVurderLivshendelseOppgave(any()) } returns OppgaveResponse(42)
 
 
@@ -178,7 +180,7 @@ class VurderLivshendelseTaskTest {
 
         assertThat(oppgaveDtoSlot.captured.aktørId).contains(PERSONIDENT_MOR)
         assertThat(oppgaveDtoSlot.captured.saksId).isEqualTo(SAKS_ID)
-        assertThat(oppgaveDtoSlot.captured.beskrivelse).isEqualTo("Søker har aktiv sak")
+        assertThat(oppgaveDtoSlot.captured.beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_DØDSFALL)
         assertThat(oppgaveDtoSlot.captured.enhetsId).isEqualTo(ENHET_ID)
         assertThat(oppgaveDtoSlot.captured.behandlingstema).isEqualTo(Behandlingstema.OrdinærBarnetrygd.value)
     }
@@ -220,7 +222,7 @@ class VurderLivshendelseTaskTest {
 
         assertThat(oppgaveDtoSlot.captured.aktørId).contains(PERSONIDENT_MOR)
         assertThat(oppgaveDtoSlot.captured.saksId).isEqualTo(SAKS_ID)
-        assertThat(oppgaveDtoSlot.captured.beskrivelse).isEqualTo("Barn har aktiv sak")
+        assertThat(oppgaveDtoSlot.captured.beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_DØDSFALL)
         assertThat(oppgaveDtoSlot.captured.enhetsId).isEqualTo(ENHET_ID)
         assertThat(oppgaveDtoSlot.captured.behandlingstema).isEqualTo(Behandlingstema.UtvidetBarnetrygd.value)
     }
