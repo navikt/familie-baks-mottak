@@ -25,7 +25,8 @@ class VurderLivshendelseTask(
     private val featureToggleService: FeatureToggleService
 ) : AsyncTaskStep {
 
-    val log: Logger = LoggerFactory.getLogger(OpprettBehandleSakOppgaveTask::class.java)
+    val log: Logger = LoggerFactory.getLogger(this::class.java)
+    val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
     val oppgaveOpprettetDødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall.oppgave.opprettet")
     val oppgaveIgnorerteDødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall.oppgave.ignorert")
 
@@ -37,6 +38,7 @@ class VurderLivshendelseTask(
         when(payload.type) {
             VurderLivshendelseType.DØDSFALL -> {
                 if (pdlPersonData.dødsfall?.firstOrNull()?.dødsdato != null) {
+
                     //Skal man gjøre spesifikk filtrering med OR for å sikre at det ikke kommer en ny relasjonstype
                     val listeMedBarn =
                         familierelasjon.filter { it.minRolleForPerson != Familierelasjonsrolle.BARN }.map { it.relatertPersonsIdent }
@@ -45,6 +47,8 @@ class VurderLivshendelseTask(
                         //søkt og er mest sannsynlig levende
                         val sak = sakClient.hentPågåendeSakStatus(payload.personIdent, listeMedBarn)
                         if (sak.baSak == Sakspart.SØKER) {
+                            log.info("Søker har en pågående sak")
+                            SECURE_LOGGER.info("Søker har en pågående sak $payload")
                             val fagsak = sakClient.hentRestFagsak(payload.personIdent)
                             val restUtvidetBehandling = fagsak.behandlinger.first { it.aktiv }
                             if (featureToggleService.isEnabled("familie-ba-mottak.opprettLivshendelseOppgave", false)) {
@@ -67,6 +71,8 @@ class VurderLivshendelseTask(
                         listeMedForeldreForBarn.forEach {
                             val sak = sakClient.hentPågåendeSakStatus(it, listOf(payload.personIdent))
                             if (sak.baSak == Sakspart.SØKER) {
+                                log.info("Barn har en pågående sak")
+                                SECURE_LOGGER.info("Barn har en pågående sak $payload")
                                 val fagsak = sakClient.hentRestFagsak(it)
                                 val restUtvidetBehandling = fagsak.behandlinger.first { it.aktiv }
                                 if (featureToggleService.isEnabled("familie-ba-mottak.opprettLivshendelseOppgave", false)) {

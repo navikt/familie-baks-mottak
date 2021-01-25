@@ -4,6 +4,7 @@ import no.nav.familie.ba.mottak.util.fristFerdigstillelse
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.oppgave.*
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -21,6 +22,8 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
                                            @Qualifier("clientCredentials") restOperations: RestOperations,
                                            private val oppgaveMapper: OppgaveMapper)
     : AbstractRestClient(restOperations, "integrasjon") {
+
+    val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
 
     fun opprettJournalføringsoppgave(journalpost: Journalpost, beskrivelse: String? = null): OppgaveResponse {
         logger.info("Oppretter journalføringsoppgave for papirsøknad")
@@ -53,6 +56,8 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
                 enhetsnummer = null,
                 behandlingstema = dto.behandlingstema,
                 behandlingstype = null)
+
+        SECURE_LOGGER.info("Oppretter vurderLivshendlseOppgave $request")
 
         return responseFra(uri, request)
     }
@@ -105,7 +110,5 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
         }
     }
 }
-
-data class OppgaveDto(val id: Long? = null)
 
 data class OppgaveVurderLivshendelseDto(val ident: String, val beskrivelse: String, val saksId: String, val behandlingstema: String)
