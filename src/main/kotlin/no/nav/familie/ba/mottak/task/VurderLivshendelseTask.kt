@@ -54,7 +54,7 @@ class VurderLivshendelseTask(
                             if (featureToggleService.isEnabled("familie-ba-mottak.opprettLivshendelseOppgave", false)) {
                                 //TODO beskrivelse????
                                 val oppgave = oppgaveClient.opprettVurderLivshendelseOppgave(OppgaveVurderLivshendelseDto(payload.personIdent, "Søker har aktiv sak", fagsak.id.toString(), tilBehandlingstema(restUtvidetBehandling)))
-                                task.metadata["oppgaveId"] = oppgave.oppgaveId
+                                task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
                                 taskRepository.saveAndFlush(task)
                                 oppgaveOpprettetDødsfallCounter.increment()
                             } else {
@@ -77,7 +77,7 @@ class VurderLivshendelseTask(
                                 val restUtvidetBehandling = fagsak.behandlinger.first { it.aktiv }
                                 if (featureToggleService.isEnabled("familie-ba-mottak.opprettLivshendelseOppgave", false)) {
                                     val oppgave = oppgaveClient.opprettVurderLivshendelseOppgave(OppgaveVurderLivshendelseDto(it, "Barn har aktiv sak", fagsak.id.toString(), tilBehandlingstema(restUtvidetBehandling)))
-                                    task.metadata["oppgaveId"] = oppgave.oppgaveId
+                                    task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
                                     taskRepository.saveAndFlush(task)
                                     oppgaveOpprettetDødsfallCounter.increment()
                                 } else {
