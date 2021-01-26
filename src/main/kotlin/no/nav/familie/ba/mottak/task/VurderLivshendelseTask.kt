@@ -35,25 +35,22 @@ class VurderLivshendelseTask(
 
     override fun doTask(task: Task) {
         val payload = objectMapper.readValue(task.payload, VurderLivshendelseTaskDTO::class.java)
-        //hent familierelasjoner
         val pdlPersonData = pdlClient.hentPerson(payload.personIdent, "hentperson-relasjon-dødsfall")
         val familierelasjon = pdlPersonData.familierelasjoner
         when (payload.type) {
             VurderLivshendelseType.DØDSFALL -> {
-                if (pdlPersonData.dødsfall?.firstOrNull()?.dødsdato != null) {
+                if (pdlPersonData.dødsfall.firstOrNull()?.dødsdato != null) {
 
-                    //Skal man gjøre spesifikk filtrering med OR for å sikre at det ikke kommer en ny relasjonstype
+                    //populerer en liste med barn for person. Hvis person har barn, så sjekker man etter løpende sak
                     val listeMedBarn =
                             familierelasjon.filter { it.minRolleForPerson != Familierelasjonsrolle.BARN }
                                     .map { it.relatertPersonsIdent }
                     if (listeMedBarn.isNotEmpty()) {
-                        //Her er vi kun interessert i om den som dør er SØKER. Er Sakspart ANNEN, så er det annen part som har
-                        //søkt og er mest sannsynlig levende
                         val sak = sakClient.hentPågåendeSakStatus(payload.personIdent, listeMedBarn)
                         opprettOppgaveHvisRolleSøker(sak.baSak, payload.personIdent, task, BESKRIVELSE_DØDSFALL)
                     }
 
-
+                    //Sjekker om foreldrene til person under 19 har en løpende sak.
                     if (pdlPersonData.fødsel.isEmpty() || pdlPersonData.fødsel.first().fødselsdato.isAfter(LocalDate.now()
                                                                                                                    .minusYears(19))) {
                         val listeMedForeldreForBarn =
@@ -78,7 +75,7 @@ class VurderLivshendelseTask(
                                              personIdent: String,
                                              task: Task,
                                              beskrivelse: String) {
-        if (saksPart == Sakspart.SØKER) {
+        if (saksPart == Sakspart.SØKER) { //Vi er kun interessert i om sakspart er SØKER
             log.info("Fant løpende sak for person")
             SECURE_LOGGER.info("Fant løpende sak for person $personIdent")
             val fagsak = sakClient.hentRestFagsak(personIdent)
