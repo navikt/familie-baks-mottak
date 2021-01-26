@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-@TaskStepBeskrivelse(taskStepType = VurderLivshendelseTask.TASK_STEP_TYPE, beskrivelse = "Vurder livshendelse")
+@TaskStepBeskrivelse(taskStepType = VurderLivshendelseTask.TASK_STEP_TYPE, beskrivelse = "Vurder livshendelse", maxAntallFeil = 3, triggerTidVedFeilISekunder = 3600)
 class VurderLivshendelseTask(
         private val oppgaveClient: OppgaveClient,
         private val taskRepository: TaskRepository,

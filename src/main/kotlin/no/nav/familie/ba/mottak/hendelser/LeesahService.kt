@@ -35,6 +35,7 @@ class LeesahService(
 ) {
 
     val dødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall")
+    val dødsfallIgnorertCounter: Counter = Metrics.counter("barnetrygd.dodsfall.ignorert")
     val fødselOpprettetCounter: Counter = Metrics.counter("barnetrygd.fodsel.opprettet")
     val fødselKorrigertCounter: Counter = Metrics.counter("barnetrygd.fodsel.korrigert")
     val fødselIgnorertCounter: Counter = Metrics.counter("barnetrygd.fodsel.ignorert")
@@ -56,15 +57,20 @@ class LeesahService(
         when (pdlHendelse.endringstype) {
             OPPRETTET -> {
 
-                Task.nyTask(
-                        VurderLivshendelseTask.TASK_STEP_TYPE,
-                        objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), DØDSFALL)),
-                        Properties().apply {
-                            this["ident"] = pdlHendelse.hentPersonident()
-                            this["callId"] = pdlHendelse.hendelseId
-                            this["type"] = DØDSFALL.name
-                        }).also {
-                    taskRepository.save(it)
+                if (pdlHendelse.dødsdato == null) {
+                    log.error("Mangler dødsdato. Ignorerer hendelse ${pdlHendelse.hendelseId}")
+                    dødsfallIgnorertCounter.increment()
+                } else {
+                    Task.nyTask(
+                            VurderLivshendelseTask.TASK_STEP_TYPE,
+                            objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), DØDSFALL)),
+                            Properties().apply {
+                                this["ident"] = pdlHendelse.hentPersonident()
+                                this["callId"] = pdlHendelse.hendelseId
+                                this["type"] = DØDSFALL.name
+                            }).also {
+                        taskRepository.save(it)
+                    }
                 }
 
             }
