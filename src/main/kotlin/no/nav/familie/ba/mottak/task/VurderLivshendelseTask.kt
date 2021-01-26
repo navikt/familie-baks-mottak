@@ -65,7 +65,9 @@ class VurderLivshendelseTask(
                             opprettOppgaveHvisRolleSøker(sak.baSak, it, task, BESKRIVELSE_DØDSFALL)
                         }
                     }
-
+                } else {
+                    SECURE_LOGGER.info("Har mottatt dødsfallshendelse uten dødsdato $pdlPersonData" )
+                    error("Har mottatt dødsfallshendelse uten dødsdato")
                 }
             }
             else -> log.debug("Behandlinger enda ikke livshendelse av type ${payload.type}")
