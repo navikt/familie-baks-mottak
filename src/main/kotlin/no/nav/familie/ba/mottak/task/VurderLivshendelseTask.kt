@@ -81,11 +81,10 @@ class VurderLivshendelseTask(
             val fagsak = sakClient.hentRestFagsak(personIdent)
             val restUtvidetBehandling = fagsak.behandlinger.first { it.aktiv }
             if (featureToggleService.isEnabled("familie-ba-mottak.opprettLivshendelseOppgave", false)) {
-                //TODO beskrivelse???
                 val aktørId = aktørClient.hentAktørId(personIdent.trim())
                 val vurderLivshendelseOppgaver = oppgaveClient.finnOppgaverPåAktørId(aktørId, Oppgavetype.VurderHenvendelse)   //TODO Bytt ut til rett OppgaveType
 
-                val oppgave = vurderLivshendelseOppgaver.firstOrNull{ it.beskrivelse?.contains("dødsfallshendelse") == true && (
+                val oppgave = vurderLivshendelseOppgaver.firstOrNull{ it.beskrivelse?.contains(BESKRIVELSE_DØDSFALL) == true && (
                         it.status != StatusEnum.FERDIGSTILT || it.status != StatusEnum.FEILREGISTRERT) }
 
                 if (oppgave == null) {
@@ -106,6 +105,7 @@ class VurderLivshendelseTask(
                 }
 
             } else {
+                log.error("Mottatt dødsfallshendelse, men oppretting av oppgave er midlertidig skrudd av")
                 oppgaveIgnorerteDødsfallCounter.increment()
             }
         }
@@ -123,7 +123,7 @@ class VurderLivshendelseTask(
     companion object {
 
         const val TASK_STEP_TYPE = "vurderLivshendelseTask"
-        const val BESKRIVELSE_DØDSFALL = "Har mottatt dødsfallshendelse på ident som har aktiv sak i ba-sak"
+        const val BESKRIVELSE_DØDSFALL = "Dødsfall"
     }
 }
 
