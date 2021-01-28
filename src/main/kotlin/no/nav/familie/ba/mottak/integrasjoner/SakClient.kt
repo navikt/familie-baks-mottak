@@ -16,6 +16,7 @@ import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.RestOperations
 import java.net.URI
+import java.time.LocalDateTime
 
 private val logger = LoggerFactory.getLogger(SakClient::class.java)
 
@@ -66,14 +67,47 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
         )
     }
 
+    fun hentRestFagsak(personIdent: String): RestFagsak {
+        val uri = URI.create("$sakServiceUri/fagsaker/hent-fagsak-paa-person")
+        return runCatching {
+            postForEntity<Ressurs<RestFagsak>>(uri, mapOf("personIdent" to personIdent))
+        }.fold(
+            onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
+            onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ba-sak.", it, uri, personIdent) }
+        )
+    }
+
 }
 
-data class RestFagsak(val id: Long)
+data class RestFagsak(val id: Long,
+                      val behandlinger: List<RestUtvidetBehandling>)
+data class RestUtvidetBehandling(val aktiv: Boolean,
+                                 val arbeidsfordelingPåBehandling: RestArbeidsfordelingPåBehandling,
+                                 val behandlingId: Long,
+                                 val kategori: BehandlingKategori,
+                                 val opprettetTidspunkt: LocalDateTime,
+                                 val underkategori: BehandlingUnderkategori,)
+data class RestArbeidsfordelingPåBehandling(
+        val behandlendeEnhetId: String,
+)
+
+enum class BehandlingKategori {
+    EØS,
+    NASJONAL
+}
+
+enum class BehandlingUnderkategori {
+    UTVIDET,
+    ORDINÆR
+}
+
 
 data class RestPågåendeSakRequest(
         var personIdent: String,
         val barnasIdenter: List<String> = emptyList(),
 )
+
+
 
 data class RestPågåendeSakResponse(
         val baSak: Sakspart? = null,

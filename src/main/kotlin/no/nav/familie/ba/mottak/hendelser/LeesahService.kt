@@ -6,8 +6,15 @@ import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.Hendelseslogg
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
+import no.nav.familie.ba.mottak.integrasjoner.SakClient
+import no.nav.familie.ba.mottak.integrasjoner.finnes
 import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
+import no.nav.familie.ba.mottak.task.VurderLivshendelseTask
+import no.nav.familie.ba.mottak.task.VurderLivshendelseTaskDTO
+import no.nav.familie.ba.mottak.task.VurderLivshendelseType
+import no.nav.familie.ba.mottak.task.VurderLivshendelseType.DØDSFALL
 import no.nav.familie.ba.mottak.util.nesteGyldigeTriggertidFødselshendelser
+import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
@@ -19,12 +26,16 @@ import java.time.LocalDate
 import java.util.*
 
 @Service
-class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository,
-                    private val taskRepository: TaskRepository,
-                    @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") private val triggerTidForTps: Long,
-                    private val environment: Environment) {
+class LeesahService(
+        private val hendelsesloggRepository: HendelsesloggRepository,
+        private val taskRepository: TaskRepository,
+        @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") private val triggerTidForTps: Long,
+        private val sakClient: SakClient,
+        private val environment: Environment
+) {
 
     val dødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall")
+    val dødsfallIgnorertCounter: Counter = Metrics.counter("barnetrygd.dodsfall.ignorert")
     val fødselOpprettetCounter: Counter = Metrics.counter("barnetrygd.fodsel.opprettet")
     val fødselKorrigertCounter: Counter = Metrics.counter("barnetrygd.fodsel.korrigert")
     val fødselIgnorertCounter: Counter = Metrics.counter("barnetrygd.fodsel.ignorert")
@@ -41,14 +52,33 @@ class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository
 
     private fun behandleDødsfallHendelse(pdlHendelse: PdlHendelse) {
         dødsfallCounter.increment()
+        logHendelse(pdlHendelse, "dødsdato: ${pdlHendelse.dødsdato}")
 
         when (pdlHendelse.endringstype) {
-            OPPRETTET, KORRIGERT -> {
-                logHendelse(pdlHendelse, "dødsdato: ${pdlHendelse.dødsdato}")
+            OPPRETTET -> {
+
+                if (pdlHendelse.dødsdato == null) {
+                    log.error("Mangler dødsdato. Ignorerer hendelse ${pdlHendelse.hendelseId}")
+                    dødsfallIgnorertCounter.increment()
+                } else {
+                    Task.nyTask(
+                            VurderLivshendelseTask.TASK_STEP_TYPE,
+                            objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), DØDSFALL)),
+                            Properties().apply {
+                                this["ident"] = pdlHendelse.hentPersonident()
+                                this["callId"] = pdlHendelse.hendelseId
+                                this["type"] = DØDSFALL.name
+                            }).also {
+                        taskRepository.save(it)
+                    }
+                }
+
             }
             else -> {
                 logHendelse(pdlHendelse)
+                logHendelse(pdlHendelse, "Ikke av type OPPRETTET. Dødsdato: ${pdlHendelse.dødsdato}")
             }
+
         }
         oppdaterHendelseslogg(pdlHendelse)
     }
@@ -97,29 +127,36 @@ class LeesahService(private val hendelsesloggRepository: HendelsesloggRepository
     }
 
     private fun logHendelse(pdlHendelse: PdlHendelse, ekstraInfo: String = "") {
-        log.info("person-pdl-leesah melding mottatt: " +
-                 "hendelseId: ${pdlHendelse.hendelseId} " +
-                 "offset: ${pdlHendelse.offset}, " +
-                 "opplysningstype: ${pdlHendelse.opplysningstype}, " +
-                 "aktørid: ${pdlHendelse.hentAktørId()}, " +
-                 "endringstype: ${pdlHendelse.endringstype}, $ekstraInfo"
+        log.info(
+                "person-pdl-leesah melding mottatt: " +
+                "hendelseId: ${pdlHendelse.hendelseId} " +
+                "offset: ${pdlHendelse.offset}, " +
+                "opplysningstype: ${pdlHendelse.opplysningstype}, " +
+                "aktørid: ${pdlHendelse.hentAktørId()}, " +
+                "endringstype: ${pdlHendelse.endringstype}, $ekstraInfo"
         )
     }
 
     private fun oppdaterHendelseslogg(pdlHendelse: PdlHendelse) {
-        val metadata = mutableMapOf("aktørId" to pdlHendelse.hentAktørId(),
-                                    "opplysningstype" to pdlHendelse.opplysningstype,
-                                    "endringstype" to pdlHendelse.endringstype)
+        val metadata = mutableMapOf(
+                "aktørId" to pdlHendelse.hentAktørId(),
+                "opplysningstype" to pdlHendelse.opplysningstype,
+                "endringstype" to pdlHendelse.endringstype
+        )
 
         if (pdlHendelse.fødeland != null) {
             metadata["fødeland"] = pdlHendelse.fødeland
         }
 
-        hendelsesloggRepository.save(Hendelseslogg(pdlHendelse.offset,
-                                                   pdlHendelse.hendelseId,
-                                                   CONSUMER_PDL,
-                                                   metadata.toProperties(),
-                                                   ident = pdlHendelse.hentPersonident()))
+        hendelsesloggRepository.save(
+                Hendelseslogg(
+                        pdlHendelse.offset,
+                        pdlHendelse.hendelseId,
+                        CONSUMER_PDL,
+                        metadata.toProperties(),
+                        ident = pdlHendelse.hentPersonident()
+                )
+        )
     }
 
     private fun erUnder18år(fødselsDato: LocalDate): Boolean {

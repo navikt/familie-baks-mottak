@@ -15,13 +15,16 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
 import java.net.URI
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
+import java.time.LocalDate
 
 @Service
-class PdlClient(@Value("\${PDL_URL}") pdlBaseUrl: URI,
-                @Qualifier("sts") val restTemplate: RestOperations,
-                private val stsRestClient: StsRestClient)
-    : AbstractRestClient(restTemplate, "pdl.personinfo") {
+class PdlClient(
+    @Value("\${PDL_URL}") pdlBaseUrl: URI,
+    @Qualifier("sts") val restTemplate: RestOperations,
+    private val stsRestClient: StsRestClient
+) : AbstractRestClient(restTemplate, "pdl.personinfo") {
 
     private val pdlUri = UriUtil.uri(pdlBaseUrl, PATH_GRAPHQL)
 
@@ -30,9 +33,11 @@ class PdlClient(@Value("\${PDL_URL}") pdlBaseUrl: URI,
         val response = postForEntity<PdlHentIdenterResponse>(pdlUri, pdlPersonRequest, httpHeaders())
 
         if (!response.harFeil()) return response.data.pdlIdenter?.identer.orEmpty()
-        throw IntegrasjonException(msg = "Fant ikke identer på person: ${response.errorMessages()}",
-                                   uri = pdlUri,
-                                   ident = personIdent)
+        throw IntegrasjonException(
+            msg = "Fant ikke identer på person: ${response.errorMessages()}",
+            uri = pdlUri,
+            ident = personIdent
+        )
     }
 
     fun hentPersonMedRelasjoner(personIdent: String): Person {
@@ -40,50 +45,100 @@ class PdlClient(@Value("\${PDL_URL}") pdlBaseUrl: URI,
         val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery("hentperson-med-relasjoner"))
 
         try {
-            val response = postForEntity<PdlHentPersonResponse>(pdlUri,
-                                                                pdlPersonRequest,
-                                                                httpHeaders())
+            val response = postForEntity<PdlHentPersonResponse>(
+                pdlUri,
+                pdlPersonRequest,
+                httpHeaders()
+            )
             if (!response.harFeil()) {
                 return Result.runCatching {
                     val familierelasjoner: Set<Familierelasjon> =
-                                    response.data.person!!.familierelasjoner.map { relasjon ->
-                                        Familierelasjon(personIdent = PersonIdent(id = relasjon.relatertPersonsIdent),
-                                                        relasjonsrolle = relasjon.relatertPersonsRolle.name)
-                                    }.toSet()
+                        response.data.person!!.familierelasjoner.map { relasjon ->
+                            Familierelasjon(
+                                personIdent = PersonIdent(id = relasjon.relatertPersonsIdent),
+                                relasjonsrolle = relasjon.relatertPersonsRolle.name
+                            )
+                        }.toSet()
 
                     response.data.person.let {
-                        Person(navn = null,
-                               familierelasjoner = familierelasjoner,
-                               adressebeskyttelseGradering = it.adressebeskyttelse.firstOrNull()?.gradering?.name,
-                               bostedsadresse = it.bostedsadresse.firstOrNull())
+                        Person(
+                            navn = null,
+                            familierelasjoner = familierelasjoner,
+                            adressebeskyttelseGradering = it.adressebeskyttelse.firstOrNull()?.gradering?.name,
+                            bostedsadresse = it.bostedsadresse.firstOrNull()
+                        )
                     }
                 }.fold(
-                        onSuccess = { it },
-                        onFailure = {
-                            throw IntegrasjonException("Fant ikke forespurte data på person.",
-                                                       it,
-                                                       pdlUri,
-                                                       personIdent)
-                        }
+                    onSuccess = { it },
+                    onFailure = {
+                        throw IntegrasjonException(
+                            "Fant ikke forespurte data på person.",
+                            it,
+                            pdlUri,
+                            personIdent
+                        )
+                    }
                 )
             } else {
-                throw IntegrasjonException(msg = "Feil ved oppslag på person: ${response.errorMessages()}",
-                                           uri = pdlUri,
-                                           ident = personIdent)
+                throw IntegrasjonException(
+                    msg = "Feil ved oppslag på person: ${response.errorMessages()}",
+                    uri = pdlUri,
+                    ident = personIdent
+                )
             }
         } catch (e: Exception) {
             when (e) {
                 is IntegrasjonException -> throw e
-                else -> throw IntegrasjonException(msg = "Feil ved oppslag på person. Gav feil: ${e.message}",
-                                                   uri = pdlUri,
-                                                   ident = personIdent)
+                else -> throw IntegrasjonException(
+                    msg = "Feil ved oppslag på person. Gav feil: ${e.message}",
+                    uri = pdlUri,
+                    ident = personIdent
+                )
             }
         }
     }
 
-    private fun mapTilPdlPersonRequest(personIdent: String,
-                                       personInfoQuery: String) = mapOf("variables" to mapOf("ident" to personIdent),
-                                                                        "query" to personInfoQuery)
+    fun hentPerson(personIdent: String, graphqlfil: String): PdlPersonData {
+        val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery(graphqlfil))
+
+        val response = try {
+            postForEntity<PdlHentPersonResponse>(
+                pdlUri,
+                pdlPersonRequest,
+                httpHeaders()
+            )
+        } catch (e: Exception) {
+            when (e) {
+                is IntegrasjonException -> throw e
+                else -> throw IntegrasjonException(
+                    msg = "Feil ved oppslag på hentPerson mot PDL. Gav feil: ${e.message}",
+                    uri = pdlUri,
+                    ident = personIdent
+                )
+            }
+        }
+
+        if (!response.harFeil()) {
+            return response.data.person!!
+        } else  {
+            throw IntegrasjonException(
+                msg = "Feil ved oppslag på hentPerson mot PDL: ${response.errorMessages()}",
+                uri = pdlUri,
+                ident = personIdent
+            )
+        }
+
+
+    }
+
+
+    private fun mapTilPdlPersonRequest(
+        personIdent: String,
+        personInfoQuery: String
+    ) = mapOf(
+        "variables" to mapOf("ident" to personIdent),
+        "query" to personInfoQuery
+    )
 
     protected fun httpHeaders(): HttpHeaders {
         return HttpHeaders().apply {
@@ -101,12 +156,14 @@ class PdlClient(@Value("\${PDL_URL}") pdlBaseUrl: URI,
     }
 
     companion object {
+
         private const val PATH_GRAPHQL = "graphql"
         private const val TEMA = "BAR"
     }
 }
 
 interface PdlBaseResponse {
+
     val errors: List<PdlError>?
 
     fun harFeil() = errors != null && errors!!.isNotEmpty()
@@ -116,34 +173,57 @@ interface PdlBaseResponse {
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PdlError(val message: String)
 
-data class PdlHentPersonResponse(val data: PdlPerson,
-                                 override val errors: List<PdlError>?): PdlBaseResponse
+data class PdlHentPersonResponse(
+    val data: PdlPerson,
+    override val errors: List<PdlError>?
+) : PdlBaseResponse
 
-data class PdlHentIdenterResponse(val data: Data,
-                                  override val errors: List<PdlError>?): PdlBaseResponse
+data class PdlHentIdenterResponse(
+    val data: Data,
+    override val errors: List<PdlError>?
+) : PdlBaseResponse
 
 data class Data(val pdlIdenter: PdlIdenter?)
 
 data class PdlIdenter(val identer: List<IdentInformasjon>)
 
-data class IdentInformasjon(val ident: String,
-                            val historisk: Boolean,
-                            val gruppe: String)
+data class IdentInformasjon(
+    val ident: String,
+    val historisk: Boolean,
+    val gruppe: String
+)
 
 data class PdlPerson(val person: PdlPersonData?)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class PdlPersonData( val familierelasjoner: List<PdlFamilierelasjon> = emptyList(),
-                         val adressebeskyttelse: List<Adressebeskyttelse>,
-                         val bostedsadresse: List<Bostedsadresse?>,)
+data class PdlPersonData(
+    val familierelasjoner: List<PdlFamilierelasjon> = emptyList(),
+    val adressebeskyttelse: List<Adressebeskyttelse> = emptyList(),
+    val bostedsadresse: List<Bostedsadresse?> = emptyList(),
+    @JsonProperty(value = "doedsfall") val dødsfall: List<Dødsfall> = emptyList(),
+    @JsonProperty(value = "foedsel") val fødsel: List<Fødsel> = emptyList(),
+)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class PdlFamilierelasjon(val relatertPersonsIdent: String,
-                              val relatertPersonsRolle: Familierelasjonsrolle)
+data class PdlFamilierelasjon(
+    val relatertPersonsIdent: String,
+    val relatertPersonsRolle: Familierelasjonsrolle,
+    val minRolleForPerson: Familierelasjonsrolle? = null
+)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Adressebeskyttelse(
-        val gradering: Adressebeskyttelsesgradering
+    val gradering: Adressebeskyttelsesgradering
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Dødsfall(
+    @JsonProperty(value = "doedsdato") val dødsdato: LocalDate
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Fødsel(
+        @JsonProperty(value = "foedselsdato") val fødselsdato: LocalDate
 )
 
 enum class Familierelasjonsrolle {
