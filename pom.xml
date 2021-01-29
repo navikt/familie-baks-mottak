@@ -20,7 +20,7 @@
         <changelist>-SNAPSHOT</changelist>
         <jvmTarget>11</jvmTarget>
         <kotlin.version>1.4.21-2</kotlin.version>
-        <mockk.version>1.10.4</mockk.version>
+        <mockk.version>1.10.5</mockk.version>
         <confluent.version>5.5.1</confluent.version>
         <felles.version>1.20210121113106_ca34836</felles.version>
         <kontrakter.version>2.0_20210105115213_05f0728</kontrakter.version>

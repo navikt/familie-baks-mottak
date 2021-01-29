@@ -2,7 +2,6 @@ package no.nav.familie.ba.mottak.hendelser
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.Hendelseslogg
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
@@ -26,10 +25,11 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class JournalhendelseService(val journalpostClient: JournalpostClient,
-                             val taskRepository: TaskRepository,
-                             val hendelsesloggRepository: HendelsesloggRepository,
-                             val featureToggleService: FeatureToggleService) {
+class JournalhendelseService(
+    val journalpostClient: JournalpostClient,
+    val taskRepository: TaskRepository,
+    val hendelsesloggRepository: HendelsesloggRepository,
+) {
 
     val kanalNavnoCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.navno")
     val kanalSkannetsCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skannets")
@@ -39,15 +39,20 @@ class JournalhendelseService(val journalpostClient: JournalpostClient,
     val logger: Logger = LoggerFactory.getLogger(JournalhendelseService::class.java)
     val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
 
-    fun prosesserNyHendelse(consumerRecord: ConsumerRecord<Long, JournalfoeringHendelseRecord>,
-                                    ack: Acknowledgment) {
+    fun prosesserNyHendelse(
+        consumerRecord: ConsumerRecord<Long, JournalfoeringHendelseRecord>,
+        ack: Acknowledgment
+    ) {
         try {
             val hendelseRecord = consumerRecord.value()
             val callId = hendelseRecord.kanalReferanseId.toStringOrNull() ?: IdUtils.generateId()
             MDC.put(MDCConstants.MDC_CALL_ID, callId)
 
-            if (hendelsesloggRepository.existsByHendelseIdAndConsumer(hendelseRecord.hendelsesId.toString(),
-                                                                      CONSUMER_JOURNAL)) {
+            if (hendelsesloggRepository.existsByHendelseIdAndConsumer(
+                    hendelseRecord.hendelsesId.toString(),
+                    CONSUMER_JOURNAL
+                )
+            ) {
                 ack.acknowledge()
                 return
             }
@@ -57,12 +62,17 @@ class JournalhendelseService(val journalpostClient: JournalpostClient,
                 behandleJournalhendelse(hendelseRecord)
             }
 
-            hendelsesloggRepository.save(Hendelseslogg(consumerRecord.offset(),
-                                                       hendelseRecord.hendelsesId.toString(),
-                                                       CONSUMER_JOURNAL,
-                                                       mapOf("journalpostId" to hendelseRecord.journalpostId.toString(),
-                                                             "hendelsesType" to hendelseRecord.hendelsesType.toString()).toProperties()
-            ))
+            hendelsesloggRepository.save(
+                Hendelseslogg(
+                    consumerRecord.offset(),
+                    hendelseRecord.hendelsesId.toString(),
+                    CONSUMER_JOURNAL,
+                    mapOf(
+                        "journalpostId" to hendelseRecord.journalpostId.toString(),
+                        "hendelsesType" to hendelseRecord.hendelsesType.toString()
+                    ).toProperties()
+                )
+            )
             ack.acknowledge()
         } catch (e: Exception) {
             logger.error("Feil ved lesing av journalhendelser ", e)
@@ -80,7 +90,7 @@ class JournalhendelseService(val journalpostClient: JournalpostClient,
 
     private fun erGyldigHendelsetype(hendelseRecord: JournalfoeringHendelseRecord): Boolean {
         return GYLDIGE_HENDELSE_TYPER.contains(hendelseRecord.hendelsesType.toString())
-               && (hendelseRecord.temaNytt != null && hendelseRecord.temaNytt.toString() == "BAR")
+                && (hendelseRecord.temaNytt != null && hendelseRecord.temaNytt.toString() == "BAR")
     }
 
     fun behandleJournalhendelse(hendelseRecord: JournalfoeringHendelseRecord) {
@@ -115,36 +125,26 @@ class JournalhendelseService(val journalpostClient: JournalpostClient,
     }
 
     private fun behandleNavnoHendelser(journalpost: Journalpost) {
-        if (featureToggleService.isEnabled("familie-ba-mottak.journalhendelse.behsak", true)) {
-            opprettJournalhendelseRutingTask(journalpost)
-            logger.info("Oppretter JournalhendelseRutingTask for \"NAV_NO\"-hendelse, feature skrudd på")
-        } else {
-            logger.info("Behandler ikke journalhendelse, feature familie-ba-mottak.journalhendelse.behsak er skrudd av i Unleash")
-        }
-
+        opprettJournalhendelseRutingTask(journalpost)
         kanalNavnoCounter.increment()
     }
 
     private fun behandleSkanningHendelser(journalpost: Journalpost) {
         logger.info("Ny Journalhendelse med [journalpostId=${journalpost.journalpostId}, status=${journalpost.journalstatus}, tema=${journalpost.tema}, kanal=${journalpost.kanal}]")
-
-        if (featureToggleService.isEnabled("familie-ba-mottak.journalhendelse.jfr")) {
-            opprettJournalhendelseRutingTask(journalpost)
-        } else {
-            logger.info("Behandler ikke journalhendelse, feature familie-ba-mottak.journalhendelse.jfr er skrudd av i Unleash")
-        }
-
+        opprettJournalhendelseRutingTask(journalpost)
         kanalSkannetsCounter.increment()
     }
 
     private fun skalBehandleJournalpost(journalpost: Journalpost) =
-            journalpost.tema == "BAR" && journalpost.journalposttype == Journalposttype.I
+        journalpost.tema == "BAR" && journalpost.journalposttype == Journalposttype.I
 
 
     private fun opprettJournalhendelseRutingTask(journalpost: Journalpost) {
-        Task.nyTask(JournalhendelseRutingTask.TASK_STEP_TYPE,
-                    journalpost.kanal!!,
-                    opprettMetadata(journalpost)).apply { taskRepository.save(this) }
+        Task.nyTask(
+            JournalhendelseRutingTask.TASK_STEP_TYPE,
+            journalpost.kanal!!,
+            opprettMetadata(journalpost)
+        ).apply { taskRepository.save(this) }
     }
 
     private fun opprettMetadata(journalpost: Journalpost): Properties {
@@ -160,6 +160,7 @@ class JournalhendelseService(val journalpostClient: JournalpostClient,
     }
 
     companion object {
+
         private val GYLDIGE_HENDELSE_TYPER = arrayOf("MidlertidigJournalført", "TemaEndret")
         private val CONSUMER_JOURNAL = HendelseConsumer.JOURNAL
     }
