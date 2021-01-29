@@ -24,8 +24,7 @@ class UserAuthorizationFilter(@Value("\${MOTTAK_ROLLE:group1}") val påkrevdRoll
 
     override fun shouldNotFilter(request: HttpServletRequest): Boolean {
         val path = request.requestURI.substring(request.contextPath.length)
-        return path.startsWith("/api/soknadmedvedlegg") || path.startsWith("/internal/") || path.startsWith("/api/soknad")
-    }
+        return path.startsWith("/api/soknadmedvedlegg") || path.startsWith("/internal/") || path.startsWith("/api/soknad")}
 
     private fun ourIssuer() = oidcUtil.getClaimAsList("groups")
     private fun currentUserGroups() = ourIssuer()
