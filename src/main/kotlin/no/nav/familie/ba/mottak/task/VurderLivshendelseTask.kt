@@ -6,6 +6,7 @@ import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstema
+import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.kontrakter.felles.oppgave.StatusEnum
 import no.nav.familie.prosessering.AsyncTaskStep
@@ -84,22 +85,25 @@ class VurderLivshendelseTask(
                 val aktørId = aktørClient.hentAktørId(personIdent.trim())
                 val vurderLivshendelseOppgaver = oppgaveClient.finnOppgaverPåAktørId(aktørId, Oppgavetype.VurderHenvendelse)   //TODO Bytt ut til rett OppgaveType
 
-                val oppgave = vurderLivshendelseOppgaver.firstOrNull{ it.beskrivelse?.contains(BESKRIVELSE_DØDSFALL) == true && (
+                val oppgave: Oppgave? = vurderLivshendelseOppgaver.firstOrNull{ it.beskrivelse?.contains(BESKRIVELSE_DØDSFALL) == true && (
                         it.status != StatusEnum.FERDIGSTILT || it.status != StatusEnum.FEILREGISTRERT) }
 
                 if (oppgave == null) {
-                    val oppgave =
-                            oppgaveClient.opprettVurderLivshendelseOppgave(
-                                    OppgaveVurderLivshendelseDto(aktørClient.hentAktørId(personIdent.trim()),
-                                                                 beskrivelse,
-                                                                 fagsak.id.toString(),
-                                                                 tilBehandlingstema(
-                                                                         restUtvidetBehandling),
-                                                                 restUtvidetBehandling.arbeidsfordelingPåBehandling.behandlendeEnhetId))
-                    task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
-                    taskRepository.saveAndFlush(task)
+                    oppgaveClient.opprettVurderLivshendelseOppgave(
+                            OppgaveVurderLivshendelseDto(aktørClient.hentAktørId(personIdent.trim()),
+                                                         beskrivelse,
+                                                         fagsak.id.toString(),
+                                                         tilBehandlingstema(
+                                                                 restUtvidetBehandling),
+                                                         restUtvidetBehandling.arbeidsfordelingPåBehandling.behandlendeEnhetId)).also {
+                        task.metadata["oppgaveId"] = it.oppgaveId.toString()
+                        taskRepository.saveAndFlush(task)
+                    }
                     oppgaveOpprettetDødsfallCounter.increment()
                 } else {
+                    task.metadata["oppgaveId"] = oppgave.id.toString()
+                    task.metadata["info"] = "Fant åpen oppgave"
+                    taskRepository.saveAndFlush(task)
                     log.info("Fant åpen oppgave på aktørId $aktørId")
                     SECURE_LOGGER.info("Fant åpen oppgave: $oppgave")
                 }
