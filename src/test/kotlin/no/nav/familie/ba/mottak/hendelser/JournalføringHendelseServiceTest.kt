@@ -33,7 +33,7 @@ class JournalføringHendelseServiceTest {
     @MockK
     lateinit var mockJournalpostClient: JournalpostClient
 
-    @MockK
+    @MockK(relaxed = true)
     lateinit var mockOppgaveClient: OppgaveClient
 
     @MockK

@@ -64,6 +64,24 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
     }
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
+    fun oppdaterOppgaveBeskrivelse(oppgaveId: Long, beskrivelse: String): OppgaveResponse {
+        val uri = URI.create("$integrasjonUri/oppgave/${oppgaveId}/oppdater")
+
+        return Result.runCatching {
+            patchForEntity<Ressurs<OppgaveResponse>>(uri, Oppgave(oppgaveId, beskrivelse = beskrivelse))
+        }.fold(
+                onSuccess = { response -> assertGyldig(response) },
+                onFailure = {
+                    throw IntegrasjonException("Patch-kall mot $uri feilet ved oppdatering av oppgave",
+                                               it,
+                                               uri,
+                                               null)
+                }
+        )
+    }
+
+
+    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
     fun finnOppgaver(journalpostId: String, oppgavetype: Oppgavetype?): List<Oppgave> {
         logger.info("Søker etter aktive oppgaver for $journalpostId")
         val uri = URI.create("$integrasjonUri/oppgave/v4")
