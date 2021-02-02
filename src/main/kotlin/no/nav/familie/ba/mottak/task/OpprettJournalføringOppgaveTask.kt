@@ -60,11 +60,9 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
         }
     }
 
-    private fun Oppgave.oppdaterOppgavebeskrivelse(sakssystemMarkering: String) {
-        this.id?.let {
-            log.info("Oppdaterer oppgavebeskrivelse for eksisterende oppgave $it: $sakssystemMarkering")
-            oppgaveClient.oppdaterOppgaveBeskrivelse(it, sakssystemMarkering)
-        }
+    private fun Oppgave.oppdaterOppgavebeskrivelse(beskrivelse: String) {
+        log.info("Oppdaterer oppgavebeskrivelse for eksisterende ${oppgavetype}-oppgave ${id}: $beskrivelse")
+        oppgaveClient.oppdaterOppgaveBeskrivelse(this, beskrivelse)
     }
 
     companion object {

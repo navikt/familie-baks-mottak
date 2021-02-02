@@ -64,11 +64,11 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
     }
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
-    fun oppdaterOppgaveBeskrivelse(oppgaveId: Long, beskrivelse: String): OppgaveResponse {
-        val uri = URI.create("$integrasjonUri/oppgave/${oppgaveId}/oppdater")
+    fun oppdaterOppgaveBeskrivelse(patchOppgave: Oppgave, beskrivelse: String): OppgaveResponse {
+        val uri = URI.create("$integrasjonUri/oppgave/${patchOppgave.id}/oppdater")
 
         return Result.runCatching {
-            patchForEntity<Ressurs<OppgaveResponse>>(uri, Oppgave(oppgaveId, beskrivelse = beskrivelse))
+            patchForEntity<Ressurs<OppgaveResponse>>(uri, patchOppgave.copy(beskrivelse = beskrivelse))
         }.fold(
                 onSuccess = { response -> assertGyldig(response) },
                 onFailure = {
