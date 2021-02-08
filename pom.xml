@@ -20,14 +20,14 @@
         <changelist>-SNAPSHOT</changelist>
         <jvmTarget>11</jvmTarget>
         <kotlin.version>1.4.21-2</kotlin.version>
-        <mockk.version>1.10.4</mockk.version>
+        <mockk.version>1.10.5</mockk.version>
         <confluent.version>5.5.1</confluent.version>
         <felles.version>1.20210111144144_6eff1f3</felles.version>
         <kontrakter.version>2.0_20210105115213_05f0728</kontrakter.version>
         <main-class>no.nav.familie.ba.mottak.LauncherKt</main-class>
         <spring.vault.version>2.2.3.RELEASE</spring.vault.version>
         <spring.cloud.version>2.2.6.RELEASE</spring.cloud.version>
-        <token-validation-spring.version>1.3.2</token-validation-spring.version>
+        <token-validation-spring.version>1.3.3</token-validation-spring.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
