@@ -1,6 +1,7 @@
 package no.nav.familie.ba.mottak.task
 
 import no.nav.familie.ba.mottak.integrasjoner.*
+import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -20,12 +21,14 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
     val log: Logger = LoggerFactory.getLogger(OpprettJournalføringOppgaveTask::class.java)
 
     override fun doTask(task: Task) {
+        val sakssystemMarkering = task.payload
 
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
         when (journalpost.journalstatus) {
             Journalstatus.MOTTATT -> {
+                val journalføringsOppgaver = oppgaveClient.finnOppgaver(journalpost.journalpostId, Oppgavetype.Journalføring)
                 val oppgaveTypeForEksisterendeOppgave: Oppgavetype? =
-                        if (oppgaveClient.finnOppgaver(journalpost.journalpostId, Oppgavetype.Journalføring).isNotEmpty()) {
+                        if (journalføringsOppgaver.isNotEmpty()) {
                             Oppgavetype.Journalføring
                         } else if (oppgaveClient.finnOppgaver(journalpost.journalpostId, Oppgavetype.Fordeling).isNotEmpty()) {
                             Oppgavetype.Fordeling
@@ -39,6 +42,9 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
                     log.info("Oppretter ny journalførings-oppgave med id ${nyOppgave.oppgaveId} for journalpost ${journalpost.journalpostId}")
                 } else {
                     log.info("Skipper oppretting av journalførings-oppgave. Fant åpen oppgave av type $oppgaveTypeForEksisterendeOppgave for ${journalpost.journalpostId}")
+                    if (sakssystemMarkering.isNotEmpty()) {
+                        journalføringsOppgaver.forEach { it.oppdaterOppgavebeskrivelse(sakssystemMarkering) }
+                    }
                 }
             }
 
@@ -52,6 +58,11 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
                 throw error
             }
         }
+    }
+
+    private fun Oppgave.oppdaterOppgavebeskrivelse(beskrivelse: String) {
+        log.info("Oppdaterer oppgavebeskrivelse for eksisterende ${oppgavetype}-oppgave ${id}: $beskrivelse")
+        oppgaveClient.oppdaterOppgaveBeskrivelse(this, beskrivelse)
     }
 
     companion object {

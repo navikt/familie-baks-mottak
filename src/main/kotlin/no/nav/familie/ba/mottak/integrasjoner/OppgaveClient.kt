@@ -26,7 +26,7 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
     val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
 
     fun opprettJournalføringsoppgave(journalpost: Journalpost, beskrivelse: String? = null): OppgaveResponse {
-        logger.info("Oppretter journalføringsoppgave for papirsøknad")
+        logger.info("Oppretter journalføringsoppgave for ${if (journalpost.kanal == "NAV_NO") "digital søknad" else "papirsøknad"}")
         val uri = URI.create("$integrasjonUri/oppgave/opprett")
         val request = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring, journalpost, beskrivelse)
 
@@ -62,6 +62,24 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
 
         return responseFra(uri, request)
     }
+
+    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
+    fun oppdaterOppgaveBeskrivelse(patchOppgave: Oppgave, beskrivelse: String): OppgaveResponse {
+        val uri = URI.create("$integrasjonUri/oppgave/${patchOppgave.id}/oppdater")
+
+        return Result.runCatching {
+            patchForEntity<Ressurs<OppgaveResponse>>(uri, patchOppgave.copy(beskrivelse = beskrivelse))
+        }.fold(
+                onSuccess = { response -> assertGyldig(response) },
+                onFailure = {
+                    throw IntegrasjonException("Patch-kall mot $uri feilet ved oppdatering av oppgave",
+                                               it,
+                                               uri,
+                                               null)
+                }
+        )
+    }
+
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
     fun finnOppgaver(journalpostId: String, oppgavetype: Oppgavetype?): List<Oppgave> {
