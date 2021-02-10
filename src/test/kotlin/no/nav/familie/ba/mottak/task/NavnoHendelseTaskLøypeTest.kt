@@ -9,17 +9,13 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.springframework.http.HttpStatus
-import org.springframework.web.client.HttpServerErrorException
-
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NavnoHendelseTaskLøypeTest {
 
     private val mockJournalpostClient: JournalpostClient = mockk()
-    private val mockDokarkivClient: DokarkivClient = mockk(relaxed = true)
     private val mockSakClient: SakClient = mockk()
-    private val mockAktørClient: AktørClient = mockk()
+    private val mockOppgaveClient: OppgaveClient = mockk(relaxed = true)
     private val mockTaskRepository: TaskRepository = mockk(relaxed = true)
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
@@ -29,11 +25,10 @@ class NavnoHendelseTaskLøypeTest {
                                                        mockInfotrygdBarnetrygdClient,
                                                        mockTaskRepository)
 
-    private val journalføringSteg = OppdaterOgFerdigstillJournalpostTask(mockJournalpostClient,
-                                                                         mockDokarkivClient,
-                                                                         mockSakClient,
-                                                                         mockAktørClient,
-                                                                         mockTaskRepository)
+    private val journalføringSteg = OpprettJournalføringOppgaveTask(mockJournalpostClient,
+                                                                    mockOppgaveClient,
+                                                                    mockTaskRepository)
+
 
 
     @BeforeEach
@@ -58,8 +53,8 @@ class NavnoHendelseTaskLøypeTest {
         } returns null
 
         every {
-            mockAktørClient.hentPersonident(any())
-        } returns "12345678910"
+            mockOppgaveClient.finnOppgaver(any(), any())
+        } returns listOf()
 
         every {
             mockSakClient.hentPågåendeSakStatus(any(), emptyList())
@@ -75,61 +70,50 @@ class NavnoHendelseTaskLøypeTest {
     }
 
     @Test
-    fun `Skal oppdatere og ferdigstille journalpost og deretter lagre ny OpprettBehandleSakOppgaveTask`() {
+    fun `Skal opprette JFR-oppgave med tekst om at bruker har sak i BA-sak`() {
         every {
             mockSakClient.hentPågåendeSakStatus(any(), emptyList())
         } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
 
         every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
 
-        journalføringSteg.doTask(Task.nyTask(OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE, payload = "mockJournalpostId"))
+        kjørRutingTaskOgReturnerNesteTask().run {
+            Assertions.assertThat(this.taskStepType).isEqualTo(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE)
+            journalføringSteg.doTask(this)
+        }
 
-        val task = slot<Task>()
+        val oppgaveBeskrivelse = slot<String>()
 
         verify(exactly = 1) {
-            mockDokarkivClient.oppdaterJournalpostSak(any(), FAGSAK_ID)
-            mockDokarkivClient.ferdigstillJournalpost(JOURNALPOST_ID)
-            mockTaskRepository.save(capture(task))
+            mockOppgaveClient.opprettJournalføringsoppgave(any(), capture(oppgaveBeskrivelse))
         }
-        Assertions.assertThat(task.captured.taskStepType).isEqualTo(OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE)
+        Assertions.assertThat(oppgaveBeskrivelse.captured).isEqualTo("Bruker har sak i BA-sak")
     }
 
     @Test
-    fun `Skal returnere uten å journalføre når bruker ikke har sak i BA-sak`() {
+    fun `Skal ikke gå videre når bruker ikke har sak i BA-sak`() {
         every {
             mockSakClient.hentPågåendeSakStatus(any(), emptyList())
         } returns RestPågåendeSakResponse()
 
-        rutingSteg.doTask(Task.nyTask(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
-                                      payload = MOTTAK_KANAL).apply {
-            this.metadata["personIdent"] = "12345678901"
-            this.metadata["journalpostId"] = "mockJournalpostId"
-        })
-
-        verify(exactly = 0) {
-            mockTaskRepository.save(any())
-        }
+        Assertions.assertThatThrownBy {
+            kjørRutingTaskOgReturnerNesteTask()
+        }.hasMessageContainingAll("TaskRepository", ".save", "was not called")
     }
 
     @Test
-    fun `Skal returnere uten å journalføre når bruker har sak i Infotrygd`() {
+    fun `Skal ikke gå videre når bruker har sak i Infotrygd`() {
         every {
             mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
         } returns InfotrygdSøkResponse(listOf(StønadDto(1)), emptyList())
 
-        rutingSteg.doTask(Task.nyTask(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
-                                      payload = MOTTAK_KANAL).apply {
-            this.metadata["personIdent"] = "12345678901"
-            this.metadata["journalpostId"] = "mockJournalpostId"
-        })
-
-        verify(exactly = 0) {
-            mockTaskRepository.save(any())
-        }
+        Assertions.assertThatThrownBy {
+            kjørRutingTaskOgReturnerNesteTask()
+        }.hasMessageContainingAll("TaskRepository", ".save", "was not called")
     }
 
     @Test
-    fun `Skal droppe automatisk journalføring og lagre ny OpprettJournalføringOppgaveTask hvis bruker har sak begge steder`() {
+    fun `Skal opprette JFR-oppgave med tekst om at bruker har sak begge steder`() {
         every {
             mockSakClient.hentPågåendeSakStatus(any(), emptyList())
         } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
@@ -140,13 +124,18 @@ class NavnoHendelseTaskLøypeTest {
             mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
         } returns InfotrygdSøkResponse(listOf(StønadDto(1)), listOf(StønadDto(2)))
 
-        val task = kjørRutingTaskOgReturnerNesteTask()
+        kjørRutingTaskOgReturnerNesteTask().run { journalføringSteg.doTask(this) }
 
-        Assertions.assertThat(task.taskStepType).isEqualTo(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE)
+        val oppgaveBeskrivelse = slot<String>()
+
+        verify(exactly = 1) {
+            mockOppgaveClient.opprettJournalføringsoppgave(any(), capture(oppgaveBeskrivelse))
+        }
+        Assertions.assertThat(oppgaveBeskrivelse.captured).isEqualTo("Bruker har sak i både Infotrygd og BA-sak")
     }
 
     @Test
-    fun `Skal automatisk journalføre mot ny løsning når bruker er migrert fra Infotrygd`() {
+    fun `Skal opprette JFR-oppgave med henvisning til BA-sak når bruker er migrert fra Infotrygd`() {
         every {
             mockSakClient.hentPågåendeSakStatus(any(), emptyList())
         } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
@@ -161,32 +150,12 @@ class NavnoHendelseTaskLøypeTest {
 
         kjørRutingTaskOgReturnerNesteTask().run { journalføringSteg.doTask(this) }
 
-        verify(exactly = 1) {
-            mockDokarkivClient.oppdaterJournalpostSak(any(), FAGSAK_ID)
-            mockDokarkivClient.ferdigstillJournalpost(JOURNALPOST_ID)
-        }
-    }
-
-    @Test
-    fun `Skal lagre ny OpprettJournalføringOppgaveTask hvis automatisk journalføring feiler`() {
-        every {
-            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
-
-        every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
-
-        every {
-            mockDokarkivClient.ferdigstillJournalpost(any())
-        } throws (HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR))
-
-        journalføringSteg.doTask(Task.nyTask(OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE, payload = "mockJournalpostId"))
-
-        val task = slot<Task>()
+        val oppgaveBeskrivelse = slot<String>()
 
         verify(exactly = 1) {
-            mockTaskRepository.save(capture(task))
+            mockOppgaveClient.opprettJournalføringsoppgave(any(), capture(oppgaveBeskrivelse))
         }
-        Assertions.assertThat(task.captured.taskStepType).isEqualTo(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE)
+        Assertions.assertThat(oppgaveBeskrivelse.captured).isEqualTo("Bruker har sak i BA-sak")
     }
 
     private fun kjørRutingTaskOgReturnerNesteTask(): Task {
