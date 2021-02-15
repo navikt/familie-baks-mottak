@@ -14,6 +14,8 @@ class EFConsumer() {
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     @KafkaListener(topics = ["aapen-ef-overgangstonad-v1"],
+                   id = "familie-ba-mottak",
+                   idIsGroup = false,
                    containerFactory = "kafkaEFListenerContainerFactory")
     fun listen(cr: ConsumerRecord<String, String>, ack: Acknowledgment) {
         val melding = cr.value()
