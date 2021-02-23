@@ -2,7 +2,6 @@ package no.nav.familie.ba.mottak.hendelser
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
 import no.nav.familie.log.mdc.MDCConstants
@@ -22,11 +21,10 @@ import javax.transaction.Transactional
 
 @Service
 @Profile("!e2e")
-class LeesahConsumer(val hendelsesloggRepository: HendelsesloggRepository,
-                     val leesahService: LeesahService) {
+class LeesahConsumer(val leesahService: LeesahService) {
 
     val leesahFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesha.feilet")
-    val leesahDuplikatCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesah.duplikat")
+
 
 
     @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"],
@@ -47,11 +45,6 @@ class LeesahConsumer(val hendelsesloggRepository: HendelsesloggRepository,
 
         try {
             MDC.put(MDCConstants.MDC_CALL_ID, pdlHendelse.hendelseId)
-            if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
-                leesahDuplikatCounter.increment()
-                ack.acknowledge()
-                return
-            }
             SECURE_LOGGER.info("Har mottatt leesah-hendelse $cr")
             leesahService.prosesserNyHendelse(pdlHendelse)
         } catch (e: RuntimeException) {
@@ -116,7 +109,6 @@ class LeesahConsumer(val hendelsesloggRepository: HendelsesloggRepository,
     }
 
     companion object {
-        private val CONSUMER_PDL = HendelseConsumer.PDL
         val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
         val log: Logger = LoggerFactory.getLogger(LeesahConsumer::class.java)
     }

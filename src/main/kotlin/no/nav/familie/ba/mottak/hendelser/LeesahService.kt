@@ -30,7 +30,6 @@ class LeesahService(
         private val hendelsesloggRepository: HendelsesloggRepository,
         private val taskRepository: TaskRepository,
         @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") private val triggerTidForTps: Long,
-        private val sakClient: SakClient,
         private val environment: Environment
 ) {
 
@@ -41,6 +40,7 @@ class LeesahService(
     val fødselIgnorertCounter: Counter = Metrics.counter("barnetrygd.fodsel.ignorert")
     val fødselIgnorertUnder18årCounter: Counter = Metrics.counter("barnetrygd.fodsel.ignorert.under18")
     val fødselIgnorertFødelandCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.fodeland.nor")
+    val leesahDuplikatCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesah.duplikat")
 
 
     fun prosesserNyHendelse(pdlHendelse: PdlHendelse) {
@@ -52,6 +52,10 @@ class LeesahService(
 
     private fun behandleDødsfallHendelse(pdlHendelse: PdlHendelse) {
         dødsfallCounter.increment()
+        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
+            leesahDuplikatCounter.increment()
+            return
+        }
         logHendelse(pdlHendelse, "dødsdato: ${pdlHendelse.dødsdato}")
 
         when (pdlHendelse.endringstype) {
@@ -84,6 +88,10 @@ class LeesahService(
     }
 
     private fun behandleFødselsHendelse(pdlHendelse: PdlHendelse) {
+        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
+            leesahDuplikatCounter.increment()
+            return
+        }
         when (pdlHendelse.endringstype) {
             OPPRETTET, KORRIGERT -> {
                 logHendelse(pdlHendelse, "fødselsdato: ${pdlHendelse.fødselsdato}")
