@@ -49,9 +49,6 @@ class JournalføringHendelseServiceTest {
     lateinit var mockTaskRepository: TaskRepository
 
     @MockK(relaxed = true)
-    lateinit var mockPdlClient: PdlClient
-
-    @MockK(relaxed = true)
     lateinit var mockFeatureToggleService: FeatureToggleService
 
     @MockK(relaxed = true)
@@ -338,7 +335,7 @@ class JournalføringHendelseServiceTest {
 
     @Test
     fun `Ikke gyldige hendelsetyper skal ignoreres`() {
-        val ugyldigHendelsetypeRecord = opprettRecord(journalpostId = JOURNALPOST_PAPIRSØKNAD, hendelseType = "UgyldigType")
+        val ugyldigHendelsetypeRecord = opprettRecord(journalpostId = JOURNALPOST_PAPIRSØKNAD, hendelseType = "UgyldigType", temaNytt = "BAR")
         val consumerRecord = ConsumerRecord("topic", 1,
                                             OFFSET,
                                             42L, ugyldigHendelsetypeRecord)
@@ -347,16 +344,9 @@ class JournalføringHendelseServiceTest {
 
 
         verify { ack.acknowledge() }
-        val slot = slot<Hendelseslogg>()
-        verify(exactly = 1) {
-            mockHendelsesloggRepository.save(capture(slot))
+        verify(exactly = 0) {
+            mockHendelsesloggRepository.save(any())
         }
-        assertThat(slot.captured).isNotNull
-        assertThat(slot.captured.offset).isEqualTo(OFFSET)
-        assertThat(slot.captured.hendelseId).isEqualTo(HENDELSE_ID)
-        assertThat(slot.captured.consumer).isEqualTo(HendelseConsumer.JOURNAL)
-        assertThat(slot.captured.metadata["journalpostId"]).isEqualTo(JOURNALPOST_PAPIRSØKNAD)
-        assertThat(slot.captured.metadata["hendelsesType"]).isEqualTo("UgyldigType")
     }
 
     @Test
@@ -370,16 +360,9 @@ class JournalføringHendelseServiceTest {
         service.prosesserNyHendelse(consumerRecord, ack)
 
         verify { ack.acknowledge() }
-        val slot = slot<Hendelseslogg>()
-        verify(exactly = 1) {
-            mockHendelsesloggRepository.save(capture(slot))
+        verify(exactly = 0) {
+            mockHendelsesloggRepository.save(any())
         }
-        assertThat(slot.captured).isNotNull
-        assertThat(slot.captured.offset).isEqualTo(OFFSET)
-        assertThat(slot.captured.hendelseId).isEqualTo(HENDELSE_ID)
-        assertThat(slot.captured.consumer).isEqualTo(HendelseConsumer.JOURNAL)
-        assertThat(slot.captured.metadata["journalpostId"]).isEqualTo(JOURNALPOST_PAPIRSØKNAD)
-        assertThat(slot.captured.metadata["hendelsesType"]).isEqualTo("MidlertidigJournalført")
     }
 
     private fun opprettRecord(journalpostId: String,
