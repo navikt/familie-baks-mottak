@@ -1,7 +1,7 @@
 package no.nav.familie.ba.mottak.søknad.domene
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import main.kotlin.no.nav.familie.ba.søknad.Søknad
+import no.nav.familie.kontrakter.ba.søknad.Søknad
 import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.LocalDateTime
 import javax.persistence.*

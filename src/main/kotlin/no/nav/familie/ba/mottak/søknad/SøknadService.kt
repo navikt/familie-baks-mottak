@@ -3,7 +3,7 @@ package no.nav.familie.ba.mottak.søknad
 import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import main.kotlin.no.nav.familie.ba.søknad.Søknad
+import no.nav.familie.kontrakter.ba.søknad.Søknad
 import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
 import no.nav.familie.ba.mottak.task.JournalførSøknadTask

@@ -3,6 +3,9 @@ package no.nav.familie.ba.mottak.task
 import io.mockk.*
 import no.nav.familie.ba.mottak.hendelser.JournalføringHendelseServiceTest
 import no.nav.familie.ba.mottak.integrasjoner.*
+import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
+import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
+import no.nav.familie.kontrakter.ba.infotrygd.Sak as SakDto
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
@@ -118,7 +121,7 @@ class SkanHendelseTaskLøypeTest {
 
         every {
             mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
-        } returns InfotrygdSøkResponse(listOf(StønadDto(1)), listOf(StønadDto(2)))
+        } returns InfotrygdSøkResponse(listOf(StønadDto()), listOf(StønadDto()))
 
         kjørRutingTaskOgReturnerNesteTask().run {
             journalføringSteg.doTask(this)
