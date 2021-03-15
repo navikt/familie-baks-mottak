@@ -1,8 +1,8 @@
 package no.nav.familie.ba.mottak.søknad
 
-import main.kotlin.no.nav.familie.ba.Søknadstype
-import main.kotlin.no.nav.familie.ba.søknad.Søknad
-import main.kotlin.no.nav.familie.ba.søknad.Søknadsfelt
+import no.nav.familie.kontrakter.ba.Søknadstype
+import no.nav.familie.kontrakter.ba.søknad.Søknad
+import no.nav.familie.kontrakter.ba.søknad.Søknadsfelt
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Month

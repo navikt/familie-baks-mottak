@@ -1,6 +1,9 @@
 package no.nav.familie.ba.mottak.task
 
 import no.nav.familie.ba.mottak.integrasjoner.*
+import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
+import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
+import no.nav.familie.kontrakter.ba.infotrygd.Sak as SakDto
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -8,6 +11,7 @@ import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 @TaskStepBeskrivelse(taskStepType = JournalhendelseRutingTask.TASK_STEP_TYPE,
@@ -78,10 +82,15 @@ val InfotrygdSøkResponse<SakDto>.resultat: Sakspart?
     get() = if (bruker.harSak()) Sakspart.SØKER else if (barn.harSak()) Sakspart.ANNEN else null
 
 private fun List<SakDto>.harSak(): Boolean {
-    val (sakerMedVedtak, sakerUtenVedtak) = this.partition { it.stønadList.isNotEmpty() }
+    val (sakerMedVedtak, sakerUtenVedtak) = this.partition { it.stønad != null }
 
-    return sakerMedVedtak.let { saker -> saker.all { it.stønadList.none { it.opphørsgrunn == Opphørsgrunn.MIGRERT.kode } } &&
-                                         saker.isNotEmpty() } ||
+    return sakerMedVedtak.let { saker -> saker.isNotEmpty() && !personErMigrert(saker) } ||
            sakerUtenVedtak.any { it.status != StatusKode.FB.name }
+}
+
+private fun personErMigrert(saker: List<no.nav.familie.kontrakter.ba.infotrygd.Sak>): Boolean {
+    return saker.any {
+        it.stønad!!.opphørsgrunn == Opphørsgrunn.MIGRERT.kode && it.vedtaksdato!!.isAfter(LocalDate.of(2020, 1, 1))
+    }
 }
 

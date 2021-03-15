@@ -3,12 +3,16 @@ package no.nav.familie.ba.mottak.task
 import io.mockk.*
 import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.ba.mottak.integrasjoner.Opphørsgrunn.MIGRERT
+import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
+import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
+import no.nav.familie.kontrakter.ba.infotrygd.Sak as SakDto
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import java.time.LocalDate
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NavnoHendelseTaskLøypeTest {
@@ -105,7 +109,7 @@ class NavnoHendelseTaskLøypeTest {
     fun `Skal ikke gå videre når bruker har sak i Infotrygd`() {
         every {
             mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
-        } returns InfotrygdSøkResponse(listOf(StønadDto(1)), emptyList())
+        } returns InfotrygdSøkResponse(listOf(StønadDto()), emptyList())
 
         Assertions.assertThatThrownBy {
             kjørRutingTaskOgReturnerNesteTask()
@@ -122,7 +126,7 @@ class NavnoHendelseTaskLøypeTest {
 
         every {
             mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
-        } returns InfotrygdSøkResponse(listOf(StønadDto(1)), listOf(StønadDto(2)))
+        } returns InfotrygdSøkResponse(listOf(StønadDto()), listOf(StønadDto()))
 
         kjørRutingTaskOgReturnerNesteTask().run { journalføringSteg.doTask(this) }
 
@@ -145,7 +149,8 @@ class NavnoHendelseTaskLøypeTest {
         every {
             mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
         } returns InfotrygdSøkResponse(listOf(SakDto(status = StatusKode.FB.name,
-                                                     stønadList = listOf(StønadDto(1, opphørsgrunn = MIGRERT.kode)))),
+                                                     vedtaksdato = LocalDate.now(),
+                                                     stønad = StønadDto(opphørsgrunn = MIGRERT.kode))),
                                        emptyList())
 
         kjørRutingTaskOgReturnerNesteTask().run { journalføringSteg.doTask(this) }

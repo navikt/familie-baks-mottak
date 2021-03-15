@@ -1,10 +1,10 @@
 package no.nav.familie.ba.mottak.søknad
 
-import main.kotlin.no.nav.familie.ba.Søknadstype
-import main.kotlin.no.nav.familie.ba.søknad.Barn
-import main.kotlin.no.nav.familie.ba.søknad.Søker
-import main.kotlin.no.nav.familie.ba.søknad.Søknad
-import main.kotlin.no.nav.familie.ba.søknad.Søknadsfelt
+import no.nav.familie.kontrakter.ba.Søknadstype
+import no.nav.familie.kontrakter.ba.søknad.Barn
+import no.nav.familie.kontrakter.ba.søknad.Søker
+import no.nav.familie.kontrakter.ba.søknad.Søknad
+import no.nav.familie.kontrakter.ba.søknad.Søknadsfelt
 
 object SøknadTestData {
     fun søker(): Søker {

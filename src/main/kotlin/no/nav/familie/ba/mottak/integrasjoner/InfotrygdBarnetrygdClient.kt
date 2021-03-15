@@ -1,14 +1,16 @@
 package no.nav.familie.ba.mottak.integrasjoner
 
-import no.nav.familie.ba.mottak.integrasjoner.Sakspart.*
 import no.nav.familie.http.client.AbstractRestClient
+import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkRequest
+import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
+import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
+import no.nav.familie.kontrakter.ba.infotrygd.Sak as SakDto
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestOperations
 import java.net.URI
-import java.time.LocalDate
 
 @Component
 class InfotrygdBarnetrygdClient(@Value("\${FAMILIE_BA_INFOTRYGD_BARNETRYGD_API_URL}/infotrygd/barnetrygd")
@@ -39,36 +41,6 @@ class InfotrygdBarnetrygdClient(@Value("\${FAMILIE_BA_INFOTRYGD_BARNETRYGD_API_U
 
     private fun uri(endepunkt: String) = URI.create("$clientUri/$endepunkt")
 }
-
-data class InfotrygdSøkRequest(val brukere: List<String>,
-                               val barn: List<String>? = null)
-
-data class InfotrygdSøkResponse<T> (
-        val bruker: List<T>,
-        val barn: List<T>,
-)
-
-data class StønadDto(
-        val stønadId: Long,
-        val sakNr: String? = null,
-        val opphørtFom: String? = null,
-        val opphørsgrunn: String? = null,
-)
-
-data class SakDto(
-        val saksnr: String? = null,
-        val kapittelnr: String? = null,
-        val valg: String? = null,
-        val type: String? = null,
-        val årsakskode: String? = null,
-        val stønadList: List<StønadDto> = emptyList(),
-        val vedtaksdato: LocalDate? = null,
-        val mottattdato: LocalDate? = null,
-        val regDato: LocalDate? = null,
-        val regAvEnhet: String? = null,
-        val behenEnhet: String? = null,
-        val status: String,         // S15_STATUS
-)
 
 enum class Opphørsgrunn(val kode: String) {
     MIGRERT("5")
