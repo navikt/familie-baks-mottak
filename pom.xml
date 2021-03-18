@@ -26,7 +26,7 @@
         <kontrakter.version>2.0_20210316145009_e7d6987</kontrakter.version>
         <main-class>no.nav.familie.ba.mottak.LauncherKt</main-class>
         <spring.vault.version>2.3.2</spring.vault.version>
-        <spring.cloud.version>3.0.1</spring.cloud.version>
+        <spring.cloud.version>3.0.2</spring.cloud.version>
         <token-validation-spring.version>1.3.3</token-validation-spring.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
@@ -147,7 +147,7 @@
         <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
-            <version>1.10.1</version>
+            <version>1.10.2</version>
         </dependency>
         <dependency>
             <groupId>io.confluent</groupId>
@@ -236,7 +236,7 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-contract-wiremock</artifactId>
-            <version>2.2.5.RELEASE</version>
+            <version>${spring.cloud.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -305,7 +305,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>3.7.0.1746</version>
+                    <version>3.8.0.2131</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
@@ -319,7 +319,7 @@
             <plugin>
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro-maven-plugin</artifactId>
-                <version>1.10.1</version>
+                <version>1.10.2</version>
 
                 <executions>
                     <execution>
