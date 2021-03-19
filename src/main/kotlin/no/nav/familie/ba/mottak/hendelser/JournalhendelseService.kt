@@ -5,11 +5,11 @@ import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.Hendelseslogg
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
+import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType.ORGNR
 import no.nav.familie.ba.mottak.integrasjoner.Journalpost
 import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.ba.mottak.integrasjoner.Journalposttype
 import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
-import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType.ORGNR
 import no.nav.familie.ba.mottak.task.JournalhendelseRutingTask
 import no.nav.familie.log.IdUtils
 import no.nav.familie.log.mdc.MDCConstants
@@ -48,31 +48,28 @@ class JournalhendelseService(
             val callId = hendelseRecord.kanalReferanseId.toStringOrNull() ?: IdUtils.generateId()
             MDC.put(MDCConstants.MDC_CALL_ID, callId)
 
-            if (hendelsesloggRepository.existsByHendelseIdAndConsumer(
-                    hendelseRecord.hendelsesId.toString(),
-                    CONSUMER_JOURNAL
-                )
-            ) {
-                ack.acknowledge()
-                return
-            }
-
             if (erGyldigHendelsetype(hendelseRecord)) {
+                if (hendelsesloggRepository.existsByHendelseIdAndConsumer(hendelseRecord.hendelsesId.toString(), CONSUMER_JOURNAL)) {
+                    ack.acknowledge()
+                    return
+                }
+
                 secureLogger.info("Mottatt gyldig hendelse: $hendelseRecord")
                 behandleJournalhendelse(hendelseRecord)
+
+                hendelsesloggRepository.save(
+                    Hendelseslogg(
+                        consumerRecord.offset(),
+                        hendelseRecord.hendelsesId.toString(),
+                        CONSUMER_JOURNAL,
+                        mapOf(
+                            "journalpostId" to hendelseRecord.journalpostId.toString(),
+                            "hendelsesType" to hendelseRecord.hendelsesType.toString()
+                        ).toProperties()
+                    )
+                )
             }
 
-            hendelsesloggRepository.save(
-                Hendelseslogg(
-                    consumerRecord.offset(),
-                    hendelseRecord.hendelsesId.toString(),
-                    CONSUMER_JOURNAL,
-                    mapOf(
-                        "journalpostId" to hendelseRecord.journalpostId.toString(),
-                        "hendelsesType" to hendelseRecord.hendelsesType.toString()
-                    ).toProperties()
-                )
-            )
             ack.acknowledge()
         } catch (e: Exception) {
             logger.error("Feil ved lesing av journalhendelser ", e)
