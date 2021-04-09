@@ -103,6 +103,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: app-preprod.yaml
+          WAIT: true
       - name: Push Docker image med 'latest' tag
         if: github.ref == 'refs/heads/master'
         run: docker push ${IMAGE_UTEN_TAG}:latest
