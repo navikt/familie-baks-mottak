@@ -1,6 +1,7 @@
 package no.nav.familie.ba.mottak.integrasjoner
 
 import no.nav.familie.ba.mottak.util.erDnummer
+import no.nav.familie.ba.mottak.util.erOrgnr
 import no.nav.familie.ba.mottak.util.fristFerdigstillelse
 import no.nav.familie.kontrakter.felles.oppgave.*
 import org.slf4j.LoggerFactory
@@ -40,7 +41,11 @@ class OppgaveMapper(private val aktørClient: AktørClient,
             BrukerIdType.FNR -> {
                 OppgaveIdentV2(ident = aktørClient.hentAktørId(journalpost.bruker.id.trim()), gruppe = IdentGruppe.AKTOERID)
             }
-            BrukerIdType.ORGNR -> OppgaveIdentV2(ident = journalpost.bruker.id.trim(), gruppe = IdentGruppe.ORGNR)
+            BrukerIdType.ORGNR -> {
+                if (erOrgnr(journalpost.bruker.id.trim())) {
+                    OppgaveIdentV2(ident = journalpost.bruker.id.trim(), gruppe = IdentGruppe.ORGNR)
+                } else null
+            }
             BrukerIdType.AKTOERID -> OppgaveIdentV2(ident = journalpost.bruker.id.trim(), gruppe = IdentGruppe.AKTOERID)
         }
     }

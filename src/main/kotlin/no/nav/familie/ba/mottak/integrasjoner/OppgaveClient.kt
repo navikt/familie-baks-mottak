@@ -3,12 +3,14 @@ package no.nav.familie.ba.mottak.integrasjoner
 import no.nav.familie.ba.mottak.util.fristFerdigstillelse
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
+import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.NestedExceptionUtils
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
@@ -30,7 +32,7 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
         val uri = URI.create("$integrasjonUri/oppgave/opprett")
         val request = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring, journalpost, beskrivelse)
 
-        return responseFra(uri, request)
+        return responseFraOpprettOppgave(uri, request)
     }
 
     fun opprettBehandleSakOppgave(journalpost: Journalpost, beskrivelse: String? = null): OppgaveResponse {
@@ -38,7 +40,7 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
         val uri = URI.create("$integrasjonUri/oppgave/opprett")
         val request = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.BehandleSak, journalpost, beskrivelse)
 
-        return responseFra(uri, request)
+        return responseFraOpprettOppgave(uri, request)
     }
 
 
@@ -60,7 +62,7 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
 
         SECURE_LOGGER.info("Oppretter vurderLivshendlseOppgave $request")
 
-        return responseFra(uri, request)
+        return responseFraOpprettOppgave(uri, request)
     }
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
@@ -94,6 +96,7 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
         }.fold(
                 onSuccess = { response -> assertGyldig(response).oppgaver },
                 onFailure = {
+                    secureLogger.error("Finn oppgaver feilet mot $uri og request: $request", NestedExceptionUtils.getMostSpecificCause(it))
                     throw IntegrasjonException("GET $uri feilet ved henting av oppgaver",
                                                it,
                                                uri,
@@ -115,6 +118,7 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
         }.fold(
                 onSuccess = { response -> assertGyldig(response).oppgaver },
                 onFailure = {
+                    secureLogger.error("Finn oppgave feilet for $aktørId og $oppgavetype", NestedExceptionUtils.getMostSpecificCause(it))
                     throw IntegrasjonException("GET $uri feilet ved henting av oppgaver",
                                                it,
                                                uri,
@@ -124,13 +128,14 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
     }
 
 
-    private fun responseFra(uri: URI, request: OpprettOppgaveRequest): OppgaveResponse {
+    private fun responseFraOpprettOppgave(uri: URI, request: OpprettOppgaveRequest): OppgaveResponse {
         return Result.runCatching {
             logger.info("Sender OpprettOppgaveRequest med beskrivelse: ${request.beskrivelse}")
             postForEntity<Ressurs<OppgaveResponse>>(uri, request)
         }.fold(
                 onSuccess = { response -> assertGyldig(response) },
                 onFailure = {
+                    secureLogger.error("Opprett oppgave feilet mot $uri og request: $request", NestedExceptionUtils.getMostSpecificCause(it))
                     log.warn("Post-kall mot $uri feilet ved opprettelse av oppgave", it)
                     throw IntegrasjonException("Post-kall mot $uri feilet ved opprettelse av oppgave",
                                                it,
