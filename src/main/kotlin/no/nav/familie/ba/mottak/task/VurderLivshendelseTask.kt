@@ -37,7 +37,7 @@ class VurderLivshendelseTask(
     override fun doTask(task: Task) {
         val payload = objectMapper.readValue(task.payload, VurderLivshendelseTaskDTO::class.java)
         val pdlPersonData = pdlClient.hentPerson(payload.personIdent, "hentperson-relasjon-dødsfall")
-        val familierelasjon = pdlPersonData.familierelasjoner
+        val familierelasjon = pdlPersonData.forelderBarnRelasjon
         when (payload.type) {
             VurderLivshendelseType.DØDSFALL -> {
                 if (pdlPersonData.dødsfall.firstOrNull()?.dødsdato != null) {

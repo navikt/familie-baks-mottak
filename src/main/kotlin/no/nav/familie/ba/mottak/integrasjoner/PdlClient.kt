@@ -53,7 +53,7 @@ class PdlClient(
             if (!response.harFeil()) {
                 return Result.runCatching {
                     val familierelasjoner: Set<Familierelasjon> =
-                        response.data.person!!.familierelasjoner.map { relasjon ->
+                        response.data.person!!.forelderBarnRelasjon.map { relasjon ->
                             Familierelasjon(
                                 personIdent = PersonIdent(id = relasjon.relatertPersonsIdent),
                                 relasjonsrolle = relasjon.relatertPersonsRolle.name
@@ -197,7 +197,7 @@ data class PdlPerson(val person: PdlPersonData?)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PdlPersonData(
-    val familierelasjoner: List<PdlFamilierelasjon> = emptyList(),
+    val forelderBarnRelasjon: List<PdlForeldreBarnRelasjon> = emptyList(),
     val adressebeskyttelse: List<Adressebeskyttelse> = emptyList(),
     val bostedsadresse: List<Bostedsadresse?> = emptyList(),
     @JsonProperty(value = "doedsfall") val dødsfall: List<Dødsfall> = emptyList(),
@@ -205,7 +205,7 @@ data class PdlPersonData(
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class PdlFamilierelasjon(
+data class PdlForeldreBarnRelasjon(
     val relatertPersonsIdent: String,
     val relatertPersonsRolle: Familierelasjonsrolle,
     val minRolleForPerson: Familierelasjonsrolle? = null
