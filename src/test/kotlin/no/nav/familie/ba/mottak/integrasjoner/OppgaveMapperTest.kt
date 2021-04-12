@@ -5,6 +5,8 @@ import io.mockk.mockk
 import no.nav.familie.ba.mottak.DevLauncher
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstema
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
+import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
+import no.nav.familie.kontrakter.felles.oppgave.OppgaveIdentV2
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
@@ -254,5 +256,41 @@ class OppgaveMapperTest(
                                                                  )
         )
         assertThat(oppgave.enhetsnummer).isNull()
+    }
+
+    @Test
+    fun `skal sette bruker null hvis Orgnr  er 000000000`() {
+        val oppgaveMapper = OppgaveMapper(mockAktørClient, mockHentEnhetClient)
+        val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
+                                                         journalpostClient.hentJournalpost("123")
+                                                             .copy(journalforendeEnhet = "5",
+                                                                   bruker = Bruker("000000000", BrukerIdType.ORGNR),
+                                                                   dokumenter = listOf(DokumentInfo(
+                                                                       tittel = null,
+                                                                       brevkode = "kode",
+                                                                       dokumentstatus = null,
+                                                                       dokumentvarianter = null)),
+                                                                   behandlingstema = "btema"
+                                                             )
+        )
+        assertThat(oppgave.ident).isNull()
+    }
+
+    @Test
+    fun `skal sette orgnr hvis Orgnr  er satt`() {
+        val oppgaveMapper = OppgaveMapper(mockAktørClient, mockHentEnhetClient)
+        val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
+                                                         journalpostClient.hentJournalpost("123")
+                                                             .copy(journalforendeEnhet = "5",
+                                                                   bruker = Bruker("900000000", BrukerIdType.ORGNR),
+                                                                   dokumenter = listOf(DokumentInfo(
+                                                                       tittel = null,
+                                                                       brevkode = "kode",
+                                                                       dokumentstatus = null,
+                                                                       dokumentvarianter = null)),
+                                                                   behandlingstema = "btema"
+                                                             )
+        )
+        assertThat(oppgave.ident).isEqualTo(OppgaveIdentV2("900000000", IdentGruppe.ORGNR))
     }
 }
