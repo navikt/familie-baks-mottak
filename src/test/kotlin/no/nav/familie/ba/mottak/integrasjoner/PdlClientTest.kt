@@ -3,7 +3,6 @@ package no.nav.familie.ba.mottak.integrasjoner
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import no.nav.familie.ba.mottak.DevLauncher
 import org.apache.commons.lang3.StringUtils
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -57,9 +56,9 @@ class PdlClientTest {
         )
 
         val pdlPersonData = pdlClient.hentPerson(testIdent, "hentperson-relasjon-dødsfall")
-        assertThat(pdlPersonData.familierelasjoner.size).isEqualTo(1)
-        assertThat(pdlPersonData.familierelasjoner.first().minRolleForPerson).isEqualTo(Familierelasjonsrolle.MOR)
-        assertThat(pdlPersonData.familierelasjoner.first().relatertPersonsRolle).isEqualTo(Familierelasjonsrolle.BARN)
+        assertThat(pdlPersonData.forelderBarnRelasjon.size).isEqualTo(1)
+        assertThat(pdlPersonData.forelderBarnRelasjon.first().minRolleForPerson).isEqualTo(Familierelasjonsrolle.MOR)
+        assertThat(pdlPersonData.forelderBarnRelasjon.first().relatertPersonsRolle).isEqualTo(Familierelasjonsrolle.BARN)
         assertThat(pdlPersonData.dødsfall.first().dødsdato).isEqualTo(LocalDate.of(2021, 1, 14))
         assertThat(pdlPersonData.fødsel.first().fødselsdato).isEqualTo(LocalDate.of(1998, 5, 9))
     }

@@ -8,7 +8,6 @@ import no.nav.familie.kontrakter.felles.oppgave.Behandlingstema
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -71,14 +70,14 @@ class VurderLivshendelseTaskTest {
         every {
             mockPdlClient.hentPerson(PERSONIDENT_BARN,
                                      any())
-        } returns PdlPersonData(familierelasjoner = listOf(PdlFamilierelasjon(minRolleForPerson = Familierelasjonsrolle.BARN,
-                                                                              relatertPersonsIdent = PERSONIDENT_MOR,
-                                                                              relatertPersonsRolle = Familierelasjonsrolle.MOR),
-                                                           PdlFamilierelasjon(minRolleForPerson = Familierelasjonsrolle.BARN,
-                                                                              relatertPersonsIdent = PERSONIDENT_FAR,
-                                                                              relatertPersonsRolle = Familierelasjonsrolle.FAR)),
+        } returns PdlPersonData(forelderBarnRelasjon = listOf(PdlForeldreBarnRelasjon(minRolleForPerson = Familierelasjonsrolle.BARN,
+                                                                                      relatertPersonsIdent = PERSONIDENT_MOR,
+                                                                                      relatertPersonsRolle = Familierelasjonsrolle.MOR),
+                                                              PdlForeldreBarnRelasjon(minRolleForPerson = Familierelasjonsrolle.BARN,
+                                                                                      relatertPersonsIdent = PERSONIDENT_FAR,
+                                                                                      relatertPersonsRolle = Familierelasjonsrolle.FAR)),
                                 dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now())),
-        fødsel = listOf(Fødsel(LocalDate.of(1980,8,3))))
+                                fødsel = listOf(Fødsel(LocalDate.of(1980,8,3))))
 
         vurderLivshendelseTask.doTask(Task.nyTask(type = VurderLivshendelseTask.TASK_STEP_TYPE,
                                                   payload = objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(
@@ -101,9 +100,9 @@ class VurderLivshendelseTaskTest {
         every {
             mockPdlClient.hentPerson(PERSONIDENT_MOR,
                                      any())
-        } returns PdlPersonData(familierelasjoner = listOf(PdlFamilierelasjon(minRolleForPerson = Familierelasjonsrolle.MOR,
-                                                                              relatertPersonsIdent = PERSONIDENT_BARN,
-                                                                              relatertPersonsRolle = Familierelasjonsrolle.BARN)),
+        } returns PdlPersonData(forelderBarnRelasjon = listOf(PdlForeldreBarnRelasjon(minRolleForPerson = Familierelasjonsrolle.MOR,
+                                                                                      relatertPersonsIdent = PERSONIDENT_BARN,
+                                                                                      relatertPersonsRolle = Familierelasjonsrolle.BARN)),
                                 dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now())))
 
         every { mockSakClient.hentPågåendeSakStatus(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN)) } returns RestPågåendeSakResponse()
@@ -128,9 +127,9 @@ class VurderLivshendelseTaskTest {
         every {
             mockPdlClient.hentPerson(PERSONIDENT_MOR,
                                      any())
-        } returns PdlPersonData(familierelasjoner = listOf(PdlFamilierelasjon(minRolleForPerson = Familierelasjonsrolle.MOR,
-                                                                              relatertPersonsIdent = PERSONIDENT_BARN,
-                                                                              relatertPersonsRolle = Familierelasjonsrolle.BARN)),
+        } returns PdlPersonData(forelderBarnRelasjon = listOf(PdlForeldreBarnRelasjon(minRolleForPerson = Familierelasjonsrolle.MOR,
+                                                                                      relatertPersonsIdent = PERSONIDENT_BARN,
+                                                                                      relatertPersonsRolle = Familierelasjonsrolle.BARN)),
                                 dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now())))
 
         every { mockSakClient.hentPågåendeSakStatus(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN)) } returns RestPågåendeSakResponse(
@@ -157,9 +156,9 @@ class VurderLivshendelseTaskTest {
         every {
             mockPdlClient.hentPerson(any(),
                                      any())
-        } returns PdlPersonData(familierelasjoner = listOf(PdlFamilierelasjon(minRolleForPerson = Familierelasjonsrolle.MOR,
-                                                                              relatertPersonsIdent = PERSONIDENT_BARN,
-                                                                              relatertPersonsRolle = Familierelasjonsrolle.BARN)),
+        } returns PdlPersonData(forelderBarnRelasjon = listOf(PdlForeldreBarnRelasjon(minRolleForPerson = Familierelasjonsrolle.MOR,
+                                                                                      relatertPersonsIdent = PERSONIDENT_BARN,
+                                                                                      relatertPersonsRolle = Familierelasjonsrolle.BARN)),
                                 dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now())))
 
         every { mockSakClient.hentPågåendeSakStatus(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN)) } returns RestPågåendeSakResponse(
@@ -192,12 +191,12 @@ class VurderLivshendelseTaskTest {
         every {
             mockPdlClient.hentPerson(PERSONIDENT_BARN,
                                      any())
-        } returns PdlPersonData(familierelasjoner = listOf(PdlFamilierelasjon(minRolleForPerson = Familierelasjonsrolle.BARN,
-                                                                              relatertPersonsIdent = PERSONIDENT_MOR,
-                                                                              relatertPersonsRolle = Familierelasjonsrolle.MOR),
-                                                           PdlFamilierelasjon(minRolleForPerson = Familierelasjonsrolle.BARN,
-                                                                              relatertPersonsIdent = PERSONIDENT_FAR,
-                                                                              relatertPersonsRolle = Familierelasjonsrolle.FAR)),
+        } returns PdlPersonData(forelderBarnRelasjon = listOf(PdlForeldreBarnRelasjon(minRolleForPerson = Familierelasjonsrolle.BARN,
+                                                                                      relatertPersonsIdent = PERSONIDENT_MOR,
+                                                                                      relatertPersonsRolle = Familierelasjonsrolle.MOR),
+                                                              PdlForeldreBarnRelasjon(minRolleForPerson = Familierelasjonsrolle.BARN,
+                                                                                      relatertPersonsIdent = PERSONIDENT_FAR,
+                                                                                      relatertPersonsRolle = Familierelasjonsrolle.FAR)),
                                 dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now())),
                                 fødsel = listOf(Fødsel(LocalDate.now().minusYears(12))))
 

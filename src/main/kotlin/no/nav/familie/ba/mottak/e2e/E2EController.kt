@@ -35,6 +35,7 @@ class E2EController(private val leesahService: LeesahService,
     val logger: Logger = LoggerFactory.getLogger(E2EController::class.java)
 
 
+
     @PostMapping(path = ["/pdl/foedsel"], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun pdlHendelseFødsel(@RequestBody personIdenter: List<String>): String {
         logger.info("Oppretter fødselshendelse e2e")
