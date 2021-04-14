@@ -3,8 +3,15 @@ package no.nav.familie.ba.mottak.integrasjoner
 import no.nav.familie.ba.mottak.util.fristFerdigstillelse
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
-import no.nav.familie.kontrakter.felles.objectMapper
-import no.nav.familie.kontrakter.felles.oppgave.*
+import no.nav.familie.kontrakter.felles.oppgave.FinnOppgaveRequest
+import no.nav.familie.kontrakter.felles.oppgave.FinnOppgaveResponseDto
+import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
+import no.nav.familie.kontrakter.felles.oppgave.Oppgave
+import no.nav.familie.kontrakter.felles.oppgave.OppgaveIdentV2
+import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
+import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
+import no.nav.familie.kontrakter.felles.oppgave.OpprettOppgaveRequest
+import no.nav.familie.kontrakter.felles.oppgave.Tema
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,10 +27,11 @@ import java.net.URI
 private val logger = LoggerFactory.getLogger(OppgaveClient::class.java)
 
 @Component
-class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonUri: URI,
-                                           @Qualifier("clientCredentials") restOperations: RestOperations,
-                                           private val oppgaveMapper: OppgaveMapper)
-    : AbstractRestClient(restOperations, "integrasjon") {
+class OppgaveClient @Autowired constructor(
+    @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonUri: URI,
+    @Qualifier("clientCredentials") restOperations: RestOperations,
+    private val oppgaveMapper: OppgaveMapper
+) : AbstractRestClient(restOperations, "integrasjon") {
 
     val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
 
@@ -44,86 +52,120 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
     }
 
 
-    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
+    @Retryable(
+        value = [RuntimeException::class],
+        maxAttempts = 3,
+        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}")
+    )
     fun opprettVurderLivshendelseOppgave(dto: OppgaveVurderLivshendelseDto): OppgaveResponse {
         logger.info("Oppretter \"Vurder livshendelse\"-oppgave")
 
         val uri = URI.create("$integrasjonUri/oppgave/opprett")
-        val request = OpprettOppgaveRequest(ident = OppgaveIdentV2(dto.aktørId, IdentGruppe.AKTOERID),
-                saksId = dto.saksId,
-                journalpostId = null,
-                tema = Tema.BAR,
-                oppgavetype = Oppgavetype.VurderHenvendelse,//TODO bytt til vurder livshendelse type
-                fristFerdigstillelse = fristFerdigstillelse(),
-                beskrivelse = dto.beskrivelse,
-                enhetsnummer = dto.enhetsId,
-                behandlingstema = dto.behandlingstema,
-                behandlingstype = null)
+        val request = OpprettOppgaveRequest(
+            ident = OppgaveIdentV2(dto.aktørId, IdentGruppe.AKTOERID),
+            saksId = dto.saksId,
+            journalpostId = null,
+            tema = Tema.BAR,
+            oppgavetype = Oppgavetype.VurderLivshendelse,
+            fristFerdigstillelse = fristFerdigstillelse(),
+            beskrivelse = dto.beskrivelse,
+            enhetsnummer = dto.enhetsId,
+            behandlingstema = dto.behandlingstema,
+            behandlingstype = null
+        )
 
         SECURE_LOGGER.info("Oppretter vurderLivshendlseOppgave $request")
 
         return responseFraOpprettOppgave(uri, request)
     }
 
-    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
+    @Retryable(
+        value = [RuntimeException::class],
+        maxAttempts = 3,
+        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}")
+    )
     fun oppdaterOppgaveBeskrivelse(patchOppgave: Oppgave, beskrivelse: String): OppgaveResponse {
         val uri = URI.create("$integrasjonUri/oppgave/${patchOppgave.id}/oppdater")
 
         return Result.runCatching {
             patchForEntity<Ressurs<OppgaveResponse>>(uri, patchOppgave.copy(beskrivelse = beskrivelse))
         }.fold(
-                onSuccess = { response -> assertGyldig(response) },
-                onFailure = {
-                    throw IntegrasjonException("Patch-kall mot $uri feilet ved oppdatering av oppgave",
-                                               it,
-                                               uri,
-                                               null)
-                }
+            onSuccess = { response -> assertGyldig(response) },
+            onFailure = {
+                throw IntegrasjonException(
+                    "Patch-kall mot $uri feilet ved oppdatering av oppgave",
+                    it,
+                    uri,
+                    null
+                )
+            }
         )
     }
 
 
-    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
+    @Retryable(
+        value = [RuntimeException::class],
+        maxAttempts = 3,
+        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}")
+    )
     fun finnOppgaver(journalpostId: String, oppgavetype: Oppgavetype?): List<Oppgave> {
         logger.info("Søker etter aktive oppgaver for $journalpostId")
         val uri = URI.create("$integrasjonUri/oppgave/v4")
-        val request = FinnOppgaveRequest(journalpostId = journalpostId,
-                                         tema = Tema.BAR,
-                                         oppgavetype = oppgavetype)
+        val request = FinnOppgaveRequest(
+            journalpostId = journalpostId,
+            tema = Tema.BAR,
+            oppgavetype = oppgavetype
+        )
 
         return Result.runCatching {
             postForEntity<Ressurs<FinnOppgaveResponseDto>>(uri, request)
         }.fold(
-                onSuccess = { response -> assertGyldig(response).oppgaver },
-                onFailure = {
-                    secureLogger.error("Finn oppgaver feilet mot $uri og request: $request", NestedExceptionUtils.getMostSpecificCause(it))
-                    throw IntegrasjonException("GET $uri feilet ved henting av oppgaver",
-                                               it,
-                                               uri,
-                                               null)
-                }
+            onSuccess = { response -> assertGyldig(response).oppgaver },
+            onFailure = {
+                secureLogger.error(
+                    "Finn oppgaver feilet mot $uri og request: $request",
+                    NestedExceptionUtils.getMostSpecificCause(it)
+                )
+                throw IntegrasjonException(
+                    "GET $uri feilet ved henting av oppgaver",
+                    it,
+                    uri,
+                    null
+                )
+            }
         )
     }
 
-    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
+    @Retryable(
+        value = [RuntimeException::class],
+        maxAttempts = 3,
+        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}")
+    )
     fun finnOppgaverPåAktørId(aktørId: String, oppgavetype: Oppgavetype): List<Oppgave> {
         logger.info("Søker etter aktive oppgaver for aktørId $aktørId")
         val uri = URI.create("$integrasjonUri/oppgave/v4")
-        val request = FinnOppgaveRequest(aktørId = aktørId,
-                                         tema = Tema.BAR,
-                                         oppgavetype = oppgavetype)
+        val request = FinnOppgaveRequest(
+            aktørId = aktørId,
+            tema = Tema.BAR,
+            oppgavetype = oppgavetype
+        )
 
         return Result.runCatching {
             postForEntity<Ressurs<FinnOppgaveResponseDto>>(uri, request)
         }.fold(
-                onSuccess = { response -> assertGyldig(response).oppgaver },
-                onFailure = {
-                    secureLogger.error("Finn oppgave feilet for $aktørId og $oppgavetype", NestedExceptionUtils.getMostSpecificCause(it))
-                    throw IntegrasjonException("GET $uri feilet ved henting av oppgaver",
-                                               it,
-                                               uri,
-                                               null)
-                }
+            onSuccess = { response -> assertGyldig(response).oppgaver },
+            onFailure = {
+                secureLogger.error(
+                    "Finn oppgave feilet for $aktørId og $oppgavetype",
+                    NestedExceptionUtils.getMostSpecificCause(it)
+                )
+                throw IntegrasjonException(
+                    "GET $uri feilet ved henting av oppgaver",
+                    it,
+                    uri,
+                    null
+                )
+            }
         )
     }
 
@@ -133,15 +175,20 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
             logger.info("Sender OpprettOppgaveRequest med beskrivelse: ${request.beskrivelse}")
             postForEntity<Ressurs<OppgaveResponse>>(uri, request)
         }.fold(
-                onSuccess = { response -> assertGyldig(response) },
-                onFailure = {
-                    secureLogger.error("Opprett oppgave feilet mot $uri og request: $request", NestedExceptionUtils.getMostSpecificCause(it))
-                    log.warn("Post-kall mot $uri feilet ved opprettelse av oppgave", it)
-                    throw IntegrasjonException("Post-kall mot $uri feilet ved opprettelse av oppgave",
-                                               it,
-                                               uri,
-                                               null)
-                }
+            onSuccess = { response -> assertGyldig(response) },
+            onFailure = {
+                secureLogger.error(
+                    "Opprett oppgave feilet mot $uri og request: $request",
+                    NestedExceptionUtils.getMostSpecificCause(it)
+                )
+                log.warn("Post-kall mot $uri feilet ved opprettelse av oppgave", it)
+                throw IntegrasjonException(
+                    "Post-kall mot $uri feilet ved opprettelse av oppgave",
+                    it,
+                    uri,
+                    null
+                )
+            }
         )
     }
 
@@ -156,8 +203,10 @@ class OppgaveClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONE
     }
 }
 
-data class OppgaveVurderLivshendelseDto(val aktørId: String,
-                                        val beskrivelse: String,
-                                        val saksId: String,
-                                        val behandlingstema: String,
-                                        val enhetsId: String)
+data class OppgaveVurderLivshendelseDto(
+    val aktørId: String,
+    val beskrivelse: String,
+    val saksId: String,
+    val behandlingstema: String,
+    val enhetsId: String
+)
