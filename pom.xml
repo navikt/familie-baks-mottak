@@ -19,10 +19,10 @@
         <sha1/>
         <changelist>-SNAPSHOT</changelist>
         <jvmTarget>11</jvmTarget>
-        <kotlin.version>1.4.31</kotlin.version>
+        <kotlin.version>1.4.32</kotlin.version>
         <mockk.version>1.11.0</mockk.version>
         <confluent.version>6.1.1</confluent.version>
-        <felles.version>1.20210416135502_5bf9eff</felles.version>
+        <felles.version>1.20210419103325_d044927</felles.version>
         <kontrakter.version>2.0_20210416141710_97efcc5</kontrakter.version>
         <main-class>no.nav.familie.ba.mottak.LauncherKt</main-class>
         <spring.vault.version>2.3.2</spring.vault.version>

@@ -2,8 +2,16 @@ package no.nav.familie.ba.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.ba.mottak.config.FeatureToggleService
-import no.nav.familie.ba.mottak.integrasjoner.*
+import no.nav.familie.ba.mottak.integrasjoner.AktørClient
+import no.nav.familie.ba.mottak.integrasjoner.BehandlingKategori
+import no.nav.familie.ba.mottak.integrasjoner.BehandlingUnderkategori
+import no.nav.familie.ba.mottak.integrasjoner.Familierelasjonsrolle
+import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
+import no.nav.familie.ba.mottak.integrasjoner.OppgaveVurderLivshendelseDto
+import no.nav.familie.ba.mottak.integrasjoner.PdlClient
+import no.nav.familie.ba.mottak.integrasjoner.RestUtvidetBehandling
+import no.nav.familie.ba.mottak.integrasjoner.SakClient
+import no.nav.familie.ba.mottak.integrasjoner.Sakspart
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstema
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
@@ -19,20 +27,23 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-@TaskStepBeskrivelse(taskStepType = VurderLivshendelseTask.TASK_STEP_TYPE, beskrivelse = "Vurder livshendelse", maxAntallFeil = 3, triggerTidVedFeilISekunder = 3600)
+@TaskStepBeskrivelse(
+    taskStepType = VurderLivshendelseTask.TASK_STEP_TYPE,
+    beskrivelse = "Vurder livshendelse",
+    maxAntallFeil = 3,
+    triggerTidVedFeilISekunder = 3600
+)
 class VurderLivshendelseTask(
-        private val oppgaveClient: OppgaveClient,
-        private val taskRepository: TaskRepository,
-        private val pdlClient: PdlClient,
-        private val sakClient: SakClient,
-        private val featureToggleService: FeatureToggleService,
-        private val aktørClient: AktørClient
+    private val oppgaveClient: OppgaveClient,
+    private val taskRepository: TaskRepository,
+    private val pdlClient: PdlClient,
+    private val sakClient: SakClient,
+    private val aktørClient: AktørClient
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(this::class.java)
     val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
     val oppgaveOpprettetDødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall.oppgave.opprettet")
-    val oppgaveIgnorerteDødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall.oppgave.ignorert")
 
     override fun doTask(task: Task) {
         val payload = objectMapper.readValue(task.payload, VurderLivshendelseTaskDTO::class.java)
@@ -44,19 +55,22 @@ class VurderLivshendelseTask(
 
                     //populerer en liste med barn for person. Hvis person har barn, så sjekker man etter løpende sak
                     val listeMedBarn =
-                            familierelasjon.filter { it.minRolleForPerson != Familierelasjonsrolle.BARN }
-                                    .map { it.relatertPersonsIdent }
+                        familierelasjon.filter { it.minRolleForPerson != Familierelasjonsrolle.BARN }
+                            .map { it.relatertPersonsIdent }
                     if (listeMedBarn.isNotEmpty()) {
                         val sak = sakClient.hentPågåendeSakStatus(payload.personIdent, listeMedBarn)
                         opprettOppgaveHvisRolleSøker(sak.baSak, payload.personIdent, task, BESKRIVELSE_DØDSFALL)
                     }
 
                     //Sjekker om foreldrene til person under 19 har en løpende sak.
-                    if (pdlPersonData.fødsel.isEmpty() || pdlPersonData.fødsel.first().fødselsdato.isAfter(LocalDate.now()
-                                                                                                                   .minusYears(19))) {
+                    if (pdlPersonData.fødsel.isEmpty() || pdlPersonData.fødsel.first().fødselsdato.isAfter(
+                            LocalDate.now()
+                                .minusYears(19)
+                        )
+                    ) {
                         val listeMedForeldreForBarn =
-                                familierelasjon.filter { it.minRolleForPerson == Familierelasjonsrolle.BARN }
-                                        .map { it.relatertPersonsIdent }
+                            familierelasjon.filter { it.minRolleForPerson == Familierelasjonsrolle.BARN }
+                                .map { it.relatertPersonsIdent }
 
                         listeMedForeldreForBarn.forEach {
                             val sak = sakClient.hentPågåendeSakStatus(it, listOf(payload.personIdent))
@@ -64,7 +78,7 @@ class VurderLivshendelseTask(
                         }
                     }
                 } else {
-                    SECURE_LOGGER.info("Har mottatt dødsfallshendelse uten dødsdato $pdlPersonData" )
+                    SECURE_LOGGER.info("Har mottatt dødsfallshendelse uten dødsdato $pdlPersonData")
                     error("Har mottatt dødsfallshendelse uten dødsdato")
                 }
             }
@@ -72,46 +86,52 @@ class VurderLivshendelseTask(
         }
     }
 
-    private fun opprettOppgaveHvisRolleSøker(saksPart: Sakspart?,
-                                             personIdent: String,
-                                             task: Task,
-                                             beskrivelse: String) {
+    private fun opprettOppgaveHvisRolleSøker(
+        saksPart: Sakspart?,
+        personIdent: String,
+        task: Task,
+        beskrivelse: String
+    ) {
         if (saksPart == Sakspart.SØKER) { //Vi er kun interessert i om sakspart er SØKER
             log.info("Fant løpende sak for person")
             SECURE_LOGGER.info("Fant løpende sak for person $personIdent")
             val fagsak = sakClient.hentRestFagsak(personIdent)
             val restUtvidetBehandling = fagsak.behandlinger.first { it.aktiv }
-            if (featureToggleService.isEnabled("familie-ba-mottak.opprettLivshendelseOppgave", false)) {
-                val aktørId = aktørClient.hentAktørId(personIdent.trim())
-                val vurderLivshendelseOppgaver = oppgaveClient.finnOppgaverPåAktørId(aktørId, Oppgavetype.VurderHenvendelse)   //TODO Bytt ut til rett OppgaveType
 
-                val oppgave: Oppgave? = vurderLivshendelseOppgaver.firstOrNull{ it.beskrivelse?.contains(BESKRIVELSE_DØDSFALL) == true && (
-                        it.status != StatusEnum.FERDIGSTILT || it.status != StatusEnum.FEILREGISTRERT) }
+            val aktørId = aktørClient.hentAktørId(personIdent.trim())
+            val vurderLivshendelseOppgaver = oppgaveClient.finnOppgaverPåAktørId(aktørId, Oppgavetype.VurderLivshendelse)
 
-                if (oppgave == null) {
-                    oppgaveClient.opprettVurderLivshendelseOppgave(
-                            OppgaveVurderLivshendelseDto(aktørClient.hentAktørId(personIdent.trim()),
-                                                         beskrivelse,
-                                                         fagsak.id.toString(),
-                                                         tilBehandlingstema(
-                                                                 restUtvidetBehandling),
-                                                         restUtvidetBehandling.arbeidsfordelingPåBehandling.behandlendeEnhetId)).also {
-                        task.metadata["oppgaveId"] = it.oppgaveId.toString()
-                        taskRepository.saveAndFlush(task)
-                    }
-                    oppgaveOpprettetDødsfallCounter.increment()
-                } else {
-                    task.metadata["oppgaveId"] = oppgave.id.toString()
-                    task.metadata["info"] = "Fant åpen oppgave"
-                    taskRepository.saveAndFlush(task)
-                    log.info("Fant åpen oppgave på aktørId $aktørId")
-                    SECURE_LOGGER.info("Fant åpen oppgave: $oppgave")
-                }
-
-            } else {
-                log.error("Mottatt dødsfallshendelse, men oppretting av oppgave er midlertidig skrudd av")
-                oppgaveIgnorerteDødsfallCounter.increment()
+            val oppgave: Oppgave? = vurderLivshendelseOppgaver.firstOrNull {
+                it.beskrivelse?.contains(BESKRIVELSE_DØDSFALL) == true && (
+                        it.status != StatusEnum.FERDIGSTILT || it.status != StatusEnum.FEILREGISTRERT)
             }
+
+            if (oppgave == null) {
+                oppgaveClient.opprettVurderLivshendelseOppgave(
+                    OppgaveVurderLivshendelseDto(
+                        aktørClient.hentAktørId(personIdent.trim()),
+                        beskrivelse,
+                        fagsak.id.toString(),
+                        tilBehandlingstema(
+                            restUtvidetBehandling
+                        ),
+                        restUtvidetBehandling.arbeidsfordelingPåBehandling.behandlendeEnhetId
+                    )
+                ).also {
+                    task.metadata["oppgaveId"] = it.oppgaveId.toString()
+                    taskRepository.saveAndFlush(task)
+                }
+                log.error("Mottatt dødsfallshendelse på sak i BA-sak. Få saksbehandlier til å se på oppgave av typen VurderLivshendelse") //TODO midlertidig error logg til man har fått dette inn i saksbehandlersrutinen.
+                oppgaveOpprettetDødsfallCounter.increment()
+            } else {
+                task.metadata["oppgaveId"] = oppgave.id.toString()
+                task.metadata["info"] = "Fant åpen oppgave"
+                taskRepository.saveAndFlush(task)
+                log.info("Fant åpen oppgave på aktørId $aktørId")
+                SECURE_LOGGER.info("Fant åpen oppgave: $oppgave")
+            }
+
+
         }
     }
 
