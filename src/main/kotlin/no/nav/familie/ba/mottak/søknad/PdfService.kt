@@ -1,8 +1,10 @@
 package no.nav.familie.ba.mottak.søknad
 
+import com.fasterxml.jackson.core.type.TypeReference
 import no.nav.familie.ba.mottak.integrasjoner.PdfClient
 import org.springframework.stereotype.Service
 import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
+import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.*
@@ -13,21 +15,19 @@ class PdfService(private val søknadRepository: SøknadRepository, private val p
 
     fun lagPdf(id: String): ByteArray {
         val dbSøknad = søknadRepository.hentDBSøknad(id.toLong()) ?: error("Kunne ikke finne søknad ($id) i database")
-        val feltMap = SøknadTreeWalker.mapSøknadsfelter(dbSøknad.hentSøknad())
-        val utvidetFeltMap = (feltMap - "verdiliste") + hentEkstraFelter(dbSøknad) + verdilisteUtenSøker(feltMap)
+        val feltMap = objectMapper.convertValue(dbSøknad.hentSøknad(), object:TypeReference<Map<String,Any>>() {})
+        val utvidetFeltMap = feltMap + hentEkstraFelter(dbSøknad)
         return pdfClient.lagPdf(utvidetFeltMap)
     }
 
     private fun hentEkstraFelter(dbSøknad: DBSøknad): Map<String, String> {
         return mapOf(
-                "dokumentDato" to dbSøknad.opprettetTid.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no"))),
-                "navn" to dbSøknad.hentSøknad().søker.verdi.navn.verdi,
+                "dokumentDato" to dbSøknad.opprettetTid.format(
+                    DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no"))
+                ),
+                "navn" to dbSøknad.hentSøknad().søker.navn.verdi,
                 "fodselsnummer" to dbSøknad.fnr
         )
-    }
-
-    private fun verdilisteUtenSøker(feltMap: Map<String, Any>): Map<String, List<Map<String, Any>>> {
-        return mapOf("verdiliste" to (feltMap["verdiliste"] as List<Map<String, Any>>).filter{it["label"] != "Søker"})
     }
 
 }

@@ -9,7 +9,7 @@ object ArkiverDokumentRequestMapper {
 
     fun toDto(dbSøknad: DBSøknad, pdf: ByteArray): ArkiverDokumentRequest {
         val søknad = dbSøknad.hentSøknad()
-        val dokumenttype = "BARNETRYGD_${søknad.søknadstype.verdi}"
+        val dokumenttype = "BARNETRYGD_${søknad.søknadstype}"
 
         val søknadsdokumentJson =
                 Dokument(dbSøknad.søknadJson.toByteArray(), FilType.JSON, null, "SØKNAD_${dokumenttype}_JSON", dokumenttype)

@@ -11,6 +11,6 @@ class DevLauncherPostgres
 
 fun main(args: Array<String>) {
     val app = SpringApplicationBuilder(DevLauncherPostgres::class.java)
-            .profiles("postgres", "mock-dokarkiv", "mock-dokgen")
+            .profiles("postgres", "mock-dokarkiv")
     app.run(*args)
 }
