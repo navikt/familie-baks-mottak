@@ -4,9 +4,10 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import no.nav.familie.ba.mottak.DevLauncher
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentResponse
-import no.nav.familie.kontrakter.felles.dokarkiv.Dokument
-import no.nav.familie.kontrakter.felles.dokarkiv.FilType
-import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentRequest
+import no.nav.familie.kontrakter.felles.dokarkiv.v2.Dokument
+import no.nav.familie.kontrakter.felles.dokarkiv.v2.Filtype
+import no.nav.familie.kontrakter.felles.dokarkiv.v2.ArkiverDokumentRequest
+import no.nav.familie.kontrakter.felles.dokarkiv.Dokumenttype
 import no.nav.familie.kontrakter.felles.objectMapper
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Tag
@@ -45,9 +46,9 @@ class DokarkivClientTest {
     @Tag("integration")
     fun `arkiver skal kjøre OK`() {
         val søknadsdokumentJson =
-                Dokument("test123".toByteArray(), FilType.JSON, null, "TEST_JSON", "BARNETRYGD_ORDINÆR")
+                Dokument("test123".toByteArray(), Filtype.JSON, null, "TEST_JSON", Dokumenttype.BARNETRYGD_ORDINÆR)
         val søknadsdokumentPdf =
-                Dokument("test321".toByteArray(), FilType.PDFA, null, "TEST_PDF", "BARNETRYGD_ORDINÆR")
+                Dokument("test321".toByteArray(), Filtype.PDFA, null, "TEST_PDF", Dokumenttype.BARNETRYGD_ORDINÆR)
         val hoveddokumentvarianter = listOf(søknadsdokumentPdf, søknadsdokumentJson)
         stubFor(post(urlEqualTo("/api/arkiv/v3"))
             .willReturn(aResponse()

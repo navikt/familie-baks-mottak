@@ -13,7 +13,7 @@ import no.nav.familie.ba.mottak.integrasjoner.RestUtvidetBehandling
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.ba.mottak.integrasjoner.Sakspart
 import no.nav.familie.kontrakter.felles.objectMapper
-import no.nav.familie.kontrakter.felles.oppgave.Behandlingstema
+import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.kontrakter.felles.oppgave.StatusEnum
