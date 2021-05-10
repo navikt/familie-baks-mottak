@@ -37,4 +37,10 @@ class SøknadController(private val featureToggleService: FeatureToggleService,
              ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt. Lagring er deaktivert.", LocalDateTime.now())))
         }
     }
+
+    @GetMapping(value = ["/ping"])
+    @Unprotected
+    fun ping(): ResponseEntity<String> {
+        return ResponseEntity.ok().body("OK")
+    }
 }
