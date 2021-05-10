@@ -22,7 +22,6 @@ class SøknadController(private val featureToggleService: FeatureToggleService,
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     @PostMapping(value = ["/soknad"], consumes = [MULTIPART_FORM_DATA_VALUE])
-    @Unprotected
     fun taImotSøknad(@RequestPart("søknad") søknad: Søknad): ResponseEntity<Ressurs<Kvittering>> {
         val lagreSøknad = featureToggleService.isEnabled("familie-ba-mottak.lagre-soknad")
         log.info("Lagring av søknad = $lagreSøknad")
