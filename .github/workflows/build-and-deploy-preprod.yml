@@ -1,6 +1,7 @@
-name: Build-Deploy
+name: Build-Deploy-Preprod
 on:
-  push:
+  pull_request_target:
+    types: [ opened, synchronize, reopened, ready_for_review ]
   workflow_dispatch:
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/familie-ba-mottak:${{ github.sha }}
@@ -104,13 +105,3 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: app-preprod.yaml
-      - name: Push Docker image med 'latest' tag
-        if: github.ref == 'refs/heads/master'
-        run: docker push ${IMAGE_UTEN_TAG}:latest
-      - name: Deploy til prod-fss
-        if: github.ref == 'refs/heads/master'
-        uses: nais/deploy/actions/deploy@v1
-        env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: prod-fss
-          RESOURCE: app-prod.yaml
