@@ -16,7 +16,7 @@ import java.time.LocalDateTime
 
 @RestController
 @RequestMapping(path = ["/api"], produces = [APPLICATION_JSON_VALUE])
-@ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
+@ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 
 class SøknadController(private val featureToggleService: FeatureToggleService,
                        private val søknadService: SøknadService) {
