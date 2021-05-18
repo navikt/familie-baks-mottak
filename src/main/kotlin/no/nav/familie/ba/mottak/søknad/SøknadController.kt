@@ -3,8 +3,9 @@ package no.nav.familie.ba.mottak.søknad
 import no.nav.familie.kontrakter.ba.søknad.Søknad
 import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
 import no.nav.familie.kontrakter.felles.Ressurs
-import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.familie.ba.mottak.config.FeatureToggleService
+import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.security.token.support.core.api.Unprotected
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
@@ -15,7 +16,7 @@ import java.time.LocalDateTime
 
 @RestController
 @RequestMapping(path = ["/api"], produces = [APPLICATION_JSON_VALUE])
-@ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
+@ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 
 class SøknadController(private val featureToggleService: FeatureToggleService,
                        private val søknadService: SøknadService) {
@@ -36,5 +37,11 @@ class SøknadController(private val featureToggleService: FeatureToggleService,
         } else {
              ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt. Lagring er deaktivert.", LocalDateTime.now())))
         }
+    }
+
+    @GetMapping(value = ["/ping"])
+    @Unprotected
+    fun ping(): ResponseEntity<String> {
+        return ResponseEntity.ok().body("OK")
     }
 }
