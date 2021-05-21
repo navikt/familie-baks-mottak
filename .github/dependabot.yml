@@ -1,4 +1,13 @@
 version: 2
+
+
+registries:
+  familie-felles:
+    type: maven-repository
+    url: https://maven.pkg.github.com/navikt/familie-ks-kontrakt
+    username: x-access-token
+    password: "${{secrets.ACCESS_TOKEN}}"
+    
 updates:
   - package-ecosystem: maven
     directory: "/"
