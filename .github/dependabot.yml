@@ -1,10 +1,8 @@
 version: 2
-
 registries:
   maven-github:
     type: maven-repository
     url: https://maven.pkg.github.com/navikt/familie-felles
-    username: x-access-token
     token: ${{secrets.ACCESS_TOKEN}}
 
 updates:
