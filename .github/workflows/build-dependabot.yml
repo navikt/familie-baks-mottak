@@ -1,14 +1,14 @@
 name: Build-Deploy-Preprod
 on:
-  pull_request:
+  pull_request_target:
     types: [ opened, synchronize, reopened, ready_for_review ]
-  workflow_dispatch:
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/familie-ba-mottak:${{ github.sha }}
   IMAGE_UTEN_TAG: docker.pkg.github.com/navikt/familie-ba-mottak/familie-ba-mottak
+
 jobs:
   deploy-to-dev:
-    if: github.event.pull_request.user.login != 'dependabot[bot]'
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
     name: Bygg app/image, push til github, deploy til dev-fss
     runs-on: ubuntu-latest
     steps:
