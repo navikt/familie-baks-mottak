@@ -53,7 +53,7 @@ object SøknadTestData {
             søker = søker(),
             barn = barn(),
             spørsmål = mapOf(),
-            vedleggReferanser = mapOf()
+            dokumentasjon = emptyList()
         )
     }
 }
