@@ -1,7 +1,7 @@
 name: Build-Deploy-Preprod
 on:
   pull_request_target:
-    types: [ opened, synchronize, reopened, ready_for_review ]
+    types: [ labeled ]
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/familie-ba-mottak:${{ github.sha }}
   IMAGE_UTEN_TAG: docker.pkg.github.com/navikt/familie-ba-mottak/familie-ba-mottak
