@@ -3,7 +3,8 @@ registries:
   maven-github:
     type: maven-repository
     url: https://maven.pkg.github.com/navikt/familie-felles
-    token: ${{secrets.ACCESS_TOKEN}}
+    username: x-access-token
+    password: ${{secrets.PAT}}
 
 updates:
   - package-ecosystem: maven
