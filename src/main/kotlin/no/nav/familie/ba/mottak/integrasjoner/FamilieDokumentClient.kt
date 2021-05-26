@@ -19,8 +19,9 @@ class FamilieDokumentClient(
 ) : AbstractRestClient(restOperations, "integrasjon") {
 
     fun hentVedlegg(vedlegg: Søknadsvedlegg): ByteArray {
-        logger.debug("Henter ${vedlegg.navn} for dokumentasjonsbehov ${vedlegg.tittel}")
         val uri = URI.create("$dokumentUri/api/mapper/ANYTHING/${vedlegg.dokumentId}")
+        logger.info("Henter ${vedlegg.navn} for dokumentasjonsbehov ${vedlegg.tittel}")
+        logger.info("{}", uri)
 
         val response = getForEntity<Ressurs<ByteArray>>(uri)
         return response.data!!
