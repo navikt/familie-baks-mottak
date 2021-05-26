@@ -9,7 +9,7 @@ env:
 jobs:
   deploy-to-dev:
     if: github.event.pull_request.user.login == 'dependabot[bot]'
-    name: Bygg app/image, push til github, deploy til dev-fss
+    name: Dependabot-bygg
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.3.4
