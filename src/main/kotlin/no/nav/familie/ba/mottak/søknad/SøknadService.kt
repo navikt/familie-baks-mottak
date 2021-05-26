@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.søknad
 
+import no.nav.familie.ba.mottak.integrasjoner.FamilieDokumentClient
 import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -13,13 +14,23 @@ import java.util.*
 
 
 @Service
-class SøknadService(private val søknadRepository: SøknadRepository, private val taskRepository: TaskRepository, private val pdfService: PdfService) {
-
+class SøknadService(
+    private val søknadRepository: SøknadRepository,
+    private val taskRepository: TaskRepository,
+    private val vedleggClient: FamilieDokumentClient
+) {
     @Transactional
     @Throws(FødselsnummerErNullException::class)
     fun motta(søknad: Søknad): DBSøknad {
         val dbSøknad = lagreDBSøknad(søknad.tilDBSøknad())
         val properties = Properties().apply { this["søkersFødselsnummer"] = dbSøknad.fnr }
+
+        søknad.dokumentasjon.forEach { søknaddokumentasjon ->
+            søknaddokumentasjon.opplastedeVedlegg.forEach { vedlegg ->
+                // TODO: Lagre til databasen, for nå tester vi bare fetch
+                val vedleggDokument = vedleggClient.hentVedlegg(vedlegg)
+            }
+        }
 
         taskRepository.save(Task.nyTask(JournalførSøknadTask.JOURNALFØR_SØKNAD,
                 dbSøknad.id.toString(),
