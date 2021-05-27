@@ -35,7 +35,7 @@ class DokarkivClient(@param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private v
     }
 
     fun arkiver(arkiverDokumentRequest: ArkiverDokumentRequest): ArkiverDokumentResponse {
-        val uri = URI.create("$integrasjonUri/arkiv/v3")
+        val uri = URI.create("$integrasjonUri/arkiv/v4")
         val response =
                 postForEntity<Ressurs<ArkiverDokumentResponse>>(uri, arkiverDokumentRequest)
         return response.getDataOrThrow()
