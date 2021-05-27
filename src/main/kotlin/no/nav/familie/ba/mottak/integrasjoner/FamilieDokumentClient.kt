@@ -6,8 +6,11 @@ import no.nav.familie.kontrakter.felles.Ressurs
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.retry.annotation.Backoff
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestOperations
+import java.lang.RuntimeException
 import java.net.URI
 
 private val logger = LoggerFactory.getLogger(FamilieDokumentClient::class.java)
@@ -18,10 +21,13 @@ class FamilieDokumentClient(
     @Qualifier("clientCredentials") restOperations: RestOperations
 ) : AbstractRestClient(restOperations, "integrasjon") {
 
+    @Retryable(
+        value = [RuntimeException::class],
+        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}")
+    )
     fun hentVedlegg(vedlegg: Søknadsvedlegg): ByteArray {
         val uri = URI.create("$dokumentUri/api/mapper/ANYTHING/${vedlegg.dokumentId}")
-        logger.info("Henter ${vedlegg.navn} for dokumentasjonsbehov ${vedlegg.tittel}")
-        logger.info("{}", uri)
+        logger.debug("Henter ${vedlegg.navn} for dokumentasjonsbehov ${vedlegg.tittel}")
 
         val response = getForEntity<Ressurs<ByteArray>>(uri)
         return response.data!!

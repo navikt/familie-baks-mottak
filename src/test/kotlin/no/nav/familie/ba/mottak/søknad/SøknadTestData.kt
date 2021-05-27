@@ -2,11 +2,14 @@ package no.nav.familie.ba.mottak.søknad
 
 import no.nav.familie.kontrakter.ba.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.Barn
+import no.nav.familie.kontrakter.ba.søknad.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.SIVILSTANDTYPE
 import no.nav.familie.kontrakter.ba.søknad.Søker
 import no.nav.familie.kontrakter.ba.søknad.Søknad
 import no.nav.familie.kontrakter.ba.søknad.SøknadAdresse
+import no.nav.familie.kontrakter.ba.søknad.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.Søknadsfelt
+import no.nav.familie.kontrakter.ba.søknad.Søknadsvedlegg
 
 object SøknadTestData {
     fun søker(): Søker {
@@ -53,7 +56,19 @@ object SøknadTestData {
             søker = søker(),
             barn = barn(),
             spørsmål = mapOf(),
-            dokumentasjon = emptyList()
+            dokumentasjon = listOf(
+                Søknaddokumentasjon(
+                    dokumentasjonsbehov = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON,
+                    harSendtInn = false,
+                    opplastedeVedlegg = listOf(
+                        Søknadsvedlegg(
+                            dokumentId = "en-slags-uuid",
+                            navn = "IMG 1337.png",
+                            tittel = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
+                        )
+                    )
+                )
+            )
         )
     }
 }
