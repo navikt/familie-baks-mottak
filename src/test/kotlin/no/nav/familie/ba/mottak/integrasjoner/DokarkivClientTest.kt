@@ -50,7 +50,7 @@ class DokarkivClientTest {
         val søknadsdokumentPdf =
                 Dokument("test321".toByteArray(), Filtype.PDFA, null, "TEST_PDF", Dokumenttype.BARNETRYGD_ORDINÆR)
         val hoveddokumentvarianter = listOf(søknadsdokumentPdf, søknadsdokumentJson)
-        stubFor(post(urlEqualTo("/api/arkiv/v3"))
+        stubFor(post(urlEqualTo("/api/arkiv/v4"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(200)
