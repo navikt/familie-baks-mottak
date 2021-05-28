@@ -63,7 +63,7 @@ object ArkiverDokumentRequestMapper {
             Dokumentasjonsbehov.VEDTAK_OPPHOLDSTILLATELSE -> "Vedtak om oppholdstillatelse"
             Dokumentasjonsbehov.BEKREFTELSE_FRA_BARNEVERN -> "Bekreftelse fra barnevern"
             Dokumentasjonsbehov.BOR_FAST_MED_SØKER -> "Bor fast med søker"
-            Dokumentasjonsbehov.ANNEN_DOKUMENTASJON -> "Annen dokumentasjon"
+            Dokumentasjonsbehov.ANNEN_DOKUMENTASJON -> "" // Random dokumentasjon skal saksbehandler sette tittel på
         }
     }
 }
