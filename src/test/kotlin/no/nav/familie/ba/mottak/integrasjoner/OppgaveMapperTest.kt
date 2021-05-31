@@ -18,7 +18,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 @SpringBootTest(classes = [DevLauncher::class])
-@ActiveProfiles("dev")
+@ActiveProfiles("dev", "mock-pdl")
 class OppgaveMapperTest(
 
         @Autowired

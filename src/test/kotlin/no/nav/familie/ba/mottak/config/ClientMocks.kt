@@ -90,7 +90,7 @@ class ClientMocks {
     }
 
     @Bean
-    @Primary
+    @Profile("mock-pdl")
     fun mockPdlClient(): PdlClient {
         val mockPdlClient = mockk<PdlClient>(relaxed = true)
         return mockPdlClient
