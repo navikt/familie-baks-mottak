@@ -2,8 +2,6 @@ package no.nav.familie.ba.mottak.config
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.ba.mottak.integrasjoner.AktørClient
-import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentResponse
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
@@ -78,7 +76,24 @@ class ClientMocks {
                               sak = null
         )
 
+        every {
+            mockJournalpostClient.hentJournalpost("321")
+        } returns Journalpost(journalpostId = "321",
+                              journalposttype = Journalposttype.I,
+                              journalstatus = Journalstatus.MOTTATT,
+                              bruker = Bruker("12345678901", BrukerIdType.FNR),
+                              tema = "BAR",
+                              kanal = "SKAN_NETS"
+        )
+
         return mockJournalpostClient
+    }
+
+    @Bean
+    @Primary
+    fun mockPdlClient(): PdlClient {
+        val mockPdlClient = mockk<PdlClient>(relaxed = true)
+        return mockPdlClient
     }
 
     @Bean

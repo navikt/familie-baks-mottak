@@ -3,8 +3,8 @@ package no.nav.familie.ba.mottak.integrasjoner
 import no.nav.familie.ba.mottak.util.erDnummer
 import no.nav.familie.ba.mottak.util.erOrgnr
 import no.nav.familie.ba.mottak.util.fristFerdigstillelse
-import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.Behandlingstema
+import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.oppgave.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -13,7 +13,8 @@ private val logger = LoggerFactory.getLogger(OppgaveMapper::class.java)
 
 @Service
 class OppgaveMapper(private val aktørClient: AktørClient,
-                    private val hentEnhetClient: HentEnhetClient) {
+                    private val hentEnhetClient: HentEnhetClient,
+                    private val pdlClient: PdlClient) {
 
     fun mapTilOpprettOppgave(oppgavetype: Oppgavetype,
                              journalpost: Journalpost,
@@ -41,7 +42,9 @@ class OppgaveMapper(private val aktørClient: AktørClient,
 
         return when (journalpost.bruker.type) {
             BrukerIdType.FNR -> {
-                OppgaveIdentV2(ident = aktørClient.hentAktørId(journalpost.bruker.id.trim()), gruppe = IdentGruppe.AKTOERID)
+                if (oppgavetype == Oppgavetype.Journalføring && !finnesIPdl(journalpost.bruker.id.trim())) {
+                    null
+                } else OppgaveIdentV2(ident = aktørClient.hentAktørId(journalpost.bruker.id.trim()), gruppe = IdentGruppe.AKTOERID)
             }
             BrukerIdType.ORGNR -> {
                 if (erOrgnr(journalpost.bruker.id.trim())) {
@@ -81,4 +84,13 @@ class OppgaveMapper(private val aktørClient: AktørClient,
             }
         }
     }
+
+    private fun finnesIPdl(brukerId: String): Boolean {
+        return try {
+            pdlClient.hentIdenter(brukerId).isNotEmpty()
+        } catch (e: IntegrasjonException) {
+            return false
+        }
+    }
 }
+

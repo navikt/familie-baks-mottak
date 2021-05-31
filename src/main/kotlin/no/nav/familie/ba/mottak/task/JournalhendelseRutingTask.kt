@@ -2,8 +2,6 @@ package no.nav.familie.ba.mottak.task
 
 import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
-import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
-import no.nav.familie.kontrakter.ba.infotrygd.Sak as SakDto
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -12,6 +10,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import no.nav.familie.kontrakter.ba.infotrygd.Sak as SakDto
+import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 
 @Service
 @TaskStepBeskrivelse(taskStepType = JournalhendelseRutingTask.TASK_STEP_TYPE,
@@ -55,8 +55,11 @@ class JournalhendelseRutingTask(private val pdlClient: PdlClient,
     }
 
     private fun søkEtterSakIBaSakOgInfotrygd(brukersIdent: String): Pair<Sakspart?, Sakspart?> {
-        val brukersIdenter =
-                pdlClient.hentIdenter(brukersIdent).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }.map { it.ident }
+        val brukersIdenter = try {
+            pdlClient.hentIdenter(brukersIdent).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }.map { it.ident }
+        } catch (e: IntegrasjonException) {
+            return Pair(null, null)
+        }
         val barnasIdenter = pdlClient.hentPersonMedRelasjoner(brukersIdent).familierelasjoner
                 .filter { it.relasjonsrolle == Familierelasjonsrolle.BARN.name }
                 .map { it.personIdent.id }
