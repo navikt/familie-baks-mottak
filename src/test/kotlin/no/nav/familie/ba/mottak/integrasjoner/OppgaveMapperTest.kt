@@ -22,9 +22,6 @@ import kotlin.test.assertNull
 class OppgaveMapperTest(
 
         @Autowired
-        private val mockAktørClient: AktørClient,
-
-        @Autowired
         private val journalpostClient: JournalpostClient,
 
         @Autowired
@@ -35,7 +32,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal kaste exception dersom dokumentlisten er tom`() {
-        val oppgaveMapper = OppgaveMapper(mockAktørClient, mockHentEnhetClient, mockPdlClient)
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         Assertions.assertThrows(IllegalStateException::class.java) {
             oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                journalpostClient.hentJournalpost("123")
@@ -46,7 +43,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal kaste exception dersom brukerid ikke er satt når oppgavetype er BehandleSak`() {
-        val oppgaveMapper = OppgaveMapper(mockAktørClient, mockHentEnhetClient, mockPdlClient)
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         Assertions.assertThrows(IllegalStateException::class.java) {
             oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.BehandleSak,
                                                journalpostClient.hentJournalpost("123")
@@ -64,7 +61,7 @@ class OppgaveMapperTest(
     fun `skal sette brukerid til null dersom bruker ikke finnes i PDL når oppgavetype er Journalføring`() {
         every { mockPdlClient.hentIdenter(any()) } throws IntegrasjonException("Fant ikke person")
 
-        val oppgaveMapper = OppgaveMapper(mockAktørClient, mockHentEnhetClient, mockPdlClient)
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("321")
                                                                  .copy(dokumenter = listOf(DokumentInfo(
@@ -79,7 +76,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal ikke kaste exception selvom brukerid mangler når oppgavetype er Journalføring`() {
-        val oppgaveMapper = OppgaveMapper(mockAktørClient, mockHentEnhetClient, mockPdlClient)
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         Assertions.assertDoesNotThrow {
             oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                journalpostClient.hentJournalpost("123")
@@ -95,7 +92,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette behandlingstema Ordinær`() {
-        val oppgaveMapper = OppgaveMapper(mockAktørClient, mockHentEnhetClient, mockPdlClient)
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
                                                                  .copy(dokumenter = listOf(DokumentInfo(
@@ -111,7 +108,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette behandlingstema Ordinær uavhengig av journalpost`() {
-        val oppgaveMapper = OppgaveMapper(mockAktørClient, mockHentEnhetClient, mockPdlClient)
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
                                                                  .copy(dokumenter = listOf(DokumentInfo(
@@ -127,7 +124,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette behandlingstema EØS`() {
-        val oppgaveMapper = OppgaveMapper(mockAktørClient, mockHentEnhetClient, mockPdlClient)
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
                                                                  .copy(dokumenter = listOf(DokumentInfo(
@@ -145,7 +142,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette behandlingstype Utland`() {
-        val oppgaveMapper = OppgaveMapper(mockAktørClient, mockHentEnhetClient, mockPdlClient)
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
                                                                  .copy(dokumenter = listOf(
@@ -168,7 +165,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette beskrivelse fra journalpost`() {
-        val oppgaveMapper = OppgaveMapper(mockAktørClient, mockHentEnhetClient, mockPdlClient)
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
                                                                  .copy(dokumenter = listOf(DokumentInfo(
@@ -209,7 +206,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette enhet 4806 hvis enhet på journalpost er 2101`() {
-        val oppgaveMapper = OppgaveMapper(mockAktørClient, mockHentEnhetClient, mockPdlClient)
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
                                                                  .copy(journalforendeEnhet = "2101",
@@ -226,7 +223,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette enhet null hvis enhet på journalpost er null`() {
-        val oppgaveMapper = OppgaveMapper(mockAktørClient, mockHentEnhetClient, mockPdlClient)
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
                                                                  .copy(journalforendeEnhet = null,
@@ -244,7 +241,7 @@ class OppgaveMapperTest(
     @Test
     fun `skal sette enhet fra journalpost hvis enhet kan behandle oppgaver`() {
         every { mockHentEnhetClient.hentEnhet("4") } returns Enhet("4", "enhetnavn", true)
-        val oppgaveMapper = OppgaveMapper(mockAktørClient, mockHentEnhetClient, mockPdlClient)
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
                                                                  .copy(journalforendeEnhet = "4",
@@ -262,7 +259,7 @@ class OppgaveMapperTest(
     @Test
     fun `skal sette enhet null hvis enhet ikke kan behandle oppgaver`() {
         every { mockHentEnhetClient.hentEnhet("5") } returns Enhet("4", "enhetnavn", false)
-        val oppgaveMapper = OppgaveMapper(mockAktørClient, mockHentEnhetClient, mockPdlClient)
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
                                                                  .copy(journalforendeEnhet = "5",
@@ -279,7 +276,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette bruker null hvis Orgnr  er 000000000`() {
-        val oppgaveMapper = OppgaveMapper(mockAktørClient, mockHentEnhetClient, mockPdlClient)
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
                                                              .copy(journalforendeEnhet = "5",
@@ -297,7 +294,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette orgnr hvis Orgnr  er satt`() {
-        val oppgaveMapper = OppgaveMapper(mockAktørClient, mockHentEnhetClient, mockPdlClient)
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
                                                              .copy(journalforendeEnhet = "5",

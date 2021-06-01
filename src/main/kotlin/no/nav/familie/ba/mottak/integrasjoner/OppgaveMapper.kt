@@ -12,8 +12,7 @@ import org.springframework.stereotype.Service
 private val logger = LoggerFactory.getLogger(OppgaveMapper::class.java)
 
 @Service
-class OppgaveMapper(private val aktørClient: AktørClient,
-                    private val hentEnhetClient: HentEnhetClient,
+class OppgaveMapper(private val hentEnhetClient: HentEnhetClient,
                     private val pdlClient: PdlClient) {
 
     fun mapTilOpprettOppgave(oppgavetype: Oppgavetype,
@@ -42,9 +41,10 @@ class OppgaveMapper(private val aktørClient: AktørClient,
 
         return when (journalpost.bruker.type) {
             BrukerIdType.FNR -> {
-                if (oppgavetype == Oppgavetype.Journalføring && !finnesIPdl(journalpost.bruker.id.trim())) {
-                    null
-                } else OppgaveIdentV2(ident = aktørClient.hentAktørId(journalpost.bruker.id.trim()), gruppe = IdentGruppe.AKTOERID)
+                hentAktørIdFraPdl(journalpost.bruker.id.trim())?.let { OppgaveIdentV2(ident = it, gruppe = IdentGruppe.AKTOERID) }
+                ?: if (oppgavetype == Oppgavetype.BehandleSak) {
+                    throw IntegrasjonException(msg = "Fant ikke aktørId på person i PDL", ident = journalpost.bruker.id)
+                } else null
             }
             BrukerIdType.ORGNR -> {
                 if (erOrgnr(journalpost.bruker.id.trim())) {
@@ -85,11 +85,11 @@ class OppgaveMapper(private val aktørClient: AktørClient,
         }
     }
 
-    private fun finnesIPdl(brukerId: String): Boolean {
+    private fun hentAktørIdFraPdl(brukerId: String): String? {
         return try {
-            pdlClient.hentIdenter(brukerId).isNotEmpty()
+            pdlClient.hentIdenter(brukerId).filter { it.gruppe == Identgruppe.AKTOERID.name && !it.historisk }.lastOrNull()?.ident
         } catch (e: IntegrasjonException) {
-            return false
+            null
         }
     }
 }
