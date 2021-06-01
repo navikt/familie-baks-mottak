@@ -2,6 +2,7 @@ package no.nav.familie.ba.mottak.søknad.domene
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.kontrakter.ba.søknad.Søknad
+import no.nav.familie.kontrakter.ba.søknad.Søknadsvedlegg
 import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.LocalDateTime
 import javax.persistence.*
@@ -25,6 +26,17 @@ data class DBSøknad(@Id
     }
 }
 
+@Entity(name = "SoknadVedlegg")
+@Table(name = "SoknadVedlegg")
+data class DBVedlegg(
+    @Id
+    @Column(name = "dokument_id")
+    val dokumentId: String,
+    @Column(name = "soknad_id")
+    val søknadId: Long,
+    val data: ByteArray
+)
+
 fun Søknad.tilDBSøknad(): DBSøknad {
     try {
         return DBSøknad(søknadJson = objectMapper.writeValueAsString(this),
@@ -34,6 +46,14 @@ fun Søknad.tilDBSøknad(): DBSøknad {
         throw FødselsnummerErNullException()
     }
 
+}
+
+fun Søknadsvedlegg.tilDBVedlegg(søknad: DBSøknad, data: ByteArray): DBVedlegg {
+    return DBVedlegg(
+        dokumentId = this.dokumentId,
+        søknadId = søknad.id,
+        data = data
+    )
 }
 
 class FødselsnummerErNullException : Exception()

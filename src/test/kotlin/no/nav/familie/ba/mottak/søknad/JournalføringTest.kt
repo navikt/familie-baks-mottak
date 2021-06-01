@@ -33,7 +33,7 @@ class JournalføringTest(
 
     @Test
     fun `arkiverSøknad returnerer riktig journalpostId`() {
-        val journalPostId = journalføringService.arkiverSøknad(dbSøknad, testPDF)
+        val journalPostId = journalføringService.arkiverSøknad(dbSøknad, testPDF, emptyMap())
 
         assertEquals("123", journalPostId)
     }
