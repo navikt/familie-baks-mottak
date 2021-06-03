@@ -1,27 +1,28 @@
 package no.nav.familie.ba.mottak.søknad
 
 import no.nav.familie.ba.mottak.integrasjoner.FamilieDokumentClient
-import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
-import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
-import no.nav.familie.kontrakter.ba.søknad.Søknad
 import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.DBVedlegg
 import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
+import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.tilDBVedlegg
 import no.nav.familie.ba.mottak.task.JournalførSøknadTask
+import no.nav.familie.kontrakter.ba.søknad.Søknad
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 
 @Service
 class SøknadService(
-    private val søknadRepository: SøknadRepository,
-    private val vedleggRepository: SøknadVedleggRepository,
-    private val taskRepository: TaskRepository,
-    private val vedleggClient: FamilieDokumentClient
+        private val søknadRepository: SøknadRepository,
+        private val vedleggRepository: SøknadVedleggRepository,
+        private val taskRepository: TaskRepository,
+        private val vedleggClient: FamilieDokumentClient
 ) {
+
     @Transactional
     @Throws(FødselsnummerErNullException::class)
     fun motta(søknad: Søknad): DBSøknad {
@@ -32,8 +33,8 @@ class SøknadService(
         hentOgLagreSøknadvedlegg(dbSøknad)
 
         taskRepository.save(Task.nyTask(JournalførSøknadTask.JOURNALFØR_SØKNAD,
-                dbSøknad.id.toString(),
-                properties))
+                                        dbSøknad.id.toString(),
+                                        properties))
         return dbSøknad
 
     }
