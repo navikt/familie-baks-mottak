@@ -22,8 +22,8 @@
         <kotlin.version>1.4.32</kotlin.version>
         <mockk.version>1.11.0</mockk.version>
         <confluent.version>6.1.1</confluent.version>
-        <felles.version>1.20210419103325_d044927</felles.version>
-        <kontrakter.version>2.0_20210526093406_a00d131</kontrakter.version>
+        <felles.version>1.20210607085527_b0c86f4</felles.version>
+        <kontrakter.version>2.0_20210604113527_8d52f24</kontrakter.version>
         <main-class>no.nav.familie.ba.mottak.LauncherKt</main-class>
         <spring.vault.version>2.3.2</spring.vault.version>
         <spring.cloud.version>3.0.3</spring.cloud.version>
@@ -258,7 +258,7 @@
         </repository>
         <repository>
             <id>github</id>
-            <url>https://maven.pkg.github.com/navikt/familie-ks-kontrakt</url>
+            <url>https://maven.pkg.github.com/navikt/familie-felles</url>
         </repository>
     </repositories>
 
