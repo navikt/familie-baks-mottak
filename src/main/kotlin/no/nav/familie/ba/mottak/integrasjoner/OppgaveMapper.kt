@@ -3,8 +3,8 @@ package no.nav.familie.ba.mottak.integrasjoner
 import no.nav.familie.ba.mottak.util.erDnummer
 import no.nav.familie.ba.mottak.util.erOrgnr
 import no.nav.familie.ba.mottak.util.fristFerdigstillelse
-import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.Behandlingstema
+import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.oppgave.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -73,7 +73,8 @@ class OppgaveMapper(private val aktørClient: AktørClient,
     private fun utledEnhetsnummer(journalpost: Journalpost): String? {
         return when {
             journalpost.journalforendeEnhet == "2101" -> "4806" //Enhet 2101 er nedlagt. Rutes til 4806
-            journalpost.journalforendeEnhet.isNullOrBlank() -> null
+            journalpost.journalforendeEnhet == "4847" -> "4817" //Enhet 4847 skal legges ned. Rutes til 4817
+                    journalpost.journalforendeEnhet.isNullOrBlank() -> null
             hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).oppgavebehandler -> journalpost.journalforendeEnhet
             else -> {
                 logger.warn("Enhet ${journalpost.journalforendeEnhet} kan ikke ta i mot oppgaver")
