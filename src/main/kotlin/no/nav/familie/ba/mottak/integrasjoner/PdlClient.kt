@@ -1,11 +1,14 @@
 package no.nav.familie.ba.mottak.integrasjoner
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.familie.ba.mottak.domene.personopplysning.Familierelasjon
 import no.nav.familie.ba.mottak.domene.personopplysning.Person
 import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.http.sts.StsRestClient
 import no.nav.familie.http.util.UriUtil
+import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -14,9 +17,6 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
 import java.net.URI
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonProperty
-import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import java.time.LocalDate
 
 @Service
@@ -241,7 +241,7 @@ enum class Adressebeskyttelsesgradering {
 }
 
 enum class Identgruppe {
-    AKTOERID,
+    AKTORID,
     FOLKEREGISTERIDENT,
     ORGNR,
 }
