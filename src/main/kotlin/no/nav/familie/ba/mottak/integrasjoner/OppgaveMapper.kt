@@ -88,7 +88,7 @@ class OppgaveMapper(private val hentEnhetClient: HentEnhetClient,
 
     private fun hentAktørIdFraPdl(brukerId: String): String? {
         return try {
-            pdlClient.hentIdenter(brukerId).filter { it.gruppe == Identgruppe.AKTOERID.name && !it.historisk }.lastOrNull()?.ident
+            pdlClient.hentIdenter(brukerId).filter { it.gruppe == Identgruppe.AKTORID.name && !it.historisk }.lastOrNull()?.ident
         } catch (e: IntegrasjonException) {
             null
         }
