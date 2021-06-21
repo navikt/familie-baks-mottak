@@ -37,6 +37,7 @@ class SøknadController(
     val antallDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.dokumentasjonsbehov.antall")
     val søknadHarVedlegg = Metrics.counter("barnetrygd.soknad.harVedlegg")
     val antallVedlegg = Metrics.counter("barnetrygd.soknad.harVedlegg.antall")
+    val harManglerIDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.harManglerIDokumentasjonsbehov")
 
     @PostMapping(value = ["/soknad"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(@RequestPart("søknad") søknad: Søknad): ResponseEntity<Ressurs<Kvittering>> {
@@ -76,6 +77,12 @@ class SøknadController(
             if (alleVedlegg.isNotEmpty()) {
                 søknadHarVedlegg.increment()
                 antallVedlegg.increment(alleVedlegg.size.toDouble())
+            }
+
+            val harMangler =
+                søknad.dokumentasjon.filter { it.harSendtInn == false && it.opplastedeVedlegg.isEmpty() }.isNotEmpty()
+            if (harMangler) {
+                harManglerIDokumentasjonsbehov.increment()
             }
         }
     }
