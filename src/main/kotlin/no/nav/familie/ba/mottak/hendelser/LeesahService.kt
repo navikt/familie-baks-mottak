@@ -6,13 +6,11 @@ import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.Hendelseslogg
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
-import no.nav.familie.ba.mottak.integrasjoner.SakClient
-import no.nav.familie.ba.mottak.integrasjoner.finnes
 import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.ba.mottak.task.VurderLivshendelseTask
 import no.nav.familie.ba.mottak.task.VurderLivshendelseTaskDTO
-import no.nav.familie.ba.mottak.task.VurderLivshendelseType
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.DØDSFALL
+import no.nav.familie.ba.mottak.task.VurderLivshendelseType.UTFLYTTING
 import no.nav.familie.ba.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.prosessering.domene.Task
@@ -35,6 +33,8 @@ class LeesahService(
 
     val dødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall")
     val dødsfallIgnorertCounter: Counter = Metrics.counter("barnetrygd.dodsfall.ignorert")
+    val utflyttingCounter: Counter = Metrics.counter("barnetrygd.utflytting")
+    val utflyttingIgnorertCounter: Counter = Metrics.counter("barnetrygd.utflytting.ignorert")
     val fødselOpprettetCounter: Counter = Metrics.counter("barnetrygd.fodsel.opprettet")
     val fødselKorrigertCounter: Counter = Metrics.counter("barnetrygd.fodsel.korrigert")
     val fødselIgnorertCounter: Counter = Metrics.counter("barnetrygd.fodsel.ignorert")
@@ -47,6 +47,7 @@ class LeesahService(
         when (pdlHendelse.opplysningstype) {
             OPPLYSNINGSTYPE_DØDSFALL -> behandleDødsfallHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_FØDSEL -> behandleFødselsHendelse(pdlHendelse)
+            OPPLYSNINGSTYPE_UTFLYTTING -> behandleUtflyttingHendelse(pdlHendelse)
         }
     }
 
@@ -134,6 +135,41 @@ class LeesahService(
         oppdaterHendelseslogg(pdlHendelse)
     }
 
+    private fun behandleUtflyttingHendelse(pdlHendelse: PdlHendelse) {
+        utflyttingCounter.increment()
+        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
+            leesahDuplikatCounter.increment()
+            return
+        }
+        logHendelse(pdlHendelse, "utflyttingsdato: ${pdlHendelse.utflyttingFraNorge?.utflyttingsdato}")
+
+        when (pdlHendelse.endringstype) {
+            OPPRETTET -> {
+
+                if (pdlHendelse.utflyttingFraNorge == null) {
+                    log.error("Mangler utflyttingsdata. Ignorerer hendelse ${pdlHendelse.hendelseId}")
+                    utflyttingIgnorertCounter.increment()
+                } else {
+                    Task.nyTask(
+                            VurderLivshendelseTask.TASK_STEP_TYPE,
+                            objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), UTFLYTTING)),
+                            Properties().apply {
+                                this["ident"] = pdlHendelse.hentPersonident()
+                                this["callId"] = pdlHendelse.hendelseId
+                                this["type"] = UTFLYTTING.name
+                            }).also {
+                        taskRepository.save(it)
+                    }
+                }
+            }
+            else -> {
+                logHendelse(pdlHendelse, "Ikke av type OPPRETTET.")
+            }
+
+        }
+        oppdaterHendelseslogg(pdlHendelse)
+    }
+
     private fun logHendelse(pdlHendelse: PdlHendelse, ekstraInfo: String = "") {
         log.info(
                 "person-pdl-leesah melding mottatt: " +
@@ -188,7 +224,9 @@ class LeesahService(
         val log: Logger = LoggerFactory.getLogger(LeesahService::class.java)
         const val OPPRETTET = "OPPRETTET"
         const val KORRIGERT = "KORRIGERT"
+        const val ANNULLERT = "ANNULLERT"
         const val OPPLYSNINGSTYPE_DØDSFALL = "DOEDSFALL_V1"
         const val OPPLYSNINGSTYPE_FØDSEL = "FOEDSEL_V1"
+        const val OPPLYSNINGSTYPE_UTFLYTTING = "UTFLYTTING_FRA_NORGE"
     }
 }

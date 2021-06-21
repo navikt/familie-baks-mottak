@@ -32,7 +32,7 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
         logger.info("Sender søknad til {}", uri)
         try {
             val response = putForEntity<Ressurs<String>>(uri, nyBehandling)
-            logger.info("Søknad sendt til sak. Status=${response?.status}")
+            logger.info("Søknad sendt til sak. Status=${response.status}")
         } catch (e: RestClientResponseException) {
             logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
             throw IllegalStateException("Innsending til sak feilet. Status: " + e.rawStatusCode
@@ -52,7 +52,7 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
         )
     }
 
-    fun hentPågåendeSakStatus(personIdent: String, barna: List<String>): RestPågåendeSakResponse {
+    fun hentPågåendeSakStatus(personIdent: String, barna: List<String> = emptyList()): RestPågåendeSakResponse {
         val uri = URI.create("$sakServiceUri/fagsaker/sok/ba-sak-og-infotrygd")
         return runCatching {
             postForEntity<Ressurs<RestPågåendeSakResponse>>(uri, RestPågåendeSakRequest(personIdent, barna))

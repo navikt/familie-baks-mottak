@@ -3,15 +3,8 @@ package no.nav.familie.ba.mottak.integrasjoner
 import no.nav.familie.ba.mottak.util.fristFerdigstillelse
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
-import no.nav.familie.kontrakter.felles.oppgave.FinnOppgaveRequest
-import no.nav.familie.kontrakter.felles.oppgave.FinnOppgaveResponseDto
-import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
-import no.nav.familie.kontrakter.felles.oppgave.Oppgave
-import no.nav.familie.kontrakter.felles.oppgave.OppgaveIdentV2
-import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
-import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
-import no.nav.familie.kontrakter.felles.oppgave.OpprettOppgaveRequest
 import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.oppgave.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -33,7 +26,7 @@ class OppgaveClient @Autowired constructor(
     private val oppgaveMapper: OppgaveMapper
 ) : AbstractRestClient(restOperations, "integrasjon") {
 
-    val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
+    val secureLog: Logger = LoggerFactory.getLogger("secureLogger")
 
     fun opprettJournalføringsoppgave(journalpost: Journalpost, beskrivelse: String? = null): OppgaveResponse {
         logger.info("Oppretter journalføringsoppgave for ${if (journalpost.kanal == "NAV_NO") "digital søknad" else "papirsøknad"}")
@@ -74,7 +67,7 @@ class OppgaveClient @Autowired constructor(
             behandlingstype = null
         )
 
-        SECURE_LOGGER.info("Oppretter vurderLivshendlseOppgave $request")
+        secureLog.info("Oppretter vurderLivshendlseOppgave $request")
 
         return responseFraOpprettOppgave(uri, request)
     }
@@ -208,5 +201,6 @@ data class OppgaveVurderLivshendelseDto(
     val beskrivelse: String,
     val saksId: String,
     val behandlingstema: String,
-    val enhetsId: String
+    val enhetsId: String,
+    val behandlesAvApplikasjon: String? = null,
 )
