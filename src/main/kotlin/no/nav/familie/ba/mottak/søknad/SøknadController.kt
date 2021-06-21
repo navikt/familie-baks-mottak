@@ -46,18 +46,7 @@ class SøknadController(
         return if (lagreSøknad) {
             try {
                 val dbSøknad = søknadService.motta(søknad)
-                søknadMottattOk.increment()
-
-                if (søknad.dokumentasjon.isNotEmpty()) {
-                    søknadHarDokumentasjonsbehov.increment()
-                    antallDokumentasjonsbehov.increment(søknad.dokumentasjon.size.toDouble())
-
-                    val alleVedlegg: List<Søknadsvedlegg> = søknad.dokumentasjon.map { it.opplastedeVedlegg }.flatten()
-                    if (alleVedlegg.isNotEmpty()) {
-                        søknadHarVedlegg.increment()
-                        antallVedlegg.increment(alleVedlegg.size.toDouble())
-                    }
-                }
+                sendMetrics(søknad)
 
                 ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt", dbSøknad.opprettetTid)))
             } catch (e: FødselsnummerErNullException) {
@@ -73,6 +62,21 @@ class SøknadController(
                     )
                 )
             )
+        }
+    }
+
+    private fun sendMetrics(søknad: Søknad) {
+        søknadMottattOk.increment()
+
+        if (søknad.dokumentasjon.isNotEmpty()) {
+            søknadHarDokumentasjonsbehov.increment()
+            antallDokumentasjonsbehov.increment(søknad.dokumentasjon.size.toDouble())
+
+            val alleVedlegg: List<Søknadsvedlegg> = søknad.dokumentasjon.map { it.opplastedeVedlegg }.flatten()
+            if (alleVedlegg.isNotEmpty()) {
+                søknadHarVedlegg.increment()
+                antallVedlegg.increment(alleVedlegg.size.toDouble())
+            }
         }
     }
 
