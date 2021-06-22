@@ -64,7 +64,8 @@ class OppgaveClient @Autowired constructor(
             beskrivelse = dto.beskrivelse,
             enhetsnummer = dto.enhetsId,
             behandlingstema = dto.behandlingstema,
-            behandlingstype = null
+            behandlingstype = null,
+            behandlesAvApplikasjon = null,
         )
 
         secureLog.info("Oppretter vurderLivshendlseOppgave $request")

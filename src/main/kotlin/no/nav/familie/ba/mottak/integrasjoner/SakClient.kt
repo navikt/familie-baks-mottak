@@ -53,7 +53,7 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
     }
 
     fun hentPågåendeSakStatus(personIdent: String, barna: List<String> = emptyList()): RestPågåendeSakResponse {
-        val uri = URI.create("$sakServiceUri/fagsaker/sok/ba-sak-og-infotrygd")
+        val uri = URI.create("$sakServiceUri/fagsaker/sok/ba-sak-og-infotrygd") // TODO: Fiks misvisende path, siden inftrygdsøk er flyttet
         return runCatching {
             postForEntity<Ressurs<RestPågåendeSakResponse>>(uri, RestPågåendeSakRequest(personIdent, barna))
         }.fold(
