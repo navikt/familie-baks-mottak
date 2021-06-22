@@ -33,13 +33,15 @@ class LeesahService(
 
     val dødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall")
     val dødsfallIgnorertCounter: Counter = Metrics.counter("barnetrygd.dodsfall.ignorert")
-    val utflyttingCounter: Counter = Metrics.counter("barnetrygd.utflytting")
-    val utflyttingIgnorertCounter: Counter = Metrics.counter("barnetrygd.utflytting.ignorert")
     val fødselOpprettetCounter: Counter = Metrics.counter("barnetrygd.fodsel.opprettet")
     val fødselKorrigertCounter: Counter = Metrics.counter("barnetrygd.fodsel.korrigert")
     val fødselIgnorertCounter: Counter = Metrics.counter("barnetrygd.fodsel.ignorert")
     val fødselIgnorertUnder18årCounter: Counter = Metrics.counter("barnetrygd.fodsel.ignorert.under18")
     val fødselIgnorertFødelandCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.fodeland.nor")
+    val utflyttingOpprettetCounter: Counter = Metrics.counter("barnetrygd.utflytting.opprettet")
+    val utflyttingAnnullertCounter: Counter = Metrics.counter("barnetrygd.utflytting.annullert")
+    val utflyttingKorrigertCounter: Counter = Metrics.counter("barnetrygd.utflytting.korrigert")
+    val utflyttingIgnorertCounter: Counter = Metrics.counter("barnetrygd.utflytting.ignorert")
     val leesahDuplikatCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesah.duplikat")
 
 
@@ -136,15 +138,15 @@ class LeesahService(
     }
 
     private fun behandleUtflyttingHendelse(pdlHendelse: PdlHendelse) {
-        utflyttingCounter.increment()
         if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
             leesahDuplikatCounter.increment()
             return
         }
-        logHendelse(pdlHendelse, "utflyttingsdato: ${pdlHendelse.utflyttingFraNorge?.utflyttingsdato}")
 
         when (pdlHendelse.endringstype) {
             OPPRETTET -> {
+                logHendelse(pdlHendelse, "utflyttingsdato: ${pdlHendelse.utflyttingFraNorge?.utflyttingsdato}")
+                utflyttingOpprettetCounter.increment()
 
                 if (pdlHendelse.utflyttingFraNorge == null) {
                     log.error("Mangler utflyttingsdata. Ignorerer hendelse ${pdlHendelse.hendelseId}")
@@ -164,8 +166,11 @@ class LeesahService(
             }
             else -> {
                 logHendelse(pdlHendelse, "Ikke av type OPPRETTET.")
+                when (pdlHendelse.endringstype) {
+                    ANNULLERT -> utflyttingAnnullertCounter.increment()
+                    KORRIGERT -> utflyttingKorrigertCounter.increment()
+                }
             }
-
         }
         oppdaterHendelseslogg(pdlHendelse)
     }

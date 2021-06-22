@@ -95,3 +95,8 @@ class OppgaveMapper(private val hentEnhetClient: HentEnhetClient,
     }
 }
 
+enum class BehandlesAvApplikasjon(val applikasjon: String?) {
+    BA_SAK("familie-ba-sak"),
+    INFOTRYGD(null),
+    UAVKLART(null)
+}

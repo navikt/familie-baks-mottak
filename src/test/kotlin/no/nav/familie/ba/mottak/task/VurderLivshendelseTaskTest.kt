@@ -1,7 +1,12 @@
 package no.nav.familie.ba.mottak.task
 
-import io.mockk.*
+import io.mockk.clearAllMocks
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import no.nav.familie.ba.mottak.integrasjoner.*
+import no.nav.familie.ba.mottak.task.VurderLivshendelseType.DØDSFALL
+import no.nav.familie.ba.mottak.task.VurderLivshendelseType.UTFLYTTING
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
@@ -61,7 +66,7 @@ class VurderLivshendelseTaskTest {
     }
 
     @Test
-    fun `Ignorer dødsfallhendelser på person som ikke har barn`() {
+    fun `Ignorer livshendelser på person som ikke har barn`() {
         every {
             mockPdlClient.hentPerson(
                 PERSONIDENT_BARN,
@@ -84,17 +89,19 @@ class VurderLivshendelseTaskTest {
             fødsel = listOf(Fødsel(LocalDate.of(1980, 8, 3)))
         )
 
-        vurderLivshendelseTask.doTask(
-            Task.nyTask(
-                type = VurderLivshendelseTask.TASK_STEP_TYPE,
-                payload = objectMapper.writeValueAsString(
-                    VurderLivshendelseTaskDTO(
-                        PERSONIDENT_BARN,
-                        VurderLivshendelseType.DØDSFALL
+        listOf(UTFLYTTING, DØDSFALL).forEach {
+            vurderLivshendelseTask.doTask(
+                    Task.nyTask(
+                            type = VurderLivshendelseTask.TASK_STEP_TYPE,
+                            payload = objectMapper.writeValueAsString(
+                                    VurderLivshendelseTaskDTO(
+                                            PERSONIDENT_BARN,
+                                            it
+                                    )
+                            )
                     )
-                )
             )
-        )
+        }
 
         verify(exactly = 0) {
             mockTaskRepository.saveAndFlush(any())
@@ -107,7 +114,7 @@ class VurderLivshendelseTaskTest {
     }
 
     @Test
-    fun `Ignorer dødsfallhendelser på person som har barn og som ikke har sak i ba-sak`() {
+    fun `Ignorer livshendelser på person som har barn og som ikke har sak i ba-sak`() {
 
         every {
             mockPdlClient.hentPerson(
@@ -127,29 +134,32 @@ class VurderLivshendelseTaskTest {
 
         every { mockSakClient.hentPågåendeSakStatus(PERSONIDENT_MOR, emptyList()) } returns RestPågåendeSakResponse()
 
-        vurderLivshendelseTask.doTask(
-            Task.nyTask(
-                type = VurderLivshendelseTask.TASK_STEP_TYPE,
-                payload = objectMapper.writeValueAsString(
-                    VurderLivshendelseTaskDTO(
-                        PERSONIDENT_MOR,
-                        VurderLivshendelseType.DØDSFALL
+        listOf(UTFLYTTING, DØDSFALL).forEach {
+            vurderLivshendelseTask.doTask(
+                    Task.nyTask(
+                            type = VurderLivshendelseTask.TASK_STEP_TYPE,
+                            payload = objectMapper.writeValueAsString(
+                                    VurderLivshendelseTaskDTO(
+                                            PERSONIDENT_MOR,
+                                            it
+                                    )
+                            )
                     )
-                )
             )
-        )
+        }
+
         verify(exactly = 0) {
             mockTaskRepository.saveAndFlush(any())
             mockOppgaveClient.opprettVurderLivshendelseOppgave(any())
         }
 
-        verify(exactly = 1) {
+        verify(exactly = 2) {
             mockSakClient.hentPågåendeSakStatus(PERSONIDENT_MOR, emptyList())
         }
     }
 
     @Test
-    fun `Dødsfallhendelse på person som har sak i ba-sak`() {
+    fun `Livshendelser på person som har sak i ba-sak`() {
 
         every {
             mockPdlClient.hentPerson(
@@ -172,35 +182,38 @@ class VurderLivshendelseTaskTest {
         )
         every { mockSakClient.hentRestFagsak(PERSONIDENT_MOR) } returns lagAktivOrdinær()
 
-        vurderLivshendelseTask.doTask(
-            Task.nyTask(
-                type = VurderLivshendelseTask.TASK_STEP_TYPE,
-                payload = objectMapper.writeValueAsString(
-                    VurderLivshendelseTaskDTO(
-                        PERSONIDENT_MOR,
-                        VurderLivshendelseType.DØDSFALL
+        listOf(DØDSFALL, UTFLYTTING).forEach {
+            vurderLivshendelseTask.doTask(
+                    Task.nyTask(
+                            type = VurderLivshendelseTask.TASK_STEP_TYPE,
+                            payload = objectMapper.writeValueAsString(
+                                    VurderLivshendelseTaskDTO(
+                                            PERSONIDENT_MOR,
+                                            it
+                                    )
+                            )
                     )
-                )
             )
-        )
-
-
-        val oppgaveDtoSlot = slot<OppgaveVurderLivshendelseDto>()
-        verify(exactly = 1) {
-            mockTaskRepository.saveAndFlush(any())
-            mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDtoSlot))
         }
 
-        assertThat(oppgaveDtoSlot.captured.aktørId).contains(PERSONIDENT_MOR)
-        assertThat(oppgaveDtoSlot.captured.saksId).isEqualTo(SAKS_ID)
-        assertThat(oppgaveDtoSlot.captured.beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_DØDSFALL)
-        assertThat(oppgaveDtoSlot.captured.enhetsId).isEqualTo(ENHET_ID)
-        assertThat(oppgaveDtoSlot.captured.behandlingstema).isEqualTo(Behandlingstema.OrdinærBarnetrygd.value)
+        val oppgaveDto = mutableListOf<OppgaveVurderLivshendelseDto>()
+        verify(exactly = 2) {
+            mockTaskRepository.saveAndFlush(any())
+            mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDto))
+        }
+
+        assertThat(oppgaveDto[0].beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_DØDSFALL)
+        assertThat(oppgaveDto[1].beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_UTFLYTTING)
+
+        assertThat(oppgaveDto).allMatch { it.aktørId.contains(PERSONIDENT_MOR) }
+        assertThat(oppgaveDto).allMatch { it.saksId == SAKS_ID }
+        assertThat(oppgaveDto).allMatch { it.enhetsId == ENHET_ID }
+        assertThat(oppgaveDto).allMatch { it.behandlingstema == Behandlingstema.OrdinærBarnetrygd.value }
+        assertThat(oppgaveDto).allMatch { it.behandlesAvApplikasjon == BehandlesAvApplikasjon.BA_SAK.applikasjon }
     }
 
-
     @Test
-    fun `Dødsfallhendelse på BARN som har sak i ba-sak`() {
+    fun `Livshendelser på BARN som har sak i ba-sak`() {
 
         every {
             mockPdlClient.hentPerson(
@@ -233,30 +246,34 @@ class VurderLivshendelseTaskTest {
         )
         every { mockSakClient.hentRestFagsak(PERSONIDENT_MOR) } returns lagAktivUtvidet()
 
-        vurderLivshendelseTask.doTask(
-            Task.nyTask(
-                type = VurderLivshendelseTask.TASK_STEP_TYPE,
-                payload = objectMapper.writeValueAsString(
-                    VurderLivshendelseTaskDTO(
-                        PERSONIDENT_BARN,
-                        VurderLivshendelseType.DØDSFALL
+        listOf(DØDSFALL, UTFLYTTING).forEach {
+            vurderLivshendelseTask.doTask(
+                    Task.nyTask(
+                            type = VurderLivshendelseTask.TASK_STEP_TYPE,
+                            payload = objectMapper.writeValueAsString(
+                                    VurderLivshendelseTaskDTO(
+                                            PERSONIDENT_BARN,
+                                            it
+                                    )
+                            )
                     )
-                )
             )
-        )
-
-
-        val oppgaveDtoSlot = slot<OppgaveVurderLivshendelseDto>()
-        verify(exactly = 1) {
-            mockTaskRepository.saveAndFlush(any())
-            mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDtoSlot))
         }
 
-        assertThat(oppgaveDtoSlot.captured.aktørId).contains(PERSONIDENT_MOR)
-        assertThat(oppgaveDtoSlot.captured.saksId).isEqualTo(SAKS_ID)
-        assertThat(oppgaveDtoSlot.captured.beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_DØDSFALL)
-        assertThat(oppgaveDtoSlot.captured.enhetsId).isEqualTo(ENHET_ID)
-        assertThat(oppgaveDtoSlot.captured.behandlingstema).isEqualTo(Behandlingstema.UtvidetBarnetrygd.value)
+        val oppgaveDto = mutableListOf<OppgaveVurderLivshendelseDto>()
+        verify(exactly = 2) {
+            mockTaskRepository.saveAndFlush(any())
+            mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDto))
+        }
+
+        assertThat(oppgaveDto[0].beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_DØDSFALL)
+        assertThat(oppgaveDto[1].beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_UTFLYTTING)
+
+        assertThat(oppgaveDto).allMatch { it.aktørId.contains(PERSONIDENT_MOR) }
+        assertThat(oppgaveDto).allMatch { it.saksId == SAKS_ID }
+        assertThat(oppgaveDto).allMatch { it.enhetsId == ENHET_ID }
+        assertThat(oppgaveDto).allMatch { it.behandlingstema == Behandlingstema.UtvidetBarnetrygd.value }
+        assertThat(oppgaveDto).allMatch { it.behandlesAvApplikasjon == BehandlesAvApplikasjon.BA_SAK.applikasjon }
     }
 
 

@@ -145,7 +145,8 @@ class VurderLivshendelseTask(
                                                     beskrivelse = beskrivelse,
                                                     saksId = fagsak.id.toString(),
                                                     behandlingstema = tilBehandlingstema(restUtvidetBehandling),
-                                                    enhetsId = restUtvidetBehandling.arbeidsfordelingPåBehandling.behandlendeEnhetId))
+                                                    enhetsId = restUtvidetBehandling.arbeidsfordelingPåBehandling.behandlendeEnhetId,
+                                                    behandlesAvApplikasjon = BehandlesAvApplikasjon.BA_SAK.applikasjon))
         }
     }
 
