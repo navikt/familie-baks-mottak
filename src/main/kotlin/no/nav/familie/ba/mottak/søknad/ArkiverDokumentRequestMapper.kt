@@ -22,9 +22,24 @@ object ArkiverDokumentRequestMapper {
         }
 
         val søknadsdokumentJson =
-                Dokument(dbSøknad.søknadJson.toByteArray(), Filtype.JSON, null, "SØKNAD_${dokumenttype}_JSON", dokumenttype)
+                Dokument(
+                    dokument = dbSøknad.søknadJson.toByteArray(),
+                    filtype = Filtype.JSON,
+                    filnavn = null,
+                    tittel = "SØKNAD_${dokumenttype}_JSON",
+                    dokumenttype = dokumenttype)
         val søknadsdokumentPdf =
-                Dokument(pdf, Filtype.PDFA, null, "SØKNAD_${dokumenttype}_PDF", dokumenttype)
+                Dokument(
+                    dokument = pdf,
+                    filtype = Filtype.PDFA,
+                    filnavn = null,
+                    tittel = when (dokumenttype) {
+                        Dokumenttype.BARNETRYGD_UTVIDET -> "Søknad om utvidet barnetrygd"
+                        Dokumenttype.BARNETRYGD_ORDINÆR -> "Søknad om ordinær barnetrygd"
+                        else -> "Søknad om ordinær barnetrygd"
+                    },
+                    dokumenttype = dokumenttype
+                )
         val hoveddokumentvarianter = listOf(søknadsdokumentPdf, søknadsdokumentJson)
 
         return ArkiverDokumentRequest(
