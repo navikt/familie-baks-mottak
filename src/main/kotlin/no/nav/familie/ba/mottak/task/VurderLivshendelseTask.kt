@@ -35,7 +35,7 @@ class VurderLivshendelseTask(
     val log: Logger = LoggerFactory.getLogger(this::class.java)
     val secureLog: Logger = LoggerFactory.getLogger("secureLogger")
     val oppgaveOpprettetDødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall.oppgave.opprettet")
-    val oppgaveOpprettetUtflyttingCounter: Counter = Metrics.counter("barnetrygd.utflytting.oppgave.opprette")
+    val oppgaveOpprettetUtflyttingCounter: Counter = Metrics.counter("barnetrygd.utflytting.oppgave.opprettet")
 
     override fun doTask(task: Task) {
         val payload = objectMapper.readValue(task.payload, VurderLivshendelseTaskDTO::class.java)
@@ -71,7 +71,7 @@ class VurderLivshendelseTask(
     private fun finnRelatertePersonerMedSak(personIdent: String,
                                             pdlPersonData: PdlPersonData): Set<String> {
 
-        val personerMedAktivSak = mutableSetOf<String>()
+        val personerMedSak = mutableSetOf<String>()
 
         val familierelasjon = pdlPersonData.forelderBarnRelasjon
         //populerer en liste med barn for person. Hvis person har barn, så sjekker man etter løpende sak
@@ -79,7 +79,7 @@ class VurderLivshendelseTask(
                 familierelasjon.filter { it.minRolleForPerson != Familierelasjonsrolle.BARN }
                         .map { it.relatertPersonsIdent }
         if (listeMedBarn.isNotEmpty()) {
-            sakClient.hentPågåendeSakStatus(personIdent).apply { if (baSak.finnes()) personerMedAktivSak.add(personIdent) }
+            sakClient.hentPågåendeSakStatus(personIdent).apply { if (baSak.finnes()) personerMedSak.add(personIdent) }
         }
 
         //Sjekker om foreldrene til person under 19 har en løpende sak.
@@ -91,15 +91,15 @@ class VurderLivshendelseTask(
                             .map { it.relatertPersonsIdent }
 
             listeMedForeldreForBarn.forEach {
-                sakClient.hentPågåendeSakStatus(it).apply { if (baSak.finnes()) personerMedAktivSak.add(it) }
+                sakClient.hentPågåendeSakStatus(it).apply { if (baSak.finnes()) personerMedSak.add(it) }
             }
         }
 
-        if (personerMedAktivSak.isNotEmpty()) {
-            log.info("Fant løpende sak for person")
-            secureLog.info("Fant løpende sak for person $personIdent")
+        if (personerMedSak.isNotEmpty()) {
+            log.info("Fant sak for person")
+            secureLog.info("Fant sak for person $personIdent")
         }
-        return personerMedAktivSak
+        return personerMedSak
     }
 
     private fun opprettVurderLivshendelseOppgave(personIdent: String,
