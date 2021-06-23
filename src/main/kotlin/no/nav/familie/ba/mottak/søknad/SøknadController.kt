@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
 import no.nav.familie.kontrakter.ba.søknad.Søknad
+import no.nav.familie.kontrakter.ba.søknad.Søknadsvedlegg
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
@@ -22,13 +23,21 @@ import java.time.LocalDateTime
 @RestController
 @RequestMapping(path = ["/api"], produces = [APPLICATION_JSON_VALUE])
 @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
-class SøknadController(private val featureToggleService: FeatureToggleService,
-                       private val søknadService: SøknadService) {
+class SøknadController(
+    private val featureToggleService: FeatureToggleService,
+    private val søknadService: SøknadService
+) {
 
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     val søknadMottattOk = Metrics.counter("barnetrygd.soknad.mottatt.ok")
     val søknadMottattFeil = Metrics.counter("barnetrygd.soknad.mottatt.feil")
+
+    val søknadHarDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.dokumentasjonsbehov")
+    val antallDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.dokumentasjonsbehov.antall")
+    val søknadHarVedlegg = Metrics.counter("barnetrygd.soknad.harVedlegg")
+    val antallVedlegg = Metrics.counter("barnetrygd.soknad.harVedlegg.antall")
+    val harManglerIDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.harManglerIDokumentasjonsbehov")
 
     @PostMapping(value = ["/soknad"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(@RequestPart("søknad") søknad: Søknad): ResponseEntity<Ressurs<Kvittering>> {
@@ -38,14 +47,43 @@ class SøknadController(private val featureToggleService: FeatureToggleService,
         return if (lagreSøknad) {
             try {
                 val dbSøknad = søknadService.motta(søknad)
-                søknadMottattOk.increment()
+                sendMetrics(søknad)
+
                 ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt", dbSøknad.opprettetTid)))
             } catch (e: FødselsnummerErNullException) {
                 søknadMottattFeil.increment()
                 ResponseEntity.status(500).body(Ressurs.failure("Lagring av søknad feilet"))
             }
         } else {
-            ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt. Lagring er deaktivert.", LocalDateTime.now())))
+            ResponseEntity.ok(
+                Ressurs.success(
+                    Kvittering(
+                        "Søknad er mottatt. Lagring er deaktivert.",
+                        LocalDateTime.now()
+                    )
+                )
+            )
+        }
+    }
+
+    private fun sendMetrics(søknad: Søknad) {
+        søknadMottattOk.increment()
+
+        if (søknad.dokumentasjon.isNotEmpty()) {
+            søknadHarDokumentasjonsbehov.increment()
+            antallDokumentasjonsbehov.increment(søknad.dokumentasjon.size.toDouble())
+
+            val alleVedlegg: List<Søknadsvedlegg> = søknad.dokumentasjon.map { it.opplastedeVedlegg }.flatten()
+            if (alleVedlegg.isNotEmpty()) {
+                søknadHarVedlegg.increment()
+                antallVedlegg.increment(alleVedlegg.size.toDouble())
+            }
+
+            val harMangler =
+                søknad.dokumentasjon.filter { it.harSendtInn == false && it.opplastedeVedlegg.isEmpty() }.isNotEmpty()
+            if (harMangler) {
+                harManglerIDokumentasjonsbehov.increment()
+            }
         }
     }
 
