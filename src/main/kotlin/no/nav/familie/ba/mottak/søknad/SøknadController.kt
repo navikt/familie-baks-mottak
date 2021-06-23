@@ -71,7 +71,7 @@ class SøknadController(
         søknadMottattOk.increment()
 
         if (søknad.dokumentasjon.isNotEmpty()) {
-            // Filtrere ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
+            // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val dokumentasjonsbehovUtenAnnenDokumentasjon =
                 søknad.dokumentasjon.filter { it.dokumentasjonsbehov != Dokumentasjonsbehov.ANNEN_DOKUMENTASJON }
             if (dokumentasjonsbehovUtenAnnenDokumentasjon.isNotEmpty()) {
@@ -79,18 +79,17 @@ class SøknadController(
                 antallDokumentasjonsbehov.increment(dokumentasjonsbehovUtenAnnenDokumentasjon.size.toDouble())
             }
 
-            // Ønsker å inkludere Dokumentasjonsbehov.ANNEN_DOKUMENTASJON for søknadHarVedlegg og antallVedlegg
+            // Inkluderer Dokumentasjonsbehov.ANNEN_DOKUMENTASJON for søknadHarVedlegg og antallVedlegg
             val alleVedlegg: List<Søknadsvedlegg> = søknad.dokumentasjon.map { it.opplastedeVedlegg }.flatten()
             if (alleVedlegg.isNotEmpty()) {
                 søknadHarVedlegg.increment()
                 antallVedlegg.increment(alleVedlegg.size.toDouble())
             }
 
-            // Filtrere ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
+            // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val harMangler =
-                søknad.dokumentasjon.filter {
-                    it.harSendtInn == false && it.opplastedeVedlegg.isEmpty() && it.dokumentasjonsbehov != Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
-                }.isNotEmpty()
+                dokumentasjonsbehovUtenAnnenDokumentasjon.filter { !it.harSendtInn && it.opplastedeVedlegg.isEmpty() }
+                    .isNotEmpty()
             if (harMangler) {
                 harManglerIDokumentasjonsbehov.increment()
             }
