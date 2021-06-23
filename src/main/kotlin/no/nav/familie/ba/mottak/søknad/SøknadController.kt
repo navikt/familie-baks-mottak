@@ -3,6 +3,7 @@ package no.nav.familie.ba.mottak.søknad
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
+import no.nav.familie.kontrakter.ba.søknad.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.Søknad
 import no.nav.familie.kontrakter.ba.søknad.Søknadsvedlegg
 import no.nav.familie.kontrakter.felles.Ressurs
@@ -70,17 +71,26 @@ class SøknadController(
         søknadMottattOk.increment()
 
         if (søknad.dokumentasjon.isNotEmpty()) {
-            søknadHarDokumentasjonsbehov.increment()
-            antallDokumentasjonsbehov.increment(søknad.dokumentasjon.size.toDouble())
+            // Filtrere ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
+            val dokumentasjonsbehovUtenAnnenDokumentasjon =
+                søknad.dokumentasjon.filter { it.dokumentasjonsbehov != Dokumentasjonsbehov.ANNEN_DOKUMENTASJON }
+            if (dokumentasjonsbehovUtenAnnenDokumentasjon.isNotEmpty()) {
+                søknadHarDokumentasjonsbehov.increment()
+                antallDokumentasjonsbehov.increment(dokumentasjonsbehovUtenAnnenDokumentasjon.size.toDouble())
+            }
 
+            // Ønsker å inkludere Dokumentasjonsbehov.ANNEN_DOKUMENTASJON for søknadHarVedlegg og antallVedlegg
             val alleVedlegg: List<Søknadsvedlegg> = søknad.dokumentasjon.map { it.opplastedeVedlegg }.flatten()
             if (alleVedlegg.isNotEmpty()) {
                 søknadHarVedlegg.increment()
                 antallVedlegg.increment(alleVedlegg.size.toDouble())
             }
 
+            // Filtrere ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val harMangler =
-                søknad.dokumentasjon.filter { it.harSendtInn == false && it.opplastedeVedlegg.isEmpty() }.isNotEmpty()
+                søknad.dokumentasjon.filter {
+                    it.harSendtInn == false && it.opplastedeVedlegg.isEmpty() && it.dokumentasjonsbehov != Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
+                }.isNotEmpty()
             if (harMangler) {
                 harManglerIDokumentasjonsbehov.increment()
             }
