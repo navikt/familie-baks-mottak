@@ -10,7 +10,7 @@ data class PdlHendelse(val hendelseId: String,
                        val dødsdato: LocalDate? = null,
                        val fødselsdato: LocalDate? = null,
                        val fødeland: String? = null,
-                       val utflyttingFraNorge: Utflytting? = null,
+                       val utflyttingsdato: LocalDate? = null,
     ) {
 
         // TODO: Skal gjøres tydeligere og mer robust.
@@ -19,7 +19,3 @@ data class PdlHendelse(val hendelseId: String,
         // TODO: Ditto.
         fun hentPersonident() = personIdenter.first { it.length == 11 }
     }
-
-data class Utflytting(val tilflyttingsland: String,
-                      val tilflyttingsstedIUtlandet: String? = null,
-                      val utflyttingsdato: LocalDate? = null)

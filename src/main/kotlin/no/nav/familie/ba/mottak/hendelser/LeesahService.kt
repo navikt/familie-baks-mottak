@@ -145,11 +145,11 @@ class LeesahService(
 
         when (pdlHendelse.endringstype) {
             OPPRETTET -> {
-                logHendelse(pdlHendelse, "utflyttingsdato: ${pdlHendelse.utflyttingFraNorge?.utflyttingsdato}")
+                logHendelse(pdlHendelse, "utflyttingsdato: ${pdlHendelse.utflyttingsdato}")
                 utflyttingOpprettetCounter.increment()
 
-                if (pdlHendelse.utflyttingFraNorge == null) {
-                    log.error("Mangler utflyttingsdata. Ignorerer hendelse ${pdlHendelse.hendelseId}")
+                if (pdlHendelse.utflyttingsdato == null) {
+                    log.error("Mangler utflyttingsdato. Ignorerer hendelse ${pdlHendelse.hendelseId}")
                     utflyttingIgnorertCounter.increment()
                 } else {
                     Task.nyTask(

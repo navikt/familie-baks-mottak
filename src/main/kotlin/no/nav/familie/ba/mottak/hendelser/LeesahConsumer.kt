@@ -2,7 +2,6 @@ package no.nav.familie.ba.mottak.hendelser
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.person.pdl.leesah.Personhendelse
@@ -40,7 +39,8 @@ class LeesahConsumer(val leesahService: LeesahService) {
                                       cr.value().hentPersonidenter(),
                                       cr.value().hentDødsdato(),
                                       cr.value().hentFødselsdato(),
-                                      cr.value().hentFødeland()
+                                      cr.value().hentFødeland(),
+                                      cr.value().hentUtflyttingsdato(),
         )
 
         try {
@@ -73,8 +73,25 @@ class LeesahConsumer(val leesahService: LeesahService) {
             get("hendelseId").toString()
 
     private fun GenericRecord.hentDødsdato(): LocalDate? {
+        return deserialiserDatofeltFraSubrecord("doedsfall", "doedsdato")
+    }
+
+    private fun GenericRecord.hentFødselsdato(): LocalDate? {
+        return deserialiserDatofeltFraSubrecord("foedsel", "foedselsdato")
+    }
+
+    private fun GenericRecord.hentFødeland(): String? {
+        return (get("foedsel") as GenericRecord?)?.get("foedeland")?.toString()
+    }
+
+    private fun GenericRecord.hentUtflyttingsdato(): LocalDate? {
+        return deserialiserDatofeltFraSubrecord("utflyttingFraNorge", "utflyttingsdato")
+    }
+
+    private fun GenericRecord.deserialiserDatofeltFraSubrecord(subrecord: String,
+                                                               datofelt: String): LocalDate? {
         return try {
-            val dato = (get("doedsfall") as GenericRecord?)?.get("doedsdato")
+            val dato = (get(subrecord) as GenericRecord?)?.get(datofelt)
 
             // Integrasjonstester bruker EmbeddedKafka, der en datoverdi tolkes direkte som en LocalDate.
             // I prod tolkes datoer som en Integer.
@@ -84,28 +101,9 @@ class LeesahConsumer(val leesahService: LeesahService) {
                 else -> LocalDate.ofEpochDay((dato as Int).toLong())
             }
         } catch (exception: Exception) {
-            log.error("Deserialisering av dødsdato feiler")
+            log.error("Deserialisering av $datofelt feiler")
             throw exception
         }
-    }
-
-    private fun GenericRecord.hentFødselsdato(): LocalDate? {
-        return try {
-            val dato = (get("foedsel") as GenericRecord?)?.get("foedselsdato")
-
-            when (dato) {
-                null -> null
-                is LocalDate -> dato
-                else -> LocalDate.ofEpochDay((dato as Int).toLong())
-            }
-        } catch (exception: Exception) {
-            log.error("Deserialisering av fødselsdato feiler")
-            throw exception
-        }
-    }
-
-    private fun GenericRecord.hentFødeland(): String? {
-        return (get("foedsel") as GenericRecord?)?.get("foedeland")?.toString()
     }
 
     companion object {

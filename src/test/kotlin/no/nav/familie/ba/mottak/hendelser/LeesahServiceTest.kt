@@ -6,7 +6,6 @@ import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
-import no.nav.familie.ba.mottak.domene.hendelser.Utflytting
 import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.ba.mottak.task.VurderLivshendelseTask
 import no.nav.familie.prosessering.domene.Task
@@ -73,7 +72,7 @@ class LeesahServiceTest {
                 personIdenter = listOf("12345678901", "1234567890123"),
                 endringstype = LeesahService.OPPRETTET,
                 opplysningstype = LeesahService.OPPLYSNINGSTYPE_UTFLYTTING,
-                utflyttingFraNorge = Utflytting("XXX"))
+                utflyttingsdato = LocalDate.now())
 
         service.prosesserNyHendelse(pdlHendelse)
 
