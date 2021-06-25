@@ -148,20 +148,15 @@ class LeesahService(
                 logHendelse(pdlHendelse, "utflyttingsdato: ${pdlHendelse.utflyttingsdato}")
                 utflyttingOpprettetCounter.increment()
 
-                if (pdlHendelse.utflyttingsdato == null) {
-                    log.error("Mangler utflyttingsdato. Ignorerer hendelse ${pdlHendelse.hendelseId}")
-                    utflyttingIgnorertCounter.increment()
-                } else {
-                    Task.nyTask(
-                            VurderLivshendelseTask.TASK_STEP_TYPE,
-                            objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), UTFLYTTING)),
-                            Properties().apply {
-                                this["ident"] = pdlHendelse.hentPersonident()
-                                this["callId"] = pdlHendelse.hendelseId
-                                this["type"] = UTFLYTTING.name
-                            }).also {
-                        taskRepository.save(it)
-                    }
+                Task.nyTask(
+                        VurderLivshendelseTask.TASK_STEP_TYPE,
+                        objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), UTFLYTTING)),
+                        Properties().apply {
+                            this["ident"] = pdlHendelse.hentPersonident()
+                            this["callId"] = pdlHendelse.hendelseId
+                            this["type"] = UTFLYTTING.name
+                        }).also {
+                    taskRepository.save(it)
                 }
             }
             else -> {
