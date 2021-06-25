@@ -203,7 +203,7 @@ class VurderLivshendelseTaskTest {
         }
 
         assertThat(oppgaveDto[0].beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_DØDSFALL)
-        assertThat(oppgaveDto[1].beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_UTFLYTTING)
+        assertThat(oppgaveDto[1].beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_UTFLYTTING.format("bruker"))
 
         assertThat(oppgaveDto).allMatch { it.aktørId.contains(PERSONIDENT_MOR) }
         assertThat(oppgaveDto).allMatch { it.saksId == SAKS_ID }
@@ -267,7 +267,7 @@ class VurderLivshendelseTaskTest {
         }
 
         assertThat(oppgaveDto[0].beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_DØDSFALL)
-        assertThat(oppgaveDto[1].beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_UTFLYTTING)
+        assertThat(oppgaveDto[1].beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_UTFLYTTING.format("barn $PERSONIDENT_BARN"))
 
         assertThat(oppgaveDto).allMatch { it.aktørId.contains(PERSONIDENT_MOR) }
         assertThat(oppgaveDto).allMatch { it.saksId == SAKS_ID }

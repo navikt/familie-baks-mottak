@@ -39,12 +39,13 @@ class VurderLivshendelseTask(
 
     override fun doTask(task: Task) {
         val payload = objectMapper.readValue(task.payload, VurderLivshendelseTaskDTO::class.java)
+        val personIdent = payload.personIdent
 
         when (payload.type) {
             VurderLivshendelseType.DØDSFALL -> {
-                val pdlPersonData = pdlClient.hentPerson(payload.personIdent, "hentperson-relasjon-dødsfall")
+                val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-dødsfall")
                 if (pdlPersonData.dødsfall.firstOrNull()?.dødsdato != null) {
-                    finnRelatertePersonerMedSak(payload.personIdent, pdlPersonData).forEach {
+                    finnRelatertePersonerMedSak(personIdent, pdlPersonData).forEach {
                         if (opprettVurderLivshendelseOppgave(it, task, BESKRIVELSE_DØDSFALL)) {
                             log.error("Mottatt dødsfallshendelse på sak i BA-sak. Få saksbehandler til å se på oppgave av typen VurderLivshendelse") //TODO midlertidig error logg til man har fått dette inn i saksbehandlersrutinen.
                             oppgaveOpprettetDødsfallCounter.increment()
@@ -56,9 +57,9 @@ class VurderLivshendelseTask(
                 }
             }
             VurderLivshendelseType.UTFLYTTING -> {
-                val pdlPersonData = pdlClient.hentPerson(payload.personIdent, "hentperson-relasjon-utflytting")
-                finnRelatertePersonerMedSak(payload.personIdent, pdlPersonData).forEach {
-                    if (opprettVurderLivshendelseOppgave(it, task, BESKRIVELSE_UTFLYTTING)) {
+                val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-utflytting")
+                finnRelatertePersonerMedSak(personIdent, pdlPersonData).forEach {
+                    if (opprettVurderLivshendelseOppgave(it, task, lagUtflyttingoppgavebeskrivelse(it, personIdent))) {
                         log.error("Mottatt utflyttingshendelse på sak i BA-sak. Få saksbehandler til å se på oppgave av typen VurderLivshendelse") //TODO midlertidig error logg til man har fått dette inn i saksbehandlersrutinen.
                         oppgaveOpprettetUtflyttingCounter.increment()
                     }
@@ -67,6 +68,7 @@ class VurderLivshendelseTask(
             else -> log.debug("Behandlinger enda ikke livshendelse av type ${payload.type}")
         }
     }
+
 
     private fun finnRelatertePersonerMedSak(personIdent: String,
                                             pdlPersonData: PdlPersonData): Set<String> {
@@ -131,7 +133,7 @@ class VurderLivshendelseTask(
         val vurderLivshendelseOppgaver = oppgaveClient.finnOppgaverPåAktørId(aktørId, Oppgavetype.VurderLivshendelse)
 
         val åpenOppgave: Oppgave? = vurderLivshendelseOppgaver.firstOrNull {
-            it.beskrivelse?.contains(beskrivelse.substring(0,8)) == true && (
+            it.beskrivelse?.startsWith(beskrivelse.substring(0,8)) == true && (
                     it.status != StatusEnum.FERDIGSTILT || it.status != StatusEnum.FEILREGISTRERT)
         }
 
@@ -159,11 +161,14 @@ class VurderLivshendelseTask(
         }
     }
 
+    private fun lagUtflyttingoppgavebeskrivelse(bruker: String, utflyttetPerson: String) =
+            BESKRIVELSE_UTFLYTTING.format(if (utflyttetPerson == bruker) "bruker" else "barn $utflyttetPerson")
+
     companion object {
 
         const val TASK_STEP_TYPE = "vurderLivshendelseTask"
         const val BESKRIVELSE_DØDSFALL = "Dødsfall"
-        const val BESKRIVELSE_UTFLYTTING = "Utflytting"
+        const val BESKRIVELSE_UTFLYTTING = "Utflytting: %s"
     }
 }
 
