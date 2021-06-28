@@ -9,7 +9,8 @@ data class PdlHendelse(val hendelseId: String,
                        val personIdenter: List<String>,
                        val dødsdato: LocalDate? = null,
                        val fødselsdato: LocalDate? = null,
-                       val fødeland: String? = null
+                       val fødeland: String? = null,
+                       val utflyttingsdato: LocalDate? = null,
     ) {
 
         // TODO: Skal gjøres tydeligere og mer robust.
