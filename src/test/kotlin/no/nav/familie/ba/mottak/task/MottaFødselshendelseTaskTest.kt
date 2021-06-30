@@ -135,10 +135,10 @@ class MottaFødselshendelseTaskTest {
     }
 
     @Test
-    fun `Skal filtrere bort fdat, bost og dnr på barn`() {
+    fun `Skal filtrere bort dnr på barn`() {
         MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
         val barnHarDnrCountFørTest = taskService.barnHarDnrCounter.count()
-        val task = Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, "02062000000")
+        val task = Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, "42062000000")
 
         taskService.doTask(task)
 
@@ -150,7 +150,7 @@ class MottaFødselshendelseTaskTest {
     }
 
     @Test
-    fun `Skal filtrere bort fdat, bost og dnr på mor`() {
+    fun `Skal filtrere bort dnr på mor`() {
         MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
         val fnrBarn = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyy")) + "54321"
         val forsørgerHarDnrCountFørTest = taskService.forsørgerHarDnrCounter.count()

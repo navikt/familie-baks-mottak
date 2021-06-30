@@ -7,9 +7,7 @@ import no.nav.familie.ba.mottak.domene.NyBehandling
 import no.nav.familie.ba.mottak.domene.personopplysning.*
 import no.nav.familie.ba.mottak.integrasjoner.PersonClient
 import no.nav.familie.ba.mottak.integrasjoner.TPSPersonClient
-import no.nav.familie.ba.mottak.util.erBostNummer
 import no.nav.familie.ba.mottak.util.erDnummer
-import no.nav.familie.ba.mottak.util.erFDatnummer
 import no.nav.familie.ba.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -43,7 +41,7 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
     override fun doTask(task: Task) {
         val barnetsId = task.payload
 
-        if (erDnummer(barnetsId) || erFDatnummer(barnetsId) || erBostNummer(barnetsId)) {
+        if (erDnummer(barnetsId)) {
             log.info("Ignorer fødselshendelse: Barnet har DNR/FDAT/BOST-nummer")
             barnHarDnrCounter.increment()
             return
@@ -60,7 +58,7 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
             val morsIdent = hentMor(personMedRelasjoner)
 
             if (morsIdent != null) {
-                if (erDnummer(morsIdent) || erFDatnummer(morsIdent) || erBostNummer(morsIdent)) {
+                if (erDnummer(morsIdent)) {
                     log.info("Ignorer fødselshendelse: Barnets forsørger har DNR/FDAT/BOST-nummer")
                     forsørgerHarDnrCounter.increment()
                     return
