@@ -4,8 +4,6 @@ import io.mockk.*
 import no.nav.familie.ba.mottak.hendelser.JournalføringHendelseServiceTest
 import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
-import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
-import no.nav.familie.kontrakter.ba.infotrygd.Sak as SakDto
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
@@ -13,6 +11,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import no.nav.familie.kontrakter.ba.infotrygd.Sak as SakDto
+import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SkanHendelseTaskLøypeTest {
@@ -65,8 +65,8 @@ class SkanHendelseTaskLøypeTest {
         } returns "12345678910"
 
         every {
-            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse()
+            mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
+        } returns emptyList()
 
         every {
             mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
@@ -86,8 +86,8 @@ class SkanHendelseTaskLøypeTest {
         } returns OppgaveResponse(1)
 
         every {
-            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
+            mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
+        } returns listOf(RestFagsakDeltager("12345678910", FagsakDeltagerRolle.FORELDER, 1L))
 
         kjørRutingTaskOgReturnerNesteTask().run {
             journalføringSteg.doTask(this)
@@ -103,8 +103,8 @@ class SkanHendelseTaskLøypeTest {
         } returns OppgaveResponse(1)
 
         every {
-            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(baSak = Sakspart.ANNEN)
+            mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
+        } returns listOf(RestFagsakDeltager("12345678910", FagsakDeltagerRolle.BARN, 1L))
 
         kjørRutingTaskOgReturnerNesteTask().run {
             journalføringSteg.doTask(this)

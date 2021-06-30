@@ -31,8 +31,9 @@ class LeesahConsumer(val leesahService: LeesahService) {
                    idIsGroup = false,
                    containerFactory = "kafkaLeesahListenerContainerFactory")
     @Transactional
-    fun listen(cr: ConsumerRecord<Int, Personhendelse>, ack: Acknowledgment) {
+    fun listen(cr: ConsumerRecord<String, Personhendelse>, ack: Acknowledgment) {
         val pdlHendelse = PdlHendelse(cr.value().hentHendelseId(),
+                                      cr.key(),
                                       cr.offset(),
                                       cr.value().hentOpplysningstype(),
                                       cr.value().hentEndringstype(),

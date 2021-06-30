@@ -4,8 +4,6 @@ import io.mockk.*
 import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.ba.mottak.integrasjoner.Opphørsgrunn.MIGRERT
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
-import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
-import no.nav.familie.kontrakter.ba.infotrygd.Sak as SakDto
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.assertj.core.api.Assertions
@@ -13,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.time.LocalDate
+import no.nav.familie.kontrakter.ba.infotrygd.Sak as SakDto
+import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NavnoHendelseTaskLøypeTest {
@@ -61,8 +61,8 @@ class NavnoHendelseTaskLøypeTest {
         } returns listOf()
 
         every {
-            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse()
+            mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
+        } returns emptyList()
 
         every {
             mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
@@ -76,8 +76,8 @@ class NavnoHendelseTaskLøypeTest {
     @Test
     fun `Skal opprette JFR-oppgave med tekst om at bruker har sak i BA-sak`() {
         every {
-            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
+            mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
+        } returns listOf(RestFagsakDeltager("12345678901", FagsakDeltagerRolle.FORELDER, FAGSAK_ID.toLong()))
 
         every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
 
@@ -97,8 +97,8 @@ class NavnoHendelseTaskLøypeTest {
     @Test
     fun `Skal ikke gå videre når bruker ikke har sak i BA-sak`() {
         every {
-            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse()
+            mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
+        } returns emptyList()
 
         Assertions.assertThatThrownBy {
             kjørRutingTaskOgReturnerNesteTask()
@@ -119,8 +119,8 @@ class NavnoHendelseTaskLøypeTest {
     @Test
     fun `Skal opprette JFR-oppgave med tekst om at bruker har sak begge steder`() {
         every {
-            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
+            mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
+        } returns listOf(RestFagsakDeltager("12345678901", FagsakDeltagerRolle.FORELDER, FAGSAK_ID.toLong()))
 
         every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
 
@@ -141,8 +141,8 @@ class NavnoHendelseTaskLøypeTest {
     @Test
     fun `Skal opprette JFR-oppgave med henvisning til BA-sak når bruker er migrert fra Infotrygd`() {
         every {
-            mockSakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
+            mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
+        } returns listOf(RestFagsakDeltager("12345678901", FagsakDeltagerRolle.FORELDER, FAGSAK_ID.toLong()))
 
         every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
 

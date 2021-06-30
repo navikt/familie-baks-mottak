@@ -1,6 +1,8 @@
 package no.nav.familie.ba.mottak.task
 
 import no.nav.familie.ba.mottak.integrasjoner.*
+import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.BARN
+import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -67,10 +69,12 @@ class JournalhendelseRutingTask(private val pdlClient: PdlClient,
                 .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
                 .map { it.ident }
 
-        return Pair(first = sakClient.hentPågåendeSakStatus(brukersIdent, barnasIdenter).baSak,
+        return Pair(first = sakClient.hentRestFagsakDeltagerListe(brukersIdent, barnasIdenter).resultat,
                     second = infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, alleBarnasIdenter).resultat
                              ?: infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).resultat)
     }
+
+    fun Sakspart?.finnes(): Boolean = this != null
 
     companion object {
         const val TASK_STEP_TYPE = "journalhendelseRuting"
@@ -96,4 +100,11 @@ private fun personErMigrert(saker: List<no.nav.familie.kontrakter.ba.infotrygd.S
         it.stønad!!.opphørsgrunn == Opphørsgrunn.MIGRERT.kode && it.vedtaksdato!!.isAfter(LocalDate.of(2020, 1, 1))
     }
 }
+
+enum class Sakspart(val part: String) {
+    SØKER("Bruker"),
+    ANNEN("Søsken"),
+}
+private val List<RestFagsakDeltager>.resultat: Sakspart?
+    get() = if (any { it.rolle == FORELDER  }) Sakspart.SØKER else if (any { it.rolle == BARN }) Sakspart.ANNEN else null
 

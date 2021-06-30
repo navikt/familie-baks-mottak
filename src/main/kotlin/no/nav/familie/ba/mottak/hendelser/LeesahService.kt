@@ -9,6 +9,7 @@ import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
 import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.ba.mottak.task.VurderLivshendelseTask
 import no.nav.familie.ba.mottak.task.VurderLivshendelseTaskDTO
+import no.nav.familie.ba.mottak.task.VurderLivshendelseType
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.DØDSFALL
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.UTFLYTTING
 import no.nav.familie.ba.mottak.util.nesteGyldigeTriggertidFødselshendelser
@@ -68,16 +69,7 @@ class LeesahService(
                     log.error("Mangler dødsdato. Ignorerer hendelse ${pdlHendelse.hendelseId}")
                     dødsfallIgnorertCounter.increment()
                 } else {
-                    Task.nyTask(
-                            VurderLivshendelseTask.TASK_STEP_TYPE,
-                            objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), DØDSFALL)),
-                            Properties().apply {
-                                this["ident"] = pdlHendelse.hentPersonident()
-                                this["callId"] = pdlHendelse.hendelseId
-                                this["type"] = DØDSFALL.name
-                            }).also {
-                        taskRepository.save(it)
-                    }
+                    opprettVurderLivshendelseTaskForHendelse(DØDSFALL, pdlHendelse)
                 }
 
             }
@@ -148,16 +140,7 @@ class LeesahService(
                 logHendelse(pdlHendelse, "utflyttingsdato: ${pdlHendelse.utflyttingsdato}")
                 utflyttingOpprettetCounter.increment()
 
-                Task.nyTask(
-                        VurderLivshendelseTask.TASK_STEP_TYPE,
-                        objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), UTFLYTTING)),
-                        Properties().apply {
-                            this["ident"] = pdlHendelse.hentPersonident()
-                            this["callId"] = pdlHendelse.hendelseId
-                            this["type"] = UTFLYTTING.name
-                        }).also {
-                    taskRepository.save(it)
-                }
+                opprettVurderLivshendelseTaskForHendelse(UTFLYTTING, pdlHendelse)
             }
             else -> {
                 logHendelse(pdlHendelse, "Ikke av type OPPRETTET.")
@@ -176,14 +159,14 @@ class LeesahService(
                 "hendelseId: ${pdlHendelse.hendelseId} " +
                 "offset: ${pdlHendelse.offset}, " +
                 "opplysningstype: ${pdlHendelse.opplysningstype}, " +
-                "aktørid: ${pdlHendelse.hentAktørId()}, " +
+                "aktørid: ${pdlHendelse.gjeldendeAktørId}, " +
                 "endringstype: ${pdlHendelse.endringstype}, $ekstraInfo"
         )
     }
 
     private fun oppdaterHendelseslogg(pdlHendelse: PdlHendelse) {
         val metadata = mutableMapOf(
-                "aktørId" to pdlHendelse.hentAktørId(),
+                "aktørId" to pdlHendelse.gjeldendeAktørId,
                 "opplysningstype" to pdlHendelse.opplysningstype,
                 "endringstype" to pdlHendelse.endringstype
         )
@@ -201,6 +184,19 @@ class LeesahService(
                         ident = pdlHendelse.hentPersonident()
                 )
         )
+    }
+
+    private fun opprettVurderLivshendelseTaskForHendelse(type: VurderLivshendelseType, pdlHendelse: PdlHendelse) {
+        Task.nyTask(
+                VurderLivshendelseTask.TASK_STEP_TYPE,
+                objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type)),
+                Properties().apply {
+                    this["ident"] = pdlHendelse.hentPersonident()
+                    this["callId"] = pdlHendelse.hendelseId
+                    this["type"] = type.name
+                }).also {
+            taskRepository.save(it)
+        }
     }
 
     private fun erUnder18år(fødselsDato: LocalDate): Boolean {

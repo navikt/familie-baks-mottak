@@ -42,6 +42,7 @@ class E2EController(private val leesahService: LeesahService,
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse = PdlHendelse(
                 offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = personIdenter.first { it.length == 13 },
                 hendelseId = hendelseId,
                 personIdenter = personIdenter,
                 endringstype = LeesahService.OPPRETTET,
@@ -58,6 +59,7 @@ class E2EController(private val leesahService: LeesahService,
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse = PdlHendelse(
                 offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = personIdenter.first { it.length == 13 },
                 hendelseId = hendelseId,
                 personIdenter = personIdenter,
                 endringstype = LeesahService.OPPRETTET,

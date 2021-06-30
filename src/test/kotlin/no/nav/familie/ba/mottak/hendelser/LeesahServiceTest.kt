@@ -42,6 +42,7 @@ class LeesahServiceTest {
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse = PdlHendelse(
                 offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = "1234567890123",
                 hendelseId = hendelseId,
                 personIdenter = listOf("12345678901", "1234567890123"),
                 endringstype = LeesahService.OPPRETTET,
@@ -68,6 +69,7 @@ class LeesahServiceTest {
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse = PdlHendelse(
                 offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = "1234567890123",
                 hendelseId = hendelseId,
                 personIdenter = listOf("12345678901", "1234567890123"),
                 endringstype = LeesahService.OPPRETTET,
@@ -94,6 +96,7 @@ class LeesahServiceTest {
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse = PdlHendelse(
                 offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = "1234567890123",
                 hendelseId = hendelseId,
                 personIdenter = listOf("12345678901", "1234567890123"),
                 endringstype = LeesahService.OPPRETTET,
@@ -122,6 +125,7 @@ class LeesahServiceTest {
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse = PdlHendelse(
                 offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = "1234567890123",
                 hendelseId = hendelseId,
                 personIdenter = listOf("12345678901", "1234567890123"),
                 endringstype = LeesahService.OPPRETTET,

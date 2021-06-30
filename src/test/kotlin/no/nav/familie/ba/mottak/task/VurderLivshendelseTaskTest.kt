@@ -106,9 +106,9 @@ class VurderLivshendelseTaskTest {
         verify(exactly = 0) {
             mockTaskRepository.saveAndFlush(any())
             mockOppgaveClient.opprettVurderLivshendelseOppgave(any())
-            mockSakClient.hentPågåendeSakStatus(PERSONIDENT_BARN, listOf())
-            mockSakClient.hentPågåendeSakStatus(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN))
-            mockSakClient.hentPågåendeSakStatus(PERSONIDENT_FAR, listOf(PERSONIDENT_BARN))
+            mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_BARN, listOf())
+            mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN))
+            mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_FAR, listOf(PERSONIDENT_BARN))
         }
 
     }
@@ -132,7 +132,7 @@ class VurderLivshendelseTaskTest {
             dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now()))
         )
 
-        every { mockSakClient.hentPågåendeSakStatus(PERSONIDENT_MOR, emptyList()) } returns RestPågåendeSakResponse()
+        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns emptyList()
 
         listOf(UTFLYTTING, DØDSFALL).forEach {
             vurderLivshendelseTask.doTask(
@@ -154,7 +154,7 @@ class VurderLivshendelseTaskTest {
         }
 
         verify(exactly = 2) {
-            mockSakClient.hentPågåendeSakStatus(PERSONIDENT_MOR, emptyList())
+            mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList())
         }
     }
 
@@ -177,10 +177,10 @@ class VurderLivshendelseTaskTest {
             dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now()))
         )
 
-        every { mockSakClient.hentPågåendeSakStatus(PERSONIDENT_MOR, emptyList()) } returns RestPågåendeSakResponse(
-            baSak = Sakspart.SØKER
-        )
-        every { mockSakClient.hentRestFagsak(PERSONIDENT_MOR) } returns lagAktivOrdinær()
+        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
+                listOf(RestFagsakDeltager(PERSONIDENT_MOR, FagsakDeltagerRolle.FORELDER, SAKS_ID))
+
+        every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivOrdinær()
 
         listOf(DØDSFALL, UTFLYTTING).forEach {
             vurderLivshendelseTask.doTask(
@@ -206,7 +206,7 @@ class VurderLivshendelseTaskTest {
         assertThat(oppgaveDto[1].beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_UTFLYTTING.format("bruker"))
 
         assertThat(oppgaveDto).allMatch { it.aktørId.contains(PERSONIDENT_MOR) }
-        assertThat(oppgaveDto).allMatch { it.saksId == SAKS_ID }
+        assertThat(oppgaveDto).allMatch { it.saksId == "$SAKS_ID"  }
         assertThat(oppgaveDto).allMatch { it.enhetsId == ENHET_ID }
         assertThat(oppgaveDto).allMatch { it.behandlingstema == Behandlingstema.OrdinærBarnetrygd.value }
         assertThat(oppgaveDto).allMatch { it.behandlesAvApplikasjon == BehandlesAvApplikasjon.BA_SAK.applikasjon }
@@ -238,13 +238,12 @@ class VurderLivshendelseTaskTest {
         )
 
 
-        every { mockSakClient.hentPågåendeSakStatus(PERSONIDENT_MOR, emptyList()) } returns RestPågåendeSakResponse(
-            baSak = Sakspart.SØKER
-        )
-        every { mockSakClient.hentPågåendeSakStatus(PERSONIDENT_FAR, emptyList()) } returns RestPågåendeSakResponse(
-            baSak = null
-        )
-        every { mockSakClient.hentRestFagsak(PERSONIDENT_MOR) } returns lagAktivUtvidet()
+        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
+                listOf(RestFagsakDeltager(PERSONIDENT_MOR, FagsakDeltagerRolle.FORELDER, SAKS_ID))
+
+        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_FAR, emptyList()) } returns emptyList()
+
+        every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
 
         listOf(DØDSFALL, UTFLYTTING).forEach {
             vurderLivshendelseTask.doTask(
@@ -270,7 +269,7 @@ class VurderLivshendelseTaskTest {
         assertThat(oppgaveDto[1].beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_UTFLYTTING.format("barn $PERSONIDENT_BARN"))
 
         assertThat(oppgaveDto).allMatch { it.aktørId.contains(PERSONIDENT_MOR) }
-        assertThat(oppgaveDto).allMatch { it.saksId == SAKS_ID }
+        assertThat(oppgaveDto).allMatch { it.saksId == "$SAKS_ID" }
         assertThat(oppgaveDto).allMatch { it.enhetsId == ENHET_ID }
         assertThat(oppgaveDto).allMatch { it.behandlingstema == Behandlingstema.UtvidetBarnetrygd.value }
         assertThat(oppgaveDto).allMatch { it.behandlesAvApplikasjon == BehandlesAvApplikasjon.BA_SAK.applikasjon }
@@ -278,8 +277,8 @@ class VurderLivshendelseTaskTest {
 
 
     private fun lagAktivOrdinær() = RestFagsak(
-        SAKS_ID.toLong(),
-        listOf(
+            SAKS_ID,
+            listOf(
             RestUtvidetBehandling(
                 true,
                 RestArbeidsfordelingPåBehandling(ENHET_ID),
@@ -311,7 +310,7 @@ class VurderLivshendelseTaskTest {
         private val PERSONIDENT_BARN = "12345654321"
         private val PERSONIDENT_MOR = "12345678901"
         private val PERSONIDENT_FAR = "12345678888"
-        private val SAKS_ID = "123"
+        private val SAKS_ID = 123L
         private val ENHET_ID = "3049"
     }
 }

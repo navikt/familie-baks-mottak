@@ -222,8 +222,8 @@ class JournalføringHendelseServiceTest {
         } returns "12345678910"
 
         every {
-            sakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
+            sakClient.hentRestFagsakDeltagerListe(any(), emptyList())
+        } returns listOf(RestFagsakDeltager("12345678910", FagsakDeltagerRolle.FORELDER, 1L))
 
         every {
             infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())

@@ -7,11 +7,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpStatus
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
-import org.springframework.web.client.HttpStatusCodeException
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.RestOperations
@@ -52,18 +50,14 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
         )
     }
 
-    fun hentPågåendeSakStatus(personIdent: String, barna: List<String> = emptyList()): RestPågåendeSakResponse {
-        val uri = URI.create("$sakServiceUri/fagsaker/sok/ba-sak-og-infotrygd")
+    fun hentRestFagsakDeltagerListe(personIdent: String,
+                                    barnasIdenter: List<String> = emptyList()): List<RestFagsakDeltager> {
+        val uri = URI.create("$sakServiceUri/fagsaker/sok/fagsakdeltagere-for-ba-mottak")
         return runCatching {
-            postForEntity<Ressurs<RestPågåendeSakResponse>>(uri, RestPågåendeSakRequest(personIdent, barna))
+            postForEntity<Ressurs<List<RestFagsakDeltager>>>(uri, RestSøkParam(personIdent, barnasIdenter))
         }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
-                onFailure = {
-                    if (it is HttpStatusCodeException && it.statusCode == HttpStatus.NOT_FOUND)
-                        return RestPågåendeSakResponse()
-                    else
-                        throw IntegrasjonException("Feil ved henting av sak opplysninger fra ba-sak.", it, uri, personIdent)
-                }
+                onFailure = { throw IntegrasjonException("", it, uri, personIdent) }
         )
     }
 
@@ -74,6 +68,16 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
         }.fold(
             onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
             onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ba-sak.", it, uri, personIdent) }
+        )
+    }
+
+    fun hentRestFagsak(fagsakId: Long): RestFagsak {
+        val uri = URI.create("$sakServiceUri/fagsaker/$fagsakId")
+        return runCatching {
+            getForEntity<Ressurs<RestFagsak>>(uri)
+        }.fold(
+                onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
+                onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ba-sak.", it, uri) }
         )
     }
 
@@ -101,21 +105,19 @@ enum class BehandlingUnderkategori {
     ORDINÆR
 }
 
-
-data class RestPågåendeSakRequest(
-        var personIdent: String,
-        val barnasIdenter: List<String> = emptyList(),
+data class RestSøkParam(
+        val personIdent: String,
+        val barnasIdenter: List<String> = emptyList()
 )
 
-
-
-data class RestPågåendeSakResponse(
-        val baSak: Sakspart? = null,
+data class RestFagsakDeltager(
+        var ident: String,
+        var rolle: FagsakDeltagerRolle,
+        var fagsakId: Long,
 )
 
-enum class Sakspart(val part: String) {
-    SØKER("Bruker"),
-    ANNEN("Søsken"),
+enum class FagsakDeltagerRolle {
+    BARN,
+    FORELDER,
+    UKJENT
 }
-
-fun Sakspart?.finnes(): Boolean = this != null
