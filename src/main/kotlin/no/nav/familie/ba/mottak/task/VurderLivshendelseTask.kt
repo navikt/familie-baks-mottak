@@ -2,7 +2,18 @@ package no.nav.familie.ba.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.ba.mottak.integrasjoner.*
+import no.nav.familie.ba.mottak.integrasjoner.AktørClient
+import no.nav.familie.ba.mottak.integrasjoner.BehandlesAvApplikasjon
+import no.nav.familie.ba.mottak.integrasjoner.BehandlingKategori
+import no.nav.familie.ba.mottak.integrasjoner.BehandlingUnderkategori
+import no.nav.familie.ba.mottak.integrasjoner.Familierelasjonsrolle
+import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
+import no.nav.familie.ba.mottak.integrasjoner.OppgaveVurderLivshendelseDto
+import no.nav.familie.ba.mottak.integrasjoner.PdlClient
+import no.nav.familie.ba.mottak.integrasjoner.PdlPersonData
+import no.nav.familie.ba.mottak.integrasjoner.RestFagsakDeltager
+import no.nav.familie.ba.mottak.integrasjoner.RestUtvidetBehandling
+import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
@@ -140,12 +151,11 @@ class VurderLivshendelseTask(
         return if (åpenOppgave != null) {
             Pair(false, åpenOppgave)
         } else {
-            val fagsak = sakClient.hentRestFagsak(fagsakPerson.fagsakId)
-            val restUtvidetBehandling = fagsak.behandlinger.first { it.aktiv }
+            val restUtvidetBehandling = sakClient.hentRestFagsak(fagsakPerson.fagsakId).behandlinger.first { it.aktiv }
 
             Pair(true, OppgaveVurderLivshendelseDto(aktørId = aktørId,
                                                     beskrivelse = beskrivelse,
-                                                    saksId = fagsak.id.toString(),
+                                                    saksId = fagsakPerson.fagsakId.toString(),
                                                     behandlingstema = tilBehandlingstema(restUtvidetBehandling),
                                                     enhetsId = restUtvidetBehandling.arbeidsfordelingPåBehandling.behandlendeEnhetId,
                                                     behandlesAvApplikasjon = BehandlesAvApplikasjon.BA_SAK.applikasjon))
