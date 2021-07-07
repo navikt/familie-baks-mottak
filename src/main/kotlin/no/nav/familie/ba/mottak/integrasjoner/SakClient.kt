@@ -52,7 +52,7 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
 
     fun hentRestFagsakDeltagerListe(personIdent: String,
                                     barnasIdenter: List<String> = emptyList()): List<RestFagsakDeltager> {
-        val uri = URI.create("$sakServiceUri/fagsaker/sok/fagsakdeltagere-for-ba-mottak")
+        val uri = URI.create("$sakServiceUri/sok/fagsakdeltagere")
         return runCatching {
             postForEntity<Ressurs<List<RestFagsakDeltager>>>(uri, RestSøkParam(personIdent, barnasIdenter))
         }.fold(
