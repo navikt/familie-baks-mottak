@@ -57,7 +57,7 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
             postForEntity<Ressurs<List<RestFagsakDeltager>>>(uri, RestSøkParam(personIdent, barnasIdenter))
         }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
-                onFailure = { throw IntegrasjonException("", it, uri, personIdent) }
+                onFailure = { throw IntegrasjonException("Feil ved henting av fagsakdeltagere fra ba-sak.", it, uri, personIdent) }
         )
     }
 
