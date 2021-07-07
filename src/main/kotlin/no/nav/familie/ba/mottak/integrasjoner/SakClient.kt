@@ -85,12 +85,17 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
 
 data class RestFagsak(val id: Long,
                       val behandlinger: List<RestUtvidetBehandling>)
+
 data class RestUtvidetBehandling(val aktiv: Boolean,
                                  val arbeidsfordelingPåBehandling: RestArbeidsfordelingPåBehandling,
                                  val behandlingId: Long,
                                  val kategori: BehandlingKategori,
                                  val opprettetTidspunkt: LocalDateTime,
+                                 val resultat: String,
+                                 val steg: String,
+                                 val type: String,
                                  val underkategori: BehandlingUnderkategori,)
+
 data class RestArbeidsfordelingPåBehandling(
         val behandlendeEnhetId: String,
 )
@@ -111,13 +116,21 @@ data class RestSøkParam(
 )
 
 data class RestFagsakDeltager(
-        var ident: String,
-        var rolle: FagsakDeltagerRolle,
-        var fagsakId: Long,
+        val ident: String,
+        val rolle: FagsakDeltagerRolle,
+        val fagsakId: Long,
+        val fagsakStatus: FagsakStatus,
+
 )
 
 enum class FagsakDeltagerRolle {
     BARN,
     FORELDER,
     UKJENT
+}
+
+enum class FagsakStatus {
+    OPPRETTET,
+    LØPENDE, // Har minst én behandling gjeldende for fremtidig utbetaling
+    AVSLUTTET
 }

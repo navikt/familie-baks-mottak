@@ -1,8 +1,25 @@
 package no.nav.familie.ba.mottak.task
 
-import io.mockk.*
-import no.nav.familie.ba.mottak.integrasjoner.*
+import io.mockk.clearAllMocks
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
+import no.nav.familie.ba.mottak.integrasjoner.Bruker
+import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType
+import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
+import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.LØPENDE
+import no.nav.familie.ba.mottak.integrasjoner.InfotrygdBarnetrygdClient
+import no.nav.familie.ba.mottak.integrasjoner.Journalpost
+import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
+import no.nav.familie.ba.mottak.integrasjoner.Journalposttype
+import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
+import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.ba.mottak.integrasjoner.Opphørsgrunn.MIGRERT
+import no.nav.familie.ba.mottak.integrasjoner.PdlClient
+import no.nav.familie.ba.mottak.integrasjoner.RestFagsakDeltager
+import no.nav.familie.ba.mottak.integrasjoner.SakClient
+import no.nav.familie.ba.mottak.integrasjoner.StatusKode
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
@@ -77,7 +94,7 @@ class NavnoHendelseTaskLøypeTest {
     fun `Skal opprette JFR-oppgave med tekst om at bruker har sak i BA-sak`() {
         every {
             mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
-        } returns listOf(RestFagsakDeltager("12345678901", FagsakDeltagerRolle.FORELDER, FAGSAK_ID.toLong()))
+        } returns listOf(RestFagsakDeltager("12345678901", FORELDER, FAGSAK_ID.toLong(), LØPENDE))
 
         every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
 
@@ -120,7 +137,7 @@ class NavnoHendelseTaskLøypeTest {
     fun `Skal opprette JFR-oppgave med tekst om at bruker har sak begge steder`() {
         every {
             mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
-        } returns listOf(RestFagsakDeltager("12345678901", FagsakDeltagerRolle.FORELDER, FAGSAK_ID.toLong()))
+        } returns listOf(RestFagsakDeltager("12345678901", FORELDER, FAGSAK_ID.toLong(), LØPENDE))
 
         every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
 
@@ -142,7 +159,7 @@ class NavnoHendelseTaskLøypeTest {
     fun `Skal opprette JFR-oppgave med henvisning til BA-sak når bruker er migrert fra Infotrygd`() {
         every {
             mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
-        } returns listOf(RestFagsakDeltager("12345678901", FagsakDeltagerRolle.FORELDER, FAGSAK_ID.toLong()))
+        } returns listOf(RestFagsakDeltager("12345678901", FORELDER, FAGSAK_ID.toLong(), LØPENDE))
 
         every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
 

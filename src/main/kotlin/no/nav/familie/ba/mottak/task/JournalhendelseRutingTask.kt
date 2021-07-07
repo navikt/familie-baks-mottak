@@ -1,8 +1,20 @@
 package no.nav.familie.ba.mottak.task
 
-import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.BARN
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
+import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.AVSLUTTET
+import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.LØPENDE
+import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.OPPRETTET
+import no.nav.familie.ba.mottak.integrasjoner.Familierelasjonsrolle
+import no.nav.familie.ba.mottak.integrasjoner.Identgruppe
+import no.nav.familie.ba.mottak.integrasjoner.InfotrygdBarnetrygdClient
+import no.nav.familie.ba.mottak.integrasjoner.IntegrasjonException
+import no.nav.familie.ba.mottak.integrasjoner.Opphørsgrunn
+import no.nav.familie.ba.mottak.integrasjoner.PdlClient
+import no.nav.familie.ba.mottak.integrasjoner.RestFagsak
+import no.nav.familie.ba.mottak.integrasjoner.RestFagsakDeltager
+import no.nav.familie.ba.mottak.integrasjoner.SakClient
+import no.nav.familie.ba.mottak.integrasjoner.StatusKode
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -69,9 +81,9 @@ class JournalhendelseRutingTask(private val pdlClient: PdlClient,
                 .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
                 .map { it.ident }
 
-        return Pair(first = sakClient.hentRestFagsakDeltagerListe(brukersIdent, barnasIdenter).resultat,
-                    second = infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, alleBarnasIdenter).resultat
-                             ?: infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).resultat)
+        return Pair(first = sakClient.hentRestFagsakDeltagerListe(brukersIdent, barnasIdenter).sakspart(sakClient),
+                    second = infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, alleBarnasIdenter).sakspart
+                             ?: infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).sakspart)
     }
 
     fun Sakspart?.finnes(): Boolean = this != null
@@ -81,11 +93,11 @@ class JournalhendelseRutingTask(private val pdlClient: PdlClient,
     }
 }
 
-val InfotrygdSøkResponse<StønadDto>.resultat: Sakspart?
+val InfotrygdSøkResponse<StønadDto>.sakspart: Sakspart?
     get() = if (bruker.isNotEmpty()) Sakspart.SØKER else if (barn.isNotEmpty()) Sakspart.ANNEN else null
 
-val InfotrygdSøkResponse<SakDto>.resultat: Sakspart?
-    @JvmName("getSakspart")
+val InfotrygdSøkResponse<SakDto>.sakspart: Sakspart?
+    @JvmName("sakspart")
     get() = if (bruker.harSak()) Sakspart.SØKER else if (barn.harSak()) Sakspart.ANNEN else null
 
 private fun List<SakDto>.harSak(): Boolean {
@@ -105,6 +117,23 @@ enum class Sakspart(val part: String) {
     SØKER("Bruker"),
     ANNEN("Søsken"),
 }
-private val List<RestFagsakDeltager>.resultat: Sakspart?
-    get() = if (any { it.rolle == FORELDER  }) Sakspart.SØKER else if (any { it.rolle == BARN }) Sakspart.ANNEN else null
 
+private fun List<RestFagsakDeltager>.sakspart(sakClient: SakClient): Sakspart? = when {
+    any { it.rolle == FORELDER && it.harPågåendeSak(sakClient) } -> Sakspart.SØKER
+    any { it.rolle == BARN && it.harPågåendeSak(sakClient) } -> Sakspart.ANNEN
+    else -> null
+}
+
+private fun RestFagsakDeltager.harPågåendeSak(sakClient: SakClient): Boolean {
+    return when (fagsakStatus) {
+        OPPRETTET, LØPENDE -> true
+        AVSLUTTET -> !sisteBehandlingHenlagtEllerTekniskOpphør(sakClient.hentRestFagsak(fagsakId))
+    }
+}
+
+private fun sisteBehandlingHenlagtEllerTekniskOpphør(fagsak: RestFagsak): Boolean {
+    val sisteBehandling = fagsak.behandlinger
+                                  .sortedBy { it.opprettetTidspunkt }
+                                  .findLast { it.steg == "BEHANDLING_AVSLUTTET" } ?: return false
+    return sisteBehandling.type == "TEKNISK_OPPHØR" || sisteBehandling.resultat.startsWith("HENLAGT")
+}

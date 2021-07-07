@@ -1,8 +1,26 @@
 package no.nav.familie.ba.mottak.task
 
-import io.mockk.*
+import io.mockk.clearAllMocks
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
 import no.nav.familie.ba.mottak.hendelser.JournalføringHendelseServiceTest
-import no.nav.familie.ba.mottak.integrasjoner.*
+import no.nav.familie.ba.mottak.integrasjoner.AktørClient
+import no.nav.familie.ba.mottak.integrasjoner.Bruker
+import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType
+import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.BARN
+import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
+import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.LØPENDE
+import no.nav.familie.ba.mottak.integrasjoner.InfotrygdBarnetrygdClient
+import no.nav.familie.ba.mottak.integrasjoner.Journalpost
+import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
+import no.nav.familie.ba.mottak.integrasjoner.Journalposttype
+import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
+import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
+import no.nav.familie.ba.mottak.integrasjoner.PdlClient
+import no.nav.familie.ba.mottak.integrasjoner.RestFagsakDeltager
+import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.prosessering.domene.Task
@@ -87,7 +105,7 @@ class SkanHendelseTaskLøypeTest {
 
         every {
             mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
-        } returns listOf(RestFagsakDeltager("12345678910", FagsakDeltagerRolle.FORELDER, 1L))
+        } returns listOf(RestFagsakDeltager("12345678910", FORELDER, 1L, LØPENDE))
 
         kjørRutingTaskOgReturnerNesteTask().run {
             journalføringSteg.doTask(this)
@@ -104,7 +122,7 @@ class SkanHendelseTaskLøypeTest {
 
         every {
             mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
-        } returns listOf(RestFagsakDeltager("12345678910", FagsakDeltagerRolle.BARN, 1L))
+        } returns listOf(RestFagsakDeltager("12345678910", BARN, 1L, LØPENDE))
 
         kjørRutingTaskOgReturnerNesteTask().run {
             journalføringSteg.doTask(this)

@@ -5,6 +5,8 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.familie.ba.mottak.integrasjoner.*
+import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
+import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.LØPENDE
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.DØDSFALL
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.UTFLYTTING
 import no.nav.familie.kontrakter.felles.Behandlingstema
@@ -178,7 +180,7 @@ class VurderLivshendelseTaskTest {
         )
 
         every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
-                listOf(RestFagsakDeltager(PERSONIDENT_MOR, FagsakDeltagerRolle.FORELDER, SAKS_ID))
+                listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE))
 
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivOrdinær()
 
@@ -239,7 +241,7 @@ class VurderLivshendelseTaskTest {
 
 
         every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
-                listOf(RestFagsakDeltager(PERSONIDENT_MOR, FagsakDeltagerRolle.FORELDER, SAKS_ID))
+                listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE))
 
         every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_FAR, emptyList()) } returns emptyList()
 
@@ -285,6 +287,9 @@ class VurderLivshendelseTaskTest {
                 321,
                 BehandlingKategori.NASJONAL,
                 LocalDateTime.now(),
+                "RESULTAT",
+                "STEG",
+                "TYPE",
                 BehandlingUnderkategori.ORDINÆR
             )
         )
@@ -299,6 +304,9 @@ class VurderLivshendelseTaskTest {
                 321,
                 BehandlingKategori.NASJONAL,
                 LocalDateTime.now(),
+                "RESULTAT",
+                "STEG",
+                "TYPE",
                 BehandlingUnderkategori.UTVIDET
             )
         )

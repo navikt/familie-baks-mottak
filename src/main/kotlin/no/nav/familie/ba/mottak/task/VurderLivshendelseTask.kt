@@ -6,6 +6,7 @@ import no.nav.familie.ba.mottak.integrasjoner.AktørClient
 import no.nav.familie.ba.mottak.integrasjoner.BehandlesAvApplikasjon
 import no.nav.familie.ba.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.ba.mottak.integrasjoner.BehandlingUnderkategori
+import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.AVSLUTTET
 import no.nav.familie.ba.mottak.integrasjoner.Familierelasjonsrolle
 import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.ba.mottak.integrasjoner.OppgaveVurderLivshendelseDto
@@ -92,7 +93,7 @@ class VurderLivshendelseTask(
                 familierelasjon.filter { it.minRolleForPerson != Familierelasjonsrolle.BARN }
                         .map { it.relatertPersonsIdent }
         if (listeMedBarn.isNotEmpty()) {
-            sakClient.hentRestFagsakDeltagerListe(personIdent).apply { personerMedSak.addAll(this)}
+            personerMedSak += sakClient.hentRestFagsakDeltagerListe(personIdent).filter { it.fagsakStatus != AVSLUTTET }
         }
 
         //Sjekker om foreldrene til person under 19 har en løpende sak.
@@ -104,7 +105,7 @@ class VurderLivshendelseTask(
                             .map { it.relatertPersonsIdent }
 
             listeMedForeldreForBarn.forEach {
-                sakClient.hentRestFagsakDeltagerListe(it).apply { personerMedSak.addAll(this) }
+                personerMedSak += sakClient.hentRestFagsakDeltagerListe(it).filter { it.fagsakStatus != AVSLUTTET }
             }
         }
 
