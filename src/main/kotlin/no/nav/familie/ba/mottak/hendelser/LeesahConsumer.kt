@@ -31,9 +31,9 @@ class LeesahConsumer(val leesahService: LeesahService) {
                    idIsGroup = false,
                    containerFactory = "kafkaLeesahListenerContainerFactory")
     @Transactional
-    fun listen(cr: ConsumerRecord<String, Personhendelse>, ack: Acknowledgment) {
+    fun listen(cr: ConsumerRecord<Int, Personhendelse>, ack: Acknowledgment) {
         val pdlHendelse = PdlHendelse(cr.value().hentHendelseId(),
-                                      cr.key().trim(),
+                                      cr.key().toString(),
                                       cr.offset(),
                                       cr.value().hentOpplysningstype(),
                                       cr.value().hentEndringstype(),
@@ -61,9 +61,11 @@ class LeesahConsumer(val leesahService: LeesahService) {
 
     private fun validerGjeldendeAktørId(pdlHendelse: PdlHendelse) {
         if (pdlHendelse.gjeldendeAktørId.length != 13 || !pdlHendelse.personIdenter.contains(pdlHendelse.gjeldendeAktørId)) {
-           leesahFeiletCounter.increment()
-           SECURE_LOGGER.error("Validering av cr.key() som gjeldende aktørId feilet. $pdlHendelse")
-           throw RuntimeException("Validering av cr.key() som gjeldende aktørId feilet")
+            leesahFeiletCounter.increment()
+            SECURE_LOGGER.error("Validering av cr.key() som gjeldende aktørId feilet. $pdlHendelse")
+            throw RuntimeException("Validering av cr.key() som gjeldende aktørId feilet.\n" +
+                                   "length: ${pdlHendelse.gjeldendeAktørId.length}, " +
+                                   "finnes i personIdenter: ${pdlHendelse.personIdenter.contains(pdlHendelse.gjeldendeAktørId)}")
         }
     }
 
