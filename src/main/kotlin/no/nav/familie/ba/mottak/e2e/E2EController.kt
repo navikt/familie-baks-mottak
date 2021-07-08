@@ -16,9 +16,14 @@ import org.springframework.context.annotation.Profile
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.kafka.support.Acknowledgment
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 import kotlin.random.Random
 import kotlin.random.nextUInt
 
@@ -42,6 +47,7 @@ class E2EController(private val leesahService: LeesahService,
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse = PdlHendelse(
                 offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = personIdenter.first { it.length == 13 },
                 hendelseId = hendelseId,
                 personIdenter = personIdenter,
                 endringstype = LeesahService.OPPRETTET,
@@ -58,6 +64,7 @@ class E2EController(private val leesahService: LeesahService,
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse = PdlHendelse(
                 offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = personIdenter.first { it.length == 13 },
                 hendelseId = hendelseId,
                 personIdenter = personIdenter,
                 endringstype = LeesahService.OPPRETTET,
@@ -68,6 +75,22 @@ class E2EController(private val leesahService: LeesahService,
         return hendelseId
     }
 
+    @PostMapping(path = ["/pdl/utflytting"], consumes = [MediaType.APPLICATION_JSON_VALUE])
+    fun pdlHendelseUtflytting(@RequestBody personIdenter: List<String>): String {
+        logger.info("Oppretter utflyttingshendlse e2e")
+        val hendelseId = UUID.randomUUID().toString()
+        val pdlHendelse = PdlHendelse(
+                offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = personIdenter.first { it.length == 13 },
+                hendelseId = hendelseId,
+                personIdenter = personIdenter,
+                endringstype = LeesahService.OPPRETTET,
+                opplysningstype = LeesahService.OPPLYSNINGSTYPE_UTFLYTTING,
+                utflyttingsdato = LocalDate.now())
+
+        leesahService.prosesserNyHendelse(pdlHendelse)
+        return hendelseId
+    }
 
     @PostMapping(path = ["/journal"])
     fun opprettJournalHendelse(@RequestBody journalpost: Journalpost): String {

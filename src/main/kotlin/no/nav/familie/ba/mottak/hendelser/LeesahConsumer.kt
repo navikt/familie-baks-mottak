@@ -31,8 +31,9 @@ class LeesahConsumer(val leesahService: LeesahService) {
                    idIsGroup = false,
                    containerFactory = "kafkaLeesahListenerContainerFactory")
     @Transactional
-    fun listen(cr: ConsumerRecord<Int, Personhendelse>, ack: Acknowledgment) {
+    fun listen(cr: ConsumerRecord<String, Personhendelse>, ack: Acknowledgment) {
         val pdlHendelse = PdlHendelse(cr.value().hentHendelseId(),
+                                      cr.key(),
                                       cr.offset(),
                                       cr.value().hentOpplysningstype(),
                                       cr.value().hentEndringstype(),
@@ -41,7 +42,7 @@ class LeesahConsumer(val leesahService: LeesahService) {
                                       cr.value().hentFødselsdato(),
                                       cr.value().hentFødeland(),
                                       cr.value().hentUtflyttingsdato(),
-        )
+        ).also { validerGjeldendeAktørId(it) }
 
         try {
             MDC.put(MDCConstants.MDC_CALL_ID, pdlHendelse.hendelseId)
@@ -56,6 +57,14 @@ class LeesahConsumer(val leesahService: LeesahService) {
         }
 
         ack.acknowledge()
+    }
+
+    private fun validerGjeldendeAktørId(pdlHendelse: PdlHendelse) {
+        if (pdlHendelse.gjeldendeAktørId.length != 13 || !pdlHendelse.personIdenter.contains(pdlHendelse.gjeldendeAktørId)) {
+           leesahFeiletCounter.increment()
+           SECURE_LOGGER.error("Validering av cr.key() som gjeldende aktørId feilet. $pdlHendelse")
+           throw RuntimeException("Validering av cr.key() som gjeldende aktørId feilet")
+        }
     }
 
     private fun GenericRecord.hentOpplysningstype() =

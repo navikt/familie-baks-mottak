@@ -2,7 +2,19 @@ package no.nav.familie.ba.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.ba.mottak.integrasjoner.*
+import no.nav.familie.ba.mottak.integrasjoner.AktørClient
+import no.nav.familie.ba.mottak.integrasjoner.BehandlesAvApplikasjon
+import no.nav.familie.ba.mottak.integrasjoner.BehandlingKategori
+import no.nav.familie.ba.mottak.integrasjoner.BehandlingUnderkategori
+import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.AVSLUTTET
+import no.nav.familie.ba.mottak.integrasjoner.Familierelasjonsrolle
+import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
+import no.nav.familie.ba.mottak.integrasjoner.OppgaveVurderLivshendelseDto
+import no.nav.familie.ba.mottak.integrasjoner.PdlClient
+import no.nav.familie.ba.mottak.integrasjoner.PdlPersonData
+import no.nav.familie.ba.mottak.integrasjoner.RestFagsakDeltager
+import no.nav.familie.ba.mottak.integrasjoner.RestUtvidetBehandling
+import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
@@ -59,7 +71,7 @@ class VurderLivshendelseTask(
             VurderLivshendelseType.UTFLYTTING -> {
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-utflytting")
                 finnRelatertePersonerMedSak(personIdent, pdlPersonData).forEach {
-                    if (opprettVurderLivshendelseOppgave(it, task, lagUtflyttingoppgavebeskrivelse(it, personIdent))) {
+                    if (opprettVurderLivshendelseOppgave(it, task, lagUtflyttingoppgavebeskrivelse(it.ident, personIdent))) {
                         log.error("Mottatt utflyttingshendelse på sak i BA-sak. Få saksbehandler til å se på oppgave av typen VurderLivshendelse") //TODO midlertidig error logg til man har fått dette inn i saksbehandlersrutinen.
                         oppgaveOpprettetUtflyttingCounter.increment()
                     }
@@ -71,9 +83,9 @@ class VurderLivshendelseTask(
 
 
     private fun finnRelatertePersonerMedSak(personIdent: String,
-                                            pdlPersonData: PdlPersonData): Set<String> {
+                                            pdlPersonData: PdlPersonData): Set<RestFagsakDeltager> {
 
-        val personerMedSak = mutableSetOf<String>()
+        val personerMedSak = mutableSetOf<RestFagsakDeltager>()
 
         val familierelasjon = pdlPersonData.forelderBarnRelasjon
         //populerer en liste med barn for person. Hvis person har barn, så sjekker man etter løpende sak
@@ -81,7 +93,7 @@ class VurderLivshendelseTask(
                 familierelasjon.filter { it.minRolleForPerson != Familierelasjonsrolle.BARN }
                         .map { it.relatertPersonsIdent }
         if (listeMedBarn.isNotEmpty()) {
-            sakClient.hentPågåendeSakStatus(personIdent).apply { if (baSak.finnes()) personerMedSak.add(personIdent) }
+            personerMedSak += sakClient.hentRestFagsakDeltagerListe(personIdent).filter { it.fagsakStatus != AVSLUTTET }
         }
 
         //Sjekker om foreldrene til person under 19 har en løpende sak.
@@ -93,7 +105,7 @@ class VurderLivshendelseTask(
                             .map { it.relatertPersonsIdent }
 
             listeMedForeldreForBarn.forEach {
-                sakClient.hentPågåendeSakStatus(it).apply { if (baSak.finnes()) personerMedSak.add(it) }
+                personerMedSak += sakClient.hentRestFagsakDeltagerListe(it).filter { it.fagsakStatus != AVSLUTTET }
             }
         }
 
@@ -104,11 +116,11 @@ class VurderLivshendelseTask(
         return personerMedSak
     }
 
-    private fun opprettVurderLivshendelseOppgave(personIdent: String,
+    private fun opprettVurderLivshendelseOppgave(fagsakPerson: RestFagsakDeltager,
                                                  task: Task,
                                                  beskrivelse: String): Boolean {
 
-        val (nyopprettet, oppgave) = hentEllerOpprettNyOppgaveForPerson(personIdent, beskrivelse)
+        val (nyopprettet, oppgave) = hentEllerOpprettNyOppgaveForPerson(fagsakPerson, beskrivelse)
 
         if (nyopprettet) {
             oppgaveClient.opprettVurderLivshendelseOppgave(oppgave as OppgaveVurderLivshendelseDto).also {
@@ -126,10 +138,10 @@ class VurderLivshendelseTask(
         }
     }
 
-    private fun hentEllerOpprettNyOppgaveForPerson(personIdent: String,
+    private fun hentEllerOpprettNyOppgaveForPerson(fagsakPerson: RestFagsakDeltager,
                                                    beskrivelse: String): Pair<Boolean, Any> {
 
-        val aktørId = aktørClient.hentAktørId(personIdent.trim())
+        val aktørId = aktørClient.hentAktørId(fagsakPerson.ident)
         val vurderLivshendelseOppgaver = oppgaveClient.finnOppgaverPåAktørId(aktørId, Oppgavetype.VurderLivshendelse)
 
         val åpenOppgave: Oppgave? = vurderLivshendelseOppgaver.firstOrNull {
@@ -140,12 +152,11 @@ class VurderLivshendelseTask(
         return if (åpenOppgave != null) {
             Pair(false, åpenOppgave)
         } else {
-            val fagsak = sakClient.hentRestFagsak(personIdent)
-            val restUtvidetBehandling = fagsak.behandlinger.first { it.aktiv }
+            val restUtvidetBehandling = sakClient.hentRestFagsak(fagsakPerson.fagsakId).behandlinger.first { it.aktiv }
 
-            Pair(true, OppgaveVurderLivshendelseDto(aktørId = aktørClient.hentAktørId(personIdent.trim()),
+            Pair(true, OppgaveVurderLivshendelseDto(aktørId = aktørId,
                                                     beskrivelse = beskrivelse,
-                                                    saksId = fagsak.id.toString(),
+                                                    saksId = fagsakPerson.fagsakId.toString(),
                                                     behandlingstema = tilBehandlingstema(restUtvidetBehandling),
                                                     enhetsId = restUtvidetBehandling.arbeidsfordelingPåBehandling.behandlendeEnhetId,
                                                     behandlesAvApplikasjon = BehandlesAvApplikasjon.BA_SAK.applikasjon))
@@ -161,8 +172,8 @@ class VurderLivshendelseTask(
         }
     }
 
-    private fun lagUtflyttingoppgavebeskrivelse(bruker: String, utflyttetPerson: String) =
-            BESKRIVELSE_UTFLYTTING.format(if (utflyttetPerson == bruker) "bruker" else "barn $utflyttetPerson")
+    private fun lagUtflyttingoppgavebeskrivelse(fagsakPerson: String, utflyttetPerson: String) =
+            BESKRIVELSE_UTFLYTTING.format(if (utflyttetPerson == fagsakPerson) "bruker" else "barn $utflyttetPerson")
 
     companion object {
 

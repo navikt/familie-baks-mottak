@@ -3,6 +3,7 @@ package no.nav.familie.ba.mottak.domene.hendelser
 import java.time.LocalDate
 
 data class PdlHendelse(val hendelseId: String,
+                       val gjeldendeAktørId: String,
                        val offset: Long,
                        val opplysningstype: String,
                        val endringstype: String,
@@ -14,8 +15,5 @@ data class PdlHendelse(val hendelseId: String,
     ) {
 
         // TODO: Skal gjøres tydeligere og mer robust.
-        fun hentAktørId() = personIdenter.first { it.length == 13 }
-
-        // TODO: Ditto.
         fun hentPersonident() = personIdenter.first { it.length == 11 }
     }
