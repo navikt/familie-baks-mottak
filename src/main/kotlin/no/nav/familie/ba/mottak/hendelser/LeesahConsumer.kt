@@ -33,7 +33,7 @@ class LeesahConsumer(val leesahService: LeesahService) {
     @Transactional
     fun listen(cr: ConsumerRecord<String, Personhendelse>, ack: Acknowledgment) {
         val pdlHendelse = PdlHendelse(cr.value().hentHendelseId(),
-                                      cr.key().toString().trim(),
+                                      cr.key().substring(6),
                                       cr.offset(),
                                       cr.value().hentOpplysningstype(),
                                       cr.value().hentEndringstype(),
