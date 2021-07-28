@@ -7,11 +7,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpStatus
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
-import org.springframework.web.client.HttpStatusCodeException
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.RestOperations
@@ -32,7 +30,7 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
         logger.info("Sender søknad til {}", uri)
         try {
             val response = putForEntity<Ressurs<String>>(uri, nyBehandling)
-            logger.info("Søknad sendt til sak. Status=${response?.status}")
+            logger.info("Søknad sendt til sak. Status=${response.status}")
         } catch (e: RestClientResponseException) {
             logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
             throw IllegalStateException("Innsending til sak feilet. Status: " + e.rawStatusCode
@@ -52,18 +50,14 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
         )
     }
 
-    fun hentPågåendeSakStatus(personIdent: String, barna: List<String>): RestPågåendeSakResponse {
-        val uri = URI.create("$sakServiceUri/fagsaker/sok/ba-sak-og-infotrygd")
+    fun hentRestFagsakDeltagerListe(personIdent: String,
+                                    barnasIdenter: List<String> = emptyList()): List<RestFagsakDeltager> {
+        val uri = URI.create("$sakServiceUri/fagsaker/sok/fagsakdeltagere")
         return runCatching {
-            postForEntity<Ressurs<RestPågåendeSakResponse>>(uri, RestPågåendeSakRequest(personIdent, barna))
+            postForEntity<Ressurs<List<RestFagsakDeltager>>>(uri, RestSøkParam(personIdent, barnasIdenter))
         }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
-                onFailure = {
-                    if (it is HttpStatusCodeException && it.statusCode == HttpStatus.NOT_FOUND)
-                        return RestPågåendeSakResponse()
-                    else
-                        throw IntegrasjonException("Feil ved henting av sak opplysninger fra ba-sak.", it, uri, personIdent)
-                }
+                onFailure = { throw IntegrasjonException("Feil ved henting av fagsakdeltagere fra ba-sak.", it, uri, personIdent) }
         )
     }
 
@@ -77,16 +71,31 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
         )
     }
 
+    fun hentRestFagsak(fagsakId: Long): RestFagsak {
+        val uri = URI.create("$sakServiceUri/fagsaker/$fagsakId")
+        return runCatching {
+            getForEntity<Ressurs<RestFagsak>>(uri)
+        }.fold(
+                onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
+                onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ba-sak.", it, uri) }
+        )
+    }
+
 }
 
 data class RestFagsak(val id: Long,
                       val behandlinger: List<RestUtvidetBehandling>)
+
 data class RestUtvidetBehandling(val aktiv: Boolean,
                                  val arbeidsfordelingPåBehandling: RestArbeidsfordelingPåBehandling,
                                  val behandlingId: Long,
                                  val kategori: BehandlingKategori,
                                  val opprettetTidspunkt: LocalDateTime,
+                                 val resultat: String,
+                                 val steg: String,
+                                 val type: String,
                                  val underkategori: BehandlingUnderkategori,)
+
 data class RestArbeidsfordelingPåBehandling(
         val behandlendeEnhetId: String,
 )
@@ -101,21 +110,27 @@ enum class BehandlingUnderkategori {
     ORDINÆR
 }
 
-
-data class RestPågåendeSakRequest(
-        var personIdent: String,
-        val barnasIdenter: List<String> = emptyList(),
+data class RestSøkParam(
+        val personIdent: String,
+        val barnasIdenter: List<String> = emptyList()
 )
 
+data class RestFagsakDeltager(
+        val ident: String,
+        val rolle: FagsakDeltagerRolle,
+        val fagsakId: Long,
+        val fagsakStatus: FagsakStatus,
 
-
-data class RestPågåendeSakResponse(
-        val baSak: Sakspart? = null,
 )
 
-enum class Sakspart(val part: String) {
-    SØKER("Bruker"),
-    ANNEN("Søsken"),
+enum class FagsakDeltagerRolle {
+    BARN,
+    FORELDER,
+    UKJENT
 }
 
-fun Sakspart?.finnes(): Boolean = this != null
+enum class FagsakStatus {
+    OPPRETTET,
+    LØPENDE, // Har minst én behandling gjeldende for fremtidig utbetaling
+    AVSLUTTET
+}

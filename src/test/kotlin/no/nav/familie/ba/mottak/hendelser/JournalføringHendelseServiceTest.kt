@@ -1,13 +1,29 @@
 package no.nav.familie.ba.mottak.hendelser
 
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.clearAllMocks
+import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
+import io.mockk.slot
+import io.mockk.verify
 import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.Hendelseslogg
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
-import no.nav.familie.ba.mottak.integrasjoner.*
+import no.nav.familie.ba.mottak.integrasjoner.AktørClient
+import no.nav.familie.ba.mottak.integrasjoner.Bruker
+import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType
+import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
+import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.LØPENDE
+import no.nav.familie.ba.mottak.integrasjoner.InfotrygdBarnetrygdClient
+import no.nav.familie.ba.mottak.integrasjoner.Journalpost
+import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
+import no.nav.familie.ba.mottak.integrasjoner.Journalposttype
+import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
+import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
+import no.nav.familie.ba.mottak.integrasjoner.RestFagsakDeltager
+import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.ba.mottak.task.JournalhendelseRutingTask
 import no.nav.familie.ba.mottak.task.OpprettJournalføringOppgaveTask
 import no.nav.familie.ba.mottak.task.SendTilSakTask
@@ -222,8 +238,8 @@ class JournalføringHendelseServiceTest {
         } returns "12345678910"
 
         every {
-            sakClient.hentPågåendeSakStatus(any(), emptyList())
-        } returns RestPågåendeSakResponse(baSak = Sakspart.SØKER)
+            sakClient.hentRestFagsakDeltagerListe(any(), emptyList())
+        } returns listOf(RestFagsakDeltager("12345678910", FORELDER, 1L, LØPENDE))
 
         every {
             infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())

@@ -6,7 +6,6 @@ import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
-import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.ba.mottak.task.VurderLivshendelseTask
 import no.nav.familie.prosessering.domene.Task
@@ -43,6 +42,7 @@ class LeesahServiceTest {
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse = PdlHendelse(
                 offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = "1234567890123",
                 hendelseId = hendelseId,
                 personIdenter = listOf("12345678901", "1234567890123"),
                 endringstype = LeesahService.OPPRETTET,
@@ -65,10 +65,38 @@ class LeesahServiceTest {
     }
 
     @Test
+    fun `Skal opprette VurderLivshendelseTask for utflyttingshendelse`() {
+        val hendelseId = UUID.randomUUID().toString()
+        val pdlHendelse = PdlHendelse(
+                offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = "1234567890123",
+                hendelseId = hendelseId,
+                personIdenter = listOf("12345678901", "1234567890123"),
+                endringstype = LeesahService.OPPRETTET,
+                opplysningstype = LeesahService.OPPLYSNINGSTYPE_UTFLYTTING,
+                utflyttingsdato = LocalDate.now())
+
+        service.prosesserNyHendelse(pdlHendelse)
+
+        val taskSlot = slot<Task>()
+        verify {
+            mockTaskRepository.save(capture(taskSlot))
+        }
+        assertThat(taskSlot.captured).isNotNull
+        assertThat(taskSlot.captured.payload).isEqualTo("{\"personIdent\":\"12345678901\",\"type\":\"UTFLYTTING\"}")
+        assertThat(taskSlot.captured.taskStepType).isEqualTo(VurderLivshendelseTask.TASK_STEP_TYPE)
+
+        verify(exactly = 1) {
+            mockHendelsesloggRepository.save(any())
+        }
+    }
+
+    @Test
     fun `Skal opprette MottaFødselshendelseTask med fnr på payload`() {
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse = PdlHendelse(
                 offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = "1234567890123",
                 hendelseId = hendelseId,
                 personIdenter = listOf("12345678901", "1234567890123"),
                 endringstype = LeesahService.OPPRETTET,
@@ -97,6 +125,7 @@ class LeesahServiceTest {
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse = PdlHendelse(
                 offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = "1234567890123",
                 hendelseId = hendelseId,
                 personIdenter = listOf("12345678901", "1234567890123"),
                 endringstype = LeesahService.OPPRETTET,
