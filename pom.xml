@@ -23,7 +23,7 @@
         <mockk.version>1.11.0</mockk.version>
         <confluent.version>6.2.0</confluent.version>
         <felles.version>1.20210607085527_b0c86f4</felles.version>
-        <kontrakter.version>2.0_20210621140151_0c7f2bb</kontrakter.version>
+        <kontrakter.version>2.0_20210728111441_df460c3</kontrakter.version>
         <main-class>no.nav.familie.ba.mottak.LauncherKt</main-class>
         <spring.vault.version>2.3.2</spring.vault.version>
         <spring.cloud.version>3.0.3</spring.cloud.version>
@@ -138,9 +138,7 @@
         <dependency>
             <groupId>no.nav.familie.kontrakter</groupId>
             <artifactId>barnetrygd</artifactId>
-            <version>barnetrygd-2.0-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/../familie-kontrakter/barnetrygd/target/barnetrygd-2.0-SNAPSHOT.jar</systemPath>
+            <version>${kontrakter.version}</version>
         </dependency>
 
         <!-- Kafka -->
