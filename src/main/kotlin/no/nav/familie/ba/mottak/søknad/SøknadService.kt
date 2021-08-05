@@ -7,7 +7,7 @@ import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
 import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.tilDBVedlegg
 import no.nav.familie.ba.mottak.task.JournalførSøknadTask
-import no.nav.familie.kontrakter.ba.søknad.Søknad
+import no.nav.familie.kontrakter.ba.søknad.v2.Søknad
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.springframework.stereotype.Service

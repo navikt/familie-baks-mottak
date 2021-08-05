@@ -1,19 +1,22 @@
 package no.nav.familie.ba.mottak.søknad
 
+import com.fasterxml.jackson.core.type.TypeReference
 import no.nav.familie.kontrakter.ba.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.Barn
 import no.nav.familie.kontrakter.ba.søknad.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.SIVILSTANDTYPE
-import no.nav.familie.kontrakter.ba.søknad.Søker
+import no.nav.familie.kontrakter.ba.søknad.v2.Søker as SøkerV2
 import no.nav.familie.kontrakter.ba.søknad.Søknad
+import no.nav.familie.kontrakter.ba.søknad.v2.Søknad as SøknadV2
 import no.nav.familie.kontrakter.ba.søknad.SøknadAdresse
 import no.nav.familie.kontrakter.ba.søknad.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.Søknadsfelt
 import no.nav.familie.kontrakter.ba.søknad.Søknadsvedlegg
+import no.nav.familie.kontrakter.felles.objectMapper
 
 object SøknadTestData {
-    fun søker(): Søker {
-        return Søker(
+    fun søker(): SøkerV2 {
+        return SøkerV2(
                 navn = Søknadsfelt("navn", "Navn Navnessen"),
                 ident = Søknadsfelt("fødselsnummer", "1234578901"),
                 statsborgerskap = Søknadsfelt("statsborgerskap", listOf("NOR")),
@@ -26,7 +29,6 @@ object SøknadTestData {
                     poststed = null
                 )),
                 sivilstand = Søknadsfelt("sivilstand", SIVILSTANDTYPE.GIFT),
-                telefonnummer = Søknadsfelt("Telefon", "40123456"),
                 spørsmål = mapOf(),
         )
     }
@@ -50,8 +52,8 @@ object SøknadTestData {
         )
     }
 
-    fun søknad(): Søknad {
-        return Søknad(
+    fun søknad(): SøknadV2 {
+        return SøknadV2(
             søknadstype = Søknadstype.ORDINÆR,
             søker = søker(),
             barn = barn(),
@@ -70,5 +72,13 @@ object SøknadTestData {
                 )
             )
         )
+    }
+
+    fun søknadV1(): Søknad {
+        val map = objectMapper.convertValue(søknad(), object:TypeReference<MutableMap<String, Any>>(){})
+        val søker: MutableMap<String, Any> = map.get("søker") as MutableMap<String, Any>
+        søker.put("telefonnummer", Søknadsfelt("Telefonnummer", "40123456"))
+
+        return objectMapper.convertValue(map, Søknad::class.java)
     }
 }

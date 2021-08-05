@@ -4,7 +4,7 @@ import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
 import no.nav.familie.kontrakter.ba.søknad.Dokumentasjonsbehov
-import no.nav.familie.kontrakter.ba.søknad.Søknad
+import no.nav.familie.kontrakter.ba.søknad.v2.Søknad
 import no.nav.familie.kontrakter.ba.søknad.Søknadsvedlegg
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.security.token.support.core.api.ProtectedWithClaims
