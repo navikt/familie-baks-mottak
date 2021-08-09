@@ -1,15 +1,19 @@
 package no.nav.familie.ba.mottak.task
 
-import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.post
+import com.github.tomakehurst.wiremock.client.WireMock.stubFor
+import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import io.mockk.clearAllMocks
 import no.nav.familie.ba.mottak.DevLauncher
 import no.nav.familie.ba.mottak.domene.NyBehandling
-import no.nav.familie.ba.mottak.domene.personopplysning.Familierelasjon
 import no.nav.familie.ba.mottak.domene.personopplysning.Person
-import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
 import no.nav.familie.kontrakter.felles.Ressurs.Companion.success
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
+import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
+import no.nav.familie.kontrakter.felles.personopplysning.ForelderBarnRelasjon
 import no.nav.familie.kontrakter.felles.personopplysning.Matrikkeladresse
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.domene.Status
@@ -61,10 +65,10 @@ class MottaFødselshendelseTaskTest {
                                                     success(lagTestPerson())))))
         //TODO fjernes når barnetrygd er ute av infotrygd
         stubFor(post(urlEqualTo("/api/personopplysning/v2/info"))
-                .willReturn(aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(
-                                success(lagTestPerson().copy(bostedsadresse = null))))))
+                        .willReturn(aResponse()
+                                            .withHeader("Content-Type", "application/json")
+                                            .withBody(objectMapper.writeValueAsString(
+                                                    success(lagTestPerson().copy(bostedsadresse = null))))))
 
 
         taskService.doTask(Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
@@ -91,10 +95,10 @@ class MottaFødselshendelseTaskTest {
                                                                                  adressebeskyttelseGradering = "STRENGT_FORTROLIG"))))))
         //TODO fjernes når barnetrygd er ute av infotrygd
         stubFor(post(urlEqualTo("/api/personopplysning/v2/info"))
-                .willReturn(aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(
-                                success(lagTestPerson().copy(bostedsadresse = null))))))
+                        .willReturn(aResponse()
+                                            .withHeader("Content-Type", "application/json")
+                                            .withBody(objectMapper.writeValueAsString(
+                                                    success(lagTestPerson().copy(bostedsadresse = null))))))
 
 
         taskService.doTask(Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
@@ -115,14 +119,14 @@ class MottaFødselshendelseTaskTest {
         val fnrBarn = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyy")) + "12345"
 
         stubFor(get(urlEqualTo("/api/personopplysning/v1/info/BAR"))
-                .willReturn(aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(
-                                success(lagTestPerson())))))
+                        .willReturn(aResponse()
+                                            .withHeader("Content-Type", "application/json")
+                                            .withBody(objectMapper.writeValueAsString(
+                                                    success(lagTestPerson())))))
 
         //TODO fjernes når barnetrygd er ute av infotrygd
         stubFor(post(urlEqualTo("/api/personopplysning/v2/info"))
-                .willReturn(aResponse().withStatus(404)))
+                        .willReturn(aResponse().withStatus(404)))
 
         assertFailsWith<RuntimeException>("Kall mot integrasjon feilet ved uthenting av personinfo. 404 NOT_FOUND") {
             taskService.doTask(Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
@@ -160,11 +164,10 @@ class MottaFødselshendelseTaskTest {
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(
                                                     objectMapper.writeValueAsString(
-                                                            success(lagTestPerson().copy(familierelasjoner = setOf(
-                                                                    Familierelasjon(
-                                                                            PersonIdent(
-                                                                                    "40107678901"),
-                                                                            "MOR"))))))))
+                                                            success(lagTestPerson().copy(forelderBarnRelasjoner = setOf(
+                                                                    ForelderBarnRelasjon(
+                                                                            "40107678901",
+                                                                            FORELDERBARNRELASJONROLLE.MOR))))))))
 
         val task = Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn)
 
@@ -187,11 +190,10 @@ class MottaFødselshendelseTaskTest {
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(
                                                     objectMapper.writeValueAsString(
-                                                            success(lagTestPerson().copy(familierelasjoner =
-                                                                                         setOf(Familierelasjon(
-                                                                                                 PersonIdent(
-                                                                                                         "20107678901"),
-                                                                                                 "FAR"))
+                                                            success(lagTestPerson().copy(forelderBarnRelasjoner =
+                                                                                         setOf(ForelderBarnRelasjon(
+                                                                                                 "20107678901",
+                                                                                                 FORELDERBARNRELASJONROLLE.FAR))
                                                             ))))))
 
         val task = Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn)
@@ -218,10 +220,10 @@ class MottaFødselshendelseTaskTest {
 
         //TODO fjernes når barnetrygd er ute av infotrygd
         stubFor(post(urlEqualTo("/api/personopplysning/v2/info"))
-                .willReturn(aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(
-                                success(lagTestPerson().copy(bostedsadresse = null))))))
+                        .willReturn(aResponse()
+                                            .withHeader("Content-Type", "application/json")
+                                            .withBody(objectMapper.writeValueAsString(
+                                                    success(lagTestPerson().copy(bostedsadresse = null))))))
 
         val task = Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn)
 
@@ -258,10 +260,9 @@ class MottaFødselshendelseTaskTest {
 
     private fun lagTestPerson(): Person {
         return Person("Test Person",
-                      setOf(Familierelasjon(
-                              PersonIdent(
-                                      "20107678901"),
-                              "MOR")),
+                      setOf(ForelderBarnRelasjon(
+                              "20107678901",
+                              FORELDERBARNRELASJONROLLE.MOR)),
                       Bostedsadresse(matrikkeladresse = Matrikkeladresse(1, "1", null, "0576", "3000"))
         )
     }

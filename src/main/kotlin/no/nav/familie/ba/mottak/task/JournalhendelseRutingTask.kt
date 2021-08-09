@@ -5,7 +5,6 @@ import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.AVSLUTTET
 import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.LØPENDE
 import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.OPPRETTET
-import no.nav.familie.ba.mottak.integrasjoner.Familierelasjonsrolle
 import no.nav.familie.ba.mottak.integrasjoner.Identgruppe
 import no.nav.familie.ba.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.ba.mottak.integrasjoner.IntegrasjonException
@@ -16,6 +15,7 @@ import no.nav.familie.ba.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.ba.mottak.integrasjoner.StatusKode
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
+import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -30,10 +30,12 @@ import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 @Service
 @TaskStepBeskrivelse(taskStepType = JournalhendelseRutingTask.TASK_STEP_TYPE,
                      beskrivelse = "Håndterer ruting og markering av sakssystem")
-class JournalhendelseRutingTask(private val pdlClient: PdlClient,
-                                private val sakClient: SakClient,
-                                private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,
-                                private val taskRepository: TaskRepository,) : AsyncTaskStep {
+class JournalhendelseRutingTask(
+        private val pdlClient: PdlClient,
+        private val sakClient: SakClient,
+        private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,
+        private val taskRepository: TaskRepository,
+) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(JournalhendelseRutingTask::class.java)
 
@@ -74,9 +76,9 @@ class JournalhendelseRutingTask(private val pdlClient: PdlClient,
         } catch (e: IntegrasjonException) {
             return Pair(null, null)
         }
-        val barnasIdenter = pdlClient.hentPersonMedRelasjoner(brukersIdent).familierelasjoner
-                .filter { it.relasjonsrolle == Familierelasjonsrolle.BARN.name }
-                .map { it.personIdent.id }
+        val barnasIdenter = pdlClient.hentPersonMedRelasjoner(brukersIdent).forelderBarnRelasjoner
+                .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
+                .map { it.relatertPersonsIdent }
         val alleBarnasIdenter = barnasIdenter.flatMap { pdlClient.hentIdenter(it) }
                 .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
                 .map { it.ident }
@@ -89,6 +91,7 @@ class JournalhendelseRutingTask(private val pdlClient: PdlClient,
     fun Sakspart?.finnes(): Boolean = this != null
 
     companion object {
+
         const val TASK_STEP_TYPE = "journalhendelseRuting"
     }
 }

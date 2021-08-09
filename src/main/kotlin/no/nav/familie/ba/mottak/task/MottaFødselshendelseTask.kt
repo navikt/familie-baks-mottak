@@ -11,6 +11,8 @@ import no.nav.familie.ba.mottak.util.erBostNummer
 import no.nav.familie.ba.mottak.util.erDnummer
 import no.nav.familie.ba.mottak.util.erFDatnummer
 import no.nav.familie.ba.mottak.util.nesteGyldigeTriggertidFødselshendelser
+import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
+import no.nav.familie.kontrakter.felles.personopplysning.ForelderBarnRelasjon
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -95,9 +97,9 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
     }
 
     fun hentMor(personinfo: Person): PersonIdent? {
-        for (familierelasjon: Familierelasjon in personinfo.familierelasjoner) {
-            if (familierelasjon.relasjonsrolle == "MOR") {
-                return familierelasjon.personIdent
+        for (forelderBarnRelasjon: ForelderBarnRelasjon in personinfo.forelderBarnRelasjoner) {
+            if (forelderBarnRelasjon.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.MOR) {
+                return PersonIdent(forelderBarnRelasjon.relatertPersonsIdent)
             }
         }
         return null

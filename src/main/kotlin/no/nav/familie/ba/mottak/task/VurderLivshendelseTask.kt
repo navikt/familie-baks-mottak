@@ -7,7 +7,6 @@ import no.nav.familie.ba.mottak.integrasjoner.BehandlesAvApplikasjon
 import no.nav.familie.ba.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.ba.mottak.integrasjoner.BehandlingUnderkategori
 import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.AVSLUTTET
-import no.nav.familie.ba.mottak.integrasjoner.Familierelasjonsrolle
 import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.ba.mottak.integrasjoner.OppgaveVurderLivshendelseDto
 import no.nav.familie.ba.mottak.integrasjoner.PdlClient
@@ -20,6 +19,7 @@ import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.kontrakter.felles.oppgave.StatusEnum
+import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -90,7 +90,7 @@ class VurderLivshendelseTask(
         val familierelasjon = pdlPersonData.forelderBarnRelasjon
         //populerer en liste med barn for person. Hvis person har barn, så sjekker man etter løpende sak
         val listeMedBarn =
-                familierelasjon.filter { it.minRolleForPerson != Familierelasjonsrolle.BARN }
+                familierelasjon.filter { it.minRolleForPerson != FORELDERBARNRELASJONROLLE.BARN }
                         .map { it.relatertPersonsIdent }
         if (listeMedBarn.isNotEmpty()) {
             personerMedSak += sakClient.hentRestFagsakDeltagerListe(personIdent).filter { it.fagsakStatus != AVSLUTTET }
@@ -101,7 +101,7 @@ class VurderLivshendelseTask(
             pdlPersonData.fødsel.first().fødselsdato.isAfter(LocalDate.now().minusYears(19))) {
 
             val listeMedForeldreForBarn =
-                    familierelasjon.filter { it.minRolleForPerson == Familierelasjonsrolle.BARN }
+                    familierelasjon.filter { it.minRolleForPerson == FORELDERBARNRELASJONROLLE.BARN }
                             .map { it.relatertPersonsIdent }
 
             listeMedForeldreForBarn.forEach {
