@@ -4,8 +4,11 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.domene.NyBehandling
-import no.nav.familie.ba.mottak.domene.personopplysning.*
-import no.nav.familie.ba.mottak.integrasjoner.PersonClient
+import no.nav.familie.ba.mottak.domene.personopplysning.Person
+import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
+import no.nav.familie.ba.mottak.domene.personopplysning.harAdresseGradering
+import no.nav.familie.ba.mottak.domene.personopplysning.harBostedsadresse
+import no.nav.familie.ba.mottak.integrasjoner.PdlClient
 import no.nav.familie.ba.mottak.integrasjoner.TPSPersonClient
 import no.nav.familie.ba.mottak.util.erBostNummer
 import no.nav.familie.ba.mottak.util.erDnummer
@@ -32,7 +35,7 @@ import org.springframework.stereotype.Service
 class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
                                private val tpsPersonClient: TPSPersonClient,
                                private val environment: Environment,
-                               private val personClient: PersonClient,
+                               private val pdlClient: PdlClient,
                                @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: Long)
     : AsyncTaskStep {
 
@@ -52,7 +55,7 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
         }
 
         try {
-            val personMedRelasjoner = personClient.hentPersonMedRelasjoner(barnetsId)
+            val personMedRelasjoner = pdlClient.hentPersonMedRelasjoner(barnetsId)
 
             // denne kreves for at infotrygd ikke skal få fødselshendelser som ikke ligger i TPS
             // vil feile ved forsinkelse i TPS feks i helger og helligdager.
