@@ -2,6 +2,7 @@ package no.nav.familie.ba.mottak.integrasjoner
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import no.nav.familie.ba.mottak.DevLauncher
+import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import org.apache.commons.lang3.StringUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -44,7 +45,7 @@ class PdlClientTest {
 
         val personInfo = pdlClient.hentPersonMedRelasjoner(testIdent)
         assertThat(personInfo.adressebeskyttelseGradering).isEqualTo(Adressebeskyttelsesgradering.UGRADERT.name)
-        assertThat(personInfo.familierelasjoner.size).isEqualTo(2)
+        assertThat(personInfo.forelderBarnRelasjoner.size).isEqualTo(2)
         assertThat(personInfo.bostedsadresse?.vegadresse).isNotNull
     }
 
@@ -57,8 +58,8 @@ class PdlClientTest {
 
         val pdlPersonData = pdlClient.hentPerson(testIdent, "hentperson-relasjon-dødsfall")
         assertThat(pdlPersonData.forelderBarnRelasjon.size).isEqualTo(1)
-        assertThat(pdlPersonData.forelderBarnRelasjon.first().minRolleForPerson).isEqualTo(Familierelasjonsrolle.MOR)
-        assertThat(pdlPersonData.forelderBarnRelasjon.first().relatertPersonsRolle).isEqualTo(Familierelasjonsrolle.BARN)
+        assertThat(pdlPersonData.forelderBarnRelasjon.first().minRolleForPerson).isEqualTo(FORELDERBARNRELASJONROLLE.MOR)
+        assertThat(pdlPersonData.forelderBarnRelasjon.first().relatertPersonsRolle).isEqualTo(FORELDERBARNRELASJONROLLE.BARN)
         assertThat(pdlPersonData.dødsfall.first().dødsdato).isEqualTo(LocalDate.of(2021, 1, 14))
         assertThat(pdlPersonData.fødsel.first().fødselsdato).isEqualTo(LocalDate.of(1998, 5, 9))
     }

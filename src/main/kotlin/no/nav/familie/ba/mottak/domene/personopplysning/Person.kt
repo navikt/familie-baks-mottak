@@ -1,11 +1,12 @@
 package no.nav.familie.ba.mottak.domene.personopplysning
 
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
+import no.nav.familie.kontrakter.felles.personopplysning.ForelderBarnRelasjon
 
 
 data class Person(
         val navn: String?,
-        val familierelasjoner: Set<Familierelasjon>,
+        val forelderBarnRelasjoner: Set<ForelderBarnRelasjon>,
         val bostedsadresse: Bostedsadresse? = null,
         val adressebeskyttelseGradering: String? = null,
 )

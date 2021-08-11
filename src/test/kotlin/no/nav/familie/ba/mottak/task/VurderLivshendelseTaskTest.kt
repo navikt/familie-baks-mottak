@@ -12,6 +12,7 @@ import no.nav.familie.ba.mottak.task.VurderLivshendelseType.UTFLYTTING
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
+import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -32,7 +33,7 @@ class VurderLivshendelseTaskTest {
 
 
     private val vurderLivshendelseTask =
-        VurderLivshendelseTask(mockOppgaveClient, mockTaskRepository, mockPdlClient, mockSakClient, mockAktørClient)
+            VurderLivshendelseTask(mockOppgaveClient, mockTaskRepository, mockPdlClient, mockSakClient, mockAktørClient)
 
 
     @BeforeEach
@@ -71,24 +72,24 @@ class VurderLivshendelseTaskTest {
     fun `Ignorer livshendelser på person som ikke har barn`() {
         every {
             mockPdlClient.hentPerson(
-                PERSONIDENT_BARN,
-                any()
+                    PERSONIDENT_BARN,
+                    any()
             )
         } returns PdlPersonData(
-            forelderBarnRelasjon = listOf(
-                PdlForeldreBarnRelasjon(
-                    minRolleForPerson = Familierelasjonsrolle.BARN,
-                    relatertPersonsIdent = PERSONIDENT_MOR,
-                    relatertPersonsRolle = Familierelasjonsrolle.MOR
+                forelderBarnRelasjon = listOf(
+                        PdlForeldreBarnRelasjon(
+                                minRolleForPerson = FORELDERBARNRELASJONROLLE.BARN,
+                                relatertPersonsIdent = PERSONIDENT_MOR,
+                                relatertPersonsRolle = FORELDERBARNRELASJONROLLE.MOR
+                        ),
+                        PdlForeldreBarnRelasjon(
+                                minRolleForPerson = FORELDERBARNRELASJONROLLE.BARN,
+                                relatertPersonsIdent = PERSONIDENT_FAR,
+                                relatertPersonsRolle = FORELDERBARNRELASJONROLLE.FAR
+                        )
                 ),
-                PdlForeldreBarnRelasjon(
-                    minRolleForPerson = Familierelasjonsrolle.BARN,
-                    relatertPersonsIdent = PERSONIDENT_FAR,
-                    relatertPersonsRolle = Familierelasjonsrolle.FAR
-                )
-            ),
-            dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now())),
-            fødsel = listOf(Fødsel(LocalDate.of(1980, 8, 3)))
+                dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now())),
+                fødsel = listOf(Fødsel(LocalDate.of(1980, 8, 3)))
         )
 
         listOf(UTFLYTTING, DØDSFALL).forEach {
@@ -120,18 +121,18 @@ class VurderLivshendelseTaskTest {
 
         every {
             mockPdlClient.hentPerson(
-                PERSONIDENT_MOR,
-                any()
+                    PERSONIDENT_MOR,
+                    any()
             )
         } returns PdlPersonData(
-            forelderBarnRelasjon = listOf(
-                PdlForeldreBarnRelasjon(
-                    minRolleForPerson = Familierelasjonsrolle.MOR,
-                    relatertPersonsIdent = PERSONIDENT_BARN,
-                    relatertPersonsRolle = Familierelasjonsrolle.BARN
-                )
-            ),
-            dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now()))
+                forelderBarnRelasjon = listOf(
+                        PdlForeldreBarnRelasjon(
+                                minRolleForPerson = FORELDERBARNRELASJONROLLE.MOR,
+                                relatertPersonsIdent = PERSONIDENT_BARN,
+                                relatertPersonsRolle = FORELDERBARNRELASJONROLLE.BARN
+                        )
+                ),
+                dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now()))
         )
 
         every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns emptyList()
@@ -165,18 +166,18 @@ class VurderLivshendelseTaskTest {
 
         every {
             mockPdlClient.hentPerson(
-                any(),
-                any()
+                    any(),
+                    any()
             )
         } returns PdlPersonData(
-            forelderBarnRelasjon = listOf(
-                PdlForeldreBarnRelasjon(
-                    minRolleForPerson = Familierelasjonsrolle.MOR,
-                    relatertPersonsIdent = PERSONIDENT_BARN,
-                    relatertPersonsRolle = Familierelasjonsrolle.BARN
-                )
-            ),
-            dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now()))
+                forelderBarnRelasjon = listOf(
+                        PdlForeldreBarnRelasjon(
+                                minRolleForPerson = FORELDERBARNRELASJONROLLE.MOR,
+                                relatertPersonsIdent = PERSONIDENT_BARN,
+                                relatertPersonsRolle = FORELDERBARNRELASJONROLLE.BARN
+                        )
+                ),
+                dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now()))
         )
 
         every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
@@ -208,7 +209,7 @@ class VurderLivshendelseTaskTest {
         assertThat(oppgaveDto[1].beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_UTFLYTTING.format("bruker"))
 
         assertThat(oppgaveDto).allMatch { it.aktørId.contains(PERSONIDENT_MOR) }
-        assertThat(oppgaveDto).allMatch { it.saksId == "$SAKS_ID"  }
+        assertThat(oppgaveDto).allMatch { it.saksId == "$SAKS_ID" }
         assertThat(oppgaveDto).allMatch { it.enhetsId == ENHET_ID }
         assertThat(oppgaveDto).allMatch { it.behandlingstema == Behandlingstema.OrdinærBarnetrygd.value }
         assertThat(oppgaveDto).allMatch { it.behandlesAvApplikasjon == BehandlesAvApplikasjon.BA_SAK.applikasjon }
@@ -219,24 +220,24 @@ class VurderLivshendelseTaskTest {
 
         every {
             mockPdlClient.hentPerson(
-                PERSONIDENT_BARN,
-                any()
+                    PERSONIDENT_BARN,
+                    any()
             )
         } returns PdlPersonData(
-            forelderBarnRelasjon = listOf(
-                PdlForeldreBarnRelasjon(
-                    minRolleForPerson = Familierelasjonsrolle.BARN,
-                    relatertPersonsIdent = PERSONIDENT_MOR,
-                    relatertPersonsRolle = Familierelasjonsrolle.MOR
+                forelderBarnRelasjon = listOf(
+                        PdlForeldreBarnRelasjon(
+                                minRolleForPerson = FORELDERBARNRELASJONROLLE.BARN,
+                                relatertPersonsIdent = PERSONIDENT_MOR,
+                                relatertPersonsRolle = FORELDERBARNRELASJONROLLE.MOR
+                        ),
+                        PdlForeldreBarnRelasjon(
+                                minRolleForPerson = FORELDERBARNRELASJONROLLE.BARN,
+                                relatertPersonsIdent = PERSONIDENT_FAR,
+                                relatertPersonsRolle = FORELDERBARNRELASJONROLLE.FAR
+                        )
                 ),
-                PdlForeldreBarnRelasjon(
-                    minRolleForPerson = Familierelasjonsrolle.BARN,
-                    relatertPersonsIdent = PERSONIDENT_FAR,
-                    relatertPersonsRolle = Familierelasjonsrolle.FAR
-                )
-            ),
-            dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now())),
-            fødsel = listOf(Fødsel(LocalDate.now().minusYears(12)))
+                dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now())),
+                fødsel = listOf(Fødsel(LocalDate.now().minusYears(12)))
         )
 
 
@@ -281,35 +282,35 @@ class VurderLivshendelseTaskTest {
     private fun lagAktivOrdinær() = RestFagsak(
             SAKS_ID,
             listOf(
-            RestUtvidetBehandling(
-                true,
-                RestArbeidsfordelingPåBehandling(ENHET_ID),
-                321,
-                BehandlingKategori.NASJONAL,
-                LocalDateTime.now(),
-                "RESULTAT",
-                "STEG",
-                "TYPE",
-                BehandlingUnderkategori.ORDINÆR
+                    RestUtvidetBehandling(
+                            true,
+                            RestArbeidsfordelingPåBehandling(ENHET_ID),
+                            321,
+                            BehandlingKategori.NASJONAL,
+                            LocalDateTime.now(),
+                            "RESULTAT",
+                            "STEG",
+                            "TYPE",
+                            BehandlingUnderkategori.ORDINÆR
+                    )
             )
-        )
     )
 
     private fun lagAktivUtvidet() = RestFagsak(
-        SAKS_ID.toLong(),
-        listOf(
-            RestUtvidetBehandling(
-                true,
-                RestArbeidsfordelingPåBehandling(ENHET_ID),
-                321,
-                BehandlingKategori.NASJONAL,
-                LocalDateTime.now(),
-                "RESULTAT",
-                "STEG",
-                "TYPE",
-                BehandlingUnderkategori.UTVIDET
+            SAKS_ID,
+            listOf(
+                    RestUtvidetBehandling(
+                            true,
+                            RestArbeidsfordelingPåBehandling(ENHET_ID),
+                            321,
+                            BehandlingKategori.NASJONAL,
+                            LocalDateTime.now(),
+                            "RESULTAT",
+                            "STEG",
+                            "TYPE",
+                            BehandlingUnderkategori.UTVIDET
+                    )
             )
-        )
     )
 
 
