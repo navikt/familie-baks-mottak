@@ -25,24 +25,26 @@ class LeesahConsumer(val leesahService: LeesahService) {
     val leesahFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesha.feilet")
 
 
-
-    @KafkaListener(topics = ["aapen-person-pdl-leesah-v1"],
-                   id = "personhendelse",
-                   idIsGroup = false,
-                   containerFactory = "kafkaLeesahListenerContainerFactory")
+    @KafkaListener(
+        topics = ["aapen-person-pdl-leesah-v1"],
+        id = "personhendelse",
+        idIsGroup = false,
+        containerFactory = "kafkaLeesahListenerContainerFactory"
+    )
     @Transactional
     fun listen(cr: ConsumerRecord<String, Personhendelse>, ack: Acknowledgment) {
-        val pdlHendelse = PdlHendelse(cr.value().hentHendelseId(),
-                                      cr.key().substring(6),
-                                      cr.offset(),
-                                      cr.value().hentOpplysningstype(),
-                                      cr.value().hentEndringstype(),
-                                      cr.value().hentPersonidenter(),
-                                      cr.value().hentDødsdato(),
-                                      cr.value().hentFødselsdato(),
-                                      cr.value().hentFødeland(),
-                                      cr.value().hentUtflyttingsdato(),
-        ).also { validerGjeldendeAktørId(it) }
+        val pdlHendelse = PdlHendelse(
+            cr.value().hentHendelseId(),
+            cr.key().substring(6),
+            cr.offset(),
+            cr.value().hentOpplysningstype(),
+            cr.value().hentEndringstype(),
+            cr.value().hentPersonidenter(),
+            cr.value().hentDødsdato(),
+            cr.value().hentFødselsdato(),
+            cr.value().hentFødeland(),
+            cr.value().hentUtflyttingsdato(),
+        )
 
         try {
             MDC.put(MDCConstants.MDC_CALL_ID, pdlHendelse.hendelseId)
@@ -59,29 +61,19 @@ class LeesahConsumer(val leesahService: LeesahService) {
         ack.acknowledge()
     }
 
-    private fun validerGjeldendeAktørId(pdlHendelse: PdlHendelse) {
-        if (pdlHendelse.gjeldendeAktørId.length != 13 || !pdlHendelse.personIdenter.contains(pdlHendelse.gjeldendeAktørId)) {
-            leesahFeiletCounter.increment()
-            SECURE_LOGGER.error("Validering av cr.key() som gjeldende aktørId feilet. $pdlHendelse")
-            throw RuntimeException("Validering av cr.key() som gjeldende aktørId feilet.\n" +
-                                   "length: ${pdlHendelse.gjeldendeAktørId.length}, " +
-                                   "finnes i personIdenter: ${pdlHendelse.personIdenter.contains(pdlHendelse.gjeldendeAktørId)}")
-        }
-    }
-
     private fun GenericRecord.hentOpplysningstype() =
-            get("opplysningstype").toString()
+        get("opplysningstype").toString()
 
 
     private fun GenericRecord.hentPersonidenter() =
-            (get("personidenter") as GenericData.Array<*>)
-                    .map { it.toString() }
+        (get("personidenter") as GenericData.Array<*>)
+            .map { it.toString() }
 
     private fun GenericRecord.hentEndringstype() =
-            get("endringstype").toString()
+        get("endringstype").toString()
 
     private fun GenericRecord.hentHendelseId() =
-            get("hendelseId").toString()
+        get("hendelseId").toString()
 
     private fun GenericRecord.hentDødsdato(): LocalDate? {
         return deserialiserDatofeltFraSubrecord("doedsfall", "doedsdato")
@@ -99,8 +91,10 @@ class LeesahConsumer(val leesahService: LeesahService) {
         return deserialiserDatofeltFraSubrecord("utflyttingFraNorge", "utflyttingsdato")
     }
 
-    private fun GenericRecord.deserialiserDatofeltFraSubrecord(subrecord: String,
-                                                               datofelt: String): LocalDate? {
+    private fun GenericRecord.deserialiserDatofeltFraSubrecord(
+        subrecord: String,
+        datofelt: String
+    ): LocalDate? {
         return try {
             val dato = (get(subrecord) as GenericRecord?)?.get(datofelt)
 
@@ -118,6 +112,7 @@ class LeesahConsumer(val leesahService: LeesahService) {
     }
 
     companion object {
+
         val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
         val log: Logger = LoggerFactory.getLogger(LeesahConsumer::class.java)
     }
