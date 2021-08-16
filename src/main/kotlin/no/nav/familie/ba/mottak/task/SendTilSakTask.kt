@@ -19,12 +19,7 @@ class SendTilSakTask(private val sakClient: SakClient, private val featureToggle
 
 
     override fun doTask(task: Task) {
-        if (featureToggleService.isEnabled("familie-ba-mottak.behandle-fodselshendelse")) {
-            logger.info("Behandler fødselshendelser, feature er skrudd på i Unleash")
-            sakClient.sendTilSak(jacksonObjectMapper().readValue(task.payload, NyBehandling::class.java))
-        } else {
-            logger.info("Behandler ikke fødselshendelse, feature er skrudd av i Unleash")
-        }
+        sakClient.sendTilSak(jacksonObjectMapper().readValue(task.payload, NyBehandling::class.java))
     }
 
     override fun onCompletion(task: Task) {
@@ -32,6 +27,7 @@ class SendTilSakTask(private val sakClient: SakClient, private val featureToggle
     }
 
     companion object {
+
         const val TASK_STEP_TYPE = "sendTilSak"
     }
 }
