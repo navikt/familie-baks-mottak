@@ -18,6 +18,7 @@ class JournalførSøknadTask(private val pdfService: PdfService,
         try {
             log.info("Generer pdf og journalfør søknad")
             val pdf = pdfService.lagPdf(task.payload)
+            log.info("Generert pdf med størrelse ${pdf.size}")
             journalføringService.journalførSøknad(task.payload, pdf)
         } catch (e: Exception) {
             log.error("Uventet feil ved journalføring av søknad. taskId=${task.id}. Se task eller securelog")
