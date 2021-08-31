@@ -120,7 +120,7 @@ class ClientMocks {
 
 
         every {
-            mockPdfClient.lagPdf(any())
+            mockPdfClient.lagPdf(any(), any())
         } returns "abc".toByteArray()
 
         return mockPdfClient
