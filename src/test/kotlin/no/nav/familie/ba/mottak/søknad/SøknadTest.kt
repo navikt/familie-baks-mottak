@@ -61,4 +61,23 @@ class SøknadTest(
 
         assertNull(søkerAsMap["telefonnummer"]);
     }
+
+    @Test
+    fun `Version detection ved henting av søknad fra database`() {
+        val lagraSøknadData = objectMapper.writeValueAsString(SøknadTestData.tomv3søknad())
+        val dbSøknad = DBSøknad(
+            id = 1L,
+            søknadJson = lagraSøknadData,
+            fnr = "1234578901",
+        )
+        assertEquals("v3", dbSøknad.hentSøknadVersjon())
+
+        val lagraGammelSøknadData = objectMapper.writeValueAsString(SøknadTestData.søknad())
+        val gammelDbSøknad = DBSøknad(
+            id = 2L,
+            søknadJson = lagraGammelSøknadData,
+            fnr = "1234123412",
+        )
+        assertEquals("v2", gammelDbSøknad.hentSøknadVersjon())
+    }
 }

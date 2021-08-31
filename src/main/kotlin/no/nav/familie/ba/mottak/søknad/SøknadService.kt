@@ -8,6 +8,7 @@ import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.tilDBVedlegg
 import no.nav.familie.ba.mottak.task.JournalførSøknadTask
 import no.nav.familie.kontrakter.ba.søknad.v2.Søknad
+import no.nav.familie.kontrakter.ba.søknad.v3.Søknad as SøknadV3
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.springframework.stereotype.Service
@@ -37,6 +38,21 @@ class SøknadService(
                                         properties))
         return dbSøknad
 
+    }
+
+    @Transactional
+    @Throws(FødselsnummerErNullException::class)
+    fun motta(søknad: SøknadV3): DBSøknad {
+        val dbSøknad = lagreDBSøknad(søknad.tilDBSøknad())
+        val properties = Properties().apply { this["søkersFødselsnummer"] = dbSøknad.fnr }
+
+        // Vi må hente vedleggene nå mens vi har gyldig on-behalf-of-token for brukeren
+        hentOgLagreSøknadvedlegg(dbSøknad)
+
+        taskRepository.save(Task.nyTask(JournalførSøknadTask.JOURNALFØR_SØKNAD,
+                                        dbSøknad.id.toString(),
+                                        properties))
+        return dbSøknad
     }
 
     fun lagreDBSøknad(dbSøknad: DBSøknad): DBSøknad {

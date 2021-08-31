@@ -1,13 +1,16 @@
 package no.nav.familie.ba.mottak.søknad
 
 import com.fasterxml.jackson.core.type.TypeReference
+import io.mockk.mockk
 import no.nav.familie.kontrakter.ba.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.Barn
 import no.nav.familie.kontrakter.ba.søknad.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.SIVILSTANDTYPE
 import no.nav.familie.kontrakter.ba.søknad.v2.Søker as SøkerV2
+import no.nav.familie.kontrakter.ba.søknad.v3.Søker as SøkerV3
 import no.nav.familie.kontrakter.ba.søknad.Søknad
 import no.nav.familie.kontrakter.ba.søknad.v2.Søknad as SøknadV2
+import no.nav.familie.kontrakter.ba.søknad.v3.Søknad as SøknadV3
 import no.nav.familie.kontrakter.ba.søknad.SøknadAdresse
 import no.nav.familie.kontrakter.ba.søknad.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.Søknadsfelt
@@ -80,5 +83,15 @@ object SøknadTestData {
         søker.put("telefonnummer", Søknadsfelt("Telefonnummer", "40123456"))
 
         return objectMapper.convertValue(map, Søknad::class.java)
+    }
+
+    fun tomv3søknad(): SøknadV3 {
+        return SøknadV3(
+            søknadstype = Søknadstype.UTVIDET,
+            barn = listOf(),
+            dokumentasjon = listOf(),
+            spørsmål = mapOf(),
+            søker = mockk()
+        )
     }
 }
