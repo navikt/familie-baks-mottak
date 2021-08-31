@@ -35,10 +35,11 @@ data class DBSøknad(
 
     fun hentSøknadVersjon(): String {
         val map: HashMap<String, Any> = objectMapper.readValue(søknadJson)
-        return when(map["søknadstype"]) {
-            Søknadstype.UTVIDET -> "v3"
+        val søknadVersjon = when(map["søknadstype"]) {
+            Søknadstype.UTVIDET.toString() -> "v3"
             else -> "v2"
         }
+        return søknadVersjon;
     }
 }
 
