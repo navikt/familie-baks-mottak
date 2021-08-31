@@ -77,12 +77,23 @@ class SøknadService(
 
     private fun hentOgLagreSøknadvedlegg(dbSøknad: DBSøknad) {
         // Ingen IO skjer her, bare et misvisende funksjonsnavn
-        val søknad = dbSøknad.hentSøknad()
+        if (dbSøknad.hentSøknadVersjon() == "v2") {
+            val søknad = dbSøknad.hentSøknad()
 
-        søknad.dokumentasjon.forEach { søknaddokumentasjon ->
-            søknaddokumentasjon.opplastedeVedlegg.forEach { vedlegg ->
-                val vedleggDokument = vedleggClient.hentVedlegg(vedlegg)
-                vedleggRepository.save(vedlegg.tilDBVedlegg(dbSøknad, vedleggDokument))
+            søknad.dokumentasjon.forEach { søknaddokumentasjon ->
+                søknaddokumentasjon.opplastedeVedlegg.forEach { vedlegg ->
+                    val vedleggDokument = vedleggClient.hentVedlegg(vedlegg)
+                    vedleggRepository.save(vedlegg.tilDBVedlegg(dbSøknad, vedleggDokument))
+                }
+            }
+        } else {
+            val søknad = dbSøknad.hentSøknadV3()
+
+            søknad.dokumentasjon.forEach { søknaddokumentasjon ->
+                søknaddokumentasjon.opplastedeVedlegg.forEach { vedlegg ->
+                    val vedleggDokument = vedleggClient.hentVedlegg(vedlegg)
+                    vedleggRepository.save(vedlegg.tilDBVedlegg(dbSøknad, vedleggDokument))
+                }
             }
         }
     }

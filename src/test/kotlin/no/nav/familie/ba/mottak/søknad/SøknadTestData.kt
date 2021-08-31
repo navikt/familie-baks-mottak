@@ -15,6 +15,7 @@ import no.nav.familie.kontrakter.ba.søknad.SøknadAdresse
 import no.nav.familie.kontrakter.ba.søknad.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.Søknadsfelt
 import no.nav.familie.kontrakter.ba.søknad.Søknadsvedlegg
+import no.nav.familie.kontrakter.ba.søknad.v3.UtvidetSøkerInfo
 import no.nav.familie.kontrakter.felles.objectMapper
 
 object SøknadTestData {
@@ -91,7 +92,19 @@ object SøknadTestData {
             barn = listOf(),
             dokumentasjon = listOf(),
             spørsmål = mapOf(),
-            søker = mockk()
+            søker = no.nav.familie.kontrakter.ba.søknad.v3.Søker(
+                ident = Søknadsfelt("ident", "123123123"),
+                adresse = Søknadsfelt("adresse", mockk()),
+                navn = Søknadsfelt("navn", "Hahaha"),
+                sivilstand = Søknadsfelt("stand", SIVILSTANDTYPE.ENKE_ELLER_ENKEMANN),
+                statsborgerskap = Søknadsfelt("sttsb", listOf()),
+                utvidet = Søknadsfelt("Utvidet", UtvidetSøkerInfo(
+                    spørsmål = mapOf(),
+                    nåværendeSamboer = null,
+                    tidligereSamboere = listOf()
+                )),
+                spørsmål = mapOf()
+            )
         )
     }
 }
