@@ -27,7 +27,6 @@ import kotlin.test.assertNull
 @SpringBootTest(classes = [DevLauncherPostgres::class])
 class SøknadTest(
         @Autowired val søknadService: SøknadService,
-        @Autowired val pdfService: PdfService
 ) {
 
     val søknad = SøknadTestData.søknad()
@@ -80,11 +79,5 @@ class SøknadTest(
             fnr = "1234123412",
         )
         assertEquals("v2", gammelDbSøknad.hentSøknadVersjon())
-
-        val søknadDbId = søknadService.lagreDBSøknad(dbSøknad).id
-        val gammelSøknadDbId = søknadService.lagreDBSøknad(gammelDbSøknad).id
-
-        pdfService.lagPdf(søknadDbId.toString())
-        pdfService.lagPdf(gammelSøknadDbId.toString())
     }
 }
