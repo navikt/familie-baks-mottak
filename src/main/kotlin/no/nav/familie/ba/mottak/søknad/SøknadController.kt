@@ -36,8 +36,8 @@ class SøknadController(
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     // Metrics for ordinær barnetrygd
-    val søknadOrdinærMottattOk = Metrics.counter("barnetrygd.soknad.mottatt.ok")
-    val søknadOrdinærMottattFeil = Metrics.counter("barnetrygd.soknad.mottatt.feil")
+    val søknadMottattOk = Metrics.counter("barnetrygd.soknad.mottatt.ok")
+    val søknadMottattFeil = Metrics.counter("barnetrygd.soknad.mottatt.feil")
     val søknadHarDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.dokumentasjonsbehov")
     val antallDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.dokumentasjonsbehov.antall")
     val søknadHarVedlegg = Metrics.counter("barnetrygd.soknad.harVedlegg")
@@ -66,7 +66,7 @@ class SøknadController(
 
                 ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt", dbSøknad.opprettetTid)))
             } catch (e: FødselsnummerErNullException) {
-                søknadOrdinærMottattFeil.increment()
+                søknadMottattFeil.increment()
                 ResponseEntity.status(500).body(Ressurs.failure("Lagring av søknad feilet"))
             }
         } else {
@@ -82,7 +82,7 @@ class SøknadController(
     }
 
     private fun sendMetrics(søknad: Søknad) {
-        søknadOrdinærMottattOk.increment()
+        søknadMottattOk.increment()
 
         if (søknad.dokumentasjon.isNotEmpty()) {
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
@@ -124,7 +124,7 @@ class SøknadController(
                 if (søknad.søknadstype == Søknadstype.UTVIDET) {
                     søknadUtvidetMottattFeil.increment()
                 } else {
-                    søknadOrdinærMottattFeil.increment()
+                    søknadMottattFeil.increment()
                 }
 
                 ResponseEntity.status(500).body(Ressurs.failure("Lagring av søknad feilet"))
@@ -143,7 +143,7 @@ class SøknadController(
 
     private fun sendMetrics(søknad: SøknadV3) {
         val erUtvidet = søknad.søknadstype == Søknadstype.UTVIDET
-        if (erUtvidet) søknadUtvidetMottattOk.increment() else søknadOrdinærMottattOk.increment()
+        if (erUtvidet) søknadUtvidetMottattOk.increment() else søknadMottattOk.increment()
 
 
         if (søknad.dokumentasjon.isNotEmpty()) {
