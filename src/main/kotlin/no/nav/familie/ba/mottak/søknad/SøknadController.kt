@@ -3,6 +3,7 @@ package no.nav.familie.ba.mottak.søknad
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
+import no.nav.familie.kontrakter.ba.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v3.Dokumentasjonsbehov as DokumentasjonsbehovV3
 import no.nav.familie.kontrakter.ba.søknad.v2.Søknad
@@ -28,20 +29,29 @@ import java.time.LocalDateTime
 @RequestMapping(path = ["/api"], produces = [APPLICATION_JSON_VALUE])
 @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 class SøknadController(
-    private val featureToggleService: FeatureToggleService,
-    private val søknadService: SøknadService
+        private val featureToggleService: FeatureToggleService,
+        private val søknadService: SøknadService
 ) {
 
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-    val søknadMottattOk = Metrics.counter("barnetrygd.soknad.mottatt.ok")
-    val søknadMottattFeil = Metrics.counter("barnetrygd.soknad.mottatt.feil")
-
+    // Metrics for ordinær barnetrygd
+    val søknadOrdinærMottattOk = Metrics.counter("barnetrygd.soknad.mottatt.ok")
+    val søknadOrdinærMottattFeil = Metrics.counter("barnetrygd.soknad.mottatt.feil")
     val søknadHarDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.dokumentasjonsbehov")
     val antallDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.dokumentasjonsbehov.antall")
     val søknadHarVedlegg = Metrics.counter("barnetrygd.soknad.harVedlegg")
     val antallVedlegg = Metrics.counter("barnetrygd.soknad.harVedlegg.antall")
     val harManglerIDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.harManglerIDokumentasjonsbehov")
+
+    // Metrics for utvidet barnetrygd
+    val søknadUtvidetMottattOk = Metrics.counter("barnetrygd.soknad.utvidet.mottatt.ok")
+    val søknadUtvidetMottattFeil = Metrics.counter("barnetrygd.soknad.utvidet.mottatt.feil")
+    val utvidetSøknadHarDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.utvidet.dokumentasjonsbehov")
+    val utvidetAntallDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.utvidet.dokumentasjonsbehov.antall")
+    val utvidetSøknadHarVedlegg = Metrics.counter("barnetrygd.soknad.utvidet.harVedlegg")
+    val utvidetAntallVedlegg = Metrics.counter("barnetrygd.soknad.utvidet.harVedlegg.antall")
+    val utvidetHarManglerIDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.utvidet.harManglerIDokumentasjonsbehov")
 
     @PostMapping(value = ["/soknad"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(@RequestPart("søknad") søknad: Søknad): ResponseEntity<Ressurs<Kvittering>> {
@@ -51,32 +61,33 @@ class SøknadController(
         return if (lagreSøknad) {
             try {
                 val dbSøknad = søknadService.motta(søknad)
+
                 sendMetrics(søknad)
 
                 ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt", dbSøknad.opprettetTid)))
             } catch (e: FødselsnummerErNullException) {
-                søknadMottattFeil.increment()
+                søknadOrdinærMottattFeil.increment()
                 ResponseEntity.status(500).body(Ressurs.failure("Lagring av søknad feilet"))
             }
         } else {
             ResponseEntity.ok(
-                Ressurs.success(
-                    Kvittering(
-                        "Søknad er mottatt. Lagring er deaktivert.",
-                        LocalDateTime.now()
+                    Ressurs.success(
+                            Kvittering(
+                                    "Søknad er mottatt. Lagring er deaktivert.",
+                                    LocalDateTime.now()
+                            )
                     )
-                )
             )
         }
     }
 
     private fun sendMetrics(søknad: Søknad) {
-        søknadMottattOk.increment()
+        søknadOrdinærMottattOk.increment()
 
         if (søknad.dokumentasjon.isNotEmpty()) {
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val dokumentasjonsbehovUtenAnnenDokumentasjon =
-                søknad.dokumentasjon.filter { it.dokumentasjonsbehov != Dokumentasjonsbehov.ANNEN_DOKUMENTASJON }
+                    søknad.dokumentasjon.filter { it.dokumentasjonsbehov != Dokumentasjonsbehov.ANNEN_DOKUMENTASJON }
             if (dokumentasjonsbehovUtenAnnenDokumentasjon.isNotEmpty()) {
                 søknadHarDokumentasjonsbehov.increment()
                 antallDokumentasjonsbehov.increment(dokumentasjonsbehovUtenAnnenDokumentasjon.size.toDouble())
@@ -91,8 +102,8 @@ class SøknadController(
 
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val harMangler =
-                dokumentasjonsbehovUtenAnnenDokumentasjon.filter { !it.harSendtInn && it.opplastedeVedlegg.isEmpty() }
-                    .isNotEmpty()
+                    dokumentasjonsbehovUtenAnnenDokumentasjon.filter { !it.harSendtInn && it.opplastedeVedlegg.isEmpty() }
+                            .isNotEmpty()
             if (harMangler) {
                 harManglerIDokumentasjonsbehov.increment()
             }
@@ -107,32 +118,41 @@ class SøknadController(
         return if (lagreSøknad) {
             try {
                 val dbSøknad = søknadService.motta(søknad)
-                sendMetrics(søknad)
+                if (søknad.søknadstype == Søknadstype.UTVIDET) {
+                    sendMetricsUtvidet(søknad)
+                } else {
+                    sendMetricsOrdinær(søknad)
+                }
 
                 ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt", dbSøknad.opprettetTid)))
             } catch (e: FødselsnummerErNullException) {
-                søknadMottattFeil.increment()
+                if (søknad.søknadstype == Søknadstype.UTVIDET) {
+                    søknadUtvidetMottattFeil.increment()
+                } else {
+                    søknadOrdinærMottattFeil.increment()
+                }
+
                 ResponseEntity.status(500).body(Ressurs.failure("Lagring av søknad feilet"))
             }
         } else {
             ResponseEntity.ok(
-                Ressurs.success(
-                    Kvittering(
-                        "Søknad er mottatt. Lagring er deaktivert.",
-                        LocalDateTime.now()
+                    Ressurs.success(
+                            Kvittering(
+                                    "Søknad er mottatt. Lagring er deaktivert.",
+                                    LocalDateTime.now()
+                            )
                     )
-                )
             )
         }
     }
 
-    private fun sendMetrics(søknad: SøknadV3) {
-        søknadMottattOk.increment()
+    private fun sendMetricsOrdinær(søknad: SøknadV3) {
+        søknadOrdinærMottattOk.increment()
 
         if (søknad.dokumentasjon.isNotEmpty()) {
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val dokumentasjonsbehovUtenAnnenDokumentasjon =
-                søknad.dokumentasjon.filter { it.dokumentasjonsbehov != DokumentasjonsbehovV3.ANNEN_DOKUMENTASJON }
+                    søknad.dokumentasjon.filter { it.dokumentasjonsbehov != DokumentasjonsbehovV3.ANNEN_DOKUMENTASJON }
             if (dokumentasjonsbehovUtenAnnenDokumentasjon.isNotEmpty()) {
                 søknadHarDokumentasjonsbehov.increment()
                 antallDokumentasjonsbehov.increment(dokumentasjonsbehovUtenAnnenDokumentasjon.size.toDouble())
@@ -147,10 +167,39 @@ class SøknadController(
 
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val harMangler =
-                dokumentasjonsbehovUtenAnnenDokumentasjon.filter { !it.harSendtInn && it.opplastedeVedlegg.isEmpty() }
-                    .isNotEmpty()
+                    dokumentasjonsbehovUtenAnnenDokumentasjon.filter { !it.harSendtInn && it.opplastedeVedlegg.isEmpty() }
+                            .isNotEmpty()
             if (harMangler) {
                 harManglerIDokumentasjonsbehov.increment()
+            }
+        }
+    }
+
+    private fun sendMetricsUtvidet(søknad: SøknadV3) {
+        søknadUtvidetMottattOk.increment()
+
+        if (søknad.dokumentasjon.isNotEmpty()) {
+            // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
+            val dokumentasjonsbehovUtenAnnenDokumentasjon =
+                    søknad.dokumentasjon.filter { it.dokumentasjonsbehov != DokumentasjonsbehovV3.ANNEN_DOKUMENTASJON }
+            if (dokumentasjonsbehovUtenAnnenDokumentasjon.isNotEmpty()) {
+                utvidetSøknadHarDokumentasjonsbehov.increment()
+                utvidetAntallDokumentasjonsbehov.increment(dokumentasjonsbehovUtenAnnenDokumentasjon.size.toDouble())
+            }
+
+            // Inkluderer Dokumentasjonsbehov.ANNEN_DOKUMENTASJON for søknadHarVedlegg og antallVedlegg
+            val alleVedlegg: List<SøknadsvedleggV3> = søknad.dokumentasjon.map { it.opplastedeVedlegg }.flatten()
+            if (alleVedlegg.isNotEmpty()) {
+                utvidetSøknadHarVedlegg.increment()
+                utvidetAntallVedlegg.increment(alleVedlegg.size.toDouble())
+            }
+
+            // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
+            val harMangler =
+                    dokumentasjonsbehovUtenAnnenDokumentasjon.filter { !it.harSendtInn && it.opplastedeVedlegg.isEmpty() }
+                            .isNotEmpty()
+            if (harMangler) {
+                utvidetHarManglerIDokumentasjonsbehov.increment()
             }
         }
     }
