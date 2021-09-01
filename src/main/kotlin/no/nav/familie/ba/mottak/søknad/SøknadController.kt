@@ -29,8 +29,8 @@ import java.time.LocalDateTime
 @RequestMapping(path = ["/api"], produces = [APPLICATION_JSON_VALUE])
 @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 class SøknadController(
-        private val featureToggleService: FeatureToggleService,
-        private val søknadService: SøknadService
+    private val featureToggleService: FeatureToggleService,
+    private val søknadService: SøknadService
 ) {
 
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -71,12 +71,12 @@ class SøknadController(
             }
         } else {
             ResponseEntity.ok(
-                    Ressurs.success(
-                            Kvittering(
-                                    "Søknad er mottatt. Lagring er deaktivert.",
-                                    LocalDateTime.now()
-                            )
+                Ressurs.success(
+                    Kvittering(
+                        "Søknad er mottatt. Lagring er deaktivert.",
+                        LocalDateTime.now()
                     )
+                )
             )
         }
     }
@@ -87,7 +87,7 @@ class SøknadController(
         if (søknad.dokumentasjon.isNotEmpty()) {
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val dokumentasjonsbehovUtenAnnenDokumentasjon =
-                    søknad.dokumentasjon.filter { it.dokumentasjonsbehov != Dokumentasjonsbehov.ANNEN_DOKUMENTASJON }
+                søknad.dokumentasjon.filter { it.dokumentasjonsbehov != Dokumentasjonsbehov.ANNEN_DOKUMENTASJON }
             if (dokumentasjonsbehovUtenAnnenDokumentasjon.isNotEmpty()) {
                 søknadHarDokumentasjonsbehov.increment()
                 antallDokumentasjonsbehov.increment(dokumentasjonsbehovUtenAnnenDokumentasjon.size.toDouble())
@@ -102,8 +102,8 @@ class SøknadController(
 
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val harMangler =
-                    dokumentasjonsbehovUtenAnnenDokumentasjon.filter { !it.harSendtInn && it.opplastedeVedlegg.isEmpty() }
-                            .isNotEmpty()
+                dokumentasjonsbehovUtenAnnenDokumentasjon.filter { !it.harSendtInn && it.opplastedeVedlegg.isEmpty() }
+                    .isNotEmpty()
             if (harMangler) {
                 harManglerIDokumentasjonsbehov.increment()
             }
@@ -131,12 +131,12 @@ class SøknadController(
             }
         } else {
             ResponseEntity.ok(
-                    Ressurs.success(
-                            Kvittering(
-                                    "Søknad er mottatt. Lagring er deaktivert.",
-                                    LocalDateTime.now()
-                            )
+                Ressurs.success(
+                    Kvittering(
+                        "Søknad er mottatt. Lagring er deaktivert.",
+                        LocalDateTime.now()
                     )
+                )
             )
         }
     }
@@ -162,7 +162,7 @@ class SøknadController(
         if (søknad.dokumentasjon.isNotEmpty()) {
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val dokumentasjonsbehovUtenAnnenDokumentasjon =
-                    søknad.dokumentasjon.filter { it.dokumentasjonsbehov != DokumentasjonsbehovV3.ANNEN_DOKUMENTASJON }
+                søknad.dokumentasjon.filter { it.dokumentasjonsbehov != DokumentasjonsbehovV3.ANNEN_DOKUMENTASJON }
             if (dokumentasjonsbehovUtenAnnenDokumentasjon.isNotEmpty()) {
                 if (erUtvidet) {
                     utvidetSøknadHarDokumentasjonsbehov.increment()
@@ -176,8 +176,8 @@ class SøknadController(
 
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val harMangler =
-                    dokumentasjonsbehovUtenAnnenDokumentasjon.filter { !it.harSendtInn && it.opplastedeVedlegg.isEmpty() }
-                            .isNotEmpty()
+                dokumentasjonsbehovUtenAnnenDokumentasjon.filter { !it.harSendtInn && it.opplastedeVedlegg.isEmpty() }
+                    .isNotEmpty()
             if (harMangler) {
                 if (erUtvidet) utvidetHarManglerIDokumentasjonsbehov.increment() else harManglerIDokumentasjonsbehov.increment()
             }
