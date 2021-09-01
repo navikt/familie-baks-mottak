@@ -141,11 +141,24 @@ class SøknadController(
         }
     }
 
+    private fun sendMetricsAntallVedlegg(søknad: SøknadV3) {
+        val erUtvidet = søknad.søknadstype == Søknadstype.UTVIDET
+        // Inkluderer Dokumentasjonsbehov.ANNEN_DOKUMENTASJON for søknadHarVedlegg og antallVedlegg
+        val alleVedlegg: List<SøknadsvedleggV3> = søknad.dokumentasjon.map { it.opplastedeVedlegg }.flatten()
+        if (alleVedlegg.isNotEmpty()) {
+            if (erUtvidet) {
+                utvidetSøknadHarVedlegg.increment()
+                utvidetAntallVedlegg.increment(alleVedlegg.size.toDouble())
+            } else {
+                søknadHarVedlegg.increment()
+                antallVedlegg.increment(alleVedlegg.size.toDouble())
+            }
+        }
+    }
+
     private fun sendMetrics(søknad: SøknadV3) {
         val erUtvidet = søknad.søknadstype == Søknadstype.UTVIDET
         if (erUtvidet) søknadUtvidetMottattOk.increment() else søknadMottattOk.increment()
-
-
         if (søknad.dokumentasjon.isNotEmpty()) {
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val dokumentasjonsbehovUtenAnnenDokumentasjon =
@@ -159,18 +172,7 @@ class SøknadController(
                     antallDokumentasjonsbehov.increment(dokumentasjonsbehovUtenAnnenDokumentasjon.size.toDouble())
                 }
             }
-
-            // Inkluderer Dokumentasjonsbehov.ANNEN_DOKUMENTASJON for søknadHarVedlegg og antallVedlegg
-            val alleVedlegg: List<SøknadsvedleggV3> = søknad.dokumentasjon.map { it.opplastedeVedlegg }.flatten()
-            if (alleVedlegg.isNotEmpty()) {
-                if (erUtvidet) {
-                    utvidetSøknadHarVedlegg.increment()
-                    utvidetAntallVedlegg.increment(alleVedlegg.size.toDouble())
-                } else {
-                    søknadHarVedlegg.increment()
-                    antallVedlegg.increment(alleVedlegg.size.toDouble())
-                }
-            }
+            sendMetricsAntallVedlegg(søknad)
 
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val harMangler =
