@@ -118,12 +118,7 @@ class SøknadController(
         return if (lagreSøknad) {
             try {
                 val dbSøknad = søknadService.motta(søknad)
-                if (søknad.søknadstype == Søknadstype.UTVIDET) {
-                    sendMetricsUtvidet(søknad)
-                } else {
-                    sendMetricsOrdinær(søknad)
-                }
-
+                sendMetrics(søknad)
                 ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt", dbSøknad.opprettetTid)))
             } catch (e: FødselsnummerErNullException) {
                 if (søknad.søknadstype == Søknadstype.UTVIDET) {
@@ -146,23 +141,35 @@ class SøknadController(
         }
     }
 
-    private fun sendMetricsOrdinær(søknad: SøknadV3) {
-        søknadOrdinærMottattOk.increment()
+    private fun sendMetrics(søknad: SøknadV3) {
+        val erUtvidet = søknad.søknadstype == Søknadstype.UTVIDET
+        if (erUtvidet) søknadUtvidetMottattOk.increment() else søknadOrdinærMottattOk.increment()
+
 
         if (søknad.dokumentasjon.isNotEmpty()) {
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val dokumentasjonsbehovUtenAnnenDokumentasjon =
                     søknad.dokumentasjon.filter { it.dokumentasjonsbehov != DokumentasjonsbehovV3.ANNEN_DOKUMENTASJON }
             if (dokumentasjonsbehovUtenAnnenDokumentasjon.isNotEmpty()) {
-                søknadHarDokumentasjonsbehov.increment()
-                antallDokumentasjonsbehov.increment(dokumentasjonsbehovUtenAnnenDokumentasjon.size.toDouble())
+                if (erUtvidet) {
+                    utvidetSøknadHarDokumentasjonsbehov.increment()
+                    utvidetAntallDokumentasjonsbehov.increment(dokumentasjonsbehovUtenAnnenDokumentasjon.size.toDouble())
+                } else {
+                    søknadHarDokumentasjonsbehov.increment()
+                    antallDokumentasjonsbehov.increment(dokumentasjonsbehovUtenAnnenDokumentasjon.size.toDouble())
+                }
             }
 
             // Inkluderer Dokumentasjonsbehov.ANNEN_DOKUMENTASJON for søknadHarVedlegg og antallVedlegg
             val alleVedlegg: List<SøknadsvedleggV3> = søknad.dokumentasjon.map { it.opplastedeVedlegg }.flatten()
             if (alleVedlegg.isNotEmpty()) {
-                søknadHarVedlegg.increment()
-                antallVedlegg.increment(alleVedlegg.size.toDouble())
+                if (erUtvidet) {
+                    utvidetSøknadHarVedlegg.increment()
+                    utvidetAntallVedlegg.increment(alleVedlegg.size.toDouble())
+                } else {
+                    søknadHarVedlegg.increment()
+                    antallVedlegg.increment(alleVedlegg.size.toDouble())
+                }
             }
 
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
@@ -170,36 +177,7 @@ class SøknadController(
                     dokumentasjonsbehovUtenAnnenDokumentasjon.filter { !it.harSendtInn && it.opplastedeVedlegg.isEmpty() }
                             .isNotEmpty()
             if (harMangler) {
-                harManglerIDokumentasjonsbehov.increment()
-            }
-        }
-    }
-
-    private fun sendMetricsUtvidet(søknad: SøknadV3) {
-        søknadUtvidetMottattOk.increment()
-
-        if (søknad.dokumentasjon.isNotEmpty()) {
-            // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
-            val dokumentasjonsbehovUtenAnnenDokumentasjon =
-                    søknad.dokumentasjon.filter { it.dokumentasjonsbehov != DokumentasjonsbehovV3.ANNEN_DOKUMENTASJON }
-            if (dokumentasjonsbehovUtenAnnenDokumentasjon.isNotEmpty()) {
-                utvidetSøknadHarDokumentasjonsbehov.increment()
-                utvidetAntallDokumentasjonsbehov.increment(dokumentasjonsbehovUtenAnnenDokumentasjon.size.toDouble())
-            }
-
-            // Inkluderer Dokumentasjonsbehov.ANNEN_DOKUMENTASJON for søknadHarVedlegg og antallVedlegg
-            val alleVedlegg: List<SøknadsvedleggV3> = søknad.dokumentasjon.map { it.opplastedeVedlegg }.flatten()
-            if (alleVedlegg.isNotEmpty()) {
-                utvidetSøknadHarVedlegg.increment()
-                utvidetAntallVedlegg.increment(alleVedlegg.size.toDouble())
-            }
-
-            // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
-            val harMangler =
-                    dokumentasjonsbehovUtenAnnenDokumentasjon.filter { !it.harSendtInn && it.opplastedeVedlegg.isEmpty() }
-                            .isNotEmpty()
-            if (harMangler) {
-                utvidetHarManglerIDokumentasjonsbehov.increment()
+                if (erUtvidet) utvidetHarManglerIDokumentasjonsbehov.increment() else harManglerIDokumentasjonsbehov.increment()
             }
         }
     }
