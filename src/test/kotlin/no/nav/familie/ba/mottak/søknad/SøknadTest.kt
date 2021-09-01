@@ -26,8 +26,8 @@ import kotlin.test.assertNull
 @Tag("integration")
 @SpringBootTest(classes = [DevLauncherPostgres::class])
 class SøknadTest(
-        @Autowired
-        val søknadService: SøknadService) {
+        @Autowired val søknadService: SøknadService,
+) {
 
     val søknad = SøknadTestData.søknad()
 

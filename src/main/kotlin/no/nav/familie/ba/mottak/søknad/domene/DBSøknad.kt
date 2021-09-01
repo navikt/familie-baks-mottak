@@ -3,6 +3,7 @@ package no.nav.familie.ba.mottak.søknad.domene
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.kontrakter.ba.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.Søknadsvedlegg
+import no.nav.familie.kontrakter.ba.søknad.v3.Søknadsvedlegg as SøknadsvedleggV3
 import no.nav.familie.kontrakter.ba.søknad.v2.Søknad
 import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.LocalDateTime
@@ -79,6 +80,14 @@ fun SøknadV3.tilDBSøknad(): DBSøknad {
 }
 
 fun Søknadsvedlegg.tilDBVedlegg(søknad: DBSøknad, data: ByteArray): DBVedlegg {
+    return DBVedlegg(
+        dokumentId = this.dokumentId,
+        søknadId = søknad.id,
+        data = data
+    )
+}
+
+fun SøknadsvedleggV3.tilDBVedlegg(søknad: DBSøknad, data: ByteArray): DBVedlegg {
     return DBVedlegg(
         dokumentId = this.dokumentId,
         søknadId = søknad.id,

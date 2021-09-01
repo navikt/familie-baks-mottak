@@ -4,7 +4,9 @@ import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.DBVedlegg
 import no.nav.familie.kontrakter.ba.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.Dokumentasjonsbehov
+import no.nav.familie.kontrakter.ba.søknad.v3.Dokumentasjonsbehov as DokumentasjonsbehovV3
 import no.nav.familie.kontrakter.ba.søknad.v2.Søknad
+import no.nav.familie.kontrakter.ba.søknad.v3.Søknad as SøknadV3
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.Dokument
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.Filtype
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.ArkiverDokumentRequest
@@ -13,8 +15,12 @@ import no.nav.familie.kontrakter.felles.dokarkiv.Dokumenttype
 object ArkiverDokumentRequestMapper {
 
     fun toDto(dbSøknad: DBSøknad, pdf: ByteArray, vedleggMap: Map<String, DBVedlegg>): ArkiverDokumentRequest {
-        val søknad = dbSøknad.hentSøknad()
-        val dokumenttype = when (søknad.søknadstype) {
+        val søknadstype = when (dbSøknad.hentSøknadVersjon()) {
+            "v2" -> dbSøknad.hentSøknad().søknadstype
+            else -> dbSøknad.hentSøknadV3().søknadstype
+        }
+
+        val dokumenttype = when (søknadstype) {
             Søknadstype.ORDINÆR -> Dokumenttype.BARNETRYGD_ORDINÆR
             Søknadstype.EØS -> Dokumenttype.BARNETRYGD_EØS
             Søknadstype.UTVIDET -> Dokumenttype.BARNETRYGD_UTVIDET
@@ -46,11 +52,35 @@ object ArkiverDokumentRequestMapper {
             fnr = dbSøknad.fnr,
             forsøkFerdigstill = false,
             hoveddokumentvarianter = hoveddokumentvarianter,
-            vedleggsdokumenter = hentVedleggListeTilArkivering(dbSøknad.hentSøknad(), vedleggMap)
+            vedleggsdokumenter = when (dbSøknad.hentSøknadVersjon()) {
+                "v2" -> hentVedleggListeTilArkivering(dbSøknad.hentSøknad(), vedleggMap)
+                else -> hentVedleggListeTilArkivering(dbSøknad.hentSøknadV3(), vedleggMap)
+            }
         )
     }
 
     private fun hentVedleggListeTilArkivering(søknad: Søknad, vedleggMap: Map<String, DBVedlegg>): List<Dokument> {
+        val vedlegg = mutableListOf<Dokument>()
+
+        søknad.dokumentasjon.forEach{ dokumentasjonskrav ->
+            dokumentasjonskrav.opplastedeVedlegg.forEach{ opplastaVedlegg ->
+                vedleggMap.get(opplastaVedlegg.dokumentId)?.also { dbFil ->
+                    vedlegg.add(
+                        Dokument(
+                            dokument = dbFil.data,
+                            dokumenttype = Dokumenttype.BARNETRYGD_VEDLEGG,
+                            filtype = Filtype.PDFA,
+                            tittel = dokumentasjonsbehovTilTittel(opplastaVedlegg.tittel)
+                        )
+                    )
+                }
+            }
+        }
+
+        return vedlegg
+    }
+
+    private fun hentVedleggListeTilArkivering(søknad: SøknadV3, vedleggMap: Map<String, DBVedlegg>): List<Dokument> {
         val vedlegg = mutableListOf<Dokument>()
 
         søknad.dokumentasjon.forEach{ dokumentasjonskrav ->
@@ -79,6 +109,19 @@ object ArkiverDokumentRequestMapper {
             Dokumentasjonsbehov.BEKREFTELSE_FRA_BARNEVERN -> "Bekreftelse fra barnevern"
             Dokumentasjonsbehov.BOR_FAST_MED_SØKER -> "Bor fast med søker"
             Dokumentasjonsbehov.ANNEN_DOKUMENTASJON -> "" // Random dokumentasjon skal saksbehandler sette tittel på
+        }
+    }
+
+    private fun dokumentasjonsbehovTilTittel(dokumentasjonsbehov: DokumentasjonsbehovV3): String {
+        return when(dokumentasjonsbehov) {
+            DokumentasjonsbehovV3.ADOPSJON_DATO -> "Adopsjonsdato"
+            DokumentasjonsbehovV3.AVTALE_DELT_BOSTED -> "Avtale om delt bosted"
+            DokumentasjonsbehovV3.VEDTAK_OPPHOLDSTILLATELSE -> "Vedtak om oppholdstillatelse"
+            DokumentasjonsbehovV3.BEKREFTELSE_FRA_BARNEVERN -> "Bekreftelse fra barnevern"
+            DokumentasjonsbehovV3.BOR_FAST_MED_SØKER -> "Bor fast med søker"
+            DokumentasjonsbehovV3.MEKLINGSATTEST -> "Meklingsattest"
+            DokumentasjonsbehovV3.SEPARERT_SKILT_ENKE -> "Dokumentasjon på separasjon, skilsmisse eller dødsfall"
+            DokumentasjonsbehovV3.ANNEN_DOKUMENTASJON -> "" // Random dokumentasjon skal saksbehandler sette tittel på
         }
     }
 }

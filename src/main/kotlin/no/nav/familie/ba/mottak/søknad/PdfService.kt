@@ -50,7 +50,10 @@ class PdfService(private val søknadRepository: SøknadRepository, private val p
             "dokumentDato" to dbSøknad.opprettetTid.format(
                 DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no"))
             ),
-            "navn" to dbSøknad.hentSøknad().søker.navn.verdi,
+            "navn" to when(dbSøknad.hentSøknadVersjon()) {
+                "v2" -> dbSøknad.hentSøknad().søker.navn.verdi
+                else -> dbSøknad.hentSøknadV3().søker.navn.verdi
+            },
             "fodselsnummer" to dbSøknad.fnr
         )
     }
