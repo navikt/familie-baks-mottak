@@ -3,6 +3,7 @@ package no.nav.familie.ba.mottak.søknad
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
+import no.nav.familie.kontrakter.ba.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v3.Dokumentasjonsbehov as DokumentasjonsbehovV3
 import no.nav.familie.kontrakter.ba.søknad.v2.Søknad
@@ -34,14 +35,23 @@ class SøknadController(
 
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
+    // Metrics for ordinær barnetrygd
     val søknadMottattOk = Metrics.counter("barnetrygd.soknad.mottatt.ok")
     val søknadMottattFeil = Metrics.counter("barnetrygd.soknad.mottatt.feil")
-
     val søknadHarDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.dokumentasjonsbehov")
     val antallDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.dokumentasjonsbehov.antall")
     val søknadHarVedlegg = Metrics.counter("barnetrygd.soknad.harVedlegg")
     val antallVedlegg = Metrics.counter("barnetrygd.soknad.harVedlegg.antall")
     val harManglerIDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.harManglerIDokumentasjonsbehov")
+
+    // Metrics for utvidet barnetrygd
+    val søknadUtvidetMottattOk = Metrics.counter("barnetrygd.soknad.utvidet.mottatt.ok")
+    val søknadUtvidetMottattFeil = Metrics.counter("barnetrygd.soknad.utvidet.mottatt.feil")
+    val utvidetSøknadHarDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.utvidet.dokumentasjonsbehov")
+    val utvidetAntallDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.utvidet.dokumentasjonsbehov.antall")
+    val utvidetSøknadHarVedlegg = Metrics.counter("barnetrygd.soknad.utvidet.harVedlegg")
+    val utvidetAntallVedlegg = Metrics.counter("barnetrygd.soknad.utvidet.harVedlegg.antall")
+    val utvidetHarManglerIDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.utvidet.harManglerIDokumentasjonsbehov")
 
     @PostMapping(value = ["/soknad"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(@RequestPart("søknad") søknad: Søknad): ResponseEntity<Ressurs<Kvittering>> {
@@ -51,6 +61,7 @@ class SøknadController(
         return if (lagreSøknad) {
             try {
                 val dbSøknad = søknadService.motta(søknad)
+
                 sendMetrics(søknad)
 
                 ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt", dbSøknad.opprettetTid)))
@@ -108,10 +119,14 @@ class SøknadController(
             try {
                 val dbSøknad = søknadService.motta(søknad)
                 sendMetrics(søknad)
-
                 ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt", dbSøknad.opprettetTid)))
             } catch (e: FødselsnummerErNullException) {
-                søknadMottattFeil.increment()
+                if (søknad.søknadstype == Søknadstype.UTVIDET) {
+                    søknadUtvidetMottattFeil.increment()
+                } else {
+                    søknadMottattFeil.increment()
+                }
+
                 ResponseEntity.status(500).body(Ressurs.failure("Lagring av søknad feilet"))
             }
         } else {
@@ -126,31 +141,45 @@ class SøknadController(
         }
     }
 
-    private fun sendMetrics(søknad: SøknadV3) {
-        søknadMottattOk.increment()
+    private fun sendMetricsAntallVedlegg(søknad: SøknadV3) {
+        val erUtvidet = søknad.søknadstype == Søknadstype.UTVIDET
+        // Inkluderer Dokumentasjonsbehov.ANNEN_DOKUMENTASJON for søknadHarVedlegg og antallVedlegg
+        val alleVedlegg: List<SøknadsvedleggV3> = søknad.dokumentasjon.map { it.opplastedeVedlegg }.flatten()
+        if (alleVedlegg.isNotEmpty()) {
+            if (erUtvidet) {
+                utvidetSøknadHarVedlegg.increment()
+                utvidetAntallVedlegg.increment(alleVedlegg.size.toDouble())
+            } else {
+                søknadHarVedlegg.increment()
+                antallVedlegg.increment(alleVedlegg.size.toDouble())
+            }
+        }
+    }
 
+    private fun sendMetrics(søknad: SøknadV3) {
+        val erUtvidet = søknad.søknadstype == Søknadstype.UTVIDET
+        if (erUtvidet) søknadUtvidetMottattOk.increment() else søknadMottattOk.increment()
         if (søknad.dokumentasjon.isNotEmpty()) {
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val dokumentasjonsbehovUtenAnnenDokumentasjon =
                 søknad.dokumentasjon.filter { it.dokumentasjonsbehov != DokumentasjonsbehovV3.ANNEN_DOKUMENTASJON }
             if (dokumentasjonsbehovUtenAnnenDokumentasjon.isNotEmpty()) {
-                søknadHarDokumentasjonsbehov.increment()
-                antallDokumentasjonsbehov.increment(dokumentasjonsbehovUtenAnnenDokumentasjon.size.toDouble())
+                if (erUtvidet) {
+                    utvidetSøknadHarDokumentasjonsbehov.increment()
+                    utvidetAntallDokumentasjonsbehov.increment(dokumentasjonsbehovUtenAnnenDokumentasjon.size.toDouble())
+                } else {
+                    søknadHarDokumentasjonsbehov.increment()
+                    antallDokumentasjonsbehov.increment(dokumentasjonsbehovUtenAnnenDokumentasjon.size.toDouble())
+                }
             }
-
-            // Inkluderer Dokumentasjonsbehov.ANNEN_DOKUMENTASJON for søknadHarVedlegg og antallVedlegg
-            val alleVedlegg: List<SøknadsvedleggV3> = søknad.dokumentasjon.map { it.opplastedeVedlegg }.flatten()
-            if (alleVedlegg.isNotEmpty()) {
-                søknadHarVedlegg.increment()
-                antallVedlegg.increment(alleVedlegg.size.toDouble())
-            }
+            sendMetricsAntallVedlegg(søknad)
 
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val harMangler =
                 dokumentasjonsbehovUtenAnnenDokumentasjon.filter { !it.harSendtInn && it.opplastedeVedlegg.isEmpty() }
                     .isNotEmpty()
             if (harMangler) {
-                harManglerIDokumentasjonsbehov.increment()
+                if (erUtvidet) utvidetHarManglerIDokumentasjonsbehov.increment() else harManglerIDokumentasjonsbehov.increment()
             }
         }
     }
