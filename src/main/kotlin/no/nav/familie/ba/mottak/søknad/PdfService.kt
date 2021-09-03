@@ -54,7 +54,17 @@ class PdfService(private val søknadRepository: SøknadRepository, private val p
                 "v2" -> dbSøknad.hentSøknad().søker.navn.verdi
                 else -> dbSøknad.hentSøknadV3().søker.navn.verdi
             },
-            "fodselsnummer" to dbSøknad.fnr
+            "fodselsnummer" to dbSøknad.fnr,
+            "label" to when(dbSøknad.hentSøknadVersjon()) {
+                "v2" -> when(dbSøknad.hentSøknad().søknadstype) {
+                    Søknadstype.UTVIDET -> "Søknad om utvidet barnetrygd"
+                    else -> "Søknad om ordinær barnetrygd"
+                }
+                else -> when(dbSøknad.hentSøknadV3().søknadstype) {
+                    Søknadstype.UTVIDET -> "Søknad om utvidet barnetrygd"
+                    else -> "Søknad om ordinær barnetrygd"
+                }
+            }
         )
     }
 
