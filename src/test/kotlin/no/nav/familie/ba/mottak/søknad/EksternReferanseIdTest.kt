@@ -35,7 +35,7 @@ class EksternReferanseIdTest(
     val dbSøknad = søknad.tilDBSøknad()
 
     @Test
-    fun `skal få 409 Conflict ved forsøk på å journalføre samme søknad to ganger`() {
+    fun `ved (409 Conflict) fra dokarkiv skal HttpClientErrorException Conflict catches og håndteres i task'en`() {
         val dbSøknadFraDBFirst = søknadService.lagreDBSøknad(dbSøknad.copy(journalpostId = null))
         val properties = Properties().apply { this["søkersFødselsnummer"] = dbSøknadFraDBFirst.fnr }
 
