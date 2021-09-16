@@ -8,6 +8,7 @@ import no.nav.familie.prosessering.domene.Task
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.web.client.HttpClientErrorException
 
 @Service
 @TaskStepBeskrivelse(taskStepType = JournalførSøknadTask.JOURNALFØR_SØKNAD, beskrivelse = "Journalfør søknad")
@@ -20,6 +21,12 @@ class JournalførSøknadTask(private val pdfService: PdfService,
             val pdf = pdfService.lagPdf(task.payload)
             log.info("Generert pdf med størrelse ${pdf.size}")
             journalføringService.journalførSøknad(task.payload, pdf)
+        } catch (e: HttpClientErrorException.Conflict) {
+            // TODO: Figure out what to do...
+            // eksternReferanseId finnes allerede. Hvordan kan dette ha skjedd?
+            log.error("409 conflict for eksternReferanseId ved journalføring av søknad. taskId=${task.id}. Se task eller securelog")
+            SECURE_LOGGER.error("409 conflict for eksternReferanseId ved journalføring søknad $task", e)
+            throw e
         } catch (e: Exception) {
             log.error("Uventet feil ved journalføring av søknad. taskId=${task.id}. Se task eller securelog")
             SECURE_LOGGER.error("Uventet feil ved journalføring søknad $task", e)
