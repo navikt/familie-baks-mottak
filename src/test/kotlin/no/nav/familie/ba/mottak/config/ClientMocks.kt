@@ -56,6 +56,7 @@ class ClientMocks {
     @Profile("mock-dokarkiv")
     fun mockDokarkivClient(): DokarkivClient {
         val mockDokarkivClient = mockk<DokarkivClient>(relaxed = true)
+        
         every {
             mockDokarkivClient.arkiver(any())
         } returns ArkiverDokumentResponse(journalpostId = "123", ferdigstilt = false)
@@ -89,9 +90,7 @@ class ClientMocks {
 
         every {
             mockSøknadService.lagreDBSøknad(any())
-        } answers {
-            dbSøknad
-        }
+        } returns dbSøknad
 
         every {
             mockSøknadService.hentLagredeVedlegg(any())
