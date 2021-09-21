@@ -54,7 +54,6 @@ class SøknadController(
     val utvidetHarManglerIDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.utvidet.harManglerIDokumentasjonsbehov")
 
     @PostMapping(value = ["/soknad/v4"], consumes = [MULTIPART_FORM_DATA_VALUE])
-    @Unprotected
     fun taImotSøknad(@RequestPart("søknad") søknad: Søknad): ResponseEntity<Ressurs<Kvittering>> {
         val lagreSøknad = featureToggleService.isEnabled("familie-ba-mottak.lagre-soknad")
         log.info("Lagring av søknad = $lagreSøknad")
