@@ -3,6 +3,7 @@ package no.nav.familie.ba.mottak.søknad
 import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.DBVedlegg
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
+import no.nav.familie.kontrakter.ba.Søknadstype as GammelSøknadstype
 import no.nav.familie.kontrakter.ba.søknad.v4.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v3.Dokumentasjonsbehov as DokumentasjonsbehovV3
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknad
@@ -22,7 +23,9 @@ object ArkiverDokumentRequestMapper {
 
         val dokumenttype = when (søknadstype) {
             Søknadstype.ORDINÆR -> Dokumenttype.BARNETRYGD_ORDINÆR
+            GammelSøknadstype.ORDINÆR -> Dokumenttype.BARNETRYGD_ORDINÆR
             Søknadstype.UTVIDET -> Dokumenttype.BARNETRYGD_UTVIDET
+            GammelSøknadstype.UTVIDET -> Dokumenttype.BARNETRYGD_UTVIDET
             else -> Dokumenttype.BARNETRYGD_ORDINÆR
         }
 
