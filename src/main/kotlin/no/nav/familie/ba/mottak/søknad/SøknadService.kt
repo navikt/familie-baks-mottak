@@ -7,7 +7,7 @@ import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
 import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.tilDBVedlegg
 import no.nav.familie.ba.mottak.task.JournalførSøknadTask
-import no.nav.familie.kontrakter.ba.søknad.v2.Søknad
+import no.nav.familie.kontrakter.ba.søknad.v4.Søknad
 import no.nav.familie.kontrakter.ba.søknad.v3.Søknad as SøknadV3
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
@@ -77,7 +77,7 @@ class SøknadService(
 
     private fun hentOgLagreSøknadvedlegg(dbSøknad: DBSøknad) {
         // Ingen IO skjer her, bare et misvisende funksjonsnavn
-        if (dbSøknad.hentSøknadVersjon() == "v2") {
+        if (dbSøknad.hentSøknadVersjon() == "v4") {
             val søknad = dbSøknad.hentSøknad()
 
             søknad.dokumentasjon.forEach { søknaddokumentasjon ->

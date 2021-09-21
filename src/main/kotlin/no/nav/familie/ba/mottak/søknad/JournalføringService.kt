@@ -12,13 +12,11 @@ import org.springframework.stereotype.Service
 class JournalføringService(private val dokarkivClient: DokarkivClient,
                            private val søknadService: SøknadService) {
 
-    fun journalførSøknad(søknadId: String, pdf: ByteArray) {
-        val dbSøknad: DBSøknad = søknadService.hentDBSøknad(søknadId.toLong())
-                ?: error("Fant ingen søknad i databasen med ID: $søknadId")
+    fun journalførSøknad(dbSøknad: DBSøknad, pdf: ByteArray, pdfOriginalSpråk: ByteArray = ByteArray(0)) {
         if (dbSøknad.journalpostId == null) {
             val vedlegg = søknadService.hentLagredeVedlegg(dbSøknad)
 
-            val journalpostId: String = arkiverSøknad(dbSøknad, pdf, vedlegg)
+            val journalpostId: String = arkiverSøknad(dbSøknad, pdf, vedlegg, pdfOriginalSpråk)
             val dbSøknadMedJournalpostId = dbSøknad.copy(journalpostId = journalpostId)
             søknadService.lagreDBSøknad(dbSøknadMedJournalpostId)
             log.info("Søknaden er journalført og lagret til database")
@@ -30,8 +28,8 @@ class JournalføringService(private val dokarkivClient: DokarkivClient,
         }
     }
 
-    fun arkiverSøknad(dbSøknad: DBSøknad, pdf: ByteArray, vedlegg: Map<String, DBVedlegg>): String {
-        val arkiverDokumentRequest = ArkiverDokumentRequestMapper.toDto(dbSøknad, pdf, vedlegg)
+    fun arkiverSøknad(dbSøknad: DBSøknad, pdf: ByteArray, vedlegg: Map<String, DBVedlegg>, pdfOriginalSpråk: ByteArray = ByteArray(0)): String {
+        val arkiverDokumentRequest = ArkiverDokumentRequestMapper.toDto(dbSøknad, pdf, vedlegg, pdfOriginalSpråk)
         val arkiverDokumentResponse = dokarkivClient.arkiver(arkiverDokumentRequest)
         log.info("Søknaden har blitt journalført med journalpostid: ${arkiverDokumentResponse.journalpostId}")
         return arkiverDokumentResponse.journalpostId

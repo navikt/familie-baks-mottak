@@ -4,11 +4,11 @@ import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
 import no.nav.familie.kontrakter.ba.Søknadstype
-import no.nav.familie.kontrakter.ba.søknad.Dokumentasjonsbehov
+import no.nav.familie.kontrakter.ba.søknad.v4.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v3.Dokumentasjonsbehov as DokumentasjonsbehovV3
-import no.nav.familie.kontrakter.ba.søknad.v2.Søknad
+import no.nav.familie.kontrakter.ba.søknad.v4.Søknad
 import no.nav.familie.kontrakter.ba.søknad.v3.Søknad as SøknadV3
-import no.nav.familie.kontrakter.ba.søknad.Søknadsvedlegg
+import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsvedlegg
 import no.nav.familie.kontrakter.ba.søknad.v3.Søknadsvedlegg as SøknadsvedleggV3
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -53,7 +53,8 @@ class SøknadController(
     val utvidetAntallVedlegg = Metrics.counter("barnetrygd.soknad.utvidet.harVedlegg.antall")
     val utvidetHarManglerIDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.utvidet.harManglerIDokumentasjonsbehov")
 
-    @PostMapping(value = ["/soknad"], consumes = [MULTIPART_FORM_DATA_VALUE])
+    @PostMapping(value = ["/soknad/v4"], consumes = [MULTIPART_FORM_DATA_VALUE])
+    @Unprotected
     fun taImotSøknad(@RequestPart("søknad") søknad: Søknad): ResponseEntity<Ressurs<Kvittering>> {
         val lagreSøknad = featureToggleService.isEnabled("familie-ba-mottak.lagre-soknad")
         log.info("Lagring av søknad = $lagreSøknad")
