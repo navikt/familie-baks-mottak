@@ -22,7 +22,6 @@ class JournalførSøknadTask(private val pdfService: PdfService,
             log.info("Generert pdf med størrelse ${pdf.size}")
             journalføringService.journalførSøknad(task.payload, pdf)
         } catch (e: HttpClientErrorException.Conflict) {
-            // TODO: Decide what todo
             log.error("409 conflict for eksternReferanseId ved journalføring av søknad. taskId=${task.id}. Se task eller securelog")
             SECURE_LOGGER.error("409 conflict for eksternReferanseId ved journalføring søknad $task", e)
             throw e
