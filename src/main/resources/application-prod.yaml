@@ -71,4 +71,4 @@ MOTTAK_ROLLE: ${MOTTAK_ROLLE}
 JOURNALFOERINGHENDELSE_V1_TOPIC_URL: aapen-dok-journalfoering-v1-p
 NORG2_API_URL: https://app.adeo.no/norg2/
 FAMILIE_DOKUMENT_API_URL: https://familie-dokument.intern.nav.no/familie/dokument
-FAMILIE_BA_DOKGEN_API_URL: https://familie-ba-dokgen.adeo.no
+FAMILIE_BA_DOKGEN_API_URL: https://familie-ba-dokgen.intern.nav.no
