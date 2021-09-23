@@ -1,7 +1,7 @@
 package no.nav.familie.ba.mottak.integrasjoner
 
 import no.nav.familie.http.client.AbstractRestClient
-import no.nav.familie.kontrakter.ba.søknad.Søknadsvedlegg
+import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsvedlegg
 import no.nav.familie.kontrakter.ba.søknad.v3.Søknadsvedlegg as SøknadsvedleggV3
 import no.nav.familie.kontrakter.felles.Ressurs
 import org.slf4j.LoggerFactory

@@ -39,17 +39,10 @@ class JournalføringTest(
     }
 
     @Test
-    fun `dbSøknad med feil id skal gi error`() {
-        assertFails {
-            journalføringService.journalførSøknad("-1", testPDF)
-        }
-    }
-
-    @Test
     fun `journalPostId blir lagt på dbSøknaden`() {
         val dbSøknadFraDB = søknadService.lagreDBSøknad(dbSøknad)
         assertEquals(null, dbSøknadFraDB.journalpostId)
-        journalføringService.journalførSøknad(dbSøknadFraDB.id.toString(), testPDF)
+        journalføringService.journalførSøknad(dbSøknadFraDB, testPDF)
         val overskrevetDBSøknad = søknadService.hentDBSøknad(dbSøknadFraDB.id)
 
         assertEquals("123", overskrevetDBSøknad!!.journalpostId)
@@ -60,7 +53,7 @@ class JournalføringTest(
         val dbSøknadMedJournalpostId = dbSøknad.copy(journalpostId = "1")
         val dbSøknadFraDB = søknadService.lagreDBSøknad(dbSøknadMedJournalpostId)
 
-        journalføringService.journalførSøknad(dbSøknadFraDB.id.toString(), testPDF)
+        journalføringService.journalførSøknad(dbSøknadFraDB, testPDF)
         val ikkeOverskrevetDBSøknad = søknadService.hentDBSøknad(dbSøknadFraDB.id)
 
         assertEquals("1", ikkeOverskrevetDBSøknad!!.journalpostId)
