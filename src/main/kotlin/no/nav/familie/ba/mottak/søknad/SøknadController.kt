@@ -81,21 +81,6 @@ class SøknadController(
         }
     }
 
-    private fun sendMetricsAntallVedlegg(søknad: Søknad) {
-        val erUtvidet = søknad.søknadstype == Søknadstype.UTVIDET
-        // Inkluderer Dokumentasjonsbehov.ANNEN_DOKUMENTASJON for søknadHarVedlegg og antallVedlegg
-        val alleVedlegg: List<Søknadsvedlegg> = søknad.dokumentasjon.map { it.opplastedeVedlegg }.flatten()
-        if (alleVedlegg.isNotEmpty()) {
-            if (erUtvidet) {
-                utvidetSøknadHarVedlegg.increment()
-                utvidetAntallVedlegg.increment(alleVedlegg.size.toDouble())
-            } else {
-                søknadHarVedlegg.increment()
-                antallVedlegg.increment(alleVedlegg.size.toDouble())
-            }
-        }
-    }
-
     private fun sendMetrics(søknad: Søknad) {
         val erUtvidet = søknad.søknadstype == Søknadstype.UTVIDET
         if (erUtvidet) søknadUtvidetMottattOk.increment() else søknadMottattOk.increment()
@@ -120,6 +105,21 @@ class SøknadController(
                     .isNotEmpty()
             if (harMangler) {
                 if (erUtvidet) utvidetHarManglerIDokumentasjonsbehov.increment() else harManglerIDokumentasjonsbehov.increment()
+            }
+        }
+    }
+
+    private fun sendMetricsAntallVedlegg(søknad: Søknad) {
+        val erUtvidet = søknad.søknadstype == Søknadstype.UTVIDET
+        // Inkluderer Dokumentasjonsbehov.ANNEN_DOKUMENTASJON for søknadHarVedlegg og antallVedlegg
+        val alleVedlegg: List<Søknadsvedlegg> = søknad.dokumentasjon.map { it.opplastedeVedlegg }.flatten()
+        if (alleVedlegg.isNotEmpty()) {
+            if (erUtvidet) {
+                utvidetSøknadHarVedlegg.increment()
+                utvidetAntallVedlegg.increment(alleVedlegg.size.toDouble())
+            } else {
+                søknadHarVedlegg.increment()
+                antallVedlegg.increment(alleVedlegg.size.toDouble())
             }
         }
     }
