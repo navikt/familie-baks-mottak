@@ -2,10 +2,11 @@ package no.nav.familie.ba.mottak.søknad
 
 import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.DBVedlegg
-import no.nav.familie.kontrakter.ba.Søknadstype
-import no.nav.familie.kontrakter.ba.søknad.Dokumentasjonsbehov
+import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
+import no.nav.familie.kontrakter.ba.Søknadstype as GammelSøknadstype
+import no.nav.familie.kontrakter.ba.søknad.v4.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v3.Dokumentasjonsbehov as DokumentasjonsbehovV3
-import no.nav.familie.kontrakter.ba.søknad.v2.Søknad
+import no.nav.familie.kontrakter.ba.søknad.v4.Søknad
 import no.nav.familie.kontrakter.ba.søknad.v3.Søknad as SøknadV3
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.Dokument
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.Filtype
@@ -14,16 +15,17 @@ import no.nav.familie.kontrakter.felles.dokarkiv.Dokumenttype
 
 object ArkiverDokumentRequestMapper {
 
-    fun toDto(dbSøknad: DBSøknad, pdf: ByteArray, vedleggMap: Map<String, DBVedlegg>): ArkiverDokumentRequest {
+    fun toDto(dbSøknad: DBSøknad, pdf: ByteArray, vedleggMap: Map<String, DBVedlegg>, pdfOriginalSpråk: ByteArray): ArkiverDokumentRequest {
         val søknadstype = when (dbSøknad.hentSøknadVersjon()) {
-            "v2" -> dbSøknad.hentSøknad().søknadstype
+            "v4" -> dbSøknad.hentSøknad().søknadstype
             else -> dbSøknad.hentSøknadV3().søknadstype
         }
 
         val dokumenttype = when (søknadstype) {
             Søknadstype.ORDINÆR -> Dokumenttype.BARNETRYGD_ORDINÆR
-            Søknadstype.EØS -> Dokumenttype.BARNETRYGD_EØS
+            GammelSøknadstype.ORDINÆR -> Dokumenttype.BARNETRYGD_ORDINÆR
             Søknadstype.UTVIDET -> Dokumenttype.BARNETRYGD_UTVIDET
+            GammelSøknadstype.UTVIDET -> Dokumenttype.BARNETRYGD_UTVIDET
             else -> Dokumenttype.BARNETRYGD_ORDINÆR
         }
 
@@ -53,14 +55,14 @@ object ArkiverDokumentRequestMapper {
             forsøkFerdigstill = false,
             hoveddokumentvarianter = hoveddokumentvarianter,
             vedleggsdokumenter = when (dbSøknad.hentSøknadVersjon()) {
-                "v2" -> hentVedleggListeTilArkivering(dbSøknad.hentSøknad(), vedleggMap)
+                "v4" -> hentVedleggListeTilArkivering(dbSøknad.hentSøknad(), vedleggMap, pdfOriginalSpråk)
                 else -> hentVedleggListeTilArkivering(dbSøknad.hentSøknadV3(), vedleggMap)
             },
             eksternReferanseId = dbSøknad.id.toString()
         )
     }
 
-    private fun hentVedleggListeTilArkivering(søknad: Søknad, vedleggMap: Map<String, DBVedlegg>): List<Dokument> {
+    private fun hentVedleggListeTilArkivering(søknad: Søknad, vedleggMap: Map<String, DBVedlegg>, pdfOriginalSpråk: ByteArray): List<Dokument> {
         val vedlegg = mutableListOf<Dokument>()
 
         søknad.dokumentasjon.forEach{ dokumentasjonskrav ->
@@ -76,6 +78,16 @@ object ArkiverDokumentRequestMapper {
                     )
                 }
             }
+        }
+
+        if (pdfOriginalSpråk.isNotEmpty()) {
+            vedlegg.add(
+                Dokument(
+                dokument = pdfOriginalSpråk,
+                dokumenttype = Dokumenttype.BARNETRYGD_VEDLEGG,
+                filtype = Filtype.PDFA,
+                tittel = "Søknad på originalt utfylt språk"
+            ))
         }
 
         return vedlegg
@@ -109,6 +121,9 @@ object ArkiverDokumentRequestMapper {
             Dokumentasjonsbehov.VEDTAK_OPPHOLDSTILLATELSE -> "Vedtak om oppholdstillatelse"
             Dokumentasjonsbehov.BEKREFTELSE_FRA_BARNEVERN -> "Bekreftelse fra barnevern"
             Dokumentasjonsbehov.BOR_FAST_MED_SØKER -> "Bor fast med søker"
+            Dokumentasjonsbehov.SEPARERT_SKILT_ENKE -> "Dokumentasjon på separasjon, skilsmisse eller dødsfall"
+            Dokumentasjonsbehov.MEKLINGSATTEST -> "Meklingsattest"
+            Dokumentasjonsbehov.EØS_SKJEMA -> "Tilleggsskjema for EØS"
             Dokumentasjonsbehov.ANNEN_DOKUMENTASJON -> "" // Random dokumentasjon skal saksbehandler sette tittel på
         }
     }
