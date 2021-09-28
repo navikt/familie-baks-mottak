@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.ba.mottak.søknad.PdfService
+import no.nav.familie.ba.mottak.søknad.SøknadRepository
 import no.nav.familie.ba.mottak.søknad.SøknadService
 import no.nav.familie.ba.mottak.søknad.SøknadTestData
 import no.nav.familie.ba.mottak.søknad.domene.DBVedlegg
@@ -74,39 +75,6 @@ class ClientMocks {
             throw HttpClientErrorException.Conflict.create(HttpStatus.CONFLICT, null, null, null, null)
         }
         return mockDokarkivClientConflict
-    }
-
-    @Bean
-    @Primary
-    @Profile("mock-søknad-service")
-    fun mockSøknadService(): SøknadService {
-        val mockSøknadService = mockk<SøknadService>(relaxed = true)
-        val søknad = SøknadTestData.søknad()
-        val dbSøknad = søknad.tilDBSøknad()
-
-        every {
-            mockSøknadService.hentDBSøknad(any())
-        } returns dbSøknad
-
-        every {
-            mockSøknadService.lagreDBSøknad(any())
-        } returns dbSøknad
-
-        every {
-            mockSøknadService.hentLagredeVedlegg(any())
-        } returns mapOf<String, DBVedlegg>()
-
-        return mockSøknadService
-    }
-    @Bean
-    @Primary
-    @Profile("mock-pdf-service")
-    fun mockPdfService(): PdfService {
-        val mockPdfService = mockk<PdfService>(relaxed = true)
-        every {
-            mockPdfService.lagPdf(any())
-        } returns "11223344".toByteArray()
-        return mockPdfService
     }
 
     @Bean

@@ -8,6 +8,7 @@ import no.nav.familie.ba.mottak.util.DbContainerInitializer
 import no.nav.familie.prosessering.domene.Task
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -21,7 +22,7 @@ import kotlin.test.*
 
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(initializers = [DbContainerInitializer::class])
-@ActiveProfiles("postgres", "mock-søknad-service", "mock-dokarkiv-conflict", "mock-dokgen", "mock-pdf-service")
+@ActiveProfiles("postgres", "mock-dokarkiv-conflict", "mock-dokgen")
 @Tag("integration")
 @SpringBootTest(classes = [DevLauncherPostgres::class])
 class EksternReferanseIdTest(
@@ -39,7 +40,7 @@ class EksternReferanseIdTest(
         val dbSøknadFraDBFirst = søknadService.lagreDBSøknad(dbSøknad.copy(journalpostId = null))
         val properties = Properties().apply { this["søkersFødselsnummer"] = dbSøknadFraDBFirst.fnr }
 
-        assertFailsWith<HttpClientErrorException.Conflict> {
+        assertDoesNotThrow {
             journalførSøknadTask.doTask(
                 Task.nyTask(
                     JournalførSøknadTask.JOURNALFØR_SØKNAD,
