@@ -2,12 +2,10 @@ package no.nav.familie.ba.mottak.søknad.domene
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsvedlegg
-import no.nav.familie.kontrakter.ba.søknad.v3.Søknadsvedlegg as SøknadsvedleggV3
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknad
 import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.LocalDateTime
 import javax.persistence.*
-import no.nav.familie.kontrakter.ba.søknad.v3.Søknad as SøknadV3
 
 @Entity(name = "Soknad")
 @Table(name = "Soknad")
@@ -26,10 +24,6 @@ data class DBSøknad(
 ) {
 
     fun hentSøknad(): Søknad {
-        return objectMapper.readValue(søknadJson)
-    }
-
-    fun hentSøknadV3(): SøknadV3 {
         return objectMapper.readValue(søknadJson)
     }
 
@@ -66,27 +60,7 @@ fun Søknad.tilDBSøknad(): DBSøknad {
 
 }
 
-fun SøknadV3.tilDBSøknad(): DBSøknad {
-    try {
-        return DBSøknad(
-            søknadJson = objectMapper.writeValueAsString(this),
-            fnr = this.søker.ident.verdi
-        )
-    } catch (e: KotlinNullPointerException) {
-        throw FødselsnummerErNullException()
-    }
-
-}
-
 fun Søknadsvedlegg.tilDBVedlegg(søknad: DBSøknad, data: ByteArray): DBVedlegg {
-    return DBVedlegg(
-        dokumentId = this.dokumentId,
-        søknadId = søknad.id,
-        data = data
-    )
-}
-
-fun SøknadsvedleggV3.tilDBVedlegg(søknad: DBSøknad, data: ByteArray): DBVedlegg {
     return DBVedlegg(
         dokumentId = this.dokumentId,
         søknadId = søknad.id,
