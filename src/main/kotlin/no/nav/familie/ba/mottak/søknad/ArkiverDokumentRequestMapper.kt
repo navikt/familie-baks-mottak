@@ -57,7 +57,8 @@ object ArkiverDokumentRequestMapper {
             vedleggsdokumenter = when (dbSøknad.hentSøknadVersjon()) {
                 "v4" -> hentVedleggListeTilArkivering(dbSøknad.hentSøknad(), vedleggMap, pdfOriginalSpråk)
                 else -> hentVedleggListeTilArkivering(dbSøknad.hentSøknadV3(), vedleggMap)
-            }
+            },
+            eksternReferanseId = dbSøknad.id.toString()
         )
     }
 
