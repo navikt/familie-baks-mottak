@@ -37,7 +37,7 @@ class PdfService(
             ),
             "navn" to dbSøknad.hentSøknad().søker.navn.verdi.getValue("nb"),
             "fodselsnummer" to dbSøknad.fnr,
-            "label" to  when(dbSøknad.hentSøknad().søknadstype) {
+            "label" to when(dbSøknad.hentSøknad().søknadstype) {
                 Søknadstype.UTVIDET -> "Søknad om utvidet barnetrygd"
                 else -> "Søknad om ordinær barnetrygd"
             }
