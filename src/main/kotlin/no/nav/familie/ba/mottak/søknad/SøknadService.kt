@@ -8,7 +8,6 @@ import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.tilDBVedlegg
 import no.nav.familie.ba.mottak.task.JournalførSøknadTask
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknad
-import no.nav.familie.kontrakter.ba.søknad.v3.Søknad as SøknadV3
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.springframework.stereotype.Service
@@ -40,21 +39,6 @@ class SøknadService(
 
     }
 
-    @Transactional
-    @Throws(FødselsnummerErNullException::class)
-    fun motta(søknad: SøknadV3): DBSøknad {
-        val dbSøknad = lagreDBSøknad(søknad.tilDBSøknad())
-        val properties = Properties().apply { this["søkersFødselsnummer"] = dbSøknad.fnr }
-
-        // Vi må hente vedleggene nå mens vi har gyldig on-behalf-of-token for brukeren
-        hentOgLagreSøknadvedlegg(dbSøknad)
-
-        taskRepository.save(Task.nyTask(JournalførSøknadTask.JOURNALFØR_SØKNAD,
-                                        dbSøknad.id.toString(),
-                                        properties))
-        return dbSøknad
-    }
-
     fun lagreDBSøknad(dbSøknad: DBSøknad): DBSøknad {
         return søknadRepository.save(dbSøknad)
     }
@@ -77,23 +61,12 @@ class SøknadService(
 
     private fun hentOgLagreSøknadvedlegg(dbSøknad: DBSøknad) {
         // Ingen IO skjer her, bare et misvisende funksjonsnavn
-        if (dbSøknad.hentSøknadVersjon() == "v4") {
-            val søknad = dbSøknad.hentSøknad()
+        val søknad = dbSøknad.hentSøknad()
 
-            søknad.dokumentasjon.forEach { søknaddokumentasjon ->
-                søknaddokumentasjon.opplastedeVedlegg.forEach { vedlegg ->
-                    val vedleggDokument = vedleggClient.hentVedlegg(vedlegg)
-                    vedleggRepository.save(vedlegg.tilDBVedlegg(dbSøknad, vedleggDokument))
-                }
-            }
-        } else {
-            val søknad = dbSøknad.hentSøknadV3()
-
-            søknad.dokumentasjon.forEach { søknaddokumentasjon ->
-                søknaddokumentasjon.opplastedeVedlegg.forEach { vedlegg ->
-                    val vedleggDokument = vedleggClient.hentVedlegg(vedlegg)
-                    vedleggRepository.save(vedlegg.tilDBVedlegg(dbSøknad, vedleggDokument))
-                }
+        søknad.dokumentasjon.forEach { søknaddokumentasjon ->
+            søknaddokumentasjon.opplastedeVedlegg.forEach { vedlegg ->
+                val vedleggDokument = vedleggClient.hentVedlegg(vedlegg)
+                vedleggRepository.save(vedlegg.tilDBVedlegg(dbSøknad, vedleggDokument))
             }
         }
     }
