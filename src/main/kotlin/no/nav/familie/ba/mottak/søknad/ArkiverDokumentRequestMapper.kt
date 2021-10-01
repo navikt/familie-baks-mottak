@@ -46,7 +46,8 @@ object ArkiverDokumentRequestMapper {
             fnr = dbSøknad.fnr,
             forsøkFerdigstill = false,
             hoveddokumentvarianter = hoveddokumentvarianter,
-            vedleggsdokumenter = hentVedleggListeTilArkivering(dbSøknad.hentSøknad(), vedleggMap, pdfOriginalSpråk)
+            vedleggsdokumenter = hentVedleggListeTilArkivering(dbSøknad.hentSøknad(), vedleggMap, pdfOriginalSpråk),
+            eksternReferanseId = dbSøknad.id.toString()
         )
     }
 
