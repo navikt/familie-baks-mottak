@@ -29,7 +29,7 @@ class JournalførSøknadTask(private val pdfService: PdfService,
             val bokmålPdf = pdfService.lagPdf(dbSøknad)
             log.info("Generert pdf med størrelse ${bokmålPdf.size}")
 
-            if (dbSøknad.hentSøknadVersjon() == "v4" && dbSøknad.hentSøknad().originalSpråk != "nb") {
+            if (dbSøknad.hentSøknad().originalSpråk != "nb") {
                 val originalspråkPdf = pdfService.lagPdf(dbSøknad, dbSøknad.hentSøknad().originalSpråk)
                 journalføringService.journalførSøknad(dbSøknad, bokmålPdf, originalspråkPdf)
             } else {
