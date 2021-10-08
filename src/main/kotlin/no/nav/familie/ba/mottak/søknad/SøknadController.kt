@@ -50,6 +50,11 @@ class SøknadController(
     val utvidetAntallVedlegg = Metrics.counter("barnetrygd.soknad.utvidet.harVedlegg.antall")
     val utvidetHarManglerIDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.utvidet.harManglerIDokumentasjonsbehov")
 
+    // Metrics for EØS barnetrygd
+    val søknadMedEøs = Metrics.counter("barnetrygd.soknad.eos.ok")
+    val søknadMedEøsHarVedlegg = Metrics.counter("barnetrygd.soknad.eos.harvedlegg")
+    val søknadMedEøsManglerVedlegg = Metrics.counter("barnetrygd.soknad.eos.manglervedlegg")
+
     @PostMapping(value = ["/soknad/v4"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(@RequestPart("søknad") søknad: Søknad): ResponseEntity<Ressurs<Kvittering>> {
         val lagreSøknad = featureToggleService.isEnabled("familie-ba-mottak.lagre-soknad")
@@ -83,7 +88,25 @@ class SøknadController(
 
     private fun sendMetrics(søknad: Søknad) {
         val erUtvidet = søknad.søknadstype == Søknadstype.UTVIDET
-        if (erUtvidet) søknadUtvidetMottattOk.increment() else søknadMottattOk.increment()
+        val erEøs = søknad.erEøs == true
+
+        if (erEøs)  {
+            søknadMedEøs.increment()
+            if(søknad.dokumentasjon.isNotEmpty()) {
+                val eøsDokumentasjon = søknad.dokumentasjon.filter{it.dokumentasjonsbehov == Dokumentasjonsbehov.EØS_SKJEMA}
+                if (eøsDokumentasjon.isNotEmpty()){
+                    søknadMedEøsHarVedlegg.increment()
+                }
+                else {
+                    søknadMedEøsManglerVedlegg.increment()
+                    }
+                }
+            else {
+                søknadMedEøsManglerVedlegg.increment()
+            }
+        }
+        if (erUtvidet) søknadUtvidetMottattOk.increment()
+            else søknadMottattOk.increment()
         if (søknad.dokumentasjon.isNotEmpty()) {
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val dokumentasjonsbehovUtenAnnenDokumentasjon =
