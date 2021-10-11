@@ -86,15 +86,9 @@ class SøknadController(
     }
 
     private fun sendMetrics(søknad: Søknad) {
-        val erUtvidet = søknad.søknadstype == Søknadstype.UTVIDET
-        val eøsDokumentasjon = søknad.dokumentasjon.find { it.dokumentasjonsbehov == Dokumentasjonsbehov.EØS_SKJEMA }
-        if (eøsDokumentasjon != null)  {
-            søknadMedEøs.increment()
-            if(eøsDokumentasjon.opplastedeVedlegg.isNotEmpty()) {
-                    søknadMedEøsHarVedlegg.increment()
-                }
-        }
+        sendMetricsEøs(søknad)
 
+        val erUtvidet = søknad.søknadstype == Søknadstype.UTVIDET
         if (erUtvidet) søknadUtvidetMottattOk.increment()
             else søknadMottattOk.increment()
         if (søknad.dokumentasjon.isNotEmpty()) {
@@ -137,6 +131,15 @@ class SøknadController(
         }
     }
 
+    private fun sendMetricsEøs(søknad: Søknad) {
+        val eøsDokumentasjon = søknad.dokumentasjon.find { it.dokumentasjonsbehov == Dokumentasjonsbehov.EØS_SKJEMA }
+        if (eøsDokumentasjon != null)  {
+            søknadMedEøs.increment()
+            if(eøsDokumentasjon.opplastedeVedlegg.isNotEmpty()) {
+                søknadMedEøsHarVedlegg.increment()
+            }
+        }
+    }
 
     @GetMapping(value = ["/ping"])
     @Unprotected
