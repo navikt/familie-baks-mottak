@@ -53,7 +53,6 @@ class SøknadController(
     // Metrics for EØS barnetrygd
     val søknadMedEøs = Metrics.counter("barnetrygd.soknad.eos.ok")
     val søknadMedEøsHarVedlegg = Metrics.counter("barnetrygd.soknad.eos.harvedlegg")
-    val søknadMedEøsManglerVedlegg = Metrics.counter("barnetrygd.soknad.eos.manglervedlegg")
 
     @PostMapping(value = ["/soknad/v4"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(@RequestPart("søknad") søknad: Søknad): ResponseEntity<Ressurs<Kvittering>> {
@@ -88,23 +87,14 @@ class SøknadController(
 
     private fun sendMetrics(søknad: Søknad) {
         val erUtvidet = søknad.søknadstype == Søknadstype.UTVIDET
-        val erEøs = søknad.erEøs == true
-
-        if (erEøs)  {
+        val eøsDokumentasjon = søknad.dokumentasjon.find { it.dokumentasjonsbehov == Dokumentasjonsbehov.EØS_SKJEMA }
+        if (eøsDokumentasjon != null)  {
             søknadMedEøs.increment()
-            if(søknad.dokumentasjon.isNotEmpty()) {
-                val eøsDokumentasjon = søknad.dokumentasjon.filter{it.dokumentasjonsbehov == Dokumentasjonsbehov.EØS_SKJEMA}
-                if (eøsDokumentasjon.isNotEmpty()){
+            if(eøsDokumentasjon.opplastedeVedlegg.isNotEmpty()) {
                     søknadMedEøsHarVedlegg.increment()
                 }
-                else {
-                    søknadMedEøsManglerVedlegg.increment()
-                    }
-                }
-            else {
-                søknadMedEøsManglerVedlegg.increment()
-            }
         }
+
         if (erUtvidet) søknadUtvidetMottattOk.increment()
             else søknadMottattOk.increment()
         if (søknad.dokumentasjon.isNotEmpty()) {
