@@ -89,8 +89,7 @@ class SøknadController(
         sendMetricsEøs(søknad)
 
         val erUtvidet = søknad.søknadstype == Søknadstype.UTVIDET
-        if (erUtvidet) søknadUtvidetMottattOk.increment()
-            else søknadMottattOk.increment()
+        if (erUtvidet) søknadUtvidetMottattOk.increment() else søknadMottattOk.increment()
         if (søknad.dokumentasjon.isNotEmpty()) {
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val dokumentasjonsbehovUtenAnnenDokumentasjon =
