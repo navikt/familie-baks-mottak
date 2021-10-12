@@ -1,14 +1,11 @@
 package no.nav.familie.ba.mottak.søknad.domene
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.familie.kontrakter.ba.Søknadstype
-import no.nav.familie.kontrakter.ba.søknad.Søknadsvedlegg
-import no.nav.familie.kontrakter.ba.søknad.v3.Søknadsvedlegg as SøknadsvedleggV3
-import no.nav.familie.kontrakter.ba.søknad.v2.Søknad
+import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsvedlegg
+import no.nav.familie.kontrakter.ba.søknad.v4.Søknad
 import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.LocalDateTime
 import javax.persistence.*
-import no.nav.familie.kontrakter.ba.søknad.v3.Søknad as SøknadV3
 
 @Entity(name = "Soknad")
 @Table(name = "Soknad")
@@ -30,15 +27,11 @@ data class DBSøknad(
         return objectMapper.readValue(søknadJson)
     }
 
-    fun hentSøknadV3(): SøknadV3 {
-        return objectMapper.readValue(søknadJson)
-    }
-
     fun hentSøknadVersjon(): String {
         val map: HashMap<String, Any> = objectMapper.readValue(søknadJson)
-        val søknadVersjon = when(map["søknadstype"]) {
-            Søknadstype.UTVIDET.toString() -> "v3"
-            else -> "v2"
+        val søknadVersjon = when(map.getOrDefault("originalSpråk", "GAMMEL")) {
+            "GAMMEL" -> "v3"
+            else -> "v4"
         }
         return søknadVersjon;
     }
@@ -59,19 +52,7 @@ fun Søknad.tilDBSøknad(): DBSøknad {
     try {
         return DBSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
-            fnr = this.søker.ident.verdi
-        )
-    } catch (e: KotlinNullPointerException) {
-        throw FødselsnummerErNullException()
-    }
-
-}
-
-fun SøknadV3.tilDBSøknad(): DBSøknad {
-    try {
-        return DBSøknad(
-            søknadJson = objectMapper.writeValueAsString(this),
-            fnr = this.søker.ident.verdi
+            fnr = this.søker.ident.verdi.getValue("nb")
         )
     } catch (e: KotlinNullPointerException) {
         throw FødselsnummerErNullException()
@@ -80,14 +61,6 @@ fun SøknadV3.tilDBSøknad(): DBSøknad {
 }
 
 fun Søknadsvedlegg.tilDBVedlegg(søknad: DBSøknad, data: ByteArray): DBVedlegg {
-    return DBVedlegg(
-        dokumentId = this.dokumentId,
-        søknadId = søknad.id,
-        data = data
-    )
-}
-
-fun SøknadsvedleggV3.tilDBVedlegg(søknad: DBSøknad, data: ByteArray): DBVedlegg {
     return DBVedlegg(
         dokumentId = this.dokumentId,
         søknadId = søknad.id,
