@@ -28,16 +28,19 @@ import org.springframework.stereotype.Service
 
 
 @Service
-@TaskStepBeskrivelse(taskStepType = MottaFødselshendelseTask.TASK_STEP_TYPE,
-                     beskrivelse = "Motta fødselshendelse",
-                     maxAntallFeil = 10,
-                     triggerTidVedFeilISekunder = 60 * 60 * 24)
-class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
-                               private val tpsPersonClient: TPSPersonClient,
-                               private val environment: Environment,
-                               private val pdlClient: PdlClient,
-                               @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: Long)
-    : AsyncTaskStep {
+@TaskStepBeskrivelse(
+    taskStepType = MottaFødselshendelseTask.TASK_STEP_TYPE,
+    beskrivelse = "Motta fødselshendelse",
+    maxAntallFeil = 10,
+    triggerTidVedFeilISekunder = 60 * 60 * 24
+)
+class MottaFødselshendelseTask(
+    private val taskRepository: TaskRepository,
+    private val tpsPersonClient: TPSPersonClient,
+    private val environment: Environment,
+    private val pdlClient: PdlClient,
+    @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: Long
+) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
     val barnHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.barn.har.dnr.eller.fdatnr")
@@ -81,10 +84,15 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
 
                 task.metadata["morsIdent"] = morsIdent.id
                 val nesteTask = Task.nyTask(
-                        SendTilSakTask.TASK_STEP_TYPE,
-                        jacksonObjectMapper().writeValueAsString(NyBehandling(morsIdent = morsIdent.id,
-                                                                              barnasIdenter = arrayOf(barnetsId))),
-                        task.metadata
+                    type = if (task.metadata["endringstype"] == "ANNULLERT")
+                        OpprettBehandleAnnullerFødselOppgaveTask.TASK_STEP_TYPE else SendTilSakTask.TASK_STEP_TYPE,
+                    jacksonObjectMapper().writeValueAsString(
+                        NyBehandling(
+                            morsIdent = morsIdent.id,
+                            barnasIdenter = arrayOf(barnetsId)
+                        )
+                    ),
+                    task.metadata
                 )
 
                 taskRepository.save(nesteTask)

@@ -4,7 +4,14 @@ import no.nav.familie.ba.mottak.util.fristFerdigstillelse
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Tema
-import no.nav.familie.kontrakter.felles.oppgave.*
+import no.nav.familie.kontrakter.felles.oppgave.FinnOppgaveRequest
+import no.nav.familie.kontrakter.felles.oppgave.FinnOppgaveResponseDto
+import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
+import no.nav.familie.kontrakter.felles.oppgave.Oppgave
+import no.nav.familie.kontrakter.felles.oppgave.OppgaveIdentV2
+import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
+import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
+import no.nav.familie.kontrakter.felles.oppgave.OpprettOppgaveRequest
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -44,6 +51,32 @@ class OppgaveClient @Autowired constructor(
         return responseFraOpprettOppgave(uri, request)
     }
 
+    fun opprettBehandleAnnullerFødselOppgave(ident: OppgaveIdentV2, saksId: String,
+                                             enhetsnummer: String, behandlingstema: String?,
+                                             behandlingstype: String?, beskrivelse: String): OppgaveResponse{
+        logger.info("Oppretter \"Behanle annuller fødsel\"-oppgave")
+
+        val uri = URI.create("$integrasjonUri/oppgave/opprett")
+        val request = OpprettOppgaveRequest(
+            ident = ident,
+            saksId = saksId,
+            journalpostId = null,
+            tema = Tema.BAR,
+            //TODO: lage nytt oppgavetype
+            oppgavetype= Oppgavetype.Generell,
+            fristFerdigstillelse = fristFerdigstillelse(),
+            beskrivelse = beskrivelse,
+            enhetsnummer = enhetsnummer,
+            behandlingstema = behandlingstema,
+            behandlingstype = behandlingstype,
+            //TODO: do we need this?
+            behandlesAvApplikasjon = null,
+        )
+
+        secureLog.info("Oppretter BehandleAnnullerFødselOppgave $request")
+
+        return responseFraOpprettOppgave(uri, request)
+    }
 
     @Retryable(
         value = [RuntimeException::class],

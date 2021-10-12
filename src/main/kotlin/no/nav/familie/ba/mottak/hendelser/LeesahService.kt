@@ -36,6 +36,8 @@ class LeesahService(
     val dødsfallIgnorertCounter: Counter = Metrics.counter("barnetrygd.dodsfall.ignorert")
     val fødselOpprettetCounter: Counter = Metrics.counter("barnetrygd.fodsel.opprettet")
     val fødselKorrigertCounter: Counter = Metrics.counter("barnetrygd.fodsel.korrigert")
+    val fødselAnnullertCounter: Counter = Metrics.counter("barnetrygd.fodsel.annullert")
+
     val fødselIgnorertCounter: Counter = Metrics.counter("barnetrygd.fodsel.ignorert")
     val fødselIgnorertUnder18årCounter: Counter = Metrics.counter("barnetrygd.fodsel.ignorert.under18")
     val fødselIgnorertFødelandCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.fodeland.nor")
@@ -88,7 +90,7 @@ class LeesahService(
             return
         }
         when (pdlHendelse.endringstype) {
-            OPPRETTET, KORRIGERT -> {
+            OPPRETTET, KORRIGERT, ANNULLERT -> {
                 logHendelse(pdlHendelse, "fødselsdato: ${pdlHendelse.fødselsdato}")
 
                 val fødselsdato = pdlHendelse.fødselsdato
@@ -104,6 +106,7 @@ class LeesahService(
                         when (pdlHendelse.endringstype) {
                             OPPRETTET -> fødselOpprettetCounter.increment()
                             KORRIGERT -> fødselKorrigertCounter.increment()
+                            ANNULLERT -> fødselAnnullertCounter.increment()
                         }
 
                         val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE,
@@ -112,6 +115,7 @@ class LeesahService(
                                                             Properties().apply {
                                                                 this["ident"] = pdlHendelse.hentPersonident()
                                                                 this["callId"] = pdlHendelse.hendelseId
+                                                                this["endringstype"] = pdlHendelse.endringstype
                                                             })
                         taskRepository.save(task)
                     }
