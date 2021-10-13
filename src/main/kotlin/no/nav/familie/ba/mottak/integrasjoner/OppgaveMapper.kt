@@ -77,7 +77,8 @@ class OppgaveMapper(private val hentEnhetClient: HentEnhetClient,
         return when {
             journalpost.journalforendeEnhet == "2101" -> "4806" //Enhet 2101 er nedlagt. Rutes til 4806
             journalpost.journalforendeEnhet == "4847" -> "4817" //Enhet 4847 skal legges ned. Rutes til 4817
-                    journalpost.journalforendeEnhet.isNullOrBlank() -> null
+            journalpost.journalforendeEnhet.isNullOrBlank() -> null
+            hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).status.toUpperCase() == "NEDLAGT" -> null
             hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).oppgavebehandler -> journalpost.journalforendeEnhet
             else -> {
                 logger.warn("Enhet ${journalpost.journalforendeEnhet} kan ikke ta i mot oppgaver")
