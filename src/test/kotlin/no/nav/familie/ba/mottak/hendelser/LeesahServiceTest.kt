@@ -145,4 +145,33 @@ class LeesahServiceTest {
 
         verify(exactly = 2) { mockTaskRepository.save(any()) }
     }
+
+    @Test
+    fun `Skal opprette MottaFødselshendelseTask med endringstype på metadata`(){
+        val hendelseId = UUID.randomUUID().toString()
+        val pdlHendelse = PdlHendelse(
+            offset = Random.nextUInt().toLong(),
+            gjeldendeAktørId = "1234567890123",
+            hendelseId = hendelseId,
+            personIdenter = listOf("12345678901", "1234567890123"),
+            endringstype = LeesahService.ANNULLERT,
+            opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
+            fødselsdato = LocalDate.now(),
+            fødeland = "NOR")
+
+        service.prosesserNyHendelse(pdlHendelse)
+
+        val taskSlot = slot<Task>()
+        verify {
+            mockTaskRepository.save(capture(taskSlot))
+        }
+
+        assertThat(taskSlot.captured).isNotNull
+        assertThat(taskSlot.captured.metadata["endringstype"]).isEqualTo("ANNULLERT")
+        assertThat(taskSlot.captured.taskStepType).isEqualTo(MottaFødselshendelseTask.TASK_STEP_TYPE)
+
+        verify(exactly = 1) {
+            mockHendelsesloggRepository.save(any())
+        }
+    }
 }

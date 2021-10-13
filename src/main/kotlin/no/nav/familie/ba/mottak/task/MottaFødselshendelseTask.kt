@@ -74,6 +74,21 @@ class MottaFødselshendelseTask(
                     return
                 }
 
+                if (task.metadata["endringstype"] == "ANNULLERT") {
+                    taskRepository.save(
+                        Task.nyTask(
+                            type = OpprettBehandleAnnullerFødselOppgaveTask.TASK_STEP_TYPE,
+                            payload = jacksonObjectMapper().writeValueAsString(
+                                NyBehandling(
+                                    morsIdent = morsIdent.id,
+                                    barnasIdenter = arrayOf(barnetsId)
+                                )
+                            ),
+                            properties = task.metadata
+                        )
+                    )
+                    return
+                }
 
                 if (skalFiltrerePåBostedsadresse(personMedRelasjoner)) {
                     log.info("Ignorer fødselshendelse: Barnet har ukjent bostedsadresse. task=${task.id}")
@@ -84,8 +99,7 @@ class MottaFødselshendelseTask(
 
                 task.metadata["morsIdent"] = morsIdent.id
                 val nesteTask = Task.nyTask(
-                    type = if (task.metadata["endringstype"] == "ANNULLERT")
-                        OpprettBehandleAnnullerFødselOppgaveTask.TASK_STEP_TYPE else SendTilSakTask.TASK_STEP_TYPE,
+                    type = SendTilSakTask.TASK_STEP_TYPE,
                     jacksonObjectMapper().writeValueAsString(
                         NyBehandling(
                             morsIdent = morsIdent.id,

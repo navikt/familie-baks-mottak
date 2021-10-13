@@ -33,31 +33,35 @@ class OpprettBehandleAnnullerFødselOppgaveTask(
         var payload = jacksonObjectMapper().readValue(task.payload, NyBehandling::class.java)
         var fagsak = sakClient.hentRestFagsak(payload.morsIdent)
         var aktivBehandling = fagsak.behandlinger.find { it.aktiv }
-        //TODO: criteria against the behandling/fagsak for creating oppgave
-        if (aktivBehandling != null) {
-            val aktørId = aktørClient.hentAktørId(payload.morsIdent)
 
-            task.metadata["oppgaveId"] =
-                "${
-                    oppgaveClient.opprettBehandleAnnullerFødselOppgave(
-                        ident = OppgaveIdentV2(aktørId, IdentGruppe.AKTOERID),
-                        saksId = fagsak.id.toString(),
-                        enhetsnummer = aktivBehandling.arbeidsfordelingPåBehandling.behandlendeEnhetId,
-                        behandlingstema = when (aktivBehandling.underkategori) {
-                            BehandlingUnderkategori.UTVIDET -> Behandlingstema.UtvidetBarnetrygd.toString()
-                            BehandlingUnderkategori.ORDINÆR -> Behandlingstema.OrdinærBarnetrygd.toString()
-                            else -> null
-                        },
-                        behandlingstype = aktivBehandling.type,
-                        //TODO: is this the good place for barnasidenter?
-                        beskrivelse = "Fødselshendelse med barnsidenter ${payload.barnasIdenter} er annulert"
-                    ).oppgaveId
-                }"
+        //TODO: criteria against the behandling/fagsak for creating oppgave
+        if (aktivBehandling == null) {
+            SECURE_LOGGER.error("Finner ikke aktiv behandling på Fagsak når behandler annuller fødsel, Fagsak ID ${fagsak.id}")
+            throw IllegalStateException("Finner ikke aktiv behandling på Fagsak når behandler annuller fødsel")
         }
+        val aktørId = aktørClient.hentAktørId(payload.morsIdent)
+
+        task.metadata["oppgaveId"] =
+            "${
+                oppgaveClient.opprettBehandleAnnullerFødselOppgave(
+                    ident = OppgaveIdentV2(aktørId, IdentGruppe.AKTOERID),
+                    saksId = fagsak.id.toString(),
+                    enhetsnummer = aktivBehandling.arbeidsfordelingPåBehandling.behandlendeEnhetId,
+                    behandlingstema = when (aktivBehandling.underkategori) {
+                        BehandlingUnderkategori.UTVIDET -> Behandlingstema.UtvidetBarnetrygd.toString()
+                        BehandlingUnderkategori.ORDINÆR -> Behandlingstema.OrdinærBarnetrygd.toString()
+                    },
+                    behandlingstype = aktivBehandling.type,
+                    //TODO: is this the good place for barnasidenter?
+                    beskrivelse = "Fødselshendelse med barnsidenter ${payload.barnasIdenter} er annulert"
+                ).oppgaveId
+            }"
     }
 
     companion object {
+
         const val TASK_STEP_TYPE = "OpprettBehandleAnnullerFødselOppgaveTask"
+        val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
     }
 
 }

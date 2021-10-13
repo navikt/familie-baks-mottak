@@ -62,7 +62,7 @@ class OppgaveClient @Autowired constructor(
             saksId = saksId,
             journalpostId = null,
             tema = Tema.BAR,
-            //TODO: lage nytt oppgavetype
+            //TODO: lag nytt oppgavetype
             oppgavetype= Oppgavetype.Generell,
             fristFerdigstillelse = fristFerdigstillelse(),
             beskrivelse = beskrivelse,

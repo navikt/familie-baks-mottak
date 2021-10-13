@@ -27,6 +27,7 @@ import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.person.pdl.leesah.Endringstype
 import org.apache.commons.lang3.StringUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -290,6 +291,41 @@ class MottaFødselshendelseTaskTest {
         assertThat(taskerMedCallId).hasSize(1)
         assertThat(taskerMedCallId.first().taskStepType).isEqualTo(MottaFødselshendelseTask.TASK_STEP_TYPE)
         assertThat(taskerMedCallId.first().triggerTid).isAfter(taskerMedCallId.first().opprettetTidspunkt)
+    }
+
+    @Test
+    fun `Skal opprette OpprettBehandleAnnullerFødselOppgaveTask task med NyBehandling som payload hvis endringstype er ANNULLERT, og barnet har gyldig fnr, har mor`() {
+        MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
+        val fnrBarn = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyy")) + "12345"
+
+        mockResponseForPdlQuery(
+            pdlRequestBody = gyldigRequest("hentperson-med-relasjoner.graphql", fnrBarn),
+            mockResponse = PdlHentPersonResponse(
+                data = PdlPerson(lagTestPdlPerson().copy(bostedsadresse = emptyList(),
+                                                         adressebeskyttelse = listOf(Adressebeskyttelse(
+                                                             Adressebeskyttelsesgradering.STRENGT_FORTROLIG)))),
+                errors = emptyList()
+            )
+        )
+        //TODO fjernes når barnetrygd er ute av infotrygd
+        stubFor(post(urlEqualTo("/api/personopplysning/v2/info"))
+                    .willReturn(aResponse()
+                                    .withHeader("Content-Type", "application/json")
+                                    .withBody(objectMapper.writeValueAsString(
+                                        success(lagTestPerson().copy(bostedsadresse = null))))))
+
+
+        taskService.doTask(Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn,  Properties().apply {
+            this["endringstype"] = Endringstype.ANNULLERT.toString()
+        }))
+
+        val taskerMedCallId = taskRepository.finnTasksMedStatus(listOf(Status.UBEHANDLET), Pageable.unpaged())
+            .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
+
+        assertThat(taskerMedCallId).hasSize(1).extracting("taskStepType").containsOnly(OpprettBehandleAnnullerFødselOppgaveTask.TASK_STEP_TYPE)
+        assertThat(objectMapper.readValue(taskerMedCallId.first().payload, NyBehandling::class.java))
+            .hasFieldOrPropertyWithValue("morsIdent", "20107678901")
+            .hasFieldOrPropertyWithValue("barnasIdenter", arrayOf(fnrBarn))
     }
 
     private fun lagTestPerson(): Person {
