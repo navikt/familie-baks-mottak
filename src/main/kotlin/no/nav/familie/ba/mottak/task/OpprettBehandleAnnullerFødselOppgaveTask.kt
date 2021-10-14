@@ -32,6 +32,10 @@ class OpprettBehandleAnnullerFødselOppgaveTask(
     override fun doTask(task: Task) {
         var payload = jacksonObjectMapper().readValue(task.payload, NyBehandling::class.java)
         var fagsak = sakClient.hentRestFagsak(payload.morsIdent)
+        if(fagsak == null){
+            return
+        }
+
         var aktivBehandling = fagsak.behandlinger.find { it.aktiv }
 
         //TODO: criteria against the behandling/fagsak for creating oppgave

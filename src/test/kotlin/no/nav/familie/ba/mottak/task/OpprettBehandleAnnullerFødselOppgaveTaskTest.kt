@@ -37,6 +37,7 @@ import org.hamcrest.CoreMatchers.containsString
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import java.lang.IllegalStateException
 import java.time.LocalDateTime
@@ -162,7 +163,7 @@ class OpprettBehandleAnnullerFødselOppgaveTaskTest {
                 capture(identSlot), capture(saksIdSlot), capture(enhetsnummerSlot),
                 capture(behandlingstemaSlot), capture(behandlingstypeSlot), capture(beskrivelseSlot)
             )
-        }returns OppgaveResponse(1)
+        } returns OppgaveResponse(1)
 
         taskStep.doTask(
             Task.nyTask(
@@ -184,6 +185,28 @@ class OpprettBehandleAnnullerFødselOppgaveTaskTest {
         assertThat(behandlingstemaSlot.captured).isEqualTo(Behandlingstema.OrdinærBarnetrygd.toString())
         assertThat(behandlingstypeSlot.captured).isEqualTo(aktivBehandling!!.type)
         assertThat(beskrivelseSlot.captured).contains("annulert")
+    }
+
+    @Test
+    fun `Skal ikke opprett oppgave hvis person har ikke Fagsak`() {
+        every {
+            mockSakClient.hentRestFagsak(any<String>())
+        } returns null
+
+        assertDoesNotThrow {
+            taskStep.doTask(
+                Task.nyTask(
+                    type = OpprettBehandleAnnullerFødselOppgaveTask.TASK_STEP_TYPE,
+                    payload = jacksonObjectMapper().writeValueAsString(
+                        NyBehandling(
+                            morsIdent = testIdent,
+                            barnasIdenter = arrayOf(testBarnIdent)
+                        )
+                    ),
+                    properties = Properties()
+                )
+            )
+        }
     }
 
     internal fun lagRestFagsak() = RestFagsak(
