@@ -6,6 +6,7 @@ import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
+import no.nav.familie.ba.mottak.task.MottaAnnullerFødselTask
 import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.ba.mottak.task.VurderLivshendelseTask
 import no.nav.familie.prosessering.domene.Task
@@ -147,7 +148,7 @@ class LeesahServiceTest {
     }
 
     @Test
-    fun `Skal opprette MottaFødselshendelseTask med endringstype på metadata`(){
+    fun `Skal opprette MottaAnnullerFødselTask når endringstype er ANNULLERT`(){
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse = PdlHendelse(
             offset = Random.nextUInt().toLong(),
@@ -157,7 +158,8 @@ class LeesahServiceTest {
             endringstype = LeesahService.ANNULLERT,
             opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
             fødselsdato = LocalDate.now(),
-            fødeland = "NOR")
+            fødeland = "NOR",
+            tidligereHendelseId = "unknown")
 
         service.prosesserNyHendelse(pdlHendelse)
 
@@ -167,8 +169,8 @@ class LeesahServiceTest {
         }
 
         assertThat(taskSlot.captured).isNotNull
-        assertThat(taskSlot.captured.metadata["endringstype"]).isEqualTo("ANNULLERT")
-        assertThat(taskSlot.captured.taskStepType).isEqualTo(MottaFødselshendelseTask.TASK_STEP_TYPE)
+        assertThat(taskSlot.captured.metadata["tidligereHendelseId"]).isEqualTo("unknown")
+        assertThat(taskSlot.captured.taskStepType).isEqualTo(MottaAnnullerFødselTask.TASK_STEP_TYPE)
 
         verify(exactly = 1) {
             mockHendelsesloggRepository.save(any())
