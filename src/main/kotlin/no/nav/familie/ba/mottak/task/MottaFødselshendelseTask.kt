@@ -28,19 +28,16 @@ import org.springframework.stereotype.Service
 
 
 @Service
-@TaskStepBeskrivelse(
-    taskStepType = MottaFødselshendelseTask.TASK_STEP_TYPE,
-    beskrivelse = "Motta fødselshendelse",
-    maxAntallFeil = 10,
-    triggerTidVedFeilISekunder = 60 * 60 * 24
-)
-class MottaFødselshendelseTask(
-    private val taskRepository: TaskRepository,
-    private val tpsPersonClient: TPSPersonClient,
-    private val environment: Environment,
-    private val pdlClient: PdlClient,
-    @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: Long
-) : AsyncTaskStep {
+@TaskStepBeskrivelse(taskStepType = MottaFødselshendelseTask.TASK_STEP_TYPE,
+                     beskrivelse = "Motta fødselshendelse",
+                     maxAntallFeil = 10,
+                     triggerTidVedFeilISekunder = 60 * 60 * 24)
+class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
+                               private val tpsPersonClient: TPSPersonClient,
+                               private val environment: Environment,
+                               private val pdlClient: PdlClient,
+                               @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: Long)
+    : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
     val barnHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.barn.har.dnr.eller.fdatnr")
@@ -74,21 +71,6 @@ class MottaFødselshendelseTask(
                     return
                 }
 
-                if (task.metadata["endringstype"] == "ANNULLERT") {
-                    taskRepository.save(
-                        Task.nyTask(
-                            type = OpprettBehandleAnnullerFødselOppgaveTask.TASK_STEP_TYPE,
-                            payload = jacksonObjectMapper().writeValueAsString(
-                                NyBehandling(
-                                    morsIdent = morsIdent.id,
-                                    barnasIdenter = arrayOf(barnetsId)
-                                )
-                            ),
-                            properties = task.metadata
-                        )
-                    )
-                    return
-                }
 
                 if (skalFiltrerePåBostedsadresse(personMedRelasjoner)) {
                     log.info("Ignorer fødselshendelse: Barnet har ukjent bostedsadresse. task=${task.id}")
@@ -99,13 +81,9 @@ class MottaFødselshendelseTask(
 
                 task.metadata["morsIdent"] = morsIdent.id
                 val nesteTask = Task.nyTask(
-                    type = SendTilSakTask.TASK_STEP_TYPE,
-                    jacksonObjectMapper().writeValueAsString(
-                        NyBehandling(
-                            morsIdent = morsIdent.id,
-                            barnasIdenter = arrayOf(barnetsId)
-                        )
-                    ),
+                    SendTilSakTask.TASK_STEP_TYPE,
+                    jacksonObjectMapper().writeValueAsString(NyBehandling(morsIdent = morsIdent.id,
+                                                                          barnasIdenter = arrayOf(barnetsId))),
                     task.metadata
                 )
 
