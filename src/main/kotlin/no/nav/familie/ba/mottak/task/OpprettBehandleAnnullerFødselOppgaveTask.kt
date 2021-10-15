@@ -12,9 +12,11 @@ import no.nav.familie.kontrakter.felles.oppgave.OppgaveIdentV2
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 @TaskStepBeskrivelse(
@@ -24,25 +26,28 @@ import org.springframework.stereotype.Service
 class OpprettBehandleAnnullerFødselOppgaveTask(
     private val oppgaveClient: OppgaveClient,
     private val sakClient: SakClient,
-    private val aktørClient: AktørClient
+    private val aktørClient: AktørClient,
+    private val taskRepository: TaskRepository
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(OpprettBehandleAnnullerFødselOppgaveTask::class.java)
 
     override fun doTask(task: Task) {
+        task.metadata["forsøkTaskId"] = null
         var payload = jacksonObjectMapper().readValue(task.payload, NyBehandling::class.java)
         var fagsak = sakClient.hentRestFagsak(payload.morsIdent)
-        if(fagsak == null){
+        if (fagsak == null) {
+            retryLater(task)
             return
         }
 
         var aktivBehandling = fagsak.behandlinger.find { it.aktiv }
 
-        //TODO: criteria against the behandling/fagsak for creating oppgave
         if (aktivBehandling == null) {
-            SECURE_LOGGER.error("Finner ikke aktiv behandling på Fagsak når behandler annuller fødsel, Fagsak ID ${fagsak.id}")
-            throw IllegalStateException("Finner ikke aktiv behandling på Fagsak når behandler annuller fødsel")
+            retryLater(task)
+            return
         }
+
         val aktørId = aktørClient.hentAktørId(payload.morsIdent)
 
         task.metadata["oppgaveId"] =
@@ -62,10 +67,28 @@ class OpprettBehandleAnnullerFødselOppgaveTask(
             }"
     }
 
+    private fun retryLater(task: Task) {
+        if ((task.metadata["antallForsøk"] as Int) >= MAX_ANTALL_FORSØK) {
+            return
+        }
+        task.metadata["antallForsøk"] = task.metadata["antallForsøk"] as Int + 1
+        task.metadata["forsøkTaskId"] =
+            taskRepository.save(
+                Task.nyTask(
+                    type = TASK_STEP_TYPE,
+                    payload = task.payload,
+                    properties = task.metadata,
+                ).copy(
+                    triggerTid = LocalDateTime.now().plusHours(2),
+                )
+            ).id
+    }
+
     companion object {
 
         const val TASK_STEP_TYPE = "OpprettBehandleAnnullerFødselOppgaveTask"
         val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
+        const val MAX_ANTALL_FORSØK = 12
     }
 
 }
