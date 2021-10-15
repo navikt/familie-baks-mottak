@@ -240,7 +240,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette enhet fra journalpost hvis enhet kan behandle oppgaver`() {
-        every { mockHentEnhetClient.hentEnhet("4") } returns Enhet("4", "enhetnavn", true)
+        every { mockHentEnhetClient.hentEnhet("4") } returns Enhet("4", "enhetnavn", true, "Aktiv")
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
@@ -258,7 +258,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette enhet null hvis enhet ikke kan behandle oppgaver`() {
-        every { mockHentEnhetClient.hentEnhet("5") } returns Enhet("4", "enhetnavn", false)
+        every { mockHentEnhetClient.hentEnhet("5") } returns Enhet("4", "enhetnavn", false, "Aktiv")
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                          journalpostClient.hentJournalpost("123")
@@ -270,6 +270,24 @@ class OppgaveMapperTest(
                                                                                dokumentvarianter = null)),
                                                                        behandlingstema = "btema"
                                                                  )
+        )
+        assertThat(oppgave.enhetsnummer).isNull()
+    }
+
+    @Test
+    fun `skal sette enhet null hvis enhet er nedlagt`() {
+        every { mockHentEnhetClient.hentEnhet("5") } returns Enhet("4", "enhetnavn", true, "Nedlagt")
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
+        val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
+                                                         journalpostClient.hentJournalpost("123")
+                                                             .copy(journalforendeEnhet = "5",
+                                                                   dokumenter = listOf(DokumentInfo(
+                                                                       tittel = null,
+                                                                       brevkode = "kode",
+                                                                       dokumentstatus = null,
+                                                                       dokumentvarianter = null)),
+                                                                   behandlingstema = "btema"
+                                                             )
         )
         assertThat(oppgave.enhetsnummer).isNull()
     }

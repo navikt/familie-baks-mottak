@@ -61,7 +61,7 @@ class OppgaveClientTest {
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(Enhet("9999", "enhetNavn", true)))
+                        .withBody(objectMapper.writeValueAsString(Enhet("9999", "enhetNavn", true, "Aktiv")))
                 )
         )
     }

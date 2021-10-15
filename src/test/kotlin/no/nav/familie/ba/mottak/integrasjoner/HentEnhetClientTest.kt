@@ -29,7 +29,7 @@ class HentEnhetClientTest {
         stubFor(get(urlEqualTo("/norg2/api/v1/enhet/1234"))
                         .willReturn(aResponse()
                                             .withHeader("Content-Type", "application/json")
-                                            .withBody(objectMapper.writeValueAsString(Enhet("1234", "enhetNavn", true)))))
+                                            .withBody(objectMapper.writeValueAsString(Enhet("1234", "enhetNavn", true, "Aktiv")))))
 
         val response = client.hentEnhet("1234")
         assertThat(response.enhetId).isEqualTo("1234")
@@ -57,14 +57,14 @@ class HentEnhetClientTest {
         stubFor(get(urlEqualTo("/norg2/api/v1/enhet/1111"))
                         .willReturn(aResponse()
                                             .withHeader("Content-Type", "application/json")
-                                            .withBody(objectMapper.writeValueAsString(Enhet("1234", "gammeltNavn", true)))))
+                                            .withBody(objectMapper.writeValueAsString(Enhet("1234", "gammeltNavn", true,"Aktiv")))))
 
         assertThat(client.hentEnhet("1111").navn).isEqualTo("gammeltNavn")
 
         stubFor(get(urlEqualTo("/norg2/api/v1/enhet/1111"))
                         .willReturn(aResponse()
                                             .withHeader("Content-Type", "application/json")
-                                            .withBody(objectMapper.writeValueAsString(Enhet("1234", "Nytt navn", true)))))
+                                            .withBody(objectMapper.writeValueAsString(Enhet("1234", "Nytt navn", true, "Aktiv")))))
 
         assertThat(client.hentEnhet("1111").navn).isEqualTo("gammeltNavn")
 
