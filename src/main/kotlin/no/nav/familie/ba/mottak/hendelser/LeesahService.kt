@@ -125,16 +125,16 @@ class LeesahService(
             }
             ANNULLERT -> {
                 fødselAnnullertCounter.increment()
-                if(pdlHendelse.tidligereHendelseId!= null){
+                if (pdlHendelse.tidligereHendelseId != null) {
                     val task = Task.nyTask(type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
-                                           payload = pdlHendelse.hentPersonident(),
+                                           payload = objectMapper.writeValueAsString(pdlHendelse.hentPersonidenter()),
                                            properties = Properties().apply {
-                                               this["ident"] = pdlHendelse.hentPersonident()
+                                               this["identer"] = pdlHendelse.hentPersonidenter()
                                                this["callId"] = pdlHendelse.hendelseId
                                                this["tidligereHendelseId"] = pdlHendelse.tidligereHendelseId
                                            })
                     taskRepository.save(task)
-                }else{
+                } else {
                     log.warn("Mottatt annuller fødsel uten tidligereHendelseId, hendelseId ${pdlHendelse.hendelseId}")
                 }
             }

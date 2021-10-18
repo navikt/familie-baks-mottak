@@ -17,4 +17,5 @@ data class PdlHendelse(val hendelseId: String,
 
         // TODO: Skal gjøres tydeligere og mer robust.
         fun hentPersonident() = personIdenter.first { it.length == 11 }
+        fun hentPersonidenter() = personIdenter.filter { it.length == 11 }
     }
