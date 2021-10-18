@@ -3,8 +3,10 @@ package no.nav.familie.ba.mottak.task
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Avvikstype
+import no.nav.familie.prosessering.domene.Loggtype
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.prosessering.domene.TaskLogg
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -32,16 +34,13 @@ class MottaAnnullerFødselTask(
                         && (it.taskStepType == MottaFødselshendelseTask.TASK_STEP_TYPE || it.taskStepType == SendTilSakTask.TASK_STEP_TYPE)
             }.forEach {
             taskRepository.save(
-                taskRepository.findById(it.id!!).get().copy(
-                    status = Status.AVVIKSHÅNDTERT,
-                    avvikstype = Avvikstype.ANNET,
-                )
+                taskRepository.findById(it.id!!).get().avvikshåndter(avvikstype = Avvikstype.ANNET, årsak = AVVIKSÅRSAK, endretAv = "VL")
             )
         }
     }
 
     companion object {
-
         const val TASK_STEP_TYPE = "mottaAnnullerFødsel"
+        const val AVVIKSÅRSAK = "Annuller fødselshendelse"
     }
 }

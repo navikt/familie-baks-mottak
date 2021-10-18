@@ -54,6 +54,11 @@ class MottaAnnullerFødselTaskTest {
         verify(exactly = 2){taskRepository.save(any())}
         assertThat(taskSlot.find{it.id == 1L}!!.status).isEqualTo(Status.AVVIKSHÅNDTERT)
         assertThat(taskSlot.find{it.id == 1L}!!.avvikstype).isEqualTo(Avvikstype.ANNET)
+        var logg = taskSlot.find{it.id == 1L}!!.logg
+        var avvikslogg = logg.get(logg.size -1)
+        assertThat(avvikslogg.endretAv).isEqualTo("VL")
+        assertThat(avvikslogg.melding).isEqualTo(MottaAnnullerFødselTask.AVVIKSÅRSAK)
+
         assertThat(taskSlot.find{it.id == 2L}!!.status).isEqualTo(Status.AVVIKSHÅNDTERT)
         assertThat(taskSlot.find{it.id == 2L}!!.avvikstype).isEqualTo(Avvikstype.ANNET)
     }
