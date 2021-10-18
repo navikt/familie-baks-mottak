@@ -33,6 +33,8 @@ class JournalhendelseService(
 
     val kanalNavnoCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.navno")
     val kanalSkannetsCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skannets")
+    val skannetOrdinæreSøknaderCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skannets.ny.ordinærsøknad")
+    val skannetUtvidedeSøknaderCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skannets.ny.utvidetsøknad")
     val kanalAnnetCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.annet")
     val ignorerteCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.ignorerte")
     val feilCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.feilet")
@@ -128,7 +130,13 @@ class JournalhendelseService(
 
     private fun behandleSkanningHendelser(journalpost: Journalpost) {
         logger.info("Ny Journalhendelse med [journalpostId=${journalpost.journalpostId}, status=${journalpost.journalstatus}, tema=${journalpost.tema}, kanal=${journalpost.kanal}]")
+        val erOrdinærSønad = journalpost.dokumenter?.find { it.brevkode == "NAV 33-00.07" } != null
+        val erUtvidetSøknad = journalpost.dokumenter?.find { it.brevkode == "NAV 33-00.09" } != null
+
         opprettJournalhendelseRutingTask(journalpost)
+
+        if (erOrdinærSønad) skannetOrdinæreSøknaderCounter.increment()
+        if (erUtvidetSøknad) skannetUtvidedeSøknaderCounter.increment()
         kanalSkannetsCounter.increment()
     }
 
