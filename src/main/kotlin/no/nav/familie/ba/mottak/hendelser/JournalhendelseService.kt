@@ -33,8 +33,8 @@ class JournalhendelseService(
 
     val kanalNavnoCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.navno")
     val kanalSkannetsCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skannets")
-    val skannetOrdinæreSøknaderCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skannets.ny.ordinærsøknad")
-    val skannetUtvidedeSøknaderCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skannets.ny.utvidetsøknad")
+    val skannetOrdinæreSøknaderCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skan.ny.ordinaer.soknad")
+    val skannetUtvidedeSøknaderCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skan.ny.utvidet.soknad")
     val kanalAnnetCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.annet")
     val ignorerteCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.ignorerte")
     val feilCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.feilet")
