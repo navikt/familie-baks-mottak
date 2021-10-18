@@ -83,7 +83,7 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
     fun sendAnnullerFødselshendelseTilSak(barnasIdenter: List<String>) {
-        val uri = URI.create("$sakServiceUri/fagsak/annullerFødsel")
+        val uri = URI.create("$sakServiceUri/fagsak/annullerFoedsel")
         logger.info("Sender annuller fødselshendelse til {}", uri)
         try {
             val response = postForEntity<Ressurs<String>>(uri, barnasIdenter)
