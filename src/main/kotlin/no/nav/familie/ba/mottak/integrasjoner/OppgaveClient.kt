@@ -51,33 +51,6 @@ class OppgaveClient @Autowired constructor(
         return responseFraOpprettOppgave(uri, request)
     }
 
-    fun opprettBehandleAnnullerFødselOppgave(ident: OppgaveIdentV2, saksId: String,
-                                             enhetsnummer: String, behandlingstema: String?,
-                                             behandlingstype: String?, beskrivelse: String): OppgaveResponse{
-        logger.info("Oppretter \"Behanle annuller fødsel\"-oppgave")
-
-        val uri = URI.create("$integrasjonUri/oppgave/opprett")
-        val request = OpprettOppgaveRequest(
-            ident = ident,
-            saksId = saksId,
-            journalpostId = null,
-            tema = Tema.BAR,
-            //TODO: lag nytt oppgavetype
-            oppgavetype= Oppgavetype.Generell,
-            fristFerdigstillelse = fristFerdigstillelse(),
-            beskrivelse = beskrivelse,
-            enhetsnummer = enhetsnummer,
-            behandlingstema = behandlingstema,
-            behandlingstype = behandlingstype,
-            //TODO: do we need this?
-            behandlesAvApplikasjon = null,
-        )
-
-        secureLog.info("Oppretter BehandleAnnullerFødselOppgave $request")
-
-        return responseFraOpprettOppgave(uri, request)
-    }
-
     @Retryable(
         value = [RuntimeException::class],
         maxAttempts = 3,

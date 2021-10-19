@@ -19,12 +19,17 @@ import java.time.LocalDateTime
 private val logger = LoggerFactory.getLogger(SakClient::class.java)
 
 @Component
-class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}") private val sakServiceUri: String,
-                                       @Qualifier("clientCredentials") restOperations: RestOperations)
-                                        : AbstractRestClient(restOperations, "integrasjon") {
+class SakClient @Autowired constructor(
+    @param:Value("\${FAMILIE_BA_SAK_API_URL}") private val sakServiceUri: String,
+    @Qualifier("clientCredentials") restOperations: RestOperations
+) : AbstractRestClient(restOperations, "integrasjon") {
 
 
-    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
+    @Retryable(
+        value = [RuntimeException::class],
+        maxAttempts = 3,
+        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}")
+    )
     fun sendTilSak(nyBehandling: NyBehandling) {
         val uri = URI.create("$sakServiceUri/behandlinger")
         logger.info("Sender søknad til {}", uri)
@@ -33,8 +38,10 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
             logger.info("Søknad sendt til sak. Status=${response.status}")
         } catch (e: RestClientResponseException) {
             logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
-            throw IllegalStateException("Innsending til sak feilet. Status: " + e.rawStatusCode
-                                        + ", body: " + e.responseBodyAsString, e)
+            throw IllegalStateException(
+                "Innsending til sak feilet. Status: " + e.rawStatusCode
+                        + ", body: " + e.responseBodyAsString, e
+            )
         } catch (e: RestClientException) {
             throw IllegalStateException("Innsending til sak feilet.", e)
         }
@@ -50,14 +57,16 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
         )
     }
 
-    fun hentRestFagsakDeltagerListe(personIdent: String,
-                                    barnasIdenter: List<String> = emptyList()): List<RestFagsakDeltager> {
+    fun hentRestFagsakDeltagerListe(
+        personIdent: String,
+        barnasIdenter: List<String> = emptyList()
+    ): List<RestFagsakDeltager> {
         val uri = URI.create("$sakServiceUri/fagsaker/sok/fagsakdeltagere")
         return runCatching {
             postForEntity<Ressurs<List<RestFagsakDeltager>>>(uri, RestSøkParam(personIdent, barnasIdenter))
         }.fold(
-                onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
-                onFailure = { throw IntegrasjonException("Feil ved henting av fagsakdeltagere fra ba-sak.", it, uri, personIdent) }
+            onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
+            onFailure = { throw IntegrasjonException("Feil ved henting av fagsakdeltagere fra ba-sak.", it, uri, personIdent) }
         )
     }
 
@@ -66,7 +75,7 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
         return runCatching {
             postForEntity<Ressurs<RestFagsak>>(uri, mapOf("personIdent" to personIdent))
         }.fold(
-            onSuccess = { it.data ?: null },
+            onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
             onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ba-sak.", it, uri, personIdent) }
         )
     }
@@ -76,12 +85,16 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
         return runCatching {
             getForEntity<Ressurs<RestFagsak>>(uri)
         }.fold(
-                onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
-                onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ba-sak.", it, uri) }
+            onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
+            onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ba-sak.", it, uri) }
         )
     }
 
-    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
+    @Retryable(
+        value = [RuntimeException::class],
+        maxAttempts = 3,
+        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}")
+    )
     fun sendAnnullerFødselshendelseTilSak(barnasIdenter: List<String>) {
         val uri = URI.create("$sakServiceUri/fagsak/annullerFoedsel")
         logger.info("Sender annuller fødselshendelse til {}", uri)
@@ -89,30 +102,40 @@ class SakClient @Autowired constructor(@param:Value("\${FAMILIE_BA_SAK_API_URL}"
             val response = postForEntity<Ressurs<String>>(uri, barnasIdenter)
             logger.info("Annuller fødselshendelse sendt til sak. Status=${response.status}")
         } catch (e: RestClientResponseException) {
-            logger.warn("Sending annuller fødselshendelse til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
-            throw IllegalStateException("Sending annuller fødselshendelse til sak feilet. Status: " + e.rawStatusCode
-                                                + ", body: " + e.responseBodyAsString, e)
+            logger.warn(
+                "Sending annuller fødselshendelse til sak feilet. Responskode: {}, body: {}",
+                e.rawStatusCode,
+                e.responseBodyAsString
+            )
+            throw IllegalStateException(
+                "Sending annuller fødselshendelse til sak feilet. Status: " + e.rawStatusCode
+                        + ", body: " + e.responseBodyAsString, e
+            )
         } catch (e: RestClientException) {
             throw IllegalStateException("Sending annuller fødselshendelse til sak feilet.", e)
         }
     }
 }
 
-data class RestFagsak(val id: Long,
-                      val behandlinger: List<RestUtvidetBehandling>)
+data class RestFagsak(
+    val id: Long,
+    val behandlinger: List<RestUtvidetBehandling>
+)
 
-data class RestUtvidetBehandling(val aktiv: Boolean,
-                                 val arbeidsfordelingPåBehandling: RestArbeidsfordelingPåBehandling,
-                                 val behandlingId: Long,
-                                 val kategori: BehandlingKategori,
-                                 val opprettetTidspunkt: LocalDateTime,
-                                 val resultat: String,
-                                 val steg: String,
-                                 val type: String,
-                                 val underkategori: BehandlingUnderkategori,)
+data class RestUtvidetBehandling(
+    val aktiv: Boolean,
+    val arbeidsfordelingPåBehandling: RestArbeidsfordelingPåBehandling,
+    val behandlingId: Long,
+    val kategori: BehandlingKategori,
+    val opprettetTidspunkt: LocalDateTime,
+    val resultat: String,
+    val steg: String,
+    val type: String,
+    val underkategori: BehandlingUnderkategori,
+)
 
 data class RestArbeidsfordelingPåBehandling(
-        val behandlendeEnhetId: String,
+    val behandlendeEnhetId: String,
 )
 
 enum class BehandlingKategori {
@@ -126,17 +149,17 @@ enum class BehandlingUnderkategori {
 }
 
 data class RestSøkParam(
-        val personIdent: String,
-        val barnasIdenter: List<String> = emptyList()
+    val personIdent: String,
+    val barnasIdenter: List<String> = emptyList()
 )
 
 data class RestFagsakDeltager(
-        val ident: String,
-        val rolle: FagsakDeltagerRolle,
-        val fagsakId: Long,
-        val fagsakStatus: FagsakStatus,
+    val ident: String,
+    val rolle: FagsakDeltagerRolle,
+    val fagsakId: Long,
+    val fagsakStatus: FagsakStatus,
 
-)
+    )
 
 enum class FagsakDeltagerRolle {
     BARN,
