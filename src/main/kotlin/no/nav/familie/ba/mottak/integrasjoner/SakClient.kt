@@ -96,7 +96,7 @@ class SakClient @Autowired constructor(
         backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}")
     )
     fun sendAnnullerFødselshendelseTilSak(barnasIdenter: List<String>) {
-        val uri = URI.create("$sakServiceUri/fagsak/annullerFoedsel")
+        val uri = URI.create("$sakServiceUri/fagsaker/annullerFoedsel")
         logger.info("Sender annuller fødselshendelse til {}", uri)
         try {
             val response = postForEntity<Ressurs<String>>(uri, barnasIdenter)
