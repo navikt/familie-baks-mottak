@@ -54,7 +54,8 @@ class MottaAnnullerFødselTaskTest {
         every { taskRepository.save(capture(taskSlot)) } returns mottaFødselshendelseTask
 
         MottaAnnullerFødselTask(taskRepository, sakClient).doTask(
-            Task.nyTask(type = MottaAnnullerFødselTask.TASK_STEP_TYPE, payload = objectMapper.writeValueAsString(listOf("12345678910")),
+            Task.nyTask(type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
+                        payload = objectMapper.writeValueAsString(listOf("12345678910")),
                         properties = Properties().apply {
                             this["tidligereHendelseId"] = "ooo"
                         })
@@ -95,7 +96,8 @@ class MottaAnnullerFødselTaskTest {
         every { taskRepository.save(capture(taskSlot)) } returns task0
 
         MottaAnnullerFødselTask(taskRepository, sakClient).doTask(
-            Task.nyTask(type = MottaAnnullerFødselTask.TASK_STEP_TYPE, payload = objectMapper.writeValueAsString(listOf("12345678910")),
+            Task.nyTask(type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
+                        payload = objectMapper.writeValueAsString(listOf("12345678910")),
                         properties = Properties().apply {
                             this["tidligereHendelseId"] = "ooo"
                         })
@@ -112,7 +114,8 @@ class MottaAnnullerFødselTaskTest {
         val statusSlot = slot<List<Status>>()
         every { taskRepository.finnTasksMedStatus(capture(statusSlot), any()) } returns emptyList()
         MottaAnnullerFødselTask(taskRepository, sakClient).doTask(
-            Task.nyTask(type = MottaAnnullerFødselTask.TASK_STEP_TYPE, payload = objectMapper.writeValueAsString(listOf("12345678910")),
+            Task.nyTask(type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
+                        payload = objectMapper.writeValueAsString(listOf("12345678910")),
                         properties = Properties().apply {
                             this["tidligereHendelseId"] = "ooo"
                         })
@@ -135,16 +138,18 @@ class MottaAnnullerFødselTaskTest {
         val barnsIdenter = listOf("12345678910", "12345678911")
         val metadata = Properties().apply {
             this["tidligereHendelseId"] = "ooo"
-            this["identer"] = barnsIdenter
+            this["identer"] = objectMapper.writeValueAsString(barnsIdenter)
         }
         MottaAnnullerFødselTask(taskRepository, sakClient).doTask(
-            Task.nyTask(type = MottaAnnullerFødselTask.TASK_STEP_TYPE, payload = objectMapper.writeValueAsString(barnsIdenter),
-                        properties = metadata)
+            Task.nyTask(
+                type = MottaAnnullerFødselTask.TASK_STEP_TYPE, payload = objectMapper.writeValueAsString(barnsIdenter),
+                properties = metadata
+            )
         )
 
         assertThat(barnasIdenterSlot.captured).hasSize(2)
-        assertThat(barnasIdenterSlot.captured.any{it == barnsIdenter[0]}).isTrue()
-        assertThat(barnasIdenterSlot.captured.any{it == barnsIdenter[1]}).isTrue()
+        assertThat(barnasIdenterSlot.captured.any { it == barnsIdenter[0] }).isTrue()
+        assertThat(barnasIdenterSlot.captured.any { it == barnsIdenter[1] }).isTrue()
     }
 
 }
