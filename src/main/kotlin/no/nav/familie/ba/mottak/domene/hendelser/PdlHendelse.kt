@@ -12,10 +12,8 @@ data class PdlHendelse(val hendelseId: String,
                        val fødselsdato: LocalDate? = null,
                        val fødeland: String? = null,
                        val utflyttingsdato: LocalDate? = null,
-                       val tidligereHendelseId: String? = null,
     ) {
 
         // TODO: Skal gjøres tydeligere og mer robust.
         fun hentPersonident() = personIdenter.first { it.length == 11 }
-        fun hentPersonidenter() = personIdenter.filter { it.length == 11 }
     }

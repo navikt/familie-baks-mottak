@@ -44,7 +44,6 @@ class LeesahConsumer(val leesahService: LeesahService) {
             cr.value().hentFødselsdato(),
             cr.value().hentFødeland(),
             cr.value().hentUtflyttingsdato(),
-            cr.value().hentTidligereHendelseId(),
         )
 
         try {
@@ -86,10 +85,6 @@ class LeesahConsumer(val leesahService: LeesahService) {
 
     private fun GenericRecord.hentFødeland(): String? {
         return (get("foedsel") as GenericRecord?)?.get("foedeland")?.toString()
-    }
-
-    private fun GenericRecord.hentTidligereHendelseId(): String? {
-        return get("tidligereHendelseId")?.toString()
     }
 
     private fun GenericRecord.hentUtflyttingsdato(): LocalDate? {
