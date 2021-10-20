@@ -95,11 +95,14 @@ class SakClient @Autowired constructor(
         maxAttempts = 3,
         backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}")
     )
-    fun sendAnnullerFødselshendelseTilSak(barnasIdenter: List<String>) {
+    fun sendAnnullerFødselshendelseTilSak(barnasIdenter: List<String>, tidligereHendelseId: String) {
         val uri = URI.create("$sakServiceUri/fagsaker/annullerFoedsel")
         logger.info("Sender annuller fødselshendelse til {}", uri)
         try {
-            val response = postForEntity<Ressurs<String>>(uri, barnasIdenter)
+            val response = postForEntity<Ressurs<String>>(uri, RestAnnullerFødsel(
+                barnasIdenter = barnasIdenter,
+                tidligereHendelseId = tidligereHendelseId,
+            ))
             logger.info("Annuller fødselshendelse sendt til sak. Status=${response.status}")
         } catch (e: RestClientResponseException) {
             logger.warn(
@@ -160,6 +163,8 @@ data class RestFagsakDeltager(
     val fagsakStatus: FagsakStatus,
 
     )
+
+data class RestAnnullerFødsel(val barnasIdenter: List<String>, val tidligereHendelseId: String)
 
 enum class FagsakDeltagerRolle {
     BARN,

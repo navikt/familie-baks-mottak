@@ -6,6 +6,7 @@ import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.Hendelseslogg
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
+import no.nav.familie.ba.mottak.integrasjoner.RestAnnullerFødsel
 import no.nav.familie.ba.mottak.task.MottaAnnullerFødselTask
 import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.ba.mottak.task.VurderLivshendelseTask
@@ -127,7 +128,12 @@ class LeesahService(
                 fødselAnnullertCounter.increment()
                 if (pdlHendelse.tidligereHendelseId != null) {
                     val task = Task.nyTask(type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
-                                           payload = objectMapper.writeValueAsString(pdlHendelse.hentPersonidenter()),
+                                           payload = objectMapper.writeValueAsString(
+                                               RestAnnullerFødsel(
+                                                   barnasIdenter = pdlHendelse.hentPersonidenter(),
+                                                   tidligereHendelseId = pdlHendelse.tidligereHendelseId
+                                               )
+                                           ),
                                            properties = Properties().apply {
                                                this["identer"] = pdlHendelse.hentPersonidenter().toString()
                                                this["callId"] = pdlHendelse.hendelseId

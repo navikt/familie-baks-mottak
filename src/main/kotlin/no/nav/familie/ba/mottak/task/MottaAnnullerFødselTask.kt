@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.task
 
+import no.nav.familie.ba.mottak.integrasjoner.RestAnnullerFødsel
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.prosessering.AsyncTaskStep
@@ -29,8 +30,9 @@ class MottaAnnullerFødselTask(
     val log: Logger = LoggerFactory.getLogger(MottaAnnullerFødselTask::class.java)
 
     override fun doTask(task: Task) {
-        val tidligereHendelseId = task.metadata["tidligereHendelseId"] as String
-        var barnasIdenter = objectMapper.readValue(task.payload, List::class.java).map { it.toString() }
+        val restAnnullerFødsel = objectMapper.readValue(task.payload, RestAnnullerFødsel::class.java)
+        val tidligereHendelseId = restAnnullerFødsel.tidligereHendelseId
+        var barnasIdenter = restAnnullerFødsel.barnasIdenter
 
         var tasker =
             taskRepository.finnTasksMedStatus(listOf(Status.KLAR_TIL_PLUKK, Status.UBEHANDLET, Status.FEILET), Pageable.unpaged())
@@ -39,7 +41,7 @@ class MottaAnnullerFødselTask(
                             && (it.taskStepType == MottaFødselshendelseTask.TASK_STEP_TYPE || it.taskStepType == SendTilSakTask.TASK_STEP_TYPE)
                 }
         if (tasker.isEmpty()) {
-            sakClient.sendAnnullerFødselshendelseTilSak(barnasIdenter)
+            sakClient.sendAnnullerFødselshendelseTilSak(barnasIdenter, tidligereHendelseId)
         } else {
             tasker.forEach {
                 taskRepository.save(
