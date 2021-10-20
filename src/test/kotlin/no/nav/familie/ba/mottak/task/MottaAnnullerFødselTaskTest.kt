@@ -6,6 +6,7 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.familie.ba.mottak.integrasjoner.RestAnnullerFødsel
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.log.mdc.MDCConstants
@@ -31,7 +32,6 @@ class MottaAnnullerFødselTaskTest {
     fun `Skal endre status av Task med riktig type`() {
         val taskRepository = mockk<TaskRepository>()
 
-        MDC.put(MDCConstants.MDC_CALL_ID, "ooo")
         val journalførSøknadTask = Task.nyTask(type = JournalførSøknadTask.JOURNALFØR_SØKNAD, payload = "").copy(
             id = 0
         )
@@ -54,11 +54,10 @@ class MottaAnnullerFødselTaskTest {
         every { taskRepository.save(capture(taskSlot)) } returns mottaFødselshendelseTask
 
         MottaAnnullerFødselTask(taskRepository, sakClient).doTask(
-            Task.nyTask(type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
-                        payload = objectMapper.writeValueAsString(listOf("12345678910")),
-                        properties = Properties().apply {
-                            this["tidligereHendelseId"] = "ooo"
-                        })
+            Task.nyTask(
+                type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
+                payload = objectMapper.writeValueAsString(RestAnnullerFødsel(listOf("12345678910"), "ooo"))
+            )
         )
         verify(exactly = 2) { taskRepository.save(any()) }
         assertThat(taskSlot.find { it.id == 1L }!!.status).isEqualTo(Status.AVVIKSHÅNDTERT)
@@ -96,11 +95,10 @@ class MottaAnnullerFødselTaskTest {
         every { taskRepository.save(capture(taskSlot)) } returns task0
 
         MottaAnnullerFødselTask(taskRepository, sakClient).doTask(
-            Task.nyTask(type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
-                        payload = objectMapper.writeValueAsString(listOf("12345678910")),
-                        properties = Properties().apply {
-                            this["tidligereHendelseId"] = "ooo"
-                        })
+            Task.nyTask(
+                type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
+                payload = objectMapper.writeValueAsString(RestAnnullerFødsel(listOf("12345678910"), "ooo")),
+            )
         )
         verify(exactly = 1) { taskRepository.save(any()) }
         assertThat(taskSlot.find { it.id == 1L }!!.status).isEqualTo(Status.AVVIKSHÅNDTERT)
@@ -114,11 +112,10 @@ class MottaAnnullerFødselTaskTest {
         val statusSlot = slot<List<Status>>()
         every { taskRepository.finnTasksMedStatus(capture(statusSlot), any()) } returns emptyList()
         MottaAnnullerFødselTask(taskRepository, sakClient).doTask(
-            Task.nyTask(type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
-                        payload = objectMapper.writeValueAsString(listOf("12345678910")),
-                        properties = Properties().apply {
-                            this["tidligereHendelseId"] = "ooo"
-                        })
+            Task.nyTask(
+                type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
+                payload = objectMapper.writeValueAsString(RestAnnullerFødsel(listOf("12345678910"), "ooo")),
+            )
         )
         verify(exactly = 1) { taskRepository.finnTasksMedStatus(any(), any()) }
         assertThat(statusSlot.captured.size).isEqualTo(3)
@@ -133,23 +130,26 @@ class MottaAnnullerFødselTaskTest {
 
         every { taskRepository.finnTasksMedStatus(any(), any()) } returns emptyList()
         val barnasIdenterSlot = slot<List<String>>()
-        every { sakClient.sendAnnullerFødselshendelseTilSak(capture(barnasIdenterSlot)) } just runs
+        val tidligereHendelseIdSlot = slot<String>()
+        every {
+            sakClient.sendAnnullerFødselshendelseTilSak(
+                capture(barnasIdenterSlot),
+                capture(tidligereHendelseIdSlot)
+            )
+        } just runs
 
         val barnsIdenter = listOf("12345678910", "12345678911")
-        val metadata = Properties().apply {
-            this["tidligereHendelseId"] = "ooo"
-            this["identer"] = objectMapper.writeValueAsString(barnsIdenter)
-        }
         MottaAnnullerFødselTask(taskRepository, sakClient).doTask(
             Task.nyTask(
-                type = MottaAnnullerFødselTask.TASK_STEP_TYPE, payload = objectMapper.writeValueAsString(barnsIdenter),
-                properties = metadata
+                type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
+                payload = objectMapper.writeValueAsString(RestAnnullerFødsel(barnsIdenter, "ooo")),
             )
         )
 
         assertThat(barnasIdenterSlot.captured).hasSize(2)
         assertThat(barnasIdenterSlot.captured.any { it == barnsIdenter[0] }).isTrue()
         assertThat(barnasIdenterSlot.captured.any { it == barnsIdenter[1] }).isTrue()
+        assertThat(tidligereHendelseIdSlot.captured).isEqualTo("ooo")
     }
 
 }
