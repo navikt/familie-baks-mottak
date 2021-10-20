@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
 
-@SpringBootTest(classes = [DevLauncher::class], properties = ["FAMILIE_BA_INFOTRYGD_BARNETRYGD_API_URL=http://localhost:28085"])
+@SpringBootTest(classes = [DevLauncher::class], properties = ["FAMILIE_BA_INFOTRYGD_API_URL=http://localhost:28085"])
 @ActiveProfiles("dev", "mock-oauth")
 @AutoConfigureWireMock(port = 28085)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

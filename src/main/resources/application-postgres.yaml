@@ -30,11 +30,11 @@ no.nav.security.jwt:
           client-id: ${CLIENT_ID}
           client-secret: ${CLIENT_SECRET}
           client-auth-method: client_secret_basic
-      familie-ba-infotrygd-barnetrygd-clientcredentials:
-        resource-url: ${FAMILIE_BA_INFOTRYGD_BARNETRYGD_API_URL}
+      familie-ba-infotrygd-clientcredentials:
+        resource-url: ${FAMILIE_BA_INFOTRYGD_API_URL}
         token-endpoint-url: https://login.microsoftonline.com/navq.onmicrosoft.com/oauth2/v2.0/token
         grant-type: client_credentials
-        scope: ${FAMILIE_BA_INFOTRYGD_BARNETRYGD_SCOPE}
+        scope: dummy
         authentication:
           client-id: ${CLIENT_ID}
           client-secret: ${CLIENT_SECRET}
