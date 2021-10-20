@@ -29,11 +29,11 @@ no.nav.security.jwt:
           client-id: ${CLIENT_ID}
           client-secret: ${CLIENT_SECRET}
           client-auth-method: client_secret_basic
-      familie-ba-infotrygd-barnetrygd-clientcredentials:
-        resource-url: ${FAMILIE_BA_INFOTRYGD_BARNETRYGD_API_URL}
+      familie-ba-infotrygd-clientcredentials:
+        resource-url: ${FAMILIE_BA_INFOTRYGD_API_URL}
         token-endpoint-url: https://login.microsoftonline.com/navq.onmicrosoft.com/oauth2/v2.0/token
         grant-type: client_credentials
-        scope: ${FAMILIE_BA_INFOTRYGD_BARNETRYGD_SCOPE}
+        scope: ${FAMILIE_BA_INFOTRYGD_SCOPE}
         authentication:
           client-id: ${CLIENT_ID}
           client-secret: ${CLIENT_SECRET}
@@ -76,7 +76,7 @@ retry.backoff.delay: 5
 FAMILIE_BA_DOKGEN_API_URL: http://localhost:5914
 FAMILIE_BA_SAK_API_URL: http://localhost:8089/api
 FAMILIE_INTEGRASJONER_API_URL: http://localhost:8085/api
-FAMILIE_BA_INFOTRYGD_BARNETRYGD_API_URL: http://localhost:8093
+FAMILIE_BA_INFOTRYGD_API_URL: http://localhost:8093
 
 FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1
 FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 1
