@@ -129,7 +129,7 @@ class LeesahService(
                     val task = Task.nyTask(type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
                                            payload = objectMapper.writeValueAsString(pdlHendelse.hentPersonidenter()),
                                            properties = Properties().apply {
-                                               this["identer"] = objectMapper.writeValueAsString(pdlHendelse.hentPersonidenter())
+                                               this["identer"] = pdlHendelse.hentPersonidenter().toString()
                                                this["callId"] = pdlHendelse.hendelseId
                                                this["tidligereHendelseId"] = pdlHendelse.tidligereHendelseId
                                            })
