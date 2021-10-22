@@ -13,11 +13,11 @@ import org.springframework.web.client.RestOperations
 import java.net.URI
 
 @Component
-class InfotrygdBarnetrygdClient(@Value("\${FAMILIE_BA_INFOTRYGD_BARNETRYGD_API_URL}/infotrygd/barnetrygd")
+class InfotrygdBarnetrygdClient(@Value("\${FAMILIE_BA_INFOTRYGD_API_URL}/infotrygd/barnetrygd")
                                 private val clientUri: URI,
                                 @Qualifier("clientCredentials") restOperations: RestOperations,
                                 private val environment: Environment)
-    : AbstractRestClient(restOperations, "infotrygd_barnetrygd_replika") {
+    : AbstractRestClient(restOperations, "familie-ba-infotrygd") {
 
     fun hentLøpendeUtbetalinger(søkersIdenter: List<String>, barnasIdenter: List<String>): InfotrygdSøkResponse<StønadDto> {
         return infotrygdResponseFra(
