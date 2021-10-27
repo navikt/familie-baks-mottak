@@ -135,7 +135,7 @@ class LeesahService(
                                                )
                                            ),
                                            properties = Properties().apply {
-                                               this["identer"] = pdlHendelse.hentPersonidenter().toString()
+                                               this["ident"] = pdlHendelse.hentPersonident()
                                                this["callId"] = pdlHendelse.hendelseId
                                                this["tidligereHendelseId"] = pdlHendelse.tidligereHendelseId
                                            })
