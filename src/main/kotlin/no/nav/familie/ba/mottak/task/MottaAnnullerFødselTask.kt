@@ -6,10 +6,8 @@ import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Avvikstype
-import no.nav.familie.prosessering.domene.Loggtype
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskLogg
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -35,10 +33,13 @@ class MottaAnnullerFødselTask(
         var barnasIdenter = restAnnullerFødsel.barnasIdenter
 
         var tasker =
-            taskRepository.finnTasksMedStatus(listOf(Status.KLAR_TIL_PLUKK, Status.UBEHANDLET, Status.FEILET), Pageable.unpaged())
+            taskRepository.finnTasksMedStatus(
+                listOf(Status.KLAR_TIL_PLUKK, Status.UBEHANDLET, Status.FEILET),
+                Pageable.unpaged()
+            )
                 .filter {
-                    it.callId == tidligereHendelseId
-                            && (it.taskStepType == MottaFødselshendelseTask.TASK_STEP_TYPE || it.taskStepType == SendTilSakTask.TASK_STEP_TYPE)
+                    it.callId == tidligereHendelseId &&
+                        (it.taskStepType == MottaFødselshendelseTask.TASK_STEP_TYPE || it.taskStepType == SendTilSakTask.TASK_STEP_TYPE)
                 }
         if (tasker.isEmpty()) {
             sakClient.sendAnnullerFødselshendelseTilSak(barnasIdenter, tidligereHendelseId)
