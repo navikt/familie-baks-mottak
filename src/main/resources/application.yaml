@@ -24,7 +24,7 @@ spring:
       enable-auto-commit: false
   datasource:
     hikari:
-      maximum-pool-size: 4
+      maximum-pool-size: 2
       connection-test-query: "select 1"
       max-lifetime: 30000
       minimum-idle: 1
