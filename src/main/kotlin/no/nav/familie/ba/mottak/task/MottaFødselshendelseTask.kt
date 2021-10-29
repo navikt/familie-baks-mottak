@@ -81,10 +81,10 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
 
                 task.metadata["morsIdent"] = morsIdent.id
                 val nesteTask = Task.nyTask(
-                        SendTilSakTask.TASK_STEP_TYPE,
-                        jacksonObjectMapper().writeValueAsString(NyBehandling(morsIdent = morsIdent.id,
-                                                                              barnasIdenter = arrayOf(barnetsId))),
-                        task.metadata
+                    SendTilSakTask.TASK_STEP_TYPE,
+                    jacksonObjectMapper().writeValueAsString(NyBehandling(morsIdent = morsIdent.id,
+                                                                          barnasIdenter = arrayOf(barnetsId))),
+                    task.metadata
                 )
 
                 taskRepository.save(nesteTask)
