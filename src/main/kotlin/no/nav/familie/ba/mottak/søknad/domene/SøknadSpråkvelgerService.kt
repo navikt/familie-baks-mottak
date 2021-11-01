@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.kotlin.convertValue
-import no.nav.familie.kontrakter.ba.søknad.v4.Søknad
+import no.nav.familie.kontrakter.ba.søknad.v5.Søknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt
 import no.nav.familie.kontrakter.felles.objectMapper as getObjectMapper

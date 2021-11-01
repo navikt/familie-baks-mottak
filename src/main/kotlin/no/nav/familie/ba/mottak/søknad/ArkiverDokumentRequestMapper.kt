@@ -4,7 +4,7 @@ import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.DBVedlegg
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.v4.Dokumentasjonsbehov
-import no.nav.familie.kontrakter.ba.søknad.v4.Søknad
+import no.nav.familie.kontrakter.ba.søknad.v5.Søknad
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.Dokument
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.Filtype
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.ArkiverDokumentRequest
