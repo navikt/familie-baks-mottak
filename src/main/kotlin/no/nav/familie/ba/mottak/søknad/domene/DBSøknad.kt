@@ -30,7 +30,7 @@ data class DBSøknad(
 
     fun hentSøknadVersjon(): String {
         try {
-            val søknad: SøknadV4 = objectMapper.readValue(søknadJson);
+            objectMapper.readValue<SøknadV4>(søknadJson);
             return "v4"
         } catch (e: Exception) {
             return "v5";
