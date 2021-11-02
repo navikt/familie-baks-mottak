@@ -5,7 +5,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.ba.mottak.DevLauncherPostgres
 import no.nav.familie.ba.mottak.util.DbContainerInitializer
-import no.nav.familie.kontrakter.ba.søknad.v4.Søknad
+import no.nav.familie.kontrakter.ba.søknad.v5.Søknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt
 import no.nav.familie.kontrakter.felles.objectMapper
 import org.junit.jupiter.api.Test
