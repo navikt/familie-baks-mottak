@@ -31,8 +31,7 @@ class JournalhendelseService(
     val hendelsesloggRepository: HendelsesloggRepository,
 ) {
 
-    val kanalNavnoCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.navno")
-    val kanalSkannetsCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skannets")
+    val kanalCounter = mutableMapOf<String, Counter>()
     val skannetOrdinæreSøknaderCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skan.ny.ordinaer.soknad")
     val skannetUtvidedeSøknaderCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skan.ny.utvidet.soknad")
     val kanalAnnetCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.annet")
@@ -111,6 +110,7 @@ class JournalhendelseService(
 
                         else -> {
                             logger.info("Ny journalhendelse med journalpostId=$journalpostId med status MOTTATT og kanal ${journalpost.kanal}")
+                            incrementKanalCounter(journalpost.kanal.toString())
                             kanalAnnetCounter.count()
                         }
                     }
@@ -125,7 +125,7 @@ class JournalhendelseService(
 
     private fun behandleNavnoHendelser(journalpost: Journalpost) {
         opprettJournalhendelseRutingTask(journalpost)
-        kanalNavnoCounter.increment()
+        incrementKanalCounter(journalpost.kanal!!)
     }
 
     private fun behandleSkanningHendelser(journalpost: Journalpost) {
@@ -137,7 +137,14 @@ class JournalhendelseService(
 
         if (erOrdinærSønad) skannetOrdinæreSøknaderCounter.increment()
         if (erUtvidetSøknad) skannetUtvidedeSøknaderCounter.increment()
-        kanalSkannetsCounter.increment()
+        incrementKanalCounter(journalpost.kanal!!)
+    }
+
+    private fun incrementKanalCounter(kanal: String) {
+        if (!kanalCounter.containsKey(kanal)) {
+            kanalCounter[kanal] = Metrics.counter("barnetrygd.journalhendelse.kanal", "kanal", kanal)
+        }
+        kanalCounter[kanal]!!.increment()
     }
 
     private fun skalBehandleJournalpost(journalpost: Journalpost) =
