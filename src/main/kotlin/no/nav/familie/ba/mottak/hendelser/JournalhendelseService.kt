@@ -142,7 +142,7 @@ class JournalhendelseService(
 
     private fun incrementKanalCounter(kanal: String) {
         if (!kanalCounter.containsKey(kanal)) {
-            kanalCounter[kanal] = Metrics.counter("barnetrygd.journalhendelse.kanal", "kanal", kanal)
+            kanalCounter[kanal] = Metrics.counter("barnetrygd.journalhendelse.mottatt", "kanal", kanal)
         }
         kanalCounter[kanal]!!.increment()
     }
