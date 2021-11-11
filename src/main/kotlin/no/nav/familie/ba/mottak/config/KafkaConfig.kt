@@ -3,6 +3,7 @@ package no.nav.familie.ba.mottak.config
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import org.apache.avro.generic.GenericRecord
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -17,7 +18,11 @@ import java.time.Duration
 
 @EnableKafka
 @Configuration
-@Profile("!e2e")
+@ConditionalOnProperty(
+    value = ["funksjonsbrytere.kafka.enabled"],
+    havingValue = "true",
+    matchIfMissing = true
+)
 class KafkaConfig {
 
 

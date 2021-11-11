@@ -62,6 +62,7 @@ spring:
     enabled: false
 
 funksjonsbrytere:
+  kafka.enabled: false
   enabled: false
   unleash:
     uri: http://dummy/api/
