@@ -158,7 +158,11 @@ class VurderLivshendelseTask(
             log.info("Oppretter oppgave for aktørId=$aktørId")
             val restFagsak = sakClient.hentRestFagsak(fagsakPerson.fagsakId)
             secureLog.info("Hentet restBehandling $restFagsak")
-            val restUtvidetBehandling = restFagsak.behandlinger.first { it.aktiv }
+            val restUtvidetBehandling = restFagsak.behandlinger.firstOrNull { it.aktiv }
+
+            if (restUtvidetBehandling == null) {
+                error("Fagsak ${restFagsak.id} mangler aktiv behandling. Får ikke opprettet VurderLivshendelseOppgave")
+            }
 
             Pair(true, OppgaveVurderLivshendelseDto(aktørId = aktørId,
                                                     beskrivelse = beskrivelse,
