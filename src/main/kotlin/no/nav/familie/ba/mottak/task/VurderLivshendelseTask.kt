@@ -140,9 +140,11 @@ class VurderLivshendelseTask(
 
     private fun hentEllerOpprettNyOppgaveForPerson(fagsakPerson: RestFagsakDeltager,
                                                    beskrivelse: String): Pair<Boolean, Any> {
+        secureLog.info("hentEllerOpprettNyOppgaveForPerson for ${fagsakPerson.ident} med beskrivelse $beskrivelse")
 
         val aktørId = aktørClient.hentAktørId(fagsakPerson.ident)
         val vurderLivshendelseOppgaver = oppgaveClient.finnOppgaverPåAktørId(aktørId, Oppgavetype.VurderLivshendelse)
+        secureLog.info("Fant følgende oppgaver: $vurderLivshendelseOppgaver")
 
         val åpenOppgave: Oppgave? = vurderLivshendelseOppgaver.firstOrNull {
             it.beskrivelse?.startsWith(beskrivelse.substring(0,8)) == true && (
@@ -150,9 +152,12 @@ class VurderLivshendelseTask(
         }
 
         return if (åpenOppgave != null) {
+            log.info("Fant åpen vurderLivshendelse oppgave for aktørId=$aktørId oppgaveId=${åpenOppgave.id}")
             Pair(false, åpenOppgave)
         } else {
+            log.info("Oppretter oppgave for aktørId=$aktørId")
             val restUtvidetBehandling = sakClient.hentRestFagsak(fagsakPerson.fagsakId).behandlinger.first { it.aktiv }
+            secureLog.info("Hentet restBehandling $restUtvidetBehandling")
 
             Pair(true, OppgaveVurderLivshendelseDto(aktørId = aktørId,
                                                     beskrivelse = beskrivelse,
