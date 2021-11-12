@@ -16,7 +16,6 @@ jobs:
         with:
           java-version: 11
           distribution: 'temurin'
-          cache: 'maven'
       - name: Bygg med maven + sonar
         env:
           SONAR_PROJECTKEY: ${{ secrets.SONAR_PROJECTKEY }}
