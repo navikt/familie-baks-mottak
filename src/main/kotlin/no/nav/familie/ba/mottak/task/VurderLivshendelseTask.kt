@@ -156,8 +156,9 @@ class VurderLivshendelseTask(
             Pair(false, åpenOppgave)
         } else {
             log.info("Oppretter oppgave for aktørId=$aktørId")
-            val restUtvidetBehandling = sakClient.hentRestFagsak(fagsakPerson.fagsakId).behandlinger.first { it.aktiv }
-            secureLog.info("Hentet restBehandling $restUtvidetBehandling")
+            val restFagsak = sakClient.hentRestFagsak(fagsakPerson.fagsakId)
+            secureLog.info("Hentet restBehandling $restFagsak")
+            val restUtvidetBehandling = restFagsak.behandlinger.first { it.aktiv }
 
             Pair(true, OppgaveVurderLivshendelseDto(aktørId = aktørId,
                                                     beskrivelse = beskrivelse,
