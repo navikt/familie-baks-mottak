@@ -70,13 +70,13 @@ class SakClient @Autowired constructor(
         )
     }
 
-    fun hentRestFagsak(personIdent: String): RestFagsak? {
-        val uri = URI.create("$sakServiceUri/fagsaker/hent-fagsak-paa-person")
+    fun hentMinimalRestFagsak(fagsakId: Long): RestMinimalFagsak {
+        val uri = URI.create("$sakServiceUri/fagsaker/minimal/$fagsakId")
         return runCatching {
-            postForEntity<Ressurs<RestFagsak>>(uri, mapOf("personIdent" to personIdent))
+            getForEntity<Ressurs<RestMinimalFagsak>>(uri)
         }.fold(
-            onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
-            onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ba-sak.", it, uri, personIdent) }
+            onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
+            onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ba-sak.", it, uri) }
         )
     }
 
@@ -119,6 +119,24 @@ class SakClient @Autowired constructor(
         }
     }
 }
+
+
+data class RestMinimalFagsak(
+    val id: Long,
+    val behandlinger: List<RestVisningBehandling>
+)
+
+class RestVisningBehandling(
+    val behandlingId: Long,
+    val opprettetTidspunkt: LocalDateTime,
+    val aktiv: Boolean,
+    val årsak: String? = null,
+    val type: String,
+    val status: String,
+    val resultat: String? = null,
+    val vedtaksdato: LocalDateTime? = null,
+)
+
 
 data class RestFagsak(
     val id: Long,

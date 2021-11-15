@@ -156,25 +156,29 @@ class VurderLivshendelseTask(
             Pair(false, åpenOppgave)
         } else {
             log.info("Oppretter oppgave for aktørId=$aktørId")
-            val restFagsak = sakClient.hentRestFagsak(fagsakPerson.fagsakId)
-            secureLog.info("Hentet restBehandling $restFagsak")
-            val restUtvidetBehandling = restFagsak.behandlinger.firstOrNull { it.aktiv }
+            val minimalRestFagsak = sakClient.hentMinimalRestFagsak(fagsakPerson.fagsakId)
+            secureLog.info("Hentet minimal rest fagsak: $minimalRestFagsak")
+            val restMinimalBehandling = minimalRestFagsak.behandlinger.firstOrNull { it.aktiv }
 
-            if (restUtvidetBehandling == null) {
-                error("Fagsak ${restFagsak.id} mangler aktiv behandling. Får ikke opprettet VurderLivshendelseOppgave")
+            if (restMinimalBehandling == null) {
+                error("Fagsak ${fagsakPerson.fagsakId} mangler aktiv behandling. Får ikke opprettet VurderLivshendelseOppgave")
             }
+
+            val restFagsak = sakClient.hentRestFagsak(fagsakPerson.fagsakId)
+            val restUtvidetBehandling = restFagsak.behandlinger.firstOrNull { it.behandlingId == restMinimalBehandling.behandlingId }
+
 
             Pair(true, OppgaveVurderLivshendelseDto(aktørId = aktørId,
                                                     beskrivelse = beskrivelse,
                                                     saksId = fagsakPerson.fagsakId.toString(),
                                                     behandlingstema = tilBehandlingstema(restUtvidetBehandling),
-                                                    enhetsId = restUtvidetBehandling.arbeidsfordelingPåBehandling.behandlendeEnhetId,
                                                     behandlesAvApplikasjon = BehandlesAvApplikasjon.BA_SAK.applikasjon))
         }
     }
 
-    private fun tilBehandlingstema(restUtvidetBehandling: RestUtvidetBehandling): String {
+    private fun tilBehandlingstema(restUtvidetBehandling: RestUtvidetBehandling?): String {
         return when {
+            restUtvidetBehandling == null -> Behandlingstema.Barnetrygd.value
             restUtvidetBehandling.kategori == BehandlingKategori.EØS -> Behandlingstema.BarnetrygdEØS.value
             restUtvidetBehandling.kategori == BehandlingKategori.NASJONAL && restUtvidetBehandling.underkategori == BehandlingUnderkategori.ORDINÆR -> Behandlingstema.OrdinærBarnetrygd.value
             restUtvidetBehandling.kategori == BehandlingKategori.NASJONAL && restUtvidetBehandling.underkategori == BehandlingUnderkategori.UTVIDET -> Behandlingstema.UtvidetBarnetrygd.value

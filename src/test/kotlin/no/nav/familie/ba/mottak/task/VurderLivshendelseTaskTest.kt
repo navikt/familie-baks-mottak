@@ -184,6 +184,7 @@ class VurderLivshendelseTaskTest {
                 listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE))
 
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivOrdinær()
+        every { mockSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagAktivOrdinærMinimal()
 
         listOf(DØDSFALL, UTFLYTTING).forEach {
             vurderLivshendelseTask.doTask(
@@ -210,7 +211,7 @@ class VurderLivshendelseTaskTest {
 
         assertThat(oppgaveDto).allMatch { it.aktørId.contains(PERSONIDENT_MOR) }
         assertThat(oppgaveDto).allMatch { it.saksId == "$SAKS_ID" }
-        assertThat(oppgaveDto).allMatch { it.enhetsId == ENHET_ID }
+        assertThat(oppgaveDto).allMatch { it.enhetsId == null }
         assertThat(oppgaveDto).allMatch { it.behandlingstema == Behandlingstema.OrdinærBarnetrygd.value }
         assertThat(oppgaveDto).allMatch { it.behandlesAvApplikasjon == BehandlesAvApplikasjon.BA_SAK.applikasjon }
     }
@@ -247,6 +248,7 @@ class VurderLivshendelseTaskTest {
         every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_FAR, emptyList()) } returns emptyList()
 
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
+        every { mockSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagAktivOrdinærMinimal()
 
         listOf(DØDSFALL, UTFLYTTING).forEach {
             vurderLivshendelseTask.doTask(
@@ -273,7 +275,7 @@ class VurderLivshendelseTaskTest {
 
         assertThat(oppgaveDto).allMatch { it.aktørId.contains(PERSONIDENT_MOR) }
         assertThat(oppgaveDto).allMatch { it.saksId == "$SAKS_ID" }
-        assertThat(oppgaveDto).allMatch { it.enhetsId == ENHET_ID }
+        assertThat(oppgaveDto).allMatch { it.enhetsId == null }
         assertThat(oppgaveDto).allMatch { it.behandlingstema == Behandlingstema.UtvidetBarnetrygd.value }
         assertThat(oppgaveDto).allMatch { it.behandlesAvApplikasjon == BehandlesAvApplikasjon.BA_SAK.applikasjon }
     }
@@ -291,9 +293,17 @@ class VurderLivshendelseTaskTest {
                             "RESULTAT",
                             "STEG",
                             "TYPE",
-                            BehandlingUnderkategori.ORDINÆR
+                            BehandlingUnderkategori.ORDINÆR,
                     )
             )
+    )
+
+    private fun lagAktivOrdinærMinimal() = RestMinimalFagsak(
+        SAKS_ID,
+        listOf(
+            RestVisningBehandling(behandlingId = 321,aktiv = true, opprettetTidspunkt = LocalDateTime.now(), status = "TEST", type = "TEST"
+            )
+        )
     )
 
     private fun lagAktivUtvidet() = RestFagsak(

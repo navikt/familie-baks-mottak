@@ -208,6 +208,6 @@ data class OppgaveVurderLivshendelseDto(
     val beskrivelse: String,
     val saksId: String,
     val behandlingstema: String,
-    val enhetsId: String,
+    val enhetsId: String? = null,
     val behandlesAvApplikasjon: String? = null,
 )
