@@ -172,7 +172,7 @@ class OppgaveClient @Autowired constructor(
 
     private fun responseFraOpprettOppgave(uri: URI, request: OpprettOppgaveRequest): OppgaveResponse {
         return Result.runCatching {
-            logger.info("Sender OpprettOppgaveRequest med beskrivelse: ${request.beskrivelse}")
+            secureLog.info("Sender OpprettOppgaveRequest ${request}")
             postForEntity<Ressurs<OppgaveResponse>>(uri, request)
         }.fold(
             onSuccess = { response -> assertGyldig(response) },
