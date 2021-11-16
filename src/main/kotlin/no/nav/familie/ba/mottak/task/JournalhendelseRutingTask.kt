@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.task
 
+import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.BARN
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.AVSLUTTET
@@ -35,6 +36,7 @@ class JournalhendelseRutingTask(
         private val sakClient: SakClient,
         private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,
         private val taskRepository: TaskRepository,
+        private val featureToggleService: FeatureToggleService,
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(JournalhendelseRutingTask::class.java)
@@ -51,6 +53,8 @@ class JournalhendelseRutingTask(
             infotrygdSak.finnes() -> "${infotrygdSak!!.part} har sak i Infotrygd"
             else -> "" // trenger ingen form for markering. Kan løses av begge systemer
         }
+
+       log.info("Ruting toggle er satt til ${featureToggleService.isEnabled("familie-ba-mottak.ta-over-ruting", false)}")
 
         when (task.payload) {
             "NAV_NO" -> {

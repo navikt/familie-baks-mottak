@@ -5,6 +5,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.integrasjoner.Bruker
 import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
@@ -40,11 +41,12 @@ class NavnoHendelseTaskLøypeTest {
     private val mockTaskRepository: TaskRepository = mockk(relaxed = true)
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
+    private val mockFeatureToggleService: FeatureToggleService = mockk()
 
     private val rutingSteg = JournalhendelseRutingTask(mockPdlClient,
                                                        mockSakClient,
                                                        mockInfotrygdBarnetrygdClient,
-                                                       mockTaskRepository)
+                                                       mockTaskRepository, mockFeatureToggleService)
 
     private val journalføringSteg = OpprettJournalføringOppgaveTask(mockJournalpostClient,
                                                                     mockOppgaveClient,
@@ -88,6 +90,8 @@ class NavnoHendelseTaskLøypeTest {
         every {
             mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
         } returns InfotrygdSøkResponse(emptyList(), emptyList())
+
+        every { mockFeatureToggleService.isEnabled("familie-ba-mottak.ta-over-ruting",false) } returns false
     }
 
     @Test
