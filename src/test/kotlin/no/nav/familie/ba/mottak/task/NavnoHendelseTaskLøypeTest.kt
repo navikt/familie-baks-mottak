@@ -91,7 +91,7 @@ class NavnoHendelseTaskLøypeTest {
             mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
         } returns InfotrygdSøkResponse(emptyList(), emptyList())
 
-        every { mockFeatureToggleService.isEnabled("familie-ba-mottak.ta-over-ruting",false) } returns false
+        every { mockFeatureToggleService.isEnabled("familie-ba-mottak.ta-over-ruting",false) } returns true
     }
 
     @Test
@@ -116,25 +116,22 @@ class NavnoHendelseTaskLøypeTest {
     }
 
     @Test
-    fun `Skal ikke gå videre når bruker ikke har sak i BA-sak`() {
-        every {
-            mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
-        } returns emptyList()
-
-        Assertions.assertThatThrownBy {
-            kjørRutingTaskOgReturnerNesteTask()
-        }.hasMessageContainingAll("TaskRepository", ".save", "was not called")
-    }
-
-    @Test
-    fun `Skal ikke gå videre når bruker har sak i Infotrygd`() {
+    fun `Skal opprette JFR-oppgave med tekst om at bruker har sak i Infotrygd`() {
         every {
             mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
         } returns InfotrygdSøkResponse(listOf(StønadDto()), emptyList())
 
-        Assertions.assertThatThrownBy {
-            kjørRutingTaskOgReturnerNesteTask()
-        }.hasMessageContainingAll("TaskRepository", ".save", "was not called")
+        kjørRutingTaskOgReturnerNesteTask().run {
+            Assertions.assertThat(this.taskStepType).isEqualTo(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE)
+            journalføringSteg.doTask(this)
+        }
+
+        val oppgaveBeskrivelse = slot<String>()
+
+        verify(exactly = 1) {
+            mockOppgaveClient.opprettJournalføringsoppgave(any(), capture(oppgaveBeskrivelse))
+        }
+        Assertions.assertThat(oppgaveBeskrivelse.captured).isEqualTo("Bruker har sak i Infotrygd")
     }
 
     @Test
@@ -157,6 +154,19 @@ class NavnoHendelseTaskLøypeTest {
             mockOppgaveClient.opprettJournalføringsoppgave(any(), capture(oppgaveBeskrivelse))
         }
         Assertions.assertThat(oppgaveBeskrivelse.captured).isEqualTo("Bruker har sak i både Infotrygd og BA-sak")
+    }
+
+    @Test
+    fun `Skal opprette JFR-oppgave uten tekst siden bruker ikke har sak i noen system`() {
+
+
+        kjørRutingTaskOgReturnerNesteTask().run { journalføringSteg.doTask(this) }
+
+        val oppgaveBeskrivelse = slot<String>()
+
+        verify(exactly = 1) {
+            mockOppgaveClient.opprettJournalføringsoppgave(any(), null)
+        }
     }
 
     @Test

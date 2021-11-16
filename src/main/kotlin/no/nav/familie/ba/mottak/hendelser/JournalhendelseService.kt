@@ -34,7 +34,6 @@ class JournalhendelseService(
     val kanalCounter = mutableMapOf<String, Counter>()
     val skannetOrdinæreSøknaderCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skan.ny.ordinaer.soknad")
     val skannetUtvidedeSøknaderCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skan.ny.utvidet.soknad")
-    val kanalAnnetCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.annet")
     val ignorerteCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.ignorerte")
     val feilCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.feilet")
     val logger: Logger = LoggerFactory.getLogger(JournalhendelseService::class.java)
@@ -111,7 +110,6 @@ class JournalhendelseService(
                         else -> {
                             logger.info("Ny journalhendelse med journalpostId=$journalpostId med status MOTTATT og kanal ${journalpost.kanal}")
                             incrementKanalCounter(journalpost.kanal.toString())
-                            kanalAnnetCounter.count()
                         }
                     }
                 }

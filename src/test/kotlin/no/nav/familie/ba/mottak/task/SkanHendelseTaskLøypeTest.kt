@@ -97,7 +97,7 @@ class SkanHendelseTaskLøypeTest {
             mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
         } returns InfotrygdSøkResponse(emptyList(), emptyList())
 
-        every { mockFeatureToggleService.isEnabled("familie-ba-mottak.ta-over-ruting",false) } returns false
+        every { mockFeatureToggleService.isEnabled("familie-ba-mottak.ta-over-ruting",false) } returns true
 
     }
 
