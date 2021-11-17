@@ -18,10 +18,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.slf4j.MDC
-import org.springframework.beans.factory.annotation.Autowired
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper
 import java.util.Optional
-import java.util.Properties
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MottaAnnullerFødselTaskTest {

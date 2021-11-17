@@ -1,5 +1,7 @@
 package no.nav.familie.ba.mottak.task
 
+import io.micrometer.core.instrument.Counter
+import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.BARN
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
@@ -40,6 +42,7 @@ class JournalhendelseRutingTask(
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(JournalhendelseRutingTask::class.java)
+    val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
 
     override fun doTask(task: Task) {
         val journalpostId = task.metadata["journalpostId"] as String
@@ -48,30 +51,54 @@ class JournalhendelseRutingTask(
         val (baSak, infotrygdSak) = brukersIdent?.run { søkEtterSakIBaSakOgInfotrygd(this) } ?: Pair(null, null)
 
         val sakssystemMarkering = when {
-            baSak.finnes() && infotrygdSak.finnes() -> "Bruker har sak i både Infotrygd og BA-sak"
-            baSak.finnes() -> "${baSak!!.part} har sak i BA-sak"
-            infotrygdSak.finnes() -> "${infotrygdSak!!.part} har sak i Infotrygd"
-            else -> "" // trenger ingen form for markering. Kan løses av begge systemer
+            baSak.finnes() && infotrygdSak.finnes() -> {
+                incrementSakssystemMarkering("Begge")
+                "Bruker har sak i både Infotrygd og BA-sak"
+            }
+            baSak.finnes() -> {
+                incrementSakssystemMarkering("BA_SAK")
+                "${baSak!!.part} har sak i BA-sak"
+            }
+            infotrygdSak.finnes() -> {
+                incrementSakssystemMarkering("Infotrygd")
+                "${infotrygdSak!!.part} har sak i Infotrygd"
+            }
+            else -> {
+                incrementSakssystemMarkering("Ingen")
+                ""
+            } // trenger ingen form for markering. Kan løses av begge systemer
         }
 
-       log.info("Ruting toggle er satt til ${featureToggleService.isEnabled("familie-ba-mottak.ta-over-ruting", false)}")
+        val taOverRuting = featureToggleService.isEnabled("familie-ba-mottak.ta-over-ruting", false)
+        log.info("Ruting toggle er satt til $taOverRuting")
 
-        when (task.payload) {
-            "NAV_NO" -> {
-                if (infotrygdSak.finnes() && !baSak.finnes()) {
-                    log.info("Bruker har sak i Infotrygd. Overlater journalføring til BRUT001 og skipper opprettelse av oppgave for" +
-                             " journalpost $journalpostId")
-                    return
-                } else if (!baSak.finnes() && brukersIdent != null) {
-                    log.info("Bruker på journalpost $journalpostId har ikke pågående sak i BA-sak. Skipper derfor " +
-                             "journalføring mot ny løsning i denne omgang.")
-                    return
+
+        if (!taOverRuting) {
+            when (task.payload) {
+                "NAV_NO" -> {
+                    if (infotrygdSak.finnes() && !baSak.finnes()) {
+                        log.info("Bruker har sak i Infotrygd. Overlater journalføring til BRUT001 og skipper opprettelse av oppgave for" +
+                                         " journalpost $journalpostId")
+                        return
+                    } else if (!baSak.finnes() && brukersIdent != null) {
+                        log.info("Bruker på journalpost $journalpostId har ikke pågående sak i BA-sak. Skipper derfor " +
+                                         "journalføring mot ny løsning i denne omgang.")
+                        return
+                    }
                 }
             }
         }
+
         Task.nyTask(type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
                     payload = sakssystemMarkering,
                     properties = task.metadata).apply { taskRepository.save(this) }
+    }
+
+    private fun incrementSakssystemMarkering(saksystem: String) {
+        if (!sakssystemMarkeringCounter.containsKey(saksystem)) {
+            sakssystemMarkeringCounter[saksystem] = Metrics.counter("barnetrygd.ruting.saksystem", "saksystem", saksystem)
+        }
+        sakssystemMarkeringCounter[saksystem]!!.increment()
     }
 
     private fun søkEtterSakIBaSakOgInfotrygd(brukersIdent: String): Pair<Sakspart?, Sakspart?> {

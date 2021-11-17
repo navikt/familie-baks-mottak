@@ -1,5 +1,7 @@
 package no.nav.familie.ba.mottak.task
 
+import io.micrometer.core.instrument.Counter
+import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
@@ -19,6 +21,9 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
                                       private val taskRepository: TaskRepository) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(OpprettJournalføringOppgaveTask::class.java)
+    val oppgaverOpprettetCounter: Counter = Metrics.counter("barnetrygd.ruting.oppgave.opprettet")
+    val oppgaverOppdatertCounter: Counter = Metrics.counter("barnetrygd.ruting.oppgave.oppdatert")
+    val skippetOppgaveCounter: Counter = Metrics.counter("barnetrygd.ruting.oppgave.skippet")
 
     override fun doTask(task: Task) {
         val sakssystemMarkering = task.payload
@@ -40,15 +45,22 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
                     task.metadata["oppgaveId"] = "${nyOppgave.oppgaveId}"
                     taskRepository.saveAndFlush(task)
                     log.info("Oppretter ny journalførings-oppgave med id ${nyOppgave.oppgaveId} for journalpost ${journalpost.journalpostId}")
+                    oppgaverOpprettetCounter.increment()
                 } else {
                     log.info("Skipper oppretting av journalførings-oppgave. Fant åpen oppgave av type $oppgaveTypeForEksisterendeOppgave for ${journalpost.journalpostId}")
                     if (sakssystemMarkering.isNotEmpty()) {
-                        journalføringsOppgaver.forEach { it.oppdaterOppgavebeskrivelse(sakssystemMarkering) }
+                        journalføringsOppgaver.forEach {
+                            it.oppdaterOppgavebeskrivelse(sakssystemMarkering)
+                            oppgaverOppdatertCounter.increment()
+                        }
                     }
                 }
             }
 
-            Journalstatus.JOURNALFOERT -> log.info("Skipper journalpost ${journalpost.journalpostId} som alt er i status JOURNALFOERT")
+            Journalstatus.JOURNALFOERT -> {
+                log.info("Skipper journalpost ${journalpost.journalpostId} som alt er i status JOURNALFOERT")
+                skippetOppgaveCounter.increment()
+            }
 
             else -> {
                 val error = IllegalStateException(
