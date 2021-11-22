@@ -69,7 +69,7 @@ class JournalhendelseRutingTask(
             } // trenger ingen form for markering. Kan løses av begge systemer
         }
 
-        val taOverRuting = featureToggleService.isEnabled("familie-ba-mottak.ta-over-ruting", false)
+        val taOverRuting = featureToggleService.isEnabled("familie-ba-mottak.ta-over-ruting", true)
         log.info("Ruting toggle er satt til $taOverRuting")
 
 
