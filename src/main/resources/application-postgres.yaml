@@ -6,45 +6,54 @@ no.nav.security.jwt:
       cookie_name: localhost-idtoken
       # Kommenteres ut ved lokal testing av innsending av søknad
     #    azuread:
-    #      discoveryurl: ${AZURE_APP_WELL_KNOWN_URL}
-    #      accepted_audience: ${AZURE_APP_CLIENT_ID}
+    #      discoveryurl: https://login.microsoftonline.com/navq.onmicrosoft.com/v2.0/.well-known/openid-configuration
+    #      accepted_audience: ${CLIENT_ID}
     #      cookie_name: azure_token
 
   client:
     registration:
       ba-sak-clientcredentials:
         resource-url: ${FAMILIE_BA_SAK_API_URL}
-        token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
+        token-endpoint-url: https://login.microsoftonline.com/navq.onmicrosoft.com/oauth2/v2.0/token
         grant-type: client_credentials
         scope: ${BA_SAK_SCOPE}
         authentication:
-          client-id: ${AZURE_APP_CLIENT_ID}
-          client-secret: ${AZURE_APP_CLIENT_SECRET}
+          client-id: ${CLIENT_ID}
+          client-secret: ${CLIENT_SECRET}
           client-auth-method: client_secret_basic
       integrasjoner-clientcredentials:
         resource-url: ${FAMILIE_INTEGRASJONER_API_URL}
-        token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
+        token-endpoint-url: https://login.microsoftonline.com/navq.onmicrosoft.com/oauth2/v2.0/token
         grant-type: client_credentials
         scope: ${FAMILIE_INTEGRASJONER_SCOPE}
         authentication:
-          client-id: ${AZURE_APP_CLIENT_ID}
-          client-secret: ${AZURE_APP_CLIENT_SECRET}
+          client-id: ${CLIENT_ID}
+          client-secret: ${CLIENT_SECRET}
           client-auth-method: client_secret_basic
       familie-ba-infotrygd-clientcredentials:
         resource-url: ${FAMILIE_BA_INFOTRYGD_API_URL}
-        token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
+        token-endpoint-url: https://login.microsoftonline.com/navq.onmicrosoft.com/oauth2/v2.0/token
         grant-type: client_credentials
         scope: dummy
         authentication:
-          client-id: ${AZURE_APP_CLIENT_ID}
-          client-secret: ${AZURE_APP_CLIENT_SECRET}
+          client-id: ${CLIENT_ID}
+          client-secret: ${CLIENT_SECRET}
           client-auth-method: client_secret_basic
+
+
+
+
+
+
+
+
+
+
 
 
 credential:
   username: "srv-ba-mottak"
   password: "not-a-real-password"
-
 funksjonsbrytere:
   kafka.enabled: false
   enabled: false
@@ -52,10 +61,8 @@ funksjonsbrytere:
     uri: http://dummy/api/
     cluster: localhost
     applicationName: familie-ba-sak
-
 logging:
   config: "classpath:logback-test.xml"
-
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/familie-ba-mottak
@@ -81,23 +88,17 @@ spring:
       schema.registry.url: ${KAFKA_BROKERS}
     consumer:
       group-id: srvc01
-
 #Brukes til tilgangskontroll av familie-ks-mottak-frontend
 MOTTAK_ROLLE: group1
-
 FAMILIE_BA_DOKGEN_API_URL: http://localhost:5914
 FAMILIE_INTEGRASJONER_API_URL: http://localhost:8085/api
 FAMILIE_BA_SAK_API_URL: http://localhost:8090/api
 FAMILIE_DOKUMENT_API_URL: http://localhost:8082
-
 FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1
 FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 1
-
 KAFKA_BROKERS: http://localhost:9092
-
 JOURNALFOERINGHENDELSE_V1_TOPIC_URL: aapen-dok-journalfoering-v1-q1
 NORG2_API_URL: #mockes ut i test
-
 STS_URL: "dummy"
 PDL_URL: "dummy"
 CREDENTIAL_USERNAME: not-a-real-srvuser
