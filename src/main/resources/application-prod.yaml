@@ -22,7 +22,7 @@ no.nav.security.jwt:
         authentication:
           client-id: ${AZURE_APP_CLIENT_ID}
           client-secret: ${AZURE_APP_CLIENT_SECRET}
-          client-auth-method: AZURE_APP_CLIENT_SECRET_basic
+          client-auth-method: client_secret_basic
       integrasjoner-clientcredentials:
         resource-url: ${FAMILIE_INTEGRASJONER_API_URL}
         token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
@@ -31,7 +31,7 @@ no.nav.security.jwt:
         authentication:
           client-id: ${AZURE_APP_CLIENT_ID}
           client-secret: ${AZURE_APP_CLIENT_SECRET}
-          client-auth-method: AZURE_APP_CLIENT_SECRET_basic
+          client-auth-method: client_secret_basic
       familie-ba-infotrygd-clientcredentials:
         resource-url: ${FAMILIE_BA_INFOTRYGD_API_URL}
         token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
@@ -40,7 +40,7 @@ no.nav.security.jwt:
         authentication:
           client-id: ${AZURE_APP_CLIENT_ID}
           client-secret: ${AZURE_APP_CLIENT_SECRET}
-          client-auth-method: AZURE_APP_CLIENT_SECRET_basic
+          client-auth-method: client_secret_basic
       dokument-clientauth:
         resource-url: ${FAMILIE_DOKUMENT_API_URL}
         well-known-url: ${TOKEN_X_WELL_KNOWN_URL}
