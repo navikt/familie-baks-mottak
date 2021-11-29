@@ -47,6 +47,20 @@ spec:
         - application: familie-ba-soknad-api
           namespace: teamfamilie
           cluster: dev-gcp
+        - application: familie-prosessering
+          namespace: teamfamilie
+          cluster: dev-gcp
+    outbound:
+      rules:
+        - application: familie-ba-sak
+          cluster: dev-fss
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: preprod
+  azure:
+    application:
+      enabled: true
+      allowAllUsers: false
+      claims:
+        groups:
+          - id: "928636f4-fd0d-4149-978e-a6fb68bb19de"  # 0000-GA-STDAPPS
