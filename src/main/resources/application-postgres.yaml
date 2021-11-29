@@ -41,16 +41,6 @@ no.nav.security.jwt:
           client-auth-method: client_secret_basic
 
 
-
-
-
-
-
-
-
-
-
-
 credential:
   username: "srv-ba-mottak"
   password: "not-a-real-password"
