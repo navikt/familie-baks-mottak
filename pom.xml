@@ -22,7 +22,7 @@
         <kotlin.version>1.6.0</kotlin.version>
         <mockk.version>1.12.1</mockk.version>
         <confluent.version>6.2.1</confluent.version>
-        <felles.version>1.20211008153542_d279663</felles.version>
+        <felles.version>1.20211129170723_c964489</felles.version>
         <kontrakter.version>2.0_20211118090819_2620db0</kontrakter.version>
         <main-class>no.nav.familie.ba.mottak.LauncherKt</main-class>
         <spring.vault.version>2.3.2</spring.vault.version>
