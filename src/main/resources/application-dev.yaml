@@ -5,10 +5,10 @@ no.nav.security.jwt:
       accepted_audience: aud-localhost
       cookie_name: localhost-idtoken
     # Kommenteres ut ved lokal testing av innsending av søknad
-#    azuread:
-#      discoveryurl: https://login.microsoftonline.com/navq.onmicrosoft.com/v2.0/.well-known/openid-configuration
-#      accepted_audience: ${CLIENT_ID}
-#      cookie_name: azure_token
+  #    azuread:
+  #      discoveryurl: https://login.microsoftonline.com/navq.onmicrosoft.com/v2.0/.well-known/openid-configuration
+  #      accepted_audience: ${CLIENT_ID}
+  #      cookie_name: azure_token
   client:
     registration:
       ba-sak-clientcredentials:
@@ -40,7 +40,6 @@ no.nav.security.jwt:
           client-auth-method: client_secret_basic
 
 
-
 spring:
   kafka:
     bootstrap-servers: ${KAFKA_BROKERS}
@@ -60,7 +59,6 @@ spring:
       ddl-auto: create
   flyway:
     enabled: false
-
 funksjonsbrytere:
   kafka.enabled: false
   enabled: false
@@ -68,29 +66,20 @@ funksjonsbrytere:
     uri: http://dummy/api/
     cluster: localhost
     applicationName: familie-ba-sak
-
 logging:
   config: "classpath:logback-test.xml"
-
 retry.backoff.delay: 5
-
 FAMILIE_BA_DOKGEN_API_URL: http://localhost:5914
 FAMILIE_BA_SAK_API_URL: http://localhost:8089/api
 FAMILIE_INTEGRASJONER_API_URL: http://localhost:8085/api
 FAMILIE_BA_INFOTRYGD_API_URL: http://localhost:8093
-
 FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1
 FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 1
-
 KAFKA_BROKERS: http://localhost:9092
-
 #Brukes til tilgangskontroll av familie-ks-mottak-frontend
 MOTTAK_ROLLE: group1
-
 JOURNALFOERINGHENDELSE_V1_TOPIC_URL: aapen-dok-journalfoering-v1-q1
-
 NORG2_API_URL: #mockes ut i test
-
 PDL_URL: dummy
 CREDENTIAL_USERNAME: not-a-real-srvuser
 CREDENTIAL_PASSWORD: not-a-real-pw

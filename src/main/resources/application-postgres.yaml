@@ -44,7 +44,6 @@ no.nav.security.jwt:
 credential:
   username: "srv-ba-mottak"
   password: "not-a-real-password"
-
 funksjonsbrytere:
   kafka.enabled: false
   enabled: false
@@ -52,10 +51,8 @@ funksjonsbrytere:
     uri: http://dummy/api/
     cluster: localhost
     applicationName: familie-ba-sak
-
 logging:
   config: "classpath:logback-test.xml"
-
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/familie-ba-mottak
@@ -81,23 +78,17 @@ spring:
       schema.registry.url: ${KAFKA_BROKERS}
     consumer:
       group-id: srvc01
-
 #Brukes til tilgangskontroll av familie-ks-mottak-frontend
 MOTTAK_ROLLE: group1
-
 FAMILIE_BA_DOKGEN_API_URL: http://localhost:5914
 FAMILIE_INTEGRASJONER_API_URL: http://localhost:8085/api
 FAMILIE_BA_SAK_API_URL: http://localhost:8090/api
 FAMILIE_DOKUMENT_API_URL: http://localhost:8082
-
 FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1
 FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 1
-
 KAFKA_BROKERS: http://localhost:9092
-
 JOURNALFOERINGHENDELSE_V1_TOPIC_URL: aapen-dok-journalfoering-v1-q1
 NORG2_API_URL: #mockes ut i test
-
 STS_URL: "dummy"
 PDL_URL: "dummy"
 CREDENTIAL_USERNAME: not-a-real-srvuser
