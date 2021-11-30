@@ -44,6 +44,13 @@ spec:
         - application: familie-ba-soknad-api
           namespace: teamfamilie
           cluster: prod-gcp
+        - application: familie-prosessering
+          namespace: teamfamilie
+          cluster: prod-gcp
+    outbound:
+      rules:
+        - application: familie-ba-sak
+          cluster: prod-fss
   ingresses: # Optional. List of ingress URLs that will route HTTP traffic to the application.
     - https://familie-ba-mottak.nais.adeo.no
     - https://familie-ba-mottak.prod-fss-pub.nais.io
@@ -51,3 +58,10 @@ spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: prod
+  azure:
+    application:
+      enabled: true
+      allowAllUsers: false
+      claims:
+        groups:
+          - id: "87190cf3-b278-457d-8ab7-1a5c55a9edd7"  # Group_87190cf3-b278-457d-8ab7-1a5c55a9edd7 tilgang til prosessering
