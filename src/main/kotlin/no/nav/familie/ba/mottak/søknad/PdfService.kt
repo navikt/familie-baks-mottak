@@ -17,17 +17,31 @@ class PdfService(
     private val pdfClient: PdfClient,
     private val søknadSpråkvelgerService: SøknadSpråkvelgerService
 ) {
-    fun lagPdf(dbSøknad: DBSøknad, språk: String = "nb"): ByteArray {
-        val søknad = dbSøknad.hentSøknad()
-        val path: String = when (søknad.søknadstype) {
-            Søknadstype.UTVIDET -> "soknad-utvidet"
-            else -> "soknad"
-        }
-        val søknadJson = søknadSpråkvelgerService.velgSøknadSpråk(søknad, språk)
-        val feltMap = objectMapper.readValue(søknadJson, object : TypeReference<Map<String, Any>>() {})
-        val utvidetFeltMap = feltMap + hentEkstraFelter(dbSøknad)
 
-        return pdfClient.lagPdf(utvidetFeltMap, path)
+    fun lagPdf(dbSøknad: DBSøknad, språk: String = "nb"): ByteArray {
+        if (dbSøknad.hentSøknadVersjon() == "v5") {
+            val søknad = dbSøknad.hentSøknadV5()
+            val søknadJson = søknadSpråkvelgerService.velgSøknadSpråk(søknad, språk)
+            val path: String = when (søknad.søknadstype) {
+                Søknadstype.UTVIDET -> "soknad-utvidet"
+                else -> "soknad"
+            }
+            val feltMap = objectMapper.readValue(søknadJson, object : TypeReference<Map<String, Any>>() {})
+            val utvidetFeltMap = feltMap + hentEkstraFelter(dbSøknad)
+
+            return pdfClient.lagPdf(utvidetFeltMap, path)
+        } else {
+            val søknad = dbSøknad.hentSøknad()
+            val søknadJson = søknadSpråkvelgerService.velgSøknadSpråk(søknad, språk)
+            val path: String = when (søknad.søknadstype) {
+                Søknadstype.UTVIDET -> "soknad-utvidet"
+                else -> "soknad"
+            }
+            val feltMap = objectMapper.readValue(søknadJson, object : TypeReference<Map<String, Any>>() {})
+            val utvidetFeltMap = feltMap + hentEkstraFelter(dbSøknad)
+            return pdfClient.lagPdf(utvidetFeltMap, path)
+        }
+
     }
 
     private fun hentEkstraFelter(dbSøknad: DBSøknad): Map<String, String> {
@@ -37,7 +51,7 @@ class PdfService(
             ),
             "navn" to dbSøknad.hentSøknad().søker.navn.verdi.getValue("nb"),
             "fodselsnummer" to dbSøknad.fnr,
-            "label" to when(dbSøknad.hentSøknad().søknadstype) {
+            "label" to when (dbSøknad.hentSøknad().søknadstype) {
                 Søknadstype.UTVIDET -> "Søknad om utvidet barnetrygd"
                 else -> "Søknad om ordinær barnetrygd"
             }
