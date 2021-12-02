@@ -2,8 +2,6 @@ package no.nav.familie.ba.mottak.config
 
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import org.apache.avro.generic.GenericRecord
-import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.common.serialization.StringDeserializer
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties
 import org.springframework.context.annotation.Bean
@@ -58,17 +56,17 @@ class KafkaConfig {
     }
 
 
-    @Bean
-    fun kafkaEFHendelseListenerContainerFactory(properties: KafkaProperties, kafkaErrorHandler: KafkaErrorHandler)
-            : ConcurrentKafkaListenerContainerFactory<String, String> {
-        val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
-        factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
-        factory.containerProperties.authorizationExceptionRetryInterval = Duration.ofSeconds(2)
-        val configs = properties.buildConsumerProperties().also {
-            it.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer::class.java)
-            it.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
-        }
-        factory.consumerFactory = DefaultKafkaConsumerFactory(configs)
-        return factory
-    }
+//    @Bean
+//    fun kafkaEFHendelseListenerContainerFactory(properties: KafkaProperties, kafkaErrorHandler: KafkaErrorHandler)
+//            : ConcurrentKafkaListenerContainerFactory<String, String> {
+//        val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
+//        factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
+//        factory.containerProperties.authorizationExceptionRetryInterval = Duration.ofSeconds(2)
+//        val configs = properties.buildConsumerProperties().also {
+//            it.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer::class.java)
+//            it.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
+//        }
+//        factory.consumerFactory = DefaultKafkaConsumerFactory(configs)
+//        return factory
+//    }
 }

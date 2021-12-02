@@ -19,34 +19,20 @@ import javax.transaction.Transactional
 class EnsligForsørgerHendelseConsumer(val vedtakOmOvergangsstønadService: EnsligForsørgerHendelseService) {
 
     @KafkaListener(
-        id = LISTENER_ID,
+        id = "efhendelse",
         topics = ["teamfamilie.$TOPIC"],
         containerFactory = "kafkaAivenEFHendelseListenerContainerFactory"
     )
     @Transactional
-    fun listenAiven(consumerRecord: ConsumerRecord<String, String>, ack: Acknowledgment) {
+    fun listenInfotrygd(consumerRecord: ConsumerRecord<String, String>, ack: Acknowledgment) {
         logger.info("$TOPIC Aiven melding mottatt. Offset: ${consumerRecord.offset()}")
         secureLogger.info("$TOPIC Aiven melding mottatt. Offset: ${consumerRecord.offset()} Key: ${consumerRecord.key()} Value: ${consumerRecord.value()}")
         //vedtakOmOvergangsstønadService.prosesserNyHendelse(consumerRecord, ack)
-        ack.acknowledge()
-    }
-
-    @KafkaListener(
-        id = LISTENER_ID,
-        topics = [TOPIC],
-        containerFactory = "kafkaEFHendelseListenerContainerFactory",
-        idIsGroup = false
-    )
-    @Transactional
-    fun listen(consumerRecord: ConsumerRecord<String, String>, ack: Acknowledgment) {
-        logger.info("$TOPIC on-premise melding mottatt. Offset: ${consumerRecord.offset()}")
-        secureLogger.info("$TOPIC on-premise melding mottatt. Offset: ${consumerRecord.offset()} Key: ${consumerRecord.key()} Value: ${consumerRecord.value()}")
-        ack.acknowledge()
+        //ack.acknowledge()
     }
 
     companion object {
         private const val TOPIC = "aapen-ef-overgangstonad-v1"
-        private const val LISTENER_ID = "familie-ba-mottak"
 
         private val logger: Logger = LoggerFactory.getLogger(EnsligForsørgerHendelseConsumer::class.java)
         private val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
