@@ -121,7 +121,7 @@ class SakClient @Autowired constructor(
     }
 
     fun sendVedtakOmOvergangsstønadHendelseTilSak(personIdent: String) {
-        val uri = URI.create("$sakServiceUri/infotrygd/overgangsstonad")
+        val uri = URI.create("$sakServiceUri/overgangsstonad")
         logger.info("sender ident fra vedtak om overgangsstønad til {}", uri)
         try {
             val response = postForEntity<Ressurs<String>>(uri, PersonIdent(ident = personIdent))

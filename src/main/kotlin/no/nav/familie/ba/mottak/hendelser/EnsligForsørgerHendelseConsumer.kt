@@ -20,20 +20,21 @@ class EnsligForsørgerHendelseConsumer(val vedtakOmOvergangsstønadService: Ensl
 
     @KafkaListener(
         id = "efhendelse",
-        topics = ["teamfamilie.$TOPIC"],
+        topics = ["teamfamilie.$TOPIC_EF_VEDTAK"],
         containerFactory = "kafkaAivenEFHendelseListenerContainerFactory",
         idIsGroup = false
     )
     @Transactional
-    fun listenInfotrygd(consumerRecord: ConsumerRecord<String, String>, ack: Acknowledgment) {
-        logger.info("$TOPIC Aiven melding mottatt. Offset: ${consumerRecord.offset()}")
-        secureLogger.info("$TOPIC Aiven melding mottatt. Offset: ${consumerRecord.offset()} Key: ${consumerRecord.key()} Value: ${consumerRecord.value()}")
+    fun listenEfIverksett(consumerRecord: ConsumerRecord<String, String>, ack: Acknowledgment) {
+        logger.info("$TOPIC_EF_VEDTAK melding mottatt. Offset: ${consumerRecord.offset()}")
+        secureLogger.info("$TOPIC_EF_VEDTAK melding mottatt. Offset: ${consumerRecord.offset()} Key: ${consumerRecord.key()} Value: ${consumerRecord.value()}")
         //vedtakOmOvergangsstønadService.prosesserNyHendelse(consumerRecord, ack)
         //ack.acknowledge()
     }
 
     companion object {
-        private const val TOPIC = "aapen-ef-overgangstonad-v1"
+        private const val TOPIC_EF_VEDTAK = "aapen-ensligforsorger-iverksatt-vedtak"
+        private const val TOPIC_INFOTRYGD_VEDTAK = "aapen-ef-overgangstonad-v1"
 
         private val logger: Logger = LoggerFactory.getLogger(EnsligForsørgerHendelseConsumer::class.java)
         private val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
