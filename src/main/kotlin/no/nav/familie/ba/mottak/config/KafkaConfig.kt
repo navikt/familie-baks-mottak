@@ -66,6 +66,7 @@ class KafkaConfig {
         factory.containerProperties.authorizationExceptionRetryInterval = Duration.ofSeconds(2)
         val configs = properties.buildConsumerProperties().also {
             it.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer::class.java)
+            it.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
         }
         factory.consumerFactory = DefaultKafkaConsumerFactory(configs)
         return factory
