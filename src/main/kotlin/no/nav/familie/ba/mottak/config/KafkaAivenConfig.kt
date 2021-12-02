@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
-import org.springframework.kafka.core.ConsumerFactory
+import org.springframework.kafka.config.KafkaListenerConfigUtils
+import org.springframework.kafka.config.KafkaListenerEndpointRegistry
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.listener.ContainerProperties
 
@@ -23,18 +24,18 @@ import org.springframework.kafka.listener.ContainerProperties
 class KafkaAivenConfig(val environment: Environment) {
 
     @Bean
-    fun consumerFactory(): ConsumerFactory<String, String> {
-        return DefaultKafkaConsumerFactory(consumerConfigs())
-    }
-
-    @Bean
     fun kafkaAivenEFHendelseListenerContainerFactory(kafkaErrorHandler: KafkaErrorHandler)
             : ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
-        factory.consumerFactory = consumerFactory()
+        factory.consumerFactory = DefaultKafkaConsumerFactory(consumerConfigs())
         factory.setErrorHandler(kafkaErrorHandler)
         return factory
+    }
+
+    @Bean(name = [KafkaListenerConfigUtils.KAFKA_LISTENER_ENDPOINT_REGISTRY_BEAN_NAME])
+    fun kafkaListenerEndpointRegistry(): KafkaListenerEndpointRegistry? {
+        return KafkaListenerEndpointRegistry()
     }
 
     private fun consumerConfigs(): Map<String, Any> {

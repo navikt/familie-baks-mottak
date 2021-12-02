@@ -21,7 +21,8 @@ class EnsligForsørgerHendelseConsumer(val vedtakOmOvergangsstønadService: Ensl
     @KafkaListener(
         id = "efhendelse",
         topics = ["teamfamilie.$TOPIC"],
-        containerFactory = "kafkaAivenEFHendelseListenerContainerFactory"
+        containerFactory = "kafkaAivenEFHendelseListenerContainerFactory",
+        idIsGroup = false
     )
     @Transactional
     fun listenInfotrygd(consumerRecord: ConsumerRecord<String, String>, ack: Acknowledgment) {
