@@ -29,32 +29,27 @@ import javax.transaction.Transactional
     havingValue = "true",
     matchIfMissing = true
 )
-class EnsligForsørgerVedtakHendelseConsumer(val vedtakOmOvergangsstønadService: EnsligForsørgerHendelseService) {
+class EnsligForsørgerInfotrygdHendelseConsumer(val vedtakOmOvergangsstønadService: EnsligForsørgerHendelseService) {
 
 
-    val ensligForsørgerVedtakhendelseFeilCounter: Counter = Metrics.counter("ef.hendelse.vedtak.feil")
+    val ensligForsørgerInfotrygdHendelseConsumerFeilCounter: Counter = Metrics.counter("ef.hendelse.infotrygdvedtak.feil")
 
     @KafkaListener(
-        id = "efhendelse",
-        topics = ["teamfamilie.$TOPIC_EF_VEDTAK"],
+        id = "ef-infotrygd-overgangstonad",
+        topics = ["teamfamilie.$TOPIC_INFOTRYGD_VEDTAK"],
         containerFactory = "kafkaAivenEFHendelseListenerContainerFactory",
         idIsGroup = false
     )
     @Transactional
     fun listen(consumerRecord: ConsumerRecord<String, String>, ack: Acknowledgment) {
         try {
-            MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
-            logger.info("$TOPIC_EF_VEDTAK melding mottatt. Offset: ${consumerRecord.offset()}")
-            secureLogger.info("$TOPIC_EF_VEDTAK melding mottatt. Offset: ${consumerRecord.offset()} Key: ${consumerRecord.key()} Value: ${consumerRecord.value()}")
-            objectMapper.readValue(consumerRecord.value(), EnsligForsørgerVedtakhendelse::class.java)
-                .also {
-                    vedtakOmOvergangsstønadService.prosesserEfVedtakHendelse(consumerRecord.offset(), it)
-                }
-            ack.acknowledge()
+            logger.info("$TOPIC_INFOTRYGD_VEDTAK melding mottatt. Offset: ${consumerRecord.offset()}")
+            secureLogger.info("$TOPIC_INFOTRYGD_VEDTAK melding mottatt. Offset: ${consumerRecord.offset()} Key: ${consumerRecord.key()} Value: ${consumerRecord.value()}")
+
         } catch (e: Exception) {
-            ensligForsørgerVedtakhendelseFeilCounter.increment()
-            secureLogger.error("Feil i prosessering av $TOPIC_EF_VEDTAK consumerRecord=$consumerRecord", e)
-            throw RuntimeException("Feil i prosessering av $TOPIC_EF_VEDTAK")
+            ensligForsørgerInfotrygdHendelseConsumerFeilCounter.increment()
+            secureLogger.error("Feil i prosessering av $TOPIC_INFOTRYGD_VEDTAK consumerRecord=$consumerRecord", e)
+            throw RuntimeException("Feil i prosessering av $TOPIC_INFOTRYGD_VEDTAK")
         } finally {
             MDC.clear()
         }
@@ -62,9 +57,9 @@ class EnsligForsørgerVedtakHendelseConsumer(val vedtakOmOvergangsstønadService
 
     companion object {
 
-        private const val TOPIC_EF_VEDTAK = "aapen-ensligforsorger-iverksatt-vedtak"
+        private const val TOPIC_INFOTRYGD_VEDTAK = "aapen-ef-overgangstonad-v1"
 
-        private val logger: Logger = LoggerFactory.getLogger(EnsligForsørgerVedtakHendelseConsumer::class.java)
+        private val logger: Logger = LoggerFactory.getLogger(EnsligForsørgerInfotrygdHendelseConsumer::class.java)
         private val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
     }
 }
