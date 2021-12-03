@@ -2,7 +2,7 @@ package no.nav.familie.ba.mottak.domene
 
 import no.nav.familie.prosessering.domene.PropertiesToStringConverter
 import java.time.LocalDateTime
-import java.util.Properties
+import java.util.*
 import javax.persistence.Column
 import javax.persistence.Convert
 import javax.persistence.Entity
@@ -44,7 +44,8 @@ data class Hendelseslogg(
 )
 
 enum class HendelseConsumer {
-    PDL,
-    JOURNAL,
-    EF
+        PDL,
+        JOURNAL,
+        EF_VEDTAK,
+        EF_VEDTAK_INFOTRYGD
 }
