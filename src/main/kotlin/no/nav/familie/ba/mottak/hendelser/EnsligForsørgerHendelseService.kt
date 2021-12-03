@@ -10,12 +10,14 @@ import no.nav.familie.kontrakter.felles.ef.EnsligForsørgerVedtakhendelse
 import no.nav.familie.kontrakter.felles.ef.StønadType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
 class EnsligForsørgerHendelseService(
     val sakClient: SakClient,
     val hendelsesloggRepository: HendelsesloggRepository,
+    @Value("\${ef.overgangstonad.sendtilsak:false}") val sendTilSak: Boolean,
 ) {
 
     val ensligForsørgerVedtakhendelseOvergangstønadCounter: Counter = Metrics.counter("ef.hendelse.vedtak", "type", "overgangstønad")
@@ -31,7 +33,9 @@ class EnsligForsørgerHendelseService(
                     )
                 ) {
                     secureLogger.info("Mottatt vedtak om overgangsstønad hendelse: $ensligForsørgerVedtakhendelse")
-                    sakClient.sendVedtakOmOvergangsstønadHendelseTilSak(ensligForsørgerVedtakhendelse.personIdent)
+                    if (sendTilSak) {
+                        sakClient.sendVedtakOmOvergangsstønadHendelseTilSak(ensligForsørgerVedtakhendelse.personIdent)
+                    }
 
                     hendelsesloggRepository.save(
                         Hendelseslogg(

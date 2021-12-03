@@ -51,7 +51,7 @@ class EnsligForsørgerVedtakHendelseConsumer(val vedtakOmOvergangsstønadService
                     vedtakOmOvergangsstønadService.prosesserEfVedtakHendelse(consumerRecord.offset(), it)
                 }
             ack.acknowledge()
-        } catch (e: RuntimeException) {
+        } catch (e: Exception) {
             ensligForsørgerVedtakhendelseFeilCounter.increment()
             secureLogger.error("Feil i prosessering av $TOPIC_EF_VEDTAK consumerRecord=$consumerRecord", e)
             throw RuntimeException("Feil i prosessering av $TOPIC_EF_VEDTAK")
