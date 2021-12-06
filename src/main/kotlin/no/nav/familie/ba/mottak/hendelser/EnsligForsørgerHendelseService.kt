@@ -22,10 +22,13 @@ class EnsligForsørgerHendelseService(
     @Value("\${ef.overgangstonad.sendtilsak:false}") val sendTilSak: Boolean,
 ) {
 
-    val ensligForsørgerVedtakhendelseOvergangstønadCounter: Counter = Metrics.counter("ef.hendelse.vedtak", "type", "overgangstønad")
+    val ensligForsørgerVedtakhendelseOvergangstønadCounter: Counter =
+        Metrics.counter("ef.hendelse.vedtak", "type", "overgangstønad")
     val ensligForsørgerVedtakhendelseAnnetCounter: Counter = Metrics.counter("ef.hendelse.vedtak", "type", "annet")
-    val ensligForsørgerInfotrygdVedtakhendelseOvergangstønadCounter: Counter = Metrics.counter("ef.hendelse.infotrygd.vedtak", "type", "overgangstønad")
-    val ensligForsørgerInfotrygdVedtakhendelseAnnetCounter: Counter = Metrics.counter("ef.hendelse.infotrygd.vedtak", "type", "annet")
+    val ensligForsørgerInfotrygdVedtakhendelseOvergangstønadCounter: Counter =
+        Metrics.counter("ef.hendelse.infotrygd.vedtak", "type", "overgangstønad")
+    val ensligForsørgerInfotrygdVedtakhendelseAnnetCounter: Counter =
+        Metrics.counter("ef.hendelse.infotrygd.vedtak", "type", "annet")
 
     fun prosesserEfVedtakHendelse(offset: Long, ensligForsørgerVedtakhendelse: EnsligForsørgerVedtakhendelse) {
 
@@ -69,37 +72,33 @@ class EnsligForsørgerHendelseService(
             logger.info("Ignorerer infotrygdhendelse for hendelseId=${hendelse.hendelseId} fordi ytelsen ikke er EF")
             return
         }
-        when(hendelse.typeHendelse.trim()) {
-            "INNVILGET" -> {
-                if (!hendelsesloggRepository.existsByHendelseIdAndConsumer(
-                        hendelse.hendelseId,
-                        HendelseConsumer.EF_VEDTAK_INFOTRYGD
-                    )
-                ) {
-                    secureLogger.info("Mottatt infotrygdvedtak om overgangsstønad: $hendelse")
 
-                    val personIdent = pdlClient.hentPersonident(hendelse.aktørId.toString())
-                    if (sendTilSak) {
-                        sakClient.sendVedtakOmOvergangsstønadHendelseTilSak(personIdent)
-                    }
+        if (!hendelsesloggRepository.existsByHendelseIdAndConsumer(
+                hendelse.hendelseId,
+                HendelseConsumer.EF_VEDTAK_INFOTRYGD
+            )
+        ) {
+            secureLogger.info("Mottatt infotrygdvedtak om overgangsstønad: $hendelse")
 
-                    hendelsesloggRepository.save(
-                        Hendelseslogg(
-                            offset,
-                            hendelse.hendelseId,
-                            HendelseConsumer.EF_VEDTAK_INFOTRYGD,
-                            mapOf(
-                                "personIdent" to personIdent,
-                                "hendelseId" to hendelse.hendelseId,
-                                "sats" to hendelse.sats.toString()
-                            ).toProperties(),
-                            ident = personIdent
-                        )
-                    )
-                    ensligForsørgerInfotrygdVedtakhendelseOvergangstønadCounter.increment()
-                }
+            val personIdent = pdlClient.hentPersonident(hendelse.aktørId.toString())
+            if (sendTilSak) {
+                sakClient.sendVedtakOmOvergangsstønadHendelseTilSak(personIdent)
             }
-            else -> ensligForsørgerInfotrygdVedtakhendelseAnnetCounter.increment()
+
+            hendelsesloggRepository.save(
+                Hendelseslogg(
+                    offset,
+                    hendelse.hendelseId,
+                    HendelseConsumer.EF_VEDTAK_INFOTRYGD,
+                    mapOf(
+                        "personIdent" to personIdent,
+                        "hendelseId" to hendelse.hendelseId,
+                        "sats" to hendelse.sats.toString()
+                    ).toProperties(),
+                    ident = personIdent
+                )
+            )
+            ensligForsørgerInfotrygdVedtakhendelseOvergangstønadCounter.increment()
         }
     }
 

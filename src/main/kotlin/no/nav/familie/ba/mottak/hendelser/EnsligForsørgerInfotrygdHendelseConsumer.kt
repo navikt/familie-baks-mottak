@@ -76,10 +76,10 @@ class EnsligForsørgerInfotrygdHendelseConsumer(val vedtakOmOvergangsstønadServ
             secureLogger.info("$TOPIC_INFOTRYGD_VEDTAK melding mottatt. Offset: ${consumerRecord.offset()} Key: ${consumerRecord.key()} Value: ${consumerRecord.value()}")
             objectMapper.readValue(consumerRecord.value(), EnsligForsørgerInfotrygdHendelse::class.java)
                 .also {
-                    MDC.put(MDCConstants.MDC_CALL_ID, it.after.hendelseId)
+                    MDC.put(MDCConstants.MDC_CALL_ID, "CallId_ef_infotrygd_${it.after.hendelseId}")
                     vedtakOmOvergangsstønadService.prosesserEfInfotrygdHendelse(consumerRecord.offset(), it.after)
                 }
-//            ack.acknowledge()
+            ack.acknowledge()
         } catch (e: Exception) {
             ensligForsørgerInfotrygdHendelseConsumerFeilCounter.increment()
             secureLogger.error("Feil i prosessering av $TOPIC_INFOTRYGD_VEDTAK consumerRecord=$consumerRecord", e)

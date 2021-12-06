@@ -7,11 +7,14 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
+import no.nav.familie.ba.mottak.integrasjoner.IdentInformasjon
+import no.nav.familie.ba.mottak.integrasjoner.Identgruppe
 import no.nav.familie.ba.mottak.integrasjoner.PdlClient
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.ef.EnsligForsørgerVedtakhendelse
 import no.nav.familie.kontrakter.felles.ef.StønadType
 import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
@@ -60,6 +63,8 @@ class EnsligForsørgerInfotrygdHendelseConsumerTest {
         service = EnsligForsørgerHendelseService(mockSakClient, mockPdlClient, mockHendelsesloggRepository, true)
         consumer = EnsligForsørgerInfotrygdHendelseConsumer(service)
         clearAllMocks()
+
+        every { mockPdlClient.hentPersonident("2424242424241") } returns "12345678910"
     }
 
     @Test
@@ -77,27 +82,26 @@ class EnsligForsørgerInfotrygdHendelseConsumerTest {
 
     }
 
-//    @Test
-//    fun `Skal lese melding, konvertere, sende til ba-sak og ACKe melding `() {
-//        val ack:Acknowledgment = mockk(relaxed = true)
-//        val consumerRecord = ConsumerRecord("topic", 1, 1, "42", json)
-//        consumer.listen(consumerRecord, ack)
-//        verify(exactly = 1) {
-//            mockSakClient.sendVedtakOmOvergangsstønadHendelseTilSak("12345678910")
-//        }
-//        verify(exactly = 1) {ack.acknowledge()}
-//    }
-//
-//    @Test
-//    fun `Skal ikke ACKe melding ved feil`() {
-//        val ack:Acknowledgment = mockk(relaxed = true)
-//        val consumerRecord = ConsumerRecord("topic", 1, 1, "42", """{"json": "Ugyldig"}""")
-//         val e= Assertions.assertThrows(RuntimeException::class.java) {
-//            consumer.listen(consumerRecord, ack)
-//        }
-//
-//        assertThat(e.message).isEqualTo("Feil i prosessering av aapen-ensligforsorger-iverksatt-vedtak")
-//
-//        verify(exactly = 0) {ack.acknowledge()}
-//    }
+    @Test
+    fun `Skal lese melding, konvertere, sende til ba-sak og ACKe melding `() {
+        val ack:Acknowledgment = mockk(relaxed = true)
+        val consumerRecord = ConsumerRecord("topic", 1, 1, "42", json)
+        consumer.listen(consumerRecord, ack)
+        verify(exactly = 1) {
+            mockSakClient.sendVedtakOmOvergangsstønadHendelseTilSak("12345678910")
+        }
+        verify(exactly = 1) {ack.acknowledge()}
+    }
+
+    @Test
+    fun `Skal ikke ACKe melding ved feil`() {
+        val ack:Acknowledgment = mockk(relaxed = true)
+        val consumerRecord = ConsumerRecord("topic", 1, 1, "42", """{"json": "Ugyldig"}""")
+         val e = Assertions.assertThrows(RuntimeException::class.java) {
+            consumer.listen(consumerRecord, ack)
+        }
+        assertThat(e.message).isEqualTo("Feil i prosessering av aapen-ef-overgangstonad-v1")
+
+        verify(exactly = 0) {ack.acknowledge()}
+    }
 }
