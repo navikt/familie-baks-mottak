@@ -23,9 +23,12 @@ import java.time.Duration
 class KafkaConfig {
 
 
-
     @Bean
-    fun kafkaLeesahListenerContainerFactory(properties: KafkaProperties, kafkaErrorHandler: KafkaErrorHandler, environment: Environment)
+    fun kafkaLeesahListenerContainerFactory(
+        properties: KafkaProperties,
+        kafkaErrorHandler: KafkaErrorHandler,
+        environment: Environment
+    )
             : ConcurrentKafkaListenerContainerFactory<Int, GenericRecord> {
         val factory = ConcurrentKafkaListenerContainerFactory<Int, GenericRecord>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
@@ -39,10 +42,6 @@ class KafkaConfig {
         return factory
     }
 
-
-
-
-
     @Bean
     fun kafkaJournalføringHendelseListenerContainerFactory(properties: KafkaProperties, kafkaErrorHandler: KafkaErrorHandler)
             : ConcurrentKafkaListenerContainerFactory<Long, JournalfoeringHendelseRecord> {
@@ -54,19 +53,4 @@ class KafkaConfig {
         factory.setErrorHandler(kafkaErrorHandler)
         return factory
     }
-
-
-//    @Bean
-//    fun kafkaEFHendelseListenerContainerFactory(properties: KafkaProperties, kafkaErrorHandler: KafkaErrorHandler)
-//            : ConcurrentKafkaListenerContainerFactory<String, String> {
-//        val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
-//        factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
-//        factory.containerProperties.authorizationExceptionRetryInterval = Duration.ofSeconds(2)
-//        val configs = properties.buildConsumerProperties().also {
-//            it.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer::class.java)
-//            it.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
-//        }
-//        factory.consumerFactory = DefaultKafkaConsumerFactory(configs)
-//        return factory
-//    }
 }
