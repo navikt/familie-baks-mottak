@@ -7,6 +7,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
+import no.nav.familie.ba.mottak.integrasjoner.PdlClient
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.ef.EnsligForsørgerVedtakhendelse
 import no.nav.familie.kontrakter.felles.ef.StønadType
@@ -24,6 +25,7 @@ class EnsligForsørgerVedtakHendelseConsumerTest {
 
     lateinit var mockHendelsesloggRepository: HendelsesloggRepository
     lateinit var mockSakClient: SakClient
+    lateinit var mockPdlClient: PdlClient
     lateinit var service:EnsligForsørgerHendelseService
 
     lateinit var consumer: EnsligForsørgerVedtakHendelseConsumer
@@ -32,7 +34,8 @@ class EnsligForsørgerVedtakHendelseConsumerTest {
     internal fun setUp() {
         mockHendelsesloggRepository = mockk(relaxed = true)
         mockSakClient = mockk(relaxed = true)
-        service = EnsligForsørgerHendelseService(mockSakClient, mockHendelsesloggRepository, true)
+        mockPdlClient = mockk(relaxed = true)
+        service = EnsligForsørgerHendelseService(mockSakClient, mockPdlClient, mockHendelsesloggRepository, true)
         consumer = EnsligForsørgerVedtakHendelseConsumer(service)
         clearAllMocks()
     }

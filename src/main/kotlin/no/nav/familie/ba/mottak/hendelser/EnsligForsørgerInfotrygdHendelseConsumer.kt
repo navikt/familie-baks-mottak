@@ -1,9 +1,13 @@
 package no.nav.familie.ba.mottak.hendelser
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.core.JsonToken
+import com.fasterxml.jackson.databind.DeserializationContext
+import com.fasterxml.jackson.databind.JsonDeserializer
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.kontrakter.felles.ef.EnsligForsørgerVedtakhendelse
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.log.mdc.MDCConstants
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -72,7 +76,8 @@ class EnsligForsørgerInfotrygdHendelseConsumer(val vedtakOmOvergangsstønadServ
             secureLogger.info("$TOPIC_INFOTRYGD_VEDTAK melding mottatt. Offset: ${consumerRecord.offset()} Key: ${consumerRecord.key()} Value: ${consumerRecord.value()}")
             objectMapper.readValue(consumerRecord.value(), EnsligForsørgerInfotrygdHendelse::class.java)
                 .also {
-                    //vedtakOmOvergangsstønadService.prosesserEfVedtakHendelse(consumerRecord.offset(), it)
+                    MDC.put(MDCConstants.MDC_CALL_ID, it.after.hendelseId)
+                    vedtakOmOvergangsstønadService.prosesserEfInfotrygdHendelse(consumerRecord.offset(), it.after)
                 }
 //            ack.acknowledge()
         } catch (e: Exception) {
@@ -97,6 +102,7 @@ class EnsligForsørgerInfotrygdHendelseConsumer(val vedtakOmOvergangsstønadServ
 }
 
 data class EnsligForsørgerInfotrygdHendelse(val after: InfotrygdHendelse)
+
 
 data class InfotrygdHendelse(
     @JsonProperty("HENDELSE_ID") val hendelseId: String,

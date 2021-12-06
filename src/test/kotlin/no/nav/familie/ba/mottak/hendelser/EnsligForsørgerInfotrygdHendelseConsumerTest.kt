@@ -7,6 +7,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
+import no.nav.familie.ba.mottak.integrasjoner.PdlClient
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.ef.EnsligForsørgerVedtakhendelse
 import no.nav.familie.kontrakter.felles.ef.StønadType
@@ -24,6 +25,7 @@ class EnsligForsørgerInfotrygdHendelseConsumerTest {
 
     lateinit var mockHendelsesloggRepository: HendelsesloggRepository
     lateinit var mockSakClient: SakClient
+    lateinit var mockPdlClient: PdlClient
     lateinit var service:EnsligForsørgerHendelseService
 
     lateinit var consumer: EnsligForsørgerInfotrygdHendelseConsumer
@@ -54,7 +56,8 @@ class EnsligForsørgerInfotrygdHendelseConsumerTest {
     internal fun setUp() {
         mockHendelsesloggRepository = mockk(relaxed = true)
         mockSakClient = mockk(relaxed = true)
-        service = EnsligForsørgerHendelseService(mockSakClient, mockHendelsesloggRepository, true)
+        mockPdlClient = mockk(relaxed = true)
+        service = EnsligForsørgerHendelseService(mockSakClient, mockPdlClient, mockHendelsesloggRepository, true)
         consumer = EnsligForsørgerInfotrygdHendelseConsumer(service)
         clearAllMocks()
     }
@@ -63,7 +66,7 @@ class EnsligForsørgerInfotrygdHendelseConsumerTest {
     fun `Konverter json til dto`() {
         val hendelseDto = objectMapper.readValue(json, EnsligForsørgerInfotrygdHendelse::class.java).after
         assertThat(hendelseDto.hendelseId).isEqualTo("10343774")
-        assertThat(hendelseDto.typeHendelse.trim()).isEqualTo("INNVILGET")
+        assertThat(hendelseDto.typeHendelse).contains("INNVILGET")
         assertThat(hendelseDto.fom).isEqualTo("2021-08-01 00:00:00")
         assertThat(hendelseDto.sats).isEqualTo(8820.0)
         assertThat(hendelseDto.typeYtelse).isEqualTo("EF")

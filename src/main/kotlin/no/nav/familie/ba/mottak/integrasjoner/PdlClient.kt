@@ -42,6 +42,10 @@ class PdlClient(
         )
     }
 
+    fun hentPersonident(aktørId: String): String {
+        return hentIdenter(aktørId).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name && !it.historisk }.last().ident
+    }
+
     fun hentPersonMedRelasjoner(personIdent: String): Person {
 
         val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery("hentperson-med-relasjoner"))
