@@ -64,3 +64,5 @@ spec:
       claims:
         groups:
           - id: "928636f4-fd0d-4149-978e-a6fb68bb19de"  # 0000-GA-STDAPPS
+  kafka:
+    pool: nav-dev

@@ -66,6 +66,10 @@ management:
     db:
       enabled: true
 
+ef:
+  overgangstonad:
+    sendtilsak: false
+
 FAMILIE_BA_DOKGEN_API_URL: http://familie-ba-dokgen.default
 FAMILIE_INTEGRASJONER_API_URL: http://familie-integrasjoner/api
 FAMILIE_BA_SAK_API_URL: http://familie-ba-sak/api
