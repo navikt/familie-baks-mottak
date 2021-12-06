@@ -1,9 +1,9 @@
 package no.nav.familie.ba.mottak.søknad.domene
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.familie.kontrakter.ba.søknad.v5.Søknad
+import no.nav.familie.kontrakter.ba.søknad.v6.Søknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsvedlegg
-import no.nav.familie.kontrakter.ba.søknad.v4.Søknad as SøknadV4
+import no.nav.familie.kontrakter.ba.søknad.v5.Søknad as SøknadV5
 import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.LocalDateTime
 import javax.persistence.*
@@ -27,14 +27,13 @@ data class DBSøknad(
     fun hentSøknad(): Søknad {
         return objectMapper.readValue(søknadJson)
     }
+    fun hentSøknadV5(): SøknadV5 {
+        return objectMapper.readValue(søknadJson)
+    }
 
     fun hentSøknadVersjon(): String {
-        try {
-            objectMapper.readValue<SøknadV4>(søknadJson);
-            return "v4"
-        } catch (e: Exception) {
-            return "v5";
-        }
+        val søknad = objectMapper.readValue<SøknadV5>(søknadJson);
+        return if (søknad.barn[0].spørsmål.containsKey("andreForelderNavn")) "v5" else "v6"
     }
 }
 
@@ -49,7 +48,7 @@ data class DBVedlegg(
     val data: ByteArray
 )
 
-fun SøknadV4.tilDBSøknad(): DBSøknad {
+fun SøknadV5.tilDBSøknad(): DBSøknad {
     try {
         return DBSøknad(
             søknadJson = objectMapper.writeValueAsString(this),

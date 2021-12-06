@@ -44,20 +44,20 @@ class SøknadTest(
 
     @Test
     fun `Version detection ved henting av søknad fra database`() {
-        val lagraV4SøknadData = objectMapper.writeValueAsString(SøknadTestData.tomv4søknad())
+        val lagraV5SøknadData = objectMapper.writeValueAsString(SøknadTestData.tomv5søknad())
         val dbSøknad = DBSøknad(
             id = 1L,
-            søknadJson = lagraV4SøknadData,
+            søknadJson = lagraV5SøknadData,
             fnr = "1234578901",
         )
-        assertEquals("v4", dbSøknad.hentSøknadVersjon())
+        assertEquals("v5", dbSøknad.hentSøknadVersjon())
 
-        val lagraV5SøknadData = objectMapper.writeValueAsString(SøknadTestData.søknad())
-        val v5dbSøknad = DBSøknad(
+        val lagraV6SøknadData = objectMapper.writeValueAsString(SøknadTestData.søknad())
+        val v6dbSøknad = DBSøknad(
             id = 2L,
-            søknadJson = lagraV5SøknadData,
+            søknadJson = lagraV6SøknadData,
             fnr = "1234123412",
         )
-        assertEquals("v5", v5dbSøknad.hentSøknadVersjon())
+        assertEquals("v6", v6dbSøknad.hentSøknadVersjon())
     }
 }

@@ -15,25 +15,38 @@ import org.springframework.web.client.HttpClientErrorException
 
 @Service
 @TaskStepBeskrivelse(taskStepType = JournalførSøknadTask.JOURNALFØR_SØKNAD, beskrivelse = "Journalfør søknad")
-class JournalførSøknadTask(private val pdfService: PdfService,
-                           private val journalføringService: JournalføringService,
-                           private val søknadRepository: SøknadRepository) : AsyncTaskStep {
+class JournalførSøknadTask(
+    private val pdfService: PdfService,
+    private val journalføringService: JournalføringService,
+    private val søknadRepository: SøknadRepository
+) : AsyncTaskStep {
 
     override fun doTask(task: Task) {
         try {
             val id = task.payload;
             log.info("Prøver å hente søknadspdf for $id")
-            val dbSøknad: DBSøknad = søknadRepository.hentDBSøknad(id.toLong()) ?: error("Kunne ikke finne søknad ($id) i database")
+            val dbSøknad: DBSøknad =
+                søknadRepository.hentDBSøknad(id.toLong()) ?: error("Kunne ikke finne søknad ($id) i database")
             log.info("Generer pdf og journalfør søknad")
 
             val bokmålPdf = pdfService.lagPdf(dbSøknad)
             log.info("Generert pdf med størrelse ${bokmålPdf.size}")
 
-            if (dbSøknad.hentSøknad().originalSpråk != "nb") {
-                val originalspråkPdf = pdfService.lagPdf(dbSøknad, dbSøknad.hentSøknad().originalSpråk)
-                journalføringService.journalførSøknad(dbSøknad, bokmålPdf, originalspråkPdf)
+            if (dbSøknad.hentSøknadVersjon() == "v5") {
+                if (dbSøknad.hentSøknadV5().originalSpråk != "nb") {
+                    val originalspråkPdf = pdfService.lagPdf(dbSøknad, dbSøknad.hentSøknadV5().originalSpråk)
+                    journalføringService.journalførSøknad(dbSøknad, bokmålPdf, originalspråkPdf)
+                } else {
+                    journalføringService.journalførSøknad(dbSøknad, bokmålPdf)
+                }
+
             } else {
-                journalføringService.journalførSøknad(dbSøknad, bokmålPdf)
+                if (dbSøknad.hentSøknad().originalSpråk != "nb") {
+                    val originalspråkPdf = pdfService.lagPdf(dbSøknad, dbSøknad.hentSøknad().originalSpråk)
+                    journalføringService.journalførSøknad(dbSøknad, bokmålPdf, originalspråkPdf)
+                } else {
+                    journalføringService.journalførSøknad(dbSøknad, bokmålPdf)
+                }
             }
         } catch (e: HttpClientErrorException.Conflict) {
             log.error("409 conflict for eksternReferanseId ved journalføring av søknad. taskId=${task.id}. Se task eller securelog")
@@ -46,6 +59,7 @@ class JournalførSøknadTask(private val pdfService: PdfService,
     }
 
     companion object {
+
         const val JOURNALFØR_SØKNAD = "journalførSøknad"
         val log: Logger = LoggerFactory.getLogger(this::class.java)
         val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
