@@ -65,3 +65,6 @@ spec:
       claims:
         groups:
           - id: "87190cf3-b278-457d-8ab7-1a5c55a9edd7"  # Group_87190cf3-b278-457d-8ab7-1a5c55a9edd7 tilgang til prosessering
+
+  kafka:
+    pool: nav-prod
