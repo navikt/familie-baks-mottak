@@ -146,6 +146,20 @@ class SakClient @Autowired constructor(
             throw IllegalStateException("Sending annuller fødselshendelse til sak feilet.", e)
         }
     }
+
+    fun sendVedtakOmOvergangsstønadHendelseTilSak(personIdent: String) {
+        val uri = URI.create("$sakServiceUri/overgangsstonad")
+        logger.info("sender ident fra vedtak om overgangsstønad til {}", uri)
+        try {
+            val response = postForEntity<Ressurs<String>>(uri, PersonIdent(ident = personIdent))
+            logger.info("Ident fra vedtak om overgangsstønad sendt til sak. Status=${response.status}")
+        } catch (e: RestClientResponseException) {
+            logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
+            throw IllegalStateException("Innsending til sak feilet. Status: ${e.rawStatusCode}, body: ${e.responseBodyAsString}", e)
+        } catch (e: RestClientException) {
+            throw IllegalStateException("Innsending til sak feilet.", e)
+        }
+    }
 }
 
 data class RestMinimalFagsak(
