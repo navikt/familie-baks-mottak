@@ -24,7 +24,7 @@ import org.springframework.kafka.listener.ContainerProperties
 class KafkaAivenConfig(val environment: Environment) {
 
     @Bean
-    fun kafkaAivenEFHendelseListenerContainerFactory(kafkaErrorHandler: KafkaErrorHandler)
+    fun kafkaAivenHendelseListenerContainerFactory(kafkaErrorHandler: KafkaErrorHandler)
             : ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
