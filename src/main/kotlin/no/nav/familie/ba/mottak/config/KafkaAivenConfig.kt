@@ -71,9 +71,13 @@ class KafkaAivenConfig(val environment: Environment) {
     private fun consumerConfigsAvro(): Map<String, Any> {
         val kafkaBrokers = System.getenv("KAFKA_BROKERS") ?: "http://localhost:9092"
         val schemaRegisty = System.getenv("KAFKA_SCHEMA_REGISTRY") ?: "http://localhost:9093"
+        val schemaRegistryUser = System.getenv("KAFKA_SCHEMA_REGISTRY_USER") ?: "mangler i pod"
+        val schemaRegistryPassword = System.getenv("KAFKA_SCHEMA_REGISTRY_PASSWORD") ?: "mangler i pod"
         val consumerConfigs = mutableMapOf(
             ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaBrokers,
             "schema.registry.url" to schemaRegisty,
+            "basic.auth.credentials.source" to "USER_INFO",
+            "basic.auth.user.info" to "${schemaRegistryUser}:${schemaRegistryPassword}",
             "specific.avro.reader" to true,
             ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
             ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java,
