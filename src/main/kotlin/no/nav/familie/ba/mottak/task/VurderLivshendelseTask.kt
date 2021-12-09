@@ -119,7 +119,6 @@ class VurderLivshendelseTask(
     ): Boolean {
         val (nyopprettet, oppgave) = hentEllerOpprettNyOppgaveForPerson(fagsakPerson, BESKRIVELSE_DØDSFALL)
         val pdlPersonData = pdlClient.hentPerson(fagsakPerson.ident, "hentperson-relasjon-dødsfall")
-        val dødsfallBruker = pdlPersonData.dødsfall.firstOrNull()?.dødsdato != null
         val dødsfallBarnList = pdlPersonData.forelderBarnRelasjon.filter {
             it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN &&
                 pdlClient.hentPerson(
@@ -127,14 +126,12 @@ class VurderLivshendelseTask(
                 "hentperson-relasjon-dødsfall"
             ).dødsfall.firstOrNull()?.dødsdato != null
         }
-        val beskrivelsesTekst = "$BESKRIVELSE_DØDSFALL: " +
-            (if (dødsfallBruker) "bruker" else "") +
-            (if (dødsfallBruker && dødsfallBarnList.isNotEmpty()) " og " else "") +
-            (
-                if (dødsfallBarnList.count() > 1) dødsfallBarnList.count()
-                    .toString() + " barn" else if (dødsfallBarnList.isNotEmpty()) "barn" else ""
-                ) +
-            dødsfallBarnList.fold("") { identList, it -> "$identList ${it.relatertPersonsIdent}" }
+        val tekstBruker = if (pdlPersonData.dødsfall.firstOrNull()?.dødsdato != null) "bruker" else ""
+        val tekstOg = if (tekstBruker.isNotEmpty() && dødsfallBarnList.isNotEmpty()) " og " else ""
+        val tekstBarn = if (dødsfallBarnList.count() > 1) dødsfallBarnList.count()
+            .toString() + " barn" else if (dødsfallBarnList.isNotEmpty()) "barn" else ""
+        val tekstBarnIdenter = dødsfallBarnList.fold("") { identList, it -> "$identList ${it.relatertPersonsIdent}" }
+        val beskrivelsesTekst = "$BESKRIVELSE_DØDSFALL: " + tekstBruker + tekstOg + tekstBarn + tekstBarnIdenter
 
         if (nyopprettet) {
             oppgaveClient.opprettVurderLivshendelseOppgave(
