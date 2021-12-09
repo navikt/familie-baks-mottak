@@ -57,6 +57,7 @@ class VurderLivshendelseTask(
             VurderLivshendelseType.DØDSFALL -> {
                 secureLog.info("Har mottat dødsfallshendelse for pseron ${personIdent}")
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-dødsfall")
+                secureLog.info("dødsfallshendelse person følselsdato = ${pdlPersonData.fødsel.firstOrNull()}")
                 if (pdlPersonData.dødsfall.firstOrNull()?.dødsdato != null) {
                     val relatertPersonMedSak = finnRelatertePersonerMedSak(personIdent, pdlPersonData)
                     secureLog.info("relatertPersonMedSak count = ${relatertPersonMedSak.size}, identer = ${
@@ -129,7 +130,7 @@ class VurderLivshendelseTask(
             listeMedForeldreForBarn.forEach {
                 personerMedSak += sakClient.hentRestFagsakDeltagerListe(it).filter { it.fagsakStatus != AVSLUTTET }
             }
-            secureLog.info("personerMedSak(): personerMedSak.size = ${personerMedSak.size}" +
+            secureLog.info("finnRelatertePersonerMedSak(): personerMedSak.size = ${personerMedSak.size}" +
                            "identer = ${personerMedSak.fold("") { identer, it -> identer + " " + it.ident }}")
         }
 
