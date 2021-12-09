@@ -141,6 +141,8 @@ class VurderLivshendelseTask(
             ).also {
                 task.metadata["oppgaveId"] = it.oppgaveId.toString()
                 taskRepository.saveAndFlush(task)
+                secureLog.info("Opprett oppgave (${it.oppgaveId}) for dødsfallshendelse (person ident:  ${fagsakPerson.ident})" +
+                        ", beskrivelsestekst: ${beskrivelsesTekst}")
             }
             return true
         } else {
