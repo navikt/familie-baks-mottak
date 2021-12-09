@@ -55,8 +55,13 @@ class VurderLivshendelseTask(
 
         when (payload.type) {
             VurderLivshendelseType.DØDSFALL -> {
+                secureLog.info("Har mottat dødsfallshendelse for pseron ${personIdent}")
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-dødsfall")
                 if (pdlPersonData.dødsfall.firstOrNull()?.dødsdato != null) {
+                    val relatertPersonMedSak = finnRelatertePersonerMedSak(personIdent, pdlPersonData)
+                    secureLog.info("relatertPersonMedSak count = ${relatertPersonMedSak.size}, identer = ${
+                        relatertPersonMedSak.fold("") { identer, it -> identer + " " + it.ident }
+                    }")
                     finnRelatertePersonerMedSak(personIdent, pdlPersonData).forEach {
                         if (opprettEllerOppdaterDødsfallshendelseOppgave(it, task)) {
                             log.error("Mottatt dødsfallshendelse på sak i BA-sak. Få saksbehandler til å se på oppgave av typen VurderLivshendelse") // TODO midlertidig error logg til man har fått dette inn i saksbehandlersrutinen.
