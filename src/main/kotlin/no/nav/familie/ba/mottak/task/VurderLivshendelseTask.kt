@@ -62,7 +62,7 @@ class VurderLivshendelseTask(
                     secureLog.info("relatertPersonMedSak count = ${relatertPersonMedSak.size}, identer = ${
                         relatertPersonMedSak.fold("") { identer, it -> identer + " " + it.ident }
                     }")
-                    finnRelatertePersonerMedSak(personIdent, pdlPersonData).forEach {
+                    relatertPersonMedSak.forEach {
                         if (opprettEllerOppdaterDødsfallshendelseOppgave(it, task)) {
                             log.error("Mottatt dødsfallshendelse på sak i BA-sak. Få saksbehandler til å se på oppgave av typen VurderLivshendelse") // TODO midlertidig error logg til man har fått dette inn i saksbehandlersrutinen.
                             oppgaveOpprettetDødsfallCounter.increment()
