@@ -154,7 +154,7 @@ class VurderLivshendelseTask(
             taskRepository.saveAndFlush(task)
             log.info("Fant åpen oppgave på aktørId ${oppgave.aktoerId}")
             secureLog.info("Fant åpen oppgave: $oppgave")
-            secureLog.info("Oppdater oppgave ($oppgave.id) beskrivelsetekster: $beskrivelsesTekst")
+            secureLog.info("Oppdater oppgave ($oppgave.id) beskrivelsestekster: $beskrivelsesTekst")
             return false
         }
     }
