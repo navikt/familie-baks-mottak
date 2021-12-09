@@ -103,9 +103,16 @@ class VurderLivshendelseTask(
         val listeMedBarn =
                 familierelasjon.filter { it.minRolleForPerson != FORELDERBARNRELASJONROLLE.BARN }
                         .map { it.relatertPersonsIdent }
+        secureLog.info("finnRelatertePersonerMedSak(): listeMedBarn size = ${listeMedBarn.size} identer = " +
+                       "${listeMedBarn.fold("") { identer, it -> identer + " " + it }}")
         if (listeMedBarn.isNotEmpty()) {
-            personerMedSak += sakClient.hentRestFagsakDeltagerListe(personIdent).filter { it.fagsakStatus != AVSLUTTET }
+            personerMedSak += sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
+                secureLog.info("finnRelatertePersonerMedSak(): Hentet Fagsak for person ${personIdent}: ${it.fagsakId} ${it.fagsakStatus}")
+                it.fagsakStatus != AVSLUTTET
+            }
         }
+
+        secureLog.info("finnRelatertePersonerMedSak(): personerMedSak.size = ${personerMedSak.size}")
 
         // Sjekker om foreldrene til person under 19 har en løpende sak.
         if (pdlPersonData.fødsel.isEmpty() ||
@@ -116,9 +123,14 @@ class VurderLivshendelseTask(
                     familierelasjon.filter { it.minRolleForPerson == FORELDERBARNRELASJONROLLE.BARN }
                             .map { it.relatertPersonsIdent }
 
+            secureLog.info("finnRelatertePersonerMedSak(): listeMedForeldreForBarn.size = ${listeMedForeldreForBarn.size}" +
+                           "identer = ${listeMedForeldreForBarn.fold("") { identer, it -> identer + " " + it }}")
+
             listeMedForeldreForBarn.forEach {
                 personerMedSak += sakClient.hentRestFagsakDeltagerListe(it).filter { it.fagsakStatus != AVSLUTTET }
             }
+            secureLog.info("personerMedSak(): personerMedSak.size = ${personerMedSak.size}" +
+                           "identer = ${personerMedSak.fold("") { identer, it -> identer + " " + it.ident }}")
         }
 
         if (personerMedSak.isNotEmpty()) {
