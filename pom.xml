@@ -327,7 +327,6 @@
                         </goals>
                         <configuration>
                             <sourceDirectory>src/main/resources/avro/leesah</sourceDirectory>
-
                             <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
                         </configuration>
                     </execution>

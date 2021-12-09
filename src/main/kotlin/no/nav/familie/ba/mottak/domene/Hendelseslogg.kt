@@ -3,16 +3,7 @@ package no.nav.familie.ba.mottak.domene
 import no.nav.familie.prosessering.domene.PropertiesToStringConverter
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.Convert
-import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.SequenceGenerator
-import javax.persistence.Table
+import javax.persistence.*
 
 @Entity
 @Table(name = "HENDELSESLOGG")
@@ -46,6 +37,7 @@ data class Hendelseslogg(
 enum class HendelseConsumer {
         PDL,
         JOURNAL,
+        JOURNAL_AIVEN,
         EF_VEDTAK,
         EF_VEDTAK_INFOTRYGD
 }

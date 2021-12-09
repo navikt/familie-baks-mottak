@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.config
 
+import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.config.SslConfigs
@@ -24,11 +25,21 @@ import org.springframework.kafka.listener.ContainerProperties
 class KafkaAivenConfig(val environment: Environment) {
 
     @Bean
-    fun kafkaAivenEFHendelseListenerContainerFactory(kafkaErrorHandler: KafkaErrorHandler)
+    fun kafkaAivenHendelseListenerContainerFactory(kafkaErrorHandler: KafkaErrorHandler)
             : ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
         factory.consumerFactory = DefaultKafkaConsumerFactory(consumerConfigs())
+        factory.setErrorHandler(kafkaErrorHandler)
+        return factory
+    }
+
+    @Bean
+    fun kafkaAivenHendelseListenerAvroContainerFactory(kafkaErrorHandler: KafkaErrorHandler)
+            : ConcurrentKafkaListenerContainerFactory<String, String> {
+        val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
+        factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
+        factory.consumerFactory = DefaultKafkaConsumerFactory(consumerConfigsAvro())
         factory.setErrorHandler(kafkaErrorHandler)
         return factory
     }
@@ -46,6 +57,32 @@ class KafkaAivenConfig(val environment: Environment) {
             ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
             ConsumerConfig.GROUP_ID_CONFIG to "familie-ba-mottak",
             ConsumerConfig.CLIENT_ID_CONFIG to "consumer-familie-ba-mottak-1",
+            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
+            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
+            CommonClientConfigs.RETRIES_CONFIG to 10,
+            CommonClientConfigs.RETRY_BACKOFF_MS_CONFIG to 100
+        )
+        if (environment.activeProfiles.none { it.contains("dev") || it.contains("postgres") }) {
+            return consumerConfigs + securityConfig()
+        }
+        return consumerConfigs.toMap()
+    }
+
+    private fun consumerConfigsAvro(): Map<String, Any> {
+        val kafkaBrokers = System.getenv("KAFKA_BROKERS") ?: "http://localhost:9092"
+        val schemaRegisty = System.getenv("KAFKA_SCHEMA_REGISTRY") ?: "http://localhost:9093"
+        val schemaRegistryUser = System.getenv("KAFKA_SCHEMA_REGISTRY_USER") ?: "mangler i pod"
+        val schemaRegistryPassword = System.getenv("KAFKA_SCHEMA_REGISTRY_PASSWORD") ?: "mangler i pod"
+        val consumerConfigs = mutableMapOf(
+            ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaBrokers,
+            "schema.registry.url" to schemaRegisty,
+            "basic.auth.credentials.source" to "USER_INFO",
+            "basic.auth.user.info" to "${schemaRegistryUser}:${schemaRegistryPassword}",
+            "specific.avro.reader" to true,
+            ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
+            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java,
+            ConsumerConfig.GROUP_ID_CONFIG to "familie-ba-mottak-avro",
+            ConsumerConfig.CLIENT_ID_CONFIG to "consumer-familie-ba-mottak-2",
             ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
             ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
             CommonClientConfigs.RETRIES_CONFIG to 10,
