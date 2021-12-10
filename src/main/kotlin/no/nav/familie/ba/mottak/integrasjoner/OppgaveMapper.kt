@@ -5,9 +5,14 @@ import no.nav.familie.ba.mottak.util.erOrgnr
 import no.nav.familie.ba.mottak.util.fristFerdigstillelse
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
-import no.nav.familie.kontrakter.felles.oppgave.*
+import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
+import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
+import no.nav.familie.kontrakter.felles.oppgave.OppgaveIdentV2
+import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
+import no.nav.familie.kontrakter.felles.oppgave.OpprettOppgaveRequest
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.util.*
 
 private val logger = LoggerFactory.getLogger(OppgaveMapper::class.java)
 
@@ -25,7 +30,7 @@ class OppgaveMapper(private val hentEnhetClient: HentEnhetClient,
                                      tema = Tema.BAR,
                                      oppgavetype = oppgavetype,
                                      fristFerdigstillelse = fristFerdigstillelse(),
-                                     beskrivelse = beskrivelse ?: journalpost.hentHovedDokumentTittel() ?: "",
+                                     beskrivelse = tilBeskrivelse(journalpost, beskrivelse),
                                      enhetsnummer = utledEnhetsnummer(journalpost),
                                      behandlingstema = hentBehandlingstema(journalpost),
                                      behandlingstype = hentBehandlingstype(journalpost))
@@ -55,6 +60,15 @@ class OppgaveMapper(private val hentEnhetClient: HentEnhetClient,
         }
     }
 
+    private fun tilBeskrivelse(journalpost: Journalpost, beskrivelse: String?): String {
+        val bindestrek = if (!beskrivelse.isNullOrEmpty() && !journalpost.hentHovedDokumentTittel().isNullOrEmpty()){
+            "-"
+        } else ""
+
+        return  "${journalpost.hentHovedDokumentTittel().orEmpty()} $bindestrek ${beskrivelse.orEmpty()}".trim()
+
+    }
+
     private fun hentBehandlingstema(journalpost: Journalpost): String? {
         if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
 
@@ -78,7 +92,7 @@ class OppgaveMapper(private val hentEnhetClient: HentEnhetClient,
             journalpost.journalforendeEnhet == "2101" -> "4806" //Enhet 2101 er nedlagt. Rutes til 4806
             journalpost.journalforendeEnhet == "4847" -> "4817" //Enhet 4847 skal legges ned. Rutes til 4817
             journalpost.journalforendeEnhet.isNullOrBlank() -> null
-            hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).status.toUpperCase() == "NEDLAGT" -> null
+            hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).status.uppercase(Locale.getDefault()) == "NEDLAGT" -> null
             hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).oppgavebehandler -> journalpost.journalforendeEnhet
             else -> {
                 logger.warn("Enhet ${journalpost.journalforendeEnhet} kan ikke ta i mot oppgaver")

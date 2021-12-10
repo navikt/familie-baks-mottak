@@ -164,32 +164,52 @@ class OppgaveMapperTest(
     }
 
     @Test
-    fun `skal sette beskrivelse fra journalpost`() {
+    fun `skal sette beskrivelse til kun tittel på journalpost når beskrivelse i input er null, brevkode på journalpost er satt og dokumentet har tittel`() {
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
-        val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                                         journalpostClient.hentJournalpost("123")
-                                                                 .copy(dokumenter = listOf(DokumentInfo(
-                                                                         tittel = "Whatever",
-                                                                         brevkode = "kode",
-                                                                         dokumentstatus = null,
-                                                                         dokumentvarianter = null)),
-                                                                       behandlingstema = "btema"
-                                                                 )
+        val oppgave = oppgaveMapper.mapTilOpprettOppgave(
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("123")
+                .copy(
+                    dokumenter = listOf(
+                        DokumentInfo(
+                            tittel = "Whatever",
+                            brevkode = "kode",
+                            dokumentstatus = null,
+                            dokumentvarianter = null
+                        )
+                    ),
+                    behandlingstema = "btema"
+                ),
+            beskrivelse = null
         )
         assertEquals("Whatever", oppgave.beskrivelse)
+    }
 
-        val oppgaveUtenBeskrivelse1 = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                                                         journalpostClient.hentJournalpost("123")
-                                                                                 .copy(dokumenter = listOf(DokumentInfo(
-                                                                                         tittel = "Whatever",
-                                                                                         brevkode = null,
-                                                                                         dokumentstatus = null,
-                                                                                         dokumentvarianter = null)),
-                                                                                       behandlingstema = "btema"
-                                                                                 )
+    @Test
+    fun `skal sette beskrivelse til tom når beskrivelse i input er null, brevkode på journalpost er ikke satt og dokumentet har tittel`() {
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
+
+        val oppgaveUtenBeskrivelse1 = oppgaveMapper.mapTilOpprettOppgave(
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("123")
+                .copy(
+                    dokumenter = listOf(
+                        DokumentInfo(
+                            tittel = "Whatever",
+                            brevkode = null,
+                            dokumentstatus = null,
+                            dokumentvarianter = null
+                        )
+                    ),
+                    behandlingstema = "btema"
+                )
         )
         assertEquals("", oppgaveUtenBeskrivelse1.beskrivelse)
+    }
 
+    @Test
+    fun `skal sette beskrivelse til tom når beskrivelse i input er null, brevkode på journalpost er ikke satt og dokumentet ikke har tittel`() {
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         val oppgaveUtenBeskrivelse2 = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
                                                                          journalpostClient.hentJournalpost("123")
                                                                                  .copy(dokumenter = listOf(DokumentInfo(
@@ -201,6 +221,40 @@ class OppgaveMapperTest(
                                                                                  )
         )
         assertEquals("", oppgaveUtenBeskrivelse2.beskrivelse)
+
+    }
+
+    @Test
+    fun `skal sette beskrivelse til tittel og beskrivelse når beskrivelse i input er satt, brevkode på journalpost er satt og dokumentet har tittel`() {
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
+        val oppgaveUtenBeskrivelse2 = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
+                                                                         journalpostClient.hentJournalpost("123")
+                                                                             .copy(dokumenter = listOf(DokumentInfo(
+                                                                                 tittel = "Whatever",
+                                                                                 brevkode = "kode",
+                                                                                 dokumentstatus = null,
+                                                                                 dokumentvarianter = null)),
+                                                                                   behandlingstema = "btema"
+                                                                             ), "beskrivelsefelt"
+        )
+        assertEquals("Whatever - beskrivelsefelt", oppgaveUtenBeskrivelse2.beskrivelse)
+
+    }
+
+    @Test
+    fun `skal sette beskrivelse til kun beskrivelse fra input når dokumentet mangler tittel`() {
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
+        val oppgaveUtenBeskrivelse2 = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
+                                                                         journalpostClient.hentJournalpost("123")
+                                                                             .copy(dokumenter = listOf(DokumentInfo(
+                                                                                 tittel = null,
+                                                                                 brevkode = "kode",
+                                                                                 dokumentstatus = null,
+                                                                                 dokumentvarianter = null)),
+                                                                                   behandlingstema = "btema"
+                                                                             ), "beskrivelsefelt"
+        )
+        assertEquals("beskrivelsefelt", oppgaveUtenBeskrivelse2.beskrivelse)
 
     }
 
