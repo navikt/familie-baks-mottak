@@ -39,6 +39,7 @@ class OppgaveClient @Autowired constructor(
         logger.info("Oppretter journalføringsoppgave for ${if (journalpost.kanal == "NAV_NO") "digital søknad" else "papirsøknad"}")
         val uri = URI.create("$integrasjonUri/oppgave/opprett")
         val request = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring, journalpost, beskrivelse)
+        secureLog.info("Oppretter journalføringsoppgave for ${journalpost.journalpostId} ${request.beskrivelse}")
 
         return responseFraOpprettOppgave(uri, request)
     }
