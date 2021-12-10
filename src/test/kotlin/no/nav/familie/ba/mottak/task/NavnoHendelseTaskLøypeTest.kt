@@ -43,10 +43,12 @@ class NavnoHendelseTaskLøypeTest {
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
     private val mockFeatureToggleService: FeatureToggleService = mockk()
 
-    private val rutingSteg = JournalhendelseRutingTask(mockPdlClient,
-                                                       mockSakClient,
-                                                       mockInfotrygdBarnetrygdClient,
-                                                       mockTaskRepository, mockFeatureToggleService)
+    private val rutingSteg = JournalhendelseRutingTask(
+        mockPdlClient,
+        mockSakClient,
+        mockInfotrygdBarnetrygdClient,
+        mockTaskRepository
+    )
 
     private val journalføringSteg = OpprettJournalføringOppgaveTask(mockJournalpostClient,
                                                                     mockOppgaveClient,
