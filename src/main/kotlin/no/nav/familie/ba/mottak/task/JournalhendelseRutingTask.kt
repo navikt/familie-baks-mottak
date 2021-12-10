@@ -34,18 +34,16 @@ import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 @TaskStepBeskrivelse(taskStepType = JournalhendelseRutingTask.TASK_STEP_TYPE,
                      beskrivelse = "Håndterer ruting og markering av sakssystem")
 class JournalhendelseRutingTask(
-        private val pdlClient: PdlClient,
-        private val sakClient: SakClient,
-        private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,
-        private val taskRepository: TaskRepository,
-        private val featureToggleService: FeatureToggleService,
+    private val pdlClient: PdlClient,
+    private val sakClient: SakClient,
+    private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,
+    private val taskRepository: TaskRepository,
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(JournalhendelseRutingTask::class.java)
     val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
 
     override fun doTask(task: Task) {
-        val journalpostId = task.metadata["journalpostId"] as String
         val brukersIdent = task.metadata["personIdent"] as String?
 
         val (baSak, infotrygdSak) = brukersIdent?.run { søkEtterSakIBaSakOgInfotrygd(this) } ?: Pair(null, null)
@@ -67,26 +65,6 @@ class JournalhendelseRutingTask(
                 incrementSakssystemMarkering("Ingen")
                 ""
             } // trenger ingen form for markering. Kan løses av begge systemer
-        }
-
-        val taOverRuting = featureToggleService.isEnabled("familie-ba-mottak.ta-over-ruting", true)
-        log.info("Ruting toggle er satt til $taOverRuting")
-
-
-        if (!taOverRuting) {
-            when (task.payload) {
-                "NAV_NO" -> {
-                    if (infotrygdSak.finnes() && !baSak.finnes()) {
-                        log.info("Bruker har sak i Infotrygd. Overlater journalføring til BRUT001 og skipper opprettelse av oppgave for" +
-                                         " journalpost $journalpostId")
-                        return
-                    } else if (!baSak.finnes() && brukersIdent != null) {
-                        log.info("Bruker på journalpost $journalpostId har ikke pågående sak i BA-sak. Skipper derfor " +
-                                         "journalføring mot ny løsning i denne omgang.")
-                        return
-                    }
-                }
-            }
         }
 
         Task.nyTask(type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
