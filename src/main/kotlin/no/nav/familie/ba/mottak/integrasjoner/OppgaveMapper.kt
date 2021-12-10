@@ -12,7 +12,7 @@ import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.kontrakter.felles.oppgave.OpprettOppgaveRequest
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.Locale
 
 private val logger = LoggerFactory.getLogger(OppgaveMapper::class.java)
 
@@ -61,11 +61,11 @@ class OppgaveMapper(private val hentEnhetClient: HentEnhetClient,
     }
 
     private fun tilBeskrivelse(journalpost: Journalpost, beskrivelse: String?): String {
-        val bindestrek = if (!beskrivelse.isNullOrEmpty() && !journalpost.hentHovedDokumentTittel().isNullOrEmpty()){
+        val bindestrek = if (!beskrivelse.isNullOrEmpty() && !journalpost.hentHovedDokumentTittel().isNullOrEmpty()) {
             "-"
         } else ""
 
-        return  "${journalpost.hentHovedDokumentTittel().orEmpty()} $bindestrek ${beskrivelse.orEmpty()}".trim()
+        return "${journalpost.hentHovedDokumentTittel().orEmpty()} $bindestrek ${beskrivelse.orEmpty()}".trim()
 
     }
 

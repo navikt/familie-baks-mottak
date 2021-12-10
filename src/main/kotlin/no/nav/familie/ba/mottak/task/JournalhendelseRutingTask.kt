@@ -44,7 +44,6 @@ class JournalhendelseRutingTask(
     val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
 
     override fun doTask(task: Task) {
-        val journalpostId = task.metadata["journalpostId"] as String
         val brukersIdent = task.metadata["personIdent"] as String?
 
         val (baSak, infotrygdSak) = brukersIdent?.run { søkEtterSakIBaSakOgInfotrygd(this) } ?: Pair(null, null)
