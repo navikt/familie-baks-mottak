@@ -45,11 +45,12 @@ class SkanHendelseTaskLøypeTest {
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
     private val mockFeatureToggleService: FeatureToggleService = mockk()
 
-    private val rutingSteg = JournalhendelseRutingTask(mockPdlClient,
-                                                       mockSakClient,
-                                                       mockInfotrygdBarnetrygdClient,
-                                                       mockTaskRepository,
-                                                       mockFeatureToggleService)
+    private val rutingSteg = JournalhendelseRutingTask(
+            mockPdlClient,
+            mockSakClient,
+            mockInfotrygdBarnetrygdClient,
+            mockTaskRepository
+    )
 
     private val journalføringSteg = OpprettJournalføringOppgaveTask(mockJournalpostClient,
                                                                     mockOppgaveClient,
@@ -97,7 +98,7 @@ class SkanHendelseTaskLøypeTest {
             mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
         } returns InfotrygdSøkResponse(emptyList(), emptyList())
 
-        every { mockFeatureToggleService.isEnabled("familie-ba-mottak.ta-over-ruting",true) } returns true
+        every { mockFeatureToggleService.isEnabled("familie-ba-mottak.ta-over-ruting", true) } returns true
 
     }
 
@@ -216,6 +217,7 @@ class SkanHendelseTaskLøypeTest {
     }
 
     companion object {
+
         private val MOTTAK_KANAL = "SKAN_NETS"
     }
 }

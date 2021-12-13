@@ -57,17 +57,7 @@ class JournalhendelseService(
                 secureLogger.info("Mottatt gyldig hendelse: $hendelseRecord")
                 behandleJournalhendelse(hendelseRecord)
 
-                hendelsesloggRepository.save(
-                    Hendelseslogg(
-                        consumerRecord.offset(),
-                        hendelseRecord.hendelsesId.toString(),
-                        CONSUMER_JOURNAL,
-                        mapOf(
-                            "journalpostId" to hendelseRecord.journalpostId.toString(),
-                            "hendelsesType" to hendelseRecord.hendelsesType.toString()
-                        ).toProperties()
-                    )
-                )
+                lagreHendelseslogg(consumerRecord, hendelseRecord, CONSUMER_JOURNAL)
             }
 
             ack.acknowledge()
@@ -80,10 +70,42 @@ class JournalhendelseService(
         }
     }
 
+    private fun lagreHendelseslogg(
+        consumerRecord: ConsumerRecord<Long, JournalfoeringHendelseRecord>,
+        hendelseRecord: JournalfoeringHendelseRecord,
+        hendelseConsumer: HendelseConsumer
+    ) {
+        hendelsesloggRepository.save(
+            Hendelseslogg(
+                consumerRecord.offset(),
+                hendelseRecord.hendelsesId.toString(),
+                hendelseConsumer,
+                mapOf(
+                    "journalpostId" to hendelseRecord.journalpostId.toString(),
+                    "hendelsesType" to hendelseRecord.hendelsesType.toString()
+                ).toProperties()
+            )
+        )
+    }
+
     fun CharSequence.toStringOrNull(): String? {
         return if (this.isNotBlank()) this.toString() else null
     }
 
+    fun bareLagreLoggOgAckAiven(consumerRecord: ConsumerRecord<Long, JournalfoeringHendelseRecord>,
+                           ack: Acknowledgment) {
+        val hendelseRecord = consumerRecord.value()
+        if (erGyldigHendelsetype(hendelseRecord)) {
+            if (!hendelsesloggRepository.existsByHendelseIdAndConsumer(
+                    hendelseRecord.hendelsesId.toString(),
+                    HendelseConsumer.JOURNAL_AIVEN
+                )
+            ) {
+                lagreHendelseslogg(consumerRecord, hendelseRecord, HendelseConsumer.JOURNAL_AIVEN)
+            }
+        }
+        ack.acknowledge()
+    }
 
     private fun erGyldigHendelsetype(hendelseRecord: JournalfoeringHendelseRecord): Boolean {
         return GYLDIGE_HENDELSE_TYPER.contains(hendelseRecord.hendelsesType.toString())

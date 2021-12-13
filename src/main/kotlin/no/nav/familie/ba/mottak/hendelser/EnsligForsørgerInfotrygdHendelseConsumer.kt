@@ -1,11 +1,6 @@
 package no.nav.familie.ba.mottak.hendelser
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.core.JsonToken
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonDeserializer
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.kontrakter.felles.objectMapper
@@ -18,7 +13,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Service
-import java.util.*
 import javax.transaction.Transactional
 
 
@@ -66,7 +60,7 @@ class EnsligForsørgerInfotrygdHendelseConsumer(val vedtakOmOvergangsstønadServ
     @KafkaListener(
         id = "ef-infotrygd-overgangstonad",
         topics = ["teamfamilie.$TOPIC_INFOTRYGD_VEDTAK"],
-        containerFactory = "kafkaAivenEFHendelseListenerContainerFactory",
+        containerFactory = "kafkaAivenHendelseListenerContainerFactory",
         idIsGroup = false
     )
     @Transactional
