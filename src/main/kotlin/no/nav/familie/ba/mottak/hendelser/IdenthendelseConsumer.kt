@@ -10,7 +10,6 @@ import no.nav.person.pdl.aktor.v2.Type
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
@@ -31,23 +30,22 @@ class IdenthendelseConsumer(private val taskRepository: TaskRepository) {
         topics = ["aapen-person-pdl-aktor-v1"],
         id = "personhendelse",
         idIsGroup = false,
-        containerFactory = "kafkaLeesahListenerContainerFactory" // TODO: Trenger vi en egen?
+        containerFactory = "kafkaIdenthendelseListenerContainerFactory"
     )
     @Transactional
-    fun listen(cr: ConsumerRecord<String, Aktor>, ack: Acknowledgment) {
-        val aktør = cr.value()
-        val folkeregisterident = aktør.identifikatorer.single { it.type == Type.FOLKEREGISTERIDENT && it.gjeldende}
+    fun listen(consumerRecord: ConsumerRecord<String, Aktor>, ack: Acknowledgment) {
+        val aktør = consumerRecord.value()
+        val folkeregisterident = aktør.identifikatorer.single { it.type == Type.FOLKEREGISTERIDENT && it.gjeldende }
 
         try {
-            SECURE_LOGGER.info("Har mottatt ident-hendelse $cr")
-            val task = SendIdenthendelseTilSakTask.opprettTask(ident = PersonIdent(ident = folkeregisterident.idnummer.toString()))
+            SECURE_LOGGER.info("Har mottatt ident-hendelse $consumerRecord")
+            val task =
+                SendIdenthendelseTilSakTask.opprettTask(ident = PersonIdent(ident = folkeregisterident.idnummer.toString()))
             taskRepository.save(task)
         } catch (e: RuntimeException) {
             identhendelseFeiletCounter.increment()
             SECURE_LOGGER.error("Feil i prosessering av ident-hendelser", e)
             throw RuntimeException("Feil i prosessering av ident-hendelser")
-        } finally {
-            MDC.clear()
         }
 
         ack.acknowledge()

@@ -2,6 +2,8 @@ package no.nav.familie.ba.mottak.config
 
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import org.apache.avro.generic.GenericRecord
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.consumer.OffsetResetStrategy
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties
 import org.springframework.context.annotation.Bean
@@ -22,14 +24,34 @@ import java.time.Duration
 )
 class KafkaConfig {
 
+    @Bean
+    fun kafkaIdenthendelseListenerContainerFactory(
+        properties: KafkaProperties,
+        kafkaErrorHandler: KafkaErrorHandler,
+        environment: Environment
+    ): ConcurrentKafkaListenerContainerFactory<Int, GenericRecord> {
+        val factory = ConcurrentKafkaListenerContainerFactory<Int, GenericRecord>()
+        factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
+        factory.containerProperties.authorizationExceptionRetryInterval = Duration.ofSeconds(2)
+        factory.consumerFactory = DefaultKafkaConsumerFactory<Int?, GenericRecord?>(
+            properties.buildConsumerProperties().also {
+                it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = OffsetResetStrategy.LATEST
+            }
+        )
+        if (environment.activeProfiles.contains("preprod")) {
+            factory.setErrorHandler(KafkaSecureloggingErrorHandler())
+        } else {
+            factory.setErrorHandler(kafkaErrorHandler)
+        }
+        return factory
+    }
 
     @Bean
     fun kafkaLeesahListenerContainerFactory(
         properties: KafkaProperties,
         kafkaErrorHandler: KafkaErrorHandler,
         environment: Environment
-    )
-            : ConcurrentKafkaListenerContainerFactory<Int, GenericRecord> {
+    ): ConcurrentKafkaListenerContainerFactory<Int, GenericRecord> {
         val factory = ConcurrentKafkaListenerContainerFactory<Int, GenericRecord>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
         factory.containerProperties.authorizationExceptionRetryInterval = Duration.ofSeconds(2)
@@ -43,8 +65,10 @@ class KafkaConfig {
     }
 
     @Bean
-    fun kafkaJournalføringHendelseListenerContainerFactory(properties: KafkaProperties, kafkaErrorHandler: KafkaErrorHandler)
-            : ConcurrentKafkaListenerContainerFactory<Long, JournalfoeringHendelseRecord> {
+    fun kafkaJournalføringHendelseListenerContainerFactory(
+        properties: KafkaProperties,
+        kafkaErrorHandler: KafkaErrorHandler
+    ): ConcurrentKafkaListenerContainerFactory<Long, JournalfoeringHendelseRecord> {
         properties.properties.put("specific.avro.reader", "true")
         val factory = ConcurrentKafkaListenerContainerFactory<Long, JournalfoeringHendelseRecord>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
