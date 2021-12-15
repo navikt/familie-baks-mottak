@@ -35,7 +35,7 @@ class KafkaConfig {
         factory.containerProperties.authorizationExceptionRetryInterval = Duration.ofSeconds(2)
         factory.consumerFactory = DefaultKafkaConsumerFactory<Int?, GenericRecord?>(
             properties.buildConsumerProperties().also {
-                it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = OffsetResetStrategy.LATEST.toString()
+                it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = OffsetResetStrategy.LATEST.toString().lowercase()
             }
         )
         if (environment.activeProfiles.contains("preprod")) {
