@@ -60,14 +60,14 @@ class SakClient @Autowired constructor(
             val response = postForEntity<Ressurs<String>>(uri, personIdent)
             logger.info("Identhendelse sendt til sak. Status=${response.status}")
         } catch (e: RestClientResponseException) {
-            logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
+            logger.warn("Innsending av identhendelse til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
             throw IllegalStateException(
-                "Innsending til sak feilet. Status: " + e.rawStatusCode +
+                "Innsending av identhendelse til sak feilet. Status: " + e.rawStatusCode +
                     ", body: " + e.responseBodyAsString,
                 e
             )
         } catch (e: RestClientException) {
-            throw IllegalStateException("Innsending til sak feilet.", e)
+            throw IllegalStateException("Innsending av identhendelse til sak feilet.", e)
         }
     }
 

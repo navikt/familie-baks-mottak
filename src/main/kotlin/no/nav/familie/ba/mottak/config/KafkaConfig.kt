@@ -40,11 +40,7 @@ class KafkaConfig {
                 it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = OffsetResetStrategy.LATEST.toString().lowercase()
             }
         )
-        if (environment.activeProfiles.contains("preprod")) {
-            factory.setErrorHandler(KafkaSecureloggingErrorHandler())
-        } else {
-            factory.setErrorHandler(kafkaErrorHandler)
-        }
+        factory.setErrorHandler(kafkaErrorHandler)
         return factory
     }
 
@@ -58,11 +54,7 @@ class KafkaConfig {
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
         factory.containerProperties.authorizationExceptionRetryInterval = Duration.ofSeconds(2)
         factory.consumerFactory = DefaultKafkaConsumerFactory(properties.buildConsumerProperties())
-        if (environment.activeProfiles.contains("preprod")) {
-            factory.setErrorHandler(KafkaSecureloggingErrorHandler())
-        } else {
-            factory.setErrorHandler(kafkaErrorHandler)
-        }
+        factory.setErrorHandler(kafkaErrorHandler)
         return factory
     }
 
