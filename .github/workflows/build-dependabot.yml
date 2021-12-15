@@ -17,12 +17,7 @@ jobs:
         with:
           java-version: 11
           distribution: 'temurin'
-      - uses: actions/cache@v2.1.7
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-cache-${{ hashFiles('pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-cache-
+          cache: 'maven'
       - name: Bygg med maven
         env:
           GITHUB_USERNAME: x-access-token
