@@ -209,6 +209,7 @@ class LeesahService(
     }
 
     private fun opprettVurderLivshendelseTaskForHendelse(type: VurderLivshendelseType, pdlHendelse: PdlHendelse) {
+        log.info("opprett VurderLivshendelseTask for pdlHendelse (id= ${pdlHendelse.hendelseId})")
         Task.nyTask(
             VurderLivshendelseTask.TASK_STEP_TYPE,
             objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type)),
