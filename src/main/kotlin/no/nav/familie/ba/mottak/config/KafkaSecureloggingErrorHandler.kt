@@ -12,7 +12,7 @@ class KafkaSecureloggingErrorHandler : LoggingErrorHandler() {
     val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
 
     override fun handle(thrownException: Exception?, record: ConsumerRecord<*, *>?) {
-        SECURE_LOGGER.error("Feil ved prosessering av kafkamelding: " + ObjectUtils.nullSafeToString(record))
+        SECURE_LOGGER.error("Feil ved prosessering av kafkamelding: ${ObjectUtils.nullSafeToString(record)} \n Exception: $thrownException")
     }
 
 }
