@@ -39,9 +39,11 @@ class IdenthendelseConsumer(private val taskRepository: TaskRepository) {
 
         try {
             SECURE_LOGGER.info("Har mottatt ident-hendelse $consumerRecord")
-            val task =
-                SendIdenthendelseTilSakTask.opprettTask(ident = PersonIdent(ident = folkeregisterident.idnummer.toString()))
-            taskRepository.save(task)
+            if (opprettTask) {
+                val task =
+                    SendIdenthendelseTilSakTask.opprettTask(ident = PersonIdent(ident = folkeregisterident.idnummer.toString()))
+                taskRepository.save(task)
+            }
         } catch (e: RuntimeException) {
             identhendelseFeiletCounter.increment()
             SECURE_LOGGER.error("Feil i prosessering av ident-hendelser", e)
@@ -55,5 +57,6 @@ class IdenthendelseConsumer(private val taskRepository: TaskRepository) {
 
         val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
         val log: Logger = LoggerFactory.getLogger(IdenthendelseConsumer::class.java)
+        val opprettTask = false // Skal fjernes når test i preprod er fullført.
     }
 }
