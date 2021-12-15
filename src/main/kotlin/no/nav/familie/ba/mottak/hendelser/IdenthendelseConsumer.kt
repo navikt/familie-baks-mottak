@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.task.SendIdenthendelseTilSakTask
 import no.nav.familie.kontrakter.felles.PersonIdent
+import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.person.pdl.aktor.v2.Aktor
 import no.nav.person.pdl.aktor.v2.Type
@@ -33,8 +34,9 @@ class IdenthendelseConsumer(private val taskRepository: TaskRepository) {
         containerFactory = "kafkaIdenthendelseListenerContainerFactory"
     )
     @Transactional
-    fun listen(consumerRecord: ConsumerRecord<String, Aktor>, ack: Acknowledgment) {
-        val aktør = consumerRecord.value()
+    fun listen(consumerRecord: ConsumerRecord<String, String>, ack: Acknowledgment) {
+        // val aktør = consumerRecord.value()
+        val aktør = objectMapper.readValue(consumerRecord.value(), Aktor::class.java)
         val folkeregisterident = aktør.identifikatorer.single { it.type == Type.FOLKEREGISTERIDENT && it.gjeldende }
 
         try {
