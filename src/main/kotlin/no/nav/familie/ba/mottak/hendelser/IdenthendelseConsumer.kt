@@ -28,7 +28,7 @@ class IdenthendelseConsumer(private val taskRepository: TaskRepository) {
 
     @KafkaListener(
         topics = ["aapen-person-pdl-aktor-v1"],
-        id = "personhendelse",
+        id = "identhendelse",
         idIsGroup = false,
         containerFactory = "kafkaIdenthendelseListenerContainerFactory"
     )
