@@ -34,9 +34,9 @@ class IdenthendelseConsumer(private val taskRepository: TaskRepository) {
         containerFactory = "kafkaIdenthendelseListenerContainerFactory"
     )
     @Transactional
-    fun listen(consumerRecord: ConsumerRecord<String, String>, ack: Acknowledgment) {
-        // val aktør = consumerRecord.value()
-        val aktør = objectMapper.readValue(consumerRecord.value(), Aktor::class.java)
+    fun listen(consumerRecord: ConsumerRecord<String, Aktor>, ack: Acknowledgment) {
+        val aktør = consumerRecord.value()
+        // val aktør = objectMapper.readValue(consumerRecord.value(), Aktor::class.java)
         val folkeregisterident = aktør.identifikatorer.single { it.type == Type.FOLKEREGISTERIDENT && it.gjeldende }
 
         try {
