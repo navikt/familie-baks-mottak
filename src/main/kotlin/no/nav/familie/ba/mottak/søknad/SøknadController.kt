@@ -48,7 +48,6 @@ class SøknadController(
     val søknadMedEøsHarVedlegg = Metrics.counter("barnetrygd.soknad.eos.harvedlegg")
 
     @PostMapping(value = ["/soknad/v5"], consumes = [MULTIPART_FORM_DATA_VALUE])
-    @Unprotected
     fun taImotSøknad(@RequestPart("søknad") søknad: SøknadV5): ResponseEntity<Ressurs<Kvittering>> {
         return try {
             val dbSøknad = søknadService.motta(søknad)
@@ -122,7 +121,6 @@ class SøknadController(
     }
 
     @PostMapping(value = ["/soknad/v6"], consumes = [MULTIPART_FORM_DATA_VALUE])
-    @Unprotected
     fun taImotSøknad(@RequestPart("søknad") søknad: Søknad): ResponseEntity<Ressurs<Kvittering>> {
         return try {
             val dbSøknad = søknadService.motta(søknad)
