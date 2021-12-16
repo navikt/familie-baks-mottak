@@ -40,8 +40,10 @@ class IdenthendelseConsumer(private val sakClient: SakClient) {
             MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
             SECURE_LOGGER.info("Har mottatt ident-hendelse $consumerRecord")
             val aktør = consumerRecord.value()
-            val folkeregisterident = aktør.identifikatorer.single { it.type == Type.FOLKEREGISTERIDENT && it.gjeldende }
-            if (opprettTask) {
+            aktør.identifikatorer.singleOrNull { ident ->
+                ident.type == Type.FOLKEREGISTERIDENT && ident.gjeldende
+            }?.also { folkeregisterident ->
+                SECURE_LOGGER.info("Sender ident-hendelse til ba-sak for ident $folkeregisterident")
                 sakClient.sendIdenthendelseTilSak(PersonIdent(ident = folkeregisterident.idnummer.toString()))
             }
         } catch (e: RuntimeException) {
@@ -59,6 +61,5 @@ class IdenthendelseConsumer(private val sakClient: SakClient) {
 
         val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
         val log: Logger = LoggerFactory.getLogger(IdenthendelseConsumer::class.java)
-        val opprettTask = false // Skal fjernes når test i preprod er fullført.
     }
 }
