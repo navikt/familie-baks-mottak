@@ -2,6 +2,8 @@ package no.nav.familie.ba.mottak.hendelser
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
+import no.nav.familie.ba.mottak.config.FeatureToggleConfig
+import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.PersonIdent
 import no.nav.familie.log.mdc.MDCConstants
@@ -24,7 +26,10 @@ import javax.transaction.Transactional
     havingValue = "true",
     matchIfMissing = true
 )
-class IdenthendelseConsumer(private val sakClient: SakClient) {
+class IdenthendelseConsumer(
+    private val sakClient: SakClient,
+    private val featureToggleService: FeatureToggleService
+) {
 
     val identhendelseFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.ident.feilet")
 
@@ -39,12 +44,16 @@ class IdenthendelseConsumer(private val sakClient: SakClient) {
         try {
             MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
             SECURE_LOGGER.info("Har mottatt ident-hendelse $consumerRecord")
-            val aktør = consumerRecord.value()
-            aktør.identifikatorer.singleOrNull { ident ->
-                ident.type == Type.FOLKEREGISTERIDENT && ident.gjeldende
-            }?.also { folkeregisterident ->
-                SECURE_LOGGER.info("Sender ident-hendelse til ba-sak for ident $folkeregisterident")
-                sakClient.sendIdenthendelseTilSak(PersonIdent(ident = folkeregisterident.idnummer.toString()))
+            if (featureToggleService.isEnabled(FeatureToggleConfig.TOGGLE_IDENTHENDELSER)) {
+                val aktør = consumerRecord.value()
+                aktør.identifikatorer.singleOrNull { ident ->
+                    ident.type == Type.FOLKEREGISTERIDENT && ident.gjeldende
+                }?.also { folkeregisterident ->
+                    SECURE_LOGGER.info("Sender ident-hendelse til ba-sak for ident $folkeregisterident")
+                    sakClient.sendIdenthendelseTilSak(PersonIdent(ident = folkeregisterident.idnummer.toString()))
+                }
+            } else {
+                log.info("Toggle ${FeatureToggleConfig.TOGGLE_IDENTHENDELSER} er ikke aktivert, gir ack på melding uten å sende til ba-sak")
             }
         } catch (e: RuntimeException) {
             identhendelseFeiletCounter.increment()
