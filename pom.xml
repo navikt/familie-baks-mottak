@@ -326,7 +326,7 @@
                             <goal>idl-protocol</goal>
                         </goals>
                         <configuration>
-                            <sourceDirectory>src/main/resources/avro/leesah</sourceDirectory>
+                            <sourceDirectory>src/main/resources/avro</sourceDirectory>
                             <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
                         </configuration>
                     </execution>

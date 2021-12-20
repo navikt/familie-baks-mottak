@@ -25,7 +25,6 @@ class SakClient @Autowired constructor(
     @Qualifier("clientCredentials") restOperations: RestOperations
 ) : AbstractRestClient(restOperations, "integrasjon") {
 
-
     @Retryable(
         value = [RuntimeException::class],
         maxAttempts = 3,
@@ -40,11 +39,35 @@ class SakClient @Autowired constructor(
         } catch (e: RestClientResponseException) {
             logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
             throw IllegalStateException(
-                "Innsending til sak feilet. Status: " + e.rawStatusCode
-                        + ", body: " + e.responseBodyAsString, e
+                "Innsending til sak feilet. Status: " + e.rawStatusCode +
+                    ", body: " + e.responseBodyAsString,
+                e
             )
         } catch (e: RestClientException) {
             throw IllegalStateException("Innsending til sak feilet.", e)
+        }
+    }
+
+    @Retryable(
+        value = [RuntimeException::class],
+        maxAttempts = 3,
+        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}")
+    )
+    fun sendIdenthendelseTilSak(personIdent: PersonIdent) {
+        val uri = URI.create("$sakServiceUri/ident")
+        logger.info("Sender identhendelse til {}", uri)
+        try {
+            val response = postForEntity<Ressurs<String>>(uri, personIdent)
+            logger.info("Identhendelse sendt til sak. Status=${response.status}")
+        } catch (e: RestClientResponseException) {
+            logger.warn("Innsending av identhendelse til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
+            throw IllegalStateException(
+                "Innsending av identhendelse til sak feilet. Status: " + e.rawStatusCode +
+                    ", body: " + e.responseBodyAsString,
+                e
+            )
+        } catch (e: RestClientException) {
+            throw IllegalStateException("Innsending av identhendelse til sak feilet.", e)
         }
     }
 
@@ -100,10 +123,13 @@ class SakClient @Autowired constructor(
         val uri = URI.create("$sakServiceUri/fagsaker/annullerFoedsel")
         logger.info("Sender annuller fødselshendelse til {}", uri)
         try {
-            val response = postForEntity<Ressurs<String>>(uri, RestAnnullerFødsel(
-                barnasIdenter = barnasIdenter,
-                tidligereHendelseId = tidligereHendelseId,
-            ))
+            val response = postForEntity<Ressurs<String>>(
+                uri,
+                RestAnnullerFødsel(
+                    barnasIdenter = barnasIdenter,
+                    tidligereHendelseId = tidligereHendelseId,
+                )
+            )
             logger.info("Annuller fødselshendelse sendt til sak. Status=${response.status}")
         } catch (e: RestClientResponseException) {
             logger.warn(
@@ -112,8 +138,9 @@ class SakClient @Autowired constructor(
                 e.responseBodyAsString
             )
             throw IllegalStateException(
-                "Sending annuller fødselshendelse til sak feilet. Status: " + e.rawStatusCode
-                        + ", body: " + e.responseBodyAsString, e
+                "Sending annuller fødselshendelse til sak feilet. Status: " + e.rawStatusCode +
+                    ", body: " + e.responseBodyAsString,
+                e
             )
         } catch (e: RestClientException) {
             throw IllegalStateException("Sending annuller fødselshendelse til sak feilet.", e)
@@ -135,7 +162,6 @@ class SakClient @Autowired constructor(
     }
 }
 
-
 data class RestMinimalFagsak(
     val id: Long,
     val behandlinger: List<RestVisningBehandling>
@@ -151,7 +177,6 @@ class RestVisningBehandling(
     val resultat: String? = null,
     val vedtaksdato: LocalDateTime? = null,
 )
-
 
 data class RestFagsak(
     val id: Long,
@@ -195,7 +220,7 @@ data class RestFagsakDeltager(
     val fagsakId: Long,
     val fagsakStatus: FagsakStatus,
 
-    )
+)
 
 data class RestAnnullerFødsel(val barnasIdenter: List<String>, val tidligereHendelseId: String)
 
