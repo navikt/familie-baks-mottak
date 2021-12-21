@@ -18,7 +18,8 @@
         <revision>1.0</revision>
         <sha1/>
         <changelist>-SNAPSHOT</changelist>
-        <jvmTarget>11</jvmTarget>
+        <java.version>17</java.version>
+        <jvmTarget>17</jvmTarget>
         <kotlin.version>1.6.10</kotlin.version>
         <mockk.version>1.12.1</mockk.version>
         <confluent.version>6.2.1</confluent.version>
@@ -346,7 +347,7 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <jvmTarget>11</jvmTarget>
+                    <jvmTarget>17</jvmTarget>
                     <compilerPlugins>
                         <plugin>spring</plugin>
                         <plugin>jpa</plugin>
