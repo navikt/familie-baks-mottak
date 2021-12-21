@@ -57,7 +57,7 @@ class VurderLivshendelseTask(
 
         when (payload.type) {
             VurderLivshendelseType.DØDSFALL -> {
-                secureLog.info("Har mottat dødsfallshendelse for pseron ${personIdent}")
+                secureLog.info("Har mottat dødsfallshendelse for person ${personIdent}")
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-dødsfall")
                 secureLog.info("dødsfallshendelse person følselsdato = ${pdlPersonData.fødsel.firstOrNull()}")
                 if (pdlPersonData.dødsfall.firstOrNull()?.dødsdato != null) {
