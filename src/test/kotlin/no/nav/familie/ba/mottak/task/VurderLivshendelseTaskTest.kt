@@ -84,7 +84,7 @@ class VurderLivshendelseTaskTest {
     }
 
     @Test
-    fun `Ignorer livshendelser på person som ikke har barn eller fagsaktilhørighet`() {
+    fun `Ignorer livshendelser på person som ikke har barn`() {
         every {
             mockPdlClient.hentPerson(
                     PERSONIDENT_BARN,
@@ -104,9 +104,8 @@ class VurderLivshendelseTaskTest {
                         )
                 ),
                 dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now())),
+                fødsel = listOf(Fødsel(LocalDate.of(1980, 8, 3)))
         )
-        every { mockSakClient.hentRestFagsakDeltagerListe(any(), listOf(PERSONIDENT_BARN)) } returns
-                emptyList()
 
         listOf(UTFLYTTING, DØDSFALL).forEach {
             vurderLivshendelseTask.doTask(
@@ -126,8 +125,6 @@ class VurderLivshendelseTaskTest {
             mockTaskRepository.saveAndFlush(any())
             mockOppgaveClient.opprettVurderLivshendelseOppgave(any())
             mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_BARN, listOf())
-        }
-        verify(exactly = 2) {
             mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN))
             mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_FAR, listOf(PERSONIDENT_BARN))
         }

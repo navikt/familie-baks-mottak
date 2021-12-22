@@ -30,6 +30,7 @@ import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 @TaskStepBeskrivelse(
@@ -117,31 +118,35 @@ class VurderLivshendelseTask(
             }
         }
 
-        secureLog.info("finnBrukereMedLøpendeSakInvolverendePerson(): personerMedSak.size = ${brukereMedLøpendeSakInvolverendePerson.size}")
-
-        // Sjekker om foreldrene til person har løpende fagsak med personen som fagsakdeltager.
-
-        val listeMedForeldreForBarn = familierelasjoner.filter { !it.erBarn }.map { it.relatertPersonsIdent }
-
-        secureLog.info("finnBrukereMedLøpendeSakInvolverendePerson(): listeMedForeldreForBarn.size = ${listeMedForeldreForBarn.size}" +
-                       "identer = ${listeMedForeldreForBarn.fold("") { identer, it -> identer + " " + it }}")
-
-        listeMedForeldreForBarn.forEach { forelder ->
-            brukereMedLøpendeSakInvolverendePerson += sakClient.hentRestFagsakDeltagerListe(forelder, barnasIdenter = listOf(personIdent))
-                .filter { it.fagsakStatus != AVSLUTTET }
-                .groupBy { it.fagsakId }.values
-                .firstOrNull { it.inneholderBådeForelderOgBarn }
-                ?.filter { it.rolle == FORELDER } ?: emptyList()
+        // Sjekker om foreldrene til person under 19 har en relatert sak.
+        if (personErBarn(pdlPersonData)) {
+            brukereMedLøpendeSakInvolverendePerson += finnForeldreMedLøpendeSak(personIdent, familierelasjoner)
         }
-        secureLog.info("finnBrukereMedLøpendeSakInvolverendePerson(): personerMedSak.size = ${brukereMedLøpendeSakInvolverendePerson.size}" +
-                       "identer = ${brukereMedLøpendeSakInvolverendePerson.fold("") { identer, it -> identer + " " + it.ident }}")
 
+        secureLog.info("finnBrukereMedLøpendeSakInvolverendePerson(): brukere.size = ${brukereMedLøpendeSakInvolverendePerson.size}" +
+                       "identer = ${brukereMedLøpendeSakInvolverendePerson.fold("") { identer, it -> identer + " " + it.ident }}")
 
         if (brukereMedLøpendeSakInvolverendePerson.isNotEmpty()) {
             log.info("Fant sak for person")
             secureLog.info("Fant sak for person $personIdent")
         }
         return brukereMedLøpendeSakInvolverendePerson
+    }
+
+    private fun personErBarn(pdlPersonData: PdlPersonData) = pdlPersonData.fødsel.isEmpty() ||
+            pdlPersonData.fødsel.first().fødselsdato.isAfter(LocalDate.now().minusYears(19))
+
+    private fun finnForeldreMedLøpendeSak(
+        personIdent: String,
+        familierelasjoner: List<PdlForeldreBarnRelasjon>
+    ): List<RestFagsakDeltager> {
+        return familierelasjoner.filter { !it.erBarn }.map { it.relatertPersonsIdent }.mapNotNull { forelder ->
+            sakClient.hentRestFagsakDeltagerListe(forelder, barnasIdenter = listOf(personIdent))
+                .filter { it.fagsakStatus != AVSLUTTET }
+                .groupBy { it.fagsakId }.values
+                .firstOrNull { it.inneholderBådeForelderOgBarn }
+                ?.find { it.rolle == FORELDER }
+        }
     }
 
     private fun lagDødsfallOppgaveBeskrivelse(fagsakPerson: RestFagsakDeltager): String {
