@@ -62,7 +62,7 @@ class VurderLivshendelseTask(
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-dødsfall")
                 secureLog.info("dødsfallshendelse person følselsdato = ${pdlPersonData.fødsel.firstOrNull()}")
                 if (pdlPersonData.dødsfall.firstOrNull()?.dødsdato != null) {
-                    val berørteBrukereIBaSak = finnBrukereMedLøpendeSakInvolverendePerson(personIdent, pdlPersonData)
+                    val berørteBrukereIBaSak = finnBrukereMedSakRelatertTilPerson(personIdent, pdlPersonData)
                     secureLog.info("berørteBrukereIBaSak count = ${berørteBrukereIBaSak.size}, identer = ${
                         berørteBrukereIBaSak.fold("") { identer, it -> identer + " " + it.ident }
                     }")
@@ -79,7 +79,7 @@ class VurderLivshendelseTask(
             }
             VurderLivshendelseType.UTFLYTTING -> {
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-utflytting")
-                finnBrukereMedLøpendeSakInvolverendePerson(personIdent, pdlPersonData).forEach {
+                finnBrukereMedSakRelatertTilPerson(personIdent, pdlPersonData).forEach {
                     if (opprettVurderLivshendelseOppgave(
                                     it,
                                     task,
@@ -95,7 +95,7 @@ class VurderLivshendelseTask(
         }
     }
 
-    private fun finnBrukereMedLøpendeSakInvolverendePerson(
+    private fun finnBrukereMedSakRelatertTilPerson(
             personIdent: String,
             pdlPersonData: PdlPersonData
     ): Set<RestFagsakDeltager> {
@@ -106,14 +106,14 @@ class VurderLivshendelseTask(
 
         // Hvis person har barn, så sjekker man etter løpende sak på person
         val personHarBarn = familierelasjoner.filter { it.erBarn }.let { listeMedBarn ->
-                secureLog.info("finnBrukereMedLøpendeSakInvolverendePerson(): listeMedBarn size = ${listeMedBarn.size} identer = " +
+                secureLog.info("finnBrukereMedSakRelatertTilPerson(): listeMedBarn size = ${listeMedBarn.size} identer = " +
                                        listeMedBarn.fold("") { identer, it -> identer + " " + it.relatertPersonsIdent })
                 listeMedBarn.isNotEmpty()
             }
 
         if (personHarBarn) {
             brukereMedLøpendeSakInvolverendePerson += sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
-                secureLog.info("finnBrukereMedLøpendeSakInvolverendePerson(): Hentet Fagsak for person ${personIdent}: ${it.fagsakId} ${it.fagsakStatus}")
+                secureLog.info("finnBrukereMedSakRelatertTilPerson(): Hentet Fagsak for person ${personIdent}: ${it.fagsakId} ${it.fagsakStatus}")
                 it.fagsakStatus != AVSLUTTET
             }
         }
@@ -123,7 +123,7 @@ class VurderLivshendelseTask(
             brukereMedLøpendeSakInvolverendePerson += finnForeldreMedLøpendeSak(personIdent, familierelasjoner)
         }
 
-        secureLog.info("finnBrukereMedLøpendeSakInvolverendePerson(): brukere.size = ${brukereMedLøpendeSakInvolverendePerson.size} " +
+        secureLog.info("finnBrukereMedSakRelatertTilPerson(): brukere.size = ${brukereMedLøpendeSakInvolverendePerson.size} " +
                        "identer = ${brukereMedLøpendeSakInvolverendePerson.fold("") { identer, it -> identer + " " + it.ident }}")
 
         if (brukereMedLøpendeSakInvolverendePerson.isNotEmpty()) {
