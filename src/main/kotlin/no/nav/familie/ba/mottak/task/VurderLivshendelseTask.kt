@@ -6,10 +6,13 @@ import no.nav.familie.ba.mottak.integrasjoner.AktørClient
 import no.nav.familie.ba.mottak.integrasjoner.BehandlesAvApplikasjon
 import no.nav.familie.ba.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.ba.mottak.integrasjoner.BehandlingUnderkategori
+import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.BARN
+import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.AVSLUTTET
 import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.ba.mottak.integrasjoner.OppgaveVurderLivshendelseDto
 import no.nav.familie.ba.mottak.integrasjoner.PdlClient
+import no.nav.familie.ba.mottak.integrasjoner.PdlForeldreBarnRelasjon
 import no.nav.familie.ba.mottak.integrasjoner.PdlPersonData
 import no.nav.familie.ba.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.ba.mottak.integrasjoner.RestUtvidetBehandling
@@ -55,15 +58,15 @@ class VurderLivshendelseTask(
 
         when (payload.type) {
             VurderLivshendelseType.DØDSFALL -> {
-                secureLog.info("Har mottat dødsfallshendelse for pseron ${personIdent}")
+                secureLog.info("Har mottat dødsfallshendelse for person ${personIdent}")
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-dødsfall")
                 secureLog.info("dødsfallshendelse person følselsdato = ${pdlPersonData.fødsel.firstOrNull()}")
                 if (pdlPersonData.dødsfall.firstOrNull()?.dødsdato != null) {
-                    val relatertPersonMedSak = finnRelatertePersonerMedSak(personIdent, pdlPersonData)
-                    secureLog.info("relatertPersonMedSak count = ${relatertPersonMedSak.size}, identer = ${
-                        relatertPersonMedSak.fold("") { identer, it -> identer + " " + it.ident }
+                    val berørteBrukereIBaSak = finnBrukereMedSakRelatertTilPerson(personIdent, pdlPersonData)
+                    secureLog.info("berørteBrukereIBaSak count = ${berørteBrukereIBaSak.size}, identer = ${
+                        berørteBrukereIBaSak.fold("") { identer, it -> identer + " " + it.ident }
                     }")
-                    relatertPersonMedSak.forEach {
+                    berørteBrukereIBaSak.forEach {
                         if (opprettEllerOppdaterDødsfallshendelseOppgave(it, task)) {
                             log.error("Mottatt dødsfallshendelse på sak i BA-sak. Få saksbehandler til å se på oppgave av typen VurderLivshendelse") // TODO midlertidig error logg til man har fått dette inn i saksbehandlersrutinen.
                             oppgaveOpprettetDødsfallCounter.increment()
@@ -76,7 +79,7 @@ class VurderLivshendelseTask(
             }
             VurderLivshendelseType.UTFLYTTING -> {
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-utflytting")
-                finnRelatertePersonerMedSak(personIdent, pdlPersonData).forEach {
+                finnBrukereMedSakRelatertTilPerson(personIdent, pdlPersonData).forEach {
                     if (opprettVurderLivshendelseOppgave(
                                     it,
                                     task,
@@ -92,53 +95,61 @@ class VurderLivshendelseTask(
         }
     }
 
-    private fun finnRelatertePersonerMedSak(
+    private fun finnBrukereMedSakRelatertTilPerson(
             personIdent: String,
             pdlPersonData: PdlPersonData
     ): Set<RestFagsakDeltager> {
 
-        val personerMedSak = mutableSetOf<RestFagsakDeltager>()
+        val brukereMedLøpendeSakInvolverendePerson = mutableSetOf<RestFagsakDeltager>()
 
-        val familierelasjon = pdlPersonData.forelderBarnRelasjon
-        // populerer en liste med barn for person. Hvis person har barn, så sjekker man etter løpende sak
-        val listeMedBarn =
-                familierelasjon.filter { it.minRolleForPerson != FORELDERBARNRELASJONROLLE.BARN }
-                        .map { it.relatertPersonsIdent }
-        secureLog.info("finnRelatertePersonerMedSak(): listeMedBarn size = ${listeMedBarn.size} identer = " +
-                       "${listeMedBarn.fold("") { identer, it -> identer + " " + it }}")
-        if (listeMedBarn.isNotEmpty()) {
-            personerMedSak += sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
-                secureLog.info("finnRelatertePersonerMedSak(): Hentet Fagsak for person ${personIdent}: ${it.fagsakId} ${it.fagsakStatus}")
+        val familierelasjoner = pdlPersonData.forelderBarnRelasjon
+
+        // Hvis person har barn, så sjekker man etter løpende sak på person
+        val personHarBarn = familierelasjoner.filter { it.erBarn }.let { listeMedBarn ->
+                secureLog.info("finnBrukereMedSakRelatertTilPerson(): listeMedBarn size = ${listeMedBarn.size} identer = " +
+                                       listeMedBarn.fold("") { identer, it -> identer + " " + it.relatertPersonsIdent })
+                listeMedBarn.isNotEmpty()
+            }
+
+        if (personHarBarn) {
+            brukereMedLøpendeSakInvolverendePerson += sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
+                secureLog.info("finnBrukereMedSakRelatertTilPerson(): Hentet Fagsak for person ${personIdent}: ${it.fagsakId} ${it.fagsakStatus}")
                 it.fagsakStatus != AVSLUTTET
             }
         }
 
-        secureLog.info("finnRelatertePersonerMedSak(): personerMedSak.size = ${personerMedSak.size}")
-
-        // Sjekker om foreldrene til person under 19 har en løpende sak.
-        if (pdlPersonData.fødsel.isEmpty() ||
-            pdlPersonData.fødsel.first().fødselsdato.isAfter(LocalDate.now().minusYears(19))
-        ) {
-
-            val listeMedForeldreForBarn =
-                    familierelasjon.filter { it.minRolleForPerson == FORELDERBARNRELASJONROLLE.BARN }
-                            .map { it.relatertPersonsIdent }
-
-            secureLog.info("finnRelatertePersonerMedSak(): listeMedForeldreForBarn.size = ${listeMedForeldreForBarn.size}" +
-                           "identer = ${listeMedForeldreForBarn.fold("") { identer, it -> identer + " " + it }}")
-
-            listeMedForeldreForBarn.forEach {
-                personerMedSak += sakClient.hentRestFagsakDeltagerListe(it).filter { it.fagsakStatus != AVSLUTTET }
-            }
-            secureLog.info("finnRelatertePersonerMedSak(): personerMedSak.size = ${personerMedSak.size}" +
-                           "identer = ${personerMedSak.fold("") { identer, it -> identer + " " + it.ident }}")
+        // Sjekker om foreldrene til person under 19 har en relatert sak.
+        if (personErBarn(pdlPersonData)) {
+            brukereMedLøpendeSakInvolverendePerson += finnForeldreMedLøpendeSak(personIdent, familierelasjoner)
         }
 
-        if (personerMedSak.isNotEmpty()) {
+        secureLog.info("finnBrukereMedSakRelatertTilPerson(): brukere.size = ${brukereMedLøpendeSakInvolverendePerson.size} " +
+                       "identer = ${brukereMedLøpendeSakInvolverendePerson.fold("") { identer, it -> identer + " " + it.ident }}")
+
+        if (brukereMedLøpendeSakInvolverendePerson.isNotEmpty()) {
             log.info("Fant sak for person")
             secureLog.info("Fant sak for person $personIdent")
         }
-        return personerMedSak
+        return brukereMedLøpendeSakInvolverendePerson
+    }
+
+    private fun personErBarn(pdlPersonData: PdlPersonData) = pdlPersonData.fødsel.isEmpty() || // Kan anta barn når data mangler
+            pdlPersonData.fødsel.first().fødselsdato.isAfter(LocalDate.now().minusYears(19))
+
+    private fun finnForeldreMedLøpendeSak(
+        personIdent: String,
+        familierelasjoner: List<PdlForeldreBarnRelasjon>
+    ): List<RestFagsakDeltager> {
+        return familierelasjoner.filter { !it.erBarn }.also { listeMedForeldreForBarn ->
+            secureLog.info("finnForeldreMedLøpendeSak(): listeMedForeldreForBarn.size = ${listeMedForeldreForBarn.size} " +
+                           "identer = ${listeMedForeldreForBarn.fold("") { identer, it -> identer + " " + it.relatertPersonsIdent }}")
+        }.mapNotNull {
+            sakClient.hentRestFagsakDeltagerListe(it.relatertPersonsIdent, barnasIdenter = listOf(personIdent))
+                .filter { it.fagsakStatus != AVSLUTTET }
+                .groupBy { it.fagsakId }.values
+                .firstOrNull { it.inneholderBådeForelderOgBarn }
+                ?.find { it.rolle == FORELDER }
+        }
     }
 
     private fun lagDødsfallOppgaveBeskrivelse(fagsakPerson: RestFagsakDeltager): String {
@@ -275,6 +286,12 @@ class VurderLivshendelseTask(
 
     private fun lagUtflyttingoppgavebeskrivelse(fagsakPerson: String, utflyttetPerson: String) =
             BESKRIVELSE_UTFLYTTING.format(if (utflyttetPerson == fagsakPerson) "bruker" else "barn $utflyttetPerson")
+
+    private val PdlForeldreBarnRelasjon.erBarn: Boolean
+        get() = this.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN
+
+    private val List<RestFagsakDeltager>.inneholderBådeForelderOgBarn: Boolean
+        get() = this.map(RestFagsakDeltager::rolle).containsAll(listOf(FORELDER, BARN))
 
     companion object {
 

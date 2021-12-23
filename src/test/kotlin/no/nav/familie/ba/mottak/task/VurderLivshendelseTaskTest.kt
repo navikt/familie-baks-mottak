@@ -10,6 +10,7 @@ import no.nav.familie.ba.mottak.integrasjoner.BehandlesAvApplikasjon
 import no.nav.familie.ba.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.ba.mottak.integrasjoner.BehandlingUnderkategori
 import no.nav.familie.ba.mottak.integrasjoner.Dødsfall
+import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.BARN
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.LØPENDE
 import no.nav.familie.ba.mottak.integrasjoner.Fødsel
@@ -174,6 +175,67 @@ class VurderLivshendelseTaskTest {
         }
     }
 
+
+    @Test
+    fun `Skal opprette oppgave på forelderen barnet er registrert på i ba-sak`() {
+
+        every {
+            mockPdlClient.hentPerson(
+                PERSONIDENT_BARN,
+                any()
+            )
+        } returns PdlPersonData(
+            forelderBarnRelasjon = listOf(
+                PdlForeldreBarnRelasjon(
+                    minRolleForPerson = FORELDERBARNRELASJONROLLE.BARN,
+                    relatertPersonsIdent = PERSONIDENT_MOR,
+                    relatertPersonsRolle = FORELDERBARNRELASJONROLLE.MOR
+                ),
+                PdlForeldreBarnRelasjon(
+                    minRolleForPerson = FORELDERBARNRELASJONROLLE.BARN,
+                    relatertPersonsIdent = PERSONIDENT_FAR,
+                    relatertPersonsRolle = FORELDERBARNRELASJONROLLE.FAR
+                )
+            ),
+            dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now()))
+        )
+
+        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN)) } returns
+                listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE),
+                       RestFagsakDeltager(PERSONIDENT_BARN, BARN, SAKS_ID, LØPENDE))
+
+        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_FAR, listOf(PERSONIDENT_BARN)) } returns
+                listOf(RestFagsakDeltager(PERSONIDENT_FAR, FORELDER, SAKS_ID + 50, LØPENDE),
+                       RestFagsakDeltager(PERSONIDENT_BARN, BARN, SAKS_ID, LØPENDE))
+
+        every { mockSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagAktivOrdinærMinimal()
+        every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
+
+        listOf(UTFLYTTING, DØDSFALL).forEach {
+            vurderLivshendelseTask.doTask(
+                Task.nyTask(
+                    type = VurderLivshendelseTask.TASK_STEP_TYPE,
+                    payload = objectMapper.writeValueAsString(
+                        VurderLivshendelseTaskDTO(
+                            PERSONIDENT_BARN,
+                            it
+                        )
+                    )
+                )
+            )
+        }
+
+        val oppgaveDto = mutableListOf<OppgaveVurderLivshendelseDto>()
+        verify(exactly = 2) {
+            mockTaskRepository.saveAndFlush(any())
+            mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDto))
+            mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN))
+            mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_FAR, listOf(PERSONIDENT_BARN))
+        }
+
+        assertThat(oppgaveDto).allMatch { it.aktørId.contains(PERSONIDENT_MOR) }
+    }
+
     @Test
     fun `Livshendelser på person som har sak i ba-sak`() {
 
@@ -269,10 +331,12 @@ class VurderLivshendelseTaskTest {
                 ),
         )
 
-        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
-                listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE))
+        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN)) } returns
+                listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE),
+                       RestFagsakDeltager(PERSONIDENT_BARN, BARN, SAKS_ID, LØPENDE))
 
-        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_FAR, emptyList()) } returns emptyList()
+        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_FAR, listOf(PERSONIDENT_BARN)) } returns
+                listOf(RestFagsakDeltager(PERSONIDENT_BARN, BARN, SAKS_ID, LØPENDE))
 
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
         every { mockSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagAktivOrdinærMinimal()
@@ -311,6 +375,10 @@ class VurderLivshendelseTaskTest {
     fun `Skal sett riktig beskrivelsestekster for ny dødsfall oppgave`() {
         every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
                 listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE))
+
+        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN)) } returns
+                listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE),
+                       RestFagsakDeltager(PERSONIDENT_BARN, BARN, SAKS_ID, LØPENDE))
 
 
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
@@ -427,6 +495,10 @@ class VurderLivshendelseTaskTest {
         every { mockOppgaveClient.finnOppgaverPåAktørId(any(), any()) } returns listOf(
                 Oppgave(beskrivelse = VurderLivshendelseTask.BESKRIVELSE_DØDSFALL + ": bruker")
         )
+
+        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN)) } returns
+                listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE),
+                       RestFagsakDeltager(PERSONIDENT_BARN, BARN, SAKS_ID, LØPENDE))
 
         setupPdlMockForDødsfallshendelse(true, true, false)
         vurderLivshendelseTask.doTask(
