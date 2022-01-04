@@ -173,19 +173,19 @@ class VurderLivshendelseTask(
             )
             return true
         } else {
+            log.info("Fant åpen oppgave på aktørId=$aktørId oppgaveId=${åpenOppgave.id}")
+            secureLog.info("Fant åpen oppgave: $åpenOppgave")
             val beskrivelse = leggTilNyPersonIBeskrivelse(beskrivelse = åpenOppgave.beskrivelse!!,
                                                           personIdent = personIdent,
                                                           personErBruker = åpenOppgave.identer?.map { it.ident }?.contains(personIdent))
 
             if (beskrivelse != åpenOppgave.beskrivelse) {
+                secureLog.info("Oppdaterer oppgave (${åpenOppgave.id}) med beskrivelse: $beskrivelse")
                 oppgaveClient.oppdaterOppgaveBeskrivelse(åpenOppgave, beskrivelse)
             }
             task.metadata["oppgaveId"] = åpenOppgave.id.toString()
             task.metadata["info"] = "Fant åpen oppgave"
             taskRepository.saveAndFlush(task)
-            log.info("Fant åpen oppgave på aktørId=$aktørId oppgaveId=${åpenOppgave.id}")
-            secureLog.info("Fant åpen oppgave: $åpenOppgave")
-            secureLog.info("Oppdater oppgave ($åpenOppgave.id) beskrivelsestekster: $beskrivelse")
             return false
         }
     }
