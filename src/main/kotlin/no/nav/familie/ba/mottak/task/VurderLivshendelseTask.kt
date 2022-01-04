@@ -22,6 +22,7 @@ import no.nav.familie.ba.mottak.task.VurderLivshendelseType.UTFLYTTING
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
+import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.kontrakter.felles.oppgave.StatusEnum
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
@@ -97,7 +98,7 @@ class VurderLivshendelseTask(
             pdlPersonData: PdlPersonData
     ): Set<Bruker> {
 
-        val brukereMedLøpendeSakInvolverendePerson = mutableSetOf<Bruker>()
+        val brukereMedSakRelatertTilPerson = mutableSetOf<Bruker>()
 
         val familierelasjoner = pdlPersonData.forelderBarnRelasjon
 
@@ -109,7 +110,7 @@ class VurderLivshendelseTask(
             }
 
         if (personHarBarn) {
-            brukereMedLøpendeSakInvolverendePerson += sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
+            brukereMedSakRelatertTilPerson += sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
                 secureLog.info("finnBrukereMedSakRelatertTilPerson(): Hentet Fagsak for person ${personIdent}: ${it.fagsakId} ${it.fagsakStatus}")
                 it.fagsakStatus != AVSLUTTET
             }.map { Bruker(personIdent, it.fagsakId) }
@@ -117,17 +118,17 @@ class VurderLivshendelseTask(
 
         // Sjekker om foreldrene til person under 19 har en relatert sak.
         if (personErBarn(pdlPersonData)) {
-            brukereMedLøpendeSakInvolverendePerson += finnForeldreMedLøpendeSak(personIdent, familierelasjoner)
+            brukereMedSakRelatertTilPerson += finnForeldreMedLøpendeSak(personIdent, familierelasjoner)
         }
 
-        secureLog.info("finnBrukereMedSakRelatertTilPerson(): brukere.size = ${brukereMedLøpendeSakInvolverendePerson.size} " +
-                       "identer = ${brukereMedLøpendeSakInvolverendePerson.fold("") { identer, it -> identer + " " + it.ident }}")
+        secureLog.info("finnBrukereMedSakRelatertTilPerson(): brukere.size = ${brukereMedSakRelatertTilPerson.size} " +
+                       "identer = ${brukereMedSakRelatertTilPerson.fold("") { identer, it -> identer + " " + it.ident }}")
 
-        if (brukereMedLøpendeSakInvolverendePerson.isNotEmpty()) {
+        if (brukereMedSakRelatertTilPerson.isNotEmpty()) {
             log.info("Fant sak for person")
             secureLog.info("Fant sak for person $personIdent")
         }
-        return brukereMedLøpendeSakInvolverendePerson
+        return brukereMedSakRelatertTilPerson
     }
 
     private fun personErBarn(pdlPersonData: PdlPersonData) = pdlPersonData.fødsel.isEmpty() || // Kan anta barn når data mangler
@@ -150,46 +151,49 @@ class VurderLivshendelseTask(
     }
 
     private fun opprettEllerOppdaterVurderLivshendelseOppgave(
-        type: VurderLivshendelseType,
+        hendelseType: VurderLivshendelseType,
         bruker: Bruker,
         personIdent: String,
         task: Task
     ): Boolean {
+        val aktørId = aktørClient.hentAktørId(bruker.ident)
+        val åpenOppgave = søkEtterÅpenOppgavePåAktør(aktørId, hendelseType)
 
-        val (nyopprettet, oppgave) = hentEllerOpprettNyOppgave(bruker, type.beskrivelse)
-        val beskrivelsesTekst = if (personIdent == bruker.ident) leggTilBrukerIBeskrivelse("${type.beskrivelse}:")
-                        else leggTilBarnIBeskrivelse("${type.beskrivelse}:", personIdent)
+        if (åpenOppgave == null) {
+            val beskrivelse = leggTilNyPersonIBeskrivelse(beskrivelse = "${hendelseType.beskrivelse}:",
+                                                          personIdent = personIdent,
+                                                          personErBruker = personIdent == bruker.ident)
 
-        if (nyopprettet) {
-            oppgaveClient.opprettVurderLivshendelseOppgave(
-                    (oppgave as OppgaveVurderLivshendelseDto).copy(
-                            beskrivelse = beskrivelsesTekst
-                    )
-            ).also {
-                task.metadata["oppgaveId"] = it.oppgaveId.toString()
-                taskRepository.saveAndFlush(task)
-                secureLog.info(
-                    "Opprettet VurderLivshendelse-oppgave (${it.oppgaveId}) for $type-hendelse (person ident:  ${bruker.ident})" +
-                            ", beskrivelsestekst: $beskrivelsesTekst"
-                )
-            }
+            val oppgave = opprettOppgavePåAktør(aktørId, bruker.fagsakId, beskrivelse)
+            task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
+            taskRepository.saveAndFlush(task)
+            secureLog.info(
+                "Opprettet VurderLivshendelse-oppgave (${oppgave.oppgaveId}) for $hendelseType-hendelse (person ident:  ${bruker.ident})" +
+                        ", beskrivelsestekst: $beskrivelse"
+            )
             return true
         } else {
-            val beskrivelse = (oppgave as Oppgave).beskrivelse!!
-            val nyBeskrivelse = when(personIdentTilhørerBruker(personIdent, oppgave)) {
-                true -> if (beskrivelse.contains("bruker")) null else leggTilBrukerIBeskrivelse(beskrivelse)
-                else -> if (beskrivelse.contains(personIdent)) null else leggTilBarnIBeskrivelse(beskrivelse, personIdent)
+            val beskrivelse = leggTilNyPersonIBeskrivelse(beskrivelse = åpenOppgave.beskrivelse!!,
+                                                          personIdent = personIdent,
+                                                          personErBruker = åpenOppgave.identer?.map { it.ident }?.contains(personIdent))
+
+            if (beskrivelse != åpenOppgave.beskrivelse) {
+                oppgaveClient.oppdaterOppgaveBeskrivelse(åpenOppgave, beskrivelse)
             }
-            if (nyBeskrivelse != null) {
-                oppgaveClient.oppdaterOppgaveBeskrivelse(oppgave, nyBeskrivelse)
-            }
-            task.metadata["oppgaveId"] = oppgave.id.toString()
+            task.metadata["oppgaveId"] = åpenOppgave.id.toString()
             task.metadata["info"] = "Fant åpen oppgave"
             taskRepository.saveAndFlush(task)
-            log.info("Fant åpen oppgave på aktørId ${oppgave.aktoerId}")
-            secureLog.info("Fant åpen oppgave: $oppgave")
-            secureLog.info("Oppdater oppgave ($oppgave.id) beskrivelsestekster: $nyBeskrivelse")
+            log.info("Fant åpen oppgave på aktørId=$aktørId oppgaveId=${åpenOppgave.id}")
+            secureLog.info("Fant åpen oppgave: $åpenOppgave")
+            secureLog.info("Oppdater oppgave ($åpenOppgave.id) beskrivelsestekster: $beskrivelse")
             return false
+        }
+    }
+
+    private fun leggTilNyPersonIBeskrivelse(beskrivelse: String, personIdent: String, personErBruker: Boolean?): String {
+        return when (personErBruker){
+            true -> if (!beskrivelse.contains("bruker")) leggTilBrukerIBeskrivelse(beskrivelse) else beskrivelse
+            else -> if (!beskrivelse.contains(personIdent)) leggTilBarnIBeskrivelse(beskrivelse, personIdent) else beskrivelse
         }
     }
 
@@ -199,69 +203,59 @@ class VurderLivshendelseTask(
     }
 
     private fun leggTilBarnIBeskrivelse(beskrivelse: String, personIdent: String): String {
-        if (beskrivelse.contains("barn")) {
-            val (tekstenForanBarn, tekstenEtterBarn) = beskrivelse.split(" barn ")
-            val indexOfAntallBarn =
-                tekstenForanBarn.indexOfFirst(Char::isDigit).let { if (it == -1) tekstenForanBarn.length else it }
-            val nyttAntallBarn = tekstenForanBarn.substring(indexOfAntallBarn).toIntOrNull()?.plus(1) ?: 2
-            val nyTekstForanBarn = tekstenForanBarn.substring(0, indexOfAntallBarn).trim() + " $nyttAntallBarn"
-            return "$nyTekstForanBarn barn $tekstenEtterBarn $personIdent"
-        } else {
+        if (!beskrivelse.contains("barn")) {
             val (livshendelseType, bruker) = beskrivelse.split(":")
             return "$livshendelseType:" + (if (bruker.isNotEmpty()) "$bruker og" else "") + " barn $personIdent"
+        } else {
+            val (tekstenForanBarn, tekstenEtterBarn) = beskrivelse.split(" barn ")
+            val indexOfBarnCount =
+                tekstenForanBarn.indexOfFirst(Char::isDigit).let { if (it > 0) it else tekstenForanBarn.length }
+            val nyBarnCount = tekstenForanBarn.substring(indexOfBarnCount).toIntOrNull()?.plus(1) ?: 2
+            val nyTekstForanBarn = tekstenForanBarn.substring(0, indexOfBarnCount).trim() + " $nyBarnCount"
+            return "$nyTekstForanBarn barn $tekstenEtterBarn $personIdent"
         }
     }
 
-    private fun personIdentTilhørerBruker(
-        personIdent: String,
-        oppgave: Oppgave
-    ) = oppgave.identer?.map { it.ident }?.contains(personIdent)
-
-    private fun hentEllerOpprettNyOppgave(
-        bruker: Bruker,
-        beskrivelse: String
-    ): Pair<Boolean, Any> {
-        secureLog.info("hentEllerOpprettNyOppgaveForPerson for ${bruker.ident} med beskrivelse $beskrivelse")
-
-        val aktørId = aktørClient.hentAktørId(bruker.ident)
-        val vurderLivshendelseOppgaver =
-                oppgaveClient.finnOppgaverPåAktørId(aktørId, Oppgavetype.VurderLivshendelse)
+    private fun søkEtterÅpenOppgavePåAktør(
+        aktørId: String,
+        type: VurderLivshendelseType
+    ): Oppgave? {
+        val vurderLivshendelseOppgaver = oppgaveClient.finnOppgaverPåAktørId(aktørId, Oppgavetype.VurderLivshendelse)
         secureLog.info("Fant følgende oppgaver: $vurderLivshendelseOppgaver")
-
-        val åpenOppgave: Oppgave? = vurderLivshendelseOppgaver.firstOrNull {
-            it.beskrivelse?.startsWith(beskrivelse.substring(0, 8)) == true && (
+        return vurderLivshendelseOppgaver.firstOrNull {
+            it.beskrivelse?.startsWith(type.beskrivelse) == true && (
                     it.status != StatusEnum.FERDIGSTILT || it.status != StatusEnum.FEILREGISTRERT
-                                                                               )
-        }
-
-        return if (åpenOppgave != null) {
-            log.info("Fant åpen vurderLivshendelse oppgave for aktørId=$aktørId oppgaveId=${åpenOppgave.id}")
-            Pair(false, åpenOppgave)
-        } else {
-            log.info("Oppretter oppgave for aktørId=$aktørId")
-            val minimalRestFagsak = sakClient.hentMinimalRestFagsak(bruker.fagsakId)
-            secureLog.info("Hentet minimal rest fagsak: $minimalRestFagsak")
-            val restMinimalBehandling = minimalRestFagsak.behandlinger.firstOrNull { it.aktiv }
-
-            if (restMinimalBehandling == null) {
-                error("Fagsak ${bruker.fagsakId} mangler aktiv behandling. Får ikke opprettet VurderLivshendelseOppgave")
-            }
-
-            val restFagsak = sakClient.hentRestFagsak(bruker.fagsakId)
-            val restUtvidetBehandling =
-                    restFagsak.behandlinger.firstOrNull { it.behandlingId == restMinimalBehandling.behandlingId }
-
-            Pair(
-                    true,
-                    OppgaveVurderLivshendelseDto(
-                        aktørId = aktørId,
-                        beskrivelse = beskrivelse,
-                        saksId = bruker.fagsakId.toString(),
-                        behandlingstema = tilBehandlingstema(restUtvidetBehandling),
-                        behandlesAvApplikasjon = BehandlesAvApplikasjon.BA_SAK.applikasjon
                     )
-            )
         }
+    }
+
+    private fun opprettOppgavePåAktør(
+        aktørId: String,
+        fagsakId: Long,
+        beskrivelse: String
+    ): OppgaveResponse {
+        log.info("Oppretter oppgave for aktørId=$aktørId")
+        val minimalRestFagsak = sakClient.hentMinimalRestFagsak(fagsakId)
+        secureLog.info("Hentet minimal rest fagsak: $minimalRestFagsak")
+        val restMinimalBehandling = minimalRestFagsak.behandlinger.firstOrNull { it.aktiv }
+
+        if (restMinimalBehandling == null) {
+            error("Fagsak ${fagsakId} mangler aktiv behandling. Får ikke opprettet VurderLivshendelseOppgave")
+        }
+
+        val restFagsak = sakClient.hentRestFagsak(fagsakId)
+        val restUtvidetBehandling =
+            restFagsak.behandlinger.firstOrNull { it.behandlingId == restMinimalBehandling.behandlingId }
+
+       return oppgaveClient.opprettVurderLivshendelseOppgave(
+            OppgaveVurderLivshendelseDto(
+                aktørId = aktørId,
+                beskrivelse = beskrivelse,
+                saksId = fagsakId.toString(),
+                behandlingstema = tilBehandlingstema(restUtvidetBehandling),
+                behandlesAvApplikasjon = BehandlesAvApplikasjon.BA_SAK.applikasjon
+            )
+        )
     }
 
     private fun tilBehandlingstema(restUtvidetBehandling: RestUtvidetBehandling?): String {
