@@ -46,6 +46,12 @@ class IdenthendelseConsumer(
             SECURE_LOGGER.info("Har mottatt ident-hendelse $consumerRecord")
             if (featureToggleService.isEnabled(FeatureToggleConfig.TOGGLE_IDENTHENDELSER)) {
                 val aktør = consumerRecord.value()
+
+                if (aktør == null) {
+                    log.error("Tom aktør fra identhendelse")
+                    SECURE_LOGGER.error("Tom aktør fra identhendelse med nøkkel ${consumerRecord.key()}")
+                }
+
                 aktør?.identifikatorer?.singleOrNull { ident ->
                     ident.type == Type.FOLKEREGISTERIDENT && ident.gjeldende
                 }?.also { folkeregisterident ->
