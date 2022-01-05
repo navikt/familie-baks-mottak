@@ -48,8 +48,8 @@ class IdenthendelseConsumer(
                 val aktør = consumerRecord.value()
 
                 if (aktør == null) {
-                    log.error("Tom aktør fra identhendelse")
-                    SECURE_LOGGER.error("Tom aktør fra identhendelse med nøkkel ${consumerRecord.key()}")
+                    log.warn("Tom aktør fra identhendelse")
+                    SECURE_LOGGER.warn("Tom aktør fra identhendelse med nøkkel ${consumerRecord.key()}")
                 }
 
                 aktør?.identifikatorer?.singleOrNull { ident ->
