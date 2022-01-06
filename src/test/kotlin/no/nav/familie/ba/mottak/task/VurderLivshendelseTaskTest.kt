@@ -281,8 +281,8 @@ class VurderLivshendelseTaskTest {
             mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDto))
         }
 
-        assertThat(oppgaveDto[0].beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_DØDSFALL + ": bruker og barn $PERSONIDENT_BARN")
-        assertThat(oppgaveDto[1].beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_UTFLYTTING.format("bruker"))
+        assertThat(oppgaveDto[0].beskrivelse).isEqualTo(DØDSFALL.beskrivelse + ": bruker")
+        assertThat(oppgaveDto[1].beskrivelse).isEqualTo(UTFLYTTING.beskrivelse + ": bruker")
 
         assertThat(oppgaveDto).allMatch { it.aktørId.contains(PERSONIDENT_MOR) }
         assertThat(oppgaveDto).allMatch { it.saksId == "$SAKS_ID" }
@@ -361,8 +361,8 @@ class VurderLivshendelseTaskTest {
             mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDto))
         }
 
-        assertThat(oppgaveDto[0].beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_DØDSFALL + ": barn $PERSONIDENT_BARN")
-        assertThat(oppgaveDto[1].beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_UTFLYTTING.format("barn $PERSONIDENT_BARN"))
+        assertThat(oppgaveDto[0].beskrivelse).isEqualTo(DØDSFALL.beskrivelse + ": barn $PERSONIDENT_BARN")
+        assertThat(oppgaveDto[1].beskrivelse).isEqualTo(UTFLYTTING.beskrivelse + ": barn $PERSONIDENT_BARN")
 
         assertThat(oppgaveDto).allMatch { it.aktørId.contains(PERSONIDENT_MOR) }
         assertThat(oppgaveDto).allMatch { it.saksId == "$SAKS_ID" }
@@ -380,6 +380,9 @@ class VurderLivshendelseTaskTest {
                 listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE),
                        RestFagsakDeltager(PERSONIDENT_BARN, BARN, SAKS_ID, LØPENDE))
 
+        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN2)) } returns
+                listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE),
+                       RestFagsakDeltager(PERSONIDENT_BARN2, BARN, SAKS_ID, LØPENDE))
 
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
         every { mockSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagAktivOrdinærMinimal()
@@ -401,7 +404,7 @@ class VurderLivshendelseTaskTest {
                 )
         )
 
-        assertThat(oppgaveDto.captured.beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_DØDSFALL + ": bruker")
+        assertThat(oppgaveDto.captured.beskrivelse).isEqualTo(DØDSFALL.beskrivelse + ": bruker")
 
         setupPdlMockForDødsfallshendelse(true, true, false)
         vurderLivshendelseTask.doTask(
@@ -409,14 +412,14 @@ class VurderLivshendelseTaskTest {
                         type = VurderLivshendelseTask.TASK_STEP_TYPE,
                         payload = objectMapper.writeValueAsString(
                                 VurderLivshendelseTaskDTO(
-                                        PERSONIDENT_MOR,
+                                        PERSONIDENT_BARN,
                                         DØDSFALL
                                 )
                         )
                 )
         )
 
-        assertThat(oppgaveDto.captured.beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_DØDSFALL + ": bruker og barn ${PERSONIDENT_BARN}")
+        assertThat(oppgaveDto.captured.beskrivelse).isEqualTo(DØDSFALL.beskrivelse + ": barn ${PERSONIDENT_BARN}")
 
         setupPdlMockForDødsfallshendelse(true, true, true)
         vurderLivshendelseTask.doTask(
@@ -424,47 +427,14 @@ class VurderLivshendelseTaskTest {
                         type = VurderLivshendelseTask.TASK_STEP_TYPE,
                         payload = objectMapper.writeValueAsString(
                                 VurderLivshendelseTaskDTO(
-                                        PERSONIDENT_MOR,
+                                        PERSONIDENT_BARN2,
                                         DØDSFALL
                                 )
                         )
                 )
         )
 
-        assertThat(oppgaveDto.captured.beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_DØDSFALL +
-                                                              ": bruker og 2 barn ${PERSONIDENT_BARN} ${PERSONIDENT_BARN2}")
-
-        setupPdlMockForDødsfallshendelse(false, true, false)
-        vurderLivshendelseTask.doTask(
-                Task.nyTask(
-                        type = VurderLivshendelseTask.TASK_STEP_TYPE,
-                        payload = objectMapper.writeValueAsString(
-                                VurderLivshendelseTaskDTO(
-                                        PERSONIDENT_BARN,
-                                        DØDSFALL
-                                )
-                        )
-                )
-        )
-
-        assertThat(oppgaveDto.captured.beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_DØDSFALL +
-                                                              ": barn ${PERSONIDENT_BARN}")
-
-        setupPdlMockForDødsfallshendelse(false, true, true)
-        vurderLivshendelseTask.doTask(
-                Task.nyTask(
-                        type = VurderLivshendelseTask.TASK_STEP_TYPE,
-                        payload = objectMapper.writeValueAsString(
-                                VurderLivshendelseTaskDTO(
-                                        PERSONIDENT_BARN,
-                                        DØDSFALL
-                                )
-                        )
-                )
-        )
-
-        assertThat(oppgaveDto.captured.beskrivelse).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_DØDSFALL +
-                                                              ": 2 barn ${PERSONIDENT_BARN} ${PERSONIDENT_BARN2}")
+        assertThat(oppgaveDto.captured.beskrivelse).isEqualTo(DØDSFALL.beskrivelse + ": barn ${PERSONIDENT_BARN2}")
     }
 
     @Test
@@ -493,7 +463,7 @@ class VurderLivshendelseTaskTest {
         )
 
         every { mockOppgaveClient.finnOppgaverPåAktørId(any(), any()) } returns listOf(
-                Oppgave(beskrivelse = VurderLivshendelseTask.BESKRIVELSE_DØDSFALL + ": bruker")
+                Oppgave(beskrivelse = DØDSFALL.beskrivelse + ": bruker")
         )
 
         every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN)) } returns
@@ -513,7 +483,30 @@ class VurderLivshendelseTaskTest {
                 )
         )
 
-        assertThat(oppgavebeskrivelseSlot.captured).isEqualTo(VurderLivshendelseTask.BESKRIVELSE_DØDSFALL + ": bruker og barn ${PERSONIDENT_BARN}")
+        assertThat(oppgavebeskrivelseSlot.captured).isEqualTo(DØDSFALL.beskrivelse + ": bruker og barn ${PERSONIDENT_BARN}")
+
+        every { mockOppgaveClient.finnOppgaverPåAktørId(any(), any()) } returns listOf(
+            Oppgave(beskrivelse = DØDSFALL.beskrivelse + ": bruker og barn ${PERSONIDENT_BARN}")
+        )
+
+        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN2)) } returns
+                listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE),
+                       RestFagsakDeltager(PERSONIDENT_BARN2, BARN, SAKS_ID, LØPENDE))
+
+        setupPdlMockForDødsfallshendelse(true, true, true)
+        vurderLivshendelseTask.doTask(
+            Task.nyTask(
+                type = VurderLivshendelseTask.TASK_STEP_TYPE,
+                payload = objectMapper.writeValueAsString(
+                    VurderLivshendelseTaskDTO(
+                        PERSONIDENT_BARN2,
+                        DØDSFALL
+                    )
+                )
+            )
+        )
+
+        assertThat(oppgavebeskrivelseSlot.captured).isEqualTo(DØDSFALL.beskrivelse + ": bruker og 2 barn $PERSONIDENT_BARN $PERSONIDENT_BARN2")
     }
 
     private fun setupPdlMockForDødsfallshendelse(morDød: Boolean, barn1Død: Boolean, barn2Død: Boolean) {
