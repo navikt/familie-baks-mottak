@@ -35,12 +35,10 @@ class JournalføringHendelseAivenConsumer(val journalhendelseService: Journalhen
     @Transactional
     fun listen(consumerRecord: ConsumerRecord<Long, JournalfoeringHendelseRecord>, ack: Acknowledgment) {
         try {
-            //logger.info("Journalføringshendelse fra aiven mottatt. Offset: ${consumerRecord.offset()}")
-            //secureLogger.info("Journalføringshendelse fra aiven mottatt. Offset: ${consumerRecord.offset()} Key: ${consumerRecord.key()} Value: ${consumerRecord.value()}")
-            //journalhendelseService.prosesserNyHendelse(consumerRecord, ack)
-            journalhendelseService.bareLagreLoggOgAckAiven(consumerRecord, ack)
+            journalhendelseService.prosesserNyHendelse(consumerRecord, ack)
         } catch (e: Exception) {
             journalføringshendelseAivenConsumerFeilCounter.increment()
+            logger.error("Feil i prosessering av Journalføringshendelse fra aiven")
             secureLogger.error("Feil i prosessering av Journalføringshendelse fra aiven consumerRecord=$consumerRecord", e)
             throw RuntimeException("Feil i prosessering av Journalføringshendelse fra aiven")
         } finally {
