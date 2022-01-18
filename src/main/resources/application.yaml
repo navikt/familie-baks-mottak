@@ -72,7 +72,6 @@ ef:
 
 FAMILIE_BA_DOKGEN_API_URL: http://familie-ba-dokgen.default
 FAMILIE_INTEGRASJONER_API_URL: http://familie-integrasjoner/api
-FAMILIE_BA_SAK_API_URL: http://familie-ba-sak/api
 FAMILIE_DOKUMENT_API_URL: http://familie-dokument
 FAMILIE_BA_INFOTRYGD_API_URL: http://familie-ba-infotrygd
 STS_URL: http://security-token-service.default.svc.nais.local/rest/v1/sts/token
