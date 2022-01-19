@@ -73,4 +73,4 @@ JOURNALFOERINGHENDELSE_V1_TOPIC_AIVEN_URL: teamdokumenthandtering.aapen-dok-jour
 NORG2_API_URL: https://app.adeo.no/norg2/
 FAMILIE_DOKUMENT_API_URL: https://familie-dokument.intern.nav.no/familie/dokument
 FAMILIE_BA_DOKGEN_API_URL: https://familie-ba-dokgen.intern.nav.no
-FAMILIE_BA_SAK_API_URL: http://familie-ba-sak/api
+FAMILIE_BA_SAK_API_URL: https://familie-ba-sak.intern.nav.no/api
