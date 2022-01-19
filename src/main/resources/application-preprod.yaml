@@ -78,6 +78,7 @@ JOURNALFOERINGHENDELSE_V1_TOPIC_URL: aapen-dok-journalfoering-v1-q1
 JOURNALFOERINGHENDELSE_V1_TOPIC_AIVEN_URL: teamdokumenthandtering.aapen-dok-journalfoering-q1
 PDL_URL: http://pdl-api-q1.pdl
 FAMILIE_INTEGRASJONER_API_URL: http://familie-integrasjoner-q1/api
+FAMILIE_BA_SAK_API_URL: https://familie-ba-sak.dev.intern.nav.no/api
 
 NORG2_API_URL: https://app-q1.adeo.no/norg2
 FAMILIE_DOKUMENT_API_URL: https://familie-dokument.dev.intern.nav.no/familie/dokument

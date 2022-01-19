@@ -53,7 +53,7 @@ spec:
     outbound:
       rules:
         - application: familie-ba-sak
-          cluster: dev-fss
+          cluster: dev-gcp
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: preprod
