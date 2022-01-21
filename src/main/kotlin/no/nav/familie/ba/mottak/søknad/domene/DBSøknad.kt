@@ -1,12 +1,18 @@
 package no.nav.familie.ba.mottak.søknad.domene
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.familie.kontrakter.ba.søknad.v6.Søknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsvedlegg
-import no.nav.familie.kontrakter.ba.søknad.v5.Søknad as SøknadV5
+import no.nav.familie.kontrakter.ba.søknad.v6.Søknad
 import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.LocalDateTime
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.SequenceGenerator
+import javax.persistence.Table
+import no.nav.familie.kontrakter.ba.søknad.v5.Søknad as SøknadV5
 
 @Entity(name = "Soknad")
 @Table(name = "Soknad")
@@ -27,13 +33,25 @@ data class DBSøknad(
     fun hentSøknad(): Søknad {
         return objectMapper.readValue(søknadJson)
     }
-    fun hentSøknadV5(): SøknadV5 {
+    private fun hentSøknadV7(): SøknadNewWip {
         return objectMapper.readValue(søknadJson)
     }
 
-    fun hentSøknadVersjon(): String {
-        val søknad = objectMapper.readValue<SøknadV5>(søknadJson);
-        return if (søknad.barn[0].spørsmål.containsKey("andreForelderNavn")) "v5" else "v6"
+    private fun hentSøknadVersjon(): String {
+        return try {
+            val søknad = objectMapper.readValue<SøknadNewWip>(søknadJson)
+            if (søknad.versjon == 7) "v7" else "v6"
+        } catch (e: Error) {
+            "v6"
+        }
+    }
+
+    fun hentVersjonertSøknad(): VersjonertSøknad {
+        val versjon = this.hentSøknadVersjon()
+        if (versjon === "v6") {
+            return SøknadV6(søknad = hentSøknad())
+        }
+        return SøknadV7(søknad = hentSøknadV7())
     }
 }
 
@@ -48,7 +66,7 @@ data class DBVedlegg(
     val data: ByteArray
 )
 
-fun SøknadV5.tilDBSøknad(): DBSøknad {
+fun Søknad.tilDBSøknad(): DBSøknad {
     try {
         return DBSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
@@ -59,7 +77,7 @@ fun SøknadV5.tilDBSøknad(): DBSøknad {
     }
 }
 
-fun Søknad.tilDBSøknad(): DBSøknad {
+fun SøknadNewWip.tilDBSøknad(): DBSøknad {
     try {
         return DBSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
@@ -79,4 +97,3 @@ fun Søknadsvedlegg.tilDBVedlegg(søknad: DBSøknad, data: ByteArray): DBVedlegg
 }
 
 class FødselsnummerErNullException : Exception()
-

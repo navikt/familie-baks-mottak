@@ -87,8 +87,8 @@ class FeatureToggleConfig(
     }
 
     companion object {
-
         const val TOGGLE_IDENTHENDELSER = "familie-ba-mottak.sende-identhendelser-til-ba-sak"
+        const val TOGGLE_EØS_FULL = "familie-ba-soknad.nytt-eos-skjema"
     }
 }
 

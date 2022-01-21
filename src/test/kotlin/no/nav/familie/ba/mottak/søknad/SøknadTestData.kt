@@ -2,14 +2,13 @@ package no.nav.familie.ba.mottak.søknad
 
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 
-import no.nav.familie.kontrakter.ba.søknad.v5.Barn as BarnV5
 import no.nav.familie.kontrakter.ba.søknad.v6.Barn
 import no.nav.familie.kontrakter.ba.søknad.v4.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.SIVILSTANDTYPE
 import no.nav.familie.kontrakter.ba.søknad.v4.Søker as SøkerV4
 
 import no.nav.familie.kontrakter.ba.søknad.v5.Søknad as SøknadV5
-import no.nav.familie.kontrakter.ba.søknad.v6.Søknad as SøknadV6
+import no.nav.familie.kontrakter.ba.søknad.v6.Søknad
 import no.nav.familie.kontrakter.ba.søknad.SøknadAdresse
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt as SøknadsfeltV4
@@ -41,25 +40,6 @@ object SøknadTestData {
         )
     }
 
-    fun barnv5(): List<BarnV5> {
-        return listOf(
-            BarnV5(
-                navn = søknadsfelt("Barnets fulle navn", "barn1"),
-                ident = søknadsfelt("Fødselsnummer", "12345678999"),
-                registrertBostedType = søknadsfelt("Skal ha samme adresse", RegistrertBostedType.REGISTRERT_ANNEN_ADRESSE),
-                alder = søknadsfelt("alder", "4 år"),
-                spørsmål = mapOf("andreForelderNavn" to søknadsfelt("navn", "Thor")),
-            ),
-            BarnV5(
-                navn = søknadsfelt("Barnets fulle navn", "barn2"),
-                ident = søknadsfelt("Fødselsnummer", "12345678987"),
-                registrertBostedType = søknadsfelt("Skal ha samme adresse", RegistrertBostedType.REGISTRERT_ANNEN_ADRESSE),
-                alder = søknadsfelt("alder", "1 år"),
-                spørsmål = mapOf("andreForelderNavn" to søknadsfelt("navn", "Thor")),
-            )
-        )
-    }
-
     fun barn(): List<Barn> {
         return listOf(
             Barn(
@@ -86,8 +66,8 @@ object SøknadTestData {
         )
     }
 
-    fun søknad(): SøknadV6 {
-        return SøknadV6(
+    fun søknad(): Søknad {
+        return Søknad(
             søknadstype = Søknadstype.ORDINÆR,
             søker = søker(),
             barn = barn(),
@@ -111,11 +91,11 @@ object SøknadTestData {
         )
     }
 
-    fun tomv5søknad(): SøknadV5 {
-        return SøknadV5(
+    fun tomv5søknad(): Søknad {
+        return Søknad(
             søknadstype = Søknadstype.ORDINÆR,
             søker = søker(),
-            barn = barnv5(),
+            barn = barn(),
             spørsmål = mapOf(),
             dokumentasjon = listOf(
                 Søknaddokumentasjon(
