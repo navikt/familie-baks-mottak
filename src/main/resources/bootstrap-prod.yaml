@@ -24,3 +24,7 @@ spring:
         backend: kv/prod/fss
         application-name: familie-ba-mottak/default
         default-context: familie-ba-mottak/default
+
+ef:
+  overgangstonad:
+    sendtilsak: true
