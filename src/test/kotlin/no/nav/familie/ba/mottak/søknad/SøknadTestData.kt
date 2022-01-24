@@ -1,7 +1,6 @@
 package no.nav.familie.ba.mottak.søknad
 
 import no.nav.familie.ba.mottak.søknad.domene.SøknadNewWip
-import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
 import no.nav.familie.kontrakter.ba.søknad.SIVILSTANDTYPE
 import no.nav.familie.kontrakter.ba.søknad.SøknadAdresse
 import no.nav.familie.kontrakter.ba.søknad.v4.Dokumentasjonsbehov
@@ -94,7 +93,7 @@ object SøknadTestData {
     }
 
     fun søknadV7(): SøknadNewWip = SøknadNewWip(
-        versjon = 7,
+        kontraktVersjon = 7,
         søknadstype = Søknadstype.ORDINÆR,
         søker = søker(),
         barn = barn(),

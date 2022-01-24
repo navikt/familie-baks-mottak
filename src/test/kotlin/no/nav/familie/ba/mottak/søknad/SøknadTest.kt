@@ -46,9 +46,9 @@ class SøknadTest(
         val versjonertSøknad = dbSøknadFraMapper.hentVersjonertSøknad()
         val versjon: Int? = when (versjonertSøknad) {
             is SøknadV6 -> null
-            is SøknadV7 -> versjonertSøknad.søknad.versjon
+            is SøknadV7 -> versjonertSøknad.søknad.kontraktVersjon
         }
-        assertEquals(søknadV7.versjon, versjon)
+        assertEquals(søknadV7.kontraktVersjon, versjon)
 
         val dbSøknadFraDB = søknadService.lagreDBSøknad(dbSøknadFraMapper)
         val hentetSøknad = søknadService.hentDBSøknad(dbSøknadFraDB.id)

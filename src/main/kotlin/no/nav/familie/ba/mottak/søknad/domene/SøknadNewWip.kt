@@ -14,7 +14,7 @@ import no.nav.familie.kontrakter.ba.søknad.v6.Barn
  * Når typen er komplett vil den bli flyttet til familie-kontrakter
  */
 data class SøknadNewWip(
-    val versjon: Int,
+    val kontraktVersjon: Int,
     val søknadstype: Søknadstype,
     val søker: Søker,
     val barn: List<Barn>,
