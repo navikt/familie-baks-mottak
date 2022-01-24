@@ -27,20 +27,18 @@ class SøknadSpråkvelgerService {
 
         valgtLocale = språk
 
-        return when (versjonertSøknad) {
-            is SøknadV6 -> {
-                val asMap = objectMapper.convertValue<MutableMap<String, Any>>(versjonertSøknad.søknad)
-                asMap["teksterUtenomSpørsmål"] = versjonertSøknad.søknad.teksterUtenomSpørsmål.mapValues { it.value[valgtLocale] }
-                valgtLocale = defaultLocale
-                objectMapper.writeValueAsString(asMap)
+        val asMap = objectMapper.convertValue<MutableMap<String, Any>>(
+            when (versjonertSøknad) {
+                is SøknadV6 -> versjonertSøknad.søknad
+                is SøknadV7 -> versjonertSøknad.søknad
             }
-            is SøknadV7 -> {
-                val asMap = objectMapper.convertValue<MutableMap<String, Any>>(versjonertSøknad.søknad)
-                asMap["teksterUtenomSpørsmål"] = versjonertSøknad.søknad.teksterUtenomSpørsmål.mapValues { it.value[valgtLocale] }
-                valgtLocale = defaultLocale
-                objectMapper.writeValueAsString(asMap)
-            }
-        }
+        )
+        asMap["teksterUtenomSpørsmål"] = when (versjonertSøknad) {
+            is SøknadV6 -> versjonertSøknad.søknad.teksterUtenomSpørsmål
+            is SøknadV7 -> versjonertSøknad.søknad.teksterUtenomSpørsmål
+        }.mapValues { it.value[valgtLocale] }
+        valgtLocale = defaultLocale
+        return objectMapper.writeValueAsString(asMap)
     }
 
     inner class SøknaddokumentasjonSerializer : JsonSerializer<Søknaddokumentasjon>() {

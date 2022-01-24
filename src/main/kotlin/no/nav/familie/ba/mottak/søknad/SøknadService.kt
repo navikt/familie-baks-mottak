@@ -11,7 +11,6 @@ import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.tilDBVedlegg
 import no.nav.familie.ba.mottak.task.JournalførSøknadTask
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknaddokumentasjon
-import no.nav.familie.kontrakter.ba.søknad.v6.Søknad
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.springframework.stereotype.Service
@@ -33,7 +32,6 @@ class SøknadService(
         val (dbSøknad, dokumentasjon) = when (versjonertSøknad) {
             is SøknadV6 -> {
                 Pair(versjonertSøknad.søknad.tilDBSøknad(), versjonertSøknad.søknad.dokumentasjon)
-
             }
             is SøknadV7 -> {
                 Pair(versjonertSøknad.søknad.tilDBSøknad(), versjonertSøknad.søknad.dokumentasjon)
