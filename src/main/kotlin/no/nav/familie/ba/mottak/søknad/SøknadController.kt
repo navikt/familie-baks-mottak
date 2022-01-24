@@ -56,7 +56,7 @@ class SøknadController(
 
     @PostMapping(value = ["/soknad/v6"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(@RequestPart("søknad") søknad: Søknad): ResponseEntity<Ressurs<Kvittering>> =
-        mottaVersjonertSøknadOgSendMetrikker(SøknadV6(søknad = søknad))
+        mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad = SøknadV6(søknad = søknad))
 
     @PostMapping(value = ["/soknad/v7"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(@RequestPart("søknad") søknad: SøknadNewWip): ResponseEntity<Ressurs<Kvittering>> =

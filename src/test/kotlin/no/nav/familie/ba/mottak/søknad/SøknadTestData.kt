@@ -93,31 +93,6 @@ object SøknadTestData {
         )
     }
 
-    fun tomv5søknad(): Søknad {
-        return Søknad(
-            søknadstype = Søknadstype.ORDINÆR,
-            søker = søker(),
-            barn = barn(),
-            spørsmål = mapOf(),
-            dokumentasjon = listOf(
-                Søknaddokumentasjon(
-                    dokumentasjonsbehov = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON,
-                    harSendtInn = false,
-                    opplastedeVedlegg = listOf(
-                        Søknadsvedlegg(
-                            dokumentId = "en-slags-uuid",
-                            navn = "IMG 1337.png",
-                            tittel = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
-                        )
-                    ),
-                    dokumentasjonSpråkTittel = mapOf("nb" to "Bekreftelse fra barnevernet")
-                )
-            ),
-            originalSpråk = "nb",
-            teksterUtenomSpørsmål = mapOf()
-        )
-    }
-
     fun søknadV7(): SøknadNewWip = SøknadNewWip(
         versjon = 7,
         søknadstype = Søknadstype.ORDINÆR,

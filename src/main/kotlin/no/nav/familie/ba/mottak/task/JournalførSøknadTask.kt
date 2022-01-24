@@ -32,7 +32,11 @@ class JournalførSøknadTask(
             val versjonertSøknad: VersjonertSøknad = dbSøknad.hentVersjonertSøknad()
 
             log.info("Generer pdf og journalfør søknad")
-            val bokmålPdf = pdfService.lagPdf(versjonertSøknad, dbSøknad)
+            val bokmålPdf = pdfService.lagPdf(
+                versjonertSøknad = versjonertSøknad,
+                dbSøknad = dbSøknad,
+                språk = "nb"
+            )
             log.info("Generert pdf med størrelse ${bokmålPdf.size}")
 
             val orginalspråk = when (versjonertSøknad) {
@@ -40,9 +44,9 @@ class JournalførSøknadTask(
                 is SøknadV7 -> versjonertSøknad.søknad.originalSpråk
             }
 
-            val maybeOrignalspråkPdf = if (orginalspråk != "nb")
+            val orginalspråkPdf: ByteArray = if (orginalspråk != "nb")
                 pdfService.lagPdf(versjonertSøknad, dbSøknad, orginalspråk) else ByteArray(0)
-            journalføringService.journalførSøknad(dbSøknad, bokmålPdf, maybeOrignalspråkPdf)
+            journalføringService.journalførSøknad(dbSøknad, bokmålPdf, orginalspråkPdf)
         } catch (e: HttpClientErrorException.Conflict) {
             log.error("409 conflict for eksternReferanseId ved journalføring av søknad. taskId=${task.id}. Se task eller securelog")
             SECURE_LOGGER.error("409 conflict for eksternReferanseId ved journalføring søknad $task ${e.responseBodyAsString}", e)
