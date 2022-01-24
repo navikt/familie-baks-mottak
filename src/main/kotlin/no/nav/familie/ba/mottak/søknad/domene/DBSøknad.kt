@@ -30,7 +30,7 @@ data class DBSøknad(
     val journalpostId: String? = null
 ) {
 
-    fun hentSøknad(): Søknad {
+    private fun hentSøknad(): Søknad {
         return objectMapper.readValue(søknadJson)
     }
     private fun hentSøknadV7(): SøknadNewWip {

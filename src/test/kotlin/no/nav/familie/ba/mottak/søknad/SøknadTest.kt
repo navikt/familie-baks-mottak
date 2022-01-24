@@ -3,6 +3,7 @@ package no.nav.familie.ba.mottak.søknad
 import no.nav.familie.ba.mottak.DevLauncherPostgres
 import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV6
+import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
 import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
 import no.nav.familie.ba.mottak.util.DbContainerInitializer
 import no.nav.familie.kontrakter.felles.objectMapper
@@ -27,19 +28,32 @@ class SøknadTest(
 ) {
 
     val søknad = SøknadTestData.søknad()
+    val søknadV7 = SøknadTestData.søknadV7()
 
     @Test
     fun `Lagring av søknad`() {
         val dbSøknadFraMapper = søknad.tilDBSøknad()
-        assertEquals(søknad, dbSøknadFraMapper.hentSøknad())
+        assertThat(dbSøknadFraMapper.hentVersjonertSøknad() is SøknadV6).isTrue()
 
         val dbSøknadFraDB = søknadService.lagreDBSøknad(dbSøknadFraMapper)
         val hentetSøknad = søknadService.hentDBSøknad(dbSøknadFraDB.id)
         assertEquals(dbSøknadFraDB.id, hentetSøknad!!.id)
-        assertEquals(
-            dbSøknadFraDB.hentSøknad(),
-            hentetSøknad.hentSøknad()
-        )
+        assertThat(hentetSøknad.hentVersjonertSøknad() is SøknadV6)
+    }
+    @Test
+    fun `Få riktig versjon v7 ved mapping fra DBSøknad`() {
+        val dbSøknadFraMapper = søknadV7.tilDBSøknad()
+        val versjonertSøknad = dbSøknadFraMapper.hentVersjonertSøknad()
+        val versjon: Int? = when (versjonertSøknad) {
+            is SøknadV6 -> null
+            is SøknadV7 -> versjonertSøknad.søknad.versjon
+        }
+        assertEquals(søknadV7.versjon, versjon)
+
+        val dbSøknadFraDB = søknadService.lagreDBSøknad(dbSøknadFraMapper)
+        val hentetSøknad = søknadService.hentDBSøknad(dbSøknadFraDB.id)
+        assertEquals(dbSøknadFraDB.id, hentetSøknad!!.id)
+        assertThat(hentetSøknad.hentVersjonertSøknad() is SøknadV7).isTrue
     }
 
     @Test
@@ -50,6 +64,6 @@ class SøknadTest(
             søknadJson = lagraV6SøknadData,
             fnr = "1234123412",
         )
-        assertThat(v6dbSøknad.hentVersjonertSøknad() is SøknadV6).isTrue()
+        assertThat(v6dbSøknad.hentVersjonertSøknad() is SøknadV6).isTrue
     }
 }
