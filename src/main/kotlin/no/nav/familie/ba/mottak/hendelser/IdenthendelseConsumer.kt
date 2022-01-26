@@ -2,8 +2,6 @@ package no.nav.familie.ba.mottak.hendelser
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.ba.mottak.config.FeatureToggleConfig
-import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.PersonIdent
 import no.nav.familie.log.mdc.MDCConstants
@@ -27,8 +25,7 @@ import javax.transaction.Transactional
     matchIfMissing = true
 )
 class IdenthendelseConsumer(
-    private val sakClient: SakClient,
-    private val featureToggleService: FeatureToggleService
+    private val sakClient: SakClient
 ) {
 
     val identhendelseFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.ident.feilet")
@@ -44,26 +41,21 @@ class IdenthendelseConsumer(
         try {
             MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
             SECURE_LOGGER.info("Har mottatt ident-hendelse $consumerRecord")
-            if (featureToggleService.isEnabled(FeatureToggleConfig.TOGGLE_IDENTHENDELSER)) {
-                val aktør = consumerRecord.value()
 
-                if (aktør == null) {
-                    log.warn("Tom aktør fra identhendelse")
-                    SECURE_LOGGER.warn("Tom aktør fra identhendelse med nøkkel ${consumerRecord.key()}")
-                }
+            val aktør = consumerRecord.value()
 
-                aktør?.identifikatorer?.singleOrNull { ident ->
-                    ident.type == Type.FOLKEREGISTERIDENT && ident.gjeldende
-                }?.also { folkeregisterident ->
-                    SECURE_LOGGER.info("Sender ident-hendelse til ba-sak for ident $folkeregisterident")
-                    sakClient.sendIdenthendelseTilSak(PersonIdent(ident = folkeregisterident.idnummer.toString()))
-                }
-            } else {
-                log.info(
-                    "Toggle ${FeatureToggleConfig.TOGGLE_IDENTHENDELSER} er ikke aktivert, " +
-                        "gir ack på melding uten å sende til ba-sak"
-                )
+            if (aktør == null) {
+                log.warn("Tom aktør fra identhendelse")
+                SECURE_LOGGER.warn("Tom aktør fra identhendelse med nøkkel ${consumerRecord.key()}")
             }
+
+            aktør?.identifikatorer?.singleOrNull { ident ->
+                ident.type == Type.FOLKEREGISTERIDENT && ident.gjeldende
+            }?.also { folkeregisterident ->
+                SECURE_LOGGER.info("Sender ident-hendelse til ba-sak for ident $folkeregisterident")
+                sakClient.sendIdenthendelseTilSak(PersonIdent(ident = folkeregisterident.idnummer.toString()))
+            }
+
         } catch (e: RuntimeException) {
             identhendelseFeiletCounter.increment()
             SECURE_LOGGER.error("Feil i prosessering av ident-hendelser", e)
