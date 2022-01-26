@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
+import org.springframework.retry.annotation.EnableRetry
 import org.springframework.scheduling.annotation.EnableScheduling
 
 @SpringBootConfiguration
@@ -28,6 +29,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @EnableScheduling
 @EnableJwtTokenValidation(ignore = ["org.springframework", "no.nav.familie.ba.mottak.e2e"])
 @EnableOAuth2Client(cacheEnabled = true)
+@EnableRetry
 class ApplicationConfig {
 
     @Bean
