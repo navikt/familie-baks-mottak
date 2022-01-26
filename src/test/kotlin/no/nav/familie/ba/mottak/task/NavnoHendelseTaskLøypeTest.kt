@@ -41,7 +41,6 @@ class NavnoHendelseTaskLøypeTest {
     private val mockTaskRepository: TaskRepository = mockk(relaxed = true)
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
-    private val mockFeatureToggleService: FeatureToggleService = mockk()
 
     private val rutingSteg = JournalhendelseRutingTask(
         mockPdlClient,
@@ -92,8 +91,6 @@ class NavnoHendelseTaskLøypeTest {
         every {
             mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
         } returns InfotrygdSøkResponse(emptyList(), emptyList())
-
-        every { mockFeatureToggleService.isEnabled("familie-ba-mottak.ta-over-ruting",true) } returns true
     }
 
     @Test
