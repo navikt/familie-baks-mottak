@@ -4,8 +4,9 @@ import no.nav.familie.ba.mottak.søknad.domene.SøknadSpråkvelgerService
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.ba.mottak.DevLauncherPostgres
+import no.nav.familie.ba.mottak.søknad.domene.SøknadV6
+import no.nav.familie.kontrakter.ba.søknad.v6.Søknad
 import no.nav.familie.ba.mottak.util.DbContainerInitializer
-import no.nav.familie.kontrakter.ba.søknad.v5.Søknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt
 import no.nav.familie.kontrakter.felles.objectMapper
 import org.junit.jupiter.api.Test
@@ -45,11 +46,11 @@ class SøknadsfeltSpråkTest (
         )
         every { søknad.teksterUtenomSpørsmål } returns mapOf()
 
-        var asJson = søknadSpråkvelgerService.velgSøknadSpråk(søknad, "en")
+        var asJson = søknadSpråkvelgerService.velgSøknadSpråk(SøknadV6(søknad = søknad), "en")
         assertNotEquals(-1, asJson.indexOf("TestAnswer"))
         assertEquals(-1, asJson.indexOf("TestSvar"))
 
-        asJson = søknadSpråkvelgerService.velgSøknadSpråk(søknad, "nb")
+        asJson = søknadSpråkvelgerService.velgSøknadSpråk(SøknadV6(søknad = søknad), "nb")
         assertEquals(-1, asJson.indexOf("TestAnswer"))
         assertNotEquals(-1, asJson.indexOf("TestSvar"))
     }
@@ -114,7 +115,7 @@ class SøknadsfeltSpråkTest (
         )
         every { søknad.teksterUtenomSpørsmål } returns mapOf()
 
-        val asJson = søknadSpråkvelgerService.velgSøknadSpråk(søknad, "nb")
+        val asJson = søknadSpråkvelgerService.velgSøknadSpråk(SøknadV6(søknad = søknad), "nb")
         assertNotEquals(-1, asJson.indexOf("TestNøstetVerdi"))
         assertEquals(-1, asJson.indexOf("TestNestedValue"))
 
@@ -133,7 +134,7 @@ class SøknadsfeltSpråkTest (
             )
         )
 
-        val asJson = søknadSpråkvelgerService.velgSøknadSpråk(søknad, "nb")
+        val asJson = søknadSpråkvelgerService.velgSøknadSpråk(SøknadV6(søknad = søknad), "nb")
 
         assertEquals(-1, asJson.indexOf("Text"))
         assertNotEquals(-1, asJson.indexOf("Tekst"))
