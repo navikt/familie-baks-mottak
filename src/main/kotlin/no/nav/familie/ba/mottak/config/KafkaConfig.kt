@@ -71,7 +71,11 @@ class KafkaConfig {
         val factory = ConcurrentKafkaListenerContainerFactory<Long, JournalfoeringHendelseRecord>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
         factory.containerProperties.authorizationExceptionRetryInterval = Duration.ofSeconds(2)
-        factory.consumerFactory = DefaultKafkaConsumerFactory(properties.buildConsumerProperties())
+        factory.consumerFactory = DefaultKafkaConsumerFactory(
+            properties.buildConsumerProperties().also {
+                it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = OffsetResetStrategy.LATEST.toString().lowercase()
+            }
+        )
         factory.setErrorHandler(kafkaErrorHandler)
         return factory
     }
