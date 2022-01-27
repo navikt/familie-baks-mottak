@@ -18,11 +18,7 @@ import javax.transaction.Transactional
 )
 class JournalføringHendelseConsumer(val journalhendelseService: JournalhendelseService) {
 
-    @KafkaListener(id = "familie-ba-mottak",
-                   topics = ["\${JOURNALFOERINGHENDELSE_V1_TOPIC_URL}"],
-                   containerFactory = "kafkaJournalføringHendelseListenerContainerFactory",
-                   idIsGroup = false
-    )
+
     @Transactional
     fun listen(consumerRecord: ConsumerRecord<Long, JournalfoeringHendelseRecord>, ack: Acknowledgment) {
         journalhendelseService.prosesserNyHendelse(consumerRecord, ack)
