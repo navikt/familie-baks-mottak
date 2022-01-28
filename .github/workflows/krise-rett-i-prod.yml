@@ -3,8 +3,8 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE: ghcr.io/navikt/familie-ba-mottak:${{ github.sha }}
-  IMAGE_LATEST: ghcr.io/navikt/familie-ba-mottak:latest
+  IMAGE: docker.pkg.github.com/${{ github.repository }}/familie-ba-mottak:${{ github.sha }}
+  IMAGE_LATEST: docker.pkg.github.com/navikt/familie-ba-mottak/familie-ba-mottak
 jobs:
   deploy-to-prod:
     name: Bygg app/image, push til github, deploy til prod-fss (MÅ KUN BRUKES VED KRISE)
