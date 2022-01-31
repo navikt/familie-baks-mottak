@@ -5,6 +5,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.core.task.SimpleAsyncTaskExecutor
+import org.springframework.kafka.listener.CommonContainerStoppingErrorHandler
 import org.springframework.kafka.listener.ContainerStoppingErrorHandler
 import org.springframework.kafka.listener.MessageListenerContainer
 import org.springframework.stereotype.Component
@@ -17,7 +18,7 @@ import java.util.concurrent.atomic.AtomicLong
  * hentet fra pensr
  */
 @Component
-class KafkaErrorHandler : ContainerStoppingErrorHandler() {
+class KafkaErrorHandler : CommonContainerStoppingErrorHandler() {
 
     val LOGGER: Logger = LoggerFactory.getLogger(KafkaErrorHandler::class.java)
     val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
@@ -25,7 +26,7 @@ class KafkaErrorHandler : ContainerStoppingErrorHandler() {
     private val executor: Executor
     private val counter = AtomicInteger(0)
     private val lastError = AtomicLong(0)
-    override fun handle(e: Exception,
+    override fun handleRemaining(e: Exception,
                         records: List<ConsumerRecord<*, *>>?,
                         consumer: Consumer<*, *>,
                         container: MessageListenerContainer) {
@@ -74,7 +75,7 @@ class KafkaErrorHandler : ContainerStoppingErrorHandler() {
             }
         }
         LOGGER.warn("Stopper kafka container for {} i {}", topic, Duration.ofMillis(stopTime).toString())
-        super.handle(e, records, consumer, container)
+        super.handleRemaining(e, records, consumer, container)
     }
 
     companion object {
