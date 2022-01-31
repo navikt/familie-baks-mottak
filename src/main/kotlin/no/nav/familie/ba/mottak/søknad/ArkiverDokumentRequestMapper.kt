@@ -2,29 +2,36 @@ package no.nav.familie.ba.mottak.søknad
 
 import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.DBVedlegg
-import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
+import no.nav.familie.ba.mottak.søknad.domene.SøknadV6
+import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
+import no.nav.familie.ba.mottak.søknad.domene.VersjonertSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Dokumentasjonsbehov
-import no.nav.familie.kontrakter.ba.søknad.v5.Søknad as SøknadV5
-import no.nav.familie.kontrakter.ba.søknad.v6.Søknad
+import no.nav.familie.kontrakter.ba.søknad.v4.Søknaddokumentasjon
+import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
+import no.nav.familie.kontrakter.felles.dokarkiv.Dokumenttype
+import no.nav.familie.kontrakter.felles.dokarkiv.v2.ArkiverDokumentRequest
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.Dokument
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.Filtype
-import no.nav.familie.kontrakter.felles.dokarkiv.v2.ArkiverDokumentRequest
-import no.nav.familie.kontrakter.felles.dokarkiv.Dokumenttype
 
 object ArkiverDokumentRequestMapper {
 
     fun toDto(
         dbSøknad: DBSøknad,
+        versjonertSøknad: VersjonertSøknad,
         pdf: ByteArray,
         vedleggMap: Map<String, DBVedlegg>,
         pdfOriginalSpråk: ByteArray
     ): ArkiverDokumentRequest {
-        val søknadstype = dbSøknad.hentSøknad().søknadstype
+
+        val (søknadstype, dokumentasjon) = when (versjonertSøknad) {
+            is SøknadV6 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
+            is SøknadV7 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
+        }
 
         val dokumenttype = when (søknadstype) {
             Søknadstype.ORDINÆR -> Dokumenttype.BARNETRYGD_ORDINÆR
             Søknadstype.UTVIDET -> Dokumenttype.BARNETRYGD_UTVIDET
-            else -> Dokumenttype.BARNETRYGD_ORDINÆR
+            Søknadstype.IKKE_SATT -> Dokumenttype.BARNETRYGD_ORDINÆR
         }
 
         val søknadsdokumentJson =
@@ -47,69 +54,24 @@ object ArkiverDokumentRequestMapper {
                 },
                 dokumenttype = dokumenttype
             )
-        val hoveddokumentvarianter = listOf(søknadsdokumentPdf, søknadsdokumentJson)
 
-        return if (dbSøknad.hentSøknadVersjon() == "v5")
-            ArkiverDokumentRequest(
-                fnr = dbSøknad.fnr,
-                forsøkFerdigstill = false,
-                hoveddokumentvarianter = hoveddokumentvarianter,
-                vedleggsdokumenter = hentVedleggListeTilArkivering(dbSøknad.hentSøknadV5(), vedleggMap, pdfOriginalSpråk),
-                eksternReferanseId = dbSøknad.id.toString()
-            )
-        else ArkiverDokumentRequest(
+        return ArkiverDokumentRequest(
             fnr = dbSøknad.fnr,
             forsøkFerdigstill = false,
-            hoveddokumentvarianter = hoveddokumentvarianter,
-            vedleggsdokumenter = hentVedleggListeTilArkivering(dbSøknad.hentSøknad(), vedleggMap, pdfOriginalSpråk),
+            hoveddokumentvarianter = listOf(søknadsdokumentPdf, søknadsdokumentJson),
+            vedleggsdokumenter = hentVedleggListeTilArkivering(dokumentasjon, vedleggMap, pdfOriginalSpråk),
             eksternReferanseId = dbSøknad.id.toString()
         )
     }
 
     private fun hentVedleggListeTilArkivering(
-        søknad: Søknad,
+        dokumentasjon: List<Søknaddokumentasjon>,
         vedleggMap: Map<String, DBVedlegg>,
         pdfOriginalSpråk: ByteArray
     ): List<Dokument> {
         val vedlegg = mutableListOf<Dokument>()
 
-        søknad.dokumentasjon.forEach { dokumentasjonskrav ->
-            dokumentasjonskrav.opplastedeVedlegg.forEach { opplastaVedlegg ->
-                vedleggMap.get(opplastaVedlegg.dokumentId)?.also { dbFil ->
-                    vedlegg.add(
-                        Dokument(
-                            dokument = dbFil.data,
-                            dokumenttype = Dokumenttype.BARNETRYGD_VEDLEGG,
-                            filtype = Filtype.PDFA,
-                            tittel = dokumentasjonsbehovTilTittel(opplastaVedlegg.tittel)
-                        )
-                    )
-                }
-            }
-        }
-
-        if (pdfOriginalSpråk.isNotEmpty()) {
-            vedlegg.add(
-                Dokument(
-                    dokument = pdfOriginalSpråk,
-                    dokumenttype = Dokumenttype.BARNETRYGD_VEDLEGG,
-                    filtype = Filtype.PDFA,
-                    tittel = "Søknad på originalt utfylt språk"
-                )
-            )
-        }
-
-        return vedlegg
-    }
-
-    private fun hentVedleggListeTilArkivering(
-        søknad: SøknadV5,
-        vedleggMap: Map<String, DBVedlegg>,
-        pdfOriginalSpråk: ByteArray
-    ): List<Dokument> {
-        val vedlegg = mutableListOf<Dokument>()
-
-        søknad.dokumentasjon.forEach { dokumentasjonskrav ->
+        dokumentasjon.forEach { dokumentasjonskrav ->
             dokumentasjonskrav.opplastedeVedlegg.forEach { opplastaVedlegg ->
                 vedleggMap.get(opplastaVedlegg.dokumentId)?.also { dbFil ->
                     vedlegg.add(

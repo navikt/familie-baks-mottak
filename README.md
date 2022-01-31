@@ -62,6 +62,8 @@ Man må legge følgende endring til i application-postgres.yaml under spring-sek
 +        role: postgres
 ```
 
+og `-Dspring.profiles.active=dev` under Edit Configurations -> VM Options.
+
 ## Kjøring av e2e tester
 Ende til ende tester kjøres av GHA ved push. Ønsker du å hoppe over dise må du ha `[e2e skip]` i commit melding for å kunne deploye til dev uten at testene kjører.
 Ende til ende testene ligger her: https://github.com/navikt/familie-ba-e2e/tree/master/autotest 
