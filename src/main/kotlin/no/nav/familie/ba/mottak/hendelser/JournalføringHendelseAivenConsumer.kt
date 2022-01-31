@@ -36,7 +36,7 @@ class JournalføringHendelseAivenConsumer(val journalhendelseService: Journalhen
     fun listen(consumerRecord: ConsumerRecord<Long, JournalfoeringHendelseRecord>, ack: Acknowledgment) {
         try {
             //logger.info("Journalføringshendelse fra aiven mottatt. Offset: ${consumerRecord.offset()}")
-            secureLogger.info("Journalføringshendelse fra aiven mottatt. Offset: ${consumerRecord.offset()} Key: ${consumerRecord.key()} Value: ${consumerRecord.value()}")
+            //secureLogger.info("Journalføringshendelse fra aiven mottatt. Offset: ${consumerRecord.offset()} Key: ${consumerRecord.key()} Value: ${consumerRecord.value()}")
             //journalhendelseService.prosesserNyHendelse(consumerRecord, ack)
             journalhendelseService.bareLagreLoggOgAckAiven(consumerRecord, ack)
         } catch (e: Exception) {
