@@ -54,7 +54,7 @@ class SakClient @Autowired constructor(
         backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}")
     )
     fun sendIdenthendelseTilSak(personIdent: PersonIdent) {
-        val uri = URI.create("$sakServiceUri/ident")
+        val uri = URI.create("$sakServiceUri/ident2")
         logger.info("Sender identhendelse til {}", uri)
         try {
             val response = postForEntity<Ressurs<String>>(uri, personIdent)
