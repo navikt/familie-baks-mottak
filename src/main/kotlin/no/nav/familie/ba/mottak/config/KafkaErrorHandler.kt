@@ -5,8 +5,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.core.task.SimpleAsyncTaskExecutor
+import org.springframework.kafka.KafkaException
 import org.springframework.kafka.listener.CommonContainerStoppingErrorHandler
-import org.springframework.kafka.listener.ContainerStoppingErrorHandler
 import org.springframework.kafka.listener.MessageListenerContainer
 import org.springframework.stereotype.Component
 import java.time.Duration
@@ -75,7 +75,7 @@ class KafkaErrorHandler : CommonContainerStoppingErrorHandler() {
             }
         }
         LOGGER.warn("Stopper kafka container for {} i {}", topic, Duration.ofMillis(stopTime).toString())
-        super.handleRemaining(e, records, consumer, container)
+        throw KafkaException("Stopper kafka", KafkaException.Level.INFO, e)
     }
 
     companion object {
