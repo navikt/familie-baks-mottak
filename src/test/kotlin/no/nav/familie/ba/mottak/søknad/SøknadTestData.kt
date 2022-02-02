@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.søknad
 
+import no.nav.familie.ba.mottak.søknad.domene.Søker
 import no.nav.familie.ba.mottak.søknad.domene.SøknadNewWip
 import no.nav.familie.kontrakter.ba.søknad.SIVILSTANDTYPE
 import no.nav.familie.kontrakter.ba.søknad.SøknadAdresse
@@ -38,6 +39,30 @@ object SøknadTestData {
             spørsmål = mapOf(),
             nåværendeSamboer = null,
             tidligereSamboere = listOf()
+        )
+    }
+
+    fun søkerV7(): Søker {
+        return Søker(
+            navn = søknadsfelt("navn", "Navn Navnessen"),
+            ident = søknadsfelt("fødselsnummer", "1234578901"),
+            statsborgerskap = søknadsfelt("statsborgerskap", listOf("NOR")),
+            adresse = søknadsfelt(
+                "adresse",
+                SøknadAdresse(
+                    adressenavn = null,
+                    postnummer = null,
+                    husbokstav = null,
+                    bruksenhetsnummer = null,
+                    husnummer = null,
+                    poststed = null
+                )
+            ),
+            sivilstand = søknadsfelt("sivilstand", SIVILSTANDTYPE.GIFT),
+            spørsmål = mapOf(),
+            nåværendeSamboer = null,
+            tidligereSamboere = listOf(),
+            arbeidsperioderUtland = listOf()
         )
     }
 
@@ -95,7 +120,7 @@ object SøknadTestData {
     fun søknadV7(): SøknadNewWip = SøknadNewWip(
         kontraktVersjon = 7,
         søknadstype = Søknadstype.ORDINÆR,
-        søker = søker(),
+        søker = søkerV7(),
         barn = barn(),
         spørsmål = mapOf(),
         dokumentasjon = listOf(

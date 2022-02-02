@@ -1,11 +1,15 @@
 package no.nav.familie.ba.mottak.søknad.domene
 
+import no.nav.familie.kontrakter.ba.søknad.SIVILSTANDTYPE
+import no.nav.familie.kontrakter.ba.søknad.SøknadAdresse
 import no.nav.familie.kontrakter.ba.søknad.v4.Locale
+import no.nav.familie.kontrakter.ba.søknad.v4.NåværendeSamboer
 import no.nav.familie.kontrakter.ba.søknad.v4.SpørsmålId
-import no.nav.familie.kontrakter.ba.søknad.v4.Søker
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
+import no.nav.familie.kontrakter.ba.søknad.v4.TidligereSamboer
+import no.nav.familie.kontrakter.ba.søknad.v4.Utenlandsopphold
 import no.nav.familie.kontrakter.ba.søknad.v6.Barn
 
 /**
@@ -23,3 +27,25 @@ data class SøknadNewWip(
     val teksterUtenomSpørsmål: Map<SpørsmålId, Map<Locale, String>>,
     val originalSpråk: Locale
 )
+
+data class Søker(
+    val ident: Søknadsfelt<String>,
+    val navn: Søknadsfelt<String>,
+    val statsborgerskap: Søknadsfelt<List<String>>,
+    val adresse: Søknadsfelt<SøknadAdresse>,
+    val sivilstand: Søknadsfelt<SIVILSTANDTYPE>,
+    val spørsmål: Map<String, Søknadsfelt<Any>>,
+    val nåværendeSamboer: Søknadsfelt<NåværendeSamboer>?,
+    val tidligereSamboere: List<Søknadsfelt<TidligereSamboer>>,
+    val utenlandsperioder: List<Søknadsfelt<Utenlandsopphold>> = listOf(),
+    val arbeidsperioderUtland: List<Søknadsfelt<Arbeidsperiode>> = listOf()
+)
+
+data class Arbeidsperiode(
+    val arbeidsperiodeAvsluttet: Søknadsfelt<String?>,
+    val arbeidsperiodeland: Søknadsfelt<String?>,
+    val arbeidsgiver: Søknadsfelt<String?>,
+    val fraDatoArbeidsperiode: Søknadsfelt<String?>,
+    val tilDatoArbeidsperiode: Søknadsfelt<String?>,
+)
+
