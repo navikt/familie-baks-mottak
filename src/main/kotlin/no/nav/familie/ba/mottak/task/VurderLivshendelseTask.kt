@@ -71,7 +71,6 @@ class VurderLivshendelseTask(
                     }")
                     berørteBrukereIBaSak.forEach {
                         if (opprettEllerOppdaterVurderLivshendelseOppgave(DØDSFALL, it, personIdent, task)) {
-                            log.error("Mottatt dødsfallshendelse på sak i BA-sak. Få saksbehandler til å se på oppgave av typen VurderLivshendelse") // TODO midlertidig error logg til man har fått dette inn i saksbehandlersrutinen.
                             oppgaveOpprettetDødsfallCounter.increment()
                         }
                     }
@@ -84,7 +83,6 @@ class VurderLivshendelseTask(
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-utflytting")
                 finnBrukereMedSakRelatertTilPerson(personIdent, pdlPersonData).forEach {
                     if (opprettEllerOppdaterVurderLivshendelseOppgave(UTFLYTTING, it, personIdent, task)) {
-                        log.error("Mottatt utflyttingshendelse på sak i BA-sak. Få saksbehandler til å se på oppgave av typen VurderLivshendelse") // TODO midlertidig error logg til man har fått dette inn i saksbehandlersrutinen.
                         oppgaveOpprettetUtflyttingCounter.increment()
                     }
                 }
