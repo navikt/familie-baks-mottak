@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.core.task.SimpleAsyncTaskExecutor
 import org.springframework.kafka.KafkaException
 import org.springframework.kafka.listener.CommonContainerStoppingErrorHandler
+import org.springframework.kafka.listener.ListenerUtils
 import org.springframework.kafka.listener.MessageListenerContainer
 import org.springframework.stereotype.Component
 import java.time.Duration
@@ -33,20 +34,16 @@ class KafkaErrorHandler : CommonContainerStoppingErrorHandler() {
         Thread.sleep(1000)
 
         if (records.isNullOrEmpty()) {
-            LOGGER.error("Feil ved konsumering av melding. Ingen records. ${consumer.subscription()}", e)
+            LOGGER.warn("Feil ved konsumering av melding. Ingen records. ${consumer.subscription()}", e)
             scheduleRestart(e,
-                            records,
-                            consumer,
                             container,
                             "Ukjent topic")
         } else {
             records.first().run {
-                LOGGER.error("Feil ved konsumering av melding fra ${this.topic()}. id ${this.key()}, " +
+                LOGGER.warn("Feil ved konsumering av melding fra ${this.topic()}. id ${this.key()}, " +
                              "offset: ${this.offset()}, partition: ${this.partition()}")
-                SECURE_LOGGER.error("${this.topic()} - Problemer med prosessering av $records", e)
+                SECURE_LOGGER.warn("${this.topic()} - Problemer med prosessering av $records", e)
                 scheduleRestart(e,
-                                records,
-                                consumer,
                                 container,
                                 this.topic())
             }
@@ -54,36 +51,52 @@ class KafkaErrorHandler : CommonContainerStoppingErrorHandler() {
     }
 
     private fun scheduleRestart(e: Exception,
-                                records: List<ConsumerRecord<*, *>>? = null,
-                                consumer: Consumer<*, *>,
                                 container: MessageListenerContainer,
                                 topic: String) {
         val now = System.currentTimeMillis()
-        if (now - lastError.getAndSet(now) > COUNTER_RESET_TIME) {
+        if (now - lastError.getAndSet(now) > COUNTER_RESET_TIME) { //Sjekker om perioden som det ventes er større enn counter_reset_time
+            LOGGER.error("Feil ved prosessering av kafkamelding for $topic. Container har restartet ${counter.get()} ganger og " +
+                                 "man må se på hvorfor record ikke kan leses. " +
+                                 "Hvis denne meldingen gjentar seg hver $LONG_SLEEP så klarer ikke tjenesten å hente seg inn")
             counter.set(0)
         }
         val numErrors = counter.incrementAndGet()
         val stopTime =
-                if (numErrors > SLOW_ERROR_COUNT) LONG else SHORT * numErrors
+                if (numErrors > SLOW_ERROR_COUNT) LONG_SLEEP else SHORT_SLEEP * numErrors
         executor.execute {
             try {
                 Thread.sleep(stopTime)
-                LOGGER.warn("Starter kafka container for {}", topic)
+                LOGGER.info("Starter kafka container for $topic")
                 container.start()
             } catch (exception: Exception) {
                 LOGGER.error("Feil oppstod ved venting og oppstart av kafka container", exception)
             }
         }
-        LOGGER.warn("Stopper kafka container for {} i {}", topic, Duration.ofMillis(stopTime).toString())
-        throw KafkaException("Stopper kafka", KafkaException.Level.INFO, e)
+        stopContainer(e, container, stopTime, topic) //i stedet for stopContainer i handleRemaining i parent som kaster error
+    }
+
+    /**
+     * Stopper container. Hentet fra parent, men denne kaster WARN i stedet for ERROR for å begrense alarmer
+     */
+    private fun stopContainer(e: Exception, container: MessageListenerContainer, stopTime: Long, topic: String) {
+        this.executor.execute {
+                container.stop {}
+        }
+        // isRunning is false before the container.stop() waits for listener thread
+        try {
+            ListenerUtils.stoppableSleep(container, 10000) // NOSONAR
+        } catch (e: InterruptedException) {
+            Thread.currentThread().interrupt()
+        }
+        throw KafkaException("Stopper kafka container for $topic i ${Duration.ofMillis(stopTime)}", KafkaException.Level.WARN, e)
     }
 
     companion object {
-        private val LONG = Duration.ofHours(3).toMillis()
-        private val SHORT = Duration.ofSeconds(20).toMillis()
+        private val LONG_SLEEP = Duration.ofHours(3).toMillis()
+        private val SHORT_SLEEP = Duration.ofSeconds(20).toMillis()
         private const val SLOW_ERROR_COUNT = 10
         private val COUNTER_RESET_TIME =
-                SHORT * SLOW_ERROR_COUNT * 2
+                SHORT_SLEEP * SLOW_ERROR_COUNT * 2 //10 min
     }
 
     init {

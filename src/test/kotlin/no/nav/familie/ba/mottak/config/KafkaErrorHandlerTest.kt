@@ -11,10 +11,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.springframework.kafka.KafkaException
 import org.springframework.kafka.listener.MessageListenerContainer
+import java.time.Duration
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Disabled
 class KafkaErrorHandlerTest {
 
     @MockK(relaxed = true)
@@ -44,6 +45,7 @@ class KafkaErrorHandlerTest {
         val consumerRecord = ConsumerRecord("topic", 1, 1, 1, "record")
         assertThatThrownBy { errorHandler.handleRemaining(RuntimeException("Feil i test"), listOf(consumerRecord), consumer, container) }
                 .hasMessageContaining("Feil i test")
+                .isInstanceOf(KafkaException::class.java)
                 .hasCauseExactlyInstanceOf(RuntimeException::class.java)
     }
 
