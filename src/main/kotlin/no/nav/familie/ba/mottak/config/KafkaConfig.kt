@@ -28,7 +28,7 @@ class KafkaConfig {
     @Bean
     fun kafkaIdenthendelseListenerContainerFactory(
         properties: KafkaProperties,
-        kafkaErrorHandler: KafkaErrorHandler,
+        kafkaRestartingErrorHandler: KafkaRestartingErrorHandler,
         environment: Environment
     ): ConcurrentKafkaListenerContainerFactory<String, Aktor> {
         properties.properties.put("specific.avro.reader", "true")
@@ -40,14 +40,14 @@ class KafkaConfig {
                 it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = OffsetResetStrategy.LATEST.toString().lowercase()
             }
         )
-        factory.setCommonErrorHandler(kafkaErrorHandler)
+        factory.setCommonErrorHandler(kafkaRestartingErrorHandler)
         return factory
     }
 
     @Bean
     fun kafkaLeesahListenerContainerFactory(
         properties: KafkaProperties,
-        kafkaErrorHandler: KafkaErrorHandler,
+        kafkaRestartingErrorHandler: KafkaRestartingErrorHandler,
         environment: Environment
     ): ConcurrentKafkaListenerContainerFactory<Int, GenericRecord> {
         val factory = ConcurrentKafkaListenerContainerFactory<Int, GenericRecord>()
@@ -58,14 +58,14 @@ class KafkaConfig {
                 it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = OffsetResetStrategy.EARLIEST.toString().lowercase()
             }
         )
-        factory.setCommonErrorHandler(kafkaErrorHandler)
+        factory.setCommonErrorHandler(kafkaRestartingErrorHandler)
         return factory
     }
 
     @Bean
     fun kafkaJournalføringHendelseListenerContainerFactory(
         properties: KafkaProperties,
-        kafkaErrorHandler: KafkaErrorHandler
+        kafkaRestartingErrorHandler: KafkaRestartingErrorHandler
     ): ConcurrentKafkaListenerContainerFactory<Long, JournalfoeringHendelseRecord> {
         properties.properties.put("specific.avro.reader", "true")
         val factory = ConcurrentKafkaListenerContainerFactory<Long, JournalfoeringHendelseRecord>()
@@ -76,7 +76,7 @@ class KafkaConfig {
                 it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = OffsetResetStrategy.LATEST.toString().lowercase()
             }
         )
-        factory.setCommonErrorHandler(kafkaErrorHandler)
+        factory.setCommonErrorHandler(kafkaRestartingErrorHandler)
         return factory
     }
 }

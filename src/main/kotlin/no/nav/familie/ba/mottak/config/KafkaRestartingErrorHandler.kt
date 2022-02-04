@@ -16,12 +16,12 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 
 /**
- * hentet fra pensr
+ * hentet fra pensr, og skrevet om litt
  */
 @Component
-class KafkaErrorHandler : CommonContainerStoppingErrorHandler() {
+class KafkaRestartingErrorHandler : CommonContainerStoppingErrorHandler() {
 
-    val LOGGER: Logger = LoggerFactory.getLogger(KafkaErrorHandler::class.java)
+    val LOGGER: Logger = LoggerFactory.getLogger(KafkaRestartingErrorHandler::class.java)
     val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
 
     private val executor: Executor
@@ -55,9 +55,12 @@ class KafkaErrorHandler : CommonContainerStoppingErrorHandler() {
                                 topic: String) {
         val now = System.currentTimeMillis()
         if (now - lastError.getAndSet(now) > COUNTER_RESET_TIME) { //Sjekker om perioden som det ventes er større enn counter_reset_time
-            LOGGER.error("Feil ved prosessering av kafkamelding for $topic. Container har restartet ${counter.get()} ganger og " +
+            if (counter.get() > 0) {
+                LOGGER.error("Feil ved prosessering av kafkamelding for $topic. Container har restartet ${counter.get()} ganger og " +
                                  "man må se på hvorfor record ikke kan leses. " +
-                                 "Hvis denne meldingen gjentar seg hver $LONG_SLEEP så klarer ikke tjenesten å hente seg inn")
+                                 "Hvis denne meldingen gjentar seg hver ${Duration.ofMillis(LONG_SLEEP)} så klarer ikke tjenesten å hente seg inn")
+
+            }
             counter.set(0)
         }
         val numErrors = counter.incrementAndGet()
@@ -72,13 +75,15 @@ class KafkaErrorHandler : CommonContainerStoppingErrorHandler() {
                 LOGGER.error("Feil oppstod ved venting og oppstart av kafka container", exception)
             }
         }
-        stopContainer(e, container, stopTime, topic) //i stedet for stopContainer i handleRemaining i parent som kaster error
+        stopContainer(container) //i stedet for stopContainer i handleRemaining i parent som kaster error
+
+        throw KafkaException("Stopper kafka container ${counter.get()} for $topic i ${Duration.ofMillis(stopTime)} antall feil $numErrors", KafkaException.Level.WARN, e)
     }
 
     /**
      * Stopper container. Hentet fra parent, men denne kaster WARN i stedet for ERROR for å begrense alarmer
      */
-    private fun stopContainer(e: Exception, container: MessageListenerContainer, stopTime: Long, topic: String) {
+    private fun stopContainer(container: MessageListenerContainer) {
         this.executor.execute {
                 container.stop {}
         }
@@ -88,7 +93,6 @@ class KafkaErrorHandler : CommonContainerStoppingErrorHandler() {
         } catch (e: InterruptedException) {
             Thread.currentThread().interrupt()
         }
-        throw KafkaException("Stopper kafka container for $topic i ${Duration.ofMillis(stopTime)}", KafkaException.Level.WARN, e)
     }
 
     companion object {

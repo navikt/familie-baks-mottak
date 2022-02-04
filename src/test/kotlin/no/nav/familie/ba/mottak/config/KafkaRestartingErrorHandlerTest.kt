@@ -8,15 +8,13 @@ import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.kafka.KafkaException
 import org.springframework.kafka.listener.MessageListenerContainer
-import java.time.Duration
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class KafkaErrorHandlerTest {
+class KafkaRestartingErrorHandlerTest {
 
     @MockK(relaxed = true)
     lateinit var container: MessageListenerContainer;
@@ -25,7 +23,7 @@ class KafkaErrorHandlerTest {
     lateinit var consumer: Consumer<*, *>
 
     @InjectMockKs
-    lateinit var errorHandler: KafkaErrorHandler
+    lateinit var errorHandler: KafkaRestartingErrorHandler
 
     @BeforeEach
     internal fun setUp() {
