@@ -58,7 +58,7 @@ class IdenthendelseConsumer(
 
         } catch (e: RuntimeException) {
             identhendelseFeiletCounter.increment()
-            SECURE_LOGGER.error("Feil i prosessering av ident-hendelser", e)
+            SECURE_LOGGER.error("Feil i prosessering av ident-hendelser $consumerRecord", e)
             throw RuntimeException("Feil i prosessering av ident-hendelser")
         } finally {
             MDC.clear()

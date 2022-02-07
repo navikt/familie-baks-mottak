@@ -61,12 +61,14 @@ class SakClient @Autowired constructor(
             logger.info("Identhendelse sendt til sak. Status=${response.status}")
         } catch (e: RestClientResponseException) {
             logger.warn("Innsending av identhendelse til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
+            secureLogger.warn("Innsending av identhendelse til sak feilet for $personIdent. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
             throw IllegalStateException(
                 "Innsending av identhendelse til sak feilet. Status: " + e.rawStatusCode +
                     ", body: " + e.responseBodyAsString,
                 e
             )
         } catch (e: RestClientException) {
+            secureLogger.warn("Innsending av identhendelse til sak feilet for $personIdent", e)
             throw IllegalStateException("Innsending av identhendelse til sak feilet.", e)
         }
     }
