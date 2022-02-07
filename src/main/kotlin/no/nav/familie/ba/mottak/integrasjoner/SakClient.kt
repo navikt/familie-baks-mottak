@@ -51,7 +51,7 @@ class SakClient @Autowired constructor(
     @Retryable(
         value = [RuntimeException::class],
         maxAttempts = 3,
-        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}")
+        backoff = Backoff(delayExpression = "60000")
     )
     fun sendIdenthendelseTilSak(personIdent: PersonIdent) {
         val uri = URI.create("$sakServiceUri/ident")
@@ -59,8 +59,8 @@ class SakClient @Autowired constructor(
             val response = postForEntity<Ressurs<String>>(uri, personIdent)
             secureLogger.info("Identhendelse sendt til sak for $personIdent. Status=${response.status}")
         } catch (e: RestClientResponseException) {
-            logger.warn("Innsending av identhendelse til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
-            secureLogger.warn("Innsending av identhendelse til sak feilet for $personIdent. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
+            logger.info("Innsending av identhendelse til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
+            secureLogger.info("Innsending av identhendelse til sak feilet for $personIdent. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
             throw IllegalStateException(
                 "Innsending av identhendelse til sak feilet. Status: " + e.rawStatusCode +
                     ", body: " + e.responseBodyAsString,
