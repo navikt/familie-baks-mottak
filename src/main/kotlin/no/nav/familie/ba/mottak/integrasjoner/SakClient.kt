@@ -55,10 +55,9 @@ class SakClient @Autowired constructor(
     )
     fun sendIdenthendelseTilSak(personIdent: PersonIdent) {
         val uri = URI.create("$sakServiceUri/ident")
-        logger.info("Sender identhendelse til {}", uri)
         try {
             val response = postForEntity<Ressurs<String>>(uri, personIdent)
-            logger.info("Identhendelse sendt til sak. Status=${response.status}")
+            secureLogger.info("Identhendelse sendt til sak for $personIdent. Status=${response.status}")
         } catch (e: RestClientResponseException) {
             logger.warn("Innsending av identhendelse til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
             secureLogger.warn("Innsending av identhendelse til sak feilet for $personIdent. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
