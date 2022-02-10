@@ -38,7 +38,11 @@ data class Søker(
     val nåværendeSamboer: Søknadsfelt<NåværendeSamboer>?,
     val tidligereSamboere: List<Søknadsfelt<TidligereSamboer>>,
     val utenlandsperioder: List<Søknadsfelt<Utenlandsopphold>> = listOf(),
-    val arbeidsperioderUtland: List<Søknadsfelt<Arbeidsperiode>> = listOf()
+    val andreUtbetalingsperioder: List<Søknadsfelt<Utbetalingsperiode>> = listOf(),
+    val arbeidsperioderUtland: List<Søknadsfelt<Arbeidsperiode>> = listOf(),
+    val arbeidsperioderNorge: List<Søknadsfelt<Arbeidsperiode>> = listOf(),
+    val pensjonsperioderNorge: List<Søknadsfelt<Pensjonsperiode>> = listOf(),
+    val pensjonsperioderUtland: List<Søknadsfelt<Pensjonsperiode>> = listOf()
 )
 
 data class Arbeidsperiode(
@@ -49,3 +53,16 @@ data class Arbeidsperiode(
     val tilDatoArbeidsperiode: Søknadsfelt<String?>,
 )
 
+data class Pensjonsperiode(
+    val mottarPensjonNå: Søknadsfelt<String?>,
+    val pensjonsland: Søknadsfelt<String?>,
+    val pensjonFra: Søknadsfelt<String?>,
+    val pensjonTil: Søknadsfelt<String?>,
+)
+
+data class Utbetalingsperiode(
+    val fårUtbetalingNå: Søknadsfelt<String?>,
+    val utbetalingLand: Søknadsfelt<String?>,
+    val utbetalingFraDato: Søknadsfelt<String?>,
+    val utbetalingTilDato: Søknadsfelt<String?>,
+)
