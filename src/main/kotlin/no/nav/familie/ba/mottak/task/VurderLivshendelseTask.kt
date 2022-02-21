@@ -18,6 +18,7 @@ import no.nav.familie.ba.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.ba.mottak.integrasjoner.RestUtvidetBehandling
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.DØDSFALL
+import no.nav.familie.ba.mottak.task.VurderLivshendelseType.SIVILSTAND
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.UTFLYTTING
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.objectMapper
@@ -54,6 +55,7 @@ class VurderLivshendelseTask(
     val secureLog: Logger = LoggerFactory.getLogger("secureLogger")
     val oppgaveOpprettetDødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall.oppgave.opprettet")
     val oppgaveOpprettetUtflyttingCounter: Counter = Metrics.counter("barnetrygd.utflytting.oppgave.opprettet")
+    val oppgaveOpprettetSivilstandCounter: Counter = Metrics.counter("barnetrygd.sivilstand.oppgave.opprettet")
 
     override fun doTask(task: Task) {
         val payload = objectMapper.readValue(task.payload, VurderLivshendelseTaskDTO::class.java)
@@ -85,6 +87,23 @@ class VurderLivshendelseTask(
                     if (opprettEllerOppdaterVurderLivshendelseOppgave(UTFLYTTING, it, personIdent, task)) {
                         oppgaveOpprettetUtflyttingCounter.increment()
                     }
+                }
+            }
+            SIVILSTAND -> {
+                val aktivFaksak = sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
+                    secureLog.info("Sivilstandhendelse: Hentet Fagsak for person ${personIdent}: ${it.fagsakId} ${it.fagsakStatus}")
+                    it.fagsakStatus != AVSLUTTET
+                }.singleOrNull()
+
+                if (aktivFaksak != null) {
+                    val aktørId = aktørClient.hentAktørId(personIdent)
+                    val oppgave = opprettOppgavePåAktør(aktørId, aktivFaksak.fagsakId, SIVILSTAND.beskrivelse)
+                    task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
+                    taskRepository.saveAndFlush(task)
+                    secureLog.info(
+                        "Opprettet VurderLivshendelse-oppgave (${oppgave.oppgaveId}) for ${SIVILSTAND}-hendelse (person ident:  $personIdent)" +
+                                ", beskrivelsestekst: ${SIVILSTAND.beskrivelse}"
+                    )
                 }
             }
             else -> log.debug("Behandlinger enda ikke livshendelse av type ${payload.type}")
