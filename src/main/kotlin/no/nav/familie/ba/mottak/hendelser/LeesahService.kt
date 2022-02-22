@@ -214,7 +214,7 @@ class LeesahService(
 
     private fun opprettTaskHvisSivilstandErGift(pdlHendelse: PdlHendelse) {
         if (pdlHendelse.sivilstand == SIVILSTAND_GIFT) {
-            opprettVurderLivshendelseTaskForHendelse(SIVILSTAND, pdlHendelse, LocalDateTime.now().plusMinutes(30))
+            opprettVurderLivshendelseTaskForHendelse(SIVILSTAND, pdlHendelse, pdlHendelse.sivilstandDato)
         } else {
             sivilstandIgnorertCounter.increment()
         }
@@ -269,12 +269,12 @@ class LeesahService(
 
     private fun opprettVurderLivshendelseTaskForHendelse(type: VurderLivshendelseType,
                                                          pdlHendelse: PdlHendelse,
-                                                         triggerTid: LocalDateTime = LocalDateTime.now()) {
+                                                         gyldigFom: LocalDate? = null) {
         log.info("opprett VurderLivshendelseTask for pdlHendelse (id= ${pdlHendelse.hendelseId})")
         Task.nyTaskMedTriggerTid(
             VurderLivshendelseTask.TASK_STEP_TYPE,
-            objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type)),
-            triggerTid,
+            objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type, gyldigFom)),
+            LocalDateTime.now().plusMinutes(30),
             Properties().apply {
                 this["ident"] = pdlHendelse.hentPersonident()
                 this["callId"] = pdlHendelse.hendelseId

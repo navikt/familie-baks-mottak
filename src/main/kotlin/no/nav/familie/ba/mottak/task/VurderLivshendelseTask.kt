@@ -35,6 +35,9 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 
 @Service
 @TaskStepBeskrivelse(
@@ -97,12 +100,16 @@ class VurderLivshendelseTask(
 
                 if (aktivFaksak != null) {
                     val aktørId = aktørClient.hentAktørId(personIdent)
-                    val oppgave = opprettOppgavePåAktør(aktørId, aktivFaksak.fagsakId, SIVILSTAND.beskrivelse)
+                    val dato = payload.gyldigFom?.let {
+                        it.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no")))
+                    }
+                    val beskrivelse = SIVILSTAND.beskrivelse.replace("(Dato)", dato ?: "ukjent dato")
+                    val oppgave = opprettOppgavePåAktør(aktørId, aktivFaksak.fagsakId, beskrivelse)
                     task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
                     taskRepository.saveAndFlush(task)
                     secureLog.info(
                         "Opprettet VurderLivshendelse-oppgave (${oppgave.oppgaveId}) for ${SIVILSTAND}-hendelse (person ident:  $personIdent)" +
-                                ", beskrivelsestekst: ${SIVILSTAND.beskrivelse}"
+                                ", beskrivelsestekst: $beskrivelse"
                     )
                 }
             }
@@ -297,11 +304,11 @@ class VurderLivshendelseTask(
         const val TASK_STEP_TYPE = "vurderLivshendelseTask"
     }
 }
-data class VurderLivshendelseTaskDTO(val personIdent: String, val type: VurderLivshendelseType)
+data class VurderLivshendelseTaskDTO(val personIdent: String, val type: VurderLivshendelseType, val gyldigFom: LocalDate? = null)
 
 enum class VurderLivshendelseType(val beskrivelse: String) {
     DØDSFALL("Dødsfall"),
-    SIVILSTAND("Sivilstand"),
+    SIVILSTAND("Endring i sivilstand. Bruker er registrert som gift fra (Dato)."),
     ADDRESSE("Addresse"),
     UTFLYTTING("Utflytting")
 }
