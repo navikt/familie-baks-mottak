@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.søknad
 
+import no.nav.familie.ba.mottak.søknad.domene.Barn as BarnV7
 import no.nav.familie.ba.mottak.søknad.domene.Søker
 import no.nav.familie.ba.mottak.søknad.domene.SøknadNewWip
 import no.nav.familie.kontrakter.ba.søknad.SIVILSTANDTYPE
@@ -117,11 +118,43 @@ object SøknadTestData {
         )
     }
 
+    fun barnV7(): List<BarnV7> {
+        return listOf(
+            BarnV7(
+                navn = søknadsfelt("Barnets fulle navn", "barn1"),
+                ident = søknadsfelt("Fødselsnummer", "12345678999"),
+                registrertBostedType = søknadsfelt("Skal ha samme adresse", RegistrertBostedType.REGISTRERT_ANNEN_ADRESSE),
+                alder = søknadsfelt("alder", "4 år"),
+                spørsmål = mapOf(),
+                utenlandsperioder = listOf(),
+                eøsBarnetrygdsperioder = listOf(),
+            ),
+            BarnV7(
+                navn = søknadsfelt("Barnets fulle navn", "barn2"),
+                ident = søknadsfelt("Fødselsnummer", "12345678987"),
+                registrertBostedType = søknadsfelt("Skal ha samme adresse", RegistrertBostedType.IKKE_FYLT_INN),
+                alder = søknadsfelt("alder", "1 år"),
+                spørsmål = mapOf(),
+                utenlandsperioder = listOf(),
+                eøsBarnetrygdsperioder = listOf(),
+            ),
+            BarnV7(
+                navn = søknadsfelt("Barnets fulle navn", "barn3"),
+                ident = søknadsfelt("Fødselsnummer", "12345678988"),
+                registrertBostedType = søknadsfelt("Skal ha samme adresse", RegistrertBostedType.REGISTRERT_SOKERS_ADRESSE),
+                alder = søknadsfelt("alder", "2 år"),
+                spørsmål = mapOf(),
+                utenlandsperioder = listOf(),
+                eøsBarnetrygdsperioder = listOf(),
+            )
+        )
+    }
+
     fun søknadV7(): SøknadNewWip = SøknadNewWip(
         kontraktVersjon = 7,
         søknadstype = Søknadstype.ORDINÆR,
         søker = søkerV7(),
-        barn = barn(),
+        barn = barnV7(),
         spørsmål = mapOf(),
         dokumentasjon = listOf(
             Søknaddokumentasjon(
