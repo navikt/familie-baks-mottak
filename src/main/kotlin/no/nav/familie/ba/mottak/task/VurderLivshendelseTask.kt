@@ -27,6 +27,7 @@ import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.kontrakter.felles.oppgave.StatusEnum
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
+import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND.GIFT
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -93,17 +94,24 @@ class VurderLivshendelseTask(
                 }
             }
             SIVILSTAND -> {
+                val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-sivilstand")
+                if (!harGyldigSivilstand(pdlPersonData)) {
+                    secureLog.info("Endringen til sivilstand GIFT for $personIdent er korrigert/annulert: $pdlPersonData")
+                    return
+                }
                 val aktivFaksak = sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
                     secureLog.info("Hentet Fagsak for person ${personIdent}: ${it.fagsakId} ${it.fagsakStatus}")
                     it.fagsakStatus != AVSLUTTET
                 }.singleOrNull()
 
                 if (aktivFaksak != null) {
-                    val aktørId = aktørClient.hentAktørId(personIdent)
-                    val formatertDato = payload.gyldigFom?.format(
+                    val sivilstand = pdlPersonData.sivilstand.first()
+                    val formatertDato = (sivilstand.gyldigFraOgMed ?: sivilstand.bekreftelsesdato)!!.format(
                         DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no"))
                     )
                     val beskrivelse = SIVILSTAND.beskrivelse + " fra " + (formatertDato ?: "ukjent dato")
+
+                    val aktørId = aktørClient.hentAktørId(personIdent)
                     val oppgave = søkEtterÅpenOppgavePåAktør(aktørId, SIVILSTAND)
                         ?: opprettOppgavePåAktør(aktørId, aktivFaksak.fagsakId, beskrivelse)
 
@@ -129,6 +137,15 @@ class VurderLivshendelseTask(
             }
             else -> log.debug("Behandlinger enda ikke livshendelse av type ${payload.type}")
         }
+    }
+
+    private fun harGyldigSivilstand(pdlPersonData: PdlPersonData): Boolean {
+        val sivilstand = pdlPersonData.sivilstand.firstOrNull()
+        if (sivilstand?.type == GIFT && (sivilstand.gyldigFraOgMed ?: sivilstand.bekreftelsesdato) == null) {
+            secureLog.info("Har mottatt sivilstandhendelse uten dato $pdlPersonData")
+            error("Har mottatt sivilstandhendelse uten dato")
+        }
+        return sivilstand?.type == GIFT
     }
 
     private fun finnBrukereMedSakRelatertTilPerson(

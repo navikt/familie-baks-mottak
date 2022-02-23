@@ -26,6 +26,7 @@ import no.nav.familie.ba.mottak.integrasjoner.RestMinimalFagsak
 import no.nav.familie.ba.mottak.integrasjoner.RestUtvidetBehandling
 import no.nav.familie.ba.mottak.integrasjoner.RestVisningBehandling
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
+import no.nav.familie.ba.mottak.integrasjoner.Sivilstand
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.DØDSFALL
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.SIVILSTAND
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.UTFLYTTING
@@ -34,6 +35,7 @@ import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
+import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND.GIFT
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -254,7 +256,13 @@ class VurderLivshendelseTaskTest {
                                 relatertPersonsRolle = FORELDERBARNRELASJONROLLE.BARN
                         )
                 ),
-                dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now()))
+                dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now())),
+                sivilstand = listOf(
+                    Sivilstand(
+                        type = GIFT,
+                        gyldigFraOgMed = LocalDate.now()
+                    )
+                )
         )
 
         every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns

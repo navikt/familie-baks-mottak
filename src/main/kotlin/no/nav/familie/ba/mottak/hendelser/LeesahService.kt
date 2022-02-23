@@ -17,15 +17,13 @@ import no.nav.familie.ba.mottak.task.VurderLivshendelseType.SIVILSTAND
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.UTFLYTTING
 import no.nav.familie.ba.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.kontrakter.felles.objectMapper
-import no.nav.familie.prosessering.domene.Avvikstype
-import no.nav.familie.prosessering.domene.Status
+import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND.GIFT
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.env.Environment
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -201,11 +199,8 @@ class LeesahService(
             else -> {
                 logHendelse(pdlHendelse, "Ikke av type OPPRETTET.")
                 when (pdlHendelse.endringstype) {
-                    ANNULLERT -> sivilstandAnnullertCounter.increment()
-                    KORRIGERT -> sivilstandKorrigertCounter.increment().also { opprettTaskHvisSivilstandErGift(pdlHendelse) }
-                }
-                if (pdlHendelse.tidligereHendelseId != null) {
-                    avvikshåndterTidligereTask(pdlHendelse)
+                    ANNULLERT -> sivilstandOpprettetCounter.increment()
+                    KORRIGERT -> sivilstandOpprettetCounter.increment()
                 }
             }
         }
@@ -213,22 +208,10 @@ class LeesahService(
     }
 
     private fun opprettTaskHvisSivilstandErGift(pdlHendelse: PdlHendelse) {
-        if (pdlHendelse.sivilstand == SIVILSTAND_GIFT) {
+        if (pdlHendelse.sivilstand == GIFT.name) {
             opprettVurderLivshendelseTaskForHendelse(SIVILSTAND, pdlHendelse, pdlHendelse.sivilstandDato)
         } else {
             sivilstandIgnorertCounter.increment()
-        }
-    }
-
-    private fun avvikshåndterTidligereTask(pdlHendelse: PdlHendelse) {
-        taskRepository.finnTasksMedStatus(
-            listOf(Status.KLAR_TIL_PLUKK, Status.UBEHANDLET, Status.FEILET),
-            Pageable.unpaged()
-        ).filter {
-            it.callId == pdlHendelse.tidligereHendelseId && it.taskStepType == VurderLivshendelseTask.TASK_STEP_TYPE
-        }.forEach {
-            it.avvikshåndter(avvikstype = Avvikstype.ANNET, årsak = pdlHendelse.endringstype, endretAv = "VL")
-            taskRepository.save(it)
         }
     }
 
@@ -274,7 +257,7 @@ class LeesahService(
         Task.nyTaskMedTriggerTid(
             type = VurderLivshendelseTask.TASK_STEP_TYPE,
             payload = objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type, gyldigFom)),
-            triggerTid = LocalDateTime.now().plusHours(1),
+            triggerTid = LocalDateTime.now().run { if (environment.activeProfiles.contains("prod")) this.plusHours(1) else this },
         ).apply {
             metadata["ident"] = pdlHendelse.hentPersonident()
             metadata["callId"] = pdlHendelse.hendelseId
@@ -309,6 +292,5 @@ class LeesahService(
         const val OPPLYSNINGSTYPE_FØDSEL = "FOEDSEL_V1"
         const val OPPLYSNINGSTYPE_UTFLYTTING = "UTFLYTTING_FRA_NORGE"
         const val OPPLYSNINGSTYPE_SIVILSTAND = "SIVILSTAND_V1"
-        const val SIVILSTAND_GIFT = "GIFT"
     }
 }
