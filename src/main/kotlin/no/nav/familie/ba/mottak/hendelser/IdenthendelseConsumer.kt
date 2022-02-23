@@ -39,6 +39,7 @@ class IdenthendelseConsumer(
     @Transactional
     fun listen(consumerRecord: ConsumerRecord<String, Aktor?>, ack: Acknowledgment) {
         try {
+            Thread.sleep(60000) //Sender man med en gang, så får man Person ikke funnet fra PDL når ba-sak gjør filtrering. Venter derfor 1 minutt
             MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
             SECURE_LOGGER.info("Har mottatt ident-hendelse $consumerRecord")
 
@@ -58,7 +59,8 @@ class IdenthendelseConsumer(
 
         } catch (e: RuntimeException) {
             identhendelseFeiletCounter.increment()
-            SECURE_LOGGER.error("Feil i prosessering av ident-hendelser", e)
+            log.warn("Feil i prosessering av ident-hendelser", e)
+            SECURE_LOGGER.warn("Feil i prosessering av ident-hendelser $consumerRecord", e)
             throw RuntimeException("Feil i prosessering av ident-hendelser")
         } finally {
             MDC.clear()

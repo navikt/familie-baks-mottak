@@ -1,29 +1,15 @@
 package no.nav.familie.ba.mottak.hendelser
 
-import io.mockk.MockKAnnotations
-import io.mockk.clearAllMocks
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
-import io.mockk.slot
-import io.mockk.verify
 import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.Hendelseslogg
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
-import no.nav.familie.ba.mottak.integrasjoner.AktørClient
-import no.nav.familie.ba.mottak.integrasjoner.Bruker
-import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType
+import no.nav.familie.ba.mottak.integrasjoner.*
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.LØPENDE
-import no.nav.familie.ba.mottak.integrasjoner.InfotrygdBarnetrygdClient
-import no.nav.familie.ba.mottak.integrasjoner.Journalpost
-import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
-import no.nav.familie.ba.mottak.integrasjoner.Journalposttype
-import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
-import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
-import no.nav.familie.ba.mottak.integrasjoner.RestFagsakDeltager
-import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.ba.mottak.task.JournalhendelseRutingTask
 import no.nav.familie.ba.mottak.task.OpprettJournalføringOppgaveTask
 import no.nav.familie.ba.mottak.task.SendTilSakTask
@@ -314,7 +300,7 @@ class JournalføringHendelseServiceTest {
                                             OFFSET,
                                             42L, opprettRecord(JOURNALPOST_PAPIRSØKNAD))
         every {
-            mockHendelsesloggRepository.existsByHendelseIdAndConsumer("hendelseId", HendelseConsumer.JOURNAL)
+            mockHendelsesloggRepository.existsByHendelseIdAndConsumer("hendelseId", HendelseConsumer.JOURNAL_AIVEN)
         } returns true
 
         service.prosesserNyHendelse(consumerRecord, ack)
@@ -344,9 +330,9 @@ class JournalføringHendelseServiceTest {
         assertThat(slot.captured).isNotNull
         assertThat(slot.captured.offset).isEqualTo(OFFSET)
         assertThat(slot.captured.hendelseId).isEqualTo(HENDELSE_ID)
-        assertThat(slot.captured.consumer).isEqualTo(HendelseConsumer.JOURNAL)
+        assertThat(slot.captured.consumer).isEqualTo(HendelseConsumer.JOURNAL_AIVEN)
         assertThat(slot.captured.metadata["journalpostId"]).isEqualTo(JOURNALPOST_PAPIRSØKNAD)
-        assertThat(slot.captured.metadata["hendelsesType"]).isEqualTo("MidlertidigJournalført")
+        assertThat(slot.captured.metadata["hendelsesType"]).isEqualTo("JournalpostMottatt")
     }
 
     @Test
@@ -382,7 +368,7 @@ class JournalføringHendelseServiceTest {
     }
 
     private fun opprettRecord(journalpostId: String,
-                              hendelseType: String = "MidlertidigJournalført",
+                              hendelseType: String = "JournalpostMottatt",
                               temaNytt: String = "BAR"): JournalfoeringHendelseRecord {
         return JournalfoeringHendelseRecord(HENDELSE_ID,
                                             1,

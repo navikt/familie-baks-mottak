@@ -14,6 +14,7 @@ import org.springframework.kafka.config.KafkaListenerConfigUtils
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.listener.ContainerProperties
+import java.time.Duration
 
 
 @Configuration
@@ -25,22 +26,24 @@ import org.springframework.kafka.listener.ContainerProperties
 class KafkaAivenConfig(val environment: Environment) {
 
     @Bean
-    fun kafkaAivenHendelseListenerContainerFactory(kafkaErrorHandler: KafkaErrorHandler)
+    fun kafkaAivenHendelseListenerContainerFactory(kafkaRestartingErrorHandler: KafkaRestartingErrorHandler)
             : ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
+        factory.containerProperties.authExceptionRetryInterval = Duration.ofSeconds(2)
         factory.consumerFactory = DefaultKafkaConsumerFactory(consumerConfigs())
-        factory.setErrorHandler(kafkaErrorHandler)
+        factory.setCommonErrorHandler(kafkaRestartingErrorHandler)
         return factory
     }
 
     @Bean
-    fun kafkaAivenHendelseListenerAvroContainerFactory(kafkaErrorHandler: KafkaErrorHandler)
+    fun kafkaAivenHendelseListenerAvroContainerFactory(kafkaRestartingErrorHandler: KafkaRestartingErrorHandler)
             : ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
+        factory.containerProperties.authExceptionRetryInterval = Duration.ofSeconds(2)
         factory.consumerFactory = DefaultKafkaConsumerFactory(consumerConfigsAvro())
-        factory.setErrorHandler(kafkaErrorHandler)
+        factory.setCommonErrorHandler(kafkaRestartingErrorHandler)
         return factory
     }
 

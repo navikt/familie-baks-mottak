@@ -193,7 +193,7 @@ class JournalhendelseService(
 
     companion object {
 
-        private val GYLDIGE_HENDELSE_TYPER = arrayOf("MidlertidigJournalført", "JournalpostMottatt", "TemaEndret") // MidlertidigJournalført -> JournalpostMottatt på aiven TODO MidlertidigJournalført kan fjernes når vi er over på aiven
-        private val CONSUMER_JOURNAL = HendelseConsumer.JOURNAL
+        private val GYLDIGE_HENDELSE_TYPER = arrayOf("JournalpostMottatt", "TemaEndret")
+        private val CONSUMER_JOURNAL = HendelseConsumer.JOURNAL_AIVEN
     }
 }
