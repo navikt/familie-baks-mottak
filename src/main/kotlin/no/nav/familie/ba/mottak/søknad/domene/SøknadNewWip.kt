@@ -76,7 +76,7 @@ data class Barn(
     val spørsmål: Map<String, Søknadsfelt<Any>>,
     val utenlandsperioder: List<Søknadsfelt<Utenlandsopphold>> = listOf(),
     val andreForelder: AndreForelder? = null,
-    val eøsBarnetrygdsperioder: List<Søknadsfelt<EøsBarnetrygdsperiode>>
+    val eøsBarnetrygdsperioder: List<Søknadsfelt<EøsBarnetrygdsperiode>> = listOf(),
 )
 
 data class AndreForelder(

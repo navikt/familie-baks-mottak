@@ -170,9 +170,9 @@
           "nn": "Får du eller har du fått pensjon frå Noreg?"
         },
         "verdi": {
-          "nb": "NEI",
-          "nn": "NEI",
-          "en": "NEI"
+          "nb": "JA",
+          "nn": "JA",
+          "en": "JA"
         }
       },
       "andreUtbetalinger": {
@@ -194,14 +194,172 @@
           "nn": "Har du sambuar no?"
         },
         "verdi": {
-          "nb": "NEI",
-          "nn": "NEI",
-          "en": "NEI"
+          "nb": "JA",
+          "nn": "JA",
+          "en": "JA"
         }
       }
     },
     "tidligereSamboere": [],
-    "nåværendeSamboer": null,
+    "nåværendeSamboer": {
+      "label": {
+        "en": "Cohabitant",
+        "nb": "Samboer",
+        "nn": "Sambuar"
+      },
+      "verdi": {
+        "nb": {
+          "navn": {
+            "label": {
+              "en": "Name of your cohabiting partner",
+              "nb": "Samboerens navn",
+              "nn": "Sambuaren sitt namn"
+            },
+            "verdi": {
+              "nb": "nora",
+              "nn": "nora",
+              "en": "nora"
+            }
+          },
+          "ident": {
+            "label": {
+              "en": "Norwegian National identity number or D number",
+              "nb": "Fødselsnummer eller d-nummer",
+              "nn": "Fødselsnummer eller d-nummer"
+            },
+            "verdi": {
+              "en": "I don't know the National identity number or-D number",
+              "nb": "Jeg kjenner ikke fødselsnummer eller d-nummer",
+              "nn": "Eg kjenner ikkje fødselsnummer eller d-nummer"
+            }
+          },
+          "fødselsdato": {
+            "label": {
+              "en": "Date of birth",
+              "nb": "Fødselsdato",
+              "nn": "Fødselsdato"
+            },
+            "verdi": {
+              "nb": "2022-02-01",
+              "nn": "2022-02-01",
+              "en": "2022-02-01"
+            }
+          },
+          "samboerFraDato": {
+            "label": {
+              "en": "When did you start living together?",
+              "nb": "Når startet samboerforholdet?",
+              "nn": "Når starta sambuarforholdet?"
+            },
+            "verdi": {
+              "nb": "2021-12-08",
+              "nn": "2021-12-08",
+              "en": "2021-12-08"
+            }
+          }
+        },
+        "nn": {
+          "navn": {
+            "label": {
+              "en": "Name of your cohabiting partner",
+              "nb": "Samboerens navn",
+              "nn": "Sambuaren sitt namn"
+            },
+            "verdi": {
+              "nb": "nora",
+              "nn": "nora",
+              "en": "nora"
+            }
+          },
+          "ident": {
+            "label": {
+              "en": "Norwegian National identity number or D number",
+              "nb": "Fødselsnummer eller d-nummer",
+              "nn": "Fødselsnummer eller d-nummer"
+            },
+            "verdi": {
+              "en": "I don't know the National identity number or-D number",
+              "nb": "Jeg kjenner ikke fødselsnummer eller d-nummer",
+              "nn": "Eg kjenner ikkje fødselsnummer eller d-nummer"
+            }
+          },
+          "fødselsdato": {
+            "label": {
+              "en": "Date of birth",
+              "nb": "Fødselsdato",
+              "nn": "Fødselsdato"
+            },
+            "verdi": {
+              "nb": "2022-02-01",
+              "nn": "2022-02-01",
+              "en": "2022-02-01"
+            }
+          },
+          "samboerFraDato": {
+            "label": {
+              "en": "When did you start living together?",
+              "nb": "Når startet samboerforholdet?",
+              "nn": "Når starta sambuarforholdet?"
+            },
+            "verdi": {
+              "nb": "2021-12-08",
+              "nn": "2021-12-08",
+              "en": "2021-12-08"
+            }
+          }
+        },
+        "en": {
+          "navn": {
+            "label": {
+              "en": "Name of your cohabiting partner",
+              "nb": "Samboerens navn",
+              "nn": "Sambuaren sitt namn"
+            },
+            "verdi": {
+              "nb": "nora",
+              "nn": "nora",
+              "en": "nora"
+            }
+          },
+          "ident": {
+            "label": {
+              "en": "Norwegian National identity number or D number",
+              "nb": "Fødselsnummer eller d-nummer",
+              "nn": "Fødselsnummer eller d-nummer"
+            },
+            "verdi": {
+              "en": "I don't know the National identity number or-D number",
+              "nb": "Jeg kjenner ikke fødselsnummer eller d-nummer",
+              "nn": "Eg kjenner ikkje fødselsnummer eller d-nummer"
+            }
+          },
+          "fødselsdato": {
+            "label": {
+              "en": "Date of birth",
+              "nb": "Fødselsdato",
+              "nn": "Fødselsdato"
+            },
+            "verdi": {
+              "nb": "2022-02-01",
+              "nn": "2022-02-01",
+              "en": "2022-02-01"
+            }
+          },
+          "samboerFraDato": {
+            "label": {
+              "en": "When did you start living together?",
+              "nb": "Når startet samboerforholdet?",
+              "nn": "Når starta sambuarforholdet?"
+            },
+            "verdi": {
+              "nb": "2021-12-08",
+              "nn": "2021-12-08",
+              "en": "2021-12-08"
+            }
+          }
+        }
+      }
+    },
     "arbeidsperioderUtland": [
       {
         "label": {
@@ -242,9 +400,9 @@
                 "nn": "Arbeidsgjevar"
               },
               "verdi": {
-                "nb": "afaf",
-                "nn": "afaf",
-                "en": "afaf"
+                "nb": "arbeidsgiverer rrr ",
+                "nn": "arbeidsgiverer rrr ",
+                "en": "arbeidsgiverer rrr "
               }
             },
             "fraDatoArbeidsperiode": {
@@ -254,9 +412,9 @@
                 "nn": "Når starta arbeidsperioden?"
               },
               "verdi": {
-                "nb": "2022-02-15",
-                "nn": "2022-02-15",
-                "en": "2022-02-15"
+                "nb": "2022-02-01",
+                "nn": "2022-02-01",
+                "en": "2022-02-01"
               }
             },
             "tilDatoArbeidsperiode": {
@@ -266,9 +424,9 @@
                 "nn": "Når blei arbeidsperioden avslutta?"
               },
               "verdi": {
-                "nb": "2022-02-17",
-                "nn": "2022-02-17",
-                "en": "2022-02-17"
+                "nb": "2022-02-23",
+                "nn": "2022-02-23",
+                "en": "2022-02-23"
               }
             }
           },
@@ -304,9 +462,9 @@
                 "nn": "Arbeidsgjevar"
               },
               "verdi": {
-                "nb": "afaf",
-                "nn": "afaf",
-                "en": "afaf"
+                "nb": "arbeidsgiverer rrr ",
+                "nn": "arbeidsgiverer rrr ",
+                "en": "arbeidsgiverer rrr "
               }
             },
             "fraDatoArbeidsperiode": {
@@ -316,9 +474,9 @@
                 "nn": "Når starta arbeidsperioden?"
               },
               "verdi": {
-                "nb": "2022-02-15",
-                "nn": "2022-02-15",
-                "en": "2022-02-15"
+                "nb": "2022-02-01",
+                "nn": "2022-02-01",
+                "en": "2022-02-01"
               }
             },
             "tilDatoArbeidsperiode": {
@@ -328,9 +486,9 @@
                 "nn": "Når blei arbeidsperioden avslutta?"
               },
               "verdi": {
-                "nb": "2022-02-17",
-                "nn": "2022-02-17",
-                "en": "2022-02-17"
+                "nb": "2022-02-23",
+                "nn": "2022-02-23",
+                "en": "2022-02-23"
               }
             }
           },
@@ -366,9 +524,9 @@
                 "nn": "Arbeidsgjevar"
               },
               "verdi": {
-                "nb": "afaf",
-                "nn": "afaf",
-                "en": "afaf"
+                "nb": "arbeidsgiverer rrr ",
+                "nn": "arbeidsgiverer rrr ",
+                "en": "arbeidsgiverer rrr "
               }
             },
             "fraDatoArbeidsperiode": {
@@ -378,9 +536,9 @@
                 "nn": "Når starta arbeidsperioden?"
               },
               "verdi": {
-                "nb": "2022-02-15",
-                "nn": "2022-02-15",
-                "en": "2022-02-15"
+                "nb": "2022-02-01",
+                "nn": "2022-02-01",
+                "en": "2022-02-01"
               }
             },
             "tilDatoArbeidsperiode": {
@@ -390,9 +548,9 @@
                 "nn": "Når blei arbeidsperioden avslutta?"
               },
               "verdi": {
-                "nb": "2022-02-17",
-                "nn": "2022-02-17",
-                "en": "2022-02-17"
+                "nb": "2022-02-23",
+                "nn": "2022-02-23",
+                "en": "2022-02-23"
               }
             }
           }
@@ -425,9 +583,9 @@
                 "nn": "Kva land arbeidar du i?"
               },
               "verdi": {
-                "nb": "Danmark",
-                "nn": "Danmark",
-                "en": "Denmark"
+                "nb": "Afghanistan",
+                "nn": "Afghanistan",
+                "en": "Afghanistan"
               }
             },
             "arbeidsgiver": {
@@ -437,9 +595,9 @@
                 "nn": "Arbeidsgjevar"
               },
               "verdi": {
-                "nb": "fafa",
-                "nn": "fafa",
-                "en": "fafa"
+                "nb": null,
+                "nn": null,
+                "en": null
               }
             },
             "fraDatoArbeidsperiode": {
@@ -449,9 +607,9 @@
                 "nn": "Når starta arbeidsperioden?"
               },
               "verdi": {
-                "nb": "2022-02-16",
-                "nn": "2022-02-16",
-                "en": "2022-02-16"
+                "nb": null,
+                "nn": null,
+                "en": null
               }
             },
             "tilDatoArbeidsperiode": {
@@ -461,9 +619,9 @@
                 "nn": "Når avsluttast arbeidsperioden?"
               },
               "verdi": {
-                "en": "I don't know when the period of work is ending",
-                "nb": "Jeg vet ikke når arbeidsperioden avsluttes",
-                "nn": "Eg veit ikkje når arbeidsperioden avsluttast"
+                "nb": null,
+                "nn": null,
+                "en": null
               }
             }
           },
@@ -487,9 +645,9 @@
                 "nn": "Kva land arbeidar du i?"
               },
               "verdi": {
-                "nb": "Danmark",
-                "nn": "Danmark",
-                "en": "Denmark"
+                "nb": "Afghanistan",
+                "nn": "Afghanistan",
+                "en": "Afghanistan"
               }
             },
             "arbeidsgiver": {
@@ -499,9 +657,9 @@
                 "nn": "Arbeidsgjevar"
               },
               "verdi": {
-                "nb": "fafa",
-                "nn": "fafa",
-                "en": "fafa"
+                "nb": null,
+                "nn": null,
+                "en": null
               }
             },
             "fraDatoArbeidsperiode": {
@@ -511,9 +669,9 @@
                 "nn": "Når starta arbeidsperioden?"
               },
               "verdi": {
-                "nb": "2022-02-16",
-                "nn": "2022-02-16",
-                "en": "2022-02-16"
+                "nb": null,
+                "nn": null,
+                "en": null
               }
             },
             "tilDatoArbeidsperiode": {
@@ -523,9 +681,9 @@
                 "nn": "Når avsluttast arbeidsperioden?"
               },
               "verdi": {
-                "en": "I don't know when the period of work is ending",
-                "nb": "Jeg vet ikke når arbeidsperioden avsluttes",
-                "nn": "Eg veit ikkje når arbeidsperioden avsluttast"
+                "nb": null,
+                "nn": null,
+                "en": null
               }
             }
           },
@@ -549,9 +707,9 @@
                 "nn": "Kva land arbeidar du i?"
               },
               "verdi": {
-                "nb": "Danmark",
-                "nn": "Danmark",
-                "en": "Denmark"
+                "nb": "Afghanistan",
+                "nn": "Afghanistan",
+                "en": "Afghanistan"
               }
             },
             "arbeidsgiver": {
@@ -561,9 +719,9 @@
                 "nn": "Arbeidsgjevar"
               },
               "verdi": {
-                "nb": "fafa",
-                "nn": "fafa",
-                "en": "fafa"
+                "nb": null,
+                "nn": null,
+                "en": null
               }
             },
             "fraDatoArbeidsperiode": {
@@ -573,9 +731,9 @@
                 "nn": "Når starta arbeidsperioden?"
               },
               "verdi": {
-                "nb": "2022-02-16",
-                "nn": "2022-02-16",
-                "en": "2022-02-16"
+                "nb": null,
+                "nn": null,
+                "en": null
               }
             },
             "tilDatoArbeidsperiode": {
@@ -585,21 +743,19 @@
                 "nn": "Når avsluttast arbeidsperioden?"
               },
               "verdi": {
-                "en": "I don't know when the period of work is ending",
-                "nb": "Jeg vet ikke når arbeidsperioden avsluttes",
-                "nn": "Eg veit ikkje når arbeidsperioden avsluttast"
+                "nb": null,
+                "nn": null,
+                "en": null
               }
             }
           }
         }
-      }
-    ],
-    "arbeidsperioderNorge": [
+      },
       {
         "label": {
-          "en": "Period of work in Norway 1",
-          "nb": "Arbeidsperiode i Norge 1",
-          "nn": "Arbeidsperiode i Noreg 1"
+          "en": "Period of work outside of Norway 3",
+          "nb": "Arbeidsperiode utenfor Norge 3",
+          "nn": "Arbeidsperiode utanfor Noreg 3"
         },
         "verdi": {
           "nb": {
@@ -622,9 +778,9 @@
                 "nn": "Kva land arbeidar du i?"
               },
               "verdi": {
-                "nb": null,
-                "nn": null,
-                "en": null
+                "nb": "Belgia",
+                "nn": "Belgia",
+                "en": "Belgium"
               }
             },
             "arbeidsgiver": {
@@ -634,9 +790,9 @@
                 "nn": "Arbeidsgjevar"
               },
               "verdi": {
-                "nb": "afaf",
-                "nn": "afaf",
-                "en": "afaf"
+                "nb": "fafaf",
+                "nn": "fafaf",
+                "en": "fafaf"
               }
             },
             "fraDatoArbeidsperiode": {
@@ -646,9 +802,9 @@
                 "nn": "Når starta arbeidsperioden?"
               },
               "verdi": {
-                "nb": "2022-02-08",
-                "nn": "2022-02-08",
-                "en": "2022-02-08"
+                "nb": "2022-02-02",
+                "nn": "2022-02-02",
+                "en": "2022-02-02"
               }
             },
             "tilDatoArbeidsperiode": {
@@ -684,9 +840,9 @@
                 "nn": "Kva land arbeidar du i?"
               },
               "verdi": {
-                "nb": null,
-                "nn": null,
-                "en": null
+                "nb": "Belgia",
+                "nn": "Belgia",
+                "en": "Belgium"
               }
             },
             "arbeidsgiver": {
@@ -696,9 +852,9 @@
                 "nn": "Arbeidsgjevar"
               },
               "verdi": {
-                "nb": "afaf",
-                "nn": "afaf",
-                "en": "afaf"
+                "nb": "fafaf",
+                "nn": "fafaf",
+                "en": "fafaf"
               }
             },
             "fraDatoArbeidsperiode": {
@@ -708,9 +864,9 @@
                 "nn": "Når starta arbeidsperioden?"
               },
               "verdi": {
-                "nb": "2022-02-08",
-                "nn": "2022-02-08",
-                "en": "2022-02-08"
+                "nb": "2022-02-02",
+                "nn": "2022-02-02",
+                "en": "2022-02-02"
               }
             },
             "tilDatoArbeidsperiode": {
@@ -746,6 +902,274 @@
                 "nn": "Kva land arbeidar du i?"
               },
               "verdi": {
+                "nb": "Belgia",
+                "nn": "Belgia",
+                "en": "Belgium"
+              }
+            },
+            "arbeidsgiver": {
+              "label": {
+                "en": "Employer",
+                "nb": "Arbeidsgiver",
+                "nn": "Arbeidsgjevar"
+              },
+              "verdi": {
+                "nb": "fafaf",
+                "nn": "fafaf",
+                "en": "fafaf"
+              }
+            },
+            "fraDatoArbeidsperiode": {
+              "label": {
+                "en": "When did the period of work start?",
+                "nb": "Når startet arbeidsperioden?",
+                "nn": "Når starta arbeidsperioden?"
+              },
+              "verdi": {
+                "nb": "2022-02-02",
+                "nn": "2022-02-02",
+                "en": "2022-02-02"
+              }
+            },
+            "tilDatoArbeidsperiode": {
+              "label": {
+                "en": "When is the period of work ending?",
+                "nb": "Når avsluttes arbeidsperioden?",
+                "nn": "Når avsluttast arbeidsperioden?"
+              },
+              "verdi": {
+                "en": "I don't know when the period of work is ending",
+                "nb": "Jeg vet ikke når arbeidsperioden avsluttes",
+                "nn": "Eg veit ikkje når arbeidsperioden avsluttast"
+              }
+            }
+          }
+        }
+      },
+      {
+        "label": {
+          "en": "Period of work outside of Norway 4",
+          "nb": "Arbeidsperiode utenfor Norge 4",
+          "nn": "Arbeidsperiode utanfor Noreg 4"
+        },
+        "verdi": {
+          "nb": {
+            "arbeidsperiodeAvsluttet": {
+              "label": {
+                "en": "Has the period of work ended?",
+                "nb": "Er arbeidsperioden avsluttet?",
+                "nn": "Er arbeidsperioden avslutta?"
+              },
+              "verdi": {
+                "nb": "JA",
+                "nn": "JA",
+                "en": "JA"
+              }
+            },
+            "arbeidsperiodeland": {
+              "label": {
+                "en": "Which country did you work in?",
+                "nb": "Hvilket land arbeidet du i?",
+                "nn": "Kva land arbeidde du i?"
+              },
+              "verdi": {
+                "nb": "Afghanistan",
+                "nn": "Afghanistan",
+                "en": "Afghanistan"
+              }
+            },
+            "arbeidsgiver": {
+              "label": {
+                "en": "Employer",
+                "nb": "Arbeidsgiver",
+                "nn": "Arbeidsgjevar"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            },
+            "fraDatoArbeidsperiode": {
+              "label": {
+                "en": "When did the period of work start?",
+                "nb": "Når startet arbeidsperioden?",
+                "nn": "Når starta arbeidsperioden?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            },
+            "tilDatoArbeidsperiode": {
+              "label": {
+                "en": "When did the period of work end?",
+                "nb": "Når ble arbeidsperioden avsluttet?",
+                "nn": "Når blei arbeidsperioden avslutta?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            }
+          },
+          "nn": {
+            "arbeidsperiodeAvsluttet": {
+              "label": {
+                "en": "Has the period of work ended?",
+                "nb": "Er arbeidsperioden avsluttet?",
+                "nn": "Er arbeidsperioden avslutta?"
+              },
+              "verdi": {
+                "nb": "JA",
+                "nn": "JA",
+                "en": "JA"
+              }
+            },
+            "arbeidsperiodeland": {
+              "label": {
+                "en": "Which country did you work in?",
+                "nb": "Hvilket land arbeidet du i?",
+                "nn": "Kva land arbeidde du i?"
+              },
+              "verdi": {
+                "nb": "Afghanistan",
+                "nn": "Afghanistan",
+                "en": "Afghanistan"
+              }
+            },
+            "arbeidsgiver": {
+              "label": {
+                "en": "Employer",
+                "nb": "Arbeidsgiver",
+                "nn": "Arbeidsgjevar"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            },
+            "fraDatoArbeidsperiode": {
+              "label": {
+                "en": "When did the period of work start?",
+                "nb": "Når startet arbeidsperioden?",
+                "nn": "Når starta arbeidsperioden?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            },
+            "tilDatoArbeidsperiode": {
+              "label": {
+                "en": "When did the period of work end?",
+                "nb": "Når ble arbeidsperioden avsluttet?",
+                "nn": "Når blei arbeidsperioden avslutta?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            }
+          },
+          "en": {
+            "arbeidsperiodeAvsluttet": {
+              "label": {
+                "en": "Has the period of work ended?",
+                "nb": "Er arbeidsperioden avsluttet?",
+                "nn": "Er arbeidsperioden avslutta?"
+              },
+              "verdi": {
+                "nb": "JA",
+                "nn": "JA",
+                "en": "JA"
+              }
+            },
+            "arbeidsperiodeland": {
+              "label": {
+                "en": "Which country did you work in?",
+                "nb": "Hvilket land arbeidet du i?",
+                "nn": "Kva land arbeidde du i?"
+              },
+              "verdi": {
+                "nb": "Afghanistan",
+                "nn": "Afghanistan",
+                "en": "Afghanistan"
+              }
+            },
+            "arbeidsgiver": {
+              "label": {
+                "en": "Employer",
+                "nb": "Arbeidsgiver",
+                "nn": "Arbeidsgjevar"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            },
+            "fraDatoArbeidsperiode": {
+              "label": {
+                "en": "When did the period of work start?",
+                "nb": "Når startet arbeidsperioden?",
+                "nn": "Når starta arbeidsperioden?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            },
+            "tilDatoArbeidsperiode": {
+              "label": {
+                "en": "When did the period of work end?",
+                "nb": "Når ble arbeidsperioden avsluttet?",
+                "nn": "Når blei arbeidsperioden avslutta?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            }
+          }
+        }
+      }
+    ],
+    "arbeidsperioderNorge": [
+      {
+        "label": {
+          "en": "Period of work in Norway 1",
+          "nb": "Arbeidsperiode i Norge 1",
+          "nn": "Arbeidsperiode i Noreg 1"
+        },
+        "verdi": {
+          "nb": {
+            "arbeidsperiodeAvsluttet": {
+              "label": {
+                "en": "Has the period of work ended?",
+                "nb": "Er arbeidsperioden avsluttet?",
+                "nn": "Er arbeidsperioden avslutta?"
+              },
+              "verdi": {
+                "nb": "JA",
+                "nn": "JA",
+                "en": "JA"
+              }
+            },
+            "arbeidsperiodeland": {
+              "label": {
+                "en": "Which country did you work in?",
+                "nb": "Hvilket land arbeidet du i?",
+                "nn": "Kva land arbeidde du i?"
+              },
+              "verdi": {
                 "nb": null,
                 "nn": null,
                 "en": null
@@ -758,9 +1182,9 @@
                 "nn": "Arbeidsgjevar"
               },
               "verdi": {
-                "nb": "afaf",
-                "nn": "afaf",
-                "en": "afaf"
+                "nb": "caafaf",
+                "nn": "caafaf",
+                "en": "caafaf"
               }
             },
             "fraDatoArbeidsperiode": {
@@ -777,14 +1201,138 @@
             },
             "tilDatoArbeidsperiode": {
               "label": {
-                "en": "When is the period of work ending?",
-                "nb": "Når avsluttes arbeidsperioden?",
-                "nn": "Når avsluttast arbeidsperioden?"
+                "en": "When did the period of work end?",
+                "nb": "Når ble arbeidsperioden avsluttet?",
+                "nn": "Når blei arbeidsperioden avslutta?"
               },
               "verdi": {
-                "en": "I don't know when the period of work is ending",
-                "nb": "Jeg vet ikke når arbeidsperioden avsluttes",
-                "nn": "Eg veit ikkje når arbeidsperioden avsluttast"
+                "nb": "2022-02-23",
+                "nn": "2022-02-23",
+                "en": "2022-02-23"
+              }
+            }
+          },
+          "nn": {
+            "arbeidsperiodeAvsluttet": {
+              "label": {
+                "en": "Has the period of work ended?",
+                "nb": "Er arbeidsperioden avsluttet?",
+                "nn": "Er arbeidsperioden avslutta?"
+              },
+              "verdi": {
+                "nb": "JA",
+                "nn": "JA",
+                "en": "JA"
+              }
+            },
+            "arbeidsperiodeland": {
+              "label": {
+                "en": "Which country did you work in?",
+                "nb": "Hvilket land arbeidet du i?",
+                "nn": "Kva land arbeidde du i?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            },
+            "arbeidsgiver": {
+              "label": {
+                "en": "Employer",
+                "nb": "Arbeidsgiver",
+                "nn": "Arbeidsgjevar"
+              },
+              "verdi": {
+                "nb": "caafaf",
+                "nn": "caafaf",
+                "en": "caafaf"
+              }
+            },
+            "fraDatoArbeidsperiode": {
+              "label": {
+                "en": "When did the period of work start?",
+                "nb": "Når startet arbeidsperioden?",
+                "nn": "Når starta arbeidsperioden?"
+              },
+              "verdi": {
+                "nb": "2022-02-08",
+                "nn": "2022-02-08",
+                "en": "2022-02-08"
+              }
+            },
+            "tilDatoArbeidsperiode": {
+              "label": {
+                "en": "When did the period of work end?",
+                "nb": "Når ble arbeidsperioden avsluttet?",
+                "nn": "Når blei arbeidsperioden avslutta?"
+              },
+              "verdi": {
+                "nb": "2022-02-23",
+                "nn": "2022-02-23",
+                "en": "2022-02-23"
+              }
+            }
+          },
+          "en": {
+            "arbeidsperiodeAvsluttet": {
+              "label": {
+                "en": "Has the period of work ended?",
+                "nb": "Er arbeidsperioden avsluttet?",
+                "nn": "Er arbeidsperioden avslutta?"
+              },
+              "verdi": {
+                "nb": "JA",
+                "nn": "JA",
+                "en": "JA"
+              }
+            },
+            "arbeidsperiodeland": {
+              "label": {
+                "en": "Which country did you work in?",
+                "nb": "Hvilket land arbeidet du i?",
+                "nn": "Kva land arbeidde du i?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            },
+            "arbeidsgiver": {
+              "label": {
+                "en": "Employer",
+                "nb": "Arbeidsgiver",
+                "nn": "Arbeidsgjevar"
+              },
+              "verdi": {
+                "nb": "caafaf",
+                "nn": "caafaf",
+                "en": "caafaf"
+              }
+            },
+            "fraDatoArbeidsperiode": {
+              "label": {
+                "en": "When did the period of work start?",
+                "nb": "Når startet arbeidsperioden?",
+                "nn": "Når starta arbeidsperioden?"
+              },
+              "verdi": {
+                "nb": "2022-02-08",
+                "nn": "2022-02-08",
+                "en": "2022-02-08"
+              }
+            },
+            "tilDatoArbeidsperiode": {
+              "label": {
+                "en": "When did the period of work end?",
+                "nb": "Når ble arbeidsperioden avsluttet?",
+                "nn": "Når blei arbeidsperioden avslutta?"
+              },
+              "verdi": {
+                "nb": "2022-02-23",
+                "nn": "2022-02-23",
+                "en": "2022-02-23"
               }
             }
           }
@@ -819,9 +1367,9 @@
                 "nn": "Kva land får du pensjon frå?"
               },
               "verdi": {
-                "nb": "Algerie",
-                "nn": "Algerie",
-                "en": "Algeria"
+                "nb": "Afghanistan",
+                "nn": "Afghanistan",
+                "en": "Afghanistan"
               }
             },
             "pensjonFra": {
@@ -869,9 +1417,9 @@
                 "nn": "Kva land får du pensjon frå?"
               },
               "verdi": {
-                "nb": "Algerie",
-                "nn": "Algerie",
-                "en": "Algeria"
+                "nb": "Afghanistan",
+                "nn": "Afghanistan",
+                "en": "Afghanistan"
               }
             },
             "pensjonFra": {
@@ -919,9 +1467,9 @@
                 "nn": "Kva land får du pensjon frå?"
               },
               "verdi": {
-                "nb": "Algerie",
-                "nn": "Algerie",
-                "en": "Algeria"
+                "nb": "Afghanistan",
+                "nn": "Afghanistan",
+                "en": "Afghanistan"
               }
             },
             "pensjonFra": {
@@ -950,9 +1498,328 @@
             }
           }
         }
+      },
+      {
+        "label": {
+          "en": "Pension period from abroad 2",
+          "nb": "Pensjonsperiode fra utlandet 2",
+          "nn": "Pensjonsperiode frå utlandet 2"
+        },
+        "verdi": {
+          "nb": {
+            "mottarPensjonNå": {
+              "label": {
+                "en": "Are you currently receiving a pension?",
+                "nb": "Får du pensjon nå?",
+                "nn": "Får du pensjon no?"
+              },
+              "verdi": {
+                "nb": "NEI",
+                "nn": "NEI",
+                "en": "NEI"
+              }
+            },
+            "pensjonsland": {
+              "label": {
+                "en": "From which country did you receive a pension?",
+                "nb": "Hvilket land fikk du pensjon fra?",
+                "nn": "Kva land fekk du pensjon frå?"
+              },
+              "verdi": {
+                "nb": "Afghanistan",
+                "nn": "Afghanistan",
+                "en": "Afghanistan"
+              }
+            },
+            "pensjonFra": {
+              "label": {
+                "en": "From when did you receive a pension?",
+                "nb": "Når fikk du pensjon fra?",
+                "nn": "Når fekk du pensjon frå?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            },
+            "pensjonTil": {
+              "label": {
+                "en": "When did the period of receiving a pension end?",
+                "nb": "Når ble pensjonen avsluttet?",
+                "nn": "Når vart pensjonen avslutta?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            }
+          },
+          "nn": {
+            "mottarPensjonNå": {
+              "label": {
+                "en": "Are you currently receiving a pension?",
+                "nb": "Får du pensjon nå?",
+                "nn": "Får du pensjon no?"
+              },
+              "verdi": {
+                "nb": "NEI",
+                "nn": "NEI",
+                "en": "NEI"
+              }
+            },
+            "pensjonsland": {
+              "label": {
+                "en": "From which country did you receive a pension?",
+                "nb": "Hvilket land fikk du pensjon fra?",
+                "nn": "Kva land fekk du pensjon frå?"
+              },
+              "verdi": {
+                "nb": "Afghanistan",
+                "nn": "Afghanistan",
+                "en": "Afghanistan"
+              }
+            },
+            "pensjonFra": {
+              "label": {
+                "en": "From when did you receive a pension?",
+                "nb": "Når fikk du pensjon fra?",
+                "nn": "Når fekk du pensjon frå?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            },
+            "pensjonTil": {
+              "label": {
+                "en": "When did the period of receiving a pension end?",
+                "nb": "Når ble pensjonen avsluttet?",
+                "nn": "Når vart pensjonen avslutta?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            }
+          },
+          "en": {
+            "mottarPensjonNå": {
+              "label": {
+                "en": "Are you currently receiving a pension?",
+                "nb": "Får du pensjon nå?",
+                "nn": "Får du pensjon no?"
+              },
+              "verdi": {
+                "nb": "NEI",
+                "nn": "NEI",
+                "en": "NEI"
+              }
+            },
+            "pensjonsland": {
+              "label": {
+                "en": "From which country did you receive a pension?",
+                "nb": "Hvilket land fikk du pensjon fra?",
+                "nn": "Kva land fekk du pensjon frå?"
+              },
+              "verdi": {
+                "nb": "Afghanistan",
+                "nn": "Afghanistan",
+                "en": "Afghanistan"
+              }
+            },
+            "pensjonFra": {
+              "label": {
+                "en": "From when did you receive a pension?",
+                "nb": "Når fikk du pensjon fra?",
+                "nn": "Når fekk du pensjon frå?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            },
+            "pensjonTil": {
+              "label": {
+                "en": "When did the period of receiving a pension end?",
+                "nb": "Når ble pensjonen avsluttet?",
+                "nn": "Når vart pensjonen avslutta?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            }
+          }
+        }
       }
     ],
-    "pensjonsperioderNorge": [],
+    "pensjonsperioderNorge": [
+      {
+        "label": {
+          "en": "Pension period from Norway 1",
+          "nb": "Pensjonsperiode fra Norge 1",
+          "nn": "Pensjonsperiode frå Noreg 1"
+        },
+        "verdi": {
+          "nb": {
+            "mottarPensjonNå": {
+              "label": {
+                "en": "Are you currently receiving a pension?",
+                "nb": "Får du pensjon nå?",
+                "nn": "Får du pensjon no?"
+              },
+              "verdi": {
+                "nb": "JA",
+                "nn": "JA",
+                "en": "JA"
+              }
+            },
+            "pensjonsland": {
+              "label": {
+                "en": "Which country do you receive a pension from?",
+                "nb": "Hvilket land får du pensjon fra?",
+                "nn": "Kva land får du pensjon frå?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            },
+            "pensjonFra": {
+              "label": {
+                "en": "From when have you received a pension?",
+                "nb": "Når har du fått pensjon fra?",
+                "nn": "Når har du fått pensjon frå?"
+              },
+              "verdi": {
+                "nb": "2022-02-10",
+                "nn": "2022-02-10",
+                "en": "2022-02-10"
+              }
+            },
+            "pensjonTil": {
+              "label": {
+                "en": "When did the period of receiving a pension end?",
+                "nb": "Når ble pensjonen avsluttet?",
+                "nn": "Når vart pensjonen avslutta?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            }
+          },
+          "nn": {
+            "mottarPensjonNå": {
+              "label": {
+                "en": "Are you currently receiving a pension?",
+                "nb": "Får du pensjon nå?",
+                "nn": "Får du pensjon no?"
+              },
+              "verdi": {
+                "nb": "JA",
+                "nn": "JA",
+                "en": "JA"
+              }
+            },
+            "pensjonsland": {
+              "label": {
+                "en": "Which country do you receive a pension from?",
+                "nb": "Hvilket land får du pensjon fra?",
+                "nn": "Kva land får du pensjon frå?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            },
+            "pensjonFra": {
+              "label": {
+                "en": "From when have you received a pension?",
+                "nb": "Når har du fått pensjon fra?",
+                "nn": "Når har du fått pensjon frå?"
+              },
+              "verdi": {
+                "nb": "2022-02-10",
+                "nn": "2022-02-10",
+                "en": "2022-02-10"
+              }
+            },
+            "pensjonTil": {
+              "label": {
+                "en": "When did the period of receiving a pension end?",
+                "nb": "Når ble pensjonen avsluttet?",
+                "nn": "Når vart pensjonen avslutta?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            }
+          },
+          "en": {
+            "mottarPensjonNå": {
+              "label": {
+                "en": "Are you currently receiving a pension?",
+                "nb": "Får du pensjon nå?",
+                "nn": "Får du pensjon no?"
+              },
+              "verdi": {
+                "nb": "JA",
+                "nn": "JA",
+                "en": "JA"
+              }
+            },
+            "pensjonsland": {
+              "label": {
+                "en": "Which country do you receive a pension from?",
+                "nb": "Hvilket land får du pensjon fra?",
+                "nn": "Kva land får du pensjon frå?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            },
+            "pensjonFra": {
+              "label": {
+                "en": "From when have you received a pension?",
+                "nb": "Når har du fått pensjon fra?",
+                "nn": "Når har du fått pensjon frå?"
+              },
+              "verdi": {
+                "nb": "2022-02-10",
+                "nn": "2022-02-10",
+                "en": "2022-02-10"
+              }
+            },
+            "pensjonTil": {
+              "label": {
+                "en": "When did the period of receiving a pension end?",
+                "nb": "Når ble pensjonen avsluttet?",
+                "nn": "Når vart pensjonen avslutta?"
+              },
+              "verdi": {
+                "nb": null,
+                "nn": null,
+                "en": null
+              }
+            }
+          }
+        }
+      }
+    ],
     "andreUtbetalingsperioder": [
       {
         "label": {
@@ -969,21 +1836,21 @@
                 "nn": "Får du utbetalingar no?"
               },
               "verdi": {
-                "nb": "NEI",
-                "nn": "NEI",
-                "en": "NEI"
+                "nb": "JA",
+                "nn": "JA",
+                "en": "JA"
               }
             },
             "utbetalingLand": {
               "label": {
-                "en": "Country you received benefits from",
-                "nb": "Hvilket land fikk du utbetalinger fra?",
-                "nn": "Landet du fekk utbetalingar frå"
+                "en": "What country are you receiving benefits from?",
+                "nb": "Hvilket land får du utbetalinger fra?",
+                "nn": "Kva land får du utbetalingar frå?"
               },
               "verdi": {
-                "nb": "Antarktis",
-                "nn": "Antarktis",
-                "en": "Antarctica"
+                "nb": "Algerie",
+                "nn": "Algerie",
+                "en": "Algeria"
               }
             },
             "utbetalingFraDato": {
@@ -993,21 +1860,21 @@
                 "nn": "Når starta utbetalingane?"
               },
               "verdi": {
-                "nb": "2022-02-14",
-                "nn": "2022-02-14",
-                "en": "2022-02-14"
+                "nb": "2022-02-01",
+                "nn": "2022-02-01",
+                "en": "2022-02-01"
               }
             },
             "utbetalingTilDato": {
               "label": {
-                "en": "When did you stop receiving benefits?",
-                "nb": "Når stoppet utbetalingene?",
-                "nn": "Når stoppa utbetalingane?"
+                "en": "When will you stop receiving benefits?",
+                "nb": "Når stopper utbetalingene?",
+                "nn": "Når stoppar utbetalingane?"
               },
               "verdi": {
-                "nb": "2022-02-16",
-                "nn": "2022-02-16",
-                "en": "2022-02-16"
+                "en": "I do not know when the stay is ending",
+                "nb": "Jeg vet ikke når oppholdet avsluttes",
+                "nn": "Eg veit ikkje når opphaldet skal avsluttast"
               }
             }
           },
@@ -1019,21 +1886,21 @@
                 "nn": "Får du utbetalingar no?"
               },
               "verdi": {
-                "nb": "NEI",
-                "nn": "NEI",
-                "en": "NEI"
+                "nb": "JA",
+                "nn": "JA",
+                "en": "JA"
               }
             },
             "utbetalingLand": {
               "label": {
-                "en": "Country you received benefits from",
-                "nb": "Hvilket land fikk du utbetalinger fra?",
-                "nn": "Landet du fekk utbetalingar frå"
+                "en": "What country are you receiving benefits from?",
+                "nb": "Hvilket land får du utbetalinger fra?",
+                "nn": "Kva land får du utbetalingar frå?"
               },
               "verdi": {
-                "nb": "Antarktis",
-                "nn": "Antarktis",
-                "en": "Antarctica"
+                "nb": "Algerie",
+                "nn": "Algerie",
+                "en": "Algeria"
               }
             },
             "utbetalingFraDato": {
@@ -1043,21 +1910,21 @@
                 "nn": "Når starta utbetalingane?"
               },
               "verdi": {
-                "nb": "2022-02-14",
-                "nn": "2022-02-14",
-                "en": "2022-02-14"
+                "nb": "2022-02-01",
+                "nn": "2022-02-01",
+                "en": "2022-02-01"
               }
             },
             "utbetalingTilDato": {
               "label": {
-                "en": "When did you stop receiving benefits?",
-                "nb": "Når stoppet utbetalingene?",
-                "nn": "Når stoppa utbetalingane?"
+                "en": "When will you stop receiving benefits?",
+                "nb": "Når stopper utbetalingene?",
+                "nn": "Når stoppar utbetalingane?"
               },
               "verdi": {
-                "nb": "2022-02-16",
-                "nn": "2022-02-16",
-                "en": "2022-02-16"
+                "en": "I do not know when the stay is ending",
+                "nb": "Jeg vet ikke når oppholdet avsluttes",
+                "nn": "Eg veit ikkje når opphaldet skal avsluttast"
               }
             }
           },
@@ -1069,21 +1936,21 @@
                 "nn": "Får du utbetalingar no?"
               },
               "verdi": {
-                "nb": "NEI",
-                "nn": "NEI",
-                "en": "NEI"
+                "nb": "JA",
+                "nn": "JA",
+                "en": "JA"
               }
             },
             "utbetalingLand": {
               "label": {
-                "en": "Country you received benefits from",
-                "nb": "Hvilket land fikk du utbetalinger fra?",
-                "nn": "Landet du fekk utbetalingar frå"
+                "en": "What country are you receiving benefits from?",
+                "nb": "Hvilket land får du utbetalinger fra?",
+                "nn": "Kva land får du utbetalingar frå?"
               },
               "verdi": {
-                "nb": "Antarktis",
-                "nn": "Antarktis",
-                "en": "Antarctica"
+                "nb": "Algerie",
+                "nn": "Algerie",
+                "en": "Algeria"
               }
             },
             "utbetalingFraDato": {
@@ -1093,21 +1960,21 @@
                 "nn": "Når starta utbetalingane?"
               },
               "verdi": {
-                "nb": "2022-02-14",
-                "nn": "2022-02-14",
-                "en": "2022-02-14"
+                "nb": "2022-02-01",
+                "nn": "2022-02-01",
+                "en": "2022-02-01"
               }
             },
             "utbetalingTilDato": {
               "label": {
-                "en": "When did you stop receiving benefits?",
-                "nb": "Når stoppet utbetalingene?",
-                "nn": "Når stoppa utbetalingane?"
+                "en": "When will you stop receiving benefits?",
+                "nb": "Når stopper utbetalingene?",
+                "nn": "Når stoppar utbetalingane?"
               },
               "verdi": {
-                "nb": "2022-02-16",
-                "nn": "2022-02-16",
-                "en": "2022-02-16"
+                "en": "I do not know when the stay is ending",
+                "nb": "Jeg vet ikke når oppholdet avsluttes",
+                "nn": "Eg veit ikkje når opphaldet skal avsluttast"
               }
             }
           }
@@ -1194,9 +2061,9 @@
                   "nn": "Kva land får du barnetrygd frå?"
                 },
                 "verdi": {
-                  "nb": "Amerikansk Samoa",
-                  "nn": "Amerikansk Samoa",
-                  "en": "American Samoa"
+                  "nb": "Barbados",
+                  "nn": "Barbados",
+                  "en": "Barbados"
                 }
               },
               "fraDatoBarnetrygdperiode": {
@@ -1206,9 +2073,9 @@
                   "nn": "Når starta barnetrygd?"
                 },
                 "verdi": {
-                  "nb": "2022-02-09",
-                  "nn": "2022-02-09",
-                  "en": "2022-02-09"
+                  "nb": "2022-02-15",
+                  "nn": "2022-02-15",
+                  "en": "2022-02-15"
                 }
               },
               "tilDatoBarnetrygdperiode": {
@@ -1230,9 +2097,9 @@
                   "nn": "Beløp kvar månad for GODSLIG DORULL"
                 },
                 "verdi": {
-                  "nb": "232",
-                  "nn": "232",
-                  "en": "232"
+                  "nb": "123",
+                  "nn": "123",
+                  "en": "123"
                 }
               }
             },
@@ -1256,9 +2123,9 @@
                   "nn": "Kva land får du barnetrygd frå?"
                 },
                 "verdi": {
-                  "nb": "Amerikansk Samoa",
-                  "nn": "Amerikansk Samoa",
-                  "en": "American Samoa"
+                  "nb": "Barbados",
+                  "nn": "Barbados",
+                  "en": "Barbados"
                 }
               },
               "fraDatoBarnetrygdperiode": {
@@ -1268,9 +2135,9 @@
                   "nn": "Når starta barnetrygd?"
                 },
                 "verdi": {
-                  "nb": "2022-02-09",
-                  "nn": "2022-02-09",
-                  "en": "2022-02-09"
+                  "nb": "2022-02-15",
+                  "nn": "2022-02-15",
+                  "en": "2022-02-15"
                 }
               },
               "tilDatoBarnetrygdperiode": {
@@ -1292,9 +2159,9 @@
                   "nn": "Beløp kvar månad for GODSLIG DORULL"
                 },
                 "verdi": {
-                  "nb": "232",
-                  "nn": "232",
-                  "en": "232"
+                  "nb": "123",
+                  "nn": "123",
+                  "en": "123"
                 }
               }
             },
@@ -1318,9 +2185,9 @@
                   "nn": "Kva land får du barnetrygd frå?"
                 },
                 "verdi": {
-                  "nb": "Amerikansk Samoa",
-                  "nn": "Amerikansk Samoa",
-                  "en": "American Samoa"
+                  "nb": "Barbados",
+                  "nn": "Barbados",
+                  "en": "Barbados"
                 }
               },
               "fraDatoBarnetrygdperiode": {
@@ -1330,9 +2197,9 @@
                   "nn": "Når starta barnetrygd?"
                 },
                 "verdi": {
-                  "nb": "2022-02-09",
-                  "nn": "2022-02-09",
-                  "en": "2022-02-09"
+                  "nb": "2022-02-15",
+                  "nn": "2022-02-15",
+                  "en": "2022-02-15"
                 }
               },
               "tilDatoBarnetrygdperiode": {
@@ -1354,204 +2221,9 @@
                   "nn": "Beløp kvar månad for GODSLIG DORULL"
                 },
                 "verdi": {
-                  "nb": "232",
-                  "nn": "232",
-                  "en": "232"
-                }
-              }
-            }
-          }
-        },
-        {
-          "label": {
-            "en": "Child benefit period 2",
-            "nb": "Barnetrygdperiode 2",
-            "nn": "Barnetrygdperiode 2"
-          },
-          "verdi": {
-            "nb": {
-              "mottarEøsBarnetrygdNå": {
-                "label": {
-                  "en": "Are you currently receiving child benefit from an EEA country?",
-                  "nb": "Får du barnetrygd fra et EU/EØS land nå?",
-                  "nn": "Får du barnetrygd frå eit EU/EØS-land no?"
-                },
-                "verdi": {
-                  "nb": "NEI",
-                  "nn": "NEI",
-                  "en": "NEI"
-                }
-              },
-              "barnetrygdsland": {
-                "label": {
-                  "en": "Which country did you receive child benefit from?",
-                  "nb": "Hvilket land fikk du barnetrygd fra?",
-                  "nn": "Kva land fekk du barnetrygd frå?"
-                },
-                "verdi": {
-                  "nb": "Amerikansk Samoa",
-                  "nn": "Amerikansk Samoa",
-                  "en": "American Samoa"
-                }
-              },
-              "fraDatoBarnetrygdperiode": {
-                "label": {
-                  "en": "When did the child benefit start?",
-                  "nb": "Når startet barnetrygden?",
-                  "nn": "Når starta barnetrygd?"
-                },
-                "verdi": {
-                  "nb": "2022-02-15",
-                  "nn": "2022-02-15",
-                  "en": "2022-02-15"
-                }
-              },
-              "tilDatoBarnetrygdperiode": {
-                "label": {
-                  "en": "When did the child benefit end?",
-                  "nb": "Når ble barnetrygden avsluttet?",
-                  "nn": "Når vart barnetrygda avslutta?"
-                },
-                "verdi": {
-                  "nb": "2022-02-23",
-                  "nn": "2022-02-23",
-                  "en": "2022-02-23"
-                }
-              },
-              "månedligBeløp": {
-                "label": {
-                  "en": "Amount each month for GODSLIG DORULL",
-                  "nb": "Beløp hver måned for GODSLIG DORULL",
-                  "nn": "Beløp kvar månad for GODSLIG DORULL"
-                },
-                "verdi": {
-                  "nb": "234",
-                  "nn": "234",
-                  "en": "234"
-                }
-              }
-            },
-            "nn": {
-              "mottarEøsBarnetrygdNå": {
-                "label": {
-                  "en": "Are you currently receiving child benefit from an EEA country?",
-                  "nb": "Får du barnetrygd fra et EU/EØS land nå?",
-                  "nn": "Får du barnetrygd frå eit EU/EØS-land no?"
-                },
-                "verdi": {
-                  "nb": "NEI",
-                  "nn": "NEI",
-                  "en": "NEI"
-                }
-              },
-              "barnetrygdsland": {
-                "label": {
-                  "en": "Which country did you receive child benefit from?",
-                  "nb": "Hvilket land fikk du barnetrygd fra?",
-                  "nn": "Kva land fekk du barnetrygd frå?"
-                },
-                "verdi": {
-                  "nb": "Amerikansk Samoa",
-                  "nn": "Amerikansk Samoa",
-                  "en": "American Samoa"
-                }
-              },
-              "fraDatoBarnetrygdperiode": {
-                "label": {
-                  "en": "When did the child benefit start?",
-                  "nb": "Når startet barnetrygden?",
-                  "nn": "Når starta barnetrygd?"
-                },
-                "verdi": {
-                  "nb": "2022-02-15",
-                  "nn": "2022-02-15",
-                  "en": "2022-02-15"
-                }
-              },
-              "tilDatoBarnetrygdperiode": {
-                "label": {
-                  "en": "When did the child benefit end?",
-                  "nb": "Når ble barnetrygden avsluttet?",
-                  "nn": "Når vart barnetrygda avslutta?"
-                },
-                "verdi": {
-                  "nb": "2022-02-23",
-                  "nn": "2022-02-23",
-                  "en": "2022-02-23"
-                }
-              },
-              "månedligBeløp": {
-                "label": {
-                  "en": "Amount each month for GODSLIG DORULL",
-                  "nb": "Beløp hver måned for GODSLIG DORULL",
-                  "nn": "Beløp kvar månad for GODSLIG DORULL"
-                },
-                "verdi": {
-                  "nb": "234",
-                  "nn": "234",
-                  "en": "234"
-                }
-              }
-            },
-            "en": {
-              "mottarEøsBarnetrygdNå": {
-                "label": {
-                  "en": "Are you currently receiving child benefit from an EEA country?",
-                  "nb": "Får du barnetrygd fra et EU/EØS land nå?",
-                  "nn": "Får du barnetrygd frå eit EU/EØS-land no?"
-                },
-                "verdi": {
-                  "nb": "NEI",
-                  "nn": "NEI",
-                  "en": "NEI"
-                }
-              },
-              "barnetrygdsland": {
-                "label": {
-                  "en": "Which country did you receive child benefit from?",
-                  "nb": "Hvilket land fikk du barnetrygd fra?",
-                  "nn": "Kva land fekk du barnetrygd frå?"
-                },
-                "verdi": {
-                  "nb": "Amerikansk Samoa",
-                  "nn": "Amerikansk Samoa",
-                  "en": "American Samoa"
-                }
-              },
-              "fraDatoBarnetrygdperiode": {
-                "label": {
-                  "en": "When did the child benefit start?",
-                  "nb": "Når startet barnetrygden?",
-                  "nn": "Når starta barnetrygd?"
-                },
-                "verdi": {
-                  "nb": "2022-02-15",
-                  "nn": "2022-02-15",
-                  "en": "2022-02-15"
-                }
-              },
-              "tilDatoBarnetrygdperiode": {
-                "label": {
-                  "en": "When did the child benefit end?",
-                  "nb": "Når ble barnetrygden avsluttet?",
-                  "nn": "Når vart barnetrygda avslutta?"
-                },
-                "verdi": {
-                  "nb": "2022-02-23",
-                  "nn": "2022-02-23",
-                  "en": "2022-02-23"
-                }
-              },
-              "månedligBeløp": {
-                "label": {
-                  "en": "Amount each month for GODSLIG DORULL",
-                  "nb": "Beløp hver måned for GODSLIG DORULL",
-                  "nn": "Beløp kvar månad for GODSLIG DORULL"
-                },
-                "verdi": {
-                  "nb": "234",
-                  "nn": "234",
-                  "en": "234"
+                  "nb": "123",
+                  "nn": "123",
+                  "en": "123"
                 }
               }
             }
@@ -1566,9 +2238,9 @@
             "nn": "Namn"
           },
           "verdi": {
-            "nb": "afa",
-            "nn": "afa",
-            "en": "afa"
+            "nb": "nronaror",
+            "nn": "nronaror",
+            "en": "nronaror"
           }
         },
         "fnr": {
@@ -1597,9 +2269,9 @@
         },
         "pensjonUtland": {
           "label": {
-            "en": "Does GODSLIG DORULL's other parent receive a pension from abroad?",
-            "nb": "Får den andre forelderen til GODSLIG DORULL pensjon fra utlandet?",
-            "nn": "Får den andre forelderen til GODSLIG DORULL pensjon frå utlandet?"
+            "en": "Has GODSLIG DORULL's other parent received a pension from abroad?",
+            "nb": "Har den andre forelderen til GODSLIG DORULL fått pensjon fra utlandet?",
+            "nn": "Har den andre forelderen til GODSLIG DORULL fått pensjon frå utlandet?"
           },
           "verdi": {
             "nb": "JA",
@@ -1609,9 +2281,9 @@
         },
         "pensjonHvilketLand": {
           "label": {
-            "en": "What country does GODSLIG DORULL's other parent receive a pension from?",
-            "nb": "Hvilket land får den andre forelderen til GODSLIG DORULL pensjon fra?",
-            "nn": "Kva land får den andre forelderen til GODSLIG DORULL pensjon frå?"
+            "en": "What country did the other parent receive a pension from?",
+            "nb": "Hvilket land fikk den andre forelderen pensjon fra?",
+            "nn": "Kva land fekk den andre forelderen pensjon frå?"
           },
           "verdi": {
             "nb": "UKJENT",
@@ -1621,9 +2293,9 @@
         },
         "arbeidUtlandet": {
           "label": {
-            "en": "Does GODSLIG DORULL's other parent work outside of Norway, on a foreign ship or on a foreign continental shelf?",
-            "nb": "Arbeider den andre forelderen til GODSLIG DORULL utenfor Norge, på utenlandsk skip eller på utenlandsk kontinentalsokkel?",
-            "nn": "Arbeidar den andre forelderen til GODSLIG DORULL utanfor Noreg, på utanlandsk skip eller på utanlandsk kontinentalsokkel?"
+            "en": "Has GODSLIG DORULL's other parent worked outside of Norway, on a foreign ship or on a foreign continental shelf?",
+            "nb": "Har den andre forelderen til GODSLIG DORULL arbeidet utenfor Norge, på utenlandsk skip eller på utenlandsk kontinentalsokkel?",
+            "nn": "Har den andre forelderen til GODSLIG DORULL arbeidt utanfor Noreg, på utanlandsk skip eller på utanlandsk kontinentalsokkel?"
           },
           "verdi": {
             "nb": "JA",
@@ -1633,9 +2305,9 @@
         },
         "arbeidUtlandetHvilketLand": {
           "label": {
-            "en": "What country does the other parent work in?",
-            "nb": "Hvilket land arbeider den andre forelderen i?",
-            "nn": "Kva land arbeidar den andre forelderen i?"
+            "en": "What country did the other parent work in?",
+            "nb": "Hvilket land arbeidet den andre forelderen i?",
+            "nn": "Kva land arbeidde den andre forelderen i?"
           },
           "verdi": {
             "nb": "UKJENT",
@@ -1650,9 +2322,9 @@
             "nn": "Har du og den andre forelderen skriftleg avtale om delt bustad for GODSLIG DORULL?"
           },
           "verdi": {
-            "nb": "NEI",
-            "nn": "NEI",
-            "en": "NEI"
+            "nb": null,
+            "nn": null,
+            "en": null
           }
         },
         "utvidet": {
@@ -1697,9 +2369,9 @@
                     "nn": "Er arbeidsperioden avslutta?"
                   },
                   "verdi": {
-                    "nb": "JA",
-                    "nn": "JA",
-                    "en": "JA"
+                    "nb": null,
+                    "nn": null,
+                    "en": null
                   }
                 },
                 "arbeidsperiodeland": {
@@ -1709,9 +2381,204 @@
                     "nn": "Kva land arbeidde den andre forelderen i?"
                   },
                   "verdi": {
-                    "nb": "Andorra",
-                    "nn": "Andorra",
-                    "en": "Andorra"
+                    "nb": "Belgia",
+                    "nn": "Belgia",
+                    "en": "Belgium"
+                  }
+                },
+                "arbeidsgiver": {
+                  "label": {
+                    "en": "Employer",
+                    "nb": "Arbeidsgiver",
+                    "nn": "Arbeidsgjevar"
+                  },
+                  "verdi": {
+                    "nb": "nornaorna enkebarn",
+                    "nn": "nornaorna enkebarn",
+                    "en": "nornaorna enkebarn"
+                  }
+                },
+                "fraDatoArbeidsperiode": {
+                  "label": {
+                    "en": "When did the period of work start?",
+                    "nb": "Når startet arbeidsperioden?",
+                    "nn": "Når starta arbeidsperioden?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-01",
+                    "nn": "2022-02-01",
+                    "en": "2022-02-01"
+                  }
+                },
+                "tilDatoArbeidsperiode": {
+                  "label": {
+                    "en": "When did the period of work end?",
+                    "nb": "Når ble arbeidsperioden avsluttet?",
+                    "nn": "Når blei arbeidsperioden avslutta?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-24",
+                    "nn": "2022-02-24",
+                    "en": "2022-02-24"
+                  }
+                }
+              },
+              "nn": {
+                "arbeidsperiodeAvsluttet": {
+                  "label": {
+                    "en": "Has the period of work ended?",
+                    "nb": "Er arbeidsperioden avsluttet?",
+                    "nn": "Er arbeidsperioden avslutta?"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                },
+                "arbeidsperiodeland": {
+                  "label": {
+                    "en": "What country did the other parent work in?",
+                    "nb": "Hvilket land arbeidet den andre forelderen i?",
+                    "nn": "Kva land arbeidde den andre forelderen i?"
+                  },
+                  "verdi": {
+                    "nb": "Belgia",
+                    "nn": "Belgia",
+                    "en": "Belgium"
+                  }
+                },
+                "arbeidsgiver": {
+                  "label": {
+                    "en": "Employer",
+                    "nb": "Arbeidsgiver",
+                    "nn": "Arbeidsgjevar"
+                  },
+                  "verdi": {
+                    "nb": "nornaorna enkebarn",
+                    "nn": "nornaorna enkebarn",
+                    "en": "nornaorna enkebarn"
+                  }
+                },
+                "fraDatoArbeidsperiode": {
+                  "label": {
+                    "en": "When did the period of work start?",
+                    "nb": "Når startet arbeidsperioden?",
+                    "nn": "Når starta arbeidsperioden?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-01",
+                    "nn": "2022-02-01",
+                    "en": "2022-02-01"
+                  }
+                },
+                "tilDatoArbeidsperiode": {
+                  "label": {
+                    "en": "When did the period of work end?",
+                    "nb": "Når ble arbeidsperioden avsluttet?",
+                    "nn": "Når blei arbeidsperioden avslutta?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-24",
+                    "nn": "2022-02-24",
+                    "en": "2022-02-24"
+                  }
+                }
+              },
+              "en": {
+                "arbeidsperiodeAvsluttet": {
+                  "label": {
+                    "en": "Has the period of work ended?",
+                    "nb": "Er arbeidsperioden avsluttet?",
+                    "nn": "Er arbeidsperioden avslutta?"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                },
+                "arbeidsperiodeland": {
+                  "label": {
+                    "en": "What country did the other parent work in?",
+                    "nb": "Hvilket land arbeidet den andre forelderen i?",
+                    "nn": "Kva land arbeidde den andre forelderen i?"
+                  },
+                  "verdi": {
+                    "nb": "Belgia",
+                    "nn": "Belgia",
+                    "en": "Belgium"
+                  }
+                },
+                "arbeidsgiver": {
+                  "label": {
+                    "en": "Employer",
+                    "nb": "Arbeidsgiver",
+                    "nn": "Arbeidsgjevar"
+                  },
+                  "verdi": {
+                    "nb": "nornaorna enkebarn",
+                    "nn": "nornaorna enkebarn",
+                    "en": "nornaorna enkebarn"
+                  }
+                },
+                "fraDatoArbeidsperiode": {
+                  "label": {
+                    "en": "When did the period of work start?",
+                    "nb": "Når startet arbeidsperioden?",
+                    "nn": "Når starta arbeidsperioden?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-01",
+                    "nn": "2022-02-01",
+                    "en": "2022-02-01"
+                  }
+                },
+                "tilDatoArbeidsperiode": {
+                  "label": {
+                    "en": "When did the period of work end?",
+                    "nb": "Når ble arbeidsperioden avsluttet?",
+                    "nn": "Når blei arbeidsperioden avslutta?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-24",
+                    "nn": "2022-02-24",
+                    "en": "2022-02-24"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "label": {
+              "en": "Period of work outside of Norway 2",
+              "nb": "Arbeidsperiode utenfor Norge 2",
+              "nn": "Arbeidsperiode utanfor Noreg 2"
+            },
+            "verdi": {
+              "nb": {
+                "arbeidsperiodeAvsluttet": {
+                  "label": {
+                    "en": "Has the period of work ended?",
+                    "nb": "Er arbeidsperioden avsluttet?",
+                    "nn": "Er arbeidsperioden avslutta?"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                },
+                "arbeidsperiodeland": {
+                  "label": {
+                    "en": "What country did the other parent work in?",
+                    "nb": "Hvilket land arbeidet den andre forelderen i?",
+                    "nn": "Kva land arbeidde den andre forelderen i?"
+                  },
+                  "verdi": {
+                    "nb": "Afghanistan",
+                    "nn": "Afghanistan",
+                    "en": "Afghanistan"
                   }
                 },
                 "arbeidsgiver": {
@@ -1759,9 +2626,9 @@
                     "nn": "Er arbeidsperioden avslutta?"
                   },
                   "verdi": {
-                    "nb": "JA",
-                    "nn": "JA",
-                    "en": "JA"
+                    "nb": null,
+                    "nn": null,
+                    "en": null
                   }
                 },
                 "arbeidsperiodeland": {
@@ -1771,9 +2638,9 @@
                     "nn": "Kva land arbeidde den andre forelderen i?"
                   },
                   "verdi": {
-                    "nb": "Andorra",
-                    "nn": "Andorra",
-                    "en": "Andorra"
+                    "nb": "Afghanistan",
+                    "nn": "Afghanistan",
+                    "en": "Afghanistan"
                   }
                 },
                 "arbeidsgiver": {
@@ -1821,9 +2688,9 @@
                     "nn": "Er arbeidsperioden avslutta?"
                   },
                   "verdi": {
-                    "nb": "JA",
-                    "nn": "JA",
-                    "en": "JA"
+                    "nb": null,
+                    "nn": null,
+                    "en": null
                   }
                 },
                 "arbeidsperiodeland": {
@@ -1833,9 +2700,9 @@
                     "nn": "Kva land arbeidde den andre forelderen i?"
                   },
                   "verdi": {
-                    "nb": "Andorra",
-                    "nn": "Andorra",
-                    "en": "Andorra"
+                    "nb": "Afghanistan",
+                    "nn": "Afghanistan",
+                    "en": "Afghanistan"
                   }
                 },
                 "arbeidsgiver": {
@@ -1894,16 +2761,16 @@
                     "nn": "Får GODSLIG DORULL sin andre forelder pensjon nå?"
                   },
                   "verdi": {
-                    "nb": "JA",
-                    "nn": "JA",
-                    "en": "JA"
+                    "nb": null,
+                    "nn": null,
+                    "en": null
                   }
                 },
                 "pensjonsland": {
                   "label": {
-                    "en": "What country does GODSLIG DORULL's other parent receive a pension from?",
-                    "nb": "Hvilket land får den andre forelderen til GODSLIG DORULL pensjon fra?",
-                    "nn": "Kva land får den andre forelderen til GODSLIG DORULL pensjon frå?"
+                    "en": "From which country did GODSLIG DORULL's other parent receive a pension?",
+                    "nb": "Hvilket land fikk den andre forelderen til GODSLIG DORULL pensjon fra?",
+                    "nn": "Kva land fekk den andre forelderen til GODSLIG DORULL pensjon frå?"
                   },
                   "verdi": {
                     "nb": "Belgia",
@@ -1914,13 +2781,172 @@
                 "pensjonFra": {
                   "label": {
                     "en": "When did the other parent start receiving a pension?",
-                    "nb": "Når har den andre forelderen til GODSLIG DORULL fått pensjon fra?",
-                    "nn": "Når har den andre forelderen til GODSLIG DORULL fått pensjon frå?"
+                    "nb": "Når fikk den andre forelderen til GODSLIG DORULL pensjon fra?",
+                    "nn": "Når fekk GODSLIG DORULL sin andre forelder pensjon frå?"
                   },
                   "verdi": {
-                    "nb": "2022-02-16",
-                    "nn": "2022-02-16",
-                    "en": "2022-02-16"
+                    "nb": "2022-02-01",
+                    "nn": "2022-02-01",
+                    "en": "2022-02-01"
+                  }
+                },
+                "pensjonTil": {
+                  "label": {
+                    "en": "When did the period of receiving a pension end?",
+                    "nb": "Når ble pensjonen avsluttet?",
+                    "nn": "Når vart pensjonen avslutta?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-23",
+                    "nn": "2022-02-23",
+                    "en": "2022-02-23"
+                  }
+                }
+              },
+              "nn": {
+                "mottarPensjonNå": {
+                  "label": {
+                    "en": "Is GODSLIG DORULL's other parent currently receiving a pension?",
+                    "nb": "Får GODSLIG DORULL sin andre forelder pensjon nå?",
+                    "nn": "Får GODSLIG DORULL sin andre forelder pensjon nå?"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                },
+                "pensjonsland": {
+                  "label": {
+                    "en": "From which country did GODSLIG DORULL's other parent receive a pension?",
+                    "nb": "Hvilket land fikk den andre forelderen til GODSLIG DORULL pensjon fra?",
+                    "nn": "Kva land fekk den andre forelderen til GODSLIG DORULL pensjon frå?"
+                  },
+                  "verdi": {
+                    "nb": "Belgia",
+                    "nn": "Belgia",
+                    "en": "Belgium"
+                  }
+                },
+                "pensjonFra": {
+                  "label": {
+                    "en": "When did the other parent start receiving a pension?",
+                    "nb": "Når fikk den andre forelderen til GODSLIG DORULL pensjon fra?",
+                    "nn": "Når fekk GODSLIG DORULL sin andre forelder pensjon frå?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-01",
+                    "nn": "2022-02-01",
+                    "en": "2022-02-01"
+                  }
+                },
+                "pensjonTil": {
+                  "label": {
+                    "en": "When did the period of receiving a pension end?",
+                    "nb": "Når ble pensjonen avsluttet?",
+                    "nn": "Når vart pensjonen avslutta?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-23",
+                    "nn": "2022-02-23",
+                    "en": "2022-02-23"
+                  }
+                }
+              },
+              "en": {
+                "mottarPensjonNå": {
+                  "label": {
+                    "en": "Is GODSLIG DORULL's other parent currently receiving a pension?",
+                    "nb": "Får GODSLIG DORULL sin andre forelder pensjon nå?",
+                    "nn": "Får GODSLIG DORULL sin andre forelder pensjon nå?"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                },
+                "pensjonsland": {
+                  "label": {
+                    "en": "From which country did GODSLIG DORULL's other parent receive a pension?",
+                    "nb": "Hvilket land fikk den andre forelderen til GODSLIG DORULL pensjon fra?",
+                    "nn": "Kva land fekk den andre forelderen til GODSLIG DORULL pensjon frå?"
+                  },
+                  "verdi": {
+                    "nb": "Belgia",
+                    "nn": "Belgia",
+                    "en": "Belgium"
+                  }
+                },
+                "pensjonFra": {
+                  "label": {
+                    "en": "When did the other parent start receiving a pension?",
+                    "nb": "Når fikk den andre forelderen til GODSLIG DORULL pensjon fra?",
+                    "nn": "Når fekk GODSLIG DORULL sin andre forelder pensjon frå?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-01",
+                    "nn": "2022-02-01",
+                    "en": "2022-02-01"
+                  }
+                },
+                "pensjonTil": {
+                  "label": {
+                    "en": "When did the period of receiving a pension end?",
+                    "nb": "Når ble pensjonen avsluttet?",
+                    "nn": "Når vart pensjonen avslutta?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-23",
+                    "nn": "2022-02-23",
+                    "en": "2022-02-23"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "label": {
+              "en": "Pension period from abroad 2",
+              "nb": "Pensjonsperiode fra utlandet 2",
+              "nn": "Pensjonsperiode frå utlandet 2"
+            },
+            "verdi": {
+              "nb": {
+                "mottarPensjonNå": {
+                  "label": {
+                    "en": "Is GODSLIG DORULL's other parent currently receiving a pension?",
+                    "nb": "Får GODSLIG DORULL sin andre forelder pensjon nå?",
+                    "nn": "Får GODSLIG DORULL sin andre forelder pensjon nå?"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                },
+                "pensjonsland": {
+                  "label": {
+                    "en": "From which country did GODSLIG DORULL's other parent receive a pension?",
+                    "nb": "Hvilket land fikk den andre forelderen til GODSLIG DORULL pensjon fra?",
+                    "nn": "Kva land fekk den andre forelderen til GODSLIG DORULL pensjon frå?"
+                  },
+                  "verdi": {
+                    "nb": "Afghanistan",
+                    "nn": "Afghanistan",
+                    "en": "Afghanistan"
+                  }
+                },
+                "pensjonFra": {
+                  "label": {
+                    "en": "When did the other parent start receiving a pension?",
+                    "nb": "Når fikk den andre forelderen til GODSLIG DORULL pensjon fra?",
+                    "nn": "Når fekk GODSLIG DORULL sin andre forelder pensjon frå?"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
                   }
                 },
                 "pensjonTil": {
@@ -1944,33 +2970,33 @@
                     "nn": "Får GODSLIG DORULL sin andre forelder pensjon nå?"
                   },
                   "verdi": {
-                    "nb": "JA",
-                    "nn": "JA",
-                    "en": "JA"
+                    "nb": null,
+                    "nn": null,
+                    "en": null
                   }
                 },
                 "pensjonsland": {
                   "label": {
-                    "en": "What country does GODSLIG DORULL's other parent receive a pension from?",
-                    "nb": "Hvilket land får den andre forelderen til GODSLIG DORULL pensjon fra?",
-                    "nn": "Kva land får den andre forelderen til GODSLIG DORULL pensjon frå?"
+                    "en": "From which country did GODSLIG DORULL's other parent receive a pension?",
+                    "nb": "Hvilket land fikk den andre forelderen til GODSLIG DORULL pensjon fra?",
+                    "nn": "Kva land fekk den andre forelderen til GODSLIG DORULL pensjon frå?"
                   },
                   "verdi": {
-                    "nb": "Belgia",
-                    "nn": "Belgia",
-                    "en": "Belgium"
+                    "nb": "Afghanistan",
+                    "nn": "Afghanistan",
+                    "en": "Afghanistan"
                   }
                 },
                 "pensjonFra": {
                   "label": {
                     "en": "When did the other parent start receiving a pension?",
-                    "nb": "Når har den andre forelderen til GODSLIG DORULL fått pensjon fra?",
-                    "nn": "Når har den andre forelderen til GODSLIG DORULL fått pensjon frå?"
+                    "nb": "Når fikk den andre forelderen til GODSLIG DORULL pensjon fra?",
+                    "nn": "Når fekk GODSLIG DORULL sin andre forelder pensjon frå?"
                   },
                   "verdi": {
-                    "nb": "2022-02-16",
-                    "nn": "2022-02-16",
-                    "en": "2022-02-16"
+                    "nb": null,
+                    "nn": null,
+                    "en": null
                   }
                 },
                 "pensjonTil": {
@@ -1994,33 +3020,33 @@
                     "nn": "Får GODSLIG DORULL sin andre forelder pensjon nå?"
                   },
                   "verdi": {
-                    "nb": "JA",
-                    "nn": "JA",
-                    "en": "JA"
+                    "nb": null,
+                    "nn": null,
+                    "en": null
                   }
                 },
                 "pensjonsland": {
                   "label": {
-                    "en": "What country does GODSLIG DORULL's other parent receive a pension from?",
-                    "nb": "Hvilket land får den andre forelderen til GODSLIG DORULL pensjon fra?",
-                    "nn": "Kva land får den andre forelderen til GODSLIG DORULL pensjon frå?"
+                    "en": "From which country did GODSLIG DORULL's other parent receive a pension?",
+                    "nb": "Hvilket land fikk den andre forelderen til GODSLIG DORULL pensjon fra?",
+                    "nn": "Kva land fekk den andre forelderen til GODSLIG DORULL pensjon frå?"
                   },
                   "verdi": {
-                    "nb": "Belgia",
-                    "nn": "Belgia",
-                    "en": "Belgium"
+                    "nb": "Afghanistan",
+                    "nn": "Afghanistan",
+                    "en": "Afghanistan"
                   }
                 },
                 "pensjonFra": {
                   "label": {
                     "en": "When did the other parent start receiving a pension?",
-                    "nb": "Når har den andre forelderen til GODSLIG DORULL fått pensjon fra?",
-                    "nn": "Når har den andre forelderen til GODSLIG DORULL fått pensjon frå?"
+                    "nb": "Når fikk den andre forelderen til GODSLIG DORULL pensjon fra?",
+                    "nn": "Når fekk GODSLIG DORULL sin andre forelder pensjon frå?"
                   },
                   "verdi": {
-                    "nb": "2022-02-16",
-                    "nn": "2022-02-16",
-                    "en": "2022-02-16"
+                    "nb": null,
+                    "nn": null,
+                    "en": null
                   }
                 },
                 "pensjonTil": {
@@ -2039,527 +3065,558 @@
             }
           }
         ],
-        "arbeidsperioderNorge": [
-          {
-            "label": {
-              "en": "Period of work in Norway 1",
-              "nb": "Arbeidsperiode i Norge 1",
-              "nn": "Arbeidsperiode i Noreg 1"
-            },
-            "verdi": {
-              "nb": {
-                "arbeidsperiodeAvsluttet": {
-                  "label": {
-                    "en": "Has the period of work ended?",
-                    "nb": "Er arbeidsperioden avsluttet?",
-                    "nn": "Er arbeidsperioden avslutta?"
-                  },
-                  "verdi": {
-                    "nb": "JA",
-                    "nn": "JA",
-                    "en": "JA"
-                  }
-                },
-                "arbeidsperiodeland": {
-                  "label": {
-                    "en": "What country did the other parent work in?",
-                    "nb": "Hvilket land arbeidet den andre forelderen i?",
-                    "nn": "Kva land arbeidde den andre forelderen i?"
-                  },
-                  "verdi": {
-                    "nb": null,
-                    "nn": null,
-                    "en": null
-                  }
-                },
-                "arbeidsgiver": {
-                  "label": {
-                    "en": "Employer",
-                    "nb": "Arbeidsgiver",
-                    "nn": "Arbeidsgjevar"
-                  },
-                  "verdi": {
-                    "nb": "cafa",
-                    "nn": "cafa",
-                    "en": "cafa"
-                  }
-                },
-                "fraDatoArbeidsperiode": {
-                  "label": {
-                    "en": "When did the period of work start?",
-                    "nb": "Når startet arbeidsperioden?",
-                    "nn": "Når starta arbeidsperioden?"
-                  },
-                  "verdi": {
-                    "nb": "2022-02-07",
-                    "nn": "2022-02-07",
-                    "en": "2022-02-07"
-                  }
-                },
-                "tilDatoArbeidsperiode": {
-                  "label": {
-                    "en": "When did the period of work end?",
-                    "nb": "Når ble arbeidsperioden avsluttet?",
-                    "nn": "Når blei arbeidsperioden avslutta?"
-                  },
-                  "verdi": {
-                    "nb": "2022-02-23",
-                    "nn": "2022-02-23",
-                    "en": "2022-02-23"
-                  }
-                }
-              },
-              "nn": {
-                "arbeidsperiodeAvsluttet": {
-                  "label": {
-                    "en": "Has the period of work ended?",
-                    "nb": "Er arbeidsperioden avsluttet?",
-                    "nn": "Er arbeidsperioden avslutta?"
-                  },
-                  "verdi": {
-                    "nb": "JA",
-                    "nn": "JA",
-                    "en": "JA"
-                  }
-                },
-                "arbeidsperiodeland": {
-                  "label": {
-                    "en": "What country did the other parent work in?",
-                    "nb": "Hvilket land arbeidet den andre forelderen i?",
-                    "nn": "Kva land arbeidde den andre forelderen i?"
-                  },
-                  "verdi": {
-                    "nb": null,
-                    "nn": null,
-                    "en": null
-                  }
-                },
-                "arbeidsgiver": {
-                  "label": {
-                    "en": "Employer",
-                    "nb": "Arbeidsgiver",
-                    "nn": "Arbeidsgjevar"
-                  },
-                  "verdi": {
-                    "nb": "cafa",
-                    "nn": "cafa",
-                    "en": "cafa"
-                  }
-                },
-                "fraDatoArbeidsperiode": {
-                  "label": {
-                    "en": "When did the period of work start?",
-                    "nb": "Når startet arbeidsperioden?",
-                    "nn": "Når starta arbeidsperioden?"
-                  },
-                  "verdi": {
-                    "nb": "2022-02-07",
-                    "nn": "2022-02-07",
-                    "en": "2022-02-07"
-                  }
-                },
-                "tilDatoArbeidsperiode": {
-                  "label": {
-                    "en": "When did the period of work end?",
-                    "nb": "Når ble arbeidsperioden avsluttet?",
-                    "nn": "Når blei arbeidsperioden avslutta?"
-                  },
-                  "verdi": {
-                    "nb": "2022-02-23",
-                    "nn": "2022-02-23",
-                    "en": "2022-02-23"
-                  }
-                }
-              },
-              "en": {
-                "arbeidsperiodeAvsluttet": {
-                  "label": {
-                    "en": "Has the period of work ended?",
-                    "nb": "Er arbeidsperioden avsluttet?",
-                    "nn": "Er arbeidsperioden avslutta?"
-                  },
-                  "verdi": {
-                    "nb": "JA",
-                    "nn": "JA",
-                    "en": "JA"
-                  }
-                },
-                "arbeidsperiodeland": {
-                  "label": {
-                    "en": "What country did the other parent work in?",
-                    "nb": "Hvilket land arbeidet den andre forelderen i?",
-                    "nn": "Kva land arbeidde den andre forelderen i?"
-                  },
-                  "verdi": {
-                    "nb": null,
-                    "nn": null,
-                    "en": null
-                  }
-                },
-                "arbeidsgiver": {
-                  "label": {
-                    "en": "Employer",
-                    "nb": "Arbeidsgiver",
-                    "nn": "Arbeidsgjevar"
-                  },
-                  "verdi": {
-                    "nb": "cafa",
-                    "nn": "cafa",
-                    "en": "cafa"
-                  }
-                },
-                "fraDatoArbeidsperiode": {
-                  "label": {
-                    "en": "When did the period of work start?",
-                    "nb": "Når startet arbeidsperioden?",
-                    "nn": "Når starta arbeidsperioden?"
-                  },
-                  "verdi": {
-                    "nb": "2022-02-07",
-                    "nn": "2022-02-07",
-                    "en": "2022-02-07"
-                  }
-                },
-                "tilDatoArbeidsperiode": {
-                  "label": {
-                    "en": "When did the period of work end?",
-                    "nb": "Når ble arbeidsperioden avsluttet?",
-                    "nn": "Når blei arbeidsperioden avslutta?"
-                  },
-                  "verdi": {
-                    "nb": "2022-02-23",
-                    "nn": "2022-02-23",
-                    "en": "2022-02-23"
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "pensjonsperioderNorge": [
-          {
-            "label": {
-              "en": "Pension period from Norway 1",
-              "nb": "Pensjonsperiode fra Norge 1",
-              "nn": "Pensjonsperiode frå Noreg 1"
-            },
-            "verdi": {
-              "nb": {
-                "mottarPensjonNå": {
-                  "label": {
-                    "en": "Is GODSLIG DORULL's other parent currently receiving a pension?",
-                    "nb": "Får GODSLIG DORULL sin andre forelder pensjon nå?",
-                    "nn": "Får GODSLIG DORULL sin andre forelder pensjon nå?"
-                  },
-                  "verdi": {
-                    "nb": "JA",
-                    "nn": "JA",
-                    "en": "JA"
-                  }
-                },
-                "pensjonsland": {
-                  "label": {
-                    "en": "What country does GODSLIG DORULL's other parent receive a pension from?",
-                    "nb": "Hvilket land får den andre forelderen til GODSLIG DORULL pensjon fra?",
-                    "nn": "Kva land får den andre forelderen til GODSLIG DORULL pensjon frå?"
-                  },
-                  "verdi": {
-                    "nb": null,
-                    "nn": null,
-                    "en": null
-                  }
-                },
-                "pensjonFra": {
-                  "label": {
-                    "en": "When did the other parent start receiving a pension?",
-                    "nb": "Når har den andre forelderen til GODSLIG DORULL fått pensjon fra?",
-                    "nn": "Når har den andre forelderen til GODSLIG DORULL fått pensjon frå?"
-                  },
-                  "verdi": {
-                    "nb": "2022-02-01",
-                    "nn": "2022-02-01",
-                    "en": "2022-02-01"
-                  }
-                },
-                "pensjonTil": {
-                  "label": {
-                    "en": "When did the period of receiving a pension end?",
-                    "nb": "Når ble pensjonen avsluttet?",
-                    "nn": "Når vart pensjonen avslutta?"
-                  },
-                  "verdi": {
-                    "nb": null,
-                    "nn": null,
-                    "en": null
-                  }
-                }
-              },
-              "nn": {
-                "mottarPensjonNå": {
-                  "label": {
-                    "en": "Is GODSLIG DORULL's other parent currently receiving a pension?",
-                    "nb": "Får GODSLIG DORULL sin andre forelder pensjon nå?",
-                    "nn": "Får GODSLIG DORULL sin andre forelder pensjon nå?"
-                  },
-                  "verdi": {
-                    "nb": "JA",
-                    "nn": "JA",
-                    "en": "JA"
-                  }
-                },
-                "pensjonsland": {
-                  "label": {
-                    "en": "What country does GODSLIG DORULL's other parent receive a pension from?",
-                    "nb": "Hvilket land får den andre forelderen til GODSLIG DORULL pensjon fra?",
-                    "nn": "Kva land får den andre forelderen til GODSLIG DORULL pensjon frå?"
-                  },
-                  "verdi": {
-                    "nb": null,
-                    "nn": null,
-                    "en": null
-                  }
-                },
-                "pensjonFra": {
-                  "label": {
-                    "en": "When did the other parent start receiving a pension?",
-                    "nb": "Når har den andre forelderen til GODSLIG DORULL fått pensjon fra?",
-                    "nn": "Når har den andre forelderen til GODSLIG DORULL fått pensjon frå?"
-                  },
-                  "verdi": {
-                    "nb": "2022-02-01",
-                    "nn": "2022-02-01",
-                    "en": "2022-02-01"
-                  }
-                },
-                "pensjonTil": {
-                  "label": {
-                    "en": "When did the period of receiving a pension end?",
-                    "nb": "Når ble pensjonen avsluttet?",
-                    "nn": "Når vart pensjonen avslutta?"
-                  },
-                  "verdi": {
-                    "nb": null,
-                    "nn": null,
-                    "en": null
-                  }
-                }
-              },
-              "en": {
-                "mottarPensjonNå": {
-                  "label": {
-                    "en": "Is GODSLIG DORULL's other parent currently receiving a pension?",
-                    "nb": "Får GODSLIG DORULL sin andre forelder pensjon nå?",
-                    "nn": "Får GODSLIG DORULL sin andre forelder pensjon nå?"
-                  },
-                  "verdi": {
-                    "nb": "JA",
-                    "nn": "JA",
-                    "en": "JA"
-                  }
-                },
-                "pensjonsland": {
-                  "label": {
-                    "en": "What country does GODSLIG DORULL's other parent receive a pension from?",
-                    "nb": "Hvilket land får den andre forelderen til GODSLIG DORULL pensjon fra?",
-                    "nn": "Kva land får den andre forelderen til GODSLIG DORULL pensjon frå?"
-                  },
-                  "verdi": {
-                    "nb": null,
-                    "nn": null,
-                    "en": null
-                  }
-                },
-                "pensjonFra": {
-                  "label": {
-                    "en": "When did the other parent start receiving a pension?",
-                    "nb": "Når har den andre forelderen til GODSLIG DORULL fått pensjon fra?",
-                    "nn": "Når har den andre forelderen til GODSLIG DORULL fått pensjon frå?"
-                  },
-                  "verdi": {
-                    "nb": "2022-02-01",
-                    "nn": "2022-02-01",
-                    "en": "2022-02-01"
-                  }
-                },
-                "pensjonTil": {
-                  "label": {
-                    "en": "When did the period of receiving a pension end?",
-                    "nb": "Når ble pensjonen avsluttet?",
-                    "nn": "Når vart pensjonen avslutta?"
-                  },
-                  "verdi": {
-                    "nb": null,
-                    "nn": null,
-                    "en": null
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "andreUtbetalingsperioder": [
-          {
-            "label": {
-              "en": "Benefit period 1",
-              "nb": "Utbetalingsperiode 1",
-              "nn": "Utbetalingsperiode 1"
-            },
-            "verdi": {
-              "nb": {
-                "fårUtbetalingNå": {
-                  "label": {
-                    "en": "Is GODSLIG DORULL's other parent currently receiving benefits?",
-                    "nb": "Får GODSLIG DORULL sin andre forelder utbetalinger nå?",
-                    "nn": "Får GODSLIG DORULL sin andre forelder utbetalingar no?"
-                  },
-                  "verdi": {
-                    "nb": "NEI",
-                    "nn": "NEI",
-                    "en": "NEI"
-                  }
-                },
-                "utbetalingLand": {
-                  "label": {
-                    "en": "Which country did GODSLIG DORULL's other parent is receive benefits from?",
-                    "nb": "Hvilket land fikk GODSLIG DORULL sin andre forelder utbetalinger fra?",
-                    "nn": "Kva land fekk GODSLIG DORULL sin andre forelder utbetalingar frå?"
-                  },
-                  "verdi": {
-                    "nb": "Amerikansk Samoa",
-                    "nn": "Amerikansk Samoa",
-                    "en": "American Samoa"
-                  }
-                },
-                "utbetalingFraDato": {
-                  "label": {
-                    "en": "When did you start receiving benefits?",
-                    "nb": "Når startet utbetalingene?",
-                    "nn": "Når starta utbetalingane?"
-                  },
-                  "verdi": {
-                    "nb": "2022-02-01",
-                    "nn": "2022-02-01",
-                    "en": "2022-02-01"
-                  }
-                },
-                "utbetalingTilDato": {
-                  "label": {
-                    "en": "When did you stop receiving benefits?",
-                    "nb": "Når stoppet utbetalingene?",
-                    "nn": "Når stoppa utbetalingane?"
-                  },
-                  "verdi": {
-                    "nb": "2022-02-10",
-                    "nn": "2022-02-10",
-                    "en": "2022-02-10"
-                  }
-                }
-              },
-              "nn": {
-                "fårUtbetalingNå": {
-                  "label": {
-                    "en": "Is GODSLIG DORULL's other parent currently receiving benefits?",
-                    "nb": "Får GODSLIG DORULL sin andre forelder utbetalinger nå?",
-                    "nn": "Får GODSLIG DORULL sin andre forelder utbetalingar no?"
-                  },
-                  "verdi": {
-                    "nb": "NEI",
-                    "nn": "NEI",
-                    "en": "NEI"
-                  }
-                },
-                "utbetalingLand": {
-                  "label": {
-                    "en": "Which country did GODSLIG DORULL's other parent is receive benefits from?",
-                    "nb": "Hvilket land fikk GODSLIG DORULL sin andre forelder utbetalinger fra?",
-                    "nn": "Kva land fekk GODSLIG DORULL sin andre forelder utbetalingar frå?"
-                  },
-                  "verdi": {
-                    "nb": "Amerikansk Samoa",
-                    "nn": "Amerikansk Samoa",
-                    "en": "American Samoa"
-                  }
-                },
-                "utbetalingFraDato": {
-                  "label": {
-                    "en": "When did you start receiving benefits?",
-                    "nb": "Når startet utbetalingene?",
-                    "nn": "Når starta utbetalingane?"
-                  },
-                  "verdi": {
-                    "nb": "2022-02-01",
-                    "nn": "2022-02-01",
-                    "en": "2022-02-01"
-                  }
-                },
-                "utbetalingTilDato": {
-                  "label": {
-                    "en": "When did you stop receiving benefits?",
-                    "nb": "Når stoppet utbetalingene?",
-                    "nn": "Når stoppa utbetalingane?"
-                  },
-                  "verdi": {
-                    "nb": "2022-02-10",
-                    "nn": "2022-02-10",
-                    "en": "2022-02-10"
-                  }
-                }
-              },
-              "en": {
-                "fårUtbetalingNå": {
-                  "label": {
-                    "en": "Is GODSLIG DORULL's other parent currently receiving benefits?",
-                    "nb": "Får GODSLIG DORULL sin andre forelder utbetalinger nå?",
-                    "nn": "Får GODSLIG DORULL sin andre forelder utbetalingar no?"
-                  },
-                  "verdi": {
-                    "nb": "NEI",
-                    "nn": "NEI",
-                    "en": "NEI"
-                  }
-                },
-                "utbetalingLand": {
-                  "label": {
-                    "en": "Which country did GODSLIG DORULL's other parent is receive benefits from?",
-                    "nb": "Hvilket land fikk GODSLIG DORULL sin andre forelder utbetalinger fra?",
-                    "nn": "Kva land fekk GODSLIG DORULL sin andre forelder utbetalingar frå?"
-                  },
-                  "verdi": {
-                    "nb": "Amerikansk Samoa",
-                    "nn": "Amerikansk Samoa",
-                    "en": "American Samoa"
-                  }
-                },
-                "utbetalingFraDato": {
-                  "label": {
-                    "en": "When did you start receiving benefits?",
-                    "nb": "Når startet utbetalingene?",
-                    "nn": "Når starta utbetalingane?"
-                  },
-                  "verdi": {
-                    "nb": "2022-02-01",
-                    "nn": "2022-02-01",
-                    "en": "2022-02-01"
-                  }
-                },
-                "utbetalingTilDato": {
-                  "label": {
-                    "en": "When did you stop receiving benefits?",
-                    "nb": "Når stoppet utbetalingene?",
-                    "nn": "Når stoppa utbetalingane?"
-                  },
-                  "verdi": {
-                    "nb": "2022-02-10",
-                    "nn": "2022-02-10",
-                    "en": "2022-02-10"
-                  }
-                }
-              }
-            }
-          }
-        ]
+        "arbeidsperioderNorge": [],
+        "pensjonsperioderNorge": [],
+        "andreUtbetalingsperioder": []
       },
       "spørsmål": {
+        "erFosterbarn": {
+          "label": {
+            "en": "Which of the children are foster children?",
+            "nb": "Hvem av barna er fosterbarn?",
+            "nn": "Kven av barna er fosterbarn?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "erAdoptertFraUtland": {
+          "label": {
+            "en": "Which of the children are adopted from abroad?",
+            "nb": "Hvem av barna er adoptert fra utlandet?",
+            "nn": "Kven av barna er adoptert frå utlandet?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "erAsylsøker": {
+          "label": {
+            "en": "For which of the children has an application for asylum been submitted?",
+            "nb": "Hvem av barna er det søkt om asyl for?",
+            "nn": "Kven av barna er det søkt om asyl for?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "barnetrygdFraAnnetEøsland": {
+          "label": {
+            "en": "For which of the children are you receiving or have applied for child benefit?",
+            "nb": "Hvem av barna får du eller har du søkt om barnetrygd for?",
+            "nn": "Kven av barna får du eller har du søkt om barnetrygd for?"
+          },
+          "verdi": {
+            "nb": "JA",
+            "nn": "JA",
+            "en": "JA"
+          }
+        },
+        "andreForelderErDød": {
+          "label": {
+            "en": "Which of the children is your previous spouse/cohabiting partner the parent of?",
+            "nb": "Hvem av barna er din tidligere ektefelle/samboer forelder til?",
+            "nn": "Kven av barna er din tidlegare ektefelle/sambuar forelder til?"
+          },
+          "verdi": {
+            "nb": "JA",
+            "nn": "JA",
+            "en": "JA"
+          }
+        },
+        "oppholderSegIInstitusjon": {
+          "label": {
+            "en": "Which of the children are in an institution?",
+            "nb": "Hvem av barna er i institusjon?",
+            "nn": "Kven av barna er seg i institusjon?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "institusjonIUtland": {
+          "label": {
+            "en": "The institution is outside of Norway",
+            "nb": "Institusjonen er i utlandet",
+            "nn": "Institusjonen er i utlandet"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "boddMindreEnn12MndINorge": {
+          "label": {
+            "en": "Which of the children have stayed outside of Norway during the last twelve months?",
+            "nb": "Hvem av barna har oppholdt seg utenfor Norge i løpet av de siste tolv månedene?",
+            "nn": "Kven av barna har oppheldt seg utanfor Noreg i løpet av dei siste tolv månadene?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "mottarEllerMottokEøsBarnetrygd": {
+          "label": {
+            "en": "Are you receiving or have you received child benefit from another EEA country?",
+            "nb": "Får du eller har du fått barnetrygd fra et annet EU/EØS land?",
+            "nn": "Får du eller har du fått barnetrygd frå eit anna EU/EØS-land?"
+          },
+          "verdi": {
+            "nb": "JA",
+            "nn": "JA",
+            "en": "JA"
+          }
+        },
+        "borFastMedSøker": {
+          "label": {
+            "en": "Does GODSLIG DORULL live with you on a permanent basis?",
+            "nb": "Bor GODSLIG DORULL fast sammen med deg?",
+            "nn": "Bur GODSLIG DORULL fast saman med deg?"
+          },
+          "verdi": {
+            "nb": "JA",
+            "nn": "JA",
+            "en": "JA"
+          }
+        },
+        "søkerForTidsrom": {
+          "label": {
+            "en": "Are you applying for child benefit for a particular period of time for GODSLIG DORULL?",
+            "nb": "Søker du barnetrygd for et spesielt tidsrom for GODSLIG DORULL?",
+            "nn": "Søker du barnetrygd for eit spesielt tidsrom for GODSLIG DORULL?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "søkerForTidsromSluttdato": {
+          "label": {
+            "en": "Up to and including",
+            "nb": "Til og med",
+            "nn": "Til og med"
+          },
+          "verdi": {
+            "nb": "",
+            "nn": "",
+            "en": ""
+          }
+        },
+        "institusjonOppholdSluttdato": {
+          "label": {
+            "en": "When is the stay at the institution ending?",
+            "nb": "Når avsluttes institusjonsoppholdet?",
+            "nn": "Når avsluttast institusjonsopphaldet?"
+          },
+          "verdi": {
+            "nb": "",
+            "nn": "",
+            "en": ""
+          }
+        }
+      }
+    },
+    {
+      "navn": {
+        "label": {
+          "en": "Name",
+          "nb": "Navn",
+          "nn": "Namn"
+        },
+        "verdi": {
+          "nb": "TYKKMAGET KRONJUVEL",
+          "nn": "TYKKMAGET KRONJUVEL",
+          "en": "TYKKMAGET KRONJUVEL"
+        }
+      },
+      "ident": {
+        "label": {
+          "en": "Ident",
+          "nb": "Ident",
+          "nn": "Ident"
+        },
+        "verdi": {
+          "nb": "08111276820",
+          "nn": "08111276820",
+          "en": "08111276820"
+        }
+      },
+      "registrertBostedType": {
+        "label": {
+          "en": "Registered place of residence",
+          "nb": "Registrert bosted",
+          "nn": "Registrert bustad"
+        },
+        "verdi": {
+          "nb": "REGISTRERT_SOKERS_ADRESSE",
+          "nn": "REGISTRERT_SOKERS_ADRESSE",
+          "en": "REGISTRERT_SOKERS_ADRESSE"
+        }
+      },
+      "alder": {
+        "label": {
+          "en": "Age",
+          "nb": "Alder",
+          "nn": "Alder"
+        },
+        "verdi": {
+          "en": "9 years",
+          "nb": "9 år",
+          "nn": "9 år"
+        }
+      },
+      "utenlandsperioder": [],
+      "eøsBarnetrygdsperioder": [
+        {
+          "label": {
+            "en": "Child benefit period 1",
+            "nb": "Barnetrygdperiode 1",
+            "nn": "Barnetrygdperiode 1"
+          },
+          "verdi": {
+            "nb": {
+              "mottarEøsBarnetrygdNå": {
+                "label": {
+                  "en": "Are you currently receiving child benefit from an EEA country?",
+                  "nb": "Får du barnetrygd fra et EU/EØS land nå?",
+                  "nn": "Får du barnetrygd frå eit EU/EØS-land no?"
+                },
+                "verdi": {
+                  "nb": "NEI",
+                  "nn": "NEI",
+                  "en": "NEI"
+                }
+              },
+              "barnetrygdsland": {
+                "label": {
+                  "en": "Which country did you receive child benefit from?",
+                  "nb": "Hvilket land fikk du barnetrygd fra?",
+                  "nn": "Kva land fekk du barnetrygd frå?"
+                },
+                "verdi": {
+                  "nb": "Andorra",
+                  "nn": "Andorra",
+                  "en": "Andorra"
+                }
+              },
+              "fraDatoBarnetrygdperiode": {
+                "label": {
+                  "en": "When did the child benefit start?",
+                  "nb": "Når startet barnetrygden?",
+                  "nn": "Når starta barnetrygd?"
+                },
+                "verdi": {
+                  "nb": "2022-02-07",
+                  "nn": "2022-02-07",
+                  "en": "2022-02-07"
+                }
+              },
+              "tilDatoBarnetrygdperiode": {
+                "label": {
+                  "en": "When did the child benefit end?",
+                  "nb": "Når ble barnetrygden avsluttet?",
+                  "nn": "Når vart barnetrygda avslutta?"
+                },
+                "verdi": {
+                  "nb": "2022-02-23",
+                  "nn": "2022-02-23",
+                  "en": "2022-02-23"
+                }
+              },
+              "månedligBeløp": {
+                "label": {
+                  "en": "Amount each month for TYKKMAGET KRONJUVEL",
+                  "nb": "Beløp hver måned for TYKKMAGET KRONJUVEL",
+                  "nn": "Beløp kvar månad for TYKKMAGET KRONJUVEL"
+                },
+                "verdi": {
+                  "nb": "adaf",
+                  "nn": "adaf",
+                  "en": "adaf"
+                }
+              }
+            },
+            "nn": {
+              "mottarEøsBarnetrygdNå": {
+                "label": {
+                  "en": "Are you currently receiving child benefit from an EEA country?",
+                  "nb": "Får du barnetrygd fra et EU/EØS land nå?",
+                  "nn": "Får du barnetrygd frå eit EU/EØS-land no?"
+                },
+                "verdi": {
+                  "nb": "NEI",
+                  "nn": "NEI",
+                  "en": "NEI"
+                }
+              },
+              "barnetrygdsland": {
+                "label": {
+                  "en": "Which country did you receive child benefit from?",
+                  "nb": "Hvilket land fikk du barnetrygd fra?",
+                  "nn": "Kva land fekk du barnetrygd frå?"
+                },
+                "verdi": {
+                  "nb": "Andorra",
+                  "nn": "Andorra",
+                  "en": "Andorra"
+                }
+              },
+              "fraDatoBarnetrygdperiode": {
+                "label": {
+                  "en": "When did the child benefit start?",
+                  "nb": "Når startet barnetrygden?",
+                  "nn": "Når starta barnetrygd?"
+                },
+                "verdi": {
+                  "nb": "2022-02-07",
+                  "nn": "2022-02-07",
+                  "en": "2022-02-07"
+                }
+              },
+              "tilDatoBarnetrygdperiode": {
+                "label": {
+                  "en": "When did the child benefit end?",
+                  "nb": "Når ble barnetrygden avsluttet?",
+                  "nn": "Når vart barnetrygda avslutta?"
+                },
+                "verdi": {
+                  "nb": "2022-02-23",
+                  "nn": "2022-02-23",
+                  "en": "2022-02-23"
+                }
+              },
+              "månedligBeløp": {
+                "label": {
+                  "en": "Amount each month for TYKKMAGET KRONJUVEL",
+                  "nb": "Beløp hver måned for TYKKMAGET KRONJUVEL",
+                  "nn": "Beløp kvar månad for TYKKMAGET KRONJUVEL"
+                },
+                "verdi": {
+                  "nb": "adaf",
+                  "nn": "adaf",
+                  "en": "adaf"
+                }
+              }
+            },
+            "en": {
+              "mottarEøsBarnetrygdNå": {
+                "label": {
+                  "en": "Are you currently receiving child benefit from an EEA country?",
+                  "nb": "Får du barnetrygd fra et EU/EØS land nå?",
+                  "nn": "Får du barnetrygd frå eit EU/EØS-land no?"
+                },
+                "verdi": {
+                  "nb": "NEI",
+                  "nn": "NEI",
+                  "en": "NEI"
+                }
+              },
+              "barnetrygdsland": {
+                "label": {
+                  "en": "Which country did you receive child benefit from?",
+                  "nb": "Hvilket land fikk du barnetrygd fra?",
+                  "nn": "Kva land fekk du barnetrygd frå?"
+                },
+                "verdi": {
+                  "nb": "Andorra",
+                  "nn": "Andorra",
+                  "en": "Andorra"
+                }
+              },
+              "fraDatoBarnetrygdperiode": {
+                "label": {
+                  "en": "When did the child benefit start?",
+                  "nb": "Når startet barnetrygden?",
+                  "nn": "Når starta barnetrygd?"
+                },
+                "verdi": {
+                  "nb": "2022-02-07",
+                  "nn": "2022-02-07",
+                  "en": "2022-02-07"
+                }
+              },
+              "tilDatoBarnetrygdperiode": {
+                "label": {
+                  "en": "When did the child benefit end?",
+                  "nb": "Når ble barnetrygden avsluttet?",
+                  "nn": "Når vart barnetrygda avslutta?"
+                },
+                "verdi": {
+                  "nb": "2022-02-23",
+                  "nn": "2022-02-23",
+                  "en": "2022-02-23"
+                }
+              },
+              "månedligBeløp": {
+                "label": {
+                  "en": "Amount each month for TYKKMAGET KRONJUVEL",
+                  "nb": "Beløp hver måned for TYKKMAGET KRONJUVEL",
+                  "nn": "Beløp kvar månad for TYKKMAGET KRONJUVEL"
+                },
+                "verdi": {
+                  "nb": "adaf",
+                  "nn": "adaf",
+                  "en": "adaf"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "andreForelder": {
+        "navn": {
+          "label": {
+            "en": "Name",
+            "nb": "Navn",
+            "nn": "Namn"
+          },
+          "verdi": {
+            "en": "I am unable to provide information about the other parent",
+            "nb": "Jeg kan ikke gi opplysninger om den andre forelderen",
+            "nn": "Eg kan ikkje gje opplysningar om den andre forelderen"
+          }
+        },
+        "fnr": {
+          "label": {
+            "en": "Norwegian National identity number or D number",
+            "nb": "Fødselsnummer eller d-nummer",
+            "nn": "Fødselsnummer eller d-nummer"
+          },
+          "verdi": {
+            "nb": "",
+            "nn": "",
+            "en": ""
+          }
+        },
+        "fødselsdato": {
+          "label": {
+            "en": "Date of birth",
+            "nb": "Fødselsdato",
+            "nn": "Fødselsdato"
+          },
+          "verdi": {
+            "nb": "",
+            "nn": "",
+            "en": ""
+          }
+        },
+        "pensjonUtland": {
+          "label": {
+            "en": "Does TYKKMAGET KRONJUVEL's other parent receive a pension from abroad?",
+            "nb": "Får den andre forelderen til TYKKMAGET KRONJUVEL pensjon fra utlandet?",
+            "nn": "Får den andre forelderen til TYKKMAGET KRONJUVEL pensjon frå utlandet?"
+          },
+          "verdi": {
+            "nb": null,
+            "nn": null,
+            "en": null
+          }
+        },
+        "pensjonHvilketLand": {
+          "label": {
+            "en": "What country does TYKKMAGET KRONJUVEL's other parent receive a pension from?",
+            "nb": "Hvilket land får den andre forelderen til TYKKMAGET KRONJUVEL pensjon fra?",
+            "nn": "Kva land får den andre forelderen til TYKKMAGET KRONJUVEL pensjon frå?"
+          },
+          "verdi": {
+            "nb": "UKJENT",
+            "nn": "UKJENT",
+            "en": "UKJENT"
+          }
+        },
+        "arbeidUtlandet": {
+          "label": {
+            "en": "Does TYKKMAGET KRONJUVEL's other parent work outside of Norway, on a foreign ship or on a foreign continental shelf?",
+            "nb": "Arbeider den andre forelderen til TYKKMAGET KRONJUVEL utenfor Norge, på utenlandsk skip eller på utenlandsk kontinentalsokkel?",
+            "nn": "Arbeidar den andre forelderen til TYKKMAGET KRONJUVEL utanfor Noreg, på utanlandsk skip eller på utanlandsk kontinentalsokkel?"
+          },
+          "verdi": {
+            "nb": null,
+            "nn": null,
+            "en": null
+          }
+        },
+        "arbeidUtlandetHvilketLand": {
+          "label": {
+            "en": "What country does the other parent work in?",
+            "nb": "Hvilket land arbeider den andre forelderen i?",
+            "nn": "Kva land arbeidar den andre forelderen i?"
+          },
+          "verdi": {
+            "nb": "UKJENT",
+            "nn": "UKJENT",
+            "en": "UKJENT"
+          }
+        },
+        "skriftligAvtaleOmDeltBosted": {
+          "label": {
+            "en": "Do you and the other parent have a written agreement on dual residence for TYKKMAGET KRONJUVEL?",
+            "nb": "Har du og den andre forelderen skriftlig avtale om delt bosted for TYKKMAGET KRONJUVEL?",
+            "nn": "Har du og den andre forelderen skriftleg avtale om delt bustad for TYKKMAGET KRONJUVEL?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "utvidet": {
+          "søkerHarBoddMedAndreForelder": {
+            "label": {
+              "en": "Have you ever lived with TYKKMAGET KRONJUVEL's other parent?",
+              "nb": "Har du bodd sammen med TYKKMAGET KRONJUVEL sin andre forelder?",
+              "nn": "Har du budd saman med TYKKMAGET KRONJUVEL sin andre forelder?"
+            },
+            "verdi": {
+              "nb": null,
+              "nn": null,
+              "en": null
+            }
+          },
+          "søkerFlyttetFraAndreForelderDato": {
+            "label": {
+              "en": "When did you move apart?",
+              "nb": "Når flyttet dere fra hverandre?",
+              "nn": "Når flytta de frå kvarandre?"
+            },
+            "verdi": {
+              "nb": "",
+              "nn": "",
+              "en": ""
+            }
+          }
+        },
+        "arbeidsperioderUtland": [],
+        "pensjonsperioderUtland": [],
+        "arbeidsperioderNorge": [],
+        "pensjonsperioderNorge": [],
+        "andreUtbetalingsperioder": []
+      },
+      "spørsmål": {
+        "sammeForelderSomAnnetBarnMedId": {
+          "label": {
+            "en": "Who is TYKKMAGET KRONJUVEL's other parent?",
+            "nb": "Hvem er TYKKMAGET KRONJUVEL sin andre forelder?",
+            "nn": "Kven er TYKKMAGET KRONJUVEL sin andre forelder?"
+          },
+          "verdi": {
+            "nb": "ANNEN_FORELDER",
+            "nn": "ANNEN_FORELDER",
+            "en": "ANNEN_FORELDER"
+          }
+        },
         "erFosterbarn": {
           "label": {
             "en": "Which of the children are foster children?",
@@ -2670,9 +3727,9 @@
         },
         "borFastMedSøker": {
           "label": {
-            "en": "Does GODSLIG DORULL live with you on a permanent basis?",
-            "nb": "Bor GODSLIG DORULL fast sammen med deg?",
-            "nn": "Bur GODSLIG DORULL fast saman med deg?"
+            "en": "Does TYKKMAGET KRONJUVEL live with you on a permanent basis?",
+            "nb": "Bor TYKKMAGET KRONJUVEL fast sammen med deg?",
+            "nn": "Bur TYKKMAGET KRONJUVEL fast saman med deg?"
           },
           "verdi": {
             "nb": "NEI",
@@ -2682,9 +3739,1060 @@
         },
         "søkerForTidsrom": {
           "label": {
-            "en": "Are you applying for child benefit for a particular period of time for GODSLIG DORULL?",
-            "nb": "Søker du barnetrygd for et spesielt tidsrom for GODSLIG DORULL?",
-            "nn": "Søker du barnetrygd for eit spesielt tidsrom for GODSLIG DORULL?"
+            "en": "Are you applying for child benefit for a particular period of time for TYKKMAGET KRONJUVEL?",
+            "nb": "Søker du barnetrygd for et spesielt tidsrom for TYKKMAGET KRONJUVEL?",
+            "nn": "Søker du barnetrygd for eit spesielt tidsrom for TYKKMAGET KRONJUVEL?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "søkerForTidsromSluttdato": {
+          "label": {
+            "en": "Up to and including",
+            "nb": "Til og med",
+            "nn": "Til og med"
+          },
+          "verdi": {
+            "nb": "",
+            "nn": "",
+            "en": ""
+          }
+        },
+        "institusjonOppholdSluttdato": {
+          "label": {
+            "en": "When is the stay at the institution ending?",
+            "nb": "Når avsluttes institusjonsoppholdet?",
+            "nn": "Når avsluttast institusjonsopphaldet?"
+          },
+          "verdi": {
+            "nb": "",
+            "nn": "",
+            "en": ""
+          }
+        }
+      }
+    },
+    {
+      "navn": {
+        "label": {
+          "en": "Name",
+          "nb": "Navn",
+          "nn": "Namn"
+        },
+        "verdi": {
+          "nb": "LUNKEN KAKKERLAKK",
+          "nn": "LUNKEN KAKKERLAKK",
+          "en": "LUNKEN KAKKERLAKK"
+        }
+      },
+      "ident": {
+        "label": {
+          "en": "Ident",
+          "nb": "Ident",
+          "nn": "Ident"
+        },
+        "verdi": {
+          "nb": "23021778087",
+          "nn": "23021778087",
+          "en": "23021778087"
+        }
+      },
+      "registrertBostedType": {
+        "label": {
+          "en": "Registered place of residence",
+          "nb": "Registrert bosted",
+          "nn": "Registrert bustad"
+        },
+        "verdi": {
+          "nb": "REGISTRERT_SOKERS_ADRESSE",
+          "nn": "REGISTRERT_SOKERS_ADRESSE",
+          "en": "REGISTRERT_SOKERS_ADRESSE"
+        }
+      },
+      "alder": {
+        "label": {
+          "en": "Age",
+          "nb": "Alder",
+          "nn": "Alder"
+        },
+        "verdi": {
+          "en": "5 years",
+          "nb": "5 år",
+          "nn": "5 år"
+        }
+      },
+      "utenlandsperioder": [],
+      "eøsBarnetrygdsperioder": [],
+      "andreForelder": {
+        "navn": {
+          "label": {
+            "en": "Name",
+            "nb": "Navn",
+            "nn": "Namn"
+          },
+          "verdi": {
+            "nb": "fafafa",
+            "nn": "fafafa",
+            "en": "fafafa"
+          }
+        },
+        "fnr": {
+          "label": {
+            "en": "Norwegian National identity number or D number",
+            "nb": "Fødselsnummer eller d-nummer",
+            "nn": "Fødselsnummer eller d-nummer"
+          },
+          "verdi": {
+            "en": "I don't know their National identity number or-D number",
+            "nb": "Jeg kjenner ikke fødselsnummer eller d-nummer",
+            "nn": "Eg kjenner ikkje fødselsnummer eller d-nummer"
+          }
+        },
+        "fødselsdato": {
+          "label": {
+            "en": "Date of birth",
+            "nb": "Fødselsdato",
+            "nn": "Fødselsdato"
+          },
+          "verdi": {
+            "en": "I don't know the date of birth",
+            "nb": "Jeg kjenner ikke fødselsdato",
+            "nn": "Eg kjenner ikkje fødselsdato"
+          }
+        },
+        "pensjonUtland": {
+          "label": {
+            "en": "Does LUNKEN KAKKERLAKK's other parent receive a pension from abroad?",
+            "nb": "Får den andre forelderen til LUNKEN KAKKERLAKK pensjon fra utlandet?",
+            "nn": "Får den andre forelderen til LUNKEN KAKKERLAKK pensjon frå utlandet?"
+          },
+          "verdi": {
+            "nb": "VET_IKKE",
+            "nn": "VET_IKKE",
+            "en": "VET_IKKE"
+          }
+        },
+        "pensjonHvilketLand": {
+          "label": {
+            "en": "What country does LUNKEN KAKKERLAKK's other parent receive a pension from?",
+            "nb": "Hvilket land får den andre forelderen til LUNKEN KAKKERLAKK pensjon fra?",
+            "nn": "Kva land får den andre forelderen til LUNKEN KAKKERLAKK pensjon frå?"
+          },
+          "verdi": {
+            "nb": "UKJENT",
+            "nn": "UKJENT",
+            "en": "UKJENT"
+          }
+        },
+        "arbeidUtlandet": {
+          "label": {
+            "en": "Does LUNKEN KAKKERLAKK's other parent work outside of Norway, on a foreign ship or on a foreign continental shelf?",
+            "nb": "Arbeider den andre forelderen til LUNKEN KAKKERLAKK utenfor Norge, på utenlandsk skip eller på utenlandsk kontinentalsokkel?",
+            "nn": "Arbeidar den andre forelderen til LUNKEN KAKKERLAKK utanfor Noreg, på utanlandsk skip eller på utanlandsk kontinentalsokkel?"
+          },
+          "verdi": {
+            "nb": "JA",
+            "nn": "JA",
+            "en": "JA"
+          }
+        },
+        "arbeidUtlandetHvilketLand": {
+          "label": {
+            "en": "What country does the other parent work in?",
+            "nb": "Hvilket land arbeider den andre forelderen i?",
+            "nn": "Kva land arbeidar den andre forelderen i?"
+          },
+          "verdi": {
+            "nb": "UKJENT",
+            "nn": "UKJENT",
+            "en": "UKJENT"
+          }
+        },
+        "skriftligAvtaleOmDeltBosted": {
+          "label": {
+            "en": "Do you and the other parent have a written agreement on dual residence for LUNKEN KAKKERLAKK?",
+            "nb": "Har du og den andre forelderen skriftlig avtale om delt bosted for LUNKEN KAKKERLAKK?",
+            "nn": "Har du og den andre forelderen skriftleg avtale om delt bustad for LUNKEN KAKKERLAKK?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "utvidet": {
+          "søkerHarBoddMedAndreForelder": {
+            "label": {
+              "en": "Have you ever lived with LUNKEN KAKKERLAKK's other parent?",
+              "nb": "Har du bodd sammen med LUNKEN KAKKERLAKK sin andre forelder?",
+              "nn": "Har du budd saman med LUNKEN KAKKERLAKK sin andre forelder?"
+            },
+            "verdi": {
+              "nb": null,
+              "nn": null,
+              "en": null
+            }
+          },
+          "søkerFlyttetFraAndreForelderDato": {
+            "label": {
+              "en": "When did you move apart?",
+              "nb": "Når flyttet dere fra hverandre?",
+              "nn": "Når flytta de frå kvarandre?"
+            },
+            "verdi": {
+              "nb": "",
+              "nn": "",
+              "en": ""
+            }
+          }
+        },
+        "arbeidsperioderUtland": [
+          {
+            "label": {
+              "en": "Period of work outside of Norway 1",
+              "nb": "Arbeidsperiode utenfor Norge 1",
+              "nn": "Arbeidsperiode utanfor Noreg 1"
+            },
+            "verdi": {
+              "nb": {
+                "arbeidsperiodeAvsluttet": {
+                  "label": {
+                    "en": "Has the period of work ended?",
+                    "nb": "Er arbeidsperioden avsluttet?",
+                    "nn": "Er arbeidsperioden avslutta?"
+                  },
+                  "verdi": {
+                    "nb": "JA",
+                    "nn": "JA",
+                    "en": "JA"
+                  }
+                },
+                "arbeidsperiodeland": {
+                  "label": {
+                    "en": "What country did the other parent work in?",
+                    "nb": "Hvilket land arbeidet den andre forelderen i?",
+                    "nn": "Kva land arbeidde den andre forelderen i?"
+                  },
+                  "verdi": {
+                    "nb": "Afghanistan",
+                    "nn": "Afghanistan",
+                    "en": "Afghanistan"
+                  }
+                },
+                "arbeidsgiver": {
+                  "label": {
+                    "en": "Employer",
+                    "nb": "Arbeidsgiver",
+                    "nn": "Arbeidsgjevar"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                },
+                "fraDatoArbeidsperiode": {
+                  "label": {
+                    "en": "When did the period of work start?",
+                    "nb": "Når startet arbeidsperioden?",
+                    "nn": "Når starta arbeidsperioden?"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                },
+                "tilDatoArbeidsperiode": {
+                  "label": {
+                    "en": "When did the period of work end?",
+                    "nb": "Når ble arbeidsperioden avsluttet?",
+                    "nn": "Når blei arbeidsperioden avslutta?"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                }
+              },
+              "nn": {
+                "arbeidsperiodeAvsluttet": {
+                  "label": {
+                    "en": "Has the period of work ended?",
+                    "nb": "Er arbeidsperioden avsluttet?",
+                    "nn": "Er arbeidsperioden avslutta?"
+                  },
+                  "verdi": {
+                    "nb": "JA",
+                    "nn": "JA",
+                    "en": "JA"
+                  }
+                },
+                "arbeidsperiodeland": {
+                  "label": {
+                    "en": "What country did the other parent work in?",
+                    "nb": "Hvilket land arbeidet den andre forelderen i?",
+                    "nn": "Kva land arbeidde den andre forelderen i?"
+                  },
+                  "verdi": {
+                    "nb": "Afghanistan",
+                    "nn": "Afghanistan",
+                    "en": "Afghanistan"
+                  }
+                },
+                "arbeidsgiver": {
+                  "label": {
+                    "en": "Employer",
+                    "nb": "Arbeidsgiver",
+                    "nn": "Arbeidsgjevar"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                },
+                "fraDatoArbeidsperiode": {
+                  "label": {
+                    "en": "When did the period of work start?",
+                    "nb": "Når startet arbeidsperioden?",
+                    "nn": "Når starta arbeidsperioden?"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                },
+                "tilDatoArbeidsperiode": {
+                  "label": {
+                    "en": "When did the period of work end?",
+                    "nb": "Når ble arbeidsperioden avsluttet?",
+                    "nn": "Når blei arbeidsperioden avslutta?"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                }
+              },
+              "en": {
+                "arbeidsperiodeAvsluttet": {
+                  "label": {
+                    "en": "Has the period of work ended?",
+                    "nb": "Er arbeidsperioden avsluttet?",
+                    "nn": "Er arbeidsperioden avslutta?"
+                  },
+                  "verdi": {
+                    "nb": "JA",
+                    "nn": "JA",
+                    "en": "JA"
+                  }
+                },
+                "arbeidsperiodeland": {
+                  "label": {
+                    "en": "What country did the other parent work in?",
+                    "nb": "Hvilket land arbeidet den andre forelderen i?",
+                    "nn": "Kva land arbeidde den andre forelderen i?"
+                  },
+                  "verdi": {
+                    "nb": "Afghanistan",
+                    "nn": "Afghanistan",
+                    "en": "Afghanistan"
+                  }
+                },
+                "arbeidsgiver": {
+                  "label": {
+                    "en": "Employer",
+                    "nb": "Arbeidsgiver",
+                    "nn": "Arbeidsgjevar"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                },
+                "fraDatoArbeidsperiode": {
+                  "label": {
+                    "en": "When did the period of work start?",
+                    "nb": "Når startet arbeidsperioden?",
+                    "nn": "Når starta arbeidsperioden?"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                },
+                "tilDatoArbeidsperiode": {
+                  "label": {
+                    "en": "When did the period of work end?",
+                    "nb": "Når ble arbeidsperioden avsluttet?",
+                    "nn": "Når blei arbeidsperioden avslutta?"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "pensjonsperioderUtland": [],
+        "arbeidsperioderNorge": [
+          {
+            "label": {
+              "en": "Period of work in Norway 1",
+              "nb": "Arbeidsperiode i Norge 1",
+              "nn": "Arbeidsperiode i Noreg 1"
+            },
+            "verdi": {
+              "nb": {
+                "arbeidsperiodeAvsluttet": {
+                  "label": {
+                    "en": "Has the period of work ended?",
+                    "nb": "Er arbeidsperioden avsluttet?",
+                    "nn": "Er arbeidsperioden avslutta?"
+                  },
+                  "verdi": {
+                    "nb": "NEI",
+                    "nn": "NEI",
+                    "en": "NEI"
+                  }
+                },
+                "arbeidsperiodeland": {
+                  "label": {
+                    "en": "What country does the other parent work in?",
+                    "nb": "Hvilket land arbeider den andre forelderen i?",
+                    "nn": "Kva land arbeidar den andre forelderen i?"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                },
+                "arbeidsgiver": {
+                  "label": {
+                    "en": "Employer",
+                    "nb": "Arbeidsgiver",
+                    "nn": "Arbeidsgjevar"
+                  },
+                  "verdi": {
+                    "nb": "vafga",
+                    "nn": "vafga",
+                    "en": "vafga"
+                  }
+                },
+                "fraDatoArbeidsperiode": {
+                  "label": {
+                    "en": "When did the period of work start?",
+                    "nb": "Når startet arbeidsperioden?",
+                    "nn": "Når starta arbeidsperioden?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-07",
+                    "nn": "2022-02-07",
+                    "en": "2022-02-07"
+                  }
+                },
+                "tilDatoArbeidsperiode": {
+                  "label": {
+                    "en": "When is the period of work ending?",
+                    "nb": "Når avsluttes arbeidsperioden?",
+                    "nn": "Når avsluttast arbeidsperioden?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-23",
+                    "nn": "2022-02-23",
+                    "en": "2022-02-23"
+                  }
+                }
+              },
+              "nn": {
+                "arbeidsperiodeAvsluttet": {
+                  "label": {
+                    "en": "Has the period of work ended?",
+                    "nb": "Er arbeidsperioden avsluttet?",
+                    "nn": "Er arbeidsperioden avslutta?"
+                  },
+                  "verdi": {
+                    "nb": "NEI",
+                    "nn": "NEI",
+                    "en": "NEI"
+                  }
+                },
+                "arbeidsperiodeland": {
+                  "label": {
+                    "en": "What country does the other parent work in?",
+                    "nb": "Hvilket land arbeider den andre forelderen i?",
+                    "nn": "Kva land arbeidar den andre forelderen i?"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                },
+                "arbeidsgiver": {
+                  "label": {
+                    "en": "Employer",
+                    "nb": "Arbeidsgiver",
+                    "nn": "Arbeidsgjevar"
+                  },
+                  "verdi": {
+                    "nb": "vafga",
+                    "nn": "vafga",
+                    "en": "vafga"
+                  }
+                },
+                "fraDatoArbeidsperiode": {
+                  "label": {
+                    "en": "When did the period of work start?",
+                    "nb": "Når startet arbeidsperioden?",
+                    "nn": "Når starta arbeidsperioden?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-07",
+                    "nn": "2022-02-07",
+                    "en": "2022-02-07"
+                  }
+                },
+                "tilDatoArbeidsperiode": {
+                  "label": {
+                    "en": "When is the period of work ending?",
+                    "nb": "Når avsluttes arbeidsperioden?",
+                    "nn": "Når avsluttast arbeidsperioden?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-23",
+                    "nn": "2022-02-23",
+                    "en": "2022-02-23"
+                  }
+                }
+              },
+              "en": {
+                "arbeidsperiodeAvsluttet": {
+                  "label": {
+                    "en": "Has the period of work ended?",
+                    "nb": "Er arbeidsperioden avsluttet?",
+                    "nn": "Er arbeidsperioden avslutta?"
+                  },
+                  "verdi": {
+                    "nb": "NEI",
+                    "nn": "NEI",
+                    "en": "NEI"
+                  }
+                },
+                "arbeidsperiodeland": {
+                  "label": {
+                    "en": "What country does the other parent work in?",
+                    "nb": "Hvilket land arbeider den andre forelderen i?",
+                    "nn": "Kva land arbeidar den andre forelderen i?"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                },
+                "arbeidsgiver": {
+                  "label": {
+                    "en": "Employer",
+                    "nb": "Arbeidsgiver",
+                    "nn": "Arbeidsgjevar"
+                  },
+                  "verdi": {
+                    "nb": "vafga",
+                    "nn": "vafga",
+                    "en": "vafga"
+                  }
+                },
+                "fraDatoArbeidsperiode": {
+                  "label": {
+                    "en": "When did the period of work start?",
+                    "nb": "Når startet arbeidsperioden?",
+                    "nn": "Når starta arbeidsperioden?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-07",
+                    "nn": "2022-02-07",
+                    "en": "2022-02-07"
+                  }
+                },
+                "tilDatoArbeidsperiode": {
+                  "label": {
+                    "en": "When is the period of work ending?",
+                    "nb": "Når avsluttes arbeidsperioden?",
+                    "nn": "Når avsluttast arbeidsperioden?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-23",
+                    "nn": "2022-02-23",
+                    "en": "2022-02-23"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "pensjonsperioderNorge": [
+          {
+            "label": {
+              "en": "Pension period from Norway 1",
+              "nb": "Pensjonsperiode fra Norge 1",
+              "nn": "Pensjonsperiode frå Noreg 1"
+            },
+            "verdi": {
+              "nb": {
+                "mottarPensjonNå": {
+                  "label": {
+                    "en": "Is LUNKEN KAKKERLAKK's other parent currently receiving a pension?",
+                    "nb": "Får LUNKEN KAKKERLAKK sin andre forelder pensjon nå?",
+                    "nn": "Får LUNKEN KAKKERLAKK sin andre forelder pensjon nå?"
+                  },
+                  "verdi": {
+                    "nb": "NEI",
+                    "nn": "NEI",
+                    "en": "NEI"
+                  }
+                },
+                "pensjonsland": {
+                  "label": {
+                    "en": "From which country did LUNKEN KAKKERLAKK's other parent receive a pension?",
+                    "nb": "Hvilket land fikk den andre forelderen til LUNKEN KAKKERLAKK pensjon fra?",
+                    "nn": "Kva land fekk den andre forelderen til LUNKEN KAKKERLAKK pensjon frå?"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                },
+                "pensjonFra": {
+                  "label": {
+                    "en": "When did the other parent start receiving a pension?",
+                    "nb": "Når fikk den andre forelderen til LUNKEN KAKKERLAKK pensjon fra?",
+                    "nn": "Når fekk LUNKEN KAKKERLAKK sin andre forelder pensjon frå?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-01",
+                    "nn": "2022-02-01",
+                    "en": "2022-02-01"
+                  }
+                },
+                "pensjonTil": {
+                  "label": {
+                    "en": "When did the period of receiving a pension end?",
+                    "nb": "Når ble pensjonen avsluttet?",
+                    "nn": "Når vart pensjonen avslutta?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-23",
+                    "nn": "2022-02-23",
+                    "en": "2022-02-23"
+                  }
+                }
+              },
+              "nn": {
+                "mottarPensjonNå": {
+                  "label": {
+                    "en": "Is LUNKEN KAKKERLAKK's other parent currently receiving a pension?",
+                    "nb": "Får LUNKEN KAKKERLAKK sin andre forelder pensjon nå?",
+                    "nn": "Får LUNKEN KAKKERLAKK sin andre forelder pensjon nå?"
+                  },
+                  "verdi": {
+                    "nb": "NEI",
+                    "nn": "NEI",
+                    "en": "NEI"
+                  }
+                },
+                "pensjonsland": {
+                  "label": {
+                    "en": "From which country did LUNKEN KAKKERLAKK's other parent receive a pension?",
+                    "nb": "Hvilket land fikk den andre forelderen til LUNKEN KAKKERLAKK pensjon fra?",
+                    "nn": "Kva land fekk den andre forelderen til LUNKEN KAKKERLAKK pensjon frå?"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                },
+                "pensjonFra": {
+                  "label": {
+                    "en": "When did the other parent start receiving a pension?",
+                    "nb": "Når fikk den andre forelderen til LUNKEN KAKKERLAKK pensjon fra?",
+                    "nn": "Når fekk LUNKEN KAKKERLAKK sin andre forelder pensjon frå?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-01",
+                    "nn": "2022-02-01",
+                    "en": "2022-02-01"
+                  }
+                },
+                "pensjonTil": {
+                  "label": {
+                    "en": "When did the period of receiving a pension end?",
+                    "nb": "Når ble pensjonen avsluttet?",
+                    "nn": "Når vart pensjonen avslutta?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-23",
+                    "nn": "2022-02-23",
+                    "en": "2022-02-23"
+                  }
+                }
+              },
+              "en": {
+                "mottarPensjonNå": {
+                  "label": {
+                    "en": "Is LUNKEN KAKKERLAKK's other parent currently receiving a pension?",
+                    "nb": "Får LUNKEN KAKKERLAKK sin andre forelder pensjon nå?",
+                    "nn": "Får LUNKEN KAKKERLAKK sin andre forelder pensjon nå?"
+                  },
+                  "verdi": {
+                    "nb": "NEI",
+                    "nn": "NEI",
+                    "en": "NEI"
+                  }
+                },
+                "pensjonsland": {
+                  "label": {
+                    "en": "From which country did LUNKEN KAKKERLAKK's other parent receive a pension?",
+                    "nb": "Hvilket land fikk den andre forelderen til LUNKEN KAKKERLAKK pensjon fra?",
+                    "nn": "Kva land fekk den andre forelderen til LUNKEN KAKKERLAKK pensjon frå?"
+                  },
+                  "verdi": {
+                    "nb": null,
+                    "nn": null,
+                    "en": null
+                  }
+                },
+                "pensjonFra": {
+                  "label": {
+                    "en": "When did the other parent start receiving a pension?",
+                    "nb": "Når fikk den andre forelderen til LUNKEN KAKKERLAKK pensjon fra?",
+                    "nn": "Når fekk LUNKEN KAKKERLAKK sin andre forelder pensjon frå?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-01",
+                    "nn": "2022-02-01",
+                    "en": "2022-02-01"
+                  }
+                },
+                "pensjonTil": {
+                  "label": {
+                    "en": "When did the period of receiving a pension end?",
+                    "nb": "Når ble pensjonen avsluttet?",
+                    "nn": "Når vart pensjonen avslutta?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-23",
+                    "nn": "2022-02-23",
+                    "en": "2022-02-23"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "andreUtbetalingsperioder": [
+          {
+            "label": {
+              "en": "Benefit period 1",
+              "nb": "Utbetalingsperiode 1",
+              "nn": "Utbetalingsperiode 1"
+            },
+            "verdi": {
+              "nb": {
+                "fårUtbetalingNå": {
+                  "label": {
+                    "en": "Is LUNKEN KAKKERLAKK's other parent currently receiving benefits?",
+                    "nb": "Får LUNKEN KAKKERLAKK sin andre forelder utbetalinger nå?",
+                    "nn": "Får LUNKEN KAKKERLAKK sin andre forelder utbetalingar no?"
+                  },
+                  "verdi": {
+                    "nb": "NEI",
+                    "nn": "NEI",
+                    "en": "NEI"
+                  }
+                },
+                "utbetalingLand": {
+                  "label": {
+                    "en": "Which country did LUNKEN KAKKERLAKK's other parent is receive benefits from?",
+                    "nb": "Hvilket land fikk LUNKEN KAKKERLAKK sin andre forelder utbetalinger fra?",
+                    "nn": "Kva land fekk LUNKEN KAKKERLAKK sin andre forelder utbetalingar frå?"
+                  },
+                  "verdi": {
+                    "nb": "Anguilla",
+                    "nn": "Anguilla",
+                    "en": "Anguilla"
+                  }
+                },
+                "utbetalingFraDato": {
+                  "label": {
+                    "en": "When did you start receiving benefits?",
+                    "nb": "Når startet utbetalingene?",
+                    "nn": "Når starta utbetalingane?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-07",
+                    "nn": "2022-02-07",
+                    "en": "2022-02-07"
+                  }
+                },
+                "utbetalingTilDato": {
+                  "label": {
+                    "en": "When did you stop receiving benefits?",
+                    "nb": "Når stoppet utbetalingene?",
+                    "nn": "Når stoppa utbetalingane?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-23",
+                    "nn": "2022-02-23",
+                    "en": "2022-02-23"
+                  }
+                }
+              },
+              "nn": {
+                "fårUtbetalingNå": {
+                  "label": {
+                    "en": "Is LUNKEN KAKKERLAKK's other parent currently receiving benefits?",
+                    "nb": "Får LUNKEN KAKKERLAKK sin andre forelder utbetalinger nå?",
+                    "nn": "Får LUNKEN KAKKERLAKK sin andre forelder utbetalingar no?"
+                  },
+                  "verdi": {
+                    "nb": "NEI",
+                    "nn": "NEI",
+                    "en": "NEI"
+                  }
+                },
+                "utbetalingLand": {
+                  "label": {
+                    "en": "Which country did LUNKEN KAKKERLAKK's other parent is receive benefits from?",
+                    "nb": "Hvilket land fikk LUNKEN KAKKERLAKK sin andre forelder utbetalinger fra?",
+                    "nn": "Kva land fekk LUNKEN KAKKERLAKK sin andre forelder utbetalingar frå?"
+                  },
+                  "verdi": {
+                    "nb": "Anguilla",
+                    "nn": "Anguilla",
+                    "en": "Anguilla"
+                  }
+                },
+                "utbetalingFraDato": {
+                  "label": {
+                    "en": "When did you start receiving benefits?",
+                    "nb": "Når startet utbetalingene?",
+                    "nn": "Når starta utbetalingane?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-07",
+                    "nn": "2022-02-07",
+                    "en": "2022-02-07"
+                  }
+                },
+                "utbetalingTilDato": {
+                  "label": {
+                    "en": "When did you stop receiving benefits?",
+                    "nb": "Når stoppet utbetalingene?",
+                    "nn": "Når stoppa utbetalingane?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-23",
+                    "nn": "2022-02-23",
+                    "en": "2022-02-23"
+                  }
+                }
+              },
+              "en": {
+                "fårUtbetalingNå": {
+                  "label": {
+                    "en": "Is LUNKEN KAKKERLAKK's other parent currently receiving benefits?",
+                    "nb": "Får LUNKEN KAKKERLAKK sin andre forelder utbetalinger nå?",
+                    "nn": "Får LUNKEN KAKKERLAKK sin andre forelder utbetalingar no?"
+                  },
+                  "verdi": {
+                    "nb": "NEI",
+                    "nn": "NEI",
+                    "en": "NEI"
+                  }
+                },
+                "utbetalingLand": {
+                  "label": {
+                    "en": "Which country did LUNKEN KAKKERLAKK's other parent is receive benefits from?",
+                    "nb": "Hvilket land fikk LUNKEN KAKKERLAKK sin andre forelder utbetalinger fra?",
+                    "nn": "Kva land fekk LUNKEN KAKKERLAKK sin andre forelder utbetalingar frå?"
+                  },
+                  "verdi": {
+                    "nb": "Anguilla",
+                    "nn": "Anguilla",
+                    "en": "Anguilla"
+                  }
+                },
+                "utbetalingFraDato": {
+                  "label": {
+                    "en": "When did you start receiving benefits?",
+                    "nb": "Når startet utbetalingene?",
+                    "nn": "Når starta utbetalingane?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-07",
+                    "nn": "2022-02-07",
+                    "en": "2022-02-07"
+                  }
+                },
+                "utbetalingTilDato": {
+                  "label": {
+                    "en": "When did you stop receiving benefits?",
+                    "nb": "Når stoppet utbetalingene?",
+                    "nn": "Når stoppa utbetalingane?"
+                  },
+                  "verdi": {
+                    "nb": "2022-02-23",
+                    "nn": "2022-02-23",
+                    "en": "2022-02-23"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "spørsmål": {
+        "sammeForelderSomAnnetBarnMedId": {
+          "label": {
+            "en": "Who is LUNKEN KAKKERLAKK's other parent?",
+            "nb": "Hvem er LUNKEN KAKKERLAKK sin andre forelder?",
+            "nn": "Kven er LUNKEN KAKKERLAKK sin andre forelder?"
+          },
+          "verdi": {
+            "nb": "ANNEN_FORELDER",
+            "nn": "ANNEN_FORELDER",
+            "en": "ANNEN_FORELDER"
+          }
+        },
+        "erFosterbarn": {
+          "label": {
+            "en": "Which of the children are foster children?",
+            "nb": "Hvem av barna er fosterbarn?",
+            "nn": "Kven av barna er fosterbarn?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "erAdoptertFraUtland": {
+          "label": {
+            "en": "Which of the children are adopted from abroad?",
+            "nb": "Hvem av barna er adoptert fra utlandet?",
+            "nn": "Kven av barna er adoptert frå utlandet?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "erAsylsøker": {
+          "label": {
+            "en": "For which of the children has an application for asylum been submitted?",
+            "nb": "Hvem av barna er det søkt om asyl for?",
+            "nn": "Kven av barna er det søkt om asyl for?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "barnetrygdFraAnnetEøsland": {
+          "label": {
+            "en": "For which of the children are you receiving or have applied for child benefit?",
+            "nb": "Hvem av barna får du eller har du søkt om barnetrygd for?",
+            "nn": "Kven av barna får du eller har du søkt om barnetrygd for?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "andreForelderErDød": {
+          "label": {
+            "en": "Which of the children is your previous spouse/cohabiting partner the parent of?",
+            "nb": "Hvem av barna er din tidligere ektefelle/samboer forelder til?",
+            "nn": "Kven av barna er din tidlegare ektefelle/sambuar forelder til?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "oppholderSegIInstitusjon": {
+          "label": {
+            "en": "Which of the children are in an institution?",
+            "nb": "Hvem av barna er i institusjon?",
+            "nn": "Kven av barna er seg i institusjon?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "institusjonIUtland": {
+          "label": {
+            "en": "The institution is outside of Norway",
+            "nb": "Institusjonen er i utlandet",
+            "nn": "Institusjonen er i utlandet"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "boddMindreEnn12MndINorge": {
+          "label": {
+            "en": "Which of the children have stayed outside of Norway during the last twelve months?",
+            "nb": "Hvem av barna har oppholdt seg utenfor Norge i løpet av de siste tolv månedene?",
+            "nn": "Kven av barna har oppheldt seg utanfor Noreg i løpet av dei siste tolv månadene?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "borFastMedSøker": {
+          "label": {
+            "en": "Does LUNKEN KAKKERLAKK live with you on a permanent basis?",
+            "nb": "Bor LUNKEN KAKKERLAKK fast sammen med deg?",
+            "nn": "Bur LUNKEN KAKKERLAKK fast saman med deg?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "søkerForTidsrom": {
+          "label": {
+            "en": "Are you applying for child benefit for a particular period of time for LUNKEN KAKKERLAKK?",
+            "nb": "Søker du barnetrygd for et spesielt tidsrom for LUNKEN KAKKERLAKK?",
+            "nn": "Søker du barnetrygd for eit spesielt tidsrom for LUNKEN KAKKERLAKK?"
           },
           "verdi": {
             "nb": "NEI",
@@ -2799,9 +4907,9 @@
         "nn": "Du er folkeregistrert som enke/enkemann. Er din tidlegare ektefelle forelder til nokre av barna du søker barnetrygd for?"
       },
       "verdi": {
-        "nb": "NEI",
-        "nn": "NEI",
-        "en": "NEI"
+        "nb": "JA",
+        "nn": "JA",
+        "en": "JA"
       }
     },
     "lestOgForståttBekreftelse": {
