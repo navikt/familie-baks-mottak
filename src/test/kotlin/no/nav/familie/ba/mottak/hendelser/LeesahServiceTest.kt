@@ -1,6 +1,7 @@
 package no.nav.familie.ba.mottak.hendelser
 
 import io.mockk.clearAllMocks
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
@@ -9,6 +10,7 @@ import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
 import no.nav.familie.ba.mottak.task.MottaAnnullerFødselTask
 import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.ba.mottak.task.VurderLivshendelseTask
+import no.nav.familie.prosessering.domene.Avvikstype
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -17,7 +19,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.core.env.Environment
 import java.time.LocalDate
-import java.util.*
+import java.time.LocalDateTime
+import java.util.UUID
 import kotlin.random.Random
 import kotlin.random.nextUInt
 
@@ -57,7 +60,7 @@ class LeesahServiceTest {
             mockTaskRepository.save(capture(taskSlot))
         }
         assertThat(taskSlot.captured).isNotNull
-        assertThat(taskSlot.captured.payload).isEqualTo("{\"personIdent\":\"12345678901\",\"type\":\"DØDSFALL\"}")
+        assertThat(taskSlot.captured.payload).contains("\"personIdent\":\"12345678901\",\"type\":\"DØDSFALL\"")
         assertThat(taskSlot.captured.taskStepType).isEqualTo(VurderLivshendelseTask.TASK_STEP_TYPE)
 
         verify(exactly = 1) {
@@ -84,10 +87,43 @@ class LeesahServiceTest {
             mockTaskRepository.save(capture(taskSlot))
         }
         assertThat(taskSlot.captured).isNotNull
-        assertThat(taskSlot.captured.payload).isEqualTo("{\"personIdent\":\"12345678901\",\"type\":\"UTFLYTTING\"}")
+        assertThat(taskSlot.captured.payload).contains("\"personIdent\":\"12345678901\",\"type\":\"UTFLYTTING\"")
         assertThat(taskSlot.captured.taskStepType).isEqualTo(VurderLivshendelseTask.TASK_STEP_TYPE)
 
         verify(exactly = 1) {
+            mockHendelsesloggRepository.save(any())
+        }
+    }
+
+    @Test
+    fun `Skal opprette VurderLivshendelseTask for sivilstandhendelse GIFT med triggerTid 1 time fra nå`() {
+        val enTimeFraNå = LocalDateTime.now().plusHours(1)
+        val hendelseId = UUID.randomUUID().toString()
+        val pdlHendelse = PdlHendelse(
+            offset = Random.nextUInt().toLong(),
+            gjeldendeAktørId = "1234567890123",
+            hendelseId = hendelseId,
+            personIdenter = listOf("12345678901", "1234567890123"),
+            endringstype = LeesahService.OPPRETTET,
+            opplysningstype = LeesahService.OPPLYSNINGSTYPE_SIVILSTAND,
+            sivilstand = "GIFT",
+            sivilstandDato = LocalDate.of(2022, 2, 22),
+        )
+
+        service.prosesserNyHendelse(pdlHendelse)
+        service.prosesserNyHendelse(pdlHendelse.copy(sivilstand = "UOPPGITT"))
+
+        val taskSlot = slot<Task>()
+        verify(exactly = 1) {
+            mockTaskRepository.save(capture(taskSlot))
+        }
+        assertThat(taskSlot.captured).isNotNull
+        assertThat(taskSlot.captured.payload)
+            .isEqualTo("{\"personIdent\":\"12345678901\",\"type\":\"SIVILSTAND\",\"gyldigFom\":\"2022-02-22\"}")
+        assertThat(taskSlot.captured.taskStepType).isEqualTo(VurderLivshendelseTask.TASK_STEP_TYPE)
+        assertThat(taskSlot.captured.triggerTid).isBetween(enTimeFraNå, enTimeFraNå.plusMinutes(1))
+
+        verify(exactly = 2) {
             mockHendelsesloggRepository.save(any())
         }
     }
@@ -175,5 +211,54 @@ class LeesahServiceTest {
         verify(exactly = 1) {
             mockHendelsesloggRepository.save(any())
         }
+    }
+
+    @Test
+    fun `Skal opprette ny task for korrigert sivilstandhendelse GIFT og avvikshåndtere uferdig task for korrigert eller annulert hendelse`() {
+        val hendelseId = UUID.randomUUID().toString()
+        val pdlHendelse = PdlHendelse(
+            offset = Random.nextUInt().toLong(),
+            gjeldendeAktørId = "1234567890123",
+            hendelseId = hendelseId,
+            personIdenter = listOf("12345678901", "1234567890123"),
+            endringstype = LeesahService.OPPRETTET,
+            opplysningstype = LeesahService.OPPLYSNINGSTYPE_SIVILSTAND,
+            sivilstand = "GIFT",
+            sivilstandDato = LocalDate.of(2022, 2, 22),
+        )
+
+        service.prosesserNyHendelse(pdlHendelse)
+
+
+        val taskSlot = slot<Task>()
+        verify(exactly = 1) {
+            mockTaskRepository.save(capture(taskSlot))
+        }
+        assertThat(taskSlot.captured).isNotNull
+        assertThat(taskSlot.captured.payload)
+            .isEqualTo("{\"personIdent\":\"12345678901\",\"type\":\"SIVILSTAND\",\"gyldigFom\":\"2022-02-22\"}")
+        assertThat(taskSlot.captured.taskStepType).isEqualTo(VurderLivshendelseTask.TASK_STEP_TYPE)
+
+        val tidligereTask = mockk<Task>(relaxed = true)
+        every { tidligereTask.callId } returns hendelseId
+        every { tidligereTask.taskStepType } returns VurderLivshendelseTask.TASK_STEP_TYPE
+
+        every { mockTaskRepository.finnTasksMedStatus(any(), any()) } returns listOf(tidligereTask)
+
+        val korrigertDato = pdlHendelse.sivilstandDato!!.minusDays(1)
+        service.prosesserNyHendelse(pdlHendelse.copy(endringstype = LeesahService.KORRIGERT,
+                                                     sivilstandDato = korrigertDato,
+                                                     tidligereHendelseId = pdlHendelse.hendelseId))
+
+        service.prosesserNyHendelse(pdlHendelse.copy(endringstype = LeesahService.ANNULLERT,
+                                                     tidligereHendelseId = pdlHendelse.hendelseId))
+
+        val tasks = mutableListOf<Task>()
+        verify {
+            mockTaskRepository.save(capture(tasks))
+            tidligereTask.avvikshåndter(Avvikstype.ANNET, LeesahService.KORRIGERT, "VL")
+            tidligereTask.avvikshåndter(Avvikstype.ANNET, LeesahService.ANNULLERT, "VL")
+        }
+        assertThat(tasks.find { it.payload.contains("$korrigertDato") }).isNotNull
     }
 }

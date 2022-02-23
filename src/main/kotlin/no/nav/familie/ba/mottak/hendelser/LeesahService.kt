@@ -227,10 +227,8 @@ class LeesahService(
         ).filter {
             it.callId == pdlHendelse.tidligereHendelseId && it.taskStepType == VurderLivshendelseTask.TASK_STEP_TYPE
         }.forEach {
-            taskRepository.save(
-                taskRepository.findById(it.id!!).get()
-                    .avvikshåndter(avvikstype = Avvikstype.ANNET, årsak = pdlHendelse.endringstype, endretAv = "VL")
-            )
+            it.avvikshåndter(avvikstype = Avvikstype.ANNET, årsak = pdlHendelse.endringstype, endretAv = "VL")
+            taskRepository.save(it)
         }
     }
 
@@ -267,20 +265,21 @@ class LeesahService(
         )
     }
 
-    private fun opprettVurderLivshendelseTaskForHendelse(type: VurderLivshendelseType,
-                                                         pdlHendelse: PdlHendelse,
-                                                         gyldigFom: LocalDate? = null) {
+    private fun opprettVurderLivshendelseTaskForHendelse(
+        type: VurderLivshendelseType,
+        pdlHendelse: PdlHendelse,
+        gyldigFom: LocalDate? = null
+    ) {
         log.info("opprett VurderLivshendelseTask for pdlHendelse (id= ${pdlHendelse.hendelseId})")
         Task.nyTaskMedTriggerTid(
-            VurderLivshendelseTask.TASK_STEP_TYPE,
-            objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type, gyldigFom)),
-            LocalDateTime.now().plusMinutes(30),
-            Properties().apply {
-                this["ident"] = pdlHendelse.hentPersonident()
-                this["callId"] = pdlHendelse.hendelseId
-                this["type"] = type.name
-            }).also {
-            taskRepository.save(it)
+            type = VurderLivshendelseTask.TASK_STEP_TYPE,
+            payload = objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type, gyldigFom)),
+            triggerTid = LocalDateTime.now().plusHours(1),
+        ).apply {
+            metadata["ident"] = pdlHendelse.hentPersonident()
+            metadata["callId"] = pdlHendelse.hendelseId
+            metadata["type"] = type.name
+            taskRepository.save(this)
         }
     }
 
