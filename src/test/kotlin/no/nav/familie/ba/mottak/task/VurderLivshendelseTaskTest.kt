@@ -26,13 +26,16 @@ import no.nav.familie.ba.mottak.integrasjoner.RestMinimalFagsak
 import no.nav.familie.ba.mottak.integrasjoner.RestUtvidetBehandling
 import no.nav.familie.ba.mottak.integrasjoner.RestVisningBehandling
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
+import no.nav.familie.ba.mottak.integrasjoner.Sivilstand
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.DØDSFALL
+import no.nav.familie.ba.mottak.task.VurderLivshendelseType.SIVILSTAND
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.UTFLYTTING
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
+import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND.GIFT
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -41,6 +44,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Year
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VurderLivshendelseTaskTest {
@@ -252,7 +256,13 @@ class VurderLivshendelseTaskTest {
                                 relatertPersonsRolle = FORELDERBARNRELASJONROLLE.BARN
                         )
                 ),
-                dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now()))
+                dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now())),
+                sivilstand = listOf(
+                    Sivilstand(
+                        type = GIFT,
+                        gyldigFraOgMed = LocalDate.now()
+                    )
+                )
         )
 
         every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
@@ -261,14 +271,15 @@ class VurderLivshendelseTaskTest {
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivOrdinær()
         every { mockSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagAktivOrdinærMinimal()
 
-        listOf(DØDSFALL, UTFLYTTING).forEach {
+        listOf(DØDSFALL, UTFLYTTING, SIVILSTAND).forEach {
             vurderLivshendelseTask.doTask(
                     Task.nyTask(
                             type = VurderLivshendelseTask.TASK_STEP_TYPE,
                             payload = objectMapper.writeValueAsString(
                                     VurderLivshendelseTaskDTO(
                                             PERSONIDENT_MOR,
-                                            it
+                                            it,
+                                            LocalDate.now()
                                     )
                             )
                     )
@@ -276,13 +287,14 @@ class VurderLivshendelseTaskTest {
         }
 
         val oppgaveDto = mutableListOf<OppgaveVurderLivshendelseDto>()
-        verify(exactly = 2) {
+        verify(exactly = 3) {
             mockTaskRepository.saveAndFlush(any())
             mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDto))
         }
 
         assertThat(oppgaveDto[0].beskrivelse).isEqualTo(DØDSFALL.beskrivelse + ": bruker")
         assertThat(oppgaveDto[1].beskrivelse).isEqualTo(UTFLYTTING.beskrivelse + ": bruker")
+        assertThat(oppgaveDto[2].beskrivelse).contains(SIVILSTAND.beskrivelse, "${Year.now()}")
 
         assertThat(oppgaveDto).allMatch { it.aktørId.contains(PERSONIDENT_MOR) }
         assertThat(oppgaveDto).allMatch { it.saksId == "$SAKS_ID" }

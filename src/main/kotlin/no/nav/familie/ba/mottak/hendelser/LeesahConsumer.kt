@@ -12,7 +12,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Service
@@ -50,6 +49,8 @@ class LeesahConsumer(val leesahService: LeesahService) {
             cr.value().hentFødeland(),
             cr.value().hentUtflyttingsdato(),
             cr.value().hentTidligereHendelseId(),
+            cr.value().hentSivilstandType(),
+            cr.value().hentSivilstandDato(),
         )
 
         try {
@@ -99,6 +100,16 @@ class LeesahConsumer(val leesahService: LeesahService) {
 
     private fun GenericRecord.hentUtflyttingsdato(): LocalDate? {
         return deserialiserDatofeltFraSubrecord("utflyttingFraNorge", "utflyttingsdato")
+    }
+
+    private fun GenericRecord.hentSivilstandType(): String? {
+        return (get("sivilstand") as GenericRecord?)?.get("type")?.toString()
+    }
+
+    private fun GenericRecord.hentSivilstandDato(): LocalDate? {
+        return deserialiserDatofeltFraSubrecord("sivilstand", "gyldigFraOgMed")
+            ?: deserialiserDatofeltFraSubrecord("sivilstand", "bekreftelsesdato")
+            // Fra pdldocs: bekreftelsesdato kun tilgjengelig når gyldighetsdato er ukjent.
     }
 
     private fun GenericRecord.deserialiserDatofeltFraSubrecord(

@@ -13,9 +13,11 @@ import no.nav.familie.ba.mottak.task.VurderLivshendelseTask
 import no.nav.familie.ba.mottak.task.VurderLivshendelseTaskDTO
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.DØDSFALL
+import no.nav.familie.ba.mottak.task.VurderLivshendelseType.SIVILSTAND
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.UTFLYTTING
 import no.nav.familie.ba.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND.GIFT
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
@@ -24,7 +26,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.util.*
+import java.time.LocalDateTime
+import java.util.Properties
 
 @Service
 class LeesahService(
@@ -43,6 +46,10 @@ class LeesahService(
     val fødselIgnorertCounter: Counter = Metrics.counter("barnetrygd.fodsel.ignorert")
     val fødselIgnorertUnder18årCounter: Counter = Metrics.counter("barnetrygd.fodsel.ignorert.under18")
     val fødselIgnorertFødelandCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.fodeland.nor")
+    val sivilstandOpprettetCounter: Counter = Metrics.counter("barnetrygd.sivilstand.opprettet")
+    val sivilstandAnnullertCounter: Counter = Metrics.counter("barnetrygd.sivilstand.annullert")
+    val sivilstandKorrigertCounter: Counter = Metrics.counter("barnetrygd.sivilstand.korrigert")
+    val sivilstandIgnorertCounter: Counter = Metrics.counter("barnetrygd.sivilstand.ignorert")
     val utflyttingOpprettetCounter: Counter = Metrics.counter("barnetrygd.utflytting.opprettet")
     val utflyttingAnnullertCounter: Counter = Metrics.counter("barnetrygd.utflytting.annullert")
     val utflyttingKorrigertCounter: Counter = Metrics.counter("barnetrygd.utflytting.korrigert")
@@ -55,6 +62,7 @@ class LeesahService(
             OPPLYSNINGSTYPE_DØDSFALL -> behandleDødsfallHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_FØDSEL -> behandleFødselsHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_UTFLYTTING -> behandleUtflyttingHendelse(pdlHendelse)
+            OPPLYSNINGSTYPE_SIVILSTAND -> behandleSivilstandHendelse(pdlHendelse)
         }
     }
 
@@ -175,6 +183,38 @@ class LeesahService(
         oppdaterHendelseslogg(pdlHendelse)
     }
 
+    private fun behandleSivilstandHendelse(pdlHendelse: PdlHendelse) {
+        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
+            leesahDuplikatCounter.increment()
+            return
+        }
+
+        when (pdlHendelse.endringstype) {
+            OPPRETTET -> {
+                logHendelse(pdlHendelse, "sivilstandDato: ${pdlHendelse.sivilstandDato}")
+                sivilstandOpprettetCounter.increment()
+
+                opprettTaskHvisSivilstandErGift(pdlHendelse)
+            }
+            else -> {
+                logHendelse(pdlHendelse, "Ikke av type OPPRETTET.")
+                when (pdlHendelse.endringstype) {
+                    ANNULLERT -> sivilstandOpprettetCounter.increment()
+                    KORRIGERT -> sivilstandOpprettetCounter.increment()
+                }
+            }
+        }
+        oppdaterHendelseslogg(pdlHendelse)
+    }
+
+    private fun opprettTaskHvisSivilstandErGift(pdlHendelse: PdlHendelse) {
+        if (pdlHendelse.sivilstand == GIFT.name) {
+            opprettVurderLivshendelseTaskForHendelse(SIVILSTAND, pdlHendelse, pdlHendelse.sivilstandDato)
+        } else {
+            sivilstandIgnorertCounter.increment()
+        }
+    }
+
     private fun logHendelse(pdlHendelse: PdlHendelse, ekstraInfo: String = "") {
         log.info(
             "person-pdl-leesah melding mottatt: " +
@@ -208,17 +248,21 @@ class LeesahService(
         )
     }
 
-    private fun opprettVurderLivshendelseTaskForHendelse(type: VurderLivshendelseType, pdlHendelse: PdlHendelse) {
+    private fun opprettVurderLivshendelseTaskForHendelse(
+        type: VurderLivshendelseType,
+        pdlHendelse: PdlHendelse,
+        gyldigFom: LocalDate? = null
+    ) {
         log.info("opprett VurderLivshendelseTask for pdlHendelse (id= ${pdlHendelse.hendelseId})")
-        Task.nyTask(
-            VurderLivshendelseTask.TASK_STEP_TYPE,
-            objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type)),
-            Properties().apply {
-                this["ident"] = pdlHendelse.hentPersonident()
-                this["callId"] = pdlHendelse.hendelseId
-                this["type"] = type.name
-            }).also {
-            taskRepository.save(it)
+        Task.nyTaskMedTriggerTid(
+            type = VurderLivshendelseTask.TASK_STEP_TYPE,
+            payload = objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type, gyldigFom)),
+            triggerTid = LocalDateTime.now().run { if (environment.activeProfiles.contains("prod")) this.plusHours(1) else this },
+        ).apply {
+            metadata["ident"] = pdlHendelse.hentPersonident()
+            metadata["callId"] = pdlHendelse.hendelseId
+            metadata["type"] = type.name
+            taskRepository.save(this)
         }
     }
 
@@ -247,5 +291,6 @@ class LeesahService(
         const val OPPLYSNINGSTYPE_DØDSFALL = "DOEDSFALL_V1"
         const val OPPLYSNINGSTYPE_FØDSEL = "FOEDSEL_V1"
         const val OPPLYSNINGSTYPE_UTFLYTTING = "UTFLYTTING_FRA_NORGE"
+        const val OPPLYSNINGSTYPE_SIVILSTAND = "SIVILSTAND_V1"
     }
 }

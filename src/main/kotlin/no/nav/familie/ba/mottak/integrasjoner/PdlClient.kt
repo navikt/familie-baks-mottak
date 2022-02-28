@@ -2,15 +2,14 @@ package no.nav.familie.ba.mottak.integrasjoner
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import no.nav.familie.ba.mottak.domene.personopplysning.Familierelasjon
 import no.nav.familie.ba.mottak.domene.personopplysning.Person
-import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.http.sts.StsRestClient
 import no.nav.familie.http.util.UriUtil
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.kontrakter.felles.personopplysning.ForelderBarnRelasjon
+import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -203,11 +202,12 @@ data class PdlPerson(val person: PdlPersonData?)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PdlPersonData(
-        val forelderBarnRelasjon: List<PdlForeldreBarnRelasjon> = emptyList(),
-        val adressebeskyttelse: List<Adressebeskyttelse> = emptyList(),
-        val bostedsadresse: List<Bostedsadresse?> = emptyList(),
-        @JsonProperty(value = "doedsfall") val dødsfall: List<Dødsfall> = emptyList(),
-        @JsonProperty(value = "foedsel") val fødsel: List<Fødsel> = emptyList(),
+    val forelderBarnRelasjon: List<PdlForeldreBarnRelasjon> = emptyList(),
+    val adressebeskyttelse: List<Adressebeskyttelse> = emptyList(),
+    val bostedsadresse: List<Bostedsadresse?> = emptyList(),
+    @JsonProperty(value = "doedsfall") val dødsfall: List<Dødsfall> = emptyList(),
+    @JsonProperty(value = "foedsel") val fødsel: List<Fødsel> = emptyList(),
+    val sivilstand: List<Sivilstand> = emptyList(),
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -230,6 +230,13 @@ data class Dødsfall(
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Fødsel(
         @JsonProperty(value = "foedselsdato") val fødselsdato: LocalDate
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Sivilstand(
+    val type: SIVILSTAND,
+    val gyldigFraOgMed: LocalDate? = null,
+    val bekreftelsesdato: LocalDate? = null,
 )
 
 enum class Adressebeskyttelsesgradering {

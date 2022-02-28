@@ -18,6 +18,7 @@ import no.nav.familie.ba.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.ba.mottak.integrasjoner.RestUtvidetBehandling
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.DØDSFALL
+import no.nav.familie.ba.mottak.task.VurderLivshendelseType.SIVILSTAND
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.UTFLYTTING
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.objectMapper
@@ -26,6 +27,7 @@ import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.kontrakter.felles.oppgave.StatusEnum
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
+import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND.GIFT
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -34,6 +36,9 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 
 @Service
 @TaskStepBeskrivelse(
@@ -54,6 +59,7 @@ class VurderLivshendelseTask(
     val secureLog: Logger = LoggerFactory.getLogger("secureLogger")
     val oppgaveOpprettetDødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall.oppgave.opprettet")
     val oppgaveOpprettetUtflyttingCounter: Counter = Metrics.counter("barnetrygd.utflytting.oppgave.opprettet")
+    val oppgaveOpprettetSivilstandCounter: Counter = Metrics.counter("barnetrygd.sivilstand.oppgave.opprettet")
 
     override fun doTask(task: Task) {
         val payload = objectMapper.readValue(task.payload, VurderLivshendelseTaskDTO::class.java)
@@ -87,8 +93,59 @@ class VurderLivshendelseTask(
                     }
                 }
             }
+            SIVILSTAND -> {
+                val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-sivilstand")
+                if (!harGyldigSivilstand(pdlPersonData)) {
+                    secureLog.info("Endringen til sivilstand GIFT for $personIdent er korrigert/annulert: $pdlPersonData")
+                    return
+                }
+                val aktivFaksak = sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
+                    secureLog.info("Hentet Fagsak for person ${personIdent}: ${it.fagsakId} ${it.fagsakStatus}")
+                    it.fagsakStatus != AVSLUTTET
+                }.singleOrNull()
+
+                if (aktivFaksak != null) {
+                    val sivilstand = pdlPersonData.sivilstand.first()
+                    val formatertDato = (sivilstand.gyldigFraOgMed ?: sivilstand.bekreftelsesdato)!!.format(
+                        DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no"))
+                    )
+                    val beskrivelse = SIVILSTAND.beskrivelse + " fra " + (formatertDato ?: "ukjent dato")
+
+                    val aktørId = aktørClient.hentAktørId(personIdent)
+                    val oppgave = søkEtterÅpenOppgavePåAktør(aktørId, SIVILSTAND)
+                        ?: opprettOppgavePåAktør(aktørId, aktivFaksak.fagsakId, beskrivelse)
+
+                    when (oppgave) {
+                        is OppgaveResponse -> {
+                            secureLog.info(
+                                "Opprettet VurderLivshendelse-oppgave (${oppgave.oppgaveId}) for $SIVILSTAND-hendelse (person ident:  $personIdent)" +
+                                        ", beskrivelsestekst: $beskrivelse"
+                            )
+                            oppgaveOpprettetSivilstandCounter.increment()
+                            task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
+                        }
+                        is Oppgave -> {
+                            log.info("Fant åpen oppgave på aktørId=$aktørId oppgaveId=${oppgave.id}")
+                            secureLog.info("Fant åpen oppgave: $oppgave")
+                            oppdaterOppgaveMedNyBeskrivelse(oppgave, beskrivelse)
+                            task.metadata["oppgaveId"] = oppgave.id.toString()
+                            task.metadata["info"] = "Fant åpen oppgave"
+                        }
+                    }
+                    taskRepository.saveAndFlush(task)
+                }
+            }
             else -> log.debug("Behandlinger enda ikke livshendelse av type ${payload.type}")
         }
+    }
+
+    private fun harGyldigSivilstand(pdlPersonData: PdlPersonData): Boolean {
+        val sivilstand = pdlPersonData.sivilstand.firstOrNull()
+        if (sivilstand?.type == GIFT && (sivilstand.gyldigFraOgMed ?: sivilstand.bekreftelsesdato) == null) {
+            secureLog.info("Har mottatt sivilstandhendelse uten dato $pdlPersonData")
+            error("Har mottatt sivilstandhendelse uten dato")
+        }
+        return sivilstand?.type == GIFT
     }
 
     private fun finnBrukereMedSakRelatertTilPerson(
@@ -177,10 +234,7 @@ class VurderLivshendelseTask(
                                                           personIdent = personIdent,
                                                           personErBruker = åpenOppgave.identer?.map { it.ident }?.contains(personIdent))
 
-            if (beskrivelse != åpenOppgave.beskrivelse) {
-                secureLog.info("Oppdaterer oppgave (${åpenOppgave.id}) med beskrivelse: $beskrivelse")
-                oppgaveClient.oppdaterOppgaveBeskrivelse(åpenOppgave, beskrivelse)
-            }
+            oppdaterOppgaveMedNyBeskrivelse(åpenOppgave, beskrivelse)
             task.metadata["oppgaveId"] = åpenOppgave.id.toString()
             task.metadata["info"] = "Fant åpen oppgave"
             taskRepository.saveAndFlush(task)
@@ -256,6 +310,16 @@ class VurderLivshendelseTask(
         )
     }
 
+    private fun oppdaterOppgaveMedNyBeskrivelse(
+        oppgave: Oppgave,
+        beskrivelse: String
+    ) {
+        if (oppgave.beskrivelse == beskrivelse) return
+
+        secureLog.info("Oppdaterer oppgave (${oppgave.id}) med beskrivelse: $beskrivelse")
+        oppgaveClient.oppdaterOppgaveBeskrivelse(oppgave, beskrivelse)
+    }
+
     private fun tilBehandlingstema(restUtvidetBehandling: RestUtvidetBehandling?): String {
         return when {
             restUtvidetBehandling == null -> Behandlingstema.Barnetrygd.value
@@ -278,11 +342,11 @@ class VurderLivshendelseTask(
         const val TASK_STEP_TYPE = "vurderLivshendelseTask"
     }
 }
-data class VurderLivshendelseTaskDTO(val personIdent: String, val type: VurderLivshendelseType)
+data class VurderLivshendelseTaskDTO(val personIdent: String, val type: VurderLivshendelseType, val gyldigFom: LocalDate? = null)
 
 enum class VurderLivshendelseType(val beskrivelse: String) {
     DØDSFALL("Dødsfall"),
-    SIVILSTAND("Sivilstand"),
+    SIVILSTAND("Endring i sivilstand. Bruker er registrert som gift"),
     ADDRESSE("Addresse"),
     UTFLYTTING("Utflytting")
 }
