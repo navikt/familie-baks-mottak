@@ -1,5 +1,7 @@
 package no.nav.familie.ba.mottak.søknad
 
+import no.nav.familie.ba.mottak.søknad.domene.Barn as BarnV7
+import no.nav.familie.ba.mottak.søknad.domene.Søker
 import no.nav.familie.ba.mottak.søknad.domene.SøknadNewWip
 import no.nav.familie.kontrakter.ba.søknad.SIVILSTANDTYPE
 import no.nav.familie.kontrakter.ba.søknad.SøknadAdresse
@@ -38,6 +40,30 @@ object SøknadTestData {
             spørsmål = mapOf(),
             nåværendeSamboer = null,
             tidligereSamboere = listOf()
+        )
+    }
+
+    fun søkerV7(): Søker {
+        return Søker(
+            navn = søknadsfelt("navn", "Navn Navnessen"),
+            ident = søknadsfelt("fødselsnummer", "1234578901"),
+            statsborgerskap = søknadsfelt("statsborgerskap", listOf("NOR")),
+            adresse = søknadsfelt(
+                "adresse",
+                SøknadAdresse(
+                    adressenavn = null,
+                    postnummer = null,
+                    husbokstav = null,
+                    bruksenhetsnummer = null,
+                    husnummer = null,
+                    poststed = null
+                )
+            ),
+            sivilstand = søknadsfelt("sivilstand", SIVILSTANDTYPE.GIFT),
+            spørsmål = mapOf(),
+            nåværendeSamboer = null,
+            tidligereSamboere = listOf(),
+            arbeidsperioderUtland = listOf()
         )
     }
 
@@ -92,11 +118,43 @@ object SøknadTestData {
         )
     }
 
+    fun barnV7(): List<BarnV7> {
+        return listOf(
+            BarnV7(
+                navn = søknadsfelt("Barnets fulle navn", "barn1"),
+                ident = søknadsfelt("Fødselsnummer", "12345678999"),
+                registrertBostedType = søknadsfelt("Skal ha samme adresse", RegistrertBostedType.REGISTRERT_ANNEN_ADRESSE),
+                alder = søknadsfelt("alder", "4 år"),
+                spørsmål = mapOf(),
+                utenlandsperioder = listOf(),
+                eøsBarnetrygdsperioder = listOf(),
+            ),
+            BarnV7(
+                navn = søknadsfelt("Barnets fulle navn", "barn2"),
+                ident = søknadsfelt("Fødselsnummer", "12345678987"),
+                registrertBostedType = søknadsfelt("Skal ha samme adresse", RegistrertBostedType.IKKE_FYLT_INN),
+                alder = søknadsfelt("alder", "1 år"),
+                spørsmål = mapOf(),
+                utenlandsperioder = listOf(),
+                eøsBarnetrygdsperioder = listOf(),
+            ),
+            BarnV7(
+                navn = søknadsfelt("Barnets fulle navn", "barn3"),
+                ident = søknadsfelt("Fødselsnummer", "12345678988"),
+                registrertBostedType = søknadsfelt("Skal ha samme adresse", RegistrertBostedType.REGISTRERT_SOKERS_ADRESSE),
+                alder = søknadsfelt("alder", "2 år"),
+                spørsmål = mapOf(),
+                utenlandsperioder = listOf(),
+                eøsBarnetrygdsperioder = listOf(),
+            )
+        )
+    }
+
     fun søknadV7(): SøknadNewWip = SøknadNewWip(
         kontraktVersjon = 7,
         søknadstype = Søknadstype.ORDINÆR,
-        søker = søker(),
-        barn = barn(),
+        søker = søkerV7(),
+        barn = barnV7(),
         spørsmål = mapOf(),
         dokumentasjon = listOf(
             Søknaddokumentasjon(
