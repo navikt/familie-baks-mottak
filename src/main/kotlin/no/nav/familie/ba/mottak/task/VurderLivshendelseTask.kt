@@ -8,7 +8,7 @@ import no.nav.familie.ba.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.ba.mottak.integrasjoner.BehandlingUnderkategori
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.BARN
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
-import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.AVSLUTTET
+import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.LØPENDE
 import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.ba.mottak.integrasjoner.OppgaveVurderLivshendelseDto
 import no.nav.familie.ba.mottak.integrasjoner.PdlClient
@@ -101,7 +101,7 @@ class VurderLivshendelseTask(
                 }
                 val aktivFaksak = sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
                     secureLog.info("Hentet Fagsak for person ${personIdent}: ${it.fagsakId} ${it.fagsakStatus}")
-                    it.fagsakStatus != AVSLUTTET
+                    it.fagsakStatus == LØPENDE
                 }.singleOrNull()
 
                 if (aktivFaksak != null) {
@@ -167,7 +167,7 @@ class VurderLivshendelseTask(
         if (personHarBarn) {
             brukereMedSakRelatertTilPerson += sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
                 secureLog.info("finnBrukereMedSakRelatertTilPerson(): Hentet Fagsak for person ${personIdent}: ${it.fagsakId} ${it.fagsakStatus}")
-                it.fagsakStatus != AVSLUTTET
+                it.fagsakStatus == LØPENDE
             }.map { Bruker(personIdent, it.fagsakId) }
         }
 
@@ -198,7 +198,7 @@ class VurderLivshendelseTask(
                            "identer = ${listeMedForeldreForBarn.fold("") { identer, it -> identer + " " + it.relatertPersonsIdent }}")
         }.mapNotNull {
             sakClient.hentRestFagsakDeltagerListe(it.relatertPersonsIdent, barnasIdenter = listOf(personIdent))
-                .filter { it.fagsakStatus != AVSLUTTET }
+                .filter { it.fagsakStatus == LØPENDE }
                 .groupBy { it.fagsakId }.values
                 .firstOrNull { it.inneholderBådeForelderOgBarn }
                 ?.find { it.rolle == FORELDER }
