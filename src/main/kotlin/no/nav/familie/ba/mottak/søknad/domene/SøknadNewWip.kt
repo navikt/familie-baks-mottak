@@ -30,7 +30,7 @@ data class SøknadNewWip(
 )
 
 data class Søker(
-    val triggetEøs: Boolean,
+    val triggetEøs: Søknadsfelt<Boolean>,
     val ident: Søknadsfelt<String>,
     val navn: Søknadsfelt<String>,
     val statsborgerskap: Søknadsfelt<List<String>>,
@@ -76,7 +76,7 @@ data class Utbetalingsperiode(
 )
 
 data class Barn(
-    val triggetEøs: Boolean,
+    val triggetEøs: Søknadsfelt<Boolean>,
     val ident: Søknadsfelt<String>,
     val navn: Søknadsfelt<String>,
     val registrertBostedType: Søknadsfelt<RegistrertBostedType>,
