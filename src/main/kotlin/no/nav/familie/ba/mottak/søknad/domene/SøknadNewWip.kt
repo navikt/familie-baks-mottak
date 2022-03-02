@@ -30,6 +30,7 @@ data class SøknadNewWip(
 )
 
 data class Søker(
+    val triggetEøs: Søknadsfelt<Boolean>,
     val ident: Søknadsfelt<String>,
     val navn: Søknadsfelt<String>,
     val statsborgerskap: Søknadsfelt<List<String>>,
@@ -43,7 +44,13 @@ data class Søker(
     val arbeidsperioderUtland: List<Søknadsfelt<Arbeidsperiode>> = listOf(),
     val arbeidsperioderNorge: List<Søknadsfelt<Arbeidsperiode>> = listOf(),
     val pensjonsperioderNorge: List<Søknadsfelt<Pensjonsperiode>> = listOf(),
-    val pensjonsperioderUtland: List<Søknadsfelt<Pensjonsperiode>> = listOf()
+    val pensjonsperioderUtland: List<Søknadsfelt<Pensjonsperiode>> = listOf(),
+    val idNummer: List<Søknadsfelt<IdNummer>> = listOf()
+)
+
+data class IdNummer(
+    val idNummer: Søknadsfelt<String>,
+    val land: Søknadsfelt<String>,
 )
 
 data class Arbeidsperiode(
@@ -69,6 +76,7 @@ data class Utbetalingsperiode(
 )
 
 data class Barn(
+    val triggetEøs: Søknadsfelt<Boolean>,
     val ident: Søknadsfelt<String>,
     val navn: Søknadsfelt<String>,
     val registrertBostedType: Søknadsfelt<RegistrertBostedType>,
@@ -90,7 +98,7 @@ data class AndreForelder(
     val skriftligAvtaleOmDeltBosted: Søknadsfelt<String>,
     val utvidet: AndreForelderUtvidet,
 
-    //EØS
+    // EØS
     val andreUtbetalingsperioder: List<Søknadsfelt<Utbetalingsperiode>> = listOf(),
     val arbeidsperioderUtland: List<Søknadsfelt<Arbeidsperiode>> = listOf(),
     val arbeidsperioderNorge: List<Søknadsfelt<Arbeidsperiode>> = listOf(),
