@@ -304,6 +304,57 @@ class VurderLivshendelseTaskTest {
     }
 
     @Test
+    fun `Skal bruke sivilstandobjekt fra PdlPersonData med nyest dato`() {
+
+        every {
+            mockPdlClient.hentPerson(
+                any(),
+                any()
+            )
+        } returns PdlPersonData(
+            sivilstand = listOf(
+                Sivilstand(type = GIFT),
+                Sivilstand(
+                    type = GIFT,
+                    gyldigFraOgMed = LocalDate.now().minusYears(10)
+                ),
+                Sivilstand(
+                    type = GIFT,
+                    bekreftelsesdato = LocalDate.now()
+                )
+            )
+        )
+
+        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
+                listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE))
+
+        every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivOrdinær()
+        every { mockSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagAktivOrdinærMinimal()
+
+        vurderLivshendelseTask.doTask(
+            Task.nyTask(
+                type = VurderLivshendelseTask.TASK_STEP_TYPE,
+                payload = objectMapper.writeValueAsString(
+                    VurderLivshendelseTaskDTO(
+                        PERSONIDENT_MOR,
+                        SIVILSTAND,
+                        LocalDate.now()
+                    )
+                )
+            )
+        )
+
+        val oppgaveSlot = slot<OppgaveVurderLivshendelseDto>()
+        verify(exactly = 1) {
+            mockTaskRepository.saveAndFlush(any())
+            mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveSlot))
+        }
+
+        assertThat(oppgaveSlot.captured.beskrivelse).contains(SIVILSTAND.beskrivelse, "${Year.now()}")
+    }
+
+
+    @Test
     fun `Livshendelser på BARN som har sak i ba-sak`() {
 
         every {

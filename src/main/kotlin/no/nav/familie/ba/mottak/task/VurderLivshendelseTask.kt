@@ -17,6 +17,7 @@ import no.nav.familie.ba.mottak.integrasjoner.PdlPersonData
 import no.nav.familie.ba.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.ba.mottak.integrasjoner.RestUtvidetBehandling
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
+import no.nav.familie.ba.mottak.integrasjoner.Sivilstand
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.DØDSFALL
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.SIVILSTAND
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.UTFLYTTING
@@ -95,7 +96,8 @@ class VurderLivshendelseTask(
             }
             SIVILSTAND -> {
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-sivilstand")
-                if (!harGyldigSivilstand(pdlPersonData)) {
+                val sivilstand = finnOgValiderNyesteSivilstand(pdlPersonData)
+                if (sivilstand?.type != GIFT) {
                     secureLog.info("Endringen til sivilstand GIFT for $personIdent er korrigert/annulert: $pdlPersonData")
                     return
                 }
@@ -105,47 +107,20 @@ class VurderLivshendelseTask(
                 }.singleOrNull()
 
                 if (aktivFaksak != null) {
-                    val sivilstand = pdlPersonData.sivilstand.first()
-                    val formatertDato = (sivilstand.gyldigFraOgMed ?: sivilstand.bekreftelsesdato)!!.format(
-                        DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no"))
-                    )
-                    val beskrivelse = SIVILSTAND.beskrivelse + " fra " + (formatertDato ?: "ukjent dato")
-
-                    val aktørId = aktørClient.hentAktørId(personIdent)
-                    val oppgave = søkEtterÅpenOppgavePåAktør(aktørId, SIVILSTAND)
-                        ?: opprettOppgavePåAktør(aktørId, aktivFaksak.fagsakId, beskrivelse)
-
-                    when (oppgave) {
-                        is OppgaveResponse -> {
-                            secureLog.info(
-                                "Opprettet VurderLivshendelse-oppgave (${oppgave.oppgaveId}) for $SIVILSTAND-hendelse (person ident:  $personIdent)" +
-                                        ", beskrivelsestekst: $beskrivelse"
-                            )
-                            oppgaveOpprettetSivilstandCounter.increment()
-                            task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
-                        }
-                        is Oppgave -> {
-                            log.info("Fant åpen oppgave på aktørId=$aktørId oppgaveId=${oppgave.id}")
-                            secureLog.info("Fant åpen oppgave: $oppgave")
-                            oppdaterOppgaveMedNyBeskrivelse(oppgave, beskrivelse)
-                            task.metadata["oppgaveId"] = oppgave.id.toString()
-                            task.metadata["info"] = "Fant åpen oppgave"
-                        }
-                    }
-                    taskRepository.saveAndFlush(task)
+                    opprettEllerOppdaterEndringISivilstandOppgave(sivilstand, aktivFaksak.fagsakId, personIdent, task)
                 }
             }
             else -> log.debug("Behandlinger enda ikke livshendelse av type ${payload.type}")
         }
     }
 
-    private fun harGyldigSivilstand(pdlPersonData: PdlPersonData): Boolean {
-        val sivilstand = pdlPersonData.sivilstand.firstOrNull()
+    private fun finnOgValiderNyesteSivilstand(pdlPersonData: PdlPersonData): Sivilstand? {
+        val sivilstand = pdlPersonData.sivilstand.maxByOrNull { it.gyldigFraOgMed ?: it.bekreftelsesdato ?: LocalDate.MIN }
         if (sivilstand?.type == GIFT && (sivilstand.gyldigFraOgMed ?: sivilstand.bekreftelsesdato) == null) {
             secureLog.info("Har mottatt sivilstandhendelse uten dato $pdlPersonData")
             error("Har mottatt sivilstandhendelse uten dato")
         }
-        return sivilstand?.type == GIFT
+        return sivilstand
     }
 
     private fun finnBrukereMedSakRelatertTilPerson(
@@ -241,6 +216,42 @@ class VurderLivshendelseTask(
             return false
         }
     }
+
+    private fun opprettEllerOppdaterEndringISivilstandOppgave(
+        sivilstand: Sivilstand,
+        fagsakId: Long,
+        personIdent: String,
+        task: Task
+    ) {
+        val formatertDato = (sivilstand.gyldigFraOgMed ?: sivilstand.bekreftelsesdato)!!.format(
+            DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no"))
+        )
+        val beskrivelse = SIVILSTAND.beskrivelse + " fra " + (formatertDato ?: "ukjent dato")
+
+        val aktørId = aktørClient.hentAktørId(personIdent)
+        val oppgave = søkEtterÅpenOppgavePåAktør(aktørId, SIVILSTAND)
+            ?: opprettOppgavePåAktør(aktørId, fagsakId, beskrivelse)
+
+        when (oppgave) {
+            is OppgaveResponse -> {
+                secureLog.info(
+                    "Opprettet VurderLivshendelse-oppgave (${oppgave.oppgaveId}) for $SIVILSTAND-hendelse (person ident:  $personIdent)" +
+                            ", beskrivelsestekst: $beskrivelse"
+                )
+                oppgaveOpprettetSivilstandCounter.increment()
+                task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
+            }
+            is Oppgave -> {
+                log.info("Fant åpen oppgave på aktørId=$aktørId oppgaveId=${oppgave.id}")
+                secureLog.info("Fant åpen oppgave: $oppgave")
+                oppdaterOppgaveMedNyBeskrivelse(oppgave, beskrivelse)
+                task.metadata["oppgaveId"] = oppgave.id.toString()
+                task.metadata["info"] = "Fant åpen oppgave"
+            }
+        }
+        taskRepository.saveAndFlush(task)
+    }
+
 
     private fun leggTilNyPersonIBeskrivelse(beskrivelse: String, personIdent: String, personErBruker: Boolean?): String {
         return when (personErBruker){
