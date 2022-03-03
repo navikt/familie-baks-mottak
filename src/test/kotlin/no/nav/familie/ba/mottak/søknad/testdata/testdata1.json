@@ -2,18 +2,7 @@
   "søknadstype": "ORDINÆR",
   "kontraktVersjon": 7,
   "søker": {
-    "triggetEøs": {
-      "label": {
-        "en": "triggetEøs",
-        "nb": "triggetEøs",
-        "nn": "triggetEøs"
-      },
-      "verdi": {
-        "nb": true,
-        "nn": true,
-        "en": true
-      }
-    },
+    "harEøsSteg": true,
     "navn": {
       "label": {
         "en": "Name",
@@ -1997,18 +1986,7 @@
   },
   "barn": [
     {
-      "triggetEøs": {
-        "label": {
-          "en": "triggetEøs",
-          "nb": "triggetEøs",
-          "nn": "triggetEøs"
-        },
-        "verdi": {
-          "nb": false,
-          "nn": false,
-          "en": false
-        }
-      },
+      "harEøsSteg": true,
       "navn": {
         "label": {
           "en": "Name",
@@ -3254,18 +3232,7 @@
       }
     },
     {
-      "triggetEøs": {
-        "label": {
-          "en": "triggetEøs",
-          "nb": "triggetEøs",
-          "nn": "triggetEøs"
-        },
-        "verdi": {
-          "nb": false,
-          "nn": false,
-          "en": false
-        }
-      },
+      "harEøsSteg": false,
       "navn": {
         "label": {
           "en": "Name",
@@ -3813,18 +3780,7 @@
       }
     },
     {
-      "triggetEøs": {
-        "label": {
-          "en": "triggetEøs",
-          "nb": "triggetEøs",
-          "nn": "triggetEøs"
-        },
-        "verdi": {
-          "nb": false,
-          "nn": false,
-          "en": false
-        }
-      },
+      "harEøsSteg": true,
       "navn": {
         "label": {
           "en": "Name",
