@@ -45,7 +45,7 @@ object SøknadTestData {
 
     fun søkerV7(): Søker {
         return Søker(
-            triggetEøs = søknadsfelt("triggetEøs", true),
+            harEøsSteg = søknadsfelt("harEøsSteg", true),
             navn = søknadsfelt("navn", "Navn Navnessen"),
             ident = søknadsfelt("fødselsnummer", "1234578901"),
             statsborgerskap = søknadsfelt("statsborgerskap", listOf("NOR")),
@@ -122,7 +122,7 @@ object SøknadTestData {
     fun barnV7(): List<BarnV7> {
         return listOf(
             BarnV7(
-                triggetEøs = søknadsfelt("triggetEøs", true),
+                harEøsSteg = søknadsfelt("harEøsSteg", true),
                 navn = søknadsfelt("Barnets fulle navn", "barn1"),
                 ident = søknadsfelt("Fødselsnummer", "12345678999"),
                 registrertBostedType = søknadsfelt("Skal ha samme adresse", RegistrertBostedType.REGISTRERT_ANNEN_ADRESSE),
@@ -132,7 +132,7 @@ object SøknadTestData {
                 eøsBarnetrygdsperioder = listOf(),
             ),
             BarnV7(
-                triggetEøs = søknadsfelt("triggetEøs", false),
+                harEøsSteg = søknadsfelt("harEøsSteg", false),
                 navn = søknadsfelt("Barnets fulle navn", "barn2"),
                 ident = søknadsfelt("Fødselsnummer", "12345678987"),
                 registrertBostedType = søknadsfelt("Skal ha samme adresse", RegistrertBostedType.IKKE_FYLT_INN),
@@ -142,7 +142,7 @@ object SøknadTestData {
                 eøsBarnetrygdsperioder = listOf(),
             ),
             BarnV7(
-                triggetEøs = søknadsfelt("triggetEøs", true),
+                harEøsSteg = søknadsfelt("harEøsSteg", true),
                 navn = søknadsfelt("Barnets fulle navn", "barn3"),
                 ident = søknadsfelt("Fødselsnummer", "12345678988"),
                 registrertBostedType = søknadsfelt("Skal ha samme adresse", RegistrertBostedType.REGISTRERT_SOKERS_ADRESSE),
@@ -155,6 +155,7 @@ object SøknadTestData {
     }
 
     fun søknadV7(): SøknadNewWip = SøknadNewWip(
+        antallEøsSteg = 3,
         kontraktVersjon = 7,
         søknadstype = Søknadstype.ORDINÆR,
         søker = søkerV7(),

@@ -20,6 +20,7 @@ import no.nav.familie.kontrakter.ba.søknad.v6.AndreForelderUtvidet
  */
 data class SøknadNewWip(
     val kontraktVersjon: Int,
+    val antallEøsSteg: Int,
     val søknadstype: Søknadstype,
     val søker: Søker,
     val barn: List<Barn>,
@@ -30,7 +31,7 @@ data class SøknadNewWip(
 )
 
 data class Søker(
-    val triggetEøs: Søknadsfelt<Boolean>,
+    val harEøsSteg: Søknadsfelt<Boolean>,
     val ident: Søknadsfelt<String>,
     val navn: Søknadsfelt<String>,
     val statsborgerskap: Søknadsfelt<List<String>>,
@@ -76,7 +77,7 @@ data class Utbetalingsperiode(
 )
 
 data class Barn(
-    val triggetEøs: Søknadsfelt<Boolean>,
+    val harEøsSteg: Søknadsfelt<Boolean>,
     val ident: Søknadsfelt<String>,
     val navn: Søknadsfelt<String>,
     val registrertBostedType: Søknadsfelt<RegistrertBostedType>,
