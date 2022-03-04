@@ -41,6 +41,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 
+
 @Service
 @TaskStepBeskrivelse(
         taskStepType = VurderLivshendelseTask.TASK_STEP_TYPE,
@@ -95,7 +96,7 @@ class VurderLivshendelseTask(
             }
             SIVILSTAND -> {
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-sivilstand")
-                val sivilstand = finnOgValiderNyesteSivilstand(pdlPersonData)
+                val sivilstand = finnNyesteSivilstandEndring(pdlPersonData)
                 if (sivilstand?.type != GIFT) {
                     secureLog.info("Endringen til sivilstand GIFT for $personIdent er korrigert/annulert: $pdlPersonData")
                     return
@@ -108,20 +109,15 @@ class VurderLivshendelseTask(
                 if (aktivFaksak != null &&
                     tilBehandlingstema(hentUtvidetBehandling(aktivFaksak.fagsakId)) == Behandlingstema.UtvidetBarnetrygd
                 ) {
-                    opprettEllerOppdaterEndringISivilstandOppgave(sivilstand, aktivFaksak.fagsakId, personIdent, task)
+                    opprettEllerOppdaterEndringISivilstandOppgave(sivilstand.dato, aktivFaksak.fagsakId, personIdent, task)
                 }
             }
             else -> log.debug("Behandlinger enda ikke livshendelse av type ${payload.type}")
         }
     }
 
-    private fun finnOgValiderNyesteSivilstand(pdlPersonData: PdlPersonData): Sivilstand? {
-        val sivilstand = pdlPersonData.sivilstand.maxByOrNull { it.gyldigFraOgMed ?: it.bekreftelsesdato ?: LocalDate.MIN }
-        if (sivilstand?.type == GIFT && (sivilstand.gyldigFraOgMed ?: sivilstand.bekreftelsesdato) == null) {
-            secureLog.info("Har mottatt sivilstandhendelse uten dato $pdlPersonData")
-            error("Har mottatt sivilstandhendelse uten dato")
-        }
-        return sivilstand
+    private fun finnNyesteSivilstandEndring(pdlPersonData: PdlPersonData): Sivilstand? {
+        return pdlPersonData.sivilstand.maxByOrNull { it.gyldigFraOgMed ?: it.bekreftelsesdato ?: LocalDate.MIN }
     }
 
     private fun finnBrukereMedSakRelatertTilPerson(
@@ -220,12 +216,12 @@ class VurderLivshendelseTask(
     }
 
     private fun opprettEllerOppdaterEndringISivilstandOppgave(
-        sivilstand: Sivilstand,
+        endringsdato: LocalDate,
         fagsakId: Long,
         personIdent: String,
         task: Task
     ) {
-        val formatertDato = (sivilstand.gyldigFraOgMed ?: sivilstand.bekreftelsesdato)!!.format(
+        val formatertDato = endringsdato.format(
             DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no"))
         )
         val beskrivelse = SIVILSTAND.beskrivelse + " fra " + (formatertDato ?: "ukjent dato")
@@ -353,6 +349,12 @@ class VurderLivshendelseTask(
 
     private val List<RestFagsakDeltager>.inneholderBådeForelderOgBarn: Boolean
         get() = this.map(RestFagsakDeltager::rolle).containsAll(listOf(FORELDER, BARN))
+
+    private val Sivilstand.dato: LocalDate
+        get() = this.gyldigFraOgMed ?: this.bekreftelsesdato ?: run {
+            secureLog.info("Har mottatt sivilstandhendelse uten dato")
+            error("Har mottatt sivilstandhendelse uten dato")
+        }
 
     data class Bruker(val ident: String, val fagsakId: Long)
 
