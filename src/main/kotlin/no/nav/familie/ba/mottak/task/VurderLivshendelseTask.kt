@@ -71,19 +71,18 @@ class VurderLivshendelseTask(
                 secureLog.info("Har mottat dødsfallshendelse for person ${personIdent}")
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-dødsfall")
                 secureLog.info("dødsfallshendelse person følselsdato = ${pdlPersonData.fødsel.firstOrNull()}")
-                if (pdlPersonData.dødsfall.firstOrNull()?.dødsdato != null) {
-                    val berørteBrukereIBaSak = finnBrukereMedSakRelatertTilPerson(personIdent, pdlPersonData)
-                    secureLog.info("berørteBrukereIBaSak count = ${berørteBrukereIBaSak.size}, identer = ${
-                        berørteBrukereIBaSak.fold("") { identer, it -> identer + " " + it.ident }
-                    }")
-                    berørteBrukereIBaSak.forEach {
-                        if (opprettEllerOppdaterVurderLivshendelseOppgave(DØDSFALL, it, personIdent, task)) {
-                            oppgaveOpprettetDødsfallCounter.increment()
-                        }
-                    }
-                } else {
+                if (pdlPersonData.dødsfall.firstOrNull()?.dødsdato == null) {
                     secureLog.info("Har mottatt dødsfallshendelse uten dødsdato $pdlPersonData")
                     error("Har mottatt dødsfallshendelse uten dødsdato")
+                }
+                val berørteBrukereIBaSak = finnBrukereMedSakRelatertTilPerson(personIdent, pdlPersonData)
+                secureLog.info("berørteBrukereIBaSak count = ${berørteBrukereIBaSak.size}, identer = ${
+                    berørteBrukereIBaSak.fold("") { identer, it -> identer + " " + it.ident }
+                }")
+                berørteBrukereIBaSak.forEach {
+                    if (opprettEllerOppdaterVurderLivshendelseOppgave(DØDSFALL, it, personIdent, task)) {
+                        oppgaveOpprettetDødsfallCounter.increment()
+                    }
                 }
             }
             UTFLYTTING -> {
