@@ -139,6 +139,7 @@ class JournalføringHendelseServiceTest {
 
         every { mockFeatureToggleService.isEnabled(any()) } returns true
         every { mockFeatureToggleService.isEnabled(any(), true) } returns true
+        every{ mockTaskRepository.save(any())} returns null
     }
 
     @Test
@@ -157,7 +158,7 @@ class JournalføringHendelseServiceTest {
         assertThat(taskSlot.captured).isNotNull
         assertThat(taskSlot.captured.payload).isEqualTo("SKAN_NETS")
         assertThat(taskSlot.captured.metadata.getProperty("callId")).isEqualTo("papir")
-        assertThat(taskSlot.captured.taskStepType).isEqualTo(JournalhendelseRutingTask.TASK_STEP_TYPE)
+        assertThat(taskSlot.captured.type).isEqualTo(JournalhendelseRutingTask.TASK_STEP_TYPE)
     }
 
 
@@ -177,7 +178,7 @@ class JournalføringHendelseServiceTest {
         assertThat(taskSlot.captured).isNotNull
         assertThat(taskSlot.captured.payload).isEqualTo("NAV_NO")
         assertThat(taskSlot.captured.metadata.getProperty("callId")).isEqualTo("digital")
-        assertThat(taskSlot.captured.taskStepType).isEqualTo(JournalhendelseRutingTask.TASK_STEP_TYPE)
+        assertThat(taskSlot.captured.type).isEqualTo(JournalhendelseRutingTask.TASK_STEP_TYPE)
     }
 
     @Test
@@ -216,7 +217,7 @@ class JournalføringHendelseServiceTest {
         } returns OppgaveResponse(1)
 
         every {
-            mockTaskRepository.saveAndFlush(any<Task>())
+            mockTaskRepository.save(any<Task>())
         } returns null
 
         every {
@@ -241,12 +242,12 @@ class JournalføringHendelseServiceTest {
                 mockOppgaveClient,
                 mockTaskRepository)
 
-        task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, "oppgavebeskrivelse").apply {
+        task.doTask(Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "oppgavebeskrivelse").apply {
             this.metadata["journalpostId"] = JOURNALPOST_UTGÅENDE_DOKUMENT
         })
 
         verify(exactly = 1) {
-            mockTaskRepository.saveAndFlush(any())
+            mockTaskRepository.save(any())
         }
         assertThat(sakssystemMarkering.captured).contains("oppgavebeskrivelse")
     }
@@ -267,15 +268,15 @@ class JournalføringHendelseServiceTest {
                 mockJournalpostClient,
                 mockOppgaveClient,
                 mockTaskRepository)
-        task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_UTGÅENDE_DOKUMENT).apply {
+        task.doTask(Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = JOURNALPOST_UTGÅENDE_DOKUMENT).apply {
             this.metadata["journalpostId"] = JOURNALPOST_UTGÅENDE_DOKUMENT
         })
-        task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_PAPIRSØKNAD).apply {
+        task.doTask(Task(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_PAPIRSØKNAD).apply {
             this.metadata["journalpostId"] = JOURNALPOST_PAPIRSØKNAD
         })
 
         verify(exactly = 0) {
-            mockTaskRepository.saveAndFlush(any<Task>())
+            mockTaskRepository.save(any<Task>())
         }
     }
 
@@ -287,7 +288,7 @@ class JournalføringHendelseServiceTest {
                 mockTaskRepository)
 
         Assertions.assertThrows(IllegalStateException::class.java) {
-            task.doTask(Task.nyTask(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_FERDIGSTILT).apply {
+            task.doTask(Task(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_FERDIGSTILT).apply {
                 this.metadata["journalpostId"] = JOURNALPOST_FERDIGSTILT
             })
         }

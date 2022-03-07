@@ -46,10 +46,10 @@ class SøknadService(
         hentOgLagreSøknadvedlegg(dbSøknad = dbSøknad, søknaddokumentasjonsliste = dokumentasjon)
 
         taskRepository.save(
-            Task.nyTask(
-                JournalførSøknadTask.JOURNALFØR_SØKNAD,
-                dbSøknad.id.toString(),
-                properties
+            Task(
+                type = JournalførSøknadTask.JOURNALFØR_SØKNAD,
+                payload = dbSøknad.id.toString(),
+                properties = properties
             )
         )
         return dbSøknad

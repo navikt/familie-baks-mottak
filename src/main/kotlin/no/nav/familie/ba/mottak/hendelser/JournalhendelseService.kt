@@ -13,6 +13,7 @@ import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
 import no.nav.familie.ba.mottak.task.JournalhendelseRutingTask
 import no.nav.familie.log.IdUtils
 import no.nav.familie.log.mdc.MDCConstants
+import no.nav.familie.prosessering.domene.PropertiesWrapper
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
@@ -80,7 +81,7 @@ class JournalhendelseService(
                 consumerRecord.offset(),
                 hendelseRecord.hendelsesId.toString(),
                 hendelseConsumer,
-                mapOf(
+                mapOf (
                     "journalpostId" to hendelseRecord.journalpostId.toString(),
                     "hendelsesType" to hendelseRecord.hendelsesType.toString()
                 ).toProperties()
@@ -172,11 +173,13 @@ class JournalhendelseService(
 
 
     private fun opprettJournalhendelseRutingTask(journalpost: Journalpost) {
-        Task.nyTask(
-            JournalhendelseRutingTask.TASK_STEP_TYPE,
-            journalpost.kanal!!,
-            opprettMetadata(journalpost)
-        ).apply { taskRepository.save(this) }
+        Task(
+            type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+            payload = journalpost.kanal!!,
+            properties = opprettMetadata(journalpost)
+        ).apply {
+            taskRepository.save(this)
+        }
     }
 
     private fun opprettMetadata(journalpost: Journalpost): Properties {

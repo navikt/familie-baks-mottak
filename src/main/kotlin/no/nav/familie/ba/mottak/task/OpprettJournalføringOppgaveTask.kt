@@ -43,7 +43,7 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
                     val nyOppgave = oppgaveClient.opprettJournalføringsoppgave(journalpost = journalpost,
                                                                                beskrivelse = task.payload.takeIf { it.isNotEmpty() })
                     task.metadata["oppgaveId"] = "${nyOppgave.oppgaveId}"
-                    taskRepository.saveAndFlush(task)
+                    taskRepository.save(task)
                     log.info("Oppretter ny journalførings-oppgave med id ${nyOppgave.oppgaveId} for journalpost ${journalpost.journalpostId}")
                     oppgaverOpprettetCounter.increment()
                 } else {

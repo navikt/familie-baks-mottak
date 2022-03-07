@@ -42,10 +42,10 @@ class EksternReferanseIdTest(
 
         assertDoesNotThrow {
             journalførSøknadTask.doTask(
-                Task.nyTask(
-                    JournalførSøknadTask.JOURNALFØR_SØKNAD,
-                    dbSøknadFraDBFirst.id.toString(),
-                    properties
+                Task(
+                    type = JournalførSøknadTask.JOURNALFØR_SØKNAD,
+                    payload = dbSøknadFraDBFirst.id.toString(),
+                    properties = properties
                 )
             )
         }

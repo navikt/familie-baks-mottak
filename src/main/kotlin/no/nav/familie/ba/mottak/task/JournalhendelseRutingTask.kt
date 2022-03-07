@@ -67,7 +67,7 @@ class JournalhendelseRutingTask(
             } // trenger ingen form for markering. Kan løses av begge systemer
         }
 
-        Task.nyTask(type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
+        Task(type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
                     payload = sakssystemMarkering,
                     properties = task.metadata).apply { taskRepository.save(this) }
     }

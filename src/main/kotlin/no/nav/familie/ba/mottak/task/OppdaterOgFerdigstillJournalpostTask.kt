@@ -36,12 +36,12 @@ class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: Journa
                         onSuccess = {
                             task.metadata["fagsakId"] = fagsakId
                             log.info("Har oppdatert og ferdigstilt journalpost ${journalpost.journalpostId}")
-                            taskRepository.saveAndFlush(task)
+                            taskRepository.save(task)
                         },
                         onFailure = {
                             log.warn("Automatisk ferdigstilling feilet. Oppretter ny journalføringsoppgave for journalpost " +
                                      "${journalpost.journalpostId}.")
-                            Task.nyTask(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
+                            Task(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
                                         journalpost.journalpostId,
                                         task.metadata).also { taskRepository.save(it) }
                             return
@@ -54,7 +54,7 @@ class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: Journa
             else -> error("Uventet journalstatus ${journalpost.journalstatus} for journalpost ${journalpost.journalpostId}")
         }
 
-        val nyTask = Task.nyTask(
+        val nyTask = Task(
                 type = OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE,
                 payload = task.payload,
                 properties = task.metadata.apply {

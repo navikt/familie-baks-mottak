@@ -29,7 +29,7 @@ class OpprettBehandleSakOppgaveTaskTest {
         } returns listOf()
 
         every {
-            mockTaskRepository.saveAndFlush(any())
+            mockTaskRepository.save(any())
         } returns null
     }
 
@@ -41,7 +41,7 @@ class OpprettBehandleSakOppgaveTaskTest {
 
 
         assertThatThrownBy {
-            taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
+            taskStep.doTask(Task(type = TASK_STEP_TYPE, payload = "mockJournalpostId"))
         }.hasMessage("Kan ikke opprette oppgave før tilhørende journalpost 111 er ferdigstilt")
     }
 
@@ -57,7 +57,7 @@ class OpprettBehandleSakOppgaveTaskTest {
 
 
         assertThatThrownBy {
-            taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
+            taskStep.doTask(Task(type = TASK_STEP_TYPE, payload = "mockJournalpostId"))
         }.hasMessage("Det eksister minst 1 åpen oppgave på journalpost mockJournalpostId")
     }
 
@@ -77,7 +77,7 @@ class OpprettBehandleSakOppgaveTaskTest {
         } returns OppgaveResponse(123)
 
 
-        val task = Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId")
+        val task = Task(type = TASK_STEP_TYPE, payload = "mockJournalpostId")
         taskStep.doTask(task)
 
         assertThat(task.metadata["oppgaveId"]).isEqualTo("123")
@@ -101,7 +101,7 @@ class OpprettBehandleSakOppgaveTaskTest {
         } returns OppgaveResponse(321)
 
 
-        val task = Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId")
+        val task = Task(type = TASK_STEP_TYPE, payload = "mockJournalpostId")
         task.metadata["fagsystem"] = "BA"
         taskStep.doTask(task)
 

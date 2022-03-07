@@ -27,36 +27,50 @@ import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
-import no.nav.person.pdl.leesah.Endringstype
 import org.apache.commons.lang3.StringUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.TestTemplate
 import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
+import org.springframework.core.io.ClassPathResource
 import org.springframework.data.domain.Pageable
+import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.datasource.init.ScriptUtils
 import org.springframework.test.context.ActiveProfiles
+import java.sql.Connection
+import java.sql.DriverManager
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.UUID
+import javax.sql.DataSource
 import kotlin.test.assertFailsWith
+
 
 @SpringBootTest(classes = [DevLauncher::class],
                 properties = ["PDL_URL=http://localhost:28085/api", "FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api"])
 @ActiveProfiles("dev", "mock-oauth", "mock-sts")
 @AutoConfigureWireMock(port = 28085)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MottaFødselshendelseTaskTest {
+class MottaFødselshendelseTaskTest{
+
+    @Autowired
+    lateinit var jdbcTemplate: JdbcTemplate
 
     @Autowired
     lateinit var taskRepository: TaskRepository
 
     @Autowired
     lateinit var taskService: MottaFødselshendelseTask
+
+    @Autowired
+    lateinit var dataSource: DataSource
 
     @BeforeEach
     internal fun setUp() {
@@ -84,12 +98,12 @@ class MottaFødselshendelseTaskTest {
                                                     success(lagTestPerson().copy(bostedsadresse = null))))))
 
 
-        taskService.doTask(Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
+        taskService.doTask(Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn))
 
-        val taskerMedCallId = taskRepository.finnTasksMedStatus(listOf(Status.UBEHANDLET), Pageable.unpaged())
+        val taskerMedCallId = taskRepository.findByStatusIn(listOf(Status.UBEHANDLET), Pageable.unpaged())
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
-        assertThat(taskerMedCallId).hasSize(1).extracting("taskStepType").containsOnly(SendTilSakTask.TASK_STEP_TYPE)
+        assertThat(taskerMedCallId).hasSize(1).extracting("type").containsOnly(SendTilSakTask.TASK_STEP_TYPE)
         assertThat(objectMapper.readValue(taskerMedCallId.first().payload, NyBehandling::class.java))
                 .hasFieldOrPropertyWithValue("morsIdent", "20107678901")
                 .hasFieldOrPropertyWithValue("barnasIdenter", arrayOf(fnrBarn))
@@ -117,12 +131,12 @@ class MottaFødselshendelseTaskTest {
                                                     success(lagTestPerson().copy(bostedsadresse = null))))))
 
 
-        taskService.doTask(Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
+        taskService.doTask(Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
 
-        val taskerMedCallId = taskRepository.finnTasksMedStatus(listOf(Status.UBEHANDLET), Pageable.unpaged())
+        val taskerMedCallId = taskRepository.findByStatusIn(listOf(Status.UBEHANDLET), Pageable.unpaged())
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
-        assertThat(taskerMedCallId).hasSize(1).extracting("taskStepType").containsOnly(SendTilSakTask.TASK_STEP_TYPE)
+        assertThat(taskerMedCallId).hasSize(1).extracting("type").containsOnly(SendTilSakTask.TASK_STEP_TYPE)
         assertThat(objectMapper.readValue(taskerMedCallId.first().payload, NyBehandling::class.java))
                 .hasFieldOrPropertyWithValue("morsIdent", "20107678901")
                 .hasFieldOrPropertyWithValue("barnasIdenter", arrayOf(fnrBarn))
@@ -145,24 +159,24 @@ class MottaFødselshendelseTaskTest {
                         .willReturn(aResponse().withStatus(404)))
 
         assertFailsWith<RuntimeException>("Kall mot integrasjon feilet ved uthenting av personinfo. 404 NOT_FOUND") {
-            taskService.doTask(Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
+            taskService.doTask(Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn))
         }
 
-        val taskerMedCallId = taskRepository.finnTasksMedStatus(listOf(Status.UBEHANDLET), Pageable.unpaged())
+        val taskerMedCallId = taskRepository.findByStatusIn(listOf(Status.UBEHANDLET), Pageable.unpaged())
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
-        assertThat(taskerMedCallId).hasSize(1).extracting("taskStepType").containsOnly(MottaFødselshendelseTask.TASK_STEP_TYPE)
+        assertThat(taskerMedCallId).hasSize(1).extracting("type").containsOnly(MottaFødselshendelseTask.TASK_STEP_TYPE)
     }
 
     @Test
     fun `Skal filtrere bort fdat, bost og dnr på barn`() {
         MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
         val barnHarDnrCountFørTest = taskService.barnHarDnrCounter.count()
-        val task = Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, "02062000000")
+        val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = "02062000000")
 
         taskService.doTask(task)
 
-        val taskerMedCallId = taskRepository.finnTasksMedStatus(listOf(Status.UBEHANDLET), Pageable.unpaged())
+        val taskerMedCallId = taskRepository.findByStatusIn(listOf(Status.UBEHANDLET), Pageable.unpaged())
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).isEmpty()
@@ -187,11 +201,11 @@ class MottaFødselshendelseTaskTest {
                 )
         )
 
-        val task = Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn)
+        val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn)
 
         taskService.doTask(task)
 
-        val taskerMedCallId = taskRepository.finnTasksMedStatus(listOf(Status.UBEHANDLET), Pageable.unpaged())
+        val taskerMedCallId = taskRepository.findByStatusIn(listOf(Status.UBEHANDLET), Pageable.unpaged())
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).isEmpty()
@@ -220,15 +234,15 @@ class MottaFødselshendelseTaskTest {
                                             .withHeader("Content-Type", "application/json")
                                             .withBody(objectMapper.writeValueAsString(
                                                     success(lagTestPerson().copy(forelderBarnRelasjoner =
-                                                                    setOf(ForelderBarnRelasjon(
-                                                            "20107678901",
-                                                            FORELDERBARNRELASJONROLLE.FAR))))))))
+                                                                                 setOf(ForelderBarnRelasjon(
+                                                                                         "20107678901",
+                                                                                         FORELDERBARNRELASJONROLLE.FAR))))))))
 
-        val task = Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn)
+        val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn)
 
         taskService.doTask(task)
 
-        val taskerMedCallId = taskRepository.finnTasksMedStatus(listOf(Status.UBEHANDLET), Pageable.unpaged())
+        val taskerMedCallId = taskRepository.findByStatusIn(listOf(Status.UBEHANDLET), Pageable.unpaged())
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).isEmpty()
@@ -254,11 +268,11 @@ class MottaFødselshendelseTaskTest {
                                             .withBody(objectMapper.writeValueAsString(
                                                     success(lagTestPerson().copy(bostedsadresse = null))))))
 
-        val task = Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn)
+        val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn)
 
         taskService.doTask(task)
 
-        val taskerMedCallId = taskRepository.finnTasksMedStatus(listOf(Status.UBEHANDLET), Pageable.unpaged())
+        val taskerMedCallId = taskRepository.findByStatusIn(listOf(Status.UBEHANDLET), Pageable.unpaged())
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).isEmpty()
@@ -280,17 +294,17 @@ class MottaFødselshendelseTaskTest {
                 )
         )
 
-        val task = Task.nyTask(MottaFødselshendelseTask.TASK_STEP_TYPE, "02091901252")
+        val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = "02091901252")
 
         assertThatThrownBy { taskService.doTask(task) }.isInstanceOf(RuntimeException::class.java)
                 .hasMessage("Feil ved oppslag på person: Feilmelding")
 
-        val taskerMedCallId = taskRepository.finnTasksMedStatus(listOf(Status.UBEHANDLET), Pageable.unpaged())
+        val taskerMedCallId = taskRepository.findByStatusIn(listOf(Status.UBEHANDLET), Pageable.unpaged())
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).hasSize(1)
-        assertThat(taskerMedCallId.first().taskStepType).isEqualTo(MottaFødselshendelseTask.TASK_STEP_TYPE)
-        assertThat(taskerMedCallId.first().triggerTid).isAfter(taskerMedCallId.first().opprettetTidspunkt)
+        assertThat(taskerMedCallId.first().type).isEqualTo(MottaFødselshendelseTask.TASK_STEP_TYPE)
+        assertThat(taskerMedCallId.first().triggerTid).isAfter(taskerMedCallId.first().opprettetTid)
     }
 
     private fun lagTestPerson(): Person {

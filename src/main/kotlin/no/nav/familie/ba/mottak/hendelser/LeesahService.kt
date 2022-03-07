@@ -16,6 +16,7 @@ import no.nav.familie.ba.mottak.task.VurderLivshendelseType.DØDSFALL
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.UTFLYTTING
 import no.nav.familie.ba.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.prosessering.domene.PropertiesWrapper
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
@@ -28,10 +29,10 @@ import java.util.*
 
 @Service
 class LeesahService(
-    private val hendelsesloggRepository: HendelsesloggRepository,
-    private val taskRepository: TaskRepository,
-    @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") private val triggerTidForTps: Long,
-    private val environment: Environment
+        private val hendelsesloggRepository: HendelsesloggRepository,
+        private val taskRepository: TaskRepository,
+        @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") private val triggerTidForTps: Long,
+        private val environment: Environment
 ) {
 
     val dødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall")
@@ -109,13 +110,14 @@ class LeesahService(
                             KORRIGERT -> fødselKorrigertCounter.increment()
                         }
 
-                        val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE,
-                                                            pdlHendelse.hentPersonident(),
-                                                            nesteGyldigeTriggertidFødselshendelser(triggerTidForTps, environment),
-                                                            Properties().apply {
-                                                                this["ident"] = pdlHendelse.hentPersonident()
-                                                                this["callId"] = pdlHendelse.hendelseId
-                                                            })
+                        val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE,
+                                        payload = pdlHendelse.hentPersonident(),
+                                        properties = Properties().apply {
+                                            this["ident"] = pdlHendelse.hentPersonident()
+                                            this["callId"] = pdlHendelse.hendelseId
+                                        }).medTriggerTid(
+                                nesteGyldigeTriggertidFødselshendelser(triggerTidForTps, environment),
+                        )
                         taskRepository.save(task)
                     }
                 } else if (erUnder18år(fødselsdato)) {
@@ -127,18 +129,18 @@ class LeesahService(
             ANNULLERT -> {
                 fødselAnnullertCounter.increment()
                 if (pdlHendelse.tidligereHendelseId != null) {
-                    val task = Task.nyTask(type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
-                                           payload = objectMapper.writeValueAsString(
-                                               RestAnnullerFødsel(
-                                                   barnasIdenter = pdlHendelse.hentPersonidenter(),
-                                                   tidligereHendelseId = pdlHendelse.tidligereHendelseId
-                                               )
-                                           ),
-                                           properties = Properties().apply {
-                                               this["ident"] = pdlHendelse.hentPersonident()
-                                               this["callId"] = pdlHendelse.hendelseId
-                                               this["tidligereHendelseId"] = pdlHendelse.tidligereHendelseId
-                                           })
+                    val task = Task(type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
+                                    payload = objectMapper.writeValueAsString(
+                                            RestAnnullerFødsel(
+                                                    barnasIdenter = pdlHendelse.hentPersonidenter(),
+                                                    tidligereHendelseId = pdlHendelse.tidligereHendelseId
+                                            )
+                                    ),
+                                    properties = Properties().apply {
+                                        this["ident"] = pdlHendelse.hentPersonident()
+                                        this["callId"] = pdlHendelse.hendelseId
+                                        this["tidligereHendelseId"] = pdlHendelse.tidligereHendelseId
+                                    })
                     taskRepository.save(task)
                 } else {
                     log.warn("Mottatt annuller fødsel uten tidligereHendelseId, hendelseId ${pdlHendelse.hendelseId}")
@@ -177,20 +179,20 @@ class LeesahService(
 
     private fun logHendelse(pdlHendelse: PdlHendelse, ekstraInfo: String = "") {
         log.info(
-            "person-pdl-leesah melding mottatt: " +
-                    "hendelseId: ${pdlHendelse.hendelseId} " +
-                    "offset: ${pdlHendelse.offset}, " +
-                    "opplysningstype: ${pdlHendelse.opplysningstype}, " +
-                    "aktørid: ${pdlHendelse.gjeldendeAktørId}, " +
-                    "endringstype: ${pdlHendelse.endringstype}, $ekstraInfo"
+                "person-pdl-leesah melding mottatt: " +
+                "hendelseId: ${pdlHendelse.hendelseId} " +
+                "offset: ${pdlHendelse.offset}, " +
+                "opplysningstype: ${pdlHendelse.opplysningstype}, " +
+                "aktørid: ${pdlHendelse.gjeldendeAktørId}, " +
+                "endringstype: ${pdlHendelse.endringstype}, $ekstraInfo"
         )
     }
 
     private fun oppdaterHendelseslogg(pdlHendelse: PdlHendelse) {
         val metadata = mutableMapOf(
-            "aktørId" to pdlHendelse.gjeldendeAktørId,
-            "opplysningstype" to pdlHendelse.opplysningstype,
-            "endringstype" to pdlHendelse.endringstype
+                "aktørId" to pdlHendelse.gjeldendeAktørId,
+                "opplysningstype" to pdlHendelse.opplysningstype,
+                "endringstype" to pdlHendelse.endringstype
         )
 
         if (pdlHendelse.fødeland != null) {
@@ -198,26 +200,26 @@ class LeesahService(
         }
 
         hendelsesloggRepository.save(
-            Hendelseslogg(
-                pdlHendelse.offset,
-                pdlHendelse.hendelseId,
-                CONSUMER_PDL,
-                metadata.toProperties(),
-                ident = pdlHendelse.hentPersonident()
-            )
+                Hendelseslogg(
+                        pdlHendelse.offset,
+                        pdlHendelse.hendelseId,
+                        CONSUMER_PDL,
+                        metadata.toProperties(),
+                        ident = pdlHendelse.hentPersonident()
+                )
         )
     }
 
     private fun opprettVurderLivshendelseTaskForHendelse(type: VurderLivshendelseType, pdlHendelse: PdlHendelse) {
         log.info("opprett VurderLivshendelseTask for pdlHendelse (id= ${pdlHendelse.hendelseId})")
-        Task.nyTask(
-            VurderLivshendelseTask.TASK_STEP_TYPE,
-            objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type)),
-            Properties().apply {
-                this["ident"] = pdlHendelse.hentPersonident()
-                this["callId"] = pdlHendelse.hendelseId
-                this["type"] = type.name
-            }).also {
+        Task(
+                VurderLivshendelseTask.TASK_STEP_TYPE,
+                objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type)),
+                Properties().apply {
+                    this["ident"] = pdlHendelse.hentPersonident()
+                    this["callId"] = pdlHendelse.hendelseId
+                    this["type"] = type.name
+                }).also {
             taskRepository.save(it)
         }
     }

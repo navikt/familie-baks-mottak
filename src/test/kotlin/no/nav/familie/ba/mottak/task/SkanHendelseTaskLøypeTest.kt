@@ -78,7 +78,7 @@ class SkanHendelseTaskLøypeTest {
         } returns listOf()
 
         every {
-            mockTaskRepository.saveAndFlush(any<Task>())
+            mockTaskRepository.save(any<Task>())
         } returns null
 
         every {
@@ -196,7 +196,7 @@ class SkanHendelseTaskLøypeTest {
     }
 
     private fun kjørRutingTaskOgReturnerNesteTask(brukerId: String? = "12345678901"): Task {
-        rutingSteg.doTask(Task.nyTask(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+        rutingSteg.doTask(Task(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
                                       payload = MOTTAK_KANAL).apply {
             if (brukerId != null) {
                 this.metadata["personIdent"] = brukerId

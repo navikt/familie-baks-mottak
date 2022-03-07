@@ -33,13 +33,13 @@ class MottaAnnullerFødselTask(
         var barnasIdenter = restAnnullerFødsel.barnasIdenter
 
         var tasker =
-            taskRepository.finnTasksMedStatus(
+            taskRepository.findByStatusIn(
                 listOf(Status.KLAR_TIL_PLUKK, Status.UBEHANDLET, Status.FEILET),
                 Pageable.unpaged()
             )
                 .filter {
                     it.callId == tidligereHendelseId &&
-                        (it.taskStepType == MottaFødselshendelseTask.TASK_STEP_TYPE || it.taskStepType == SendTilSakTask.TASK_STEP_TYPE)
+                        (it.type == MottaFødselshendelseTask.TASK_STEP_TYPE || it.type == SendTilSakTask.TASK_STEP_TYPE)
                 }
         if (tasker.isEmpty()) {
             sakClient.sendAnnullerFødselshendelseTilSak(barnasIdenter, tidligereHendelseId)
