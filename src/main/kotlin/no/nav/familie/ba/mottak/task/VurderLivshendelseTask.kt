@@ -14,6 +14,7 @@ import no.nav.familie.ba.mottak.integrasjoner.OppgaveVurderLivshendelseDto
 import no.nav.familie.ba.mottak.integrasjoner.PdlClient
 import no.nav.familie.ba.mottak.integrasjoner.PdlForeldreBarnRelasjon
 import no.nav.familie.ba.mottak.integrasjoner.PdlPersonData
+import no.nav.familie.ba.mottak.integrasjoner.RestFagsak
 import no.nav.familie.ba.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.ba.mottak.integrasjoner.RestUtvidetBehandling
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
@@ -40,6 +41,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
+
 
 @Service
 @TaskStepBeskrivelse(
@@ -71,19 +73,18 @@ class VurderLivshendelseTask(
                 secureLog.info("Har mottat dødsfallshendelse for person ${personIdent}")
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-dødsfall")
                 secureLog.info("dødsfallshendelse person følselsdato = ${pdlPersonData.fødsel.firstOrNull()}")
-                if (pdlPersonData.dødsfall.firstOrNull()?.dødsdato != null) {
-                    val berørteBrukereIBaSak = finnBrukereMedSakRelatertTilPerson(personIdent, pdlPersonData)
-                    secureLog.info("berørteBrukereIBaSak count = ${berørteBrukereIBaSak.size}, identer = ${
-                        berørteBrukereIBaSak.fold("") { identer, it -> identer + " " + it.ident }
-                    }")
-                    berørteBrukereIBaSak.forEach {
-                        if (opprettEllerOppdaterVurderLivshendelseOppgave(DØDSFALL, it, personIdent, task)) {
-                            oppgaveOpprettetDødsfallCounter.increment()
-                        }
-                    }
-                } else {
+                if (pdlPersonData.dødsfall.firstOrNull()?.dødsdato == null) {
                     secureLog.info("Har mottatt dødsfallshendelse uten dødsdato $pdlPersonData")
                     error("Har mottatt dødsfallshendelse uten dødsdato")
+                }
+                val berørteBrukereIBaSak = finnBrukereMedSakRelatertTilPerson(personIdent, pdlPersonData)
+                secureLog.info("berørteBrukereIBaSak count = ${berørteBrukereIBaSak.size}, identer = ${
+                    berørteBrukereIBaSak.fold("") { identer, it -> identer + " " + it.ident }
+                }")
+                berørteBrukereIBaSak.forEach {
+                    if (opprettEllerOppdaterVurderLivshendelseOppgave(DØDSFALL, it, personIdent, task)) {
+                        oppgaveOpprettetDødsfallCounter.increment()
+                    }
                 }
             }
             UTFLYTTING -> {
@@ -96,7 +97,7 @@ class VurderLivshendelseTask(
             }
             SIVILSTAND -> {
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-sivilstand")
-                val sivilstand = finnOgValiderNyesteSivilstand(pdlPersonData)
+                val sivilstand = finnNyesteSivilstandEndring(pdlPersonData)
                 if (sivilstand?.type != GIFT) {
                     secureLog.info("Endringen til sivilstand GIFT for $personIdent er korrigert/annulert: $pdlPersonData")
                     return
@@ -104,23 +105,20 @@ class VurderLivshendelseTask(
                 val aktivFaksak = sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
                     secureLog.info("Hentet Fagsak for person ${personIdent}: ${it.fagsakId} ${it.fagsakStatus}")
                     it.fagsakStatus == LØPENDE
-                }.singleOrNull()
+                }.singleOrNull()?.let { hentRestFagsak(it.fagsakId) }
 
-                if (aktivFaksak != null) {
-                    opprettEllerOppdaterEndringISivilstandOppgave(sivilstand, aktivFaksak.fagsakId, personIdent, task)
+                if (aktivFaksak != null &&
+                    tilBehandlingstema(hentSisteBehandlingSomErIverksatt(aktivFaksak)) == Behandlingstema.UtvidetBarnetrygd
+                ) {
+                    opprettEllerOppdaterEndringISivilstandOppgave(sivilstand.dato, aktivFaksak.id, personIdent, task)
                 }
             }
             else -> log.debug("Behandlinger enda ikke livshendelse av type ${payload.type}")
         }
     }
 
-    private fun finnOgValiderNyesteSivilstand(pdlPersonData: PdlPersonData): Sivilstand? {
-        val sivilstand = pdlPersonData.sivilstand.maxByOrNull { it.gyldigFraOgMed ?: it.bekreftelsesdato ?: LocalDate.MIN }
-        if (sivilstand?.type == GIFT && (sivilstand.gyldigFraOgMed ?: sivilstand.bekreftelsesdato) == null) {
-            secureLog.info("Har mottatt sivilstandhendelse uten dato $pdlPersonData")
-            error("Har mottatt sivilstandhendelse uten dato")
-        }
-        return sivilstand
+    private fun finnNyesteSivilstandEndring(pdlPersonData: PdlPersonData): Sivilstand? {
+        return pdlPersonData.sivilstand.maxByOrNull { it.gyldigFraOgMed ?: it.bekreftelsesdato ?: LocalDate.MIN }
     }
 
     private fun finnBrukereMedSakRelatertTilPerson(
@@ -193,8 +191,10 @@ class VurderLivshendelseTask(
             val beskrivelse = leggTilNyPersonIBeskrivelse(beskrivelse = "${hendelseType.beskrivelse}:",
                                                           personIdent = personIdent,
                                                           personErBruker = personIdent == bruker.ident)
-
-            val oppgave = opprettOppgavePåAktør(aktørId, bruker.fagsakId, beskrivelse)
+            val restFagsak = hentRestFagsak(bruker.fagsakId)
+            val restBehandling = hentSisteBehandlingSomErIverksatt(restFagsak) ?: hentAktivBehandling(restFagsak)
+            val behandlingstema = tilBehandlingstema(restBehandling)
+            val oppgave = opprettOppgavePåAktør(aktørId, bruker.fagsakId, beskrivelse, behandlingstema)
             task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
             taskRepository.saveAndFlush(task)
             secureLog.info(
@@ -218,19 +218,19 @@ class VurderLivshendelseTask(
     }
 
     private fun opprettEllerOppdaterEndringISivilstandOppgave(
-        sivilstand: Sivilstand,
+        endringsdato: LocalDate,
         fagsakId: Long,
         personIdent: String,
         task: Task
     ) {
-        val formatertDato = (sivilstand.gyldigFraOgMed ?: sivilstand.bekreftelsesdato)!!.format(
+        val formatertDato = endringsdato.format(
             DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no"))
         )
         val beskrivelse = SIVILSTAND.beskrivelse + " fra " + (formatertDato ?: "ukjent dato")
 
         val aktørId = aktørClient.hentAktørId(personIdent)
         val oppgave = søkEtterÅpenOppgavePåAktør(aktørId, SIVILSTAND)
-            ?: opprettOppgavePåAktør(aktørId, fagsakId, beskrivelse)
+            ?: opprettOppgavePåAktør(aktørId, fagsakId, beskrivelse, Behandlingstema.UtvidetBarnetrygd)
 
         when (oppgave) {
             is OppgaveResponse -> {
@@ -295,27 +295,17 @@ class VurderLivshendelseTask(
     private fun opprettOppgavePåAktør(
         aktørId: String,
         fagsakId: Long,
-        beskrivelse: String
+        beskrivelse: String,
+        behandlingstema: Behandlingstema
     ): OppgaveResponse {
         log.info("Oppretter oppgave for aktørId=$aktørId")
-        val minimalRestFagsak = sakClient.hentMinimalRestFagsak(fagsakId)
-        secureLog.info("Hentet minimal rest fagsak: $minimalRestFagsak")
-        val restMinimalBehandling = minimalRestFagsak.behandlinger.firstOrNull { it.aktiv }
 
-        if (restMinimalBehandling == null) {
-            error("Fagsak ${fagsakId} mangler aktiv behandling. Får ikke opprettet VurderLivshendelseOppgave")
-        }
-
-        val restFagsak = sakClient.hentRestFagsak(fagsakId)
-        val restUtvidetBehandling =
-            restFagsak.behandlinger.firstOrNull { it.behandlingId == restMinimalBehandling.behandlingId }
-
-       return oppgaveClient.opprettVurderLivshendelseOppgave(
+        return oppgaveClient.opprettVurderLivshendelseOppgave(
             OppgaveVurderLivshendelseDto(
                 aktørId = aktørId,
                 beskrivelse = beskrivelse,
                 saksId = fagsakId.toString(),
-                behandlingstema = tilBehandlingstema(restUtvidetBehandling),
+                behandlingstema = behandlingstema.value,
                 behandlesAvApplikasjon = BehandlesAvApplikasjon.BA_SAK.applikasjon
             )
         )
@@ -331,13 +321,30 @@ class VurderLivshendelseTask(
         oppgaveClient.oppdaterOppgaveBeskrivelse(oppgave, beskrivelse)
     }
 
-    private fun tilBehandlingstema(restUtvidetBehandling: RestUtvidetBehandling?): String {
+    private fun hentRestFagsak(fagsakId: Long): RestFagsak {
+        return sakClient.hentRestFagsak(fagsakId).also {
+            secureLog.info("Hentet rest fagsak: $it")
+        }
+    }
+
+    private fun hentSisteBehandlingSomErIverksatt(restFagsak: RestFagsak): RestUtvidetBehandling? {
+        return restFagsak.behandlinger
+            .filter { it.steg == STEG_TYPE_BEHANDLING_AVSLUTTET }
+            .maxByOrNull { it.opprettetTidspunkt }
+    }
+
+    private fun hentAktivBehandling(restFagsak: RestFagsak): RestUtvidetBehandling {
+        return restFagsak.behandlinger.firstOrNull { it.aktiv }
+            ?: error("Fagsak ${restFagsak.id} mangler aktiv behandling. Får ikke opprettet VurderLivshendelseOppgave")
+    }
+
+    private fun tilBehandlingstema(restUtvidetBehandling: RestUtvidetBehandling?): Behandlingstema {
         return when {
-            restUtvidetBehandling == null -> Behandlingstema.Barnetrygd.value
-            restUtvidetBehandling.kategori == BehandlingKategori.EØS -> Behandlingstema.BarnetrygdEØS.value
-            restUtvidetBehandling.kategori == BehandlingKategori.NASJONAL && restUtvidetBehandling.underkategori == BehandlingUnderkategori.ORDINÆR -> Behandlingstema.OrdinærBarnetrygd.value
-            restUtvidetBehandling.kategori == BehandlingKategori.NASJONAL && restUtvidetBehandling.underkategori == BehandlingUnderkategori.UTVIDET -> Behandlingstema.UtvidetBarnetrygd.value
-            else -> Behandlingstema.Barnetrygd.value
+            restUtvidetBehandling == null -> Behandlingstema.Barnetrygd
+            restUtvidetBehandling.kategori == BehandlingKategori.EØS -> Behandlingstema.BarnetrygdEØS
+            restUtvidetBehandling.kategori == BehandlingKategori.NASJONAL && restUtvidetBehandling.underkategori == BehandlingUnderkategori.ORDINÆR -> Behandlingstema.OrdinærBarnetrygd
+            restUtvidetBehandling.kategori == BehandlingKategori.NASJONAL && restUtvidetBehandling.underkategori == BehandlingUnderkategori.UTVIDET -> Behandlingstema.UtvidetBarnetrygd
+            else -> Behandlingstema.Barnetrygd
         }
     }
 
@@ -347,10 +354,18 @@ class VurderLivshendelseTask(
     private val List<RestFagsakDeltager>.inneholderBådeForelderOgBarn: Boolean
         get() = this.map(RestFagsakDeltager::rolle).containsAll(listOf(FORELDER, BARN))
 
+    private val Sivilstand.dato: LocalDate
+        get() = this.gyldigFraOgMed ?: this.bekreftelsesdato ?: run {
+            secureLog.info("Har mottatt sivilstandhendelse uten dato")
+            error("Har mottatt sivilstandhendelse uten dato")
+        }
+
     data class Bruker(val ident: String, val fagsakId: Long)
 
     companion object {
         const val TASK_STEP_TYPE = "vurderLivshendelseTask"
+
+        const val STEG_TYPE_BEHANDLING_AVSLUTTET = "BEHANDLING_AVSLUTTET"
     }
 }
 data class VurderLivshendelseTaskDTO(val personIdent: String, val type: VurderLivshendelseType, val gyldigFom: LocalDate? = null)
