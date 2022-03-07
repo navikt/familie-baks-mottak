@@ -22,9 +22,7 @@ import no.nav.familie.ba.mottak.integrasjoner.PdlPersonData
 import no.nav.familie.ba.mottak.integrasjoner.RestArbeidsfordelingPåBehandling
 import no.nav.familie.ba.mottak.integrasjoner.RestFagsak
 import no.nav.familie.ba.mottak.integrasjoner.RestFagsakDeltager
-import no.nav.familie.ba.mottak.integrasjoner.RestMinimalFagsak
 import no.nav.familie.ba.mottak.integrasjoner.RestUtvidetBehandling
-import no.nav.familie.ba.mottak.integrasjoner.RestVisningBehandling
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.ba.mottak.integrasjoner.Sivilstand
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.DØDSFALL
@@ -212,7 +210,6 @@ class VurderLivshendelseTaskTest {
                 listOf(RestFagsakDeltager(PERSONIDENT_FAR, FORELDER, SAKS_ID + 50, LØPENDE),
                        RestFagsakDeltager(PERSONIDENT_BARN, BARN, SAKS_ID, LØPENDE))
 
-        every { mockSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagAktivOrdinærMinimal()
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivOrdinær()
 
         listOf(UTFLYTTING, DØDSFALL).forEach {
@@ -269,7 +266,6 @@ class VurderLivshendelseTaskTest {
                 listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE))
 
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
-        every { mockSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagAktivOrdinærMinimal()
 
         listOf(DØDSFALL, UTFLYTTING, SIVILSTAND).forEach {
             vurderLivshendelseTask.doTask(
@@ -323,7 +319,6 @@ class VurderLivshendelseTaskTest {
                 listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE))
 
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivOrdinær() andThen lagAktivUtvidet()
-        every { mockSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagAktivOrdinærMinimal()
 
         listOf(1,2).forEach {
             vurderLivshendelseTask.doTask(
@@ -376,7 +371,6 @@ class VurderLivshendelseTaskTest {
                 listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE))
 
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
-        every { mockSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagAktivOrdinærMinimal()
 
         vurderLivshendelseTask.doTask(
             Task.nyTask(
@@ -449,7 +443,6 @@ class VurderLivshendelseTaskTest {
                 listOf(RestFagsakDeltager(PERSONIDENT_BARN, BARN, SAKS_ID, LØPENDE))
 
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
-        every { mockSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagAktivOrdinærMinimal()
 
         listOf(DØDSFALL, UTFLYTTING).forEach {
             vurderLivshendelseTask.doTask(
@@ -495,7 +488,6 @@ class VurderLivshendelseTaskTest {
                        RestFagsakDeltager(PERSONIDENT_BARN2, BARN, SAKS_ID, LØPENDE))
 
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
-        every { mockSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagAktivOrdinærMinimal()
         val oppgaveDto = slot<OppgaveVurderLivshendelseDto>()
         every { mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDto)) } returns OppgaveResponse(
                 oppgaveId = 1
@@ -553,7 +545,6 @@ class VurderLivshendelseTaskTest {
                 listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE))
 
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
-        every { mockSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagAktivOrdinærMinimal()
         val oppgavebeskrivelseSlot = slot<String>()
         every { mockOppgaveClient.oppdaterOppgaveBeskrivelse(any(), capture(oppgavebeskrivelseSlot)) } returns OppgaveResponse(
                 oppgaveId = 1
@@ -688,22 +679,9 @@ class VurderLivshendelseTaskTest {
                             BehandlingKategori.NASJONAL,
                             LocalDateTime.now(),
                             "RESULTAT",
-                            "STEG",
+                            "BEHANDLING_AVSLUTTET",
                             "TYPE",
                             BehandlingUnderkategori.ORDINÆR,
-                    )
-            )
-    )
-
-    private fun lagAktivOrdinærMinimal() = RestMinimalFagsak(
-            SAKS_ID,
-            listOf(
-                    RestVisningBehandling(
-                            behandlingId = 321,
-                            aktiv = true,
-                            opprettetTidspunkt = LocalDateTime.now(),
-                            status = "TEST",
-                            type = "TEST"
                     )
             )
     )
@@ -718,7 +696,7 @@ class VurderLivshendelseTaskTest {
                             BehandlingKategori.NASJONAL,
                             LocalDateTime.now(),
                             "RESULTAT",
-                            "STEG",
+                            "BEHANDLING_AVSLUTTET",
                             "TYPE",
                             BehandlingUnderkategori.UTVIDET
                     )

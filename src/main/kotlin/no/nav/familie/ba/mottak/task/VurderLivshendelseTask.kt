@@ -14,6 +14,7 @@ import no.nav.familie.ba.mottak.integrasjoner.OppgaveVurderLivshendelseDto
 import no.nav.familie.ba.mottak.integrasjoner.PdlClient
 import no.nav.familie.ba.mottak.integrasjoner.PdlForeldreBarnRelasjon
 import no.nav.familie.ba.mottak.integrasjoner.PdlPersonData
+import no.nav.familie.ba.mottak.integrasjoner.RestFagsak
 import no.nav.familie.ba.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.ba.mottak.integrasjoner.RestUtvidetBehandling
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
@@ -104,12 +105,12 @@ class VurderLivshendelseTask(
                 val aktivFaksak = sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
                     secureLog.info("Hentet Fagsak for person ${personIdent}: ${it.fagsakId} ${it.fagsakStatus}")
                     it.fagsakStatus == LØPENDE
-                }.singleOrNull()
+                }.singleOrNull()?.let { hentRestFagsak(it.fagsakId) }
 
                 if (aktivFaksak != null &&
-                    tilBehandlingstema(hentUtvidetBehandling(aktivFaksak.fagsakId)) == Behandlingstema.UtvidetBarnetrygd
+                    tilBehandlingstema(hentSisteBehandlingSomErIverksatt(aktivFaksak)) == Behandlingstema.UtvidetBarnetrygd
                 ) {
-                    opprettEllerOppdaterEndringISivilstandOppgave(sivilstand.dato, aktivFaksak.fagsakId, personIdent, task)
+                    opprettEllerOppdaterEndringISivilstandOppgave(sivilstand.dato, aktivFaksak.id, personIdent, task)
                 }
             }
             else -> log.debug("Behandlinger enda ikke livshendelse av type ${payload.type}")
@@ -190,8 +191,9 @@ class VurderLivshendelseTask(
             val beskrivelse = leggTilNyPersonIBeskrivelse(beskrivelse = "${hendelseType.beskrivelse}:",
                                                           personIdent = personIdent,
                                                           personErBruker = personIdent == bruker.ident)
-
-            val behandlingstema = tilBehandlingstema(hentUtvidetBehandling(bruker.fagsakId))
+            val restFagsak = hentRestFagsak(bruker.fagsakId)
+            val restBehandling = hentSisteBehandlingSomErIverksatt(restFagsak) ?: hentAktivBehandling(restFagsak)
+            val behandlingstema = tilBehandlingstema(restBehandling)
             val oppgave = opprettOppgavePåAktør(aktørId, bruker.fagsakId, beskrivelse, behandlingstema)
             task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
             taskRepository.saveAndFlush(task)
@@ -319,19 +321,21 @@ class VurderLivshendelseTask(
         oppgaveClient.oppdaterOppgaveBeskrivelse(oppgave, beskrivelse)
     }
 
-    private fun hentUtvidetBehandling(fagsakId: Long): RestUtvidetBehandling? {
-        val minimalRestFagsak = sakClient.hentMinimalRestFagsak(fagsakId)
-        secureLog.info("Hentet minimal rest fagsak: $minimalRestFagsak")
-        val restMinimalBehandling = minimalRestFagsak.behandlinger.firstOrNull { it.aktiv }
-
-        if (restMinimalBehandling == null) {
-            error("Fagsak ${fagsakId} mangler aktiv behandling. Får ikke opprettet VurderLivshendelseOppgave")
+    private fun hentRestFagsak(fagsakId: Long): RestFagsak {
+        return sakClient.hentRestFagsak(fagsakId).also {
+            secureLog.info("Hentet rest fagsak: $it")
         }
+    }
 
-        val restFagsak = sakClient.hentRestFagsak(fagsakId)
-        val restUtvidetBehandling =
-            restFagsak.behandlinger.firstOrNull { it.behandlingId == restMinimalBehandling.behandlingId }
-        return restUtvidetBehandling
+    private fun hentSisteBehandlingSomErIverksatt(restFagsak: RestFagsak): RestUtvidetBehandling? {
+        return restFagsak.behandlinger
+            .filter { it.steg == STEG_TYPE_BEHANDLING_AVSLUTTET }
+            .maxByOrNull { it.opprettetTidspunkt }
+    }
+
+    private fun hentAktivBehandling(restFagsak: RestFagsak): RestUtvidetBehandling {
+        return restFagsak.behandlinger.firstOrNull { it.aktiv }
+            ?: error("Fagsak ${restFagsak.id} mangler aktiv behandling. Får ikke opprettet VurderLivshendelseOppgave")
     }
 
     private fun tilBehandlingstema(restUtvidetBehandling: RestUtvidetBehandling?): Behandlingstema {
@@ -360,6 +364,8 @@ class VurderLivshendelseTask(
 
     companion object {
         const val TASK_STEP_TYPE = "vurderLivshendelseTask"
+
+        const val STEG_TYPE_BEHANDLING_AVSLUTTET = "BEHANDLING_AVSLUTTET"
     }
 }
 data class VurderLivshendelseTaskDTO(val personIdent: String, val type: VurderLivshendelseType, val gyldigFom: LocalDate? = null)
