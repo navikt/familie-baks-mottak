@@ -18,8 +18,7 @@ import org.springframework.stereotype.Service
 class EnsligForsørgerHendelseService(
     val sakClient: SakClient,
     val pdlClient: PdlClient,
-    val hendelsesloggRepository: HendelsesloggRepository,
-    @Value("\${ef.overgangstonad.sendtilsak:false}") val sendTilSak: Boolean,
+    val hendelsesloggRepository: HendelsesloggRepository
 ) {
 
     val ensligForsørgerVedtakhendelseOvergangstønadCounter: Counter =
@@ -27,8 +26,6 @@ class EnsligForsørgerHendelseService(
     val ensligForsørgerVedtakhendelseAnnetCounter: Counter = Metrics.counter("ef.hendelse.vedtak", "type", "annet")
     val ensligForsørgerInfotrygdVedtakhendelseOvergangstønadCounter: Counter =
         Metrics.counter("ef.hendelse.infotrygd.vedtak", "type", "overgangstønad")
-    val ensligForsørgerInfotrygdVedtakhendelseAnnetCounter: Counter =
-        Metrics.counter("ef.hendelse.infotrygd.vedtak", "type", "annet")
 
     fun prosesserEfVedtakHendelse(offset: Long, ensligForsørgerVedtakhendelse: EnsligForsørgerVedtakhendelse) {
 
@@ -40,9 +37,7 @@ class EnsligForsørgerHendelseService(
                     )
                 ) {
                     secureLogger.info("Mottatt vedtak om overgangsstønad hendelse: $ensligForsørgerVedtakhendelse")
-                    if (sendTilSak) {
-                        sakClient.sendVedtakOmOvergangsstønadHendelseTilSak(ensligForsørgerVedtakhendelse.personIdent)
-                    }
+                    sakClient.sendVedtakOmOvergangsstønadHendelseTilSak(ensligForsørgerVedtakhendelse.personIdent)
 
                     hendelsesloggRepository.save(
                         Hendelseslogg(
@@ -81,9 +76,7 @@ class EnsligForsørgerHendelseService(
             secureLogger.info("Mottatt infotrygdvedtak om overgangsstønad: $hendelse")
 
             val personIdent = pdlClient.hentPersonident(hendelse.aktørId.toString())
-            if (sendTilSak) {
-                sakClient.sendVedtakOmOvergangsstønadHendelseTilSak(personIdent)
-            }
+            sakClient.sendVedtakOmOvergangsstønadHendelseTilSak(personIdent)
 
             hendelsesloggRepository.save(
                 Hendelseslogg(
