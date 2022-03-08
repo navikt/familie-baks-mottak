@@ -26,12 +26,23 @@ import java.time.Duration
 class KafkaAivenConfig(val environment: Environment) {
 
     @Bean
-    fun kafkaAivenHendelseListenerContainerFactory(kafkaRestartingErrorHandler: KafkaRestartingErrorHandler)
+    fun kafkaEnsligForsørgerInfotrygdHendelseContainerFactory(kafkaRestartingErrorHandler: KafkaRestartingErrorHandler)
             : ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
         factory.containerProperties.authExceptionRetryInterval = Duration.ofSeconds(2)
-        factory.consumerFactory = DefaultKafkaConsumerFactory(consumerConfigs())
+        factory.consumerFactory = DefaultKafkaConsumerFactory(consumerConfigs("ba-mottak-ef-infotrygd"))
+        factory.setCommonErrorHandler(kafkaRestartingErrorHandler)
+        return factory
+    }
+
+    @Bean
+    fun kafkaEnsligForsørgerVedtakHendelseContainerFactory(kafkaRestartingErrorHandler: KafkaRestartingErrorHandler)
+            : ConcurrentKafkaListenerContainerFactory<String, String> {
+        val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
+        factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
+        factory.containerProperties.authExceptionRetryInterval = Duration.ofSeconds(2)
+        factory.consumerFactory = DefaultKafkaConsumerFactory(consumerConfigs("ba-mottak-ef-vedtak"))
         factory.setCommonErrorHandler(kafkaRestartingErrorHandler)
         return factory
     }
@@ -52,13 +63,13 @@ class KafkaAivenConfig(val environment: Environment) {
         return KafkaListenerEndpointRegistry()
     }
 
-    private fun consumerConfigs(): Map<String, Any> {
+    private fun consumerConfigs(groupId: String): Map<String, Any> {
         val kafkaBrokers = System.getenv("KAFKA_BROKERS") ?: "http://localhost:9092"
         val consumerConfigs = mutableMapOf(
             ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaBrokers,
             ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
             ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
-            ConsumerConfig.GROUP_ID_CONFIG to "familie-ba-mottak",
+            ConsumerConfig.GROUP_ID_CONFIG to groupId,
             ConsumerConfig.CLIENT_ID_CONFIG to "consumer-familie-ba-mottak-1",
             ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
             ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
