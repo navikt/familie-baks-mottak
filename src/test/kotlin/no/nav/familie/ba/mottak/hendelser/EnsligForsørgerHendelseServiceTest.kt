@@ -28,7 +28,7 @@ class EnsligForsørgerHendelseServiceTest {
         mockHendelsesloggRepository = mockk(relaxed = true)
         mockSakClient = mockk(relaxed = true)
         mockPdlClient = mockk(relaxed = true)
-        service = EnsligForsørgerHendelseService(mockSakClient, mockPdlClient, mockHendelsesloggRepository, true)
+        service = EnsligForsørgerHendelseService(mockSakClient, mockPdlClient, mockHendelsesloggRepository)
         clearAllMocks()
     }
 
