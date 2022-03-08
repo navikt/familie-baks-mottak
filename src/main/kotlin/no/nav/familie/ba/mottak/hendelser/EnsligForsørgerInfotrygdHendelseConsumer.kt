@@ -60,7 +60,7 @@ class EnsligForsørgerInfotrygdHendelseConsumer(val vedtakOmOvergangsstønadServ
     @KafkaListener(
         id = "ef-infotrygd-overgangstonad",
         topics = ["teamfamilie.$TOPIC_INFOTRYGD_VEDTAK"],
-        containerFactory = "kafkaAivenHendelseListenerContainerFactory",
+        containerFactory = "kafkaEnsligForsørgerInfotrygdHendelseContainerFactory",
         idIsGroup = false
     )
     @Transactional
