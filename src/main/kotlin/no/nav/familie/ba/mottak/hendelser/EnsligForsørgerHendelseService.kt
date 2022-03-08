@@ -32,7 +32,7 @@ class EnsligForsørgerHendelseService(
             StønadType.OVERGANGSSTØNAD -> {
                 if (!hendelsesloggRepository.existsByHendelseIdAndConsumer(
                         ensligForsørgerVedtakhendelse.behandlingId.toString(),
-                        HendelseConsumer.EF_VEDTAK
+                        HendelseConsumer.EF_VEDTAK_V1
                     )
                 ) {
                     secureLogger.info("Mottatt vedtak om overgangsstønad hendelse: $ensligForsørgerVedtakhendelse")
@@ -42,7 +42,7 @@ class EnsligForsørgerHendelseService(
                         Hendelseslogg(
                             offset,
                             ensligForsørgerVedtakhendelse.behandlingId.toString(),
-                            HendelseConsumer.EF_VEDTAK,
+                            HendelseConsumer.EF_VEDTAK_V1,
                             mapOf(
                                 "behandlingId" to ensligForsørgerVedtakhendelse.behandlingId.toString(),
                                 "stønadstype" to ensligForsørgerVedtakhendelse.stønadType.toString()
@@ -69,7 +69,7 @@ class EnsligForsørgerHendelseService(
 
         if (!hendelsesloggRepository.existsByHendelseIdAndConsumer(
                 hendelse.hendelseId,
-                HendelseConsumer.EF_VEDTAK_INFOTRYGD
+                HendelseConsumer.EF_VEDTAK_INFOTRYGD_V1
             )
         ) {
             secureLogger.info("Mottatt infotrygdvedtak om overgangsstønad: $hendelse")
@@ -81,7 +81,7 @@ class EnsligForsørgerHendelseService(
                 Hendelseslogg(
                     offset,
                     hendelse.hendelseId,
-                    HendelseConsumer.EF_VEDTAK_INFOTRYGD,
+                    HendelseConsumer.EF_VEDTAK_INFOTRYGD_V1,
                     mapOf(
                         "personIdent" to personIdent,
                         "hendelseId" to hendelse.hendelseId,

@@ -38,6 +38,6 @@ enum class HendelseConsumer {
         PDL,
         JOURNAL,
         JOURNAL_AIVEN,
-        EF_VEDTAK,
-        EF_VEDTAK_INFOTRYGD
+        EF_VEDTAK_V1,
+        EF_VEDTAK_INFOTRYGD_V1
 }

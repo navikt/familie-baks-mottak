@@ -31,7 +31,7 @@ class KafkaAivenConfig(val environment: Environment) {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
         factory.containerProperties.authExceptionRetryInterval = Duration.ofSeconds(2)
-        factory.consumerFactory = DefaultKafkaConsumerFactory(consumerConfigs("ba-mottak-ef-infotrygd"))
+        factory.consumerFactory = DefaultKafkaConsumerFactory(consumerConfigs("ba-mottak-ef-infotrygd-1"))
         factory.setCommonErrorHandler(kafkaRestartingErrorHandler)
         return factory
     }
@@ -42,7 +42,7 @@ class KafkaAivenConfig(val environment: Environment) {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
         factory.containerProperties.authExceptionRetryInterval = Duration.ofSeconds(2)
-        factory.consumerFactory = DefaultKafkaConsumerFactory(consumerConfigs("ba-mottak-ef-vedtak"))
+        factory.consumerFactory = DefaultKafkaConsumerFactory(consumerConfigs("ba-mottak-ef-vedtak-1"))
         factory.setCommonErrorHandler(kafkaRestartingErrorHandler)
         return factory
     }
