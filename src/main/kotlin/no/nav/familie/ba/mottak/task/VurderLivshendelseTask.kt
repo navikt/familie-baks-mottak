@@ -9,6 +9,8 @@ import no.nav.familie.ba.mottak.integrasjoner.BehandlingUnderkategori
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.BARN
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.LØPENDE
+import no.nav.familie.ba.mottak.integrasjoner.Identgruppe
+import no.nav.familie.ba.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.ba.mottak.integrasjoner.OppgaveVurderLivshendelseDto
 import no.nav.familie.ba.mottak.integrasjoner.PdlClient
@@ -38,6 +40,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
@@ -55,7 +58,8 @@ class VurderLivshendelseTask(
         private val taskRepository: TaskRepository,
         private val pdlClient: PdlClient,
         private val sakClient: SakClient,
-        private val aktørClient: AktørClient
+        private val aktørClient: AktørClient,
+        private val infotrygdClient: InfotrygdBarnetrygdClient
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -97,8 +101,11 @@ class VurderLivshendelseTask(
             }
             SIVILSTAND -> {
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-sivilstand")
-                val sivilstand = finnNyesteSivilstandEndring(pdlPersonData)
-                if (sivilstand?.type != GIFT) {
+                val sivilstand = finnNyesteSivilstandEndring(pdlPersonData) ?: run {
+                    secureLog.info("Ignorerer sivilstandhendelse for $personIdent uten dato: $pdlPersonData")
+                    return
+                }
+                if (sivilstand.type != GIFT) {
                     secureLog.info("Endringen til sivilstand GIFT for $personIdent er korrigert/annulert: $pdlPersonData")
                     return
                 }
@@ -108,17 +115,40 @@ class VurderLivshendelseTask(
                 }.singleOrNull()?.let { hentRestFagsak(it.fagsakId) }
 
                 if (aktivFaksak != null &&
-                    tilBehandlingstema(hentSisteBehandlingSomErIverksatt(aktivFaksak)) == Behandlingstema.UtvidetBarnetrygd
+                    tilBehandlingstema(hentSisteBehandlingSomErIverksatt(aktivFaksak)) == Behandlingstema.UtvidetBarnetrygd &&
+                    sjekkOmDatoErEtterEldsteVedtaksdato(sivilstand.dato!!, aktivFaksak, personIdent)
                 ) {
-                    opprettEllerOppdaterEndringISivilstandOppgave(sivilstand.dato, aktivFaksak.id, personIdent, task)
+                    opprettEllerOppdaterEndringISivilstandOppgave(sivilstand.dato!!, aktivFaksak.id, personIdent, task)
                 }
             }
             else -> log.debug("Behandlinger enda ikke livshendelse av type ${payload.type}")
         }
     }
 
+    private fun sjekkOmDatoErEtterEldsteVedtaksdato(dato: LocalDate, aktivFaksak: RestFagsak, personIdent: String): Boolean {
+        val tidligsteVedtakIBaSak = aktivFaksak.behandlinger
+            .filter { it.resultat == RESULTAT_INNVILGET && it.steg == STEG_TYPE_BEHANDLING_AVSLUTTET }
+            .minByOrNull { it.opprettetTidspunkt } ?: return false
+
+        if (dato.isAfter(tidligsteVedtakIBaSak.opprettetTidspunkt.toLocalDate()))
+            return true
+        if (tidligsteVedtakIBaSak.type == BEHANDLING_TYPE_MIGRERING) {
+            val personIdenter = pdlClient.hentIdenter(personIdent)
+                .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
+                .map { it.ident }
+            val tidligsteInfotrygdVedtak = infotrygdClient.hentVedtak(personIdenter).bruker
+                .maxByOrNull { it.iverksattFom ?: "000000" } // maxBy... siden datoen er på "seq"-format
+            val tidligsteInfotrygdVedtaksdato = tidligsteInfotrygdVedtak?.iverksattFom
+                ?.let { YearMonth.parse("${999999 - it.toInt()}", DateTimeFormatter.ofPattern("yyyyMM")) }
+                ?.atDay(1) ?: return false
+
+            return dato.isAfter(tidligsteInfotrygdVedtaksdato)
+        }
+        return false
+    }
+
     private fun finnNyesteSivilstandEndring(pdlPersonData: PdlPersonData): Sivilstand? {
-        return pdlPersonData.sivilstand.maxByOrNull { it.gyldigFraOgMed ?: it.bekreftelsesdato ?: LocalDate.MIN }
+        return pdlPersonData.sivilstand.filter { it.dato != null }.maxByOrNull { it.dato!! }
     }
 
     private fun finnBrukereMedSakRelatertTilPerson(
@@ -354,11 +384,8 @@ class VurderLivshendelseTask(
     private val List<RestFagsakDeltager>.inneholderBådeForelderOgBarn: Boolean
         get() = this.map(RestFagsakDeltager::rolle).containsAll(listOf(FORELDER, BARN))
 
-    private val Sivilstand.dato: LocalDate
-        get() = this.gyldigFraOgMed ?: this.bekreftelsesdato ?: run {
-            secureLog.info("Har mottatt sivilstandhendelse uten dato")
-            error("Har mottatt sivilstandhendelse uten dato")
-        }
+    private val Sivilstand.dato: LocalDate?
+        get() = this.gyldigFraOgMed ?: this.bekreftelsesdato
 
     data class Bruker(val ident: String, val fagsakId: Long)
 
@@ -366,9 +393,11 @@ class VurderLivshendelseTask(
         const val TASK_STEP_TYPE = "vurderLivshendelseTask"
 
         const val STEG_TYPE_BEHANDLING_AVSLUTTET = "BEHANDLING_AVSLUTTET"
+        const val RESULTAT_INNVILGET = "INNVILGET"
+        const val BEHANDLING_TYPE_MIGRERING = "MIGRERING_FRA_INFOTRYGD"
     }
 }
-data class VurderLivshendelseTaskDTO(val personIdent: String, val type: VurderLivshendelseType, val gyldigFom: LocalDate? = null)
+data class VurderLivshendelseTaskDTO(val personIdent: String, val type: VurderLivshendelseType)
 
 enum class VurderLivshendelseType(val beskrivelse: String) {
     DØDSFALL("Dødsfall"),

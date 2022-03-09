@@ -3,8 +3,8 @@ package no.nav.familie.ba.mottak.integrasjoner
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkRequest
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
-import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 import no.nav.familie.kontrakter.ba.infotrygd.Sak as SakDto
+import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.env.Environment
@@ -30,6 +30,13 @@ class InfotrygdBarnetrygdClient(@Value("\${FAMILIE_BA_INFOTRYGD_API_URL}/infotry
         return infotrygdResponseFra(
                 request = { postForEntity(uri("saker"), InfotrygdSøkRequest(søkersIdenter, barnasIdenter)) },
                 onFailure = { ex -> IntegrasjonException("Feil ved uthenting av saker fra infotrygd.", ex, uri("saker")) }
+        )
+    }
+
+    fun hentVedtak(søkersIdenter: List<String>): InfotrygdSøkResponse<StønadDto> {
+        return infotrygdResponseFra(
+            request = { postForEntity(uri("stonad?historikk=true"), InfotrygdSøkRequest(søkersIdenter)) },
+            onFailure = {ex -> IntegrasjonException("Feil ved uthenting av vedtak fra infotrygd", ex, uri("stonad?historikk=true"))}
         )
     }
 

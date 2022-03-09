@@ -209,7 +209,7 @@ class LeesahService(
 
     private fun opprettTaskHvisSivilstandErGift(pdlHendelse: PdlHendelse) {
         if (pdlHendelse.sivilstand == GIFT.name) {
-            opprettVurderLivshendelseTaskForHendelse(SIVILSTAND, pdlHendelse, pdlHendelse.sivilstandDato)
+            opprettVurderLivshendelseTaskForHendelse(SIVILSTAND, pdlHendelse)
         } else {
             sivilstandIgnorertCounter.increment()
         }
@@ -248,15 +248,11 @@ class LeesahService(
         )
     }
 
-    private fun opprettVurderLivshendelseTaskForHendelse(
-        type: VurderLivshendelseType,
-        pdlHendelse: PdlHendelse,
-        gyldigFom: LocalDate? = null
-    ) {
+    private fun opprettVurderLivshendelseTaskForHendelse(type: VurderLivshendelseType, pdlHendelse: PdlHendelse) {
         log.info("opprett VurderLivshendelseTask for pdlHendelse (id= ${pdlHendelse.hendelseId})")
         Task.nyTaskMedTriggerTid(
             type = VurderLivshendelseTask.TASK_STEP_TYPE,
-            payload = objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type, gyldigFom)),
+            payload = objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type)),
             triggerTid = LocalDateTime.now().run { if (environment.activeProfiles.contains("prod")) this.plusHours(1) else this },
         ).apply {
             metadata["ident"] = pdlHendelse.hentPersonident()
