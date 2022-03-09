@@ -30,6 +30,7 @@ class LeesahConsumer(val leesahService: LeesahService) {
 
 
     @KafkaListener(
+        groupId = "srvfamilie-ba-mottak",
         topics = ["aapen-person-pdl-leesah-v1"],
         id = "personhendelse",
         idIsGroup = false,
