@@ -26,18 +26,7 @@ import java.time.Duration
 class KafkaAivenConfig(val environment: Environment) {
 
     @Bean
-    fun kafkaEnsligForsørgerInfotrygdHendelseContainerFactory(kafkaRestartingErrorHandler: KafkaRestartingErrorHandler)
-            : ConcurrentKafkaListenerContainerFactory<String, String> {
-        val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
-        factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
-        factory.containerProperties.authExceptionRetryInterval = Duration.ofSeconds(2)
-        factory.consumerFactory = DefaultKafkaConsumerFactory(consumerConfigs())
-        factory.setCommonErrorHandler(kafkaRestartingErrorHandler)
-        return factory
-    }
-
-    @Bean
-    fun kafkaEnsligForsørgerVedtakHendelseContainerFactory(kafkaRestartingErrorHandler: KafkaRestartingErrorHandler)
+    fun kafkaAivenHendelseListenerContainerFactory(kafkaRestartingErrorHandler: KafkaRestartingErrorHandler)
             : ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
@@ -69,12 +58,8 @@ class KafkaAivenConfig(val environment: Environment) {
             ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaBrokers,
             ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
             ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
-
             ConsumerConfig.CLIENT_ID_CONFIG to "consumer-familie-ba-mottak-1",
-            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
-            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
-            CommonClientConfigs.RETRIES_CONFIG to 10,
-            CommonClientConfigs.RETRY_BACKOFF_MS_CONFIG to 100
+            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest"
         )
         if (environment.activeProfiles.none { it.contains("dev") || it.contains("postgres") }) {
             return consumerConfigs + securityConfig()
@@ -95,12 +80,8 @@ class KafkaAivenConfig(val environment: Environment) {
             "specific.avro.reader" to true,
             ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
             ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java,
-            ConsumerConfig.GROUP_ID_CONFIG to "familie-ba-mottak-avro",
             ConsumerConfig.CLIENT_ID_CONFIG to "consumer-familie-ba-mottak-2",
-            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
-            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
-            CommonClientConfigs.RETRIES_CONFIG to 10,
-            CommonClientConfigs.RETRY_BACKOFF_MS_CONFIG to 100
+            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest"
         )
         if (environment.activeProfiles.none { it.contains("dev") || it.contains("postgres") }) {
             return consumerConfigs + securityConfig()

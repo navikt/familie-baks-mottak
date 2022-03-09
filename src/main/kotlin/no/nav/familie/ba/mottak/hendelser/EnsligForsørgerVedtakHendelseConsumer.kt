@@ -38,7 +38,7 @@ class EnsligForsørgerVedtakHendelseConsumer(val vedtakOmOvergangsstønadService
         groupId = "ba-mottak-ef-vedtak-1",
         id = "efhendelse",
         topics = ["teamfamilie.$TOPIC_EF_VEDTAK"],
-        containerFactory = "kafkaEnsligForsørgerVedtakHendelseContainerFactory",
+        containerFactory = "kafkaAivenHendelseListenerContainerFactory",
         idIsGroup = false
     )
     @Transactional
