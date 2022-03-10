@@ -105,7 +105,7 @@ class LeesahService(
 
                 val fødselsdato = pdlHendelse.fødselsdato
                 if (fødselsdato == null) {
-                    log.error("Mangler fødselsdato. Ignorerer hendelse ${pdlHendelse.hendelseId}")
+                    log.warn("Mangler fødselsdato. Ignorerer hendelse ${pdlHendelse.hendelseId}")
                     fødselIgnorertCounter.increment()
                 } else if (erUnder6mnd(fødselsdato)) {
                     if (erUtenforNorge(pdlHendelse.fødeland)) {

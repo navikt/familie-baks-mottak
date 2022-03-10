@@ -54,7 +54,7 @@ class JournalhendelseService(
                     return
                 }
 
-                secureLogger.info("Mottatt gyldig hendelse: $hendelseRecord")
+                secureLogger.info("Behandler gyldig journalhendelse: $hendelseRecord")
                 behandleJournalhendelse(hendelseRecord)
 
                 lagreHendelseslogg(consumerRecord, hendelseRecord, CONSUMER_JOURNAL)
