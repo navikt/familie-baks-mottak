@@ -249,7 +249,7 @@ class VurderLivshendelseTask(
                 task.metadata["info"] = "Fant åpen oppgave"
             }
         }
-        taskRepository.saveAndFlush(task)
+        taskRepository.save(task)
     }
 
 
