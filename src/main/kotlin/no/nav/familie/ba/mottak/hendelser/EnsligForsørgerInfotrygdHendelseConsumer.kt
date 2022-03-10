@@ -58,9 +58,10 @@ class EnsligForsørgerInfotrygdHendelseConsumer(val vedtakOmOvergangsstønadServ
     val ensligForsørgerInfotrygdHendelseConsumerFeilCounter: Counter = Metrics.counter("ef.hendelse.infotrygdvedtak.feil")
 
     @KafkaListener(
+        groupId = "ba-mottak-ef-infotrygd-1",
         id = "ef-infotrygd-overgangstonad",
         topics = ["teamfamilie.$TOPIC_INFOTRYGD_VEDTAK"],
-        containerFactory = "kafkaEnsligForsørgerInfotrygdHendelseContainerFactory",
+        containerFactory = "kafkaAivenHendelseListenerContainerFactory",
         idIsGroup = false
     )
     @Transactional
