@@ -11,20 +11,16 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.retry.annotation.EnableRetry
 import org.springframework.scheduling.annotation.EnableScheduling
 
 @SpringBootConfiguration
-@EnableJpaAuditing
-@EnableJpaRepositories("no.nav.familie")
-@ComponentScan("no.nav.familie.prosessering",
+@ComponentScan(
+        "no.nav.familie.prosessering",
         "no.nav.familie.sikkerhet",
         "no.nav.familie.ba.mottak"
 )
-
-@EntityScan("no.nav.familie")
+@EntityScan("no.nav.familie.prosessering", "no.nav.familie")
 @ConfigurationPropertiesScan("no.nav.familie")
 @EnableScheduling
 @EnableJwtTokenValidation(ignore = ["org.springframework", "no.nav.familie.ba.mottak.e2e"])

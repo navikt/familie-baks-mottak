@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.Properties
 
 @Service
 class JournalhendelseService(
@@ -80,7 +80,7 @@ class JournalhendelseService(
                 consumerRecord.offset(),
                 hendelseRecord.hendelsesId.toString(),
                 hendelseConsumer,
-                mapOf(
+                mapOf (
                     "journalpostId" to hendelseRecord.journalpostId.toString(),
                     "hendelsesType" to hendelseRecord.hendelsesType.toString()
                 ).toProperties()
@@ -172,11 +172,13 @@ class JournalhendelseService(
 
 
     private fun opprettJournalhendelseRutingTask(journalpost: Journalpost) {
-        Task.nyTask(
-            JournalhendelseRutingTask.TASK_STEP_TYPE,
-            journalpost.kanal!!,
-            opprettMetadata(journalpost)
-        ).apply { taskRepository.save(this) }
+        Task(
+            type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+            payload = journalpost.kanal!!,
+            properties = opprettMetadata(journalpost)
+        ).apply {
+            taskRepository.save(this)
+        }
     }
 
     private fun opprettMetadata(journalpost: Journalpost): Properties {

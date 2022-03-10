@@ -1,9 +1,18 @@
 package no.nav.familie.ba.mottak.domene
 
-import no.nav.familie.prosessering.domene.PropertiesToStringConverter
+import no.nav.familie.ba.mottak.util.PropertiesToStringConverter
 import java.time.LocalDateTime
-import java.util.*
-import javax.persistence.*
+import java.util.Properties
+import javax.persistence.Column
+import javax.persistence.Convert
+import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.SequenceGenerator
+import javax.persistence.Table
 
 @Entity
 @Table(name = "HENDELSESLOGG")

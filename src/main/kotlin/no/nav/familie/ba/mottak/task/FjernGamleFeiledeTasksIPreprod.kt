@@ -25,8 +25,8 @@ class FjernGamleFeiledeTasksIPreprod(val taskRepository: TaskRepository) {
         if (isLeader != null && isLeader) {
             LOG.info("Fjerner gamle feilede tasks")
 
-            for (task: Task in taskRepository.finnTasksMedStatus(listOf(Status.FEILET), PageRequest.of(0, 200))) {
-                if (task.opprettetTidspunkt.isBefore(LocalDateTime.now().minusMonths(1))) {
+            for (task: Task in taskRepository.findByStatusIn(listOf(Status.FEILET), PageRequest.of(0, 200))) {
+                if (task.opprettetTid.isBefore(LocalDateTime.now().minusMonths(1))) {
                     task.avvikshåndter(avvikstype = Avvikstype.ANNET, årsak = "Rydder", endretAv = "VL")
                     taskRepository.save(task)
                 }

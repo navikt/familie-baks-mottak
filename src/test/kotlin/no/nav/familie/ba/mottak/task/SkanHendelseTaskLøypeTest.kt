@@ -5,7 +5,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.hendelser.JournalføringHendelseServiceTest
 import no.nav.familie.ba.mottak.integrasjoner.AktørClient
 import no.nav.familie.ba.mottak.integrasjoner.Bruker
@@ -78,7 +77,7 @@ class SkanHendelseTaskLøypeTest {
         } returns listOf()
 
         every {
-            mockTaskRepository.saveAndFlush(any<Task>())
+            mockTaskRepository.save(any<Task>())
         } returns null
 
         every {
@@ -196,7 +195,7 @@ class SkanHendelseTaskLøypeTest {
     }
 
     private fun kjørRutingTaskOgReturnerNesteTask(brukerId: String? = "12345678901"): Task {
-        rutingSteg.doTask(Task.nyTask(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+        rutingSteg.doTask(Task(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
                                       payload = MOTTAK_KANAL).apply {
             if (brukerId != null) {
                 this.metadata["personIdent"] = brukerId

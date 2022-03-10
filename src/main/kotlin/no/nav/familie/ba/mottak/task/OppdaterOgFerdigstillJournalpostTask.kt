@@ -1,14 +1,18 @@
 package no.nav.familie.ba.mottak.task
 
-import no.nav.familie.ba.mottak.integrasjoner.*
-
+import no.nav.familie.ba.mottak.integrasjoner.AktørClient
+import no.nav.familie.ba.mottak.integrasjoner.Bruker
+import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType
+import no.nav.familie.ba.mottak.integrasjoner.DokarkivClient
+import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
+import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
+import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 import org.springframework.stereotype.Service
 
 @Service
@@ -36,12 +40,12 @@ class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: Journa
                         onSuccess = {
                             task.metadata["fagsakId"] = fagsakId
                             log.info("Har oppdatert og ferdigstilt journalpost ${journalpost.journalpostId}")
-                            taskRepository.saveAndFlush(task)
+                            taskRepository.save(task)
                         },
                         onFailure = {
                             log.warn("Automatisk ferdigstilling feilet. Oppretter ny journalføringsoppgave for journalpost " +
                                      "${journalpost.journalpostId}.")
-                            Task.nyTask(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
+                            Task(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
                                         journalpost.journalpostId,
                                         task.metadata).also { taskRepository.save(it) }
                             return
@@ -54,7 +58,7 @@ class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: Journa
             else -> error("Uventet journalstatus ${journalpost.journalstatus} for journalpost ${journalpost.journalpostId}")
         }
 
-        val nyTask = Task.nyTask(
+        val nyTask = Task(
                 type = OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE,
                 payload = task.payload,
                 properties = task.metadata.apply {

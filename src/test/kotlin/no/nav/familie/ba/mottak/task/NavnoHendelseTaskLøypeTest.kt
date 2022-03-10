@@ -5,7 +5,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.integrasjoner.Bruker
 import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
@@ -73,7 +72,7 @@ class NavnoHendelseTaskLøypeTest {
                               sak = null)
 
         every {
-            mockTaskRepository.saveAndFlush(any<Task>())
+            mockTaskRepository.save(any<Task>())
         } returns null
 
         every {
@@ -102,7 +101,7 @@ class NavnoHendelseTaskLøypeTest {
         every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
 
         kjørRutingTaskOgReturnerNesteTask().run {
-            Assertions.assertThat(this.taskStepType).isEqualTo(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE)
+            Assertions.assertThat(this.type).isEqualTo(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE)
             journalføringSteg.doTask(this)
         }
 
@@ -121,7 +120,7 @@ class NavnoHendelseTaskLøypeTest {
         } returns InfotrygdSøkResponse(listOf(StønadDto()), emptyList())
 
         kjørRutingTaskOgReturnerNesteTask().run {
-            Assertions.assertThat(this.taskStepType).isEqualTo(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE)
+            Assertions.assertThat(this.type).isEqualTo(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE)
             journalføringSteg.doTask(this)
         }
 
@@ -194,7 +193,7 @@ class NavnoHendelseTaskLøypeTest {
     }
 
     private fun kjørRutingTaskOgReturnerNesteTask(): Task {
-        rutingSteg.doTask(Task.nyTask(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+        rutingSteg.doTask(Task(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
                                       payload = MOTTAK_KANAL).apply {
             this.metadata["personIdent"] = "12345678901"
             this.metadata["journalpostId"] = "mockJournalpostId"

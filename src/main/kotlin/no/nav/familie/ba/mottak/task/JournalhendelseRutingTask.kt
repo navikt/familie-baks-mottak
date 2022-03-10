@@ -2,7 +2,6 @@ package no.nav.familie.ba.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.BARN
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.AVSLUTTET
@@ -67,7 +66,7 @@ class JournalhendelseRutingTask(
             } // trenger ingen form for markering. Kan løses av begge systemer
         }
 
-        Task.nyTask(type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
+        Task(type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
                     payload = sakssystemMarkering,
                     properties = task.metadata).apply { taskRepository.save(this) }
     }

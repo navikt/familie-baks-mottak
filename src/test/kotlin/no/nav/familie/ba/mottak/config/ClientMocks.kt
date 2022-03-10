@@ -2,13 +2,17 @@ package no.nav.familie.ba.mottak.config
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.ba.mottak.integrasjoner.*
-import no.nav.familie.ba.mottak.søknad.PdfService
-import no.nav.familie.ba.mottak.søknad.SøknadRepository
-import no.nav.familie.ba.mottak.søknad.SøknadService
-import no.nav.familie.ba.mottak.søknad.SøknadTestData
-import no.nav.familie.ba.mottak.søknad.domene.DBVedlegg
-import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
+import no.nav.familie.ba.mottak.integrasjoner.AktørClient
+import no.nav.familie.ba.mottak.integrasjoner.Bruker
+import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType
+import no.nav.familie.ba.mottak.integrasjoner.DokarkivClient
+import no.nav.familie.ba.mottak.integrasjoner.Journalpost
+import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
+import no.nav.familie.ba.mottak.integrasjoner.Journalposttype
+import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
+import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
+import no.nav.familie.ba.mottak.integrasjoner.PdfClient
+import no.nav.familie.ba.mottak.integrasjoner.PdlClient
 import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentResponse
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import org.springframework.context.annotation.Bean

@@ -70,7 +70,7 @@ class VurderLivshendelseTaskTest {
         } returns listOf()
 
         every {
-            mockTaskRepository.saveAndFlush(any<Task>())
+            mockTaskRepository.save(any<Task>())
         } returns null
 
         every {
@@ -118,7 +118,7 @@ class VurderLivshendelseTaskTest {
 
         listOf(UTFLYTTING, DØDSFALL).forEach {
             vurderLivshendelseTask.doTask(
-                    Task.nyTask(
+                    Task(
                             type = VurderLivshendelseTask.TASK_STEP_TYPE,
                             payload = objectMapper.writeValueAsString(
                                     VurderLivshendelseTaskDTO(
@@ -131,7 +131,7 @@ class VurderLivshendelseTaskTest {
         }
 
         verify(exactly = 0) {
-            mockTaskRepository.saveAndFlush(any())
+            mockTaskRepository.save(any())
             mockOppgaveClient.opprettVurderLivshendelseOppgave(any())
             mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_BARN, listOf())
             mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN))
@@ -162,7 +162,7 @@ class VurderLivshendelseTaskTest {
 
         listOf(UTFLYTTING, DØDSFALL).forEach {
             vurderLivshendelseTask.doTask(
-                    Task.nyTask(
+                    Task(
                             type = VurderLivshendelseTask.TASK_STEP_TYPE,
                             payload = objectMapper.writeValueAsString(
                                     VurderLivshendelseTaskDTO(
@@ -175,7 +175,7 @@ class VurderLivshendelseTaskTest {
         }
 
         verify(exactly = 0) {
-            mockTaskRepository.saveAndFlush(any())
+            mockTaskRepository.save(any())
             mockOppgaveClient.opprettVurderLivshendelseOppgave(any())
         }
 
@@ -221,7 +221,7 @@ class VurderLivshendelseTaskTest {
 
         listOf(UTFLYTTING, DØDSFALL).forEach {
             vurderLivshendelseTask.doTask(
-                Task.nyTask(
+                Task(
                     type = VurderLivshendelseTask.TASK_STEP_TYPE,
                     payload = objectMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
@@ -235,7 +235,7 @@ class VurderLivshendelseTaskTest {
 
         val oppgaveDto = mutableListOf<OppgaveVurderLivshendelseDto>()
         verify(exactly = 2) {
-            mockTaskRepository.saveAndFlush(any())
+            mockTaskRepository.save(any())
             mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDto))
             mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN))
             mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_FAR, listOf(PERSONIDENT_BARN))
@@ -276,7 +276,7 @@ class VurderLivshendelseTaskTest {
 
         listOf(DØDSFALL, UTFLYTTING, SIVILSTAND).forEach {
             vurderLivshendelseTask.doTask(
-                    Task.nyTask(
+                    Task(
                             type = VurderLivshendelseTask.TASK_STEP_TYPE,
                             payload = objectMapper.writeValueAsString(
                                     VurderLivshendelseTaskDTO(
@@ -290,7 +290,7 @@ class VurderLivshendelseTaskTest {
 
         val oppgaveDto = mutableListOf<OppgaveVurderLivshendelseDto>()
         verify(exactly = 3) {
-            mockTaskRepository.saveAndFlush(any())
+            mockTaskRepository.save(any())
             mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDto))
         }
 
@@ -328,7 +328,7 @@ class VurderLivshendelseTaskTest {
 
         listOf(1,2).forEach {
             vurderLivshendelseTask.doTask(
-                Task.nyTask(
+                Task(
                     type = VurderLivshendelseTask.TASK_STEP_TYPE,
                     payload = objectMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
@@ -342,7 +342,7 @@ class VurderLivshendelseTaskTest {
 
         val oppgaveSlot = slot<OppgaveVurderLivshendelseDto>()
         verify(exactly = 1) {
-            mockTaskRepository.saveAndFlush(any())
+            mockTaskRepository.save(any())
             mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveSlot))
         }
 
@@ -378,7 +378,7 @@ class VurderLivshendelseTaskTest {
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
 
         vurderLivshendelseTask.doTask(
-            Task.nyTask(
+            Task(
                 type = VurderLivshendelseTask.TASK_STEP_TYPE,
                 payload = objectMapper.writeValueAsString(
                     VurderLivshendelseTaskDTO(
@@ -391,7 +391,7 @@ class VurderLivshendelseTaskTest {
 
         val oppgaveSlot = slot<OppgaveVurderLivshendelseDto>()
         verify(exactly = 1) {
-            mockTaskRepository.saveAndFlush(any())
+            mockTaskRepository.save(any())
             mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveSlot))
         }
 
@@ -494,7 +494,7 @@ class VurderLivshendelseTaskTest {
 
         listOf(DØDSFALL, UTFLYTTING).forEach {
             vurderLivshendelseTask.doTask(
-                    Task.nyTask(
+                    Task(
                             type = VurderLivshendelseTask.TASK_STEP_TYPE,
                             payload = objectMapper.writeValueAsString(
                                     VurderLivshendelseTaskDTO(
@@ -508,7 +508,7 @@ class VurderLivshendelseTaskTest {
 
         val oppgaveDto = mutableListOf<OppgaveVurderLivshendelseDto>()
         verify(exactly = 2) {
-            mockTaskRepository.saveAndFlush(any())
+            mockTaskRepository.save(any())
             mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDto))
         }
 
@@ -543,7 +543,7 @@ class VurderLivshendelseTaskTest {
 
         setupPdlMockForDødsfallshendelse(true, false, false)
         vurderLivshendelseTask.doTask(
-                Task.nyTask(
+                Task(
                         type = VurderLivshendelseTask.TASK_STEP_TYPE,
                         payload = objectMapper.writeValueAsString(
                                 VurderLivshendelseTaskDTO(
@@ -558,7 +558,7 @@ class VurderLivshendelseTaskTest {
 
         setupPdlMockForDødsfallshendelse(true, true, false)
         vurderLivshendelseTask.doTask(
-                Task.nyTask(
+                Task(
                         type = VurderLivshendelseTask.TASK_STEP_TYPE,
                         payload = objectMapper.writeValueAsString(
                                 VurderLivshendelseTaskDTO(
@@ -573,7 +573,7 @@ class VurderLivshendelseTaskTest {
 
         setupPdlMockForDødsfallshendelse(true, true, true)
         vurderLivshendelseTask.doTask(
-                Task.nyTask(
+                Task(
                         type = VurderLivshendelseTask.TASK_STEP_TYPE,
                         payload = objectMapper.writeValueAsString(
                                 VurderLivshendelseTaskDTO(
@@ -600,7 +600,7 @@ class VurderLivshendelseTaskTest {
 
         setupPdlMockForDødsfallshendelse(true, false, false)
         vurderLivshendelseTask.doTask(
-                Task.nyTask(
+                Task(
                         type = VurderLivshendelseTask.TASK_STEP_TYPE,
                         payload = objectMapper.writeValueAsString(
                                 VurderLivshendelseTaskDTO(
@@ -621,7 +621,7 @@ class VurderLivshendelseTaskTest {
 
         setupPdlMockForDødsfallshendelse(true, true, false)
         vurderLivshendelseTask.doTask(
-                Task.nyTask(
+                Task(
                         type = VurderLivshendelseTask.TASK_STEP_TYPE,
                         payload = objectMapper.writeValueAsString(
                                 VurderLivshendelseTaskDTO(
@@ -644,7 +644,7 @@ class VurderLivshendelseTaskTest {
 
         setupPdlMockForDødsfallshendelse(true, true, true)
         vurderLivshendelseTask.doTask(
-            Task.nyTask(
+            Task(
                 type = VurderLivshendelseTask.TASK_STEP_TYPE,
                 payload = objectMapper.writeValueAsString(
                     VurderLivshendelseTaskDTO(

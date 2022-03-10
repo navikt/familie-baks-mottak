@@ -226,7 +226,7 @@ class VurderLivshendelseTask(
             val behandlingstema = tilBehandlingstema(restBehandling)
             val oppgave = opprettOppgavePåAktør(aktørId, bruker.fagsakId, beskrivelse, behandlingstema)
             task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
-            taskRepository.saveAndFlush(task)
+            taskRepository.save(task)
             secureLog.info(
                 "Opprettet VurderLivshendelse-oppgave (${oppgave.oppgaveId}) for $hendelseType-hendelse (person ident:  ${bruker.ident})" +
                         ", beskrivelsestekst: $beskrivelse"
@@ -242,7 +242,7 @@ class VurderLivshendelseTask(
             oppdaterOppgaveMedNyBeskrivelse(åpenOppgave, beskrivelse)
             task.metadata["oppgaveId"] = åpenOppgave.id.toString()
             task.metadata["info"] = "Fant åpen oppgave"
-            taskRepository.saveAndFlush(task)
+            taskRepository.save(task)
             return false
         }
     }
@@ -279,7 +279,7 @@ class VurderLivshendelseTask(
                 task.metadata["info"] = "Fant åpen oppgave"
             }
         }
-        taskRepository.saveAndFlush(task)
+        taskRepository.save(task)
     }
 
 
