@@ -65,16 +65,11 @@ spring:
   datasource:
     url: jdbc:postgresql://b27dbvl009.preprod.local:5432/familie-ba-mottak
 
-ef:
-  overgangstonad:
-    sendtilsak: true
-
 FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1
 FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 1
 
 #Brukes til tilgangskontroll av familie-ks-mottak-frontend
 MOTTAK_ROLLE: ${MOTTAK_ROLLE}
-JOURNALFOERINGHENDELSE_V1_TOPIC_URL: aapen-dok-journalfoering-v1-q1
 JOURNALFOERINGHENDELSE_V1_TOPIC_AIVEN_URL: teamdokumenthandtering.aapen-dok-journalfoering-q1
 PDL_URL: http://pdl-api-q1.pdl
 FAMILIE_INTEGRASJONER_API_URL: http://familie-integrasjoner-q1/api

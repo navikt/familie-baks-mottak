@@ -28,7 +28,7 @@ class EnsligForsørgerHendelseServiceTest {
         mockHendelsesloggRepository = mockk(relaxed = true)
         mockSakClient = mockk(relaxed = true)
         mockPdlClient = mockk(relaxed = true)
-        service = EnsligForsørgerHendelseService(mockSakClient, mockPdlClient, mockHendelsesloggRepository, true)
+        service = EnsligForsørgerHendelseService(mockSakClient, mockPdlClient, mockHendelsesloggRepository)
         clearAllMocks()
     }
 
@@ -48,7 +48,7 @@ class EnsligForsørgerHendelseServiceTest {
 
     @Test
     fun `Skal ignorere hendelse fra ef hvis alt lest`() {
-        every { mockHendelsesloggRepository.existsByHendelseIdAndConsumer("200", HendelseConsumer.EF_VEDTAK) } returns true
+        every { mockHendelsesloggRepository.existsByHendelseIdAndConsumer("200", HendelseConsumer.EF_VEDTAK_V1) } returns true
 
         service.prosesserEfVedtakHendelse(42, EnsligForsørgerVedtakhendelse(200, "01020300110", StønadType.OVERGANGSSTØNAD))
 
