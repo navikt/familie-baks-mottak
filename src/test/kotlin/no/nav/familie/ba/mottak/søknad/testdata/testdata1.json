@@ -2,6 +2,7 @@
   "søknadstype": "ORDINÆR",
   "kontraktVersjon": 7,
   "søker": {
+    "harEøsSteg": true,
     "navn": {
       "label": {
         "en": "Name",
@@ -90,6 +91,7 @@
       }
     },
     "utenlandsperioder": [],
+    "idNummer": [],
     "spørsmål": {
       "borPåRegistrertAdresse": {
         "label": {
@@ -1984,6 +1986,7 @@
   },
   "barn": [
     {
+      "harEøsSteg": true,
       "navn": {
         "label": {
           "en": "Name",
@@ -3229,6 +3232,7 @@
       }
     },
     {
+      "harEøsSteg": false,
       "navn": {
         "label": {
           "en": "Name",
@@ -3776,6 +3780,7 @@
       }
     },
     {
+      "harEøsSteg": true,
       "navn": {
         "label": {
           "en": "Name",

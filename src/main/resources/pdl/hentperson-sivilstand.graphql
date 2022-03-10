@@ -1,0 +1,9 @@
+query($ident: ID!) {
+    person: hentPerson(ident: $ident) {
+        sivilstand {
+            type,
+            gyldigFraOgMed,
+            bekreftelsesdato
+        }
+    }
+}

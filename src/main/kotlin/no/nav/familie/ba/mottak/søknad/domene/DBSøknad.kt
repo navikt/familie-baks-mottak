@@ -38,8 +38,8 @@ data class DBSøknad(
 
     private fun hentSøknadVersjon(): String {
         return try {
-            val søknad = objectMapper.readValue<SøknadNewWip>(søknadJson)
-            if (søknad.kontraktVersjon == 7) "v7" else "v6"
+            val søknad = objectMapper.readTree(søknadJson)
+            if (søknad.get("kontraktVersjon")?.asInt() == 7) "v7" else "v6"
         } catch (e: Error) {
             "v6"
         }

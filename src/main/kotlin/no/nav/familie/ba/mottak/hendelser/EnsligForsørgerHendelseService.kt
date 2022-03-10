@@ -9,54 +9,46 @@ import no.nav.familie.ba.mottak.integrasjoner.PdlClient
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.ef.EnsligForsørgerVedtakhendelse
 import no.nav.familie.kontrakter.felles.ef.StønadType
-import no.nav.familie.prosessering.domene.PropertiesWrapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import java.util.Properties
 
 @Service
 class EnsligForsørgerHendelseService(
-        val sakClient: SakClient,
-        val pdlClient: PdlClient,
-        val hendelsesloggRepository: HendelsesloggRepository,
-        @Value("\${ef.overgangstonad.sendtilsak:false}") val sendTilSak: Boolean,
+    val sakClient: SakClient,
+    val pdlClient: PdlClient,
+    val hendelsesloggRepository: HendelsesloggRepository
 ) {
 
     val ensligForsørgerVedtakhendelseOvergangstønadCounter: Counter =
-            Metrics.counter("ef.hendelse.vedtak", "type", "overgangstønad")
+        Metrics.counter("ef.hendelse.vedtak", "type", "overgangstønad")
     val ensligForsørgerVedtakhendelseAnnetCounter: Counter = Metrics.counter("ef.hendelse.vedtak", "type", "annet")
     val ensligForsørgerInfotrygdVedtakhendelseOvergangstønadCounter: Counter =
-            Metrics.counter("ef.hendelse.infotrygd.vedtak", "type", "overgangstønad")
-    val ensligForsørgerInfotrygdVedtakhendelseAnnetCounter: Counter =
-            Metrics.counter("ef.hendelse.infotrygd.vedtak", "type", "annet")
+        Metrics.counter("ef.hendelse.infotrygd.vedtak", "type", "overgangstønad")
 
     fun prosesserEfVedtakHendelse(offset: Long, ensligForsørgerVedtakhendelse: EnsligForsørgerVedtakhendelse) {
 
         when (ensligForsørgerVedtakhendelse.stønadType) {
             StønadType.OVERGANGSSTØNAD -> {
                 if (!hendelsesloggRepository.existsByHendelseIdAndConsumer(
-                                ensligForsørgerVedtakhendelse.behandlingId.toString(),
-                                HendelseConsumer.EF_VEDTAK
-                        )
+                        ensligForsørgerVedtakhendelse.behandlingId.toString(),
+                        HendelseConsumer.EF_VEDTAK_V1
+                    )
                 ) {
                     secureLogger.info("Mottatt vedtak om overgangsstønad hendelse: $ensligForsørgerVedtakhendelse")
-                    if (sendTilSak) {
-                        sakClient.sendVedtakOmOvergangsstønadHendelseTilSak(ensligForsørgerVedtakhendelse.personIdent)
-                    }
+                    sakClient.sendVedtakOmOvergangsstønadHendelseTilSak(ensligForsørgerVedtakhendelse.personIdent)
 
                     hendelsesloggRepository.save(
-                            Hendelseslogg(
-                                    offset,
-                                    ensligForsørgerVedtakhendelse.behandlingId.toString(),
-                                    HendelseConsumer.EF_VEDTAK,
-                                    mapOf(
-                                            "behandlingId" to ensligForsørgerVedtakhendelse.behandlingId.toString(),
-                                            "stønadstype" to ensligForsørgerVedtakhendelse.stønadType.toString()
-                                    ).toProperties(),
-                                    ident = ensligForsørgerVedtakhendelse.personIdent
-                            )
+                        Hendelseslogg(
+                            offset,
+                            ensligForsørgerVedtakhendelse.behandlingId.toString(),
+                            HendelseConsumer.EF_VEDTAK_V1,
+                            mapOf(
+                                "behandlingId" to ensligForsørgerVedtakhendelse.behandlingId.toString(),
+                                "stønadstype" to ensligForsørgerVedtakhendelse.stønadType.toString()
+                            ).toProperties(),
+                            ident = ensligForsørgerVedtakhendelse.personIdent
+                        )
                     )
                     ensligForsørgerVedtakhendelseOvergangstønadCounter.increment()
                 }
@@ -76,29 +68,27 @@ class EnsligForsørgerHendelseService(
         }
 
         if (!hendelsesloggRepository.existsByHendelseIdAndConsumer(
-                        hendelse.hendelseId,
-                        HendelseConsumer.EF_VEDTAK_INFOTRYGD
-                )
+                hendelse.hendelseId,
+                HendelseConsumer.EF_VEDTAK_INFOTRYGD_V1
+            )
         ) {
             secureLogger.info("Mottatt infotrygdvedtak om overgangsstønad: $hendelse")
 
             val personIdent = pdlClient.hentPersonident(hendelse.aktørId.toString())
-            if (sendTilSak) {
-                sakClient.sendVedtakOmOvergangsstønadHendelseTilSak(personIdent)
-            }
+            sakClient.sendVedtakOmOvergangsstønadHendelseTilSak(personIdent)
 
             hendelsesloggRepository.save(
-                    Hendelseslogg(
-                            offset,
-                            hendelse.hendelseId,
-                            HendelseConsumer.EF_VEDTAK_INFOTRYGD,
-                            mapOf(
-                                    "personIdent" to personIdent,
-                                    "hendelseId" to hendelse.hendelseId,
-                                    "sats" to hendelse.sats.toString()
-                            ).toProperties(),
-                            ident = personIdent
-                    )
+                Hendelseslogg(
+                    offset,
+                    hendelse.hendelseId,
+                    HendelseConsumer.EF_VEDTAK_INFOTRYGD_V1,
+                    mapOf(
+                        "personIdent" to personIdent,
+                        "hendelseId" to hendelse.hendelseId,
+                        "sats" to hendelse.sats.toString()
+                    ).toProperties(),
+                    ident = personIdent
+                )
             )
             ensligForsørgerInfotrygdVedtakhendelseOvergangstønadCounter.increment()
         }

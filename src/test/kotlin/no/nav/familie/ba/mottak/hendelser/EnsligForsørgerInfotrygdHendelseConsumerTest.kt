@@ -29,7 +29,7 @@ class EnsligForsørgerInfotrygdHendelseConsumerTest {
     lateinit var mockHendelsesloggRepository: HendelsesloggRepository
     lateinit var mockSakClient: SakClient
     lateinit var mockPdlClient: PdlClient
-    lateinit var service:EnsligForsørgerHendelseService
+    lateinit var service: EnsligForsørgerHendelseService
 
     lateinit var consumer: EnsligForsørgerInfotrygdHendelseConsumer
 
@@ -60,7 +60,7 @@ class EnsligForsørgerInfotrygdHendelseConsumerTest {
         mockHendelsesloggRepository = mockk(relaxed = true)
         mockSakClient = mockk(relaxed = true)
         mockPdlClient = mockk(relaxed = true)
-        service = EnsligForsørgerHendelseService(mockSakClient, mockPdlClient, mockHendelsesloggRepository, true)
+        service = EnsligForsørgerHendelseService(mockSakClient, mockPdlClient, mockHendelsesloggRepository)
         consumer = EnsligForsørgerInfotrygdHendelseConsumer(service)
         clearAllMocks()
 

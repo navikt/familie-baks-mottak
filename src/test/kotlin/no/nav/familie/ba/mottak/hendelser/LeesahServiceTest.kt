@@ -59,7 +59,7 @@ class LeesahServiceTest {
             mockTaskRepository.save(capture(taskSlot))
         }
         assertThat(taskSlot.captured).isNotNull
-        assertThat(taskSlot.captured.payload).isEqualTo("{\"personIdent\":\"12345678901\",\"type\":\"DØDSFALL\"}")
+        assertThat(taskSlot.captured.payload).contains("\"personIdent\":\"12345678901\",\"type\":\"DØDSFALL\"")
         assertThat(taskSlot.captured.type).isEqualTo(VurderLivshendelseTask.TASK_STEP_TYPE)
 
         verify(exactly = 1) {
@@ -86,10 +86,41 @@ class LeesahServiceTest {
             mockTaskRepository.save(capture(taskSlot))
         }
         assertThat(taskSlot.captured).isNotNull
-        assertThat(taskSlot.captured.payload).isEqualTo("{\"personIdent\":\"12345678901\",\"type\":\"UTFLYTTING\"}")
+        assertThat(taskSlot.captured.payload).contains("\"personIdent\":\"12345678901\",\"type\":\"UTFLYTTING\"")
         assertThat(taskSlot.captured.type).isEqualTo(VurderLivshendelseTask.TASK_STEP_TYPE)
 
         verify(exactly = 1) {
+            mockHendelsesloggRepository.save(any())
+        }
+    }
+
+    @Test
+    fun `Skal opprette VurderLivshendelseTask for sivilstandhendelse GIFT`() {
+        val hendelseId = UUID.randomUUID().toString()
+        val pdlHendelse = PdlHendelse(
+            offset = Random.nextUInt().toLong(),
+            gjeldendeAktørId = "1234567890123",
+            hendelseId = hendelseId,
+            personIdenter = listOf("12345678901", "1234567890123"),
+            endringstype = LeesahService.OPPRETTET,
+            opplysningstype = LeesahService.OPPLYSNINGSTYPE_SIVILSTAND,
+            sivilstand = "GIFT",
+            sivilstandDato = LocalDate.of(2022, 2, 22),
+        )
+
+        service.prosesserNyHendelse(pdlHendelse)
+        service.prosesserNyHendelse(pdlHendelse.copy(sivilstand = "UOPPGITT"))
+
+        val taskSlot = slot<Task>()
+        verify(exactly = 1) {
+            mockTaskRepository.save(capture(taskSlot))
+        }
+        assertThat(taskSlot.captured).isNotNull
+        assertThat(taskSlot.captured.payload)
+            .isEqualTo("{\"personIdent\":\"12345678901\",\"type\":\"SIVILSTAND\",\"gyldigFom\":\"2022-02-22\"}")
+        assertThat(taskSlot.captured.type).isEqualTo(VurderLivshendelseTask.TASK_STEP_TYPE)
+
+        verify(exactly = 2) {
             mockHendelsesloggRepository.save(any())
         }
     }
@@ -150,18 +181,18 @@ class LeesahServiceTest {
     }
 
     @Test
-    fun `Skal opprette MottaAnnullerFødselTask når endringstype er ANNULLERT`() {
+    fun `Skal opprette MottaAnnullerFødselTask når endringstype er ANNULLERT`(){
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse = PdlHendelse(
-                offset = Random.nextUInt().toLong(),
-                gjeldendeAktørId = "1234567890123",
-                hendelseId = hendelseId,
-                personIdenter = listOf("12345678901", "1234567890123"),
-                endringstype = LeesahService.ANNULLERT,
-                opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
-                fødselsdato = LocalDate.now(),
-                fødeland = "NOR",
-                tidligereHendelseId = "unknown")
+            offset = Random.nextUInt().toLong(),
+            gjeldendeAktørId = "1234567890123",
+            hendelseId = hendelseId,
+            personIdenter = listOf("12345678901", "1234567890123"),
+            endringstype = LeesahService.ANNULLERT,
+            opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
+            fødselsdato = LocalDate.now(),
+            fødeland = "NOR",
+            tidligereHendelseId = "unknown")
 
         service.prosesserNyHendelse(pdlHendelse)
 
