@@ -115,7 +115,7 @@ class LeesahServiceTest {
         }
         assertThat(taskSlot.captured).isNotNull
         assertThat(taskSlot.captured.payload)
-            .isEqualTo("{\"personIdent\":\"12345678901\",\"type\":\"SIVILSTAND\",\"gyldigFom\":\"2022-02-22\"}")
+            .isEqualTo("{\"personIdent\":\"12345678901\",\"type\":\"SIVILSTAND\"}")
         assertThat(taskSlot.captured.taskStepType).isEqualTo(VurderLivshendelseTask.TASK_STEP_TYPE)
 
         verify(exactly = 2) {
