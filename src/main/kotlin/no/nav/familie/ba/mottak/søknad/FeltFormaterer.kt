@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 import java.time.Month
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
-import java.util.*
+import java.util.Locale
 
 
 object Feltformaterer {

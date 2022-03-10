@@ -4,8 +4,19 @@ import java.io.IOException
 import java.io.StringReader
 import java.io.StringWriter
 import java.time.LocalDateTime
-import java.util.*
-import javax.persistence.*
+import java.util.Properties
+import javax.persistence.AttributeConverter
+import javax.persistence.Column
+import javax.persistence.Convert
+import javax.persistence.Converter
+import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.SequenceGenerator
+import javax.persistence.Table
 
 @Entity
 @Table(name = "HENDELSESLOGG")

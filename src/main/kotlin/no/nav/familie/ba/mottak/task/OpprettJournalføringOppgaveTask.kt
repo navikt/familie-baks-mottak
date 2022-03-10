@@ -2,7 +2,9 @@ package no.nav.familie.ba.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.ba.mottak.integrasjoner.*
+import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
+import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
+import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.prosessering.AsyncTaskStep

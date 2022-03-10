@@ -1,14 +1,18 @@
 package no.nav.familie.ba.mottak.task
 
-import no.nav.familie.ba.mottak.integrasjoner.*
-
+import no.nav.familie.ba.mottak.integrasjoner.AktørClient
+import no.nav.familie.ba.mottak.integrasjoner.Bruker
+import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType
+import no.nav.familie.ba.mottak.integrasjoner.DokarkivClient
+import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
+import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
+import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 import org.springframework.stereotype.Service
 
 @Service

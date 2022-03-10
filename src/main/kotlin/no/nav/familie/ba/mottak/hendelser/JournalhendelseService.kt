@@ -13,7 +13,6 @@ import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
 import no.nav.familie.ba.mottak.task.JournalhendelseRutingTask
 import no.nav.familie.log.IdUtils
 import no.nav.familie.log.mdc.MDCConstants
-import no.nav.familie.prosessering.domene.PropertiesWrapper
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
@@ -23,7 +22,7 @@ import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.Properties
 
 @Service
 class JournalhendelseService(

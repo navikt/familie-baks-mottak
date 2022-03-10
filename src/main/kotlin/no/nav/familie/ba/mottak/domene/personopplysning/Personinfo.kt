@@ -1,7 +1,7 @@
 package no.nav.familie.ba.mottak.domene.personopplysning
 
 import java.time.LocalDate
-import java.util.*
+import java.util.Collections
 
 @Deprecated("Fjernes når barnetrygd er ute av infotrygd")
 data class Personinfo(

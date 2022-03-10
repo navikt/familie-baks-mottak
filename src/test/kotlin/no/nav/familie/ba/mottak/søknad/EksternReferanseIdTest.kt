@@ -15,9 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.web.client.HttpClientErrorException
-import java.util.*
-import kotlin.test.*
+import java.util.Properties
 
 
 @ExtendWith(SpringExtension::class)

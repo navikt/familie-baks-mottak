@@ -1,6 +1,5 @@
 package no.nav.familie.ba.mottak.søknad
 
-import no.nav.familie.ba.mottak.søknad.domene.Barn as BarnV7
 import no.nav.familie.ba.mottak.søknad.domene.Søker
 import no.nav.familie.ba.mottak.søknad.domene.SøknadNewWip
 import no.nav.familie.kontrakter.ba.søknad.SIVILSTANDTYPE
@@ -12,6 +11,7 @@ import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsvedlegg
 import no.nav.familie.kontrakter.ba.søknad.v5.RegistrertBostedType
 import no.nav.familie.kontrakter.ba.søknad.v6.Barn
 import no.nav.familie.kontrakter.ba.søknad.v6.Søknad
+import no.nav.familie.ba.mottak.søknad.domene.Barn as BarnV7
 import no.nav.familie.kontrakter.ba.søknad.v4.Søker as SøkerV4
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt as SøknadsfeltV4
 

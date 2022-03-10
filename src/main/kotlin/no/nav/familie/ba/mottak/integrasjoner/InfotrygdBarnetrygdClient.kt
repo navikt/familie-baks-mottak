@@ -3,14 +3,14 @@ package no.nav.familie.ba.mottak.integrasjoner
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkRequest
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
-import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
-import no.nav.familie.kontrakter.ba.infotrygd.Sak as SakDto
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestOperations
 import java.net.URI
+import no.nav.familie.kontrakter.ba.infotrygd.Sak as SakDto
+import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 
 @Component
 class InfotrygdBarnetrygdClient(@Value("\${FAMILIE_BA_INFOTRYGD_API_URL}/infotrygd/barnetrygd")

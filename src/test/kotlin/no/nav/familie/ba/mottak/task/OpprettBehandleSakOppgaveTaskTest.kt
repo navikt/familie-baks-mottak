@@ -1,14 +1,24 @@
 package no.nav.familie.ba.mottak.task
 
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.familie.ba.mottak.hendelser.JournalføringHendelseServiceTest
-import no.nav.familie.ba.mottak.integrasjoner.*
+import no.nav.familie.ba.mottak.integrasjoner.Bruker
+import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType
+import no.nav.familie.ba.mottak.integrasjoner.DokumentInfo
+import no.nav.familie.ba.mottak.integrasjoner.Dokumentstatus
+import no.nav.familie.ba.mottak.integrasjoner.Journalpost
+import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
+import no.nav.familie.ba.mottak.integrasjoner.Journalposttype
+import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
+import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.ba.mottak.task.OpprettJournalføringOppgaveTask.Companion.TASK_STEP_TYPE
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
-import org.assertj.core.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

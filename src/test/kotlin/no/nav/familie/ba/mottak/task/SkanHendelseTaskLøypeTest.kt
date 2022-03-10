@@ -5,7 +5,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.hendelser.JournalføringHendelseServiceTest
 import no.nav.familie.ba.mottak.integrasjoner.AktørClient
 import no.nav.familie.ba.mottak.integrasjoner.Bruker
