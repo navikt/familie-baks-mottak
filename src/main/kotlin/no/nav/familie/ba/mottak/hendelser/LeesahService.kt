@@ -117,13 +117,14 @@ class LeesahService(
                             KORRIGERT -> fødselKorrigertCounter.increment()
                         }
 
-                        val task = Task.nyTaskMedTriggerTid(MottaFødselshendelseTask.TASK_STEP_TYPE,
-                                                            pdlHendelse.hentPersonident(),
-                                                            nesteGyldigeTriggertidFødselshendelser(triggerTidForTps, environment),
-                                                            Properties().apply {
-                                                                this["ident"] = pdlHendelse.hentPersonident()
-                                                                this["callId"] = pdlHendelse.hendelseId
-                                                            })
+                        val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE,
+                                        payload = pdlHendelse.hentPersonident(),
+                                        properties = Properties().apply {
+                                            this["ident"] = pdlHendelse.hentPersonident()
+                                            this["callId"] = pdlHendelse.hendelseId
+                                        }).medTriggerTid(
+                                nesteGyldigeTriggertidFødselshendelser(triggerTidForTps, environment),
+                        )
                         taskRepository.save(task)
                     }
                 } else if (erUnder18år(fødselsdato)) {
@@ -135,18 +136,18 @@ class LeesahService(
             ANNULLERT -> {
                 fødselAnnullertCounter.increment()
                 if (pdlHendelse.tidligereHendelseId != null) {
-                    val task = Task.nyTask(type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
-                                           payload = objectMapper.writeValueAsString(
-                                               RestAnnullerFødsel(
-                                                   barnasIdenter = pdlHendelse.hentPersonidenter(),
-                                                   tidligereHendelseId = pdlHendelse.tidligereHendelseId
-                                               )
-                                           ),
-                                           properties = Properties().apply {
-                                               this["ident"] = pdlHendelse.hentPersonident()
-                                               this["callId"] = pdlHendelse.hendelseId
-                                               this["tidligereHendelseId"] = pdlHendelse.tidligereHendelseId
-                                           })
+                    val task = Task(type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
+                                    payload = objectMapper.writeValueAsString(
+                                            RestAnnullerFødsel(
+                                                    barnasIdenter = pdlHendelse.hentPersonidenter(),
+                                                    tidligereHendelseId = pdlHendelse.tidligereHendelseId
+                                            )
+                                    ),
+                                    properties = Properties().apply {
+                                        this["ident"] = pdlHendelse.hentPersonident()
+                                        this["callId"] = pdlHendelse.hendelseId
+                                        this["tidligereHendelseId"] = pdlHendelse.tidligereHendelseId
+                                    })
                     taskRepository.save(task)
                 } else {
                     log.warn("Mottatt annuller fødsel uten tidligereHendelseId, hendelseId ${pdlHendelse.hendelseId}")
@@ -254,15 +255,17 @@ class LeesahService(
         gyldigFom: LocalDate? = null
     ) {
         log.info("opprett VurderLivshendelseTask for pdlHendelse (id= ${pdlHendelse.hendelseId})")
-        Task.nyTaskMedTriggerTid(
-            type = VurderLivshendelseTask.TASK_STEP_TYPE,
-            payload = objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type, gyldigFom)),
-            triggerTid = LocalDateTime.now().run { if (environment.activeProfiles.contains("prod")) this.plusHours(1) else this },
-        ).apply {
-            metadata["ident"] = pdlHendelse.hentPersonident()
-            metadata["callId"] = pdlHendelse.hendelseId
-            metadata["type"] = type.name
-            taskRepository.save(this)
+        Task(
+                type = VurderLivshendelseTask.TASK_STEP_TYPE,
+                payload = objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type, gyldigFom)),
+                properties =  Properties().apply {
+                    this["ident"] = pdlHendelse.hentPersonident()
+                    this["callId"] = pdlHendelse.hendelseId
+                    this["type"] = type.name
+                }
+        ).medTriggerTid(LocalDateTime.now().run { if (environment.activeProfiles.contains("prod")) this.plusHours(1) else this })
+                .also {
+            taskRepository.save(it)
         }
     }
 

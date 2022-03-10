@@ -1,16 +1,16 @@
 package no.nav.familie.ba.mottak.søknad
 
-import no.nav.familie.ba.mottak.søknad.domene.SøknadSpråkvelgerService
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.ba.mottak.DevLauncherPostgres
+import no.nav.familie.ba.mottak.søknad.domene.SøknadSpråkvelgerService
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV6
-import no.nav.familie.kontrakter.ba.søknad.v6.Søknad
 import no.nav.familie.ba.mottak.util.DbContainerInitializer
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt
+import no.nav.familie.kontrakter.ba.søknad.v6.Søknad
 import no.nav.familie.kontrakter.felles.objectMapper
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest

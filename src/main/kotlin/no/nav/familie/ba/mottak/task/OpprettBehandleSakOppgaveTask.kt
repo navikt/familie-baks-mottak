@@ -31,7 +31,7 @@ class OpprettBehandleSakOppgaveTask(private val journalpostClient: JournalpostCl
                 }
                 task.metadata["oppgaveId"] =
                         "${oppgaveClient.opprettBehandleSakOppgave(journalpost, beskrivelse).oppgaveId}"
-                taskRepository.saveAndFlush(task)
+                taskRepository.save(task)
             } else {
                 log.error("Det eksister minst 1 åpen oppgave på journalpost ${task.payload}")
                 throw error("Det eksister minst 1 åpen oppgave på journalpost ${task.payload}")

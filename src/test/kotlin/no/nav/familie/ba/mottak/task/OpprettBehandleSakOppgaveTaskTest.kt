@@ -1,14 +1,24 @@
 package no.nav.familie.ba.mottak.task
 
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.familie.ba.mottak.hendelser.JournalføringHendelseServiceTest
-import no.nav.familie.ba.mottak.integrasjoner.*
+import no.nav.familie.ba.mottak.integrasjoner.Bruker
+import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType
+import no.nav.familie.ba.mottak.integrasjoner.DokumentInfo
+import no.nav.familie.ba.mottak.integrasjoner.Dokumentstatus
+import no.nav.familie.ba.mottak.integrasjoner.Journalpost
+import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
+import no.nav.familie.ba.mottak.integrasjoner.Journalposttype
+import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
+import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.ba.mottak.task.OpprettJournalføringOppgaveTask.Companion.TASK_STEP_TYPE
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
-import org.assertj.core.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -29,7 +39,7 @@ class OpprettBehandleSakOppgaveTaskTest {
         } returns listOf()
 
         every {
-            mockTaskRepository.saveAndFlush(any())
+            mockTaskRepository.save(any())
         } returns null
     }
 
@@ -41,7 +51,7 @@ class OpprettBehandleSakOppgaveTaskTest {
 
 
         assertThatThrownBy {
-            taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
+            taskStep.doTask(Task(type = TASK_STEP_TYPE, payload = "mockJournalpostId"))
         }.hasMessage("Kan ikke opprette oppgave før tilhørende journalpost 111 er ferdigstilt")
     }
 
@@ -57,7 +67,7 @@ class OpprettBehandleSakOppgaveTaskTest {
 
 
         assertThatThrownBy {
-            taskStep.doTask(Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId"))
+            taskStep.doTask(Task(type = TASK_STEP_TYPE, payload = "mockJournalpostId"))
         }.hasMessage("Det eksister minst 1 åpen oppgave på journalpost mockJournalpostId")
     }
 
@@ -77,7 +87,7 @@ class OpprettBehandleSakOppgaveTaskTest {
         } returns OppgaveResponse(123)
 
 
-        val task = Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId")
+        val task = Task(type = TASK_STEP_TYPE, payload = "mockJournalpostId")
         taskStep.doTask(task)
 
         assertThat(task.metadata["oppgaveId"]).isEqualTo("123")
@@ -101,7 +111,7 @@ class OpprettBehandleSakOppgaveTaskTest {
         } returns OppgaveResponse(321)
 
 
-        val task = Task.nyTask(TASK_STEP_TYPE, payload = "mockJournalpostId")
+        val task = Task(type = TASK_STEP_TYPE, payload = "mockJournalpostId")
         task.metadata["fagsystem"] = "BA"
         taskStep.doTask(task)
 

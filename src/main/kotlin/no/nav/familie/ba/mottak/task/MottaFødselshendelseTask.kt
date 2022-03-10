@@ -80,11 +80,11 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
 
 
                 task.metadata["morsIdent"] = morsIdent.id
-                val nesteTask = Task.nyTask(
-                    SendTilSakTask.TASK_STEP_TYPE,
-                    jacksonObjectMapper().writeValueAsString(NyBehandling(morsIdent = morsIdent.id,
-                                                                          barnasIdenter = arrayOf(barnetsId))),
-                    task.metadata
+                val nesteTask = Task(
+                        SendTilSakTask.TASK_STEP_TYPE,
+                        jacksonObjectMapper().writeValueAsString(NyBehandling(morsIdent = morsIdent.id,
+                                                                              barnasIdenter = arrayOf(barnetsId))),
+                        task.metadata
                 )
 
                 taskRepository.save(nesteTask)
@@ -93,8 +93,7 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
             }
         } catch (ex: RuntimeException) {
             log.info("MottaFødselshendelseTask feilet.")
-            task.triggerTid = nesteGyldigeTriggertidFødselshendelser(rekjøringsintervall, environment)
-            taskRepository.save(task)
+            taskRepository.save(task.medTriggerTid(nesteGyldigeTriggertidFødselshendelser(rekjøringsintervall, environment)))
             throw ex
         }
     }
