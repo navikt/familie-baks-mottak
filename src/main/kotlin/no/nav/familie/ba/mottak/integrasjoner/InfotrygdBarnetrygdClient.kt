@@ -33,6 +33,13 @@ class InfotrygdBarnetrygdClient(@Value("\${FAMILIE_BA_INFOTRYGD_API_URL}/infotry
         )
     }
 
+    fun hentVedtak(søkersIdenter: List<String>): InfotrygdSøkResponse<StønadDto> {
+        return infotrygdResponseFra(
+            request = { postForEntity(uri("stonad?historikk=true"), InfotrygdSøkRequest(søkersIdenter)) },
+            onFailure = {ex -> IntegrasjonException("Feil ved uthenting av vedtak fra infotrygd", ex, uri("stonad?historikk=true"))}
+        )
+    }
+
     private fun <T> infotrygdResponseFra(request: () -> InfotrygdSøkResponse<T>,
                                          onFailure: (Throwable) -> RuntimeException): InfotrygdSøkResponse<T> {
         return if (environment.activeProfiles.contains("e2e"))  InfotrygdSøkResponse(emptyList(), emptyList())

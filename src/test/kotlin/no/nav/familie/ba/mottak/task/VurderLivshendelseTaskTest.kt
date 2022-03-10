@@ -14,6 +14,7 @@ import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.BARN
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.ba.mottak.integrasjoner.FagsakStatus.LØPENDE
 import no.nav.familie.ba.mottak.integrasjoner.Fødsel
+import no.nav.familie.ba.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.ba.mottak.integrasjoner.OppgaveVurderLivshendelseDto
 import no.nav.familie.ba.mottak.integrasjoner.PdlClient
@@ -28,6 +29,8 @@ import no.nav.familie.ba.mottak.integrasjoner.Sivilstand
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.DØDSFALL
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.SIVILSTAND
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.UTFLYTTING
+import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
+import no.nav.familie.kontrakter.ba.infotrygd.Stønad
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
@@ -43,6 +46,7 @@ import org.junit.jupiter.api.TestInstance
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
+import java.time.YearMonth
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VurderLivshendelseTaskTest {
@@ -52,9 +56,10 @@ class VurderLivshendelseTaskTest {
     private val mockAktørClient: AktørClient = mockk()
     private val mockTaskRepository: TaskRepository = mockk(relaxed = true)
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
+    private val mockInfotrygdClient: InfotrygdBarnetrygdClient = mockk()
 
     private val vurderLivshendelseTask =
-            VurderLivshendelseTask(mockOppgaveClient, mockTaskRepository, mockPdlClient, mockSakClient, mockAktørClient)
+            VurderLivshendelseTask(mockOppgaveClient, mockTaskRepository, mockPdlClient, mockSakClient, mockAktørClient, mockInfotrygdClient)
 
     @BeforeEach
     internal fun setUp() {
@@ -83,6 +88,8 @@ class VurderLivshendelseTaskTest {
         every { mockOppgaveClient.finnOppgaverPåAktørId(any(), any()) } returns emptyList()
 
         every { mockOppgaveClient.opprettVurderLivshendelseOppgave(any()) } returns OppgaveResponse(42)
+
+        every { mockInfotrygdClient.hentVedtak(any()) } returns lagInfotrygdResponse()
     }
 
     @Test
@@ -274,8 +281,7 @@ class VurderLivshendelseTaskTest {
                             payload = objectMapper.writeValueAsString(
                                     VurderLivshendelseTaskDTO(
                                             PERSONIDENT_MOR,
-                                            it,
-                                            LocalDate.now()
+                                            it
                                     )
                             )
                     )
@@ -327,8 +333,7 @@ class VurderLivshendelseTaskTest {
                     payload = objectMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
                             PERSONIDENT_MOR,
-                            SIVILSTAND,
-                            LocalDate.now()
+                            SIVILSTAND
                         )
                     )
                 )
@@ -378,8 +383,7 @@ class VurderLivshendelseTaskTest {
                 payload = objectMapper.writeValueAsString(
                     VurderLivshendelseTaskDTO(
                         PERSONIDENT_MOR,
-                        SIVILSTAND,
-                        LocalDate.now()
+                        SIVILSTAND
                     )
                 )
             )
@@ -392,6 +396,50 @@ class VurderLivshendelseTaskTest {
         }
 
         assertThat(oppgaveSlot.captured.beskrivelse).contains(SIVILSTAND.beskrivelse, "${Year.now()}")
+    }
+
+    @Test
+    fun `Skal ignorere sivilstandhendelser uten dato eller dato eldre enn tidligste vedtak`() {
+        val sivilstandUtenDato = Sivilstand(GIFT)
+        val sivilstandEldreEnnTidligsteInfotrygdVedtak = Sivilstand(GIFT, LocalDate.now().minusYears(6))
+        val sivilstandMedDagensDato = Sivilstand(GIFT, LocalDate.now())
+        val sivilstandEldreEnnBasakVedtakMenNyereEnnInfotrygdVedtak = Sivilstand(GIFT, LocalDate.now().minusYears(4))
+
+        every {
+            mockPdlClient.hentPerson(any(), any())
+        } returns
+                sivilstandUtenDato.data andThen
+                sivilstandEldreEnnTidligsteInfotrygdVedtak.data andThen
+                sivilstandMedDagensDato.data andThen
+                sivilstandEldreEnnBasakVedtakMenNyereEnnInfotrygdVedtak.data
+
+        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
+                listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE))
+
+        every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
+
+        listOf(1,2,3,4).forEach {
+            vurderLivshendelseTask.doTask(
+                Task(
+                    type = VurderLivshendelseTask.TASK_STEP_TYPE,
+                    payload = objectMapper.writeValueAsString(
+                        VurderLivshendelseTaskDTO(
+                            PERSONIDENT_MOR,
+                            SIVILSTAND
+                        )
+                    )
+                )
+            )
+        }
+
+        val oppgaveSlot = mutableListOf<OppgaveVurderLivshendelseDto>()
+        verify(exactly = 2) {
+            mockTaskRepository.save(any())
+            mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveSlot))
+        }
+
+        assertThat(oppgaveSlot[0].beskrivelse).contains(SIVILSTAND.beskrivelse, "${Year.now()}")
+        assertThat(oppgaveSlot[1].beskrivelse).contains(SIVILSTAND.beskrivelse, "${Year.now().minusYears(4)}")
     }
 
 
@@ -695,12 +743,20 @@ class VurderLivshendelseTaskTest {
                             321,
                             BehandlingKategori.NASJONAL,
                             LocalDateTime.now(),
-                            "RESULTAT",
+                            "INNVILGET",
                             "BEHANDLING_AVSLUTTET",
-                            "TYPE",
+                            "MIGRERING_FRA_INFOTRYGD",
                             BehandlingUnderkategori.UTVIDET
                     )
             )
+    )
+
+    private fun lagInfotrygdResponse() = InfotrygdSøkResponse(
+        bruker = listOf(
+            Stønad(iverksattFom = YearMonth.now().minusYears(2).tilSeqFormat),
+            Stønad(iverksattFom = YearMonth.now().minusYears(5).tilSeqFormat)
+        ),
+        barn = listOf()
     )
 
     companion object {
@@ -713,3 +769,9 @@ class VurderLivshendelseTaskTest {
         private val ENHET_ID = "3049"
     }
 }
+
+private val Sivilstand.data: PdlPersonData
+    get() = PdlPersonData(sivilstand = listOf(this))
+
+private val YearMonth.tilSeqFormat: String
+    get() = "${999999 - ("$year" + "$monthValue".padStart(2, '0')).toInt()}"
