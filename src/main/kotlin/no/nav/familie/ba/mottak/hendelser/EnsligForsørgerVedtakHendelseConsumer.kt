@@ -35,9 +35,10 @@ class EnsligForsørgerVedtakHendelseConsumer(val vedtakOmOvergangsstønadService
     val ensligForsørgerVedtakhendelseFeilCounter: Counter = Metrics.counter("ef.hendelse.vedtak.feil")
 
     @KafkaListener(
+        groupId = "ba-mottak-ef-vedtak-1",
         id = "efhendelse",
         topics = ["teamfamilie.$TOPIC_EF_VEDTAK"],
-        containerFactory = "kafkaEnsligForsørgerVedtakHendelseContainerFactory",
+        containerFactory = "kafkaAivenHendelseListenerContainerFactory",
         idIsGroup = false
     )
     @Transactional

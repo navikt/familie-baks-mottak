@@ -34,7 +34,7 @@ class KafkaConfig {
         properties.properties.put("specific.avro.reader", "true")
         val factory = ConcurrentKafkaListenerContainerFactory<String, Aktor>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
-        factory.containerProperties.authorizationExceptionRetryInterval = Duration.ofSeconds(2)
+        factory.containerProperties.authExceptionRetryInterval = Duration.ofSeconds(2)
         factory.consumerFactory = DefaultKafkaConsumerFactory(
             properties.buildConsumerProperties().also {
                 it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = OffsetResetStrategy.LATEST.toString().lowercase()
@@ -56,24 +56,6 @@ class KafkaConfig {
         factory.consumerFactory = DefaultKafkaConsumerFactory(
             properties.buildConsumerProperties().also {
                 it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = OffsetResetStrategy.EARLIEST.toString().lowercase()
-            }
-        )
-        factory.setCommonErrorHandler(kafkaRestartingErrorHandler)
-        return factory
-    }
-
-    @Bean
-    fun kafkaJournalføringHendelseListenerContainerFactory(
-        properties: KafkaProperties,
-        kafkaRestartingErrorHandler: KafkaRestartingErrorHandler
-    ): ConcurrentKafkaListenerContainerFactory<Long, JournalfoeringHendelseRecord> {
-        properties.properties.put("specific.avro.reader", "true")
-        val factory = ConcurrentKafkaListenerContainerFactory<Long, JournalfoeringHendelseRecord>()
-        factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
-        factory.containerProperties.authExceptionRetryInterval = Duration.ofSeconds(2)
-        factory.consumerFactory = DefaultKafkaConsumerFactory(
-            properties.buildConsumerProperties().also {
-                it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = OffsetResetStrategy.LATEST.toString().lowercase()
             }
         )
         factory.setCommonErrorHandler(kafkaRestartingErrorHandler)
