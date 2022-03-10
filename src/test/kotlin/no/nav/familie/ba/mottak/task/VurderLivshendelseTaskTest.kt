@@ -420,7 +420,7 @@ class VurderLivshendelseTaskTest {
 
         listOf(1,2,3,4).forEach {
             vurderLivshendelseTask.doTask(
-                Task.nyTask(
+                Task(
                     type = VurderLivshendelseTask.TASK_STEP_TYPE,
                     payload = objectMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
@@ -434,7 +434,7 @@ class VurderLivshendelseTaskTest {
 
         val oppgaveSlot = mutableListOf<OppgaveVurderLivshendelseDto>()
         verify(exactly = 2) {
-            mockTaskRepository.saveAndFlush(any())
+            mockTaskRepository.save(any())
             mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveSlot))
         }
 
