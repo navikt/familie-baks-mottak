@@ -99,9 +99,9 @@ data class AndreForelder(
     val utvidet: AndreForelderUtvidet,
 
     // EØS
-    val pensjonNorge: Søknadsfelt<String>,
-    val arbeidNorge: Søknadsfelt<String>,
-    val andreUtbetalinger: Søknadsfelt<String>,
+    val pensjonNorge: Søknadsfelt<String?>,
+    val arbeidNorge: Søknadsfelt<String?>,
+    val andreUtbetalinger: Søknadsfelt<String?>,
     val arbeidsperioderUtland: List<Søknadsfelt<Arbeidsperiode>> = listOf(),
     val pensjonsperioderUtland: List<Søknadsfelt<Pensjonsperiode>> = listOf(),
     val arbeidsperioderNorge: List<Søknadsfelt<Arbeidsperiode>> = listOf(),
