@@ -7,6 +7,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.put
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import no.nav.familie.ba.mottak.DevLauncher
+import no.nav.familie.http.client.RessursException
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentResponse
 import no.nav.familie.kontrakter.felles.dokarkiv.Dokumenttype
@@ -89,8 +90,8 @@ class DokarkivClientTest {
 
         Assertions.assertThatThrownBy {
             dokarkivClient.ferdigstillJournalpost("12345678")
-        }.isInstanceOf(IntegrasjonException::class.java)
-            .hasMessageContaining("status=500 body={\"data\":null,\"status\":\"FEILET\",\"melding\":\"test\",\"frontendFeilmelding\":null,\"stacktrace\":")
+        }.isInstanceOf(IntegrasjonException::class.java).hasCauseInstanceOf(RessursException::class.java)
+            .hasMessageContaining("Ferdigstilling av journalpost 12345678 feilet")
     }
 
     fun forventetRequestJson(): String {
