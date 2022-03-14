@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
 import java.net.URI
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Service
 class PdlClient(
@@ -208,6 +209,7 @@ data class PdlPersonData(
     @JsonProperty(value = "doedsfall") val dødsfall: List<Dødsfall> = emptyList(),
     @JsonProperty(value = "foedsel") val fødsel: List<Fødsel> = emptyList(),
     val sivilstand: List<Sivilstand> = emptyList(),
+    val innflyttingTilNorge: List<InnflyttingTilNorge> = emptyList(),
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -237,6 +239,17 @@ data class Sivilstand(
     val type: SIVILSTAND,
     val gyldigFraOgMed: LocalDate? = null,
     val bekreftelsesdato: LocalDate? = null,
+)
+
+data class InnflyttingTilNorge(
+    val fraflyttingsland: String?,
+    val fraflyttingsstedIUtlandet: String?,
+    val folkeregistermetadata: Folkeregistermetadata
+)
+
+data class Folkeregistermetadata(
+    val ajourholdstidspunkt: LocalDateTime?,
+    val gyldighetstidspunkt: LocalDateTime?
 )
 
 enum class Adressebeskyttelsesgradering {

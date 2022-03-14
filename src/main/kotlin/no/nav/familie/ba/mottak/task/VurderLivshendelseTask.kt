@@ -132,19 +132,29 @@ class VurderLivshendelseTask(
 
         if (dato.isAfter(tidligsteVedtakIBaSak.opprettetTidspunkt.toLocalDate()))
             return true
-        if (tidligsteVedtakIBaSak.type == BEHANDLING_TYPE_MIGRERING) {
-            val personIdenter = pdlClient.hentIdenter(personIdent)
-                .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
-                .map { it.ident }
-            val tidligsteInfotrygdVedtak = infotrygdClient.hentVedtak(personIdenter).bruker
-                .maxByOrNull { it.iverksattFom ?: "000000" } // maxBy... siden datoen er på "seq"-format
-            val tidligsteInfotrygdVedtaksdato = tidligsteInfotrygdVedtak?.iverksattFom
-                ?.let { YearMonth.parse("${999999 - it.toInt()}", DateTimeFormatter.ofPattern("yyyyMM")) }
-                ?.atDay(1) ?: return false
 
-            return dato.isAfter(tidligsteInfotrygdVedtaksdato)
-        }
-        return false
+        val erEtterTidligsteInfotrygdVedtak = if (tidligsteVedtakIBaSak.type == BEHANDLING_TYPE_MIGRERING) {
+            hentTidligsteVedtaksdatoFraInfotrygd(personIdent)?.isBefore(dato) ?: false
+        } else false
+
+        return erEtterTidligsteInfotrygdVedtak
+            .also { if (!it) hentOgLoggRelevantInfoOmÅrsakenKanVæreInnflytting(personIdent, dato) }
+    }
+
+    private fun hentTidligsteVedtaksdatoFraInfotrygd(personIdent: String): LocalDate? {
+        val personIdenter = pdlClient.hentIdenter(personIdent)
+            .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
+            .map { it.ident }
+        val tidligsteInfotrygdVedtak = infotrygdClient.hentVedtak(personIdenter).bruker
+            .maxByOrNull { it.iverksattFom ?: "000000" } // maxBy... siden datoen er på "seq"-format
+        return tidligsteInfotrygdVedtak?.iverksattFom
+            ?.let { YearMonth.parse("${999999 - it.toInt()}", DateTimeFormatter.ofPattern("yyyyMM")) }
+            ?.atDay(1)
+    }
+
+    private fun hentOgLoggRelevantInfoOmÅrsakenKanVæreInnflytting(personIdent: String, dato: LocalDate) {
+        val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-innflytting")
+        secureLog.info("Ignorerer sivilstandhendelse med gammel dato ($dato). Se om årsak kan være innflytting: $pdlPersonData")
     }
 
     private fun finnNyesteSivilstandEndring(pdlPersonData: PdlPersonData): Sivilstand? {
