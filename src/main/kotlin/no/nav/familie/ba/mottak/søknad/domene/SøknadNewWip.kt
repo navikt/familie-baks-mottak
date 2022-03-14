@@ -86,6 +86,7 @@ data class Barn(
     val utenlandsperioder: List<Søknadsfelt<Utenlandsopphold>> = listOf(),
     val andreForelder: AndreForelder? = null,
     val eøsBarnetrygdsperioder: List<Søknadsfelt<EøsBarnetrygdsperiode>> = listOf(),
+    val idNummer: List<Søknadsfelt<IdNummer>> = listOf()
 )
 
 data class AndreForelder(
