@@ -34,6 +34,7 @@ import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROL
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND.GIFT
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
+import no.nav.familie.prosessering.domene.PropertiesWrapper
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
@@ -44,6 +45,7 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
+import java.util.Properties
 
 
 @Service
@@ -235,8 +237,8 @@ class VurderLivshendelseTask(
             val restBehandling = hentSisteBehandlingSomErIverksatt(restFagsak) ?: hentAktivBehandling(restFagsak)
             val behandlingstema = tilBehandlingstema(restBehandling)
             val oppgave = opprettOppgavePåAktør(aktørId, bruker.fagsakId, beskrivelse, behandlingstema)
-            task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
-            taskRepository.save(task)
+
+            taskRepository.save(task.copy(metadataWrapper =  PropertiesWrapper(task.metadata.apply { put("oppgaveId", oppgave.oppgaveId.toString()) })))
             secureLog.info(
                 "Opprettet VurderLivshendelse-oppgave (${oppgave.oppgaveId}) for $hendelseType-hendelse (person ident:  ${bruker.ident})" +
                         ", beskrivelsestekst: $beskrivelse"
