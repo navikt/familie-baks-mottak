@@ -94,18 +94,19 @@ data class AndreForelder(
     val fnr: Søknadsfelt<String>,
     val fødselsdato: Søknadsfelt<String>,
     val arbeidUtlandet: Søknadsfelt<String>,
-    val arbeidUtlandetHvilketLand: Søknadsfelt<String>,
     val pensjonUtland: Søknadsfelt<String>,
-    val pensjonHvilketLand: Søknadsfelt<String>,
     val skriftligAvtaleOmDeltBosted: Søknadsfelt<String>,
     val utvidet: AndreForelderUtvidet,
 
     // EØS
-    val andreUtbetalingsperioder: List<Søknadsfelt<Utbetalingsperiode>> = listOf(),
+    val pensjonNorge: Søknadsfelt<String>,
+    val arbeidNorge: Søknadsfelt<String>,
+    val andreUtbetalinger: Søknadsfelt<String>,
     val arbeidsperioderUtland: List<Søknadsfelt<Arbeidsperiode>> = listOf(),
+    val pensjonsperioderUtland: List<Søknadsfelt<Pensjonsperiode>> = listOf(),
     val arbeidsperioderNorge: List<Søknadsfelt<Arbeidsperiode>> = listOf(),
     val pensjonsperioderNorge: List<Søknadsfelt<Pensjonsperiode>> = listOf(),
-    val pensjonsperioderUtland: List<Søknadsfelt<Pensjonsperiode>> = listOf()
+    val andreUtbetalingsperioder: List<Søknadsfelt<Utbetalingsperiode>> = listOf()
 )
 
 data class EøsBarnetrygdsperiode(
