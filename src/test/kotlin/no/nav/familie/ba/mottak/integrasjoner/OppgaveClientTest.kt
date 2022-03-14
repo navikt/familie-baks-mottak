@@ -16,6 +16,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.verify
 import io.mockk.every
 import io.mockk.mockkStatic
 import no.nav.familie.ba.mottak.DevLauncher
+import no.nav.familie.http.client.RessursException
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Ressurs.Companion.success
@@ -163,12 +164,14 @@ class OppgaveClientTest {
         assertThatThrownBy {
             oppgaveClient.opprettJournalføringsoppgave(journalPost)
         }.isInstanceOf(IntegrasjonException::class.java)
-            .hasMessageContaining("Error mot http://localhost:28085/api/oppgave/opprett status=500 body={")
+            .hasCauseInstanceOf(RessursException::class.java)
+            .hasMessageContaining("feilet ved opprettelse av oppgave")
 
         assertThatThrownBy {
             oppgaveClient.opprettBehandleSakOppgave(journalPost)
         }.isInstanceOf(IntegrasjonException::class.java)
-            .hasMessageContaining("Error mot http://localhost:28085/api/oppgave/opprett status=500 body={")
+            .hasCauseInstanceOf(RessursException::class.java)
+            .hasMessageContaining("feilet ved opprettelse av oppgave")
     }
 
     @Test
