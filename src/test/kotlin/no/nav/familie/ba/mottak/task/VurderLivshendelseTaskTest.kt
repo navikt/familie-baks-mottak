@@ -406,7 +406,7 @@ class VurderLivshendelseTaskTest {
         val sivilstandEldreEnnBasakVedtakMenNyereEnnInfotrygdVedtak = Sivilstand(GIFT, LocalDate.now().minusYears(4))
 
         every {
-            mockPdlClient.hentPerson(any(), any())
+            mockPdlClient.hentPerson(any(), "hentperson-sivilstand")
         } returns
                 sivilstandUtenDato.data andThen
                 sivilstandEldreEnnTidligsteInfotrygdVedtak.data andThen
