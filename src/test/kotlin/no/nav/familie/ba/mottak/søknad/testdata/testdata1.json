@@ -1987,6 +1987,7 @@
   "barn": [
     {
       "harEøsSteg": true,
+      "idNummer": [],
       "navn": {
         "label": {
           "en": "Name",
@@ -3233,6 +3234,7 @@
     },
     {
       "harEøsSteg": false,
+      "idNummer": [],
       "navn": {
         "label": {
           "en": "Name",
@@ -3781,6 +3783,7 @@
     },
     {
       "harEøsSteg": true,
+      "idNummer": [],
       "navn": {
         "label": {
           "en": "Name",
