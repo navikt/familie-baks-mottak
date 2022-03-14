@@ -2283,18 +2283,6 @@
             "en": "JA"
           }
         },
-        "pensjonHvilketLand": {
-          "label": {
-            "en": "What country did the other parent receive a pension from?",
-            "nb": "Hvilket land fikk den andre forelderen pensjon fra?",
-            "nn": "Kva land fekk den andre forelderen pensjon frå?"
-          },
-          "verdi": {
-            "nb": "UKJENT",
-            "nn": "UKJENT",
-            "en": "UKJENT"
-          }
-        },
         "arbeidUtlandet": {
           "label": {
             "en": "Has GODSLIG DORULL's other parent worked outside of Norway, on a foreign ship or on a foreign continental shelf?",
@@ -2305,18 +2293,6 @@
             "nb": "JA",
             "nn": "JA",
             "en": "JA"
-          }
-        },
-        "arbeidUtlandetHvilketLand": {
-          "label": {
-            "en": "What country did the other parent work in?",
-            "nb": "Hvilket land arbeidet den andre forelderen i?",
-            "nn": "Kva land arbeidde den andre forelderen i?"
-          },
-          "verdi": {
-            "nb": "UKJENT",
-            "nn": "UKJENT",
-            "en": "UKJENT"
           }
         },
         "skriftligAvtaleOmDeltBosted": {
@@ -3566,18 +3542,6 @@
             "en": null
           }
         },
-        "pensjonHvilketLand": {
-          "label": {
-            "en": "What country does TYKKMAGET KRONJUVEL's other parent receive a pension from?",
-            "nb": "Hvilket land får den andre forelderen til TYKKMAGET KRONJUVEL pensjon fra?",
-            "nn": "Kva land får den andre forelderen til TYKKMAGET KRONJUVEL pensjon frå?"
-          },
-          "verdi": {
-            "nb": "UKJENT",
-            "nn": "UKJENT",
-            "en": "UKJENT"
-          }
-        },
         "arbeidUtlandet": {
           "label": {
             "en": "Does TYKKMAGET KRONJUVEL's other parent work outside of Norway, on a foreign ship or on a foreign continental shelf?",
@@ -3588,18 +3552,6 @@
             "nb": null,
             "nn": null,
             "en": null
-          }
-        },
-        "arbeidUtlandetHvilketLand": {
-          "label": {
-            "en": "What country does the other parent work in?",
-            "nb": "Hvilket land arbeider den andre forelderen i?",
-            "nn": "Kva land arbeidar den andre forelderen i?"
-          },
-          "verdi": {
-            "nb": "UKJENT",
-            "nn": "UKJENT",
-            "en": "UKJENT"
           }
         },
         "skriftligAvtaleOmDeltBosted": {
@@ -3955,18 +3907,6 @@
             "en": "VET_IKKE"
           }
         },
-        "pensjonHvilketLand": {
-          "label": {
-            "en": "What country does LUNKEN KAKKERLAKK's other parent receive a pension from?",
-            "nb": "Hvilket land får den andre forelderen til LUNKEN KAKKERLAKK pensjon fra?",
-            "nn": "Kva land får den andre forelderen til LUNKEN KAKKERLAKK pensjon frå?"
-          },
-          "verdi": {
-            "nb": "UKJENT",
-            "nn": "UKJENT",
-            "en": "UKJENT"
-          }
-        },
         "arbeidUtlandet": {
           "label": {
             "en": "Does LUNKEN KAKKERLAKK's other parent work outside of Norway, on a foreign ship or on a foreign continental shelf?",
@@ -3977,18 +3917,6 @@
             "nb": "JA",
             "nn": "JA",
             "en": "JA"
-          }
-        },
-        "arbeidUtlandetHvilketLand": {
-          "label": {
-            "en": "What country does the other parent work in?",
-            "nb": "Hvilket land arbeider den andre forelderen i?",
-            "nn": "Kva land arbeidar den andre forelderen i?"
-          },
-          "verdi": {
-            "nb": "UKJENT",
-            "nn": "UKJENT",
-            "en": "UKJENT"
           }
         },
         "skriftligAvtaleOmDeltBosted": {
