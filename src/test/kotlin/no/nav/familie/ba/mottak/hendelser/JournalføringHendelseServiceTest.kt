@@ -253,16 +253,11 @@ class JournalføringHendelseServiceTest {
 
         val task = OpprettJournalføringOppgaveTask(
                 mockJournalpostClient,
-                mockOppgaveClient,
-                mockTaskRepository)
+                mockOppgaveClient)
 
         task.doTask(Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "oppgavebeskrivelse").apply {
             this.metadata["journalpostId"] = JOURNALPOST_UTGÅENDE_DOKUMENT
         })
-
-        verify(exactly = 1) {
-            mockTaskRepository.save(any())
-        }
         assertThat(sakssystemMarkering.captured).contains("oppgavebeskrivelse")
     }
 
@@ -280,8 +275,7 @@ class JournalføringHendelseServiceTest {
 
         val task = OpprettJournalføringOppgaveTask(
                 mockJournalpostClient,
-                mockOppgaveClient,
-                mockTaskRepository)
+                mockOppgaveClient)
         task.doTask(Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = JOURNALPOST_UTGÅENDE_DOKUMENT).apply {
             this.metadata["journalpostId"] = JOURNALPOST_UTGÅENDE_DOKUMENT
         })
@@ -298,8 +292,7 @@ class JournalføringHendelseServiceTest {
     fun `Kaster exception dersom journalstatus annet enn MOTTATT`() {
         val task = OpprettJournalføringOppgaveTask(
                 mockJournalpostClient,
-                mockOppgaveClient,
-                mockTaskRepository)
+                mockOppgaveClient)
 
         Assertions.assertThrows(IllegalStateException::class.java) {
             task.doTask(Task(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_FERDIGSTILT).apply {

@@ -57,7 +57,6 @@ import java.util.Properties
 )
 class VurderLivshendelseTask(
         private val oppgaveClient: OppgaveClient,
-        private val taskRepository: TaskRepository,
         private val pdlClient: PdlClient,
         private val sakClient: SakClient,
         private val aktørClient: AktørClient,
@@ -289,7 +288,6 @@ class VurderLivshendelseTask(
                 task.metadata["info"] = "Fant åpen oppgave"
             }
         }
-        taskRepository.save(task)
     }
 
 

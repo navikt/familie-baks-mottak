@@ -51,8 +51,7 @@ class SkanHendelseTaskLøypeTest {
     )
 
     private val journalføringSteg = OpprettJournalføringOppgaveTask(mockJournalpostClient,
-                                                                    mockOppgaveClient,
-                                                                    mockTaskRepository)
+                                                                    mockOppgaveClient)
 
 
     @BeforeEach

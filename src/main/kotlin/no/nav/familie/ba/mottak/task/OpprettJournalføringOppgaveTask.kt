@@ -19,8 +19,7 @@ import org.springframework.stereotype.Service
 @TaskStepBeskrivelse(taskStepType = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
                      beskrivelse = "Opprett journalføringsoppgave")
 class OpprettJournalføringOppgaveTask(private val journalpostClient: JournalpostClient,
-                                      private val oppgaveClient: OppgaveClient,
-                                      private val taskRepository: TaskRepository) : AsyncTaskStep {
+                                      private val oppgaveClient: OppgaveClient) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(OpprettJournalføringOppgaveTask::class.java)
     val oppgaverOpprettetCounter: Counter = Metrics.counter("barnetrygd.ruting.oppgave.opprettet")
@@ -45,7 +44,6 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
                     val nyOppgave = oppgaveClient.opprettJournalføringsoppgave(journalpost = journalpost,
                                                                                beskrivelse = task.payload.takeIf { it.isNotEmpty() })
                     task.metadata["oppgaveId"] = "${nyOppgave.oppgaveId}"
-                    taskRepository.save(task)
                     log.info("Oppretter ny journalførings-oppgave med id ${nyOppgave.oppgaveId} for journalpost ${journalpost.journalpostId}")
                     oppgaverOpprettetCounter.increment()
                 } else {
