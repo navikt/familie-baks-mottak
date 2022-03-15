@@ -46,8 +46,8 @@ class TPSPersonClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJO
             if (e is HttpClientErrorException.NotFound) {
                 throw e
             }
-            logger.info("Feil mot TPS. status=${e.statusCode}, stacktrace=${e.stackTrace.toList()}")
-            secureLogger.info("Feil mot TPS. msg=${e.message}, body=${e.responseBodyAsString}")
+            logger.info("Feil mot TPS. status=${e.statusCode}")
+            secureLogger.info("Feil mot TPS. msg=${e.message}, body=${e.responseBodyAsString}", e)
             throw RuntimeException("Kall mot integrasjon feilet ved uthenting av personinfo. ${e.statusCode} ${e.responseBodyAsString}")
         }
     }
