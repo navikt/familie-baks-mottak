@@ -80,13 +80,6 @@ class MottaFødselshendelseTaskTest{
                         errors = emptyList()
                 )
         )
-        //TODO fjernes når barnetrygd er ute av infotrygd
-        stubFor(post(urlEqualTo("/api/personopplysning/v2/info"))
-                        .willReturn(aResponse()
-                                            .withHeader("Content-Type", "application/json")
-                                            .withBody(objectMapper.writeValueAsString(
-                                                    success(lagTestPerson().copy(bostedsadresse = null))))))
-
 
         taskService.doTask(Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn))
 
@@ -113,13 +106,6 @@ class MottaFødselshendelseTaskTest{
                         errors = emptyList()
                 )
         )
-        //TODO fjernes når barnetrygd er ute av infotrygd
-        stubFor(post(urlEqualTo("/api/personopplysning/v2/info"))
-                        .willReturn(aResponse()
-                                            .withHeader("Content-Type", "application/json")
-                                            .withBody(objectMapper.writeValueAsString(
-                                                    success(lagTestPerson().copy(bostedsadresse = null))))))
-
 
         taskService.doTask(Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
 
@@ -130,35 +116,6 @@ class MottaFødselshendelseTaskTest{
         assertThat(objectMapper.readValue(taskerMedCallId.first().payload, NyBehandling::class.java))
                 .hasFieldOrPropertyWithValue("morsIdent", "20107678901")
                 .hasFieldOrPropertyWithValue("barnasIdenter", arrayOf(fnrBarn))
-    }
-
-
-    @Test
-    fun `Skal ikke opprette SendTilSak task og kaste RekjørSenereException hvis personen ikke finnes i TPS`() {
-        MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
-        val fnrBarn = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyy")) + "12345"
-
-        mockResponseForPdlQuery(
-            pdlRequestBody = gyldigRequest("hentperson-med-relasjoner.graphql", fnrBarn),
-            mockResponse = PdlHentPersonResponse(
-                data = PdlPerson(lagTestPdlPerson().copy(forelderBarnRelasjon = listOf(
-                    PdlForeldreBarnRelasjon(
-                        "40107678901",
-                        FORELDERBARNRELASJONROLLE.MOR)))),
-                errors = emptyList()
-            )
-        )
-
-        //skal fjernes når barnetrygd er ute av infotrygd
-        stubFor(post(urlEqualTo("/api/personopplysning/v2/info"))
-                        .willReturn(aResponse().withStatus(404)))
-
-        val exception = assertFailsWith<RekjørSenereException>("Kall mot integrasjon feilet ved uthenting av personinfo. 404 NOT_FOUND") {
-            taskService.doTask(Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn))
-        }
-
-        assertThat(exception.årsak).isEqualTo("MottaFødselshendelseTask feilet")
-        assertThat(exception.triggerTid).isAfter(LocalDateTime.now())
     }
 
     @Test
@@ -221,15 +178,6 @@ class MottaFødselshendelseTaskTest{
                         errors = emptyList()
                 )
         )
-        //TODO fjernes når barnetrygd er ute av infotrygd
-        stubFor(post(urlEqualTo("/api/personopplysning/v2/info"))
-                        .willReturn(aResponse()
-                                            .withHeader("Content-Type", "application/json")
-                                            .withBody(objectMapper.writeValueAsString(
-                                                    success(lagTestPerson().copy(forelderBarnRelasjoner =
-                                                                                 setOf(ForelderBarnRelasjon(
-                                                                                         "20107678901",
-                                                                                         FORELDERBARNRELASJONROLLE.FAR))))))))
 
         val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn)
 
@@ -254,12 +202,6 @@ class MottaFødselshendelseTaskTest{
                         errors = emptyList()
                 )
         )
-        //TODO fjernes når barnetrygd er ute av infotrygd
-        stubFor(post(urlEqualTo("/api/personopplysning/v2/info"))
-                        .willReturn(aResponse()
-                                            .withHeader("Content-Type", "application/json")
-                                            .withBody(objectMapper.writeValueAsString(
-                                                    success(lagTestPerson().copy(bostedsadresse = null))))))
 
         val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn)
 
@@ -273,7 +215,7 @@ class MottaFødselshendelseTaskTest{
     }
 
     @Test
-    fun `Skal kaste Feil og sette rekjøringsintervall frem i tid for mottaFødselshendelseTask`() {
+    fun `Feil mot PDL kaster IntegrasjonException `() {
         MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
 
         mockResponseForPdlQuery(
@@ -291,15 +233,6 @@ class MottaFødselshendelseTaskTest{
 
         assertThatThrownBy { taskService.doTask(task) }.isInstanceOf(IntegrasjonException::class.java)
                 .hasMessage("Feil ved oppslag på person: Feilmelding")
-    }
-
-    private fun lagTestPerson(): Person {
-        return Person("Test Person",
-                      setOf(ForelderBarnRelasjon(
-                              "20107678901",
-                              FORELDERBARNRELASJONROLLE.MOR)),
-                      Bostedsadresse(matrikkeladresse = Matrikkeladresse(1, "1", null, "0576", "3000"))
-        )
     }
 
     private fun lagTestPdlPerson(): PdlPersonData {
