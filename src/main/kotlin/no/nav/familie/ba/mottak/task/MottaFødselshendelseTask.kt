@@ -29,12 +29,10 @@ import org.springframework.stereotype.Service
 @TaskStepBeskrivelse(
     taskStepType = MottaFødselshendelseTask.TASK_STEP_TYPE,
     beskrivelse = "Motta fødselshendelse",
-    maxAntallFeil = 10,
-    triggerTidVedFeilISekunder = 60L * 60 * 24
+    maxAntallFeil = 3
 )
 class MottaFødselshendelseTask(
     private val taskRepository: TaskRepository,
-    private val environment: Environment,
     private val pdlClient: PdlClient,
     @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: Long
 ) : AsyncTaskStep {
