@@ -2283,18 +2283,6 @@
             "en": "JA"
           }
         },
-        "pensjonHvilketLand": {
-          "label": {
-            "en": "What country did the other parent receive a pension from?",
-            "nb": "Hvilket land fikk den andre forelderen pensjon fra?",
-            "nn": "Kva land fekk den andre forelderen pensjon frå?"
-          },
-          "verdi": {
-            "nb": "UKJENT",
-            "nn": "UKJENT",
-            "en": "UKJENT"
-          }
-        },
         "arbeidUtlandet": {
           "label": {
             "en": "Has GODSLIG DORULL's other parent worked outside of Norway, on a foreign ship or on a foreign continental shelf?",
@@ -2307,18 +2295,6 @@
             "en": "JA"
           }
         },
-        "arbeidUtlandetHvilketLand": {
-          "label": {
-            "en": "What country did the other parent work in?",
-            "nb": "Hvilket land arbeidet den andre forelderen i?",
-            "nn": "Kva land arbeidde den andre forelderen i?"
-          },
-          "verdi": {
-            "nb": "UKJENT",
-            "nn": "UKJENT",
-            "en": "UKJENT"
-          }
-        },
         "skriftligAvtaleOmDeltBosted": {
           "label": {
             "en": "Do you and the other parent have a written agreement on dual residence for GODSLIG DORULL?",
@@ -2329,6 +2305,42 @@
             "nb": null,
             "nn": null,
             "en": null
+          }
+        },
+        "pensjonNorge": {
+          "label": {
+            "en": "Does GODSLIG DORULL's other parent receive, or have they received a pension from Norway?",
+            "nb": "Får eller har GODSLIG DORULL sin andre forelder fått pensjon fra Norge?",
+            "nn": "Får eller har GODSLIG DORULL sin andre forelder fått pensjon frå Noreg?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "arbeidNorge": {
+          "label": {
+            "en": "Does GODSLIG DORULL's other parent work, or have they worked in Norway, on the Norwegian continental shelf or on a ship flying the Norwegian flag?",
+            "nb": "Arbeider eller har den andre forelderen til GODSLIG DORULL arbeidet i Norge, på norsk kontinentalsokkel eller på skip som fører norsk flagg?",
+            "nn": "Arbeider eller har den andre forelderen til GODSLIG DORULL arbeida i Noreg, på norsk kontinentalsokkel eller på skip som fører norsk flagg?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "andreUtbetalinger": {
+          "label": {
+            "en": "Does GODSLIG DORULL's other parent receive, or have they received benefits that replace income from Norway and/or another EEA member state?",
+            "nb": "Får eller har GODSLIG DORULLsin andre forelder fått utbetalinger som erstatter arbeidsinntekt fra Norge og/eller andre EØS-land?",
+            "nn": "Får eller har GODSLIG DORULL sin andre forelder fått utbetalingar som erstattar arbeidsinntekt frå Noreg og/eller andre EØS-land?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
           }
         },
         "utvidet": {
@@ -3530,18 +3542,6 @@
             "en": null
           }
         },
-        "pensjonHvilketLand": {
-          "label": {
-            "en": "What country does TYKKMAGET KRONJUVEL's other parent receive a pension from?",
-            "nb": "Hvilket land får den andre forelderen til TYKKMAGET KRONJUVEL pensjon fra?",
-            "nn": "Kva land får den andre forelderen til TYKKMAGET KRONJUVEL pensjon frå?"
-          },
-          "verdi": {
-            "nb": "UKJENT",
-            "nn": "UKJENT",
-            "en": "UKJENT"
-          }
-        },
         "arbeidUtlandet": {
           "label": {
             "en": "Does TYKKMAGET KRONJUVEL's other parent work outside of Norway, on a foreign ship or on a foreign continental shelf?",
@@ -3554,23 +3554,47 @@
             "en": null
           }
         },
-        "arbeidUtlandetHvilketLand": {
-          "label": {
-            "en": "What country does the other parent work in?",
-            "nb": "Hvilket land arbeider den andre forelderen i?",
-            "nn": "Kva land arbeidar den andre forelderen i?"
-          },
-          "verdi": {
-            "nb": "UKJENT",
-            "nn": "UKJENT",
-            "en": "UKJENT"
-          }
-        },
         "skriftligAvtaleOmDeltBosted": {
           "label": {
             "en": "Do you and the other parent have a written agreement on dual residence for TYKKMAGET KRONJUVEL?",
             "nb": "Har du og den andre forelderen skriftlig avtale om delt bosted for TYKKMAGET KRONJUVEL?",
             "nn": "Har du og den andre forelderen skriftleg avtale om delt bustad for TYKKMAGET KRONJUVEL?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "pensjonNorge": {
+          "label": {
+            "en": "Does TYKKMAGET KRONJUVEL's other parent receive, or have they received a pension from Norway?",
+            "nb": "Får eller har TYKKMAGET KRONJUVEL sin andre forelder fått pensjon fra Norge?",
+            "nn": "Får eller har TYKKMAGET KRONJUVEL sin andre forelder fått pensjon frå Noreg?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "arbeidNorge": {
+          "label": {
+            "en": "Does TYKKMAGET KRONJUVEL's other parent work, or have they worked in Norway, on the Norwegian continental shelf or on a ship flying the Norwegian flag?",
+            "nb": "Arbeider eller har den andre forelderen til TYKKMAGET KRONJUVEL arbeidet i Norge, på norsk kontinentalsokkel eller på skip som fører norsk flagg?",
+            "nn": "Arbeider eller har den andre forelderen til TYKKMAGET KRONJUVEL arbeida i Noreg, på norsk kontinentalsokkel eller på skip som fører norsk flagg?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "andreUtbetalinger": {
+          "label": {
+            "en": "Does TYKKMAGET KRONJUVEL's other parent receive, or have they received benefits that replace income from Norway and/or another EEA member state?",
+            "nb": "Får eller har TYKKMAGET KRONJUVELsin andre forelder fått utbetalinger som erstatter arbeidsinntekt fra Norge og/eller andre EØS-land?",
+            "nn": "Får eller har TYKKMAGET KRONJUVEL sin andre forelder fått utbetalingar som erstattar arbeidsinntekt frå Noreg og/eller andre EØS-land?"
           },
           "verdi": {
             "nb": "NEI",
@@ -3883,18 +3907,6 @@
             "en": "VET_IKKE"
           }
         },
-        "pensjonHvilketLand": {
-          "label": {
-            "en": "What country does LUNKEN KAKKERLAKK's other parent receive a pension from?",
-            "nb": "Hvilket land får den andre forelderen til LUNKEN KAKKERLAKK pensjon fra?",
-            "nn": "Kva land får den andre forelderen til LUNKEN KAKKERLAKK pensjon frå?"
-          },
-          "verdi": {
-            "nb": "UKJENT",
-            "nn": "UKJENT",
-            "en": "UKJENT"
-          }
-        },
         "arbeidUtlandet": {
           "label": {
             "en": "Does LUNKEN KAKKERLAKK's other parent work outside of Norway, on a foreign ship or on a foreign continental shelf?",
@@ -3907,23 +3919,47 @@
             "en": "JA"
           }
         },
-        "arbeidUtlandetHvilketLand": {
-          "label": {
-            "en": "What country does the other parent work in?",
-            "nb": "Hvilket land arbeider den andre forelderen i?",
-            "nn": "Kva land arbeidar den andre forelderen i?"
-          },
-          "verdi": {
-            "nb": "UKJENT",
-            "nn": "UKJENT",
-            "en": "UKJENT"
-          }
-        },
         "skriftligAvtaleOmDeltBosted": {
           "label": {
             "en": "Do you and the other parent have a written agreement on dual residence for LUNKEN KAKKERLAKK?",
             "nb": "Har du og den andre forelderen skriftlig avtale om delt bosted for LUNKEN KAKKERLAKK?",
             "nn": "Har du og den andre forelderen skriftleg avtale om delt bustad for LUNKEN KAKKERLAKK?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "pensjonNorge": {
+          "label": {
+            "en": "Does LUNKEN KAKKERLAKK's other parent receive, or have they received a pension from Norway?",
+            "nb": "Får eller har LUNKEN KAKKERLAKK sin andre forelder fått pensjon fra Norge?",
+            "nn": "Får eller har LUNKEN KAKKERLAKK sin andre forelder fått pensjon frå Noreg?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "arbeidNorge": {
+          "label": {
+            "en": "Does LUNKEN KAKKERLAKK's other parent work, or have they worked in Norway, on the Norwegian continental shelf or on a ship flying the Norwegian flag?",
+            "nb": "Arbeider eller har den andre forelderen til LUNKEN KAKKERLAKK arbeidet i Norge, på norsk kontinentalsokkel eller på skip som fører norsk flagg?",
+            "nn": "Arbeider eller har den andre forelderen til LUNKEN KAKKERLAKK arbeida i Noreg, på norsk kontinentalsokkel eller på skip som fører norsk flagg?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "andreUtbetalinger": {
+          "label": {
+            "en": "Does LUNKEN KAKKERLAKK's other parent receive, or have they received benefits that replace income from Norway and/or another EEA member state?",
+            "nb": "Får eller har LUNKEN KAKKERLAKKsin andre forelder fått utbetalinger som erstatter arbeidsinntekt fra Norge og/eller andre EØS-land?",
+            "nn": "Får eller har LUNKEN KAKKERLAKK sin andre forelder fått utbetalingar som erstattar arbeidsinntekt frå Noreg og/eller andre EØS-land?"
           },
           "verdi": {
             "nb": "NEI",
