@@ -2,7 +2,6 @@ package no.nav.familie.ba.mottak.task
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
-import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
@@ -12,6 +11,7 @@ import no.nav.familie.ba.mottak.domene.NyBehandling
 import no.nav.familie.ba.mottak.domene.personopplysning.Person
 import no.nav.familie.ba.mottak.integrasjoner.Adressebeskyttelse
 import no.nav.familie.ba.mottak.integrasjoner.Adressebeskyttelsesgradering
+import no.nav.familie.ba.mottak.integrasjoner.IntegrasjonException
 import no.nav.familie.ba.mottak.integrasjoner.PdlError
 import no.nav.familie.ba.mottak.integrasjoner.PdlForeldreBarnRelasjon
 import no.nav.familie.ba.mottak.integrasjoner.PdlHentPersonResponse
@@ -27,6 +27,7 @@ import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.error.RekjørSenereException
 import org.apache.commons.lang3.StringUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -41,6 +42,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 import javax.sql.DataSource
@@ -55,16 +57,10 @@ import kotlin.test.assertFailsWith
 class MottaFødselshendelseTaskTest{
 
     @Autowired
-    lateinit var jdbcTemplate: JdbcTemplate
-
-    @Autowired
     lateinit var taskRepository: TaskRepository
 
     @Autowired
     lateinit var taskService: MottaFødselshendelseTask
-
-    @Autowired
-    lateinit var dataSource: DataSource
 
     @BeforeEach
     internal fun setUp() {
@@ -138,28 +134,31 @@ class MottaFødselshendelseTaskTest{
 
 
     @Test
-    fun `Skal ikke opprette SendTilSak task hvis personen ikke finnes i TPS`() {
+    fun `Skal ikke opprette SendTilSak task og kaste RekjørSenereException hvis personen ikke finnes i TPS`() {
         MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
         val fnrBarn = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyy")) + "12345"
 
-        stubFor(get(urlEqualTo("/api/personopplysning/v1/info/BAR"))
-                        .willReturn(aResponse()
-                                            .withHeader("Content-Type", "application/json")
-                                            .withBody(objectMapper.writeValueAsString(
-                                                    success(lagTestPerson())))))
+        mockResponseForPdlQuery(
+            pdlRequestBody = gyldigRequest("hentperson-med-relasjoner.graphql", fnrBarn),
+            mockResponse = PdlHentPersonResponse(
+                data = PdlPerson(lagTestPdlPerson().copy(forelderBarnRelasjon = listOf(
+                    PdlForeldreBarnRelasjon(
+                        "40107678901",
+                        FORELDERBARNRELASJONROLLE.MOR)))),
+                errors = emptyList()
+            )
+        )
 
-        //TODO fjernes når barnetrygd er ute av infotrygd
+        //skal fjernes når barnetrygd er ute av infotrygd
         stubFor(post(urlEqualTo("/api/personopplysning/v2/info"))
                         .willReturn(aResponse().withStatus(404)))
 
-        assertFailsWith<RuntimeException>("Kall mot integrasjon feilet ved uthenting av personinfo. 404 NOT_FOUND") {
+        val exception = assertFailsWith<RekjørSenereException>("Kall mot integrasjon feilet ved uthenting av personinfo. 404 NOT_FOUND") {
             taskService.doTask(Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn))
         }
 
-        val taskerMedCallId = taskRepository.findByStatusIn(listOf(Status.UBEHANDLET), Pageable.unpaged())
-                .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
-
-        assertThat(taskerMedCallId).hasSize(1).extracting("type").containsOnly(MottaFødselshendelseTask.TASK_STEP_TYPE)
+        assertThat(exception.årsak).isEqualTo("MottaFødselshendelseTask feilet")
+        assertThat(exception.triggerTid).isAfter(LocalDateTime.now())
     }
 
     @Test
@@ -290,15 +289,8 @@ class MottaFødselshendelseTaskTest{
 
         val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = "02091901252")
 
-        assertThatThrownBy { taskService.doTask(task) }.isInstanceOf(RuntimeException::class.java)
+        assertThatThrownBy { taskService.doTask(task) }.isInstanceOf(IntegrasjonException::class.java)
                 .hasMessage("Feil ved oppslag på person: Feilmelding")
-
-        val taskerMedCallId = taskRepository.findByStatusIn(listOf(Status.UBEHANDLET), Pageable.unpaged())
-                .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
-
-        assertThat(taskerMedCallId).hasSize(1)
-        assertThat(taskerMedCallId.first().type).isEqualTo(MottaFødselshendelseTask.TASK_STEP_TYPE)
-        assertThat(taskerMedCallId.first().triggerTid).isAfter(taskerMedCallId.first().opprettetTid)
     }
 
     private fun lagTestPerson(): Person {

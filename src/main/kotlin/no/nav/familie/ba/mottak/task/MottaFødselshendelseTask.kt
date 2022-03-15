@@ -20,11 +20,13 @@ import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.error.RekjørSenereException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
+import org.springframework.web.client.HttpClientErrorException
 
 
 @Service
@@ -92,8 +94,12 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
                 log.info("Skipper fødselshendelse fordi man ikke fant en mor")
             }
         } catch (ex: RuntimeException) {
-            log.info("MottaFødselshendelseTask feilet.")
-            taskRepository.save(task.medTriggerTid(nesteGyldigeTriggertidFødselshendelser(rekjøringsintervall, environment)))
+            if (ex is HttpClientErrorException.NotFound) {
+                throw RekjørSenereException(
+                    årsak = "MottaFødselshendelseTask feilet",
+                    triggerTid = nesteGyldigeTriggertidFødselshendelser(rekjøringsintervall, environment)
+                )
+            }
             throw ex
         }
     }
