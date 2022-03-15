@@ -34,9 +34,7 @@ import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROL
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND.GIFT
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
-import no.nav.familie.prosessering.domene.PropertiesWrapper
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -45,22 +43,21 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
-import java.util.Properties
 
 
 @Service
 @TaskStepBeskrivelse(
-        taskStepType = VurderLivshendelseTask.TASK_STEP_TYPE,
-        beskrivelse = "Vurder livshendelse",
-        maxAntallFeil = 3,
-        triggerTidVedFeilISekunder = 3600
+    taskStepType = VurderLivshendelseTask.TASK_STEP_TYPE,
+    beskrivelse = "Vurder livshendelse",
+    maxAntallFeil = 3,
+    triggerTidVedFeilISekunder = 3600
 )
 class VurderLivshendelseTask(
-        private val oppgaveClient: OppgaveClient,
-        private val pdlClient: PdlClient,
-        private val sakClient: SakClient,
-        private val aktørClient: AktørClient,
-        private val infotrygdClient: InfotrygdBarnetrygdClient
+    private val oppgaveClient: OppgaveClient,
+    private val pdlClient: PdlClient,
+    private val sakClient: SakClient,
+    private val aktørClient: AktørClient,
+    private val infotrygdClient: InfotrygdBarnetrygdClient
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -163,8 +160,8 @@ class VurderLivshendelseTask(
     }
 
     private fun finnBrukereMedSakRelatertTilPerson(
-            personIdent: String,
-            pdlPersonData: PdlPersonData
+        personIdent: String,
+        pdlPersonData: PdlPersonData
     ): Set<Bruker> {
 
         val brukereMedSakRelatertTilPerson = mutableSetOf<Bruker>()
@@ -173,10 +170,10 @@ class VurderLivshendelseTask(
 
         // Hvis person har barn, så sjekker man etter løpende sak på person
         val personHarBarn = familierelasjoner.filter { it.erBarn }.let { listeMedBarn ->
-                secureLog.info("finnBrukereMedSakRelatertTilPerson(): listeMedBarn size = ${listeMedBarn.size} identer = " +
-                                       listeMedBarn.fold("") { identer, it -> identer + " " + it.relatertPersonsIdent })
-                listeMedBarn.isNotEmpty()
-            }
+            secureLog.info("finnBrukereMedSakRelatertTilPerson(): listeMedBarn size = ${listeMedBarn.size} identer = " +
+                                   listeMedBarn.fold("") { identer, it -> identer + " " + it.relatertPersonsIdent })
+            listeMedBarn.isNotEmpty()
+        }
 
         if (personHarBarn) {
             brukereMedSakRelatertTilPerson += sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
@@ -191,7 +188,8 @@ class VurderLivshendelseTask(
         }
 
         secureLog.info("finnBrukereMedSakRelatertTilPerson(): brukere.size = ${brukereMedSakRelatertTilPerson.size} " +
-                       "identer = ${brukereMedSakRelatertTilPerson.fold("") { identer, it -> identer + " " + it.ident }}")
+                               "identer = ${brukereMedSakRelatertTilPerson.fold("") { identer, it -> identer + " " + it.ident }}"
+        )
 
         if (brukereMedSakRelatertTilPerson.isNotEmpty()) {
             log.info("Fant sak for person")
@@ -209,7 +207,8 @@ class VurderLivshendelseTask(
     ): List<Bruker> {
         return familierelasjoner.filter { !it.erBarn }.also { listeMedForeldreForBarn ->
             secureLog.info("finnForeldreMedLøpendeSak(): listeMedForeldreForBarn.size = ${listeMedForeldreForBarn.size} " +
-                           "identer = ${listeMedForeldreForBarn.fold("") { identer, it -> identer + " " + it.relatertPersonsIdent }}")
+                                   "identer = ${listeMedForeldreForBarn.fold("") { identer, it -> identer + " " + it.relatertPersonsIdent }}"
+            )
         }.mapNotNull {
             sakClient.hentRestFagsakDeltagerListe(it.relatertPersonsIdent, barnasIdenter = listOf(personIdent))
                 .filter { it.fagsakStatus == LØPENDE }
@@ -229,9 +228,11 @@ class VurderLivshendelseTask(
         val åpenOppgave = søkEtterÅpenOppgavePåAktør(aktørId, hendelseType)
 
         if (åpenOppgave == null) {
-            val beskrivelse = leggTilNyPersonIBeskrivelse(beskrivelse = "${hendelseType.beskrivelse}:",
-                                                          personIdent = personIdent,
-                                                          personErBruker = personIdent == bruker.ident)
+            val beskrivelse = leggTilNyPersonIBeskrivelse(
+                beskrivelse = "${hendelseType.beskrivelse}:",
+                personIdent = personIdent,
+                personErBruker = personIdent == bruker.ident
+            )
             val restFagsak = hentRestFagsak(bruker.fagsakId)
             val restBehandling = hentSisteBehandlingSomErIverksatt(restFagsak) ?: hentAktivBehandling(restFagsak)
             val behandlingstema = tilBehandlingstema(restBehandling)
@@ -247,7 +248,9 @@ class VurderLivshendelseTask(
             secureLog.info("Fant åpen oppgave: $åpenOppgave")
             val beskrivelse = leggTilNyPersonIBeskrivelse(beskrivelse = åpenOppgave.beskrivelse!!,
                                                           personIdent = personIdent,
-                                                          personErBruker = åpenOppgave.identer?.map { it.ident }?.contains(personIdent))
+                                                          personErBruker = åpenOppgave.identer?.map { it.ident }
+                                                              ?.contains(personIdent)
+            )
 
             oppdaterOppgaveMedNyBeskrivelse(åpenOppgave, beskrivelse)
             task.metadata["oppgaveId"] = åpenOppgave.id.toString()
@@ -292,7 +295,7 @@ class VurderLivshendelseTask(
 
 
     private fun leggTilNyPersonIBeskrivelse(beskrivelse: String, personIdent: String, personErBruker: Boolean?): String {
-        return when (personErBruker){
+        return when (personErBruker) {
             true -> if (!beskrivelse.contains("bruker")) leggTilBrukerIBeskrivelse(beskrivelse) else beskrivelse
             else -> if (!beskrivelse.contains(personIdent)) leggTilBarnIBeskrivelse(beskrivelse, personIdent) else beskrivelse
         }
@@ -398,6 +401,7 @@ class VurderLivshendelseTask(
     data class Bruker(val ident: String, val fagsakId: Long)
 
     companion object {
+
         const val TASK_STEP_TYPE = "vurderLivshendelseTask"
 
         const val STEG_TYPE_BEHANDLING_AVSLUTTET = "BEHANDLING_AVSLUTTET"
@@ -405,6 +409,7 @@ class VurderLivshendelseTask(
         const val BEHANDLING_TYPE_MIGRERING = "MIGRERING_FRA_INFOTRYGD"
     }
 }
+
 data class VurderLivshendelseTaskDTO(val personIdent: String, val type: VurderLivshendelseType)
 
 enum class VurderLivshendelseType(val beskrivelse: String) {

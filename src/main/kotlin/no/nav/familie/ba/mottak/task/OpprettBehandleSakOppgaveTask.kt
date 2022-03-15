@@ -6,15 +6,16 @@ import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
 @TaskStepBeskrivelse(taskStepType = OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE, beskrivelse = "Opprett \"BehandleSak\"-oppgave")
-class OpprettBehandleSakOppgaveTask(private val journalpostClient: JournalpostClient,
-                                    private val oppgaveClient: OppgaveClient) : AsyncTaskStep {
+class OpprettBehandleSakOppgaveTask(
+    private val journalpostClient: JournalpostClient,
+    private val oppgaveClient: OppgaveClient
+) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(OpprettBehandleSakOppgaveTask::class.java)
 
@@ -29,7 +30,7 @@ class OpprettBehandleSakOppgaveTask(private val journalpostClient: JournalpostCl
                     beskrivelse = "Må behandles i BA-sak.\n $beskrivelse"
                 }
                 task.metadata["oppgaveId"] =
-                        "${oppgaveClient.opprettBehandleSakOppgave(journalpost, beskrivelse).oppgaveId}"
+                    "${oppgaveClient.opprettBehandleSakOppgave(journalpost, beskrivelse).oppgaveId}"
             } else {
                 log.error("Det eksister minst 1 åpen oppgave på journalpost ${task.payload}")
                 error("Det eksister minst 1 åpen oppgave på journalpost ${task.payload}")
@@ -41,6 +42,7 @@ class OpprettBehandleSakOppgaveTask(private val journalpostClient: JournalpostCl
     }
 
     companion object {
+
         const val TASK_STEP_TYPE = "opprettBehandleSakoppgave"
     }
 }

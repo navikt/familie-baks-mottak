@@ -10,16 +10,19 @@ import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
-@TaskStepBeskrivelse(taskStepType = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
-                     beskrivelse = "Opprett journalføringsoppgave")
-class OpprettJournalføringOppgaveTask(private val journalpostClient: JournalpostClient,
-                                      private val oppgaveClient: OppgaveClient) : AsyncTaskStep {
+@TaskStepBeskrivelse(
+    taskStepType = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
+    beskrivelse = "Opprett journalføringsoppgave"
+)
+class OpprettJournalføringOppgaveTask(
+    private val journalpostClient: JournalpostClient,
+    private val oppgaveClient: OppgaveClient
+) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(OpprettJournalføringOppgaveTask::class.java)
     val oppgaverOpprettetCounter: Counter = Metrics.counter("barnetrygd.ruting.oppgave.opprettet")
@@ -34,11 +37,11 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
             Journalstatus.MOTTATT -> {
                 val journalføringsOppgaver = oppgaveClient.finnOppgaver(journalpost.journalpostId, Oppgavetype.Journalføring)
                 val oppgaveTypeForEksisterendeOppgave: Oppgavetype? =
-                        if (journalføringsOppgaver.isNotEmpty()) {
-                            Oppgavetype.Journalføring
-                        } else if (oppgaveClient.finnOppgaver(journalpost.journalpostId, Oppgavetype.Fordeling).isNotEmpty()) {
-                            Oppgavetype.Fordeling
-                        } else null
+                    if (journalføringsOppgaver.isNotEmpty()) {
+                        Oppgavetype.Journalføring
+                    } else if (oppgaveClient.finnOppgaver(journalpost.journalpostId, Oppgavetype.Fordeling).isNotEmpty()) {
+                        Oppgavetype.Fordeling
+                    } else null
 
                 if (oppgaveTypeForEksisterendeOppgave == null) {
                     val nyOppgave = oppgaveClient.opprettJournalføringsoppgave(journalpost = journalpost,
@@ -64,7 +67,7 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
 
             else -> {
                 val error = IllegalStateException(
-                        "Journalpost ${journalpost.journalpostId} har endret status fra MOTTATT til ${journalpost.journalstatus.name}"
+                    "Journalpost ${journalpost.journalpostId} har endret status fra MOTTATT til ${journalpost.journalstatus.name}"
                 )
                 log.info("OpprettJournalføringOppgaveTask feilet.", error)
                 throw error
@@ -78,6 +81,7 @@ class OpprettJournalføringOppgaveTask(private val journalpostClient: Journalpos
     }
 
     companion object {
+
         const val TASK_STEP_TYPE = "opprettJournalføringsoppgave"
     }
 }
