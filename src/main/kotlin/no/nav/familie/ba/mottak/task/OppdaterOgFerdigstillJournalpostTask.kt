@@ -28,7 +28,7 @@ class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: Journa
 
     override fun doTask(task: Task) {
         val journalpost = journalpostClient.hentJournalpost(task.payload)
-                                  .takeUnless { it.bruker == null } ?: throw error("Journalpost ${task.payload} mangler bruker")
+                                  .takeUnless { it.bruker == null } ?: error("Journalpost ${task.payload} mangler bruker")
 
         when (journalpost.journalstatus) {
             Journalstatus.MOTTATT -> {
@@ -40,7 +40,6 @@ class OppdaterOgFerdigstillJournalpostTask(private val journalpostClient: Journa
                         onSuccess = {
                             task.metadata["fagsakId"] = fagsakId
                             log.info("Har oppdatert og ferdigstilt journalpost ${journalpost.journalpostId}")
-                            taskRepository.save(task)
                         },
                         onFailure = {
                             log.warn("Automatisk ferdigstilling feilet. Oppretter ny journalføringsoppgave for journalpost " +
