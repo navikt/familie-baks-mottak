@@ -30,7 +30,7 @@ class OpprettBehandleSakOppgaveTaskTest {
     private val mockOppgaveClient: OppgaveClient = mockk()
     private val mockTaskRepository: TaskRepository = mockk(relaxed = true)
 
-    private val taskStep = OpprettBehandleSakOppgaveTask(mockJournalpostClient, mockOppgaveClient, mockTaskRepository)
+    private val taskStep = OpprettBehandleSakOppgaveTask(mockJournalpostClient, mockOppgaveClient)
 
     @BeforeAll
     internal fun setUp() {

@@ -49,8 +49,7 @@ class NavnoHendelseTaskLøypeTest {
     )
 
     private val journalføringSteg = OpprettJournalføringOppgaveTask(mockJournalpostClient,
-                                                                    mockOppgaveClient,
-                                                                    mockTaskRepository)
+                                                                    mockOppgaveClient)
 
 
 

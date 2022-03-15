@@ -54,12 +54,11 @@ class VurderLivshendelseTaskTest {
     private val mockOppgaveClient: OppgaveClient = mockk()
     private val mockSakClient: SakClient = mockk()
     private val mockAktørClient: AktørClient = mockk()
-    private val mockTaskRepository: TaskRepository = mockk(relaxed = true)
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdClient: InfotrygdBarnetrygdClient = mockk()
 
     private val vurderLivshendelseTask =
-            VurderLivshendelseTask(mockOppgaveClient, mockTaskRepository, mockPdlClient, mockSakClient, mockAktørClient, mockInfotrygdClient)
+            VurderLivshendelseTask(mockOppgaveClient, mockPdlClient, mockSakClient, mockAktørClient, mockInfotrygdClient)
 
     @BeforeEach
     internal fun setUp() {
@@ -68,10 +67,6 @@ class VurderLivshendelseTaskTest {
         every {
             mockOppgaveClient.finnOppgaver(any(), any())
         } returns listOf()
-
-        every {
-            mockTaskRepository.save(any<Task>())
-        } returns null
 
         every {
             mockAktørClient.hentAktørId(PERSONIDENT_MOR)
@@ -131,7 +126,6 @@ class VurderLivshendelseTaskTest {
         }
 
         verify(exactly = 0) {
-            mockTaskRepository.save(any())
             mockOppgaveClient.opprettVurderLivshendelseOppgave(any())
             mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_BARN, listOf())
             mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN))
@@ -175,7 +169,6 @@ class VurderLivshendelseTaskTest {
         }
 
         verify(exactly = 0) {
-            mockTaskRepository.save(any())
             mockOppgaveClient.opprettVurderLivshendelseOppgave(any())
         }
 
@@ -235,7 +228,6 @@ class VurderLivshendelseTaskTest {
 
         val oppgaveDto = mutableListOf<OppgaveVurderLivshendelseDto>()
         verify(exactly = 2) {
-//            mockTaskRepository.save(any())
             mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDto))
             mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN))
             mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_FAR, listOf(PERSONIDENT_BARN))
@@ -290,7 +282,6 @@ class VurderLivshendelseTaskTest {
 
         val oppgaveDto = mutableListOf<OppgaveVurderLivshendelseDto>()
         verify(exactly = 3) {
-//            mockTaskRepository.save(any())
             mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDto))
         }
 
@@ -342,7 +333,6 @@ class VurderLivshendelseTaskTest {
 
         val oppgaveSlot = slot<OppgaveVurderLivshendelseDto>()
         verify(exactly = 1) {
-            mockTaskRepository.save(any())
             mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveSlot))
         }
 
@@ -391,7 +381,6 @@ class VurderLivshendelseTaskTest {
 
         val oppgaveSlot = slot<OppgaveVurderLivshendelseDto>()
         verify(exactly = 1) {
-            mockTaskRepository.save(any())
             mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveSlot))
         }
 
@@ -434,7 +423,6 @@ class VurderLivshendelseTaskTest {
 
         val oppgaveSlot = mutableListOf<OppgaveVurderLivshendelseDto>()
         verify(exactly = 2) {
-            mockTaskRepository.save(any())
             mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveSlot))
         }
 
@@ -507,13 +495,12 @@ class VurderLivshendelseTaskTest {
         }
 
         val oppgaveDto = mutableListOf<OppgaveVurderLivshendelseDto>()
-//        verify(exactly = 2) {
-//            mockTaskRepository.save(any())
-//            mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDto))
-//        }
-//
-//        assertThat(oppgaveDto[0].beskrivelse).isEqualTo(DØDSFALL.beskrivelse + ": barn $PERSONIDENT_BARN")
-//        assertThat(oppgaveDto[1].beskrivelse).isEqualTo(UTFLYTTING.beskrivelse + ": barn $PERSONIDENT_BARN")
+        verify(exactly = 2) {
+            mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDto))
+        }
+
+        assertThat(oppgaveDto[0].beskrivelse).isEqualTo(DØDSFALL.beskrivelse + ": barn $PERSONIDENT_BARN")
+        assertThat(oppgaveDto[1].beskrivelse).isEqualTo(UTFLYTTING.beskrivelse + ": barn $PERSONIDENT_BARN")
 
         assertThat(oppgaveDto).allMatch { it.aktørId.contains(PERSONIDENT_MOR) }
         assertThat(oppgaveDto).allMatch { it.saksId == "$SAKS_ID" }

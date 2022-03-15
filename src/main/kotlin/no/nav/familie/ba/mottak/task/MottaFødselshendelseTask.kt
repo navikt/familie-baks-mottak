@@ -59,7 +59,7 @@ class MottaFødselshendelseTask(private val taskRepository: TaskRepository,
 
             // denne kreves for at infotrygd ikke skal få fødselshendelser som ikke ligger i TPS
             // vil feile ved forsinkelse i TPS feks i helger og helligdager.
-            // TODO fjerne når barnetrygd er ute av infotrygd
+            // Kan fjernes når barnetrygd er ute av infotrygd
             tpsPersonClient.hentPersonMedRelasjoner(barnetsId)
 
             val morsIdent = hentMor(personMedRelasjoner)
