@@ -85,6 +85,7 @@ data class Barn(
     val spørsmål: Map<String, Søknadsfelt<Any>>,
     val utenlandsperioder: List<Søknadsfelt<Utenlandsopphold>> = listOf(),
     val andreForelder: AndreForelder? = null,
+    val omsorgsperson: Omsorgsperson? = null,
     val eøsBarnetrygdsperioder: List<Søknadsfelt<EøsBarnetrygdsperiode>> = listOf(),
     val idNummer: List<Søknadsfelt<IdNummer>> = listOf()
 )
@@ -107,6 +108,14 @@ data class AndreForelder(
     val arbeidsperioderNorge: List<Søknadsfelt<Arbeidsperiode>> = listOf(),
     val pensjonsperioderNorge: List<Søknadsfelt<Pensjonsperiode>> = listOf(),
     val andreUtbetalingsperioder: List<Søknadsfelt<Utbetalingsperiode>> = listOf()
+)
+
+data class Omsorgsperson(
+    val omsorgspersonNavn: Søknadsfelt<String>,
+    val omsorgspersonSlektsforhold: Søknadsfelt<String>,
+    val omsorgpersonSlektsforholdSpesifisering: Søknadsfelt<String>,
+    val omsorgspersonIdNummer: Søknadsfelt<String>,
+    val omsorgspersonAdresse: Søknadsfelt<String>,
 )
 
 data class EøsBarnetrygdsperiode(
