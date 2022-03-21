@@ -2235,6 +2235,8 @@
         }
       ],
       "andreForelder": {
+        "idNummer": [],
+        "kanIkkeGiOpplysninger": false,
         "navn": {
           "label": {
             "en": "Name",
@@ -3494,6 +3496,8 @@
         }
       ],
       "andreForelder": {
+        "idNummer": [],
+        "kanIkkeGiOpplysninger": false,
         "navn": {
           "label": {
             "en": "Name",
@@ -3859,6 +3863,8 @@
       "utenlandsperioder": [],
       "eøsBarnetrygdsperioder": [],
       "andreForelder": {
+        "idNummer": [],
+        "kanIkkeGiOpplysninger": false,
         "navn": {
           "label": {
             "en": "Name",
