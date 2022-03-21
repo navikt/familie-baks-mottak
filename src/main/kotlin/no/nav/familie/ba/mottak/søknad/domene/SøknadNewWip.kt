@@ -90,6 +90,7 @@ data class Barn(
 )
 
 data class AndreForelder(
+    val kanIkkeGiOpplysninger: Boolean,
     val navn: Søknadsfelt<String>,
     val fnr: Søknadsfelt<String>,
     val fødselsdato: Søknadsfelt<String>,
@@ -106,7 +107,8 @@ data class AndreForelder(
     val pensjonsperioderUtland: List<Søknadsfelt<Pensjonsperiode>> = listOf(),
     val arbeidsperioderNorge: List<Søknadsfelt<Arbeidsperiode>> = listOf(),
     val pensjonsperioderNorge: List<Søknadsfelt<Pensjonsperiode>> = listOf(),
-    val andreUtbetalingsperioder: List<Søknadsfelt<Utbetalingsperiode>> = listOf()
+    val andreUtbetalingsperioder: List<Søknadsfelt<Utbetalingsperiode>> = listOf(),
+    val idNummer: List<Søknadsfelt<IdNummer>> = listOf()
 )
 
 data class EøsBarnetrygdsperiode(
