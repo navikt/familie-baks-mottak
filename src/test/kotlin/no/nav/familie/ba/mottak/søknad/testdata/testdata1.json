@@ -2235,6 +2235,7 @@
         }
       ],
       "andreForelder": {
+        "adresse": "Norge",
         "idNummer": [],
         "kanIkkeGiOpplysninger": false,
         "navn": {
@@ -3496,6 +3497,7 @@
         }
       ],
       "andreForelder": {
+        "adresse": "Norge",
         "idNummer": [],
         "kanIkkeGiOpplysninger": false,
         "navn": {
@@ -3863,6 +3865,7 @@
       "utenlandsperioder": [],
       "eøsBarnetrygdsperioder": [],
       "andreForelder": {
+        "adresse": "Norge",
         "idNummer": [],
         "kanIkkeGiOpplysninger": false,
         "navn": {
