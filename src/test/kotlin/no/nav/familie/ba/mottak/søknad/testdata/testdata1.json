@@ -2235,7 +2235,18 @@
         }
       ],
       "andreForelder": {
-        "adresse": "Norge",
+        "adresse": {
+          "label": {
+            "en": "Adresse",
+            "nb": "Adresse",
+            "nn": "Adresse"
+           },
+          "verdi": {
+            "nb": "Adresse",
+            "nn": "Adresse",
+            "en": "Adresse"
+          }
+        },
         "idNummer": [],
         "kanIkkeGiOpplysninger": false,
         "navn": {
@@ -3497,7 +3508,18 @@
         }
       ],
       "andreForelder": {
-        "adresse": "Norge",
+        "adresse": {
+          "label": {
+            "en": "Adresse",
+            "nb": "Adresse",
+            "nn": "Adresse"
+          },
+          "verdi": {
+            "nb": "Adresse",
+            "nn": "Adresse",
+            "en": "Adresse"
+          }
+        },
         "idNummer": [],
         "kanIkkeGiOpplysninger": false,
         "navn": {
@@ -3865,7 +3887,18 @@
       "utenlandsperioder": [],
       "eøsBarnetrygdsperioder": [],
       "andreForelder": {
-        "adresse": "Norge",
+        "adresse": {
+          "label": {
+            "en": "Adresse",
+            "nb": "Adresse",
+            "nn": "Adresse"
+          },
+          "verdi": {
+            "nb": "Adresse",
+            "nn": "Adresse",
+            "en": "Adresse"
+          }
+        },
         "idNummer": [],
         "kanIkkeGiOpplysninger": false,
         "navn": {
