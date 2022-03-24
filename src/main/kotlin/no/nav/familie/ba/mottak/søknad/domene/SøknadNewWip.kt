@@ -109,8 +109,9 @@ data class AndreForelder(
     val arbeidsperioderNorge: List<Søknadsfelt<Arbeidsperiode>> = listOf(),
     val pensjonsperioderNorge: List<Søknadsfelt<Pensjonsperiode>> = listOf(),
     val andreUtbetalingsperioder: List<Søknadsfelt<Utbetalingsperiode>> = listOf(),
-    val idNummer: List<Søknadsfelt<IdNummer>> = listOf()
-)
+    val idNummer: List<Søknadsfelt<IdNummer>> = listOf(),
+    val adresse: Søknadsfelt<String>,
+    )
 
 data class Omsorgsperson(
     val omsorgspersonNavn: Søknadsfelt<String>,
