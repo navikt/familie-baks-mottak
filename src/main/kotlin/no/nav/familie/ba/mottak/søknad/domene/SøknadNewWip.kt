@@ -114,11 +114,11 @@ data class AndreForelder(
     )
 
 data class Omsorgsperson(
-    val omsorgspersonNavn: Søknadsfelt<String>,
-    val omsorgspersonSlektsforhold: Søknadsfelt<String>,
-    val omsorgpersonSlektsforholdSpesifisering: Søknadsfelt<String>,
-    val omsorgspersonIdNummer: Søknadsfelt<String>,
-    val omsorgspersonAdresse: Søknadsfelt<String>,
+    val navn: Søknadsfelt<String>,
+    val slektsforhold: Søknadsfelt<String>,
+    val slektsforholdSpesifisering: Søknadsfelt<String>,
+    val idNummer: Søknadsfelt<String>,
+    val adresse: Søknadsfelt<String>,
 )
 
 data class EøsBarnetrygdsperiode(
