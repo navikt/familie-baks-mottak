@@ -2235,6 +2235,20 @@
         }
       ],
       "andreForelder": {
+        "adresse": {
+          "label": {
+            "en": "Adresse",
+            "nb": "Adresse",
+            "nn": "Adresse"
+           },
+          "verdi": {
+            "nb": "Adresse",
+            "nn": "Adresse",
+            "en": "Adresse"
+          }
+        },
+        "idNummer": [],
+        "kanIkkeGiOpplysninger": false,
         "navn": {
           "label": {
             "en": "Name",
@@ -3494,6 +3508,20 @@
         }
       ],
       "andreForelder": {
+        "adresse": {
+          "label": {
+            "en": "Adresse",
+            "nb": "Adresse",
+            "nn": "Adresse"
+          },
+          "verdi": {
+            "nb": "Adresse",
+            "nn": "Adresse",
+            "en": "Adresse"
+          }
+        },
+        "idNummer": [],
+        "kanIkkeGiOpplysninger": false,
         "navn": {
           "label": {
             "en": "Name",
@@ -3859,6 +3887,20 @@
       "utenlandsperioder": [],
       "eøsBarnetrygdsperioder": [],
       "andreForelder": {
+        "adresse": {
+          "label": {
+            "en": "Adresse",
+            "nb": "Adresse",
+            "nn": "Adresse"
+          },
+          "verdi": {
+            "nb": "Adresse",
+            "nn": "Adresse",
+            "en": "Adresse"
+          }
+        },
+        "idNummer": [],
+        "kanIkkeGiOpplysninger": false,
         "navn": {
           "label": {
             "en": "Name",
