@@ -92,14 +92,9 @@ class SøknadController(
             is SøknadV7 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
         }
 
-        val harEøsSteg: Boolean = when (versjonertSøknad) {
-            is SøknadV6 -> false
-            is SøknadV7 -> versjonertSøknad.søknad.antallEøsSteg > 0
-        }
-
-        val kontraktVersjon: Int = when (versjonertSøknad) {
-            is SøknadV6 -> 6
-            is SøknadV7 -> versjonertSøknad.søknad.kontraktVersjon
+        val (harEøsSteg, kontraktVersjon) = when (versjonertSøknad) {
+            is SøknadV6 -> Pair(false, 6)
+            is SøknadV7 -> Pair(versjonertSøknad.søknad.antallEøsSteg > 0, versjonertSøknad.søknad.kontraktVersjon)
         }
 
         val erUtvidet = søknadstype == Søknadstype.UTVIDET
