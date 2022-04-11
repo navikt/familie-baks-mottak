@@ -1,6 +1,5 @@
 package no.nav.familie.ba.mottak.søknad
 
-import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.config.FeatureToggleConfig
 import no.nav.familie.ba.mottak.config.FeatureToggleService
@@ -104,9 +103,16 @@ class SøknadController(
             is SøknadV7 -> versjonertSøknad.søknad.antallEøsSteg > 0
         }
 
+        val kontraktVersjon: Int = when(versjonertSøknad) {
+            is SøknadV6 -> 6
+            is SøknadV7 -> versjonertSøknad.søknad.kontraktVersjon
+        }
+
         val erUtvidet = søknadstype == Søknadstype.UTVIDET
 
-        if(!harEøsSteg) { // versjon v6 og mindre har ingen eøs-steg
+        /* Kontraktversjonsnummer mindre enn 6 har ingen eøs-steg og bruker krevd
+        dokumentasjon som grunnlag for å avgjøre om det er en eøs-søknad */
+        if(kontraktVersjon < 7) {
             sendMetricsEøs(dokumentasjon)
         }
 
