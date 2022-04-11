@@ -53,7 +53,7 @@ class SøknadController(
     // Metrics for EØS barnetrygd
     val søknadMedEøs = Metrics.counter("barnetrygd.soknad.eos.ok")
     val søknadMedEøsHarVedlegg = Metrics.counter("barnetrygd.soknad.eos.harvedlegg")
-    val ordinaerSøknadEøs = Metrics.counter("barnetrygd.ordinaer.soknad.eos")
+    val ordinærSøknadEøs = Metrics.counter("barnetrygd.ordinaer.soknad.eos")
     val utvidetSøknadEøs = Metrics.counter("barnetrygd.utvidet.soknad.eos")
 
     @PostMapping(value = ["/soknad/v6"], consumes = [MULTIPART_FORM_DATA_VALUE])
@@ -124,7 +124,7 @@ class SøknadController(
         } else {
             søknadMottattOk.increment()
             if(harEøsSteg) {
-                ordinaerSøknadEøs.increment()
+                ordinærSøknadEøs.increment()
             }
         }
 
