@@ -70,29 +70,23 @@ class SøknadController(
         }
 
     fun mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad: VersjonertSøknad): ResponseEntity<Ressurs<Kvittering>> {
+
+        val søknadstype = when (versjonertSøknad) {
+            is SøknadV6 -> versjonertSøknad.søknad.søknadstype
+            is SøknadV7 -> versjonertSøknad.søknad.søknadstype
+        }
+
         return try {
             val dbSøknad = søknadService.motta(versjonertSøknad = versjonertSøknad)
-            sendMetricsSuksess(versjonertSøknad = versjonertSøknad)
+            sendMetrics(versjonertSøknad = versjonertSøknad)
             ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt", dbSøknad.opprettetTid)))
         } catch (e: FødselsnummerErNullException) {
-            sendMetricsFeil(versjonertSøknad = versjonertSøknad)
+            if (søknadstype == Søknadstype.UTVIDET) søknadUtvidetMottattFeil.increment() else søknadMottattFeil.increment()
             ResponseEntity.status(500).body(Ressurs.failure("Lagring av søknad feilet"))
         }
     }
 
-    private fun sendMetricsFeil(versjonertSøknad: VersjonertSøknad) {
-        val søknadstype = when(versjonertSøknad){
-            is SøknadV6 -> versjonertSøknad.søknad.søknadstype
-            is SøknadV7 -> versjonertSøknad.søknad.søknadstype}
-
-        if (søknadstype == Søknadstype.UTVIDET) {
-            søknadUtvidetMottattFeil.increment()
-        } else {
-            søknadMottattFeil.increment()
-        }
-    }
-
-    private fun sendMetricsSuksess(versjonertSøknad: VersjonertSøknad) {
+    private fun sendMetrics(versjonertSøknad: VersjonertSøknad) {
         val (søknadstype, dokumentasjon) = when (versjonertSøknad) {
             is SøknadV6 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
             is SøknadV7 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
@@ -103,7 +97,7 @@ class SøknadController(
             is SøknadV7 -> versjonertSøknad.søknad.antallEøsSteg > 0
         }
 
-        val kontraktVersjon: Int = when(versjonertSøknad) {
+        val kontraktVersjon: Int = when (versjonertSøknad) {
             is SøknadV6 -> 6
             is SøknadV7 -> versjonertSøknad.søknad.kontraktVersjon
         }
@@ -112,27 +106,22 @@ class SøknadController(
 
         /* Kontraktversjonsnummer mindre enn 6 har ingen eøs-steg og bruker krevd
         dokumentasjon som grunnlag for å avgjøre om det er en eøs-søknad */
-        if(kontraktVersjon < 7) {
+        if (kontraktVersjon < 7) {
             sendMetricsEøs(dokumentasjon)
         }
 
         if (erUtvidet) {
             søknadUtvidetMottattOk.increment()
-            if(harEøsSteg) {
+            if (harEøsSteg) {
                 utvidetSøknadEøs.increment()
             }
         } else {
             søknadMottattOk.increment()
-            if(harEøsSteg) {
+            if (harEøsSteg) {
                 ordinærSøknadEøs.increment()
             }
         }
 
-        sendMetricsDokumentasjon(søknadstype, dokumentasjon)
-    }
-
-    private fun sendMetricsDokumentasjon(søknadstype: Søknadstype, dokumentasjon: List<Søknaddokumentasjon>) {
-        val erUtvidet = søknadstype == Søknadstype.UTVIDET
         if (dokumentasjon.isNotEmpty()) {
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val dokumentasjonsbehovUtenAnnenDokumentasjon =
@@ -146,17 +135,7 @@ class SøknadController(
                     antallDokumentasjonsbehov.increment(dokumentasjonsbehovUtenAnnenDokumentasjon.size.toDouble())
                 }
             }
-            // Inkluderer Dokumentasjonsbehov.ANNEN_DOKUMENTASJON for søknadHarVedlegg og antallVedlegg
-            val alleVedlegg: List<Søknadsvedlegg> = dokumentasjon.map { it.opplastedeVedlegg }.flatten()
-            if (alleVedlegg.isNotEmpty()) {
-                if (erUtvidet) {
-                    utvidetSøknadHarVedlegg.increment()
-                    utvidetAntallVedlegg.increment(alleVedlegg.size.toDouble())
-                } else {
-                    søknadHarVedlegg.increment()
-                    antallVedlegg.increment(alleVedlegg.size.toDouble())
-                }
-            }
+            sendMetricsAntallVedlegg(søknadstype, dokumentasjon)
 
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val harMangler =
@@ -164,6 +143,21 @@ class SøknadController(
                     .isNotEmpty()
             if (harMangler) {
                 if (erUtvidet) utvidetHarManglerIDokumentasjonsbehov.increment() else harManglerIDokumentasjonsbehov.increment()
+            }
+        }
+    }
+
+    private fun sendMetricsAntallVedlegg(søknadstype: Søknadstype, dokumentasjon: List<Søknaddokumentasjon>) {
+        val erUtvidet = søknadstype == Søknadstype.UTVIDET
+        // Inkluderer Dokumentasjonsbehov.ANNEN_DOKUMENTASJON for søknadHarVedlegg og antallVedlegg
+        val alleVedlegg: List<Søknadsvedlegg> = dokumentasjon.map { it.opplastedeVedlegg }.flatten()
+        if (alleVedlegg.isNotEmpty()) {
+            if (erUtvidet) {
+                utvidetSøknadHarVedlegg.increment()
+                utvidetAntallVedlegg.increment(alleVedlegg.size.toDouble())
+            } else {
+                søknadHarVedlegg.increment()
+                antallVedlegg.increment(alleVedlegg.size.toDouble())
             }
         }
     }
