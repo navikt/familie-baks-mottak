@@ -126,37 +126,54 @@ class SøknadController(
 
     private fun sendMetricsDokumentasjon(erUtvidet: Boolean, dokumentasjon: List<Søknaddokumentasjon>) {
         if (dokumentasjon.isNotEmpty()) {
+
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val dokumentasjonsbehovUtenAnnenDokumentasjon =
                 dokumentasjon.filter { it.dokumentasjonsbehov != Dokumentasjonsbehov.ANNEN_DOKUMENTASJON }
+
             if (dokumentasjonsbehovUtenAnnenDokumentasjon.isNotEmpty()) {
-                if (erUtvidet) {
-                    utvidetSøknadHarDokumentasjonsbehov.increment()
-                    utvidetAntallDokumentasjonsbehov.increment(dokumentasjonsbehovUtenAnnenDokumentasjon.size.toDouble())
-                } else {
-                    søknadHarDokumentasjonsbehov.increment()
-                    antallDokumentasjonsbehov.increment(dokumentasjonsbehovUtenAnnenDokumentasjon.size.toDouble())
-                }
+                sendMetricsDokumentasjonsbehov(
+                    erUtvidet = erUtvidet,
+                    dokumentasjonsbehov = dokumentasjonsbehovUtenAnnenDokumentasjon
+                )
             }
             // Inkluderer Dokumentasjonsbehov.ANNEN_DOKUMENTASJON for søknadHarVedlegg og antallVedlegg
             val alleVedlegg: List<Søknadsvedlegg> = dokumentasjon.map { it.opplastedeVedlegg }.flatten()
             if (alleVedlegg.isNotEmpty()) {
-                if (erUtvidet) {
-                    utvidetSøknadHarVedlegg.increment()
-                    utvidetAntallVedlegg.increment(alleVedlegg.size.toDouble())
-                } else {
-                    søknadHarVedlegg.increment()
-                    antallVedlegg.increment(alleVedlegg.size.toDouble())
-                }
+                sendMetricsVedlegg(erUtvidet = erUtvidet, vedlegg = alleVedlegg)
             }
+
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val harMangler =
-                dokumentasjonsbehovUtenAnnenDokumentasjon.filter { !it.harSendtInn && it.opplastedeVedlegg.isEmpty() }
-                    .isNotEmpty()
+                dokumentasjonsbehovUtenAnnenDokumentasjon.any { !it.harSendtInn && it.opplastedeVedlegg.isEmpty() }
             if (harMangler) {
-                if (erUtvidet) utvidetHarManglerIDokumentasjonsbehov.increment() else harManglerIDokumentasjonsbehov.increment()
+                sendMetricsManglerVedlegg(erUtvidet = erUtvidet)
             }
         }
+    }
+
+    private fun sendMetricsDokumentasjonsbehov(erUtvidet: Boolean, dokumentasjonsbehov: List<Søknaddokumentasjon>) {
+        if (erUtvidet) {
+            utvidetSøknadHarDokumentasjonsbehov.increment()
+            utvidetAntallDokumentasjonsbehov.increment(dokumentasjonsbehov.size.toDouble())
+        } else {
+            søknadHarDokumentasjonsbehov.increment()
+            antallDokumentasjonsbehov.increment(dokumentasjonsbehov.size.toDouble())
+        }
+    }
+
+    private fun sendMetricsVedlegg(erUtvidet: Boolean, vedlegg: List<Søknadsvedlegg>) {
+        if (erUtvidet) {
+            utvidetSøknadHarVedlegg.increment()
+            utvidetAntallVedlegg.increment(vedlegg.size.toDouble())
+        } else {
+            søknadHarVedlegg.increment()
+            antallVedlegg.increment(vedlegg.size.toDouble())
+        }
+    }
+
+    private fun sendMetricsManglerVedlegg(erUtvidet: Boolean) {
+        if (erUtvidet) utvidetHarManglerIDokumentasjonsbehov.increment() else harManglerIDokumentasjonsbehov.increment()
     }
 
     private fun sendMetricsEøs(dokumentasjon: List<Søknaddokumentasjon>) {
