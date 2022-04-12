@@ -2,7 +2,7 @@
 Mottaksapplikasjon for barnetrygd. Lytter på ulike hendelser (fødsler, dødsfall mm) og mottar søknader. 
 
 ## Lokal kjøring
-Appen bygges med maven og kan kjøres fra DevLauncher-klassen. Lokalt må man kjøre serveren sammen med [navkafka-docker-compose][1].
+Appen bygges med maven og kan kjøres fra DevLauncher-klassen. Sett `-Dspring.profiles.active=dev` under Edit Configurations -> VM Options. Lokalt må man kjøre serveren sammen med [navkafka-docker-compose][1].
 Topicene vi lytter på må da opprettes via deres api med følgende data:
 ```
 {
@@ -62,7 +62,7 @@ Man må legge følgende endring til i application-postgres.yaml under spring-sek
 +        role: postgres
 ```
 
-og `-Dspring.profiles.active=dev` under Edit Configurations -> VM Options.
+og `-Dspring.profiles.active=postgres` under Edit Configurations -> VM Options.
 
 ## Kjøring av e2e tester
 Ende til ende tester kjøres av GHA ved push. Ønsker du å hoppe over dise må du ha `[e2e skip]` i commit melding for å kunne deploye til dev uten at testene kjører.
