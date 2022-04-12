@@ -32,6 +32,7 @@ class SøknadController(
     private val søknadService: SøknadService,
     private val featureToggleService: FeatureToggleService
 ) {
+
     // Metrics for ordinær barnetrygd
     val søknadMottattOk = Metrics.counter("barnetrygd.soknad.mottatt.ok")
     val søknadMottattFeil = Metrics.counter("barnetrygd.soknad.mottatt.feil")
@@ -98,6 +99,7 @@ class SøknadController(
         }
 
         val erUtvidet = søknadstype == Søknadstype.UTVIDET
+        sendMetricsSøknad(harEøsSteg, erUtvidet)
 
         /* Kontraktversjonsnummer mindre enn 6 har ingen eøs-steg og bruker krevd
         dokumentasjon som grunnlag for å avgjøre om det er en eøs-søknad */
@@ -105,6 +107,10 @@ class SøknadController(
             sendMetricsEøs(dokumentasjon)
         }
 
+        sendMetricsDokumentasjon(erUtvidet, dokumentasjon)
+    }
+
+    private fun sendMetricsSøknad(harEøsSteg: Boolean, erUtvidet: Boolean) {
         if (erUtvidet) {
             søknadUtvidetMottattOk.increment()
             if (harEøsSteg) {
@@ -116,7 +122,9 @@ class SøknadController(
                 ordinærSøknadEøs.increment()
             }
         }
+    }
 
+    private fun sendMetricsDokumentasjon(erUtvidet: Boolean, dokumentasjon: List<Søknaddokumentasjon>) {
         if (dokumentasjon.isNotEmpty()) {
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val dokumentasjonsbehovUtenAnnenDokumentasjon =
@@ -130,29 +138,23 @@ class SøknadController(
                     antallDokumentasjonsbehov.increment(dokumentasjonsbehovUtenAnnenDokumentasjon.size.toDouble())
                 }
             }
-            sendMetricsAntallVedlegg(søknadstype, dokumentasjon)
-
+            // Inkluderer Dokumentasjonsbehov.ANNEN_DOKUMENTASJON for søknadHarVedlegg og antallVedlegg
+            val alleVedlegg: List<Søknadsvedlegg> = dokumentasjon.map { it.opplastedeVedlegg }.flatten()
+            if (alleVedlegg.isNotEmpty()) {
+                if (erUtvidet) {
+                    utvidetSøknadHarVedlegg.increment()
+                    utvidetAntallVedlegg.increment(alleVedlegg.size.toDouble())
+                } else {
+                    søknadHarVedlegg.increment()
+                    antallVedlegg.increment(alleVedlegg.size.toDouble())
+                }
+            }
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val harMangler =
                 dokumentasjonsbehovUtenAnnenDokumentasjon.filter { !it.harSendtInn && it.opplastedeVedlegg.isEmpty() }
                     .isNotEmpty()
             if (harMangler) {
                 if (erUtvidet) utvidetHarManglerIDokumentasjonsbehov.increment() else harManglerIDokumentasjonsbehov.increment()
-            }
-        }
-    }
-
-    private fun sendMetricsAntallVedlegg(søknadstype: Søknadstype, dokumentasjon: List<Søknaddokumentasjon>) {
-        val erUtvidet = søknadstype == Søknadstype.UTVIDET
-        // Inkluderer Dokumentasjonsbehov.ANNEN_DOKUMENTASJON for søknadHarVedlegg og antallVedlegg
-        val alleVedlegg: List<Søknadsvedlegg> = dokumentasjon.map { it.opplastedeVedlegg }.flatten()
-        if (alleVedlegg.isNotEmpty()) {
-            if (erUtvidet) {
-                utvidetSøknadHarVedlegg.increment()
-                utvidetAntallVedlegg.increment(alleVedlegg.size.toDouble())
-            } else {
-                søknadHarVedlegg.increment()
-                antallVedlegg.increment(alleVedlegg.size.toDouble())
             }
         }
     }
