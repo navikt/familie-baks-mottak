@@ -40,6 +40,7 @@ class SøknadTest(
         assertEquals(dbSøknadFraDB.id, hentetSøknad!!.id)
         assertThat(hentetSøknad.hentVersjonertSøknad() is SøknadV6)
     }
+
     @Test
     fun `Få riktig versjon v7 ved mapping fra DBSøknad`() {
         val dbSøknadFraMapper = søknadV7.tilDBSøknad()
@@ -47,6 +48,9 @@ class SøknadTest(
         val versjon: Int? = when (versjonertSøknad) {
             is SøknadV6 -> null
             is SøknadV7 -> versjonertSøknad.søknad.kontraktVersjon
+            else -> {
+                null
+            }
         }
         assertEquals(søknadV7.kontraktVersjon, versjon)
 

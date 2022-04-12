@@ -1,7 +1,5 @@
 package no.nav.familie.ba.mottak.søknad
 
-import no.nav.familie.ba.mottak.søknad.domene.Søker
-import no.nav.familie.ba.mottak.søknad.domene.SøknadNewWip
 import no.nav.familie.kontrakter.ba.søknad.SIVILSTANDTYPE
 import no.nav.familie.kontrakter.ba.søknad.SøknadAdresse
 import no.nav.familie.kontrakter.ba.søknad.v4.Dokumentasjonsbehov
@@ -9,18 +7,21 @@ import no.nav.familie.kontrakter.ba.søknad.v4.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsvedlegg
 import no.nav.familie.kontrakter.ba.søknad.v5.RegistrertBostedType
-import no.nav.familie.kontrakter.ba.søknad.v6.Barn
-import no.nav.familie.kontrakter.ba.søknad.v6.Søknad
-import no.nav.familie.ba.mottak.søknad.domene.Barn as BarnV7
+import no.nav.familie.kontrakter.ba.søknad.v6.Barn as BarnV6
+import no.nav.familie.kontrakter.ba.søknad.v6.Søknad as SøknadV6
 import no.nav.familie.kontrakter.ba.søknad.v4.Søker as SøkerV4
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt as SøknadsfeltV4
+import no.nav.familie.kontrakter.ba.søknad.v7.Barn as BarnV7
+import no.nav.familie.kontrakter.ba.søknad.v7.Søker as SøkerV7
+import no.nav.familie.kontrakter.ba.søknad.v7.Søknad as SøknadV7
 
 fun <T> søknadsfelt(label: String, verdi: T): SøknadsfeltV4<T> {
     return SøknadsfeltV4(label = mapOf("nb" to label), verdi = mapOf("nb" to verdi))
 }
 
 object SøknadTestData {
-    fun søker(): SøkerV4 {
+
+    private fun søker(): SøkerV4 {
         return SøkerV4(
             navn = søknadsfelt("navn", "Navn Navnessen"),
             ident = søknadsfelt("fødselsnummer", "1234578901"),
@@ -43,8 +44,8 @@ object SøknadTestData {
         )
     }
 
-    fun søkerV7(): Søker {
-        return Søker(
+    private fun søkerV7(): SøkerV7 {
+        return SøkerV7(
             harEøsSteg = true,
             navn = søknadsfelt("navn", "Navn Navnessen"),
             ident = søknadsfelt("fødselsnummer", "1234578901"),
@@ -68,23 +69,23 @@ object SøknadTestData {
         )
     }
 
-    fun barn(): List<Barn> {
+    fun barn(): List<BarnV6> {
         return listOf(
-            Barn(
+            BarnV6(
                 navn = søknadsfelt("Barnets fulle navn", "barn1"),
                 ident = søknadsfelt("Fødselsnummer", "12345678999"),
                 registrertBostedType = søknadsfelt("Skal ha samme adresse", RegistrertBostedType.REGISTRERT_ANNEN_ADRESSE),
                 alder = søknadsfelt("alder", "4 år"),
                 spørsmål = mapOf(),
             ),
-            Barn(
+            BarnV6(
                 navn = søknadsfelt("Barnets fulle navn", "barn2"),
                 ident = søknadsfelt("Fødselsnummer", "12345678987"),
                 registrertBostedType = søknadsfelt("Skal ha samme adresse", RegistrertBostedType.IKKE_FYLT_INN),
                 alder = søknadsfelt("alder", "1 år"),
                 spørsmål = mapOf(),
             ),
-            Barn(
+            BarnV6(
                 navn = søknadsfelt("Barnets fulle navn", "barn3"),
                 ident = søknadsfelt("Fødselsnummer", "12345678988"),
                 registrertBostedType = søknadsfelt("Skal ha samme adresse", RegistrertBostedType.REGISTRERT_SOKERS_ADRESSE),
@@ -94,8 +95,8 @@ object SøknadTestData {
         )
     }
 
-    fun søknad(): Søknad {
-        return Søknad(
+    fun søknad(): SøknadV6 {
+        return SøknadV6(
             søknadstype = Søknadstype.ORDINÆR,
             søker = søker(),
             barn = barn(),
@@ -119,7 +120,7 @@ object SøknadTestData {
         )
     }
 
-    fun barnV7(): List<BarnV7> {
+    private fun barnV7(): List<BarnV7> {
         return listOf(
             BarnV7(
                 harEøsSteg = true,
@@ -154,7 +155,7 @@ object SøknadTestData {
         )
     }
 
-    fun søknadV7(): SøknadNewWip = SøknadNewWip(
+    fun søknadV7(): SøknadV7 = SøknadV7(
         antallEøsSteg = 3,
         kontraktVersjon = 7,
         søknadstype = Søknadstype.ORDINÆR,

@@ -9,9 +9,9 @@ import io.mockk.mockk
 import io.mockk.slot
 import no.nav.familie.ba.mottak.integrasjoner.PdfClient
 import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
-import no.nav.familie.ba.mottak.søknad.domene.SøknadNewWip
 import no.nav.familie.ba.mottak.søknad.domene.SøknadSpråkvelgerService
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
+import no.nav.familie.kontrakter.ba.søknad.v7.Søknad as SøknadKontraktV7
 import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -37,7 +37,7 @@ internal class PdfServiceTest {
 
         val jsonString: String = File("./src/test/kotlin/no/nav/familie/ba/mottak/søknad/testdata/testdata1.json")
             .readText(Charsets.UTF_8)
-        val søknad: SøknadNewWip = mapper.readValue(jsonString)
+        val søknad: SøknadKontraktV7 = mapper.readValue(jsonString)
         val dbSøknad: DBSøknad = søknad.tilDBSøknad()
         pdfService.lagPdf(SøknadV7(søknad = søknad), dbSøknad, språk = "nb")
 

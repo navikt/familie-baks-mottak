@@ -2,7 +2,8 @@ package no.nav.familie.ba.mottak.søknad.domene
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsvedlegg
-import no.nav.familie.kontrakter.ba.søknad.v6.Søknad
+import no.nav.familie.kontrakter.ba.søknad.v6.Søknad as SøknadV6
+import no.nav.familie.kontrakter.ba.søknad.v7.Søknad as SøknadV7
 import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.LocalDateTime
 import javax.persistence.Column
@@ -29,10 +30,10 @@ data class DBSøknad(
     val journalpostId: String? = null
 ) {
 
-    private fun hentSøknad(): Søknad {
+    private fun hentSøknad(): SøknadV6 {
         return objectMapper.readValue(søknadJson)
     }
-    private fun hentSøknadV7(): SøknadNewWip {
+    private fun hentSøknadV7(): SøknadV7 {
         return objectMapper.readValue(søknadJson)
     }
 
@@ -65,7 +66,7 @@ data class DBVedlegg(
     val data: ByteArray
 )
 
-fun Søknad.tilDBSøknad(): DBSøknad {
+fun SøknadV6.tilDBSøknad(): DBSøknad {
     try {
         return DBSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
@@ -76,7 +77,7 @@ fun Søknad.tilDBSøknad(): DBSøknad {
     }
 }
 
-fun SøknadNewWip.tilDBSøknad(): DBSøknad {
+fun SøknadV7.tilDBSøknad(): DBSøknad {
     try {
         return DBSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
