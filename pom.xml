@@ -20,7 +20,7 @@
         <changelist>-SNAPSHOT</changelist>
         <java.version>17</java.version>
         <jvmTarget>17</jvmTarget>
-        <kotlin.version>1.6.10</kotlin.version>
+        <kotlin.version>1.6.20</kotlin.version>
         <mockk.version>1.12.3</mockk.version>
         <confluent.version>6.2.1</confluent.version>
         <prosessering.version>1.20220331123748_03bdb3b</prosessering.version>
