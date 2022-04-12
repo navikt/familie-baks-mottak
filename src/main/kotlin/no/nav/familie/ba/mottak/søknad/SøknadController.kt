@@ -4,7 +4,6 @@ import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.config.FeatureToggleConfig
 import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
-import no.nav.familie.ba.mottak.søknad.domene.SøknadNewWip
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV6
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
 import no.nav.familie.ba.mottak.søknad.domene.VersjonertSøknad
@@ -12,7 +11,8 @@ import no.nav.familie.kontrakter.ba.søknad.v4.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsvedlegg
-import no.nav.familie.kontrakter.ba.søknad.v6.Søknad
+import no.nav.familie.kontrakter.ba.søknad.v6.Søknad as SøknadKontraktV6
+import no.nav.familie.kontrakter.ba.søknad.v7.Søknad as SøknadKontraktV7
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
@@ -58,11 +58,11 @@ class SøknadController(
     val utvidetSøknadEøs = Metrics.counter("barnetrygd.utvidet.soknad.eos")
 
     @PostMapping(value = ["/soknad/v6"], consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun taImotSøknad(@RequestPart("søknad") søknad: Søknad): ResponseEntity<Ressurs<Kvittering>> =
+    fun taImotSøknad(@RequestPart("søknad") søknad: SøknadKontraktV6): ResponseEntity<Ressurs<Kvittering>> =
         mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad = SøknadV6(søknad = søknad))
 
     @PostMapping(value = ["/soknad/v7"], consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun taImotSøknad(@RequestPart("søknad") søknad: SøknadNewWip): ResponseEntity<Ressurs<Kvittering>> =
+    fun taImotSøknad(@RequestPart("søknad") søknad: SøknadKontraktV7): ResponseEntity<Ressurs<Kvittering>> =
         if (!featureToggleService.isEnabled(FeatureToggleConfig.TOGGLE_EØS_FULL)) {
             ResponseEntity.status(500)
                 .body(Ressurs.failure("Endepunkt ikke tilgjengelig. Feature er skrudd av."))
