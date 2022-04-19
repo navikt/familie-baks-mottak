@@ -43,7 +43,7 @@ jobs:
           RESOURCE: app-preprod.yaml
       - name: Push Docker image med 'latest' tag
         if: github.ref == 'refs/heads/master'
-        run: docker push ${IMAGE_UTEN_TAG}:latest
+        run: docker push ${IMAGE_LATEST}
       - name: Deploy til prod-fss
         if: github.ref == 'refs/heads/master'
         uses: nais/deploy/actions/deploy@v1
