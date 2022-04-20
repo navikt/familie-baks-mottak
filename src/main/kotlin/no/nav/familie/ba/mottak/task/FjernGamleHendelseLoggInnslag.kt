@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 class FjernGamleHendelseLoggInnslag(val hendelsesloggRepository: HendelsesloggRepository) {
 
     @Scheduled(cron = "0 0 9 * * *")
-    fun FjernGamleHendelseLoggInnslag() {
+    fun fjernGamleHendelseLoggInnslag() {
         if (LeaderClient.isLeader() == true) {
             slettHendelserEldreEnn2Måneder()
         }
