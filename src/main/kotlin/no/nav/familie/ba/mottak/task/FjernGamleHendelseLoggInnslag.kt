@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.task
 
+import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.leader.LeaderClient
 import org.slf4j.LoggerFactory
@@ -14,15 +15,16 @@ class FjernGamleHendelseLoggInnslag(val hendelsesloggRepository: HendelsesloggRe
     @Scheduled(cron = "0 0 9 * * *")
     fun fjernGamleHendelseLoggInnslag() {
         if (LeaderClient.isLeader() == true) {
-            slettHendelserEldreEnn2Måneder()
+            slettHendelserEldreEnn2MånederFraTopicsMedMindreRetentionTid()
         }
     }
 
     @Transactional
-    fun slettHendelserEldreEnn2Måneder() {
+    fun slettHendelserEldreEnn2MånederFraTopicsMedMindreRetentionTid() {
         val gamleHendelser = hendelsesloggRepository.findAll().filter {
             it.opprettetTidspunkt.isBefore(LocalDateTime.now().minusMonths(2))
-        }
+        }.filterNot { it.consumer == HendelseConsumer.EF_VEDTAK_INFOTRYGD_V1 }
+
         LOG.info("Fjerner gamle hendelser eldre enn måneder fra hendelse_logg")
         hendelsesloggRepository.deleteAll(gamleHendelser)
     }

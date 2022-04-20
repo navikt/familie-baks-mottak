@@ -36,7 +36,7 @@ class FjernGamleHendelseLoggInnslagTest {
     }
 
     @Test
-    fun `Skal slette hendelser fra hendelse_logg eldre enn 2 måneder`() {
+    fun `Skal slette hendelser fra hendelse_logg eldre enn 2 måneder, bortsett for de fra topic EF_VEDTAK_INFOTRYGD_V1 med retention -1`() {
         val opprettetDatoer = listOf(
             now(),
             now().minusMonths(1),
@@ -48,18 +48,20 @@ class FjernGamleHendelseLoggInnslagTest {
                 Hendelseslogg(
                     offset = idx.toLong(),
                     hendelseId = idx.toString(),
-                    consumer = HendelseConsumer.PDL,
+                    consumer = HendelseConsumer.values()[idx],
                     opprettetTidspunkt = dato.atStartOfDay())
             }
         )
-        fjernGamleHendelseLoggInnslag.slettHendelserEldreEnn2Måneder()
+        fjernGamleHendelseLoggInnslag.slettHendelserEldreEnn2MånederFraTopicsMedMindreRetentionTid()
 
         val hendelserEtterRyddeJobb = hendelseLoggRepository.findAll()
 
         assertThat(hendelserFørRyddeJobb).hasSize(4)
-        assertThat(hendelserEtterRyddeJobb).hasSize(2)
+        assertThat(hendelserEtterRyddeJobb).hasSize(3)
         assertThat(hendelserEtterRyddeJobb).doesNotContainAnyElementsOf(
-            hendelserFørRyddeJobb.filter { it.opprettetTidspunkt.isBefore(LocalDateTime.now().minusMonths(2)) }
+            hendelserFørRyddeJobb
+                .filter { it.opprettetTidspunkt.isBefore(LocalDateTime.now().minusMonths(2)) }
+                .filterNot { it.consumer == HendelseConsumer.EF_VEDTAK_INFOTRYGD_V1 }
         )
     }
 }
