@@ -25,7 +25,7 @@ class FjernGamleHendelseLoggInnslag(val hendelsesloggRepository: HendelsesloggRe
             it.opprettetTidspunkt.isBefore(LocalDateTime.now().minusMonths(2))
         }.filterNot { it.consumer == HendelseConsumer.EF_VEDTAK_INFOTRYGD_V1 }
 
-        LOG.info("Fjerner gamle hendelser eldre enn måneder fra hendelse_logg")
+        LOG.info("Fjerner gamle hendelser eldre enn 2 måneder fra hendelse_logg")
         hendelsesloggRepository.deleteAll(gamleHendelser)
     }
 
