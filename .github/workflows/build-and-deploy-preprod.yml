@@ -50,7 +50,8 @@ jobs:
           CLUSTER: dev-fss
           RESOURCE: app-preprod.yaml
   bygg-sonar:
-    if: github.event.pull_request.user.login != 'dependabot[bot]'
+    if: ${{ false }}  # disable for now
+    #if: github.event.pull_request.user.login != 'dependabot[bot]'
     name: Build sonar
     runs-on: ubuntu-latest
     steps:
