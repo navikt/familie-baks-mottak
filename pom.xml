@@ -25,7 +25,7 @@
         <confluent.version>6.2.1</confluent.version>
         <prosessering.version>1.20220331123748_03bdb3b</prosessering.version>
         <felles.version>1.20220406145421_5f46d64</felles.version>
-        <kontrakter.version>2.0_20220412101553_5627657</kontrakter.version>
+        <kontrakter.version>2.0_20220429151635_4bb9f6d</kontrakter.version>
         <main-class>no.nav.familie.ba.mottak.LauncherKt</main-class>
         <spring.vault.version>2.3.2</spring.vault.version>
         <spring.cloud.version>3.1.0</spring.cloud.version>
