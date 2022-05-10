@@ -209,12 +209,14 @@ class VurderLivshendelseTask(
             secureLog.info("finnForeldreMedLøpendeSak(): listeMedForeldreForBarn.size = ${listeMedForeldreForBarn.size} " +
                                    "identer = ${listeMedForeldreForBarn.fold("") { identer, it -> identer + " " + it.relatertPersonsIdent }}"
             )
-        }.mapNotNull {
-            sakClient.hentRestFagsakDeltagerListe(it.relatertPersonsIdent, barnasIdenter = listOf(personIdent))
-                .filter { it.fagsakStatus == LØPENDE }
-                .groupBy { it.fagsakId }.values
-                .firstOrNull { it.inneholderBådeForelderOgBarn }
-                ?.find { it.rolle == FORELDER }
+        }.mapNotNull { forelder ->
+            forelder.relatertPersonsIdent?.let {
+                sakClient.hentRestFagsakDeltagerListe(it, barnasIdenter = listOf(personIdent))
+                    .filter { it.fagsakStatus == LØPENDE }
+                    .groupBy { it.fagsakId }.values
+                    .firstOrNull { it.inneholderBådeForelderOgBarn }
+                    ?.find { it.rolle == FORELDER }
+            }
         }.map { Bruker(it.ident, it.fagsakId) }
     }
 

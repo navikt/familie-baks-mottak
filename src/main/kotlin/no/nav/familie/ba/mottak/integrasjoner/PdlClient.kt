@@ -214,7 +214,7 @@ data class PdlPersonData(
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PdlForeldreBarnRelasjon(
-        val relatertPersonsIdent: String,
+        val relatertPersonsIdent: String?,
         val relatertPersonsRolle: FORELDERBARNRELASJONROLLE,
         val minRolleForPerson: FORELDERBARNRELASJONROLLE? = null
 )

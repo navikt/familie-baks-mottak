@@ -87,6 +87,7 @@ class JournalhendelseRutingTask(
         val barnasIdenter = pdlClient.hentPersonMedRelasjoner(brukersIdent).forelderBarnRelasjoner
                 .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
                 .map { it.relatertPersonsIdent }
+                .filterNotNull()
         val alleBarnasIdenter = barnasIdenter.flatMap { pdlClient.hentIdenter(it) }
                 .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
                 .map { it.ident }
