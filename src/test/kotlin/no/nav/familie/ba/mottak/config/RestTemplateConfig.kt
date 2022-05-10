@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.config
 
+import no.nav.familie.http.config.NaisProxyCustomizer
 import no.nav.familie.http.interceptor.ConsumerIdClientInterceptor
 import no.nav.familie.http.interceptor.MdcValuesPropagatingClientInterceptor
 import no.nav.familie.http.interceptor.StsBearerTokenClientInterceptor
@@ -18,7 +19,10 @@ import java.nio.charset.StandardCharsets
 
 @Configuration
 @Profile("dev")
-@Import(ConsumerIdClientInterceptor::class, MdcValuesPropagatingClientInterceptor::class, StsBearerTokenClientInterceptor::class,)
+@Import(ConsumerIdClientInterceptor::class,
+        MdcValuesPropagatingClientInterceptor::class,
+        StsBearerTokenClientInterceptor::class,
+        NaisProxyCustomizer::class,)
 class RestTemplateConfig {
 
     @Bean
@@ -28,19 +32,22 @@ class RestTemplateConfig {
 
     @Bean("jwtBearer")
     fun restTemplateJwtBearer(consumerIdClientInterceptor: ConsumerIdClientInterceptor,
-                              mdcValuesPropagatingClientInterceptor: MdcValuesPropagatingClientInterceptor): RestOperations {
+                              mdcValuesPropagatingClientInterceptor: MdcValuesPropagatingClientInterceptor,
+                              naisProxyCustomizer: NaisProxyCustomizer): RestOperations {
 
         return RestTemplateBuilder()
-                .additionalCustomizers(NaisProxyCustomizer())
+                .additionalCustomizers(naisProxyCustomizer)
                 .additionalInterceptors(consumerIdClientInterceptor, mdcValuesPropagatingClientInterceptor)
                 .build()
     }
 
 
     @Bean("clientCredentials")
-    fun restTemplateClientCredentials(consumerIdClientInterceptor: ConsumerIdClientInterceptor, mdcValuesPropagatingClientInterceptor: MdcValuesPropagatingClientInterceptor): RestOperations {
+    fun restTemplateClientCredentials(consumerIdClientInterceptor: ConsumerIdClientInterceptor,
+                                      mdcValuesPropagatingClientInterceptor: MdcValuesPropagatingClientInterceptor,
+                                      naisProxyCustomizer: NaisProxyCustomizer): RestOperations {
         return RestTemplateBuilder()
-                .additionalCustomizers(NaisProxyCustomizer())
+                .additionalCustomizers(naisProxyCustomizer)
                 .additionalInterceptors(consumerIdClientInterceptor, mdcValuesPropagatingClientInterceptor)
                 .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
                 .build()

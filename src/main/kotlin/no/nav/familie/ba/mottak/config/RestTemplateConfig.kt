@@ -1,5 +1,6 @@
 package no.nav.familie.ba.mottak.config
 
+import no.nav.familie.http.config.NaisProxyCustomizer
 import no.nav.familie.http.config.RestTemplateSts
 import no.nav.familie.http.interceptor.BearerTokenClientInterceptor
 import no.nav.familie.http.interceptor.ConsumerIdClientInterceptor
@@ -16,15 +17,17 @@ import org.springframework.web.client.RestOperations
 @Configuration
 @Import(BearerTokenClientInterceptor::class,
         MdcValuesPropagatingClientInterceptor::class,
-        RestTemplateSts::class)
+        RestTemplateSts::class,
+        NaisProxyCustomizer::class)
 class RestTemplateConfig {
 
     @Profile("!dev || !e2e || !postgres")
     @Bean("clientCredentials")
     fun restTemplateClientCredentials(consumerIdClientInterceptor: ConsumerIdClientInterceptor,
-                                      bearerTokenClientInterceptor: BearerTokenClientInterceptor): RestOperations {
+                                      bearerTokenClientInterceptor: BearerTokenClientInterceptor,
+                                      naisProxyCustomizer: NaisProxyCustomizer): RestOperations {
         return RestTemplateBuilder()
-            .additionalCustomizers(NaisProxyCustomizer())
+            .additionalCustomizers(naisProxyCustomizer)
             .interceptors(consumerIdClientInterceptor,
                 bearerTokenClientInterceptor,
                 MdcValuesPropagatingClientInterceptor())
