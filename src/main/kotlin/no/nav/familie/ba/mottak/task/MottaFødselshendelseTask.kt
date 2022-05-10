@@ -97,7 +97,7 @@ class MottaFødselshendelseTask(
     fun hentMor(personinfo: Person): PersonIdent? {
         for (forelderBarnRelasjon: ForelderBarnRelasjon in personinfo.forelderBarnRelasjoner) {
             if (forelderBarnRelasjon.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.MOR) {
-                return PersonIdent(forelderBarnRelasjon.relatertPersonsIdent)
+                return forelderBarnRelasjon.relatertPersonsIdent?.let { PersonIdent(it) }
             }
         }
         return null
