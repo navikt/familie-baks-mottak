@@ -1,6 +1,7 @@
 package no.nav.familie.ba.mottak.søknad.domene
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import no.nav.familie.ba.soknad.api.controllers.SøknadWipV8
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsvedlegg
 import no.nav.familie.kontrakter.ba.søknad.v6.Søknad as SøknadV6
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknad as SøknadV7
@@ -37,10 +38,16 @@ data class DBSøknad(
         return objectMapper.readValue(søknadJson)
     }
 
+    private fun hentSøknadV8(): SøknadWipV8 {
+        return objectMapper.readValue(søknadJson)
+    }
+
     private fun hentSøknadVersjon(): String {
         return try {
             val søknad = objectMapper.readTree(søknadJson)
-            if (søknad.get("kontraktVersjon")?.asInt() == 7) "v7" else "v6"
+            if (søknad.get("kontraktVersjon")?.asInt() == 7) "v7"
+            else if (søknad.get("kontraktVersjon")?.asInt() == 8) "v8"
+            else "v6"
         } catch (e: Error) {
             "v6"
         }
@@ -50,6 +57,9 @@ data class DBSøknad(
         val versjon = this.hentSøknadVersjon()
         if (versjon == "v7") {
             return SøknadV7(søknad = hentSøknadV7())
+        }
+        else if (versjon == "v8"){
+            return SøknadV8(søknad = hentSøknadV8())
         }
         return SøknadV6(søknad = hentSøknad())
     }
@@ -78,6 +88,17 @@ fun SøknadV6.tilDBSøknad(): DBSøknad {
 }
 
 fun SøknadV7.tilDBSøknad(): DBSøknad {
+    try {
+        return DBSøknad(
+            søknadJson = objectMapper.writeValueAsString(this),
+            fnr = this.søker.ident.verdi.getValue("nb")
+        )
+    } catch (e: KotlinNullPointerException) {
+        throw FødselsnummerErNullException()
+    }
+}
+
+fun SøknadWipV8.tilDBSøknad(): DBSøknad {
     try {
         return DBSøknad(
             søknadJson = objectMapper.writeValueAsString(this),

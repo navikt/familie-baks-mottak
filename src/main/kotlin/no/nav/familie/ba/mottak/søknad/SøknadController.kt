@@ -6,7 +6,9 @@ import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV6
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
+import no.nav.familie.ba.mottak.søknad.domene.SøknadV8
 import no.nav.familie.ba.mottak.søknad.domene.VersjonertSøknad
+import no.nav.familie.ba.soknad.api.controllers.SøknadWipV8
 import no.nav.familie.kontrakter.ba.søknad.v4.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
@@ -70,11 +72,17 @@ class SøknadController(
             mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad = SøknadV7(søknad = søknad))
         }
 
+    @PostMapping(value = ["/soknad/v8"], consumes = [MULTIPART_FORM_DATA_VALUE])
+    fun taImotSøknad(@RequestPart("søknad") søknad: SøknadWipV8): ResponseEntity<Ressurs<Kvittering>> =
+            mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad = SøknadV8(søknad = søknad))
+
+
     fun mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad: VersjonertSøknad): ResponseEntity<Ressurs<Kvittering>> {
 
         val søknadstype = when (versjonertSøknad) {
             is SøknadV6 -> versjonertSøknad.søknad.søknadstype
             is SøknadV7 -> versjonertSøknad.søknad.søknadstype
+            is SøknadV8 -> versjonertSøknad.søknad.søknadstype
         }
 
         return try {
@@ -91,11 +99,13 @@ class SøknadController(
         val (søknadstype, dokumentasjon) = when (versjonertSøknad) {
             is SøknadV6 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
             is SøknadV7 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
+            is SøknadV8 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
         }
 
         val (harEøsSteg, kontraktVersjon) = when (versjonertSøknad) {
             is SøknadV6 -> Pair(false, 6)
             is SøknadV7 -> Pair(versjonertSøknad.søknad.antallEøsSteg > 0, versjonertSøknad.søknad.kontraktVersjon)
+            is SøknadV8 -> Pair(versjonertSøknad.søknad.antallEøsSteg > 0, versjonertSøknad.søknad.kontraktVersjon)
         }
 
         val erUtvidet = søknadstype == Søknadstype.UTVIDET

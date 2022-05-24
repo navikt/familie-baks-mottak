@@ -31,11 +31,13 @@ class SøknadSpråkvelgerService {
             when (versjonertSøknad) {
                 is SøknadV6 -> versjonertSøknad.søknad
                 is SøknadV7 -> versjonertSøknad.søknad
+                is SøknadV8 -> versjonertSøknad.søknad
             }
         )
         asMap["teksterUtenomSpørsmål"] = when (versjonertSøknad) {
             is SøknadV6 -> versjonertSøknad.søknad.teksterUtenomSpørsmål
             is SøknadV7 -> versjonertSøknad.søknad.teksterUtenomSpørsmål
+            is SøknadV8 -> versjonertSøknad.søknad.teksterUtenomSpørsmål
         }.mapValues { it.value[valgtLocale] }
         valgtLocale = defaultLocale
         return objectMapper.writeValueAsString(asMap)
