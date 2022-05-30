@@ -7,8 +7,8 @@ import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV6
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV8
+import no.nav.familie.ba.mottak.søknad.domene.SøknadWipV8
 import no.nav.familie.ba.mottak.søknad.domene.VersjonertSøknad
-import no.nav.familie.ba.soknad.api.controllers.SøknadWipV8
 import no.nav.familie.kontrakter.ba.søknad.v4.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype

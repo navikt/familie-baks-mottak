@@ -1,7 +1,6 @@
 package no.nav.familie.ba.mottak.søknad.domene
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.familie.ba.soknad.api.controllers.SøknadWipV8
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsvedlegg
 import no.nav.familie.kontrakter.ba.søknad.v6.Søknad as SøknadV6
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknad as SøknadV7
