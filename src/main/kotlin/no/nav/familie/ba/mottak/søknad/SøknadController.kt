@@ -4,14 +4,12 @@ import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.config.FeatureToggleConfig
 import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
-import no.nav.familie.ba.mottak.søknad.domene.SøknadV6
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
 import no.nav.familie.ba.mottak.søknad.domene.VersjonertSøknad
-import no.nav.familie.kontrakter.ba.søknad.v4.Dokumentasjonsbehov
-import no.nav.familie.kontrakter.ba.søknad.v4.Søknaddokumentasjon
+import no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov
+import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
-import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsvedlegg
-import no.nav.familie.kontrakter.ba.søknad.v6.Søknad as SøknadKontraktV6
+import no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknad as SøknadKontraktV7
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -52,14 +50,8 @@ class SøknadController(
     val utvidetHarManglerIDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.utvidet.harManglerIDokumentasjonsbehov")
 
     // Metrics for EØS barnetrygd
-    val søknadMedEøs = Metrics.counter("barnetrygd.soknad.eos.ok")
-    val søknadMedEøsHarVedlegg = Metrics.counter("barnetrygd.soknad.eos.harvedlegg")
     val ordinærSøknadEøs = Metrics.counter("barnetrygd.ordinaer.soknad.eos")
     val utvidetSøknadEøs = Metrics.counter("barnetrygd.utvidet.soknad.eos")
-
-    @PostMapping(value = ["/soknad/v6"], consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun taImotSøknad(@RequestPart("søknad") søknad: SøknadKontraktV6): ResponseEntity<Ressurs<Kvittering>> =
-        mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad = SøknadV6(søknad = søknad))
 
     @PostMapping(value = ["/soknad/v7"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(@RequestPart("søknad") søknad: SøknadKontraktV7): ResponseEntity<Ressurs<Kvittering>> =
@@ -73,7 +65,6 @@ class SøknadController(
     fun mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad: VersjonertSøknad): ResponseEntity<Ressurs<Kvittering>> {
 
         val søknadstype = when (versjonertSøknad) {
-            is SøknadV6 -> versjonertSøknad.søknad.søknadstype
             is SøknadV7 -> versjonertSøknad.søknad.søknadstype
         }
 
@@ -89,23 +80,13 @@ class SøknadController(
 
     private fun sendMetrics(versjonertSøknad: VersjonertSøknad) {
         val (søknadstype, dokumentasjon) = when (versjonertSøknad) {
-            is SøknadV6 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
             is SøknadV7 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
         }
 
-        val (harEøsSteg, kontraktVersjon) = when (versjonertSøknad) {
-            is SøknadV6 -> Pair(false, 6)
-            is SøknadV7 -> Pair(versjonertSøknad.søknad.antallEøsSteg > 0, versjonertSøknad.søknad.kontraktVersjon)
-        }
+        val harEøsSteg = versjonertSøknad.søknad.antallEøsSteg > 0
 
         val erUtvidet = søknadstype == Søknadstype.UTVIDET
         sendMetricsSøknad(harEøsSteg, erUtvidet)
-
-        /* Kontraktversjonsnummer mindre enn 6 har ingen eøs-steg og bruker krevd
-        dokumentasjon som grunnlag for å avgjøre om det er en eøs-søknad */
-        if (kontraktVersjon < 7) {
-            sendMetricsEøs(dokumentasjon)
-        }
 
         sendMetricsDokumentasjon(erUtvidet, dokumentasjon)
     }
@@ -174,16 +155,6 @@ class SøknadController(
 
     private fun sendMetricsManglerVedlegg(erUtvidet: Boolean) {
         if (erUtvidet) utvidetHarManglerIDokumentasjonsbehov.increment() else harManglerIDokumentasjonsbehov.increment()
-    }
-
-    private fun sendMetricsEøs(dokumentasjon: List<Søknaddokumentasjon>) {
-        val eøsDokumentasjon = dokumentasjon.find { it.dokumentasjonsbehov == Dokumentasjonsbehov.EØS_SKJEMA }
-        if (eøsDokumentasjon != null) {
-            søknadMedEøs.increment()
-            if (eøsDokumentasjon.opplastedeVedlegg.isNotEmpty()) {
-                søknadMedEøsHarVedlegg.increment()
-            }
-        }
     }
 
     @GetMapping(value = ["/ping"])

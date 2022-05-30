@@ -2,11 +2,10 @@ package no.nav.familie.ba.mottak.søknad
 
 import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.DBVedlegg
-import no.nav.familie.ba.mottak.søknad.domene.SøknadV6
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
 import no.nav.familie.ba.mottak.søknad.domene.VersjonertSøknad
-import no.nav.familie.kontrakter.ba.søknad.v4.Dokumentasjonsbehov
-import no.nav.familie.kontrakter.ba.søknad.v4.Søknaddokumentasjon
+import no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov
+import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.felles.dokarkiv.Dokumenttype
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.ArkiverDokumentRequest
@@ -24,7 +23,6 @@ object ArkiverDokumentRequestMapper {
     ): ArkiverDokumentRequest {
 
         val (søknadstype, dokumentasjon) = when (versjonertSøknad) {
-            is SøknadV6 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
             is SøknadV7 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
         }
 
@@ -109,7 +107,6 @@ object ArkiverDokumentRequestMapper {
             Dokumentasjonsbehov.BOR_FAST_MED_SØKER -> "Bor fast med søker"
             Dokumentasjonsbehov.SEPARERT_SKILT_ENKE -> "Dokumentasjon på separasjon, skilsmisse eller dødsfall"
             Dokumentasjonsbehov.MEKLINGSATTEST -> "Meklingsattest"
-            Dokumentasjonsbehov.EØS_SKJEMA -> "Tilleggsskjema for EØS"
             Dokumentasjonsbehov.ANNEN_DOKUMENTASJON -> "" // Random dokumentasjon skal saksbehandler sette tittel på
         }
     }
