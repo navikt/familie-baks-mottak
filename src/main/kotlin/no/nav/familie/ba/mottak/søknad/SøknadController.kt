@@ -1,8 +1,6 @@
 package no.nav.familie.ba.mottak.søknad
 
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.ba.mottak.config.FeatureToggleConfig
-import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
 import no.nav.familie.ba.mottak.søknad.domene.VersjonertSøknad
@@ -28,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController
 @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 class SøknadController(
     private val søknadService: SøknadService,
-    private val featureToggleService: FeatureToggleService
 ) {
 
     // Metrics for ordinær barnetrygd
@@ -55,12 +52,7 @@ class SøknadController(
 
     @PostMapping(value = ["/soknad/v7"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(@RequestPart("søknad") søknad: SøknadKontraktV7): ResponseEntity<Ressurs<Kvittering>> =
-        if (!featureToggleService.isEnabled(FeatureToggleConfig.TOGGLE_EØS_FULL)) {
-            ResponseEntity.status(500)
-                .body(Ressurs.failure("Endepunkt ikke tilgjengelig. Feature er skrudd av."))
-        } else {
-            mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad = SøknadV7(søknad = søknad))
-        }
+        mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad = SøknadV7(søknad = søknad))
 
     fun mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad: VersjonertSøknad): ResponseEntity<Ressurs<Kvittering>> {
 
