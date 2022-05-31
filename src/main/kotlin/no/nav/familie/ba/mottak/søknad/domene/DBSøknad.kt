@@ -1,8 +1,7 @@
 package no.nav.familie.ba.mottak.søknad.domene
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsvedlegg
-import no.nav.familie.kontrakter.ba.søknad.v6.Søknad as SøknadV6
+import no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknad as SøknadV7
 import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.LocalDateTime
@@ -30,9 +29,6 @@ data class DBSøknad(
     val journalpostId: String? = null
 ) {
 
-    private fun hentSøknad(): SøknadV6 {
-        return objectMapper.readValue(søknadJson)
-    }
     private fun hentSøknadV7(): SøknadV7 {
         return objectMapper.readValue(søknadJson)
     }
@@ -44,23 +40,19 @@ data class DBSøknad(
     private fun hentSøknadVersjon(): String {
         return try {
             val søknad = objectMapper.readTree(søknadJson)
-            if (søknad.get("kontraktVersjon")?.asInt() == 7) "v7"
-            else if (søknad.get("kontraktVersjon")?.asInt() == 8) "v8"
-            else "v6"
+            if (søknad.get("kontraktVersjon")?.asInt() == 8) "v8"
+            else "v7"
         } catch (e: Error) {
-            "v6"
+            "v7"
         }
     }
 
     fun hentVersjonertSøknad(): VersjonertSøknad {
         val versjon = this.hentSøknadVersjon()
-        if (versjon == "v7") {
-            return SøknadV7(søknad = hentSøknadV7())
-        }
-        else if (versjon == "v8"){
+        if (versjon == "v8") {
             return SøknadV8(søknad = hentSøknadV8())
         }
-        return SøknadV6(søknad = hentSøknad())
+        return SøknadV7(søknad = hentSøknadV7())
     }
 }
 
@@ -74,17 +66,6 @@ data class DBVedlegg(
     val søknadId: Long,
     val data: ByteArray
 )
-
-fun SøknadV6.tilDBSøknad(): DBSøknad {
-    try {
-        return DBSøknad(
-            søknadJson = objectMapper.writeValueAsString(this),
-            fnr = this.søker.ident.verdi.getValue("nb")
-        )
-    } catch (e: KotlinNullPointerException) {
-        throw FødselsnummerErNullException()
-    }
-}
 
 fun SøknadV7.tilDBSøknad(): DBSøknad {
     try {

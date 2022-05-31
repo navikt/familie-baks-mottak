@@ -15,6 +15,7 @@ import no.nav.familie.kontrakter.ba.søknad.v7.Arbeidsperiode
 import no.nav.familie.kontrakter.ba.søknad.v7.EøsBarnetrygdsperiode
 import no.nav.familie.kontrakter.ba.søknad.v7.IdNummer
 import no.nav.familie.kontrakter.ba.søknad.v7.Pensjonsperiode
+import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.v7.Utbetalingsperiode
 
 data class SøknadWipV8(
@@ -83,30 +84,6 @@ data class Omsorgsperson(
     val pågåendeSøknadHvilketLand: Søknadsfelt<String?>,
     val barnetrygdFraEøs: Søknadsfelt<String?>,
     val eøsBarnetrygdsperioder: List<Søknadsfelt<EøsBarnetrygdsperiode>> = listOf(),
-)
-
-data class Søknaddokumentasjon(
-    val dokumentasjonsbehov: Dokumentasjonsbehov,
-    val harSendtInn: Boolean,
-    val opplastedeVedlegg: List<Søknadsvedlegg>,
-    val dokumentasjonSpråkTittel: Map<Locale, String>
-)
-
-enum class Dokumentasjonsbehov {
-    AVTALE_DELT_BOSTED,
-    VEDTAK_OPPHOLDSTILLATELSE,
-    ADOPSJON_DATO,
-    BEKREFTELSE_FRA_BARNEVERN,
-    BOR_FAST_MED_SØKER,
-    SEPARERT_SKILT_ENKE,
-    MEKLINGSATTEST,
-    ANNEN_DOKUMENTASJON,
-}
-
-data class Søknadsvedlegg(
-    val dokumentId: String,
-    val navn: String,
-    val tittel: Dokumentasjonsbehov,
 )
 
 data class AndreForelder(

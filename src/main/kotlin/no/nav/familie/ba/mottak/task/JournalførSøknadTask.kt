@@ -4,7 +4,6 @@ import no.nav.familie.ba.mottak.søknad.JournalføringService
 import no.nav.familie.ba.mottak.søknad.PdfService
 import no.nav.familie.ba.mottak.søknad.SøknadRepository
 import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
-import no.nav.familie.ba.mottak.søknad.domene.SøknadV6
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV8
 import no.nav.familie.ba.mottak.søknad.domene.VersjonertSøknad
@@ -41,7 +40,6 @@ class JournalførSøknadTask(
             log.info("Generert pdf med størrelse ${bokmålPdf.size}")
 
             val orginalspråk = when (versjonertSøknad) {
-                is SøknadV6 -> versjonertSøknad.søknad.originalSpråk
                 is SøknadV7 -> versjonertSøknad.søknad.originalSpråk
                 is SøknadV8 -> versjonertSøknad.søknad.originalSpråk
             }
