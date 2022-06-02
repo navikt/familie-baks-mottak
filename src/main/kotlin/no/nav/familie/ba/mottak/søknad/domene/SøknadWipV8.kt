@@ -10,13 +10,8 @@ import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.v4.TidligereSamboer
 import no.nav.familie.kontrakter.ba.søknad.v4.Utenlandsopphold
 import no.nav.familie.kontrakter.ba.søknad.v5.RegistrertBostedType
-import no.nav.familie.kontrakter.ba.søknad.v6.AndreForelderUtvidet
-import no.nav.familie.kontrakter.ba.søknad.v7.Arbeidsperiode
-import no.nav.familie.kontrakter.ba.søknad.v7.EøsBarnetrygdsperiode
 import no.nav.familie.kontrakter.ba.søknad.v7.IdNummer
-import no.nav.familie.kontrakter.ba.søknad.v7.Pensjonsperiode
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
-import no.nav.familie.kontrakter.ba.søknad.v7.Utbetalingsperiode
 
 data class SøknadWipV8(
     val kontraktVersjon: Int,
@@ -67,46 +62,81 @@ data class Barn(
 data class Omsorgsperson(
     val navn: Søknadsfelt<String>,
     val slektsforhold: Søknadsfelt<String>,
-    val slektsforholdSpesifisering: Søknadsfelt<String?>,
+    val slektsforholdSpesifisering: Søknadsfelt<String>? = null,
     val idNummer: Søknadsfelt<String>,
     val adresse: Søknadsfelt<String>,
-    val arbeidUtland: Søknadsfelt<String?>,
+    val arbeidUtland: Søknadsfelt<String>,
     val arbeidsperioderUtland: List<Søknadsfelt<Arbeidsperiode>> = listOf(),
-    val arbeidNorge: Søknadsfelt<String?>,
+    val arbeidNorge: Søknadsfelt<String>,
     val arbeidsperioderNorge: List<Søknadsfelt<Arbeidsperiode>> = listOf(),
-    val pensjonUtland: Søknadsfelt<String?>,
+    val pensjonUtland: Søknadsfelt<String>,
     val pensjonsperioderUtland: List<Søknadsfelt<Pensjonsperiode>> = listOf(),
-    val pensjonNorge: Søknadsfelt<String?>,
+    val pensjonNorge: Søknadsfelt<String>,
     val pensjonsperioderNorge: List<Søknadsfelt<Pensjonsperiode>> = listOf(),
-    val andreUtbetalinger: Søknadsfelt<String?>,
+    val andreUtbetalinger: Søknadsfelt<String>,
     val andreUtbetalingsperioder: List<Søknadsfelt<Utbetalingsperiode>> = listOf(),
-    val pågåendeSøknadFraAnnetEøsLand: Søknadsfelt<String?>,
-    val pågåendeSøknadHvilketLand: Søknadsfelt<String?>,
-    val barnetrygdFraEøs: Søknadsfelt<String?>,
+    val pågåendeSøknadFraAnnetEøsLand: Søknadsfelt<String>,
+    val pågåendeSøknadHvilketLand: Søknadsfelt<String>? = null,
+    val barnetrygdFraEøs: Søknadsfelt<String>,
     val eøsBarnetrygdsperioder: List<Søknadsfelt<EøsBarnetrygdsperiode>> = listOf(),
 )
 
 data class AndreForelder(
-    val kanIkkeGiOpplysninger: Boolean,
-    val navn: Søknadsfelt<String>,
-    val fnr: Søknadsfelt<String>,
-    val fødselsdato: Søknadsfelt<String>,
-    val arbeidUtlandet: Søknadsfelt<String>,
-    val pensjonUtland: Søknadsfelt<String>,
-    val skriftligAvtaleOmDeltBosted: Søknadsfelt<String>,
-    val utvidet: AndreForelderUtvidet,
-    val pensjonNorge: Søknadsfelt<String?>,
-    val arbeidNorge: Søknadsfelt<String?>,
-    val andreUtbetalinger: Søknadsfelt<String?>,
+    val kanIkkeGiOpplysninger: Søknadsfelt<String>,
+    val navn: Søknadsfelt<String>? = null,
+    val fnr: Søknadsfelt<String>? = null,
+    val fødselsdato: Søknadsfelt<String>? = null,
+    val arbeidUtlandet: Søknadsfelt<String>? = null,
+    val pensjonUtland: Søknadsfelt<String>? = null,
+    val skriftligAvtaleOmDeltBosted: Søknadsfelt<String>? = null,
+    val pensjonNorge: Søknadsfelt<String>? = null,
+    val arbeidNorge: Søknadsfelt<String>? = null,
+    val andreUtbetalinger: Søknadsfelt<String>? = null,
+    val idNummer: List<Søknadsfelt<IdNummer>> = listOf(),
+    val adresse: Søknadsfelt<String>? = null,
+    val pågåendeSøknadFraAnnetEøsLand: Søknadsfelt<String>? = null,
+    val pågåendeSøknadHvilketLand: Søknadsfelt<String>? = null,
+    val barnetrygdFraEøs: Søknadsfelt<String>? = null,
     val arbeidsperioderUtland: List<Søknadsfelt<Arbeidsperiode>> = listOf(),
     val pensjonsperioderUtland: List<Søknadsfelt<Pensjonsperiode>> = listOf(),
     val arbeidsperioderNorge: List<Søknadsfelt<Arbeidsperiode>> = listOf(),
     val pensjonsperioderNorge: List<Søknadsfelt<Pensjonsperiode>> = listOf(),
     val andreUtbetalingsperioder: List<Søknadsfelt<Utbetalingsperiode>> = listOf(),
-    val idNummer: List<Søknadsfelt<IdNummer>> = listOf(),
-    val adresse: Søknadsfelt<String>,
-    val pågåendeSøknadFraAnnetEøsLand: Søknadsfelt<String?>,
-    val pågåendeSøknadHvilketLand: Søknadsfelt<String?>,
-    val barnetrygdFraEøs: Søknadsfelt<String?>,
     val eøsBarnetrygdsperioder: List<Søknadsfelt<EøsBarnetrygdsperiode>> = listOf(),
+    val utvidet: AndreForelderUtvidet,
+)
+
+data class AndreForelderUtvidet(
+    val søkerHarBoddMedAndreForelder: Søknadsfelt<String>? = null,
+    val søkerFlyttetFraAndreForelderDato: Søknadsfelt<String>? = null,
+)
+
+data class EøsBarnetrygdsperiode(
+    val mottarEøsBarnetrygdNå: Søknadsfelt<String>? = null,
+    val barnetrygdsland: Søknadsfelt<String>,
+    val fraDatoBarnetrygdperiode: Søknadsfelt<String>,
+    val tilDatoBarnetrygdperiode: Søknadsfelt<String>? = null,
+    val månedligBeløp: Søknadsfelt<String>,
+)
+
+data class Arbeidsperiode(
+    val arbeidsperiodeAvsluttet: Søknadsfelt<String>? = null,
+    val arbeidsperiodeland: Søknadsfelt<String>? = null,
+    val arbeidsgiver: Søknadsfelt<String>? = null,
+    val fraDatoArbeidsperiode: Søknadsfelt<String>? = null,
+    val tilDatoArbeidsperiode: Søknadsfelt<String>? = null,
+)
+
+data class Pensjonsperiode(
+    val mottarPensjonNå: Søknadsfelt<String>? = null,
+    val pensjonsland: Søknadsfelt<String>? = null,
+    val pensjonFra: Søknadsfelt<String>? = null,
+    val pensjonTil: Søknadsfelt<String>? = null,
+)
+
+data class Utbetalingsperiode(
+    val fårUtbetalingNå: Søknadsfelt<String>? = null,
+    val utbetalingLand: Søknadsfelt<String>,
+    val utbetalingFraDato: Søknadsfelt<String>,
+    val utbetalingTilDato: Søknadsfelt<String>,
 )
