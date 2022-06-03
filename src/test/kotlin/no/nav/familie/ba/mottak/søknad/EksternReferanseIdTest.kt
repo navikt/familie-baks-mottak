@@ -30,7 +30,7 @@ class EksternReferanseIdTest(
     val journalførSøknadTask: JournalførSøknadTask
 ) {
 
-    val søknad = SøknadTestData.søknad()
+    val søknad = SøknadTestData.søknadV8()
     val dbSøknad = søknad.tilDBSøknad()
 
     @Test

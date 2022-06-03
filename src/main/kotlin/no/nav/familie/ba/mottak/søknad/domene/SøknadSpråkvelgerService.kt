@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.kotlin.convertValue
-import no.nav.familie.kontrakter.ba.søknad.v4.Søknaddokumentasjon
+import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt
 import org.springframework.stereotype.Service
 import no.nav.familie.kontrakter.felles.objectMapper as getObjectMapper
@@ -29,13 +29,13 @@ class SøknadSpråkvelgerService {
 
         val asMap = objectMapper.convertValue<MutableMap<String, Any>>(
             when (versjonertSøknad) {
-                is SøknadV6 -> versjonertSøknad.søknad
                 is SøknadV7 -> versjonertSøknad.søknad
+                is SøknadV8 -> versjonertSøknad.søknad
             }
         )
         asMap["teksterUtenomSpørsmål"] = when (versjonertSøknad) {
-            is SøknadV6 -> versjonertSøknad.søknad.teksterUtenomSpørsmål
             is SøknadV7 -> versjonertSøknad.søknad.teksterUtenomSpørsmål
+            is SøknadV8 -> versjonertSøknad.søknad.teksterUtenomSpørsmål
         }.mapValues { it.value[valgtLocale] }
         valgtLocale = defaultLocale
         return objectMapper.writeValueAsString(asMap)

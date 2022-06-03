@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference
 import no.nav.familie.ba.mottak.integrasjoner.PdfClient
 import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.SøknadSpråkvelgerService
-import no.nav.familie.ba.mottak.søknad.domene.SøknadV6
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
+import no.nav.familie.ba.mottak.søknad.domene.SøknadV8
 import no.nav.familie.ba.mottak.søknad.domene.VersjonertSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
@@ -26,10 +26,10 @@ class PdfService(
         val søknadJson = søknadSpråkvelgerService.velgSøknadSpråk(versjonertSøknad, språk)
 
         val (søknadstype, navn) = when (versjonertSøknad) {
-            is SøknadV6 -> {
+            is SøknadV7 -> {
                 Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.søker.navn)
             }
-            is SøknadV7 -> {
+            is SøknadV8 -> {
                 Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.søker.navn)
             }
         }
