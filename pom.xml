@@ -29,7 +29,7 @@
         <main-class>no.nav.familie.ba.mottak.LauncherKt</main-class>
         <spring.vault.version>2.3.2</spring.vault.version>
         <spring.cloud.version>3.1.0</spring.cloud.version>
-        <token-validation-spring.version>2.0.20</token-validation-spring.version>
+        <token-validation-spring.version>2.0.21</token-validation-spring.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
