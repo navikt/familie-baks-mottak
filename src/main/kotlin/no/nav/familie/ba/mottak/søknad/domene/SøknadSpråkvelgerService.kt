@@ -30,10 +30,12 @@ class SøknadSpråkvelgerService {
         val asMap = objectMapper.convertValue<MutableMap<String, Any>>(
             when (versjonertSøknad) {
                 is SøknadV7 -> versjonertSøknad.søknad
+                is SøknadV8 -> versjonertSøknad.søknad
             }
         )
         asMap["teksterUtenomSpørsmål"] = when (versjonertSøknad) {
             is SøknadV7 -> versjonertSøknad.søknad.teksterUtenomSpørsmål
+            is SøknadV8 -> versjonertSøknad.søknad.teksterUtenomSpørsmål
         }.mapValues { it.value[valgtLocale] }
         valgtLocale = defaultLocale
         return objectMapper.writeValueAsString(asMap)

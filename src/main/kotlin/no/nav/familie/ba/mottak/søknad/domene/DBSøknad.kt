@@ -3,6 +3,7 @@ package no.nav.familie.ba.mottak.søknad.domene
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknad as SøknadV7
+import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadV8
 import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.LocalDateTime
 import javax.persistence.Column
@@ -33,8 +34,25 @@ data class DBSøknad(
         return objectMapper.readValue(søknadJson)
     }
 
+    private fun hentSøknadV8(): SøknadV8 {
+        return objectMapper.readValue(søknadJson)
+    }
+
+    private fun hentSøknadVersjon(): String {
+        return try {
+            val søknad = objectMapper.readTree(søknadJson)
+            if (søknad.get("kontraktVersjon")?.asInt() == 8) "v8"
+            else "v7"
+        } catch (e: Error) {
+            "v7"
+        }
+    }
 
     fun hentVersjonertSøknad(): VersjonertSøknad {
+        val versjon = this.hentSøknadVersjon()
+        if (versjon == "v8") {
+            return SøknadV8(søknad = hentSøknadV8())
+        }
         return SøknadV7(søknad = hentSøknadV7())
     }
 }
@@ -50,8 +68,18 @@ data class DBVedlegg(
     val data: ByteArray
 )
 
-
 fun SøknadV7.tilDBSøknad(): DBSøknad {
+    try {
+        return DBSøknad(
+            søknadJson = objectMapper.writeValueAsString(this),
+            fnr = this.søker.ident.verdi.getValue("nb")
+        )
+    } catch (e: KotlinNullPointerException) {
+        throw FødselsnummerErNullException()
+    }
+}
+
+fun SøknadV8.tilDBSøknad(): DBSøknad {
     try {
         return DBSøknad(
             søknadJson = objectMapper.writeValueAsString(this),

@@ -3,6 +3,7 @@ package no.nav.familie.ba.mottak.søknad
 import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.DBVedlegg
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
+import no.nav.familie.ba.mottak.søknad.domene.SøknadV8
 import no.nav.familie.ba.mottak.søknad.domene.VersjonertSøknad
 import no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
@@ -24,6 +25,7 @@ object ArkiverDokumentRequestMapper {
 
         val (søknadstype, dokumentasjon) = when (versjonertSøknad) {
             is SøknadV7 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
+            is SøknadV8 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
         }
 
         val dokumenttype = when (søknadstype) {

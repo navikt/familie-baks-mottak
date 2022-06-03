@@ -5,6 +5,7 @@ import no.nav.familie.ba.mottak.søknad.PdfService
 import no.nav.familie.ba.mottak.søknad.SøknadRepository
 import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
+import no.nav.familie.ba.mottak.søknad.domene.SøknadV8
 import no.nav.familie.ba.mottak.søknad.domene.VersjonertSøknad
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -40,6 +41,7 @@ class JournalførSøknadTask(
 
             val orginalspråk = when (versjonertSøknad) {
                 is SøknadV7 -> versjonertSøknad.søknad.originalSpråk
+                is SøknadV8 -> versjonertSøknad.søknad.originalSpråk
             }
 
             val orginalspråkPdf: ByteArray = if (orginalspråk != "nb")

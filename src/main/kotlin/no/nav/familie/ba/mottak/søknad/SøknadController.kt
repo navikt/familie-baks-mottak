@@ -3,12 +3,14 @@ package no.nav.familie.ba.mottak.søknad
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
+import no.nav.familie.ba.mottak.søknad.domene.SøknadV8
 import no.nav.familie.ba.mottak.søknad.domene.VersjonertSøknad
 import no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknad as SøknadKontraktV7
+import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadKontraktV8
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
@@ -54,10 +56,16 @@ class SøknadController(
     fun taImotSøknad(@RequestPart("søknad") søknad: SøknadKontraktV7): ResponseEntity<Ressurs<Kvittering>> =
         mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad = SøknadV7(søknad = søknad))
 
+    @PostMapping(value = ["/soknad/v8"], consumes = [MULTIPART_FORM_DATA_VALUE])
+    fun taImotSøknad(@RequestPart("søknad") søknad: SøknadKontraktV8): ResponseEntity<Ressurs<Kvittering>> =
+            mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad = SøknadV8(søknad = søknad))
+
+
     fun mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad: VersjonertSøknad): ResponseEntity<Ressurs<Kvittering>> {
 
         val søknadstype = when (versjonertSøknad) {
             is SøknadV7 -> versjonertSøknad.søknad.søknadstype
+            is SøknadV8 -> versjonertSøknad.søknad.søknadstype
         }
 
         return try {
@@ -73,9 +81,13 @@ class SøknadController(
     private fun sendMetrics(versjonertSøknad: VersjonertSøknad) {
         val (søknadstype, dokumentasjon) = when (versjonertSøknad) {
             is SøknadV7 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
+            is SøknadV8 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
         }
 
-        val harEøsSteg = versjonertSøknad.søknad.antallEøsSteg > 0
+        val harEøsSteg = when (versjonertSøknad) {
+            is SøknadV7 -> versjonertSøknad.søknad.antallEøsSteg > 0
+            is SøknadV8 -> versjonertSøknad.søknad.antallEøsSteg > 0
+        }
 
         val erUtvidet = søknadstype == Søknadstype.UTVIDET
         sendMetricsSøknad(harEøsSteg, erUtvidet)

@@ -10,8 +10,8 @@ import io.mockk.slot
 import no.nav.familie.ba.mottak.integrasjoner.PdfClient
 import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.SøknadSpråkvelgerService
-import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
-import no.nav.familie.kontrakter.ba.søknad.v7.Søknad as SøknadKontraktV7
+import no.nav.familie.ba.mottak.søknad.domene.SøknadV8
+import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadKontraktV8
 import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -37,14 +37,14 @@ internal class PdfServiceTest {
 
         val jsonString: String = File("./src/test/kotlin/no/nav/familie/ba/mottak/søknad/testdata/testdata1.json")
             .readText(Charsets.UTF_8)
-        val søknad: SøknadKontraktV7 = mapper.readValue(jsonString)
+        val søknad: SøknadKontraktV8 = mapper.readValue(jsonString)
         val dbSøknad: DBSøknad = søknad.tilDBSøknad()
-        pdfService.lagPdf(SøknadV7(søknad = søknad), dbSøknad, språk = "nb")
+        pdfService.lagPdf(SøknadV8(søknad = søknad), dbSøknad, språk = "nb")
 
         // Kommenter inn dette for å logge generert json til console
         // val jsonToDokgen: String = mapper.writeValueAsString(jsonSlot)
         // println(jsonToDokgen)
 
-        assertThat(jsonSlot.captured["kontraktVersjon"]).isEqualTo(7)
+        assertThat(jsonSlot.captured["kontraktVersjon"]).isEqualTo(8)
     }
 }

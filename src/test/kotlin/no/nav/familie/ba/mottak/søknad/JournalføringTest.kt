@@ -26,7 +26,7 @@ class JournalføringTest(
         @Autowired
         val søknadService: SøknadService) {
 
-    val søknad = SøknadTestData.søknadV7()
+    val søknad = SøknadTestData.søknadV8()
     val testPDF = "test123".toByteArray()
     val dbSøknad = søknad.tilDBSøknad()
 
