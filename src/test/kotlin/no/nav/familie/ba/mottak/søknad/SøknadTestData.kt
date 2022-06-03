@@ -8,9 +8,9 @@ import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg
 import no.nav.familie.kontrakter.ba.søknad.v5.RegistrertBostedType
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt as SøknadsfeltV4
-import no.nav.familie.kontrakter.ba.søknad.v7.Barn as BarnV7
-import no.nav.familie.kontrakter.ba.søknad.v7.Søker as SøkerV7
-import no.nav.familie.kontrakter.ba.søknad.v7.Søknad as SøknadV7
+import no.nav.familie.kontrakter.ba.søknad.v8.Barn as BarnV8
+import no.nav.familie.kontrakter.ba.søknad.v8.Søker as SøkerV8
+import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadV8
 
 fun <T> søknadsfelt(label: String, verdi: T): SøknadsfeltV4<T> {
     return SøknadsfeltV4(label = mapOf("nb" to label), verdi = mapOf("nb" to verdi))
@@ -18,12 +18,13 @@ fun <T> søknadsfelt(label: String, verdi: T): SøknadsfeltV4<T> {
 
 object SøknadTestData {
 
-    private fun søkerV7(): SøkerV7 {
-        return SøkerV7(
+    private fun søkerV8(): SøkerV8 {
+        return SøkerV8(
             harEøsSteg = true,
             navn = søknadsfelt("navn", "Navn Navnessen"),
             ident = søknadsfelt("fødselsnummer", "1234578901"),
             statsborgerskap = søknadsfelt("statsborgerskap", listOf("NOR")),
+            adressebeskyttelse = false,
             adresse = søknadsfelt(
                 "adresse",
                 SøknadAdresse(
@@ -43,9 +44,9 @@ object SøknadTestData {
         )
     }
 
-    private fun barnV7(): List<BarnV7> {
+    private fun barnV8(): List<BarnV8> {
         return listOf(
-            BarnV7(
+            BarnV8(
                 harEøsSteg = true,
                 navn = søknadsfelt("Barnets fulle navn", "barn1"),
                 ident = søknadsfelt("Fødselsnummer", "12345678999"),
@@ -55,7 +56,7 @@ object SøknadTestData {
                 utenlandsperioder = listOf(),
                 eøsBarnetrygdsperioder = listOf(),
             ),
-            BarnV7(
+            BarnV8(
                 harEøsSteg = false,
                 navn = søknadsfelt("Barnets fulle navn", "barn2"),
                 ident = søknadsfelt("Fødselsnummer", "12345678987"),
@@ -65,7 +66,7 @@ object SøknadTestData {
                 utenlandsperioder = listOf(),
                 eøsBarnetrygdsperioder = listOf(),
             ),
-            BarnV7(
+            BarnV8(
                 harEøsSteg = true,
                 navn = søknadsfelt("Barnets fulle navn", "barn3"),
                 ident = søknadsfelt("Fødselsnummer", "12345678988"),
@@ -78,12 +79,12 @@ object SøknadTestData {
         )
     }
 
-    fun søknadV7(): SøknadV7 = SøknadV7(
+    fun søknadV8(): SøknadV8 = SøknadV8(
         antallEøsSteg = 3,
         kontraktVersjon = 7,
         søknadstype = Søknadstype.ORDINÆR,
-        søker = søkerV7(),
-        barn = barnV7(),
+        søker = søkerV8(),
+        barn = barnV8(),
         spørsmål = mapOf(),
         dokumentasjon = listOf(
             Søknaddokumentasjon(

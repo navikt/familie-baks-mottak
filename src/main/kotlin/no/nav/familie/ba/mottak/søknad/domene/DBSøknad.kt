@@ -3,6 +3,7 @@ package no.nav.familie.ba.mottak.søknad.domene
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknad as SøknadV7
+import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadV8
 import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.LocalDateTime
 import javax.persistence.Column
@@ -33,7 +34,7 @@ data class DBSøknad(
         return objectMapper.readValue(søknadJson)
     }
 
-    private fun hentSøknadV8(): SøknadWipV8 {
+    private fun hentSøknadV8(): SøknadV8 {
         return objectMapper.readValue(søknadJson)
     }
 
@@ -78,7 +79,7 @@ fun SøknadV7.tilDBSøknad(): DBSøknad {
     }
 }
 
-fun SøknadWipV8.tilDBSøknad(): DBSøknad {
+fun SøknadV8.tilDBSøknad(): DBSøknad {
     try {
         return DBSøknad(
             søknadJson = objectMapper.writeValueAsString(this),

@@ -4,13 +4,13 @@ import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV8
-import no.nav.familie.ba.mottak.søknad.domene.SøknadWipV8
 import no.nav.familie.ba.mottak.søknad.domene.VersjonertSøknad
 import no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknad as SøknadKontraktV7
+import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadKontraktV8
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
@@ -57,7 +57,7 @@ class SøknadController(
         mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad = SøknadV7(søknad = søknad))
 
     @PostMapping(value = ["/soknad/v8"], consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun taImotSøknad(@RequestPart("søknad") søknad: SøknadWipV8): ResponseEntity<Ressurs<Kvittering>> =
+    fun taImotSøknad(@RequestPart("søknad") søknad: SøknadKontraktV8): ResponseEntity<Ressurs<Kvittering>> =
             mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad = SøknadV8(søknad = søknad))
 
 
