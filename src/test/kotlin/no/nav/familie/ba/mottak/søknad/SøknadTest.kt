@@ -2,6 +2,7 @@ package no.nav.familie.ba.mottak.søknad
 
 import no.nav.familie.ba.mottak.DevLauncherPostgres
 import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
+import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV8
 import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
 import no.nav.familie.ba.mottak.util.DbContainerInitializer
@@ -31,7 +32,7 @@ class SøknadTest(
     @Test
     fun `Lagring av søknad`() {
         val dbSøknadFraMapper = søknadV8.tilDBSøknad()
-        assertThat(dbSøknadFraMapper.hentVersjonertSøknad() is SøknadV8).isTrue()
+        assertThat(dbSøknadFraMapper.hentVersjonertSøknad() is SøknadV8).isTrue
 
         val dbSøknadFraDB = søknadService.lagreDBSøknad(dbSøknadFraMapper)
         val hentetSøknad = søknadService.hentDBSøknad(dbSøknadFraDB.id)
@@ -42,8 +43,8 @@ class SøknadTest(
     @Test
     fun `Få riktig versjon v8 ved mapping fra DBSøknad`() {
         val dbSøknadFraMapper = søknadV8.tilDBSøknad()
-        val versjonertSøknad = dbSøknadFraMapper.hentVersjonertSøknad()
-        val versjon: Int? = when (versjonertSøknad) {
+        val versjon: Int? = when (val versjonertSøknad = dbSøknadFraMapper.hentVersjonertSøknad()) {
+            is SøknadV7 -> versjonertSøknad.søknad.kontraktVersjon
             is SøknadV8 -> versjonertSøknad.søknad.kontraktVersjon
             else -> {
                 null

@@ -81,7 +81,7 @@ object SøknadTestData {
 
     fun søknadV8(): SøknadV8 = SøknadV8(
         antallEøsSteg = 3,
-        kontraktVersjon = 7,
+        kontraktVersjon = 8,
         søknadstype = Søknadstype.ORDINÆR,
         søker = søkerV8(),
         barn = barnV8(),
