@@ -48,27 +48,29 @@ class NavnoHendelseTaskLøypeTest {
         mockTaskRepository
     )
 
-    private val journalføringSteg = OpprettJournalføringOppgaveTask(mockJournalpostClient,
-                                                                    mockOppgaveClient)
-
-
+    private val journalføringSteg = OpprettJournalføringOppgaveTask(
+        mockJournalpostClient,
+        mockOppgaveClient
+    )
 
     @BeforeEach
     internal fun setUp() {
         clearAllMocks()
-        //Inngående digital, Mottatt
+        // Inngående digital, Mottatt
         every {
             mockJournalpostClient.hentJournalpost(any())
-        } returns Journalpost(journalpostId = JOURNALPOST_ID,
-                              journalposttype = Journalposttype.I,
-                              journalstatus = Journalstatus.MOTTATT,
-                              bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-                              tema = "BAR",
-                              kanal = MOTTAK_KANAL,
-                              behandlingstema = null,
-                              dokumenter = null,
-                              journalforendeEnhet = null,
-                              sak = null)
+        } returns Journalpost(
+            journalpostId = JOURNALPOST_ID,
+            journalposttype = Journalposttype.I,
+            journalstatus = Journalstatus.MOTTATT,
+            bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+            tema = "BAR",
+            kanal = MOTTAK_KANAL,
+            behandlingstema = null,
+            dokumenter = null,
+            journalforendeEnhet = null,
+            sak = null
+        )
 
         every {
             mockTaskRepository.save(any<Task>())
@@ -156,7 +158,6 @@ class NavnoHendelseTaskLøypeTest {
     @Test
     fun `Skal opprette JFR-oppgave uten tekst siden bruker ikke har sak i noen system`() {
 
-
         kjørRutingTaskOgReturnerNesteTask().run { journalføringSteg.doTask(this) }
 
         val oppgaveBeskrivelse = slot<String>()
@@ -176,10 +177,16 @@ class NavnoHendelseTaskLøypeTest {
 
         every {
             mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
-        } returns InfotrygdSøkResponse(listOf(SakDto(status = StatusKode.FB.name,
-                                                     vedtaksdato = LocalDate.now(),
-                                                     stønad = StønadDto(opphørsgrunn = MIGRERT.kode))),
-                                       emptyList())
+        } returns InfotrygdSøkResponse(
+            listOf(
+                SakDto(
+                    status = StatusKode.FB.name,
+                    vedtaksdato = LocalDate.now(),
+                    stønad = StønadDto(opphørsgrunn = MIGRERT.kode)
+                )
+            ),
+            emptyList()
+        )
 
         kjørRutingTaskOgReturnerNesteTask().run { journalføringSteg.doTask(this) }
 
@@ -192,11 +199,15 @@ class NavnoHendelseTaskLøypeTest {
     }
 
     private fun kjørRutingTaskOgReturnerNesteTask(): Task {
-        rutingSteg.doTask(Task(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
-                                      payload = MOTTAK_KANAL).apply {
-            this.metadata["personIdent"] = "12345678901"
-            this.metadata["journalpostId"] = "mockJournalpostId"
-        })
+        rutingSteg.doTask(
+            Task(
+                type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+                payload = MOTTAK_KANAL
+            ).apply {
+                this.metadata["personIdent"] = "12345678901"
+                this.metadata["journalpostId"] = "mockJournalpostId"
+            }
+        )
 
         val nesteTask = slot<Task>().let { nyTask ->
             verify(atMost = 1) {
@@ -207,11 +218,9 @@ class NavnoHendelseTaskLøypeTest {
         return nesteTask
     }
 
-
     companion object {
         private const val JOURNALPOST_ID = "222"
         private const val FAGSAK_ID = "1"
         private const val MOTTAK_KANAL = "NAV_NO"
     }
-
 }

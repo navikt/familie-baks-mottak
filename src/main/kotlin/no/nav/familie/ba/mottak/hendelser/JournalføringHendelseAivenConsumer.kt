@@ -1,9 +1,7 @@
 package no.nav.familie.ba.mottak.hendelser
 
-
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
@@ -22,7 +20,6 @@ import javax.transaction.Transactional
     matchIfMissing = true
 )
 class JournalføringHendelseAivenConsumer(val journalhendelseService: JournalhendelseService) {
-
 
     val journalføringshendelseAivenConsumerFeilCounter: Counter = Metrics.counter("joark.hendelse.journalføring.feil")
 
@@ -46,9 +43,6 @@ class JournalføringHendelseAivenConsumer(val journalhendelseService: Journalhen
             MDC.clear()
         }
     }
-
-
-
 
     companion object {
         private val logger: Logger = LoggerFactory.getLogger(EnsligForsørgerInfotrygdHendelseConsumer::class.java)

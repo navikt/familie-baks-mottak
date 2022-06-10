@@ -72,29 +72,28 @@ class EnsligForsørgerInfotrygdHendelseConsumerTest {
         assertThat(hendelseDto.identdato).isEqualTo("20210801")
 
         assertThat(hendelseDto.aktørId).isEqualTo(2424242424241)
-
     }
 
     @Test
     fun `Skal lese melding, konvertere, sende til ba-sak og ACKe melding `() {
-        val ack:Acknowledgment = mockk(relaxed = true)
+        val ack: Acknowledgment = mockk(relaxed = true)
         val consumerRecord = ConsumerRecord("topic", 1, 1, "42", json)
         consumer.listen(consumerRecord, ack)
         verify(exactly = 1) {
             mockSakClient.sendVedtakOmOvergangsstønadHendelseTilSak("12345678910")
         }
-        verify(exactly = 1) {ack.acknowledge()}
+        verify(exactly = 1) { ack.acknowledge() }
     }
 
     @Test
     fun `Skal ikke ACKe melding ved feil`() {
-        val ack:Acknowledgment = mockk(relaxed = true)
+        val ack: Acknowledgment = mockk(relaxed = true)
         val consumerRecord = ConsumerRecord("topic", 1, 1, "42", """{"json": "Ugyldig"}""")
-         val e = Assertions.assertThrows(RuntimeException::class.java) {
+        val e = Assertions.assertThrows(RuntimeException::class.java) {
             consumer.listen(consumerRecord, ack)
         }
         assertThat(e.message).isEqualTo("Feil i prosessering av aapen-ef-overgangstonad-v1")
 
-        verify(exactly = 0) {ack.acknowledge()}
+        verify(exactly = 0) { ack.acknowledge() }
     }
 }

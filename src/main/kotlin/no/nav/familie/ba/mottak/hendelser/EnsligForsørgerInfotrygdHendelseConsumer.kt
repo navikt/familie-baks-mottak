@@ -15,7 +15,6 @@ import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
-
 /**
  * Lytter på en kafka topic aapen-ef-overgangstonad-v1 fra infotrygd og sender til ba-sak. Retention på topic er satt til -1 i prod
  *
@@ -23,26 +22,26 @@ import javax.transaction.Transactional
  * Melding på format:
  * <code>
  {
-    "table": "INFOTRYGD_Q1.T_HENDELSE",
-    "op_type": "I",
-    "op_ts": "2021-11-11 17:49:51.000000",
-    "current_ts": "2021-11-11T17:49:55.821000",
-    "pos": "00000000300000004241",
-    "after": {
-        "HENDELSE_ID": 10343774,
-        "TYPE_HENDELSE": "INNVILGET      ",
-        "AKTOR_ID": "2424242424241       ",
-        "TYPE_YTELSE": "EF",
-        "IDENTDATO": "20210801",
-        "FOM": "2021-08-01 00:00:00",
-        "SATS": 8820.00,
-        "KOBLING_ID": 0,
-        "BRUKERID": "K278CP10",
-        "TIDSPUNKT_REG": "2021-11-11 17:49:36.690083000",
-        "OPPRETTET": "2021-11-11 17:49:44.361512000",
-        "OPPDATERT": "2021-11-11 17:49:44.361512000",
-        "DB_SPLITT": "  "
-    },
+ "table": "INFOTRYGD_Q1.T_HENDELSE",
+ "op_type": "I",
+ "op_ts": "2021-11-11 17:49:51.000000",
+ "current_ts": "2021-11-11T17:49:55.821000",
+ "pos": "00000000300000004241",
+ "after": {
+ "HENDELSE_ID": 10343774,
+ "TYPE_HENDELSE": "INNVILGET      ",
+ "AKTOR_ID": "2424242424241       ",
+ "TYPE_YTELSE": "EF",
+ "IDENTDATO": "20210801",
+ "FOM": "2021-08-01 00:00:00",
+ "SATS": 8820.00,
+ "KOBLING_ID": 0,
+ "BRUKERID": "K278CP10",
+ "TIDSPUNKT_REG": "2021-11-11 17:49:36.690083000",
+ "OPPRETTET": "2021-11-11 17:49:44.361512000",
+ "OPPDATERT": "2021-11-11 17:49:44.361512000",
+ "DB_SPLITT": "  "
+ },
 }
  * </code>
  */
@@ -53,7 +52,6 @@ import javax.transaction.Transactional
     matchIfMissing = true
 )
 class EnsligForsørgerInfotrygdHendelseConsumer(val vedtakOmOvergangsstønadService: EnsligForsørgerHendelseService) {
-
 
     val ensligForsørgerInfotrygdHendelseConsumerFeilCounter: Counter = Metrics.counter("ef.hendelse.infotrygdvedtak.feil")
 
@@ -84,9 +82,6 @@ class EnsligForsørgerInfotrygdHendelseConsumer(val vedtakOmOvergangsstønadServ
         }
     }
 
-
-
-
     companion object {
 
         private const val TOPIC_INFOTRYGD_VEDTAK = "aapen-ef-overgangstonad-v1"
@@ -97,7 +92,6 @@ class EnsligForsørgerInfotrygdHendelseConsumer(val vedtakOmOvergangsstønadServ
 }
 
 data class EnsligForsørgerInfotrygdHendelse(val after: InfotrygdHendelse)
-
 
 data class InfotrygdHendelse(
     @JsonProperty("HENDELSE_ID") val hendelseId: String,

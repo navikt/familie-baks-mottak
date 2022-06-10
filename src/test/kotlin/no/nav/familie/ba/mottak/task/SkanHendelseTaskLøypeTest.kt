@@ -44,32 +44,35 @@ class SkanHendelseTaskLøypeTest {
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
 
     private val rutingSteg = JournalhendelseRutingTask(
-            mockPdlClient,
-            mockSakClient,
-            mockInfotrygdBarnetrygdClient,
-            mockTaskRepository
+        mockPdlClient,
+        mockSakClient,
+        mockInfotrygdBarnetrygdClient,
+        mockTaskRepository
     )
 
-    private val journalføringSteg = OpprettJournalføringOppgaveTask(mockJournalpostClient,
-                                                                    mockOppgaveClient)
-
+    private val journalføringSteg = OpprettJournalføringOppgaveTask(
+        mockJournalpostClient,
+        mockOppgaveClient
+    )
 
     @BeforeEach
     internal fun setUp() {
         clearAllMocks()
-        //Inngående papirsøknad, Mottatt
+        // Inngående papirsøknad, Mottatt
         every {
             mockJournalpostClient.hentJournalpost(any())
-        } returns Journalpost(journalpostId = JournalføringHendelseServiceTest.JOURNALPOST_PAPIRSØKNAD,
-                              journalposttype = Journalposttype.I,
-                              journalstatus = Journalstatus.MOTTATT,
-                              bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-                              tema = "BAR",
-                              kanal = MOTTAK_KANAL,
-                              behandlingstema = null,
-                              dokumenter = null,
-                              journalforendeEnhet = null,
-                              sak = null)
+        } returns Journalpost(
+            journalpostId = JournalføringHendelseServiceTest.JOURNALPOST_PAPIRSØKNAD,
+            journalposttype = Journalposttype.I,
+            journalstatus = Journalstatus.MOTTATT,
+            bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+            tema = "BAR",
+            kanal = MOTTAK_KANAL,
+            behandlingstema = null,
+            dokumenter = null,
+            journalforendeEnhet = null,
+            sak = null
+        )
 
         every {
             mockOppgaveClient.finnOppgaver(any(), any())
@@ -94,7 +97,6 @@ class SkanHendelseTaskLøypeTest {
         every {
             mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
         } returns InfotrygdSøkResponse(emptyList(), emptyList())
-
     }
 
     @Test
@@ -194,13 +196,17 @@ class SkanHendelseTaskLøypeTest {
     }
 
     private fun kjørRutingTaskOgReturnerNesteTask(brukerId: String? = "12345678901"): Task {
-        rutingSteg.doTask(Task(type = JournalhendelseRutingTask.TASK_STEP_TYPE,
-                                      payload = MOTTAK_KANAL).apply {
-            if (brukerId != null) {
-                this.metadata["personIdent"] = brukerId
+        rutingSteg.doTask(
+            Task(
+                type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+                payload = MOTTAK_KANAL
+            ).apply {
+                if (brukerId != null) {
+                    this.metadata["personIdent"] = brukerId
+                }
+                this.metadata["journalpostId"] = "mockJournalpostId"
             }
-            this.metadata["journalpostId"] = "mockJournalpostId"
-        })
+        )
 
         val nesteTask = slot<Task>().let { nyTask ->
             verify(exactly = 1) {

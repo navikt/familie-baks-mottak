@@ -1,6 +1,5 @@
 package no.nav.familie.ba.mottak.søknad
 
-
 import no.nav.familie.ba.mottak.DevLauncherPostgres
 import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
 import no.nav.familie.ba.mottak.util.DbContainerInitializer
@@ -14,17 +13,17 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import kotlin.test.assertEquals
 
-
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(initializers = [DbContainerInitializer::class])
 @ActiveProfiles("postgres", "mock-dokarkiv")
 @Tag("integration")
 @SpringBootTest(classes = [DevLauncherPostgres::class])
 class JournalføringTest(
-        @Autowired
-        val journalføringService: JournalføringService,
-        @Autowired
-        val søknadService: SøknadService) {
+    @Autowired
+    val journalføringService: JournalføringService,
+    @Autowired
+    val søknadService: SøknadService
+) {
 
     val søknad = SøknadTestData.søknadV8()
     val testPDF = "test123".toByteArray()

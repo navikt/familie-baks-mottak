@@ -32,7 +32,6 @@ class FjernGamleFeiledeTasksIPreprod(val taskRepository: TaskRepository) {
                 }
             }
         }
-
     }
 
     companion object {

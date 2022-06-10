@@ -1,6 +1,5 @@
 package no.nav.familie.ba.mottak.søknad
 
-
 import no.nav.familie.kontrakter.ba.søknad.Søknadsfelt
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -8,7 +7,6 @@ import java.time.Month
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
-
 
 object Feltformaterer {
 
@@ -39,5 +37,4 @@ object Feltformaterer {
     private fun displayName(verdi: Month) = verdi.getDisplayName(TextStyle.FULL, Locale("no"))
 
     private fun feltMap(label: String, verdi: String) = mapOf("label" to label, "verdi" to verdi)
-
 }

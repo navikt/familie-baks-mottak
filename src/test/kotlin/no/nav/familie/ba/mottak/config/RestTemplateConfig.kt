@@ -19,10 +19,12 @@ import java.nio.charset.StandardCharsets
 
 @Configuration
 @Profile("dev")
-@Import(ConsumerIdClientInterceptor::class,
-        MdcValuesPropagatingClientInterceptor::class,
-        StsBearerTokenClientInterceptor::class,
-        NaisProxyCustomizer::class,)
+@Import(
+    ConsumerIdClientInterceptor::class,
+    MdcValuesPropagatingClientInterceptor::class,
+    StsBearerTokenClientInterceptor::class,
+    NaisProxyCustomizer::class,
+)
 class RestTemplateConfig {
 
     @Bean
@@ -31,43 +33,52 @@ class RestTemplateConfig {
     }
 
     @Bean("jwtBearer")
-    fun restTemplateJwtBearer(consumerIdClientInterceptor: ConsumerIdClientInterceptor,
-                              mdcValuesPropagatingClientInterceptor: MdcValuesPropagatingClientInterceptor,
-                              naisProxyCustomizer: NaisProxyCustomizer): RestOperations {
+    fun restTemplateJwtBearer(
+        consumerIdClientInterceptor: ConsumerIdClientInterceptor,
+        mdcValuesPropagatingClientInterceptor: MdcValuesPropagatingClientInterceptor,
+        naisProxyCustomizer: NaisProxyCustomizer
+    ): RestOperations {
 
         return RestTemplateBuilder()
-                .additionalCustomizers(naisProxyCustomizer)
-                .additionalInterceptors(consumerIdClientInterceptor, mdcValuesPropagatingClientInterceptor)
-                .build()
+            .additionalCustomizers(naisProxyCustomizer)
+            .additionalInterceptors(consumerIdClientInterceptor, mdcValuesPropagatingClientInterceptor)
+            .build()
     }
 
-
     @Bean("clientCredentials")
-    fun restTemplateClientCredentials(consumerIdClientInterceptor: ConsumerIdClientInterceptor,
-                                      mdcValuesPropagatingClientInterceptor: MdcValuesPropagatingClientInterceptor,
-                                      naisProxyCustomizer: NaisProxyCustomizer): RestOperations {
+    fun restTemplateClientCredentials(
+        consumerIdClientInterceptor: ConsumerIdClientInterceptor,
+        mdcValuesPropagatingClientInterceptor: MdcValuesPropagatingClientInterceptor,
+        naisProxyCustomizer: NaisProxyCustomizer
+    ): RestOperations {
         return RestTemplateBuilder()
-                .additionalCustomizers(naisProxyCustomizer)
-                .additionalInterceptors(consumerIdClientInterceptor, mdcValuesPropagatingClientInterceptor)
-                .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
-                .build()
+            .additionalCustomizers(naisProxyCustomizer)
+            .additionalInterceptors(consumerIdClientInterceptor, mdcValuesPropagatingClientInterceptor)
+            .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
+            .build()
     }
 
     @Bean("restTemplateUnsecured")
-    fun restTemplate(restTemplateBuilder: RestTemplateBuilder,
-                     mdcInterceptor: MdcValuesPropagatingClientInterceptor,
-                     consumerIdClientInterceptor: ConsumerIdClientInterceptor): RestOperations {
+    fun restTemplate(
+        restTemplateBuilder: RestTemplateBuilder,
+        mdcInterceptor: MdcValuesPropagatingClientInterceptor,
+        consumerIdClientInterceptor: ConsumerIdClientInterceptor
+    ): RestOperations {
         return restTemplateBuilder.interceptors(mdcInterceptor, consumerIdClientInterceptor).build()
     }
 
     @Bean("sts")
-    fun restTemplateSts(stsBearerTokenClientInterceptor: StsBearerTokenClientInterceptor,
-                        consumerIdClientInterceptor: ConsumerIdClientInterceptor): RestOperations {
+    fun restTemplateSts(
+        stsBearerTokenClientInterceptor: StsBearerTokenClientInterceptor,
+        consumerIdClientInterceptor: ConsumerIdClientInterceptor
+    ): RestOperations {
 
         return RestTemplateBuilder()
-                .interceptors(consumerIdClientInterceptor,
-                              stsBearerTokenClientInterceptor,
-                              MdcValuesPropagatingClientInterceptor())
-                .build()
+            .interceptors(
+                consumerIdClientInterceptor,
+                stsBearerTokenClientInterceptor,
+                MdcValuesPropagatingClientInterceptor()
+            )
+            .build()
     }
 }

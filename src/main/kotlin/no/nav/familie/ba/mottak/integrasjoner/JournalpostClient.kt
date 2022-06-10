@@ -19,10 +19,12 @@ private val logger = LoggerFactory.getLogger(JournalpostClient::class.java)
 private const val OAUTH2_CLIENT_CONFIG_KEY = "integrasjoner-clientcredentials"
 
 @Component
-class JournalpostClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRASJONER_API_URL}")
-                                               private val integrasjonerServiceUri: URI,
-                                               @Qualifier("clientCredentials") restOperations: RestOperations)
-    : AbstractRestClient(restOperations, "integrasjon.saf") {
+class JournalpostClient @Autowired constructor(
+    @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}")
+    private val integrasjonerServiceUri: URI,
+    @Qualifier("clientCredentials") restOperations: RestOperations
+) :
+    AbstractRestClient(restOperations, "integrasjon.saf") {
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
     fun hentJournalpost(journalpostId: String): Journalpost {
@@ -33,24 +35,29 @@ class JournalpostClient @Autowired constructor(@param:Value("\${FAMILIE_INTEGRAS
             response.getDataOrThrow()
         } catch (e: RestClientResponseException) {
             logger.warn("Henting av journalpost feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
-            throw IllegalStateException("Henting av journalpost med id $journalpostId feilet. Status: " + e.rawStatusCode
-                                        + ", body: " + e.responseBodyAsString, e)
+            throw IllegalStateException(
+                "Henting av journalpost med id $journalpostId feilet. Status: " + e.rawStatusCode +
+                    ", body: " + e.responseBodyAsString,
+                e
+            )
         } catch (e: RestClientException) {
             throw IllegalStateException("Henting av journalpost med id $journalpostId feilet.", e)
         }
     }
 }
 
-data class Journalpost(val journalpostId: String,
-                       val journalposttype: Journalposttype,
-                       val journalstatus: Journalstatus,
-                       val tema: String? = null,
-                       val behandlingstema: String? = null,
-                       val sak: Sak? = null,
-                       val bruker: Bruker? = null,
-                       val journalforendeEnhet: String? = null,
-                       val kanal: String? = null,
-                       val dokumenter: List<DokumentInfo>? = null) {
+data class Journalpost(
+    val journalpostId: String,
+    val journalposttype: Journalposttype,
+    val journalstatus: Journalstatus,
+    val tema: String? = null,
+    val behandlingstema: String? = null,
+    val sak: Sak? = null,
+    val bruker: Bruker? = null,
+    val journalforendeEnhet: String? = null,
+    val kanal: String? = null,
+    val dokumenter: List<DokumentInfo>? = null
+) {
 
     fun hentHovedDokumentTittel(): String? {
         if (dokumenter.isNullOrEmpty()) error("Journalpost $journalpostId mangler dokumenter")
@@ -58,18 +65,24 @@ data class Journalpost(val journalpostId: String,
     }
 }
 
-data class Sak(val arkivsaksnummer: String?,
-               var arkivsaksystem: String?,
-               val fagsakId: String?,
-               val fagsaksystem: String?)
+data class Sak(
+    val arkivsaksnummer: String?,
+    var arkivsaksystem: String?,
+    val fagsakId: String?,
+    val fagsaksystem: String?
+)
 
-data class Bruker(val id: String,
-                  val type: BrukerIdType)
+data class Bruker(
+    val id: String,
+    val type: BrukerIdType
+)
 
-data class DokumentInfo(val tittel: String?,
-                        val brevkode: String?,
-                        val dokumentstatus: Dokumentstatus?,
-                        val dokumentvarianter: List<Dokumentvariant>?)
+data class DokumentInfo(
+    val tittel: String?,
+    val brevkode: String?,
+    val dokumentstatus: Dokumentstatus?,
+    val dokumentvarianter: List<Dokumentvariant>?
+)
 
 data class Dokumentvariant(val variantformat: String)
 

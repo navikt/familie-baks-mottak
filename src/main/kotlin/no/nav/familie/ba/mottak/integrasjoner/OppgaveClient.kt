@@ -103,7 +103,6 @@ class OppgaveClient @Autowired constructor(
         )
     }
 
-
     @Retryable(
         value = [RuntimeException::class],
         maxAttempts = 3,
@@ -170,10 +169,9 @@ class OppgaveClient @Autowired constructor(
         )
     }
 
-
     private fun responseFraOpprettOppgave(uri: URI, request: OpprettOppgaveRequest): OppgaveResponse {
         return Result.runCatching {
-            secureLog.info("Sender OpprettOppgaveRequest ${request}")
+            secureLog.info("Sender OpprettOppgaveRequest $request")
             postForEntity<Ressurs<OppgaveResponse>>(uri, request)
         }.fold(
             onSuccess = { response -> assertGyldig(response) },

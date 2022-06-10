@@ -38,7 +38,6 @@ class ClientMocks {
         return mockOppgaveClient
     }
 
-
     @Bean
     @Primary
     fun mockAktørClient(): AktørClient {
@@ -61,7 +60,7 @@ class ClientMocks {
     @Profile("mock-dokarkiv")
     fun mockDokarkivClient(): DokarkivClient {
         val mockDokarkivClient = mockk<DokarkivClient>(relaxed = true)
-        
+
         every {
             mockDokarkivClient.arkiver(any())
         } returns ArkiverDokumentResponse(journalpostId = "123", ferdigstilt = false)
@@ -89,26 +88,28 @@ class ClientMocks {
 
         every {
             mockJournalpostClient.hentJournalpost("123")
-        } returns Journalpost(journalpostId = "123",
-                              journalposttype = Journalposttype.I,
-                              journalstatus = Journalstatus.MOTTATT,
-                              bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-                              tema = "BAR",
-                              kanal = "SKAN_NETS",
-                              behandlingstema = null,
-                              dokumenter = null,
-                              journalforendeEnhet = null,
-                              sak = null
+        } returns Journalpost(
+            journalpostId = "123",
+            journalposttype = Journalposttype.I,
+            journalstatus = Journalstatus.MOTTATT,
+            bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+            tema = "BAR",
+            kanal = "SKAN_NETS",
+            behandlingstema = null,
+            dokumenter = null,
+            journalforendeEnhet = null,
+            sak = null
         )
 
         every {
             mockJournalpostClient.hentJournalpost("321")
-        } returns Journalpost(journalpostId = "321",
-                              journalposttype = Journalposttype.I,
-                              journalstatus = Journalstatus.MOTTATT,
-                              bruker = Bruker("12345678901", BrukerIdType.FNR),
-                              tema = "BAR",
-                              kanal = "SKAN_NETS"
+        } returns Journalpost(
+            journalpostId = "321",
+            journalposttype = Journalposttype.I,
+            journalstatus = Journalstatus.MOTTATT,
+            bruker = Bruker("12345678901", BrukerIdType.FNR),
+            tema = "BAR",
+            kanal = "SKAN_NETS"
         )
 
         return mockJournalpostClient
@@ -137,13 +138,11 @@ class ClientMocks {
         return mockFeatureToggleClient
     }
 
-
     @Bean
     @Primary
     @Profile("mock-dokgen")
     fun mockPdfClient(): PdfClient {
         val mockPdfClient = mockk<PdfClient>()
-
 
         every {
             mockPdfClient.lagPdf(any(), any())
@@ -152,4 +151,3 @@ class ClientMocks {
         return mockPdfClient
     }
 }
-

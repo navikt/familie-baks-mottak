@@ -81,79 +81,89 @@ class JournalføringHendelseServiceTest {
         MockKAnnotations.init(this)
         clearAllMocks()
 
-        //Inngående papirsøknad, Mottatt
+        // Inngående papirsøknad, Mottatt
         every {
             mockJournalpostClient.hentJournalpost(JOURNALPOST_PAPIRSØKNAD)
-        } returns Journalpost(journalpostId = JOURNALPOST_PAPIRSØKNAD,
-                              journalposttype = Journalposttype.I,
-                              journalstatus = Journalstatus.MOTTATT,
-                              bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-                              tema = "BAR",
-                              kanal = "SKAN_NETS",
-                              behandlingstema = null,
-                              dokumenter = null,
-                              journalforendeEnhet = null,
-                              sak = null)
+        } returns Journalpost(
+            journalpostId = JOURNALPOST_PAPIRSØKNAD,
+            journalposttype = Journalposttype.I,
+            journalstatus = Journalstatus.MOTTATT,
+            bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+            tema = "BAR",
+            kanal = "SKAN_NETS",
+            behandlingstema = null,
+            dokumenter = null,
+            journalforendeEnhet = null,
+            sak = null
+        )
 
-        //Inngående digital, Mottatt
+        // Inngående digital, Mottatt
         every {
             mockJournalpostClient.hentJournalpost(JOURNALPOST_DIGITALSØKNAD)
-        } returns Journalpost(journalpostId = JOURNALPOST_DIGITALSØKNAD,
-                              journalposttype = Journalposttype.I,
-                              journalstatus = Journalstatus.MOTTATT,
-                              bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-                              tema = "BAR",
-                              kanal = "NAV_NO",
-                              behandlingstema = null,
-                              dokumenter = null,
-                              journalforendeEnhet = null,
-                              sak = null)
+        } returns Journalpost(
+            journalpostId = JOURNALPOST_DIGITALSØKNAD,
+            journalposttype = Journalposttype.I,
+            journalstatus = Journalstatus.MOTTATT,
+            bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+            tema = "BAR",
+            kanal = "NAV_NO",
+            behandlingstema = null,
+            dokumenter = null,
+            journalforendeEnhet = null,
+            sak = null
+        )
 
-        //Utgående digital, Mottatt
+        // Utgående digital, Mottatt
         every {
             mockJournalpostClient.hentJournalpost(JOURNALPOST_UTGÅENDE_DOKUMENT)
-        } returns Journalpost(journalpostId = JOURNALPOST_UTGÅENDE_DOKUMENT,
-                              journalposttype = Journalposttype.U,
-                              journalstatus = Journalstatus.MOTTATT,
-                              bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-                              tema = "BAR",
-                              kanal = "SKAN_NETS",
-                              behandlingstema = null,
-                              dokumenter = null,
-                              journalforendeEnhet = null,
-                              sak = null)
+        } returns Journalpost(
+            journalpostId = JOURNALPOST_UTGÅENDE_DOKUMENT,
+            journalposttype = Journalposttype.U,
+            journalstatus = Journalstatus.MOTTATT,
+            bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+            tema = "BAR",
+            kanal = "SKAN_NETS",
+            behandlingstema = null,
+            dokumenter = null,
+            journalforendeEnhet = null,
+            sak = null
+        )
 
-        //Ikke barnetrygd
+        // Ikke barnetrygd
         every {
             mockJournalpostClient.hentJournalpost(JOURNALPOST_IKKE_BARNETRYGD)
-        } returns Journalpost(journalpostId = JOURNALPOST_IKKE_BARNETRYGD,
-                              journalposttype = Journalposttype.U,
-                              journalstatus = Journalstatus.MOTTATT,
-                              bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-                              tema = "FOR",
-                              kanal = "NAV_NO",
-                              behandlingstema = null,
-                              dokumenter = null,
-                              journalforendeEnhet = null,
-                              sak = null)
+        } returns Journalpost(
+            journalpostId = JOURNALPOST_IKKE_BARNETRYGD,
+            journalposttype = Journalposttype.U,
+            journalstatus = Journalstatus.MOTTATT,
+            bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+            tema = "FOR",
+            kanal = "NAV_NO",
+            behandlingstema = null,
+            dokumenter = null,
+            journalforendeEnhet = null,
+            sak = null
+        )
 
-        //ferdigstilt journalpost
+        // ferdigstilt journalpost
         every {
             mockJournalpostClient.hentJournalpost(JOURNALPOST_FERDIGSTILT)
-        } returns Journalpost(journalpostId = JOURNALPOST_FERDIGSTILT,
-                              journalposttype = Journalposttype.U,
-                              journalstatus = Journalstatus.FERDIGSTILT,
-                              bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-                              tema = "FOR",
-                              kanal = "NAV_NO",
-                              behandlingstema = null,
-                              dokumenter = null,
-                              journalforendeEnhet = null,
-                              sak = null)
+        } returns Journalpost(
+            journalpostId = JOURNALPOST_FERDIGSTILT,
+            journalposttype = Journalposttype.U,
+            journalstatus = Journalstatus.FERDIGSTILT,
+            bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+            tema = "FOR",
+            kanal = "NAV_NO",
+            behandlingstema = null,
+            dokumenter = null,
+            journalforendeEnhet = null,
+            sak = null
+        )
 
         every { mockFeatureToggleService.isEnabled(any()) } returns true
         every { mockFeatureToggleService.isEnabled(any(), true) } returns true
-        every{ mockTaskRepository.save(any())} returns null
+        every { mockTaskRepository.save(any()) } returns null
     }
 
     @Test
@@ -162,7 +172,6 @@ class JournalføringHendelseServiceTest {
         val record = opprettRecord(JOURNALPOST_PAPIRSØKNAD)
 
         service.behandleJournalhendelse(record)
-
 
         val taskSlot = slot<Task>()
         verify {
@@ -175,12 +184,10 @@ class JournalføringHendelseServiceTest {
         assertThat(taskSlot.captured.type).isEqualTo(JournalhendelseRutingTask.TASK_STEP_TYPE)
     }
 
-
     @Test
     fun `Mottak av digital søknader skal opprette task`() {
         MDC.put("callId", "digital")
         val record = opprettRecord(JOURNALPOST_DIGITALSØKNAD)
-
 
         service.behandleJournalhendelse(record)
 
@@ -204,7 +211,6 @@ class JournalføringHendelseServiceTest {
         verify(exactly = 0) {
             mockTaskRepository.save(any())
         }
-
     }
 
     @Test
@@ -216,7 +222,6 @@ class JournalføringHendelseServiceTest {
         verify(exactly = 0) {
             mockTaskRepository.save(any())
         }
-
     }
 
     @Test
@@ -250,14 +255,16 @@ class JournalføringHendelseServiceTest {
             infotrygdBarnetrygdClient.hentSaker(any(), any())
         } returns InfotrygdSøkResponse(emptyList(), emptyList())
 
-
         val task = OpprettJournalføringOppgaveTask(
-                mockJournalpostClient,
-                mockOppgaveClient)
+            mockJournalpostClient,
+            mockOppgaveClient
+        )
 
-        task.doTask(Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "oppgavebeskrivelse").apply {
-            this.metadata["journalpostId"] = JOURNALPOST_UTGÅENDE_DOKUMENT
-        })
+        task.doTask(
+            Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "oppgavebeskrivelse").apply {
+                this.metadata["journalpostId"] = JOURNALPOST_UTGÅENDE_DOKUMENT
+            }
+        )
         assertThat(sakssystemMarkering.captured).contains("oppgavebeskrivelse")
     }
 
@@ -274,14 +281,19 @@ class JournalføringHendelseServiceTest {
         } returns listOf(Oppgave(123))
 
         val task = OpprettJournalføringOppgaveTask(
-                mockJournalpostClient,
-                mockOppgaveClient)
-        task.doTask(Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = JOURNALPOST_UTGÅENDE_DOKUMENT).apply {
-            this.metadata["journalpostId"] = JOURNALPOST_UTGÅENDE_DOKUMENT
-        })
-        task.doTask(Task(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_PAPIRSØKNAD).apply {
-            this.metadata["journalpostId"] = JOURNALPOST_PAPIRSØKNAD
-        })
+            mockJournalpostClient,
+            mockOppgaveClient
+        )
+        task.doTask(
+            Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = JOURNALPOST_UTGÅENDE_DOKUMENT).apply {
+                this.metadata["journalpostId"] = JOURNALPOST_UTGÅENDE_DOKUMENT
+            }
+        )
+        task.doTask(
+            Task(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_PAPIRSØKNAD).apply {
+                this.metadata["journalpostId"] = JOURNALPOST_PAPIRSØKNAD
+            }
+        )
 
         verify(exactly = 0) {
             mockTaskRepository.save(any<Task>())
@@ -291,22 +303,26 @@ class JournalføringHendelseServiceTest {
     @Test
     fun `Kaster exception dersom journalstatus annet enn MOTTATT`() {
         val task = OpprettJournalføringOppgaveTask(
-                mockJournalpostClient,
-                mockOppgaveClient)
+            mockJournalpostClient,
+            mockOppgaveClient
+        )
 
         Assertions.assertThrows(IllegalStateException::class.java) {
-            task.doTask(Task(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_FERDIGSTILT).apply {
-                this.metadata["journalpostId"] = JOURNALPOST_FERDIGSTILT
-            })
+            task.doTask(
+                Task(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_FERDIGSTILT).apply {
+                    this.metadata["journalpostId"] = JOURNALPOST_FERDIGSTILT
+                }
+            )
         }
     }
 
-
     @Test
     fun `Skal ignorere hendelse fordi den eksisterer i hendelseslogg`() {
-        val consumerRecord = ConsumerRecord("topic", 1,
-                                            OFFSET,
-                                            42L, opprettRecord(JOURNALPOST_PAPIRSØKNAD))
+        val consumerRecord = ConsumerRecord(
+            "topic", 1,
+            OFFSET,
+            42L, opprettRecord(JOURNALPOST_PAPIRSØKNAD)
+        )
         every {
             mockHendelsesloggRepository.existsByHendelseIdAndConsumer("hendelseId", HendelseConsumer.JOURNAL_AIVEN)
         } returns true
@@ -322,9 +338,11 @@ class JournalføringHendelseServiceTest {
 
     @Test
     fun `Mottak av gyldig hendelse skal delegeres til service`() {
-        val consumerRecord = ConsumerRecord("topic", 1,
-                                            OFFSET,
-                                            42L, opprettRecord(JOURNALPOST_PAPIRSØKNAD))
+        val consumerRecord = ConsumerRecord(
+            "topic", 1,
+            OFFSET,
+            42L, opprettRecord(JOURNALPOST_PAPIRSØKNAD)
+        )
 
         service.prosesserNyHendelse(consumerRecord, ack)
 
@@ -346,12 +364,13 @@ class JournalføringHendelseServiceTest {
     @Test
     fun `Ikke gyldige hendelsetyper skal ignoreres`() {
         val ugyldigHendelsetypeRecord = opprettRecord(journalpostId = JOURNALPOST_PAPIRSØKNAD, hendelseType = "UgyldigType", temaNytt = "BAR")
-        val consumerRecord = ConsumerRecord("topic", 1,
-                                            OFFSET,
-                                            42L, ugyldigHendelsetypeRecord)
+        val consumerRecord = ConsumerRecord(
+            "topic", 1,
+            OFFSET,
+            42L, ugyldigHendelsetypeRecord
+        )
 
         service.prosesserNyHendelse(consumerRecord, ack)
-
 
         verify { ack.acknowledge() }
         verify(exactly = 0) {
@@ -363,9 +382,11 @@ class JournalføringHendelseServiceTest {
     fun `Hendelser hvor journalpost ikke har tema for Barnetrygd skal ignoreres`() {
         val ukjentTemaRecord = opprettRecord(journalpostId = JOURNALPOST_PAPIRSØKNAD, temaNytt = "UKJ")
 
-        val consumerRecord = ConsumerRecord("topic", 1,
-                                            OFFSET,
-                                            42L, ukjentTemaRecord)
+        val consumerRecord = ConsumerRecord(
+            "topic", 1,
+            OFFSET,
+            42L, ukjentTemaRecord
+        )
 
         service.prosesserNyHendelse(consumerRecord, ack)
 
@@ -375,19 +396,23 @@ class JournalføringHendelseServiceTest {
         }
     }
 
-    private fun opprettRecord(journalpostId: String,
-                              hendelseType: String = "JournalpostMottatt",
-                              temaNytt: String = "BAR"): JournalfoeringHendelseRecord {
-        return JournalfoeringHendelseRecord(HENDELSE_ID,
-                                            1,
-                                            hendelseType,
-                                            journalpostId.toLong(),
-                                            "M",
-                                            "BAR",
-                                            temaNytt,
-                                            "SKAN_NETS",
-                                            "kanalReferanseId",
-                                            "BAR")
+    private fun opprettRecord(
+        journalpostId: String,
+        hendelseType: String = "JournalpostMottatt",
+        temaNytt: String = "BAR"
+    ): JournalfoeringHendelseRecord {
+        return JournalfoeringHendelseRecord(
+            HENDELSE_ID,
+            1,
+            hendelseType,
+            journalpostId.toLong(),
+            "M",
+            "BAR",
+            temaNytt,
+            "SKAN_NETS",
+            "kanalReferanseId",
+            "BAR"
+        )
     }
 
     companion object {

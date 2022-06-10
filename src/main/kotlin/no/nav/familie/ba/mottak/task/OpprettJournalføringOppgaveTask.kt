@@ -44,8 +44,10 @@ class OpprettJournalføringOppgaveTask(
                     } else null
 
                 if (oppgaveTypeForEksisterendeOppgave == null) {
-                    val nyOppgave = oppgaveClient.opprettJournalføringsoppgave(journalpost = journalpost,
-                                                                               beskrivelse = task.payload.takeIf { it.isNotEmpty() })
+                    val nyOppgave = oppgaveClient.opprettJournalføringsoppgave(
+                        journalpost = journalpost,
+                        beskrivelse = task.payload.takeIf { it.isNotEmpty() }
+                    )
                     task.metadata["oppgaveId"] = "${nyOppgave.oppgaveId}"
                     log.info("Oppretter ny journalførings-oppgave med id ${nyOppgave.oppgaveId} for journalpost ${journalpost.journalpostId}")
                     oppgaverOpprettetCounter.increment()
@@ -76,7 +78,7 @@ class OpprettJournalføringOppgaveTask(
     }
 
     private fun Oppgave.oppdaterOppgavebeskrivelse(beskrivelse: String) {
-        log.info("Oppdaterer oppgavebeskrivelse for eksisterende ${oppgavetype}-oppgave ${id}: $beskrivelse")
+        log.info("Oppdaterer oppgavebeskrivelse for eksisterende $oppgavetype-oppgave $id: $beskrivelse")
         oppgaveClient.oppdaterOppgaveBeskrivelse(this, beskrivelse)
     }
 
@@ -85,4 +87,3 @@ class OpprettJournalføringOppgaveTask(
         const val TASK_STEP_TYPE = "opprettJournalføringsoppgave"
     }
 }
-

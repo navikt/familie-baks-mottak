@@ -44,7 +44,6 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 
-
 @Service
 @TaskStepBeskrivelse(
     taskStepType = VurderLivshendelseTask.TASK_STEP_TYPE,
@@ -72,7 +71,7 @@ class VurderLivshendelseTask(
 
         when (payload.type) {
             DØDSFALL -> {
-                secureLog.info("Har mottat dødsfallshendelse for person ${personIdent}")
+                secureLog.info("Har mottat dødsfallshendelse for person $personIdent")
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-dødsfall")
                 secureLog.info("dødsfallshendelse person følselsdato = ${pdlPersonData.fødsel.firstOrNull()}")
                 if (pdlPersonData.dødsfall.firstOrNull()?.dødsdato == null) {
@@ -80,9 +79,11 @@ class VurderLivshendelseTask(
                     error("Har mottatt dødsfallshendelse uten dødsdato")
                 }
                 val berørteBrukereIBaSak = finnBrukereMedSakRelatertTilPerson(personIdent, pdlPersonData)
-                secureLog.info("berørteBrukereIBaSak count = ${berørteBrukereIBaSak.size}, identer = ${
+                secureLog.info(
+                    "berørteBrukereIBaSak count = ${berørteBrukereIBaSak.size}, identer = ${
                     berørteBrukereIBaSak.fold("") { identer, it -> identer + " " + it.ident }
-                }")
+                    }"
+                )
                 berørteBrukereIBaSak.forEach {
                     if (opprettEllerOppdaterVurderLivshendelseOppgave(DØDSFALL, it, personIdent, task)) {
                         oppgaveOpprettetDødsfallCounter.increment()
@@ -108,7 +109,7 @@ class VurderLivshendelseTask(
                     return
                 }
                 val aktivFaksak = sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
-                    secureLog.info("Hentet Fagsak for person ${personIdent}: ${it.fagsakId} ${it.fagsakStatus}")
+                    secureLog.info("Hentet Fagsak for person $personIdent: ${it.fagsakId} ${it.fagsakStatus}")
                     it.fagsakStatus == LØPENDE
                 }.singleOrNull()?.let { hentRestFagsak(it.fagsakId) }
 
@@ -170,14 +171,16 @@ class VurderLivshendelseTask(
 
         // Hvis person har barn, så sjekker man etter løpende sak på person
         val personHarBarn = familierelasjoner.filter { it.erBarn }.let { listeMedBarn ->
-            secureLog.info("finnBrukereMedSakRelatertTilPerson(): listeMedBarn size = ${listeMedBarn.size} identer = " +
-                                   listeMedBarn.fold("") { identer, it -> identer + " " + it.relatertPersonsIdent })
+            secureLog.info(
+                "finnBrukereMedSakRelatertTilPerson(): listeMedBarn size = ${listeMedBarn.size} identer = " +
+                    listeMedBarn.fold("") { identer, it -> identer + " " + it.relatertPersonsIdent }
+            )
             listeMedBarn.isNotEmpty()
         }
 
         if (personHarBarn) {
             brukereMedSakRelatertTilPerson += sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
-                secureLog.info("finnBrukereMedSakRelatertTilPerson(): Hentet Fagsak for person ${personIdent}: ${it.fagsakId} ${it.fagsakStatus}")
+                secureLog.info("finnBrukereMedSakRelatertTilPerson(): Hentet Fagsak for person $personIdent: ${it.fagsakId} ${it.fagsakStatus}")
                 it.fagsakStatus == LØPENDE
             }.map { Bruker(personIdent, it.fagsakId) }
         }
@@ -187,8 +190,9 @@ class VurderLivshendelseTask(
             brukereMedSakRelatertTilPerson += finnForeldreMedLøpendeSak(personIdent, familierelasjoner)
         }
 
-        secureLog.info("finnBrukereMedSakRelatertTilPerson(): brukere.size = ${brukereMedSakRelatertTilPerson.size} " +
-                               "identer = ${brukereMedSakRelatertTilPerson.fold("") { identer, it -> identer + " " + it.ident }}"
+        secureLog.info(
+            "finnBrukereMedSakRelatertTilPerson(): brukere.size = ${brukereMedSakRelatertTilPerson.size} " +
+                "identer = ${brukereMedSakRelatertTilPerson.fold("") { identer, it -> identer + " " + it.ident }}"
         )
 
         if (brukereMedSakRelatertTilPerson.isNotEmpty()) {
@@ -199,15 +203,16 @@ class VurderLivshendelseTask(
     }
 
     private fun personErBarn(pdlPersonData: PdlPersonData) = pdlPersonData.fødsel.isEmpty() || // Kan anta barn når data mangler
-            pdlPersonData.fødsel.first().fødselsdato.isAfter(LocalDate.now().minusYears(19))
+        pdlPersonData.fødsel.first().fødselsdato.isAfter(LocalDate.now().minusYears(19))
 
     private fun finnForeldreMedLøpendeSak(
         personIdent: String,
         familierelasjoner: List<PdlForeldreBarnRelasjon>
     ): List<Bruker> {
         return familierelasjoner.filter { !it.erBarn }.also { listeMedForeldreForBarn ->
-            secureLog.info("finnForeldreMedLøpendeSak(): listeMedForeldreForBarn.size = ${listeMedForeldreForBarn.size} " +
-                                   "identer = ${listeMedForeldreForBarn.fold("") { identer, it -> identer + " " + it.relatertPersonsIdent }}"
+            secureLog.info(
+                "finnForeldreMedLøpendeSak(): listeMedForeldreForBarn.size = ${listeMedForeldreForBarn.size} " +
+                    "identer = ${listeMedForeldreForBarn.fold("") { identer, it -> identer + " " + it.relatertPersonsIdent }}"
             )
         }.mapNotNull { forelder ->
             forelder.relatertPersonsIdent?.let {
@@ -242,16 +247,17 @@ class VurderLivshendelseTask(
             task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
             secureLog.info(
                 "Opprettet VurderLivshendelse-oppgave (${oppgave.oppgaveId}) for $hendelseType-hendelse (person ident:  ${bruker.ident})" +
-                        ", beskrivelsestekst: $beskrivelse"
+                    ", beskrivelsestekst: $beskrivelse"
             )
             return true
         } else {
             log.info("Fant åpen oppgave på aktørId=$aktørId oppgaveId=${åpenOppgave.id}")
             secureLog.info("Fant åpen oppgave: $åpenOppgave")
-            val beskrivelse = leggTilNyPersonIBeskrivelse(beskrivelse = åpenOppgave.beskrivelse!!,
-                                                          personIdent = personIdent,
-                                                          personErBruker = åpenOppgave.identer?.map { it.ident }
-                                                              ?.contains(personIdent)
+            val beskrivelse = leggTilNyPersonIBeskrivelse(
+                beskrivelse = åpenOppgave.beskrivelse!!,
+                personIdent = personIdent,
+                personErBruker = åpenOppgave.identer?.map { it.ident }
+                    ?.contains(personIdent)
             )
 
             oppdaterOppgaveMedNyBeskrivelse(åpenOppgave, beskrivelse)
@@ -280,7 +286,7 @@ class VurderLivshendelseTask(
             is OppgaveResponse -> {
                 secureLog.info(
                     "Opprettet VurderLivshendelse-oppgave (${oppgave.oppgaveId}) for $SIVILSTAND-hendelse (person ident:  $personIdent)" +
-                            ", beskrivelsestekst: $beskrivelse"
+                        ", beskrivelsestekst: $beskrivelse"
                 )
                 oppgaveOpprettetSivilstandCounter.increment()
                 task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
@@ -294,7 +300,6 @@ class VurderLivshendelseTask(
             }
         }
     }
-
 
     private fun leggTilNyPersonIBeskrivelse(beskrivelse: String, personIdent: String, personErBruker: Boolean?): String {
         return when (personErBruker) {
@@ -330,8 +335,8 @@ class VurderLivshendelseTask(
         secureLog.info("Fant følgende oppgaver: $vurderLivshendelseOppgaver")
         return vurderLivshendelseOppgaver.firstOrNull {
             it.beskrivelse?.startsWith(type.beskrivelse) == true && (
-                    it.status != StatusEnum.FERDIGSTILT || it.status != StatusEnum.FEILREGISTRERT
-                    )
+                it.status != StatusEnum.FERDIGSTILT || it.status != StatusEnum.FEILREGISTRERT
+                )
         }
     }
 

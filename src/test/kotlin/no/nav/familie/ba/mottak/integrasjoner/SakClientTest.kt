@@ -16,7 +16,6 @@ import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.test.context.ActiveProfiles
 import java.io.IOException
 
-
 @SpringBootTest(classes = [DevLauncher::class], properties = ["FAMILIE_BA_SAK_API_URL=http://localhost:28085/api"])
 @ActiveProfiles("dev", "mock-oauth")
 @AutoConfigureWireMock(port = 28085)
@@ -29,11 +28,15 @@ class SakClientTest {
     @Test
     @Tag("integration")
     fun `hentSaksnummer skal returnere fagsakId`() {
-        stubFor(post(urlEqualTo("/api/fagsaker"))
-            .withRequestBody(equalToJson("{ \"personIdent\": \"$personIdent\" }"))
-                        .willReturn(aResponse()
-                                            .withHeader("Content-Type", "application/json")
-                                            .withBody(gyldigResponse())))
+        stubFor(
+            post(urlEqualTo("/api/fagsaker"))
+                .withRequestBody(equalToJson("{ \"personIdent\": \"$personIdent\" }"))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(gyldigResponse())
+                )
+        )
 
         val response = sakClient.hentSaksnummer(personIdent)
         Assertions.assertThat(response).isEqualTo(fagsakId.toString())

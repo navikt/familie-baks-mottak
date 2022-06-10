@@ -30,8 +30,10 @@ import no.nav.familie.kontrakter.ba.infotrygd.Sak as SakDto
 import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 
 @Service
-@TaskStepBeskrivelse(taskStepType = JournalhendelseRutingTask.TASK_STEP_TYPE,
-                     beskrivelse = "Håndterer ruting og markering av sakssystem")
+@TaskStepBeskrivelse(
+    taskStepType = JournalhendelseRutingTask.TASK_STEP_TYPE,
+    beskrivelse = "Håndterer ruting og markering av sakssystem"
+)
 class JournalhendelseRutingTask(
     private val pdlClient: PdlClient,
     private val sakClient: SakClient,
@@ -66,9 +68,11 @@ class JournalhendelseRutingTask(
             } // trenger ingen form for markering. Kan løses av begge systemer
         }
 
-        Task(type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
-                    payload = sakssystemMarkering,
-                    properties = task.metadata).apply { taskRepository.save(this) }
+        Task(
+            type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
+            payload = sakssystemMarkering,
+            properties = task.metadata
+        ).apply { taskRepository.save(this) }
     }
 
     private fun incrementSakssystemMarkering(saksystem: String) {
@@ -85,16 +89,18 @@ class JournalhendelseRutingTask(
             return Pair(null, null)
         }
         val barnasIdenter = pdlClient.hentPersonMedRelasjoner(brukersIdent).forelderBarnRelasjoner
-                .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
-                .map { it.relatertPersonsIdent }
-                .filterNotNull()
+            .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
+            .map { it.relatertPersonsIdent }
+            .filterNotNull()
         val alleBarnasIdenter = barnasIdenter.flatMap { pdlClient.hentIdenter(it) }
-                .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
-                .map { it.ident }
+            .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
+            .map { it.ident }
 
-        return Pair(first = sakClient.hentRestFagsakDeltagerListe(brukersIdent, barnasIdenter).sakspart(sakClient),
-                    second = infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, alleBarnasIdenter).sakspart
-                             ?: infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).sakspart)
+        return Pair(
+            first = sakClient.hentRestFagsakDeltagerListe(brukersIdent, barnasIdenter).sakspart(sakClient),
+            second = infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, alleBarnasIdenter).sakspart
+                ?: infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).sakspart
+        )
     }
 
     fun Sakspart?.finnes(): Boolean = this != null
@@ -116,7 +122,7 @@ private fun List<SakDto>.harSak(): Boolean {
     val (sakerMedVedtak, sakerUtenVedtak) = this.partition { it.stønad != null }
 
     return sakerMedVedtak.let { saker -> saker.isNotEmpty() && !personErMigrert(saker) } ||
-           sakerUtenVedtak.any { it.status != StatusKode.FB.name }
+        sakerUtenVedtak.any { it.status != StatusKode.FB.name }
 }
 
 private fun personErMigrert(saker: List<no.nav.familie.kontrakter.ba.infotrygd.Sak>): Boolean {
@@ -145,7 +151,7 @@ private fun RestFagsakDeltager.harPågåendeSak(sakClient: SakClient): Boolean {
 
 private fun sisteBehandlingHenlagtEllerTekniskOpphør(fagsak: RestFagsak): Boolean {
     val sisteBehandling = fagsak.behandlinger
-                                  .sortedBy { it.opprettetTidspunkt }
-                                  .findLast { it.steg == "BEHANDLING_AVSLUTTET" } ?: return false
+        .sortedBy { it.opprettetTidspunkt }
+        .findLast { it.steg == "BEHANDLING_AVSLUTTET" } ?: return false
     return sisteBehandling.type == "TEKNISK_OPPHØR" || sisteBehandling.resultat.startsWith("HENLAGT")
 }

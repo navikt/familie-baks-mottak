@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service
 import java.util.UUID
 import javax.transaction.Transactional
 
-
 /**
  * Lytter på en kafka topic fra familie-ef-iverksatt og sender til ba-sak. Retention på topic er satt til 720 timer.
  *
@@ -30,7 +29,6 @@ import javax.transaction.Transactional
     matchIfMissing = true
 )
 class EnsligForsørgerVedtakHendelseConsumer(val vedtakOmOvergangsstønadService: EnsligForsørgerHendelseService) {
-
 
     val ensligForsørgerVedtakhendelseFeilCounter: Counter = Metrics.counter("ef.hendelse.vedtak.feil")
 

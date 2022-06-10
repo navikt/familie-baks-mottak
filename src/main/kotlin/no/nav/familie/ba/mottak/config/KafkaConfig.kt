@@ -1,6 +1,5 @@
 package no.nav.familie.ba.mottak.config
 
-import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import no.nav.person.pdl.aktor.v2.Aktor
 import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.clients.consumer.ConsumerConfig

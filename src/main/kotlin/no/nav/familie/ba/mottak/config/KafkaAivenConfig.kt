@@ -16,7 +16,6 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.listener.ContainerProperties
 import java.time.Duration
 
-
 @Configuration
 @ConditionalOnProperty(
     value = ["funksjonsbrytere.kafka.enabled"],
@@ -26,8 +25,7 @@ import java.time.Duration
 class KafkaAivenConfig(val environment: Environment) {
 
     @Bean
-    fun kafkaAivenHendelseListenerContainerFactory(kafkaRestartingErrorHandler: KafkaRestartingErrorHandler)
-            : ConcurrentKafkaListenerContainerFactory<String, String> {
+    fun kafkaAivenHendelseListenerContainerFactory(kafkaRestartingErrorHandler: KafkaRestartingErrorHandler): ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
         factory.containerProperties.authExceptionRetryInterval = Duration.ofSeconds(2)
@@ -37,8 +35,7 @@ class KafkaAivenConfig(val environment: Environment) {
     }
 
     @Bean
-    fun kafkaAivenHendelseListenerAvroContainerFactory(kafkaRestartingErrorHandler: KafkaRestartingErrorHandler)
-            : ConcurrentKafkaListenerContainerFactory<String, String> {
+    fun kafkaAivenHendelseListenerAvroContainerFactory(kafkaRestartingErrorHandler: KafkaRestartingErrorHandler): ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
         factory.containerProperties.authExceptionRetryInterval = Duration.ofSeconds(2)
@@ -77,7 +74,7 @@ class KafkaAivenConfig(val environment: Environment) {
             ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaBrokers,
             "schema.registry.url" to schemaRegisty,
             "basic.auth.credentials.source" to "USER_INFO",
-            "basic.auth.user.info" to "${schemaRegistryUser}:${schemaRegistryPassword}",
+            "basic.auth.user.info" to "$schemaRegistryUser:$schemaRegistryPassword",
             "specific.avro.reader" to true,
             ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
             ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java,

@@ -16,9 +16,9 @@ class OAuth2AccessTokenTestConfig {
     @Bean
     @Primary fun oAuth2AccessTokenServiceMock(): OAuth2AccessTokenService? {
         val tokenMockService =
-                Mockito.mock(OAuth2AccessTokenService::class.java)
+            Mockito.mock(OAuth2AccessTokenService::class.java)
         Mockito.`when`(tokenMockService.getAccessToken(ArgumentMatchers.any()))
-                .thenReturn(OAuth2AccessTokenResponse("Mock-token-response", 60, 60, null))
+            .thenReturn(OAuth2AccessTokenResponse("Mock-token-response", 60, 60, null))
         return tokenMockService
     }
 }

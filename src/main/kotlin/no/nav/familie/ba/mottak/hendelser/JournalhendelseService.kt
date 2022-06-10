@@ -80,7 +80,7 @@ class JournalhendelseService(
                 consumerRecord.offset(),
                 hendelseRecord.hendelsesId.toString(),
                 hendelseConsumer,
-                mapOf (
+                mapOf(
                     "journalpostId" to hendelseRecord.journalpostId.toString(),
                     "hendelsesType" to hendelseRecord.hendelsesType.toString()
                 ).toProperties()
@@ -92,8 +92,10 @@ class JournalhendelseService(
         return if (this.isNotBlank()) this.toString() else null
     }
 
-    fun bareLagreLoggOgAckAiven(consumerRecord: ConsumerRecord<Long, JournalfoeringHendelseRecord>,
-                           ack: Acknowledgment) {
+    fun bareLagreLoggOgAckAiven(
+        consumerRecord: ConsumerRecord<Long, JournalfoeringHendelseRecord>,
+        ack: Acknowledgment
+    ) {
         val hendelseRecord = consumerRecord.value()
         if (erGyldigHendelsetype(hendelseRecord)) {
             if (!hendelsesloggRepository.existsByHendelseIdAndConsumer(
@@ -108,12 +110,12 @@ class JournalhendelseService(
     }
 
     private fun erGyldigHendelsetype(hendelseRecord: JournalfoeringHendelseRecord): Boolean {
-        return GYLDIGE_HENDELSE_TYPER.contains(hendelseRecord.hendelsesType.toString())
-                && (hendelseRecord.temaNytt != null && hendelseRecord.temaNytt.toString() == "BAR")
+        return GYLDIGE_HENDELSE_TYPER.contains(hendelseRecord.hendelsesType.toString()) &&
+            (hendelseRecord.temaNytt != null && hendelseRecord.temaNytt.toString() == "BAR")
     }
 
     fun behandleJournalhendelse(hendelseRecord: JournalfoeringHendelseRecord) {
-        //hent journalpost fra saf
+        // hent journalpost fra saf
         val journalpostId = hendelseRecord.journalpostId.toString()
         val journalpost = journalpostClient.hentJournalpost(journalpostId)
         if (skalBehandleJournalpost(journalpost)) {
@@ -169,7 +171,6 @@ class JournalhendelseService(
 
     private fun skalBehandleJournalpost(journalpost: Journalpost) =
         journalpost.tema == "BAR" && journalpost.journalposttype == Journalposttype.I
-
 
     private fun opprettJournalhendelseRutingTask(journalpost: Journalpost) {
         Task(

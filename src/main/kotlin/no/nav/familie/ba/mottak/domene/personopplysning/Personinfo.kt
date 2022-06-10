@@ -5,32 +5,33 @@ import java.util.Collections
 
 @Deprecated("Fjernes når barnetrygd er ute av infotrygd")
 data class Personinfo(
-        var personIdent: PersonIdent?,
-        var navn: String?,
-        var bostedsadresse: Adresseinfo?,
-        var kjønn: String?,
-        var fødselsdato: LocalDate?,
-        var dødsdato: LocalDate?,
-        var personstatus: PersonstatusType?,
-        var sivilstand: SivilstandType?,
-        var familierelasjoner: Set<Familierelasjon>? = Collections.emptySet(),
-        var statsborgerskap: Landkode?,
-        var utlandsadresse: String?,
-        var geografiskTilknytning: String?,
-        var diskresjonskode: String?,
-        var adresseLandkode: String?)
+    var personIdent: PersonIdent?,
+    var navn: String?,
+    var bostedsadresse: Adresseinfo?,
+    var kjønn: String?,
+    var fødselsdato: LocalDate?,
+    var dødsdato: LocalDate?,
+    var personstatus: PersonstatusType?,
+    var sivilstand: SivilstandType?,
+    var familierelasjoner: Set<Familierelasjon>? = Collections.emptySet(),
+    var statsborgerskap: Landkode?,
+    var utlandsadresse: String?,
+    var geografiskTilknytning: String?,
+    var diskresjonskode: String?,
+    var adresseLandkode: String?
+)
 
 data class Adresseinfo(
-        var gjeldendePostadresseType: AdresseType?,
-        var mottakerNavn: String?,
-        var adresselinje1: String?,
-        var adresselinje2: String?,
-        var adresselinje3: String?,
-        var adresselinje4: String?,
-        var postNr: String?,
-        var poststed: String?,
-        var land: String?,
-        var personstatus: PersonstatusType?
+    var gjeldendePostadresseType: AdresseType?,
+    var mottakerNavn: String?,
+    var adresselinje1: String?,
+    var adresselinje2: String?,
+    var adresselinje3: String?,
+    var adresselinje4: String?,
+    var postNr: String?,
+    var poststed: String?,
+    var land: String?,
+    var personstatus: PersonstatusType?
 )
 
 enum class PersonstatusType {
@@ -59,4 +60,3 @@ data class Landkode(var kode: String?) {
         val NORGE = Landkode("NOR")
     }
 }
-

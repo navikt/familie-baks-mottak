@@ -25,14 +25,14 @@ import kotlin.test.assertNotEquals
 @ActiveProfiles("postgres")
 @Tag("integration")
 @SpringBootTest(classes = [DevLauncherPostgres::class])
-class SøknadsfeltSpråkTest (
+class SøknadsfeltSpråkTest(
     @Autowired val søknadSpråkvelgerService: SøknadSpråkvelgerService,
 ) {
     @Test
-    fun `Kan velge språk for søknadsfelter`(){
+    fun `Kan velge språk for søknadsfelter`() {
         val søknad: Søknad = mockk()
-        every {søknad.originalSpråk } returns "nb"
-        every {søknad.spørsmål} returns mapOf(
+        every { søknad.originalSpråk } returns "nb"
+        every { søknad.spørsmål } returns mapOf(
             "testSpørsmål" to Søknadsfelt(
                 label = mapOf(
                     "nb" to "TestSpørsmål",
@@ -58,8 +58,8 @@ class SøknadsfeltSpråkTest (
     @Test
     fun `Påvirker ikke global objectmapping`() {
         val søknad: Søknad = mockk()
-        every {søknad.originalSpråk } returns "nb"
-        every {søknad.spørsmål} returns mapOf(
+        every { søknad.originalSpråk } returns "nb"
+        every { søknad.spørsmål } returns mapOf(
             "testSpørsmål" to Søknadsfelt(
                 label = mapOf(
                     "nb" to "TestSpørsmål",
@@ -82,8 +82,8 @@ class SøknadsfeltSpråkTest (
     @Test
     fun `Håndterer nested SøknadsFelter korrekt`() {
         val søknad: Søknad = mockk()
-        every {søknad.originalSpråk } returns "nb"
-        every {søknad.spørsmål} returns mapOf(
+        every { søknad.originalSpråk } returns "nb"
+        every { søknad.spørsmål } returns mapOf(
             "testSpørsmål" to Søknadsfelt(
                 label = mapOf(
                     "nb" to "TestSpørsmål",
@@ -126,8 +126,8 @@ class SøknadsfeltSpråkTest (
     @Test
     fun `Håndterer språkvalg for ekstratekster`() {
         val søknad: Søknad = mockk()
-        every {søknad.originalSpråk } returns "nb"
-        every {søknad.teksterUtenomSpørsmål } returns mapOf(
+        every { søknad.originalSpråk } returns "nb"
+        every { søknad.teksterUtenomSpørsmål } returns mapOf(
             "test.tekst" to mapOf(
                 "nb" to "TestTekst",
                 "en" to "TestText"

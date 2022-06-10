@@ -2,11 +2,11 @@ package no.nav.familie.ba.mottak.søknad
 
 import no.nav.familie.kontrakter.ba.søknad.SIVILSTANDTYPE
 import no.nav.familie.kontrakter.ba.søknad.SøknadAdresse
+import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
+import no.nav.familie.kontrakter.ba.søknad.v5.RegistrertBostedType
 import no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
-import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg
-import no.nav.familie.kontrakter.ba.søknad.v5.RegistrertBostedType
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt as SøknadsfeltV4
 import no.nav.familie.kontrakter.ba.søknad.v8.Barn as BarnV8
 import no.nav.familie.kontrakter.ba.søknad.v8.Søker as SøkerV8
@@ -104,5 +104,3 @@ object SøknadTestData {
         teksterUtenomSpørsmål = mapOf()
     )
 }
-
-

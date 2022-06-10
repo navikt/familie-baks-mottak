@@ -18,18 +18,18 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 @EnableJdbcAuditing
 @EnableJdbcRepositories("no.nav.familie.prosessering")
 @EnableJpaRepositories(
-        "no.nav.familie",
-        excludeFilters = [ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = arrayOf(TaskRepository::class))]
+    "no.nav.familie",
+    excludeFilters = [ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = arrayOf(TaskRepository::class))]
 )
 @EnableJpaAuditing
-class DatabaseConfig: AbstractJdbcConfiguration() {
+class DatabaseConfig : AbstractJdbcConfiguration() {
     @Bean
     override fun jdbcCustomConversions(): JdbcCustomConversions {
         return JdbcCustomConversions(
-                listOf(
-                        PropertiesWrapperTilStringConverter(),
-                        StringTilPropertiesWrapperConverter()
-                )
+            listOf(
+                PropertiesWrapperTilStringConverter(),
+                StringTilPropertiesWrapperConverter()
+            )
         )
     }
 }

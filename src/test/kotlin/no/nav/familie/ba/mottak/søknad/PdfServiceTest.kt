@@ -11,12 +11,12 @@ import no.nav.familie.ba.mottak.integrasjoner.PdfClient
 import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
 import no.nav.familie.ba.mottak.søknad.domene.SøknadSpråkvelgerService
 import no.nav.familie.ba.mottak.søknad.domene.SøknadV8
-import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadKontraktV8
 import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.io.File
+import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadKontraktV8
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class PdfServiceTest {

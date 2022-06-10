@@ -1,6 +1,5 @@
 package no.nav.familie.ba.mottak.søknad
 
-
 import no.nav.familie.ba.mottak.DevLauncherPostgres
 import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
 import no.nav.familie.ba.mottak.task.JournalførSøknadTask
@@ -16,7 +15,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.util.Properties
-
 
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(initializers = [DbContainerInitializer::class])

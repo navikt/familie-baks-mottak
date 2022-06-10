@@ -58,7 +58,6 @@ class EnsligForsørgerHendelseService(
                 ensligForsørgerVedtakhendelseAnnetCounter.increment()
             }
         }
-
     }
 
     fun prosesserEfInfotrygdHendelse(offset: Long, hendelse: InfotrygdHendelse) {

@@ -17,7 +17,7 @@ import org.springframework.kafka.listener.MessageListenerContainer
 class KafkaRestartingErrorHandlerTest {
 
     @MockK(relaxed = true)
-    lateinit var container: MessageListenerContainer;
+    lateinit var container: MessageListenerContainer
 
     @MockK(relaxed = true)
     lateinit var consumer: Consumer<*, *>
@@ -34,24 +34,24 @@ class KafkaRestartingErrorHandlerTest {
     @Test
     fun `skal stoppe container hvis man mottar feil med en tom liste med records`() {
         assertThatThrownBy { errorHandler.handleRemaining(RuntimeException("Feil i test"), emptyList(), consumer, container) }
-                .hasMessageContaining("Feil i test")
-                .hasCauseExactlyInstanceOf(RuntimeException::class.java)
+            .hasMessageContaining("Feil i test")
+            .hasCauseExactlyInstanceOf(RuntimeException::class.java)
     }
 
     @Test
     fun `skal stoppe container hvis man mottar feil med en liste med records`() {
         val consumerRecord = ConsumerRecord("topic", 1, 1, 1, "record")
         assertThatThrownBy { errorHandler.handleRemaining(RuntimeException("Feil i test"), listOf(consumerRecord), consumer, container) }
-                .hasMessageContaining("Feil i test")
-                .isInstanceOf(KafkaException::class.java)
-                .hasCauseExactlyInstanceOf(RuntimeException::class.java)
+            .hasMessageContaining("Feil i test")
+            .isInstanceOf(KafkaException::class.java)
+            .hasCauseExactlyInstanceOf(RuntimeException::class.java)
     }
 
     @Test
     fun `skal stoppe container hvis man mottar feil hvor liste med records er null`() {
         val consumerRecord = ConsumerRecord("topic", 1, 1, 1, "record")
         assertThatThrownBy { errorHandler.handleRemaining(RuntimeException("Feil i test"), null, consumer, container) }
-                .hasMessageContaining("Feil i test")
-                .hasCauseExactlyInstanceOf(RuntimeException::class.java)
+            .hasMessageContaining("Feil i test")
+            .hasCauseExactlyInstanceOf(RuntimeException::class.java)
     }
 }

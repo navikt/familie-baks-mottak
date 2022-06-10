@@ -6,7 +6,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Month
 
-
 fun fristFerdigstillelse(daysToAdd: Long = 0): LocalDate {
     var date = LocalDateTime.now().plusDays(daysToAdd)
 

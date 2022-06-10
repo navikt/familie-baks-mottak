@@ -23,7 +23,7 @@ import java.util.Optional
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MottaAnnullerFødselTaskTest {
 
-    private val sakClient = mockk<SakClient>();
+    private val sakClient = mockk<SakClient>()
 
     @Test
     fun `Skal endre status av Task med riktig type`() {
@@ -148,5 +148,4 @@ class MottaAnnullerFødselTaskTest {
         assertThat(barnasIdenterSlot.captured.any { it == barnsIdenter[1] }).isTrue()
         assertThat(tidligereHendelseIdSlot.captured).isEqualTo("ooo")
     }
-
 }

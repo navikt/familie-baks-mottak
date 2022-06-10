@@ -40,7 +40,7 @@ class IdenthendelseConsumer(
     @Transactional
     fun listen(consumerRecord: ConsumerRecord<String, Aktor?>, ack: Acknowledgment) {
         try {
-            Thread.sleep(60000) //Sender man med en gang, så får man Person ikke funnet fra PDL når ba-sak gjør filtrering. Venter derfor 1 minutt
+            Thread.sleep(60000) // Sender man med en gang, så får man Person ikke funnet fra PDL når ba-sak gjør filtrering. Venter derfor 1 minutt
             MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
             SECURE_LOGGER.info("Har mottatt ident-hendelse $consumerRecord")
 
@@ -57,7 +57,6 @@ class IdenthendelseConsumer(
                 SECURE_LOGGER.info("Sender ident-hendelse til ba-sak for ident $folkeregisterident")
                 sakClient.sendIdenthendelseTilSak(PersonIdent(ident = folkeregisterident.idnummer.toString()))
             }
-
         } catch (e: RuntimeException) {
             identhendelseFeiletCounter.increment()
             log.warn("Feil i prosessering av ident-hendelser", e)
