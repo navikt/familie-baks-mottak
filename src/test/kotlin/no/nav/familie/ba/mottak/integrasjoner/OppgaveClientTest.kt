@@ -105,7 +105,8 @@ class OppgaveClientTest {
                             oppgavetype = "Journalføring",
                             behandlingstema = Behandlingstema.OrdinærBarnetrygd.value,
                             beskrivelse = "Tittel"
-                        ), true, true
+                        ),
+                        true, true
                     )
                 )
         )
@@ -143,7 +144,8 @@ class OppgaveClientTest {
                             oppgavetype = "BehandleSak",
                             behandlingstema = Behandlingstema.OrdinærBarnetrygd.value,
                             beskrivelse = "Tittel"
-                        ), true, true
+                        ),
+                        true, true
                     )
                 )
         )
@@ -237,7 +239,6 @@ class OppgaveClientTest {
         assertThat(oppgaveListe).isEmpty()
     }
 
-
     private fun forventetOpprettOppgaveRequestJson(
         journalpostId: String,
         oppgavetype: String,
@@ -245,20 +246,20 @@ class OppgaveClientTest {
         beskrivelse: String
     ): String {
         return "{\n" +
-                "  \"ident\": {\n" +
-                "    \"ident\": \"1234567891011\",\n" +
-                "    \"gruppe\": \"AKTOERID\"\n" +
-                "  },\n" +
-                "  \"enhetsnummer\": \"9999\",\n" +
-                "  \"journalpostId\": \"$journalpostId\",\n" +
-                "  \"tema\": \"BAR\",\n" +
-                "  \"oppgavetype\": \"$oppgavetype\",\n" +
-                "  \"behandlingstema\": \"$behandlingstema\",\n" +
-                "  \"fristFerdigstillelse\": \"2020-04-01\",\n" +
-                "  \"aktivFra\": \"${LocalDate.now()}\",\n" +
-                "  \"beskrivelse\": \"${beskrivelse}\",\n" +
-                "  \"prioritet\": \"NORM\"\n" +
-                "}"
+            "  \"ident\": {\n" +
+            "    \"ident\": \"1234567891011\",\n" +
+            "    \"gruppe\": \"AKTOERID\"\n" +
+            "  },\n" +
+            "  \"enhetsnummer\": \"9999\",\n" +
+            "  \"journalpostId\": \"$journalpostId\",\n" +
+            "  \"tema\": \"BAR\",\n" +
+            "  \"oppgavetype\": \"$oppgavetype\",\n" +
+            "  \"behandlingstema\": \"$behandlingstema\",\n" +
+            "  \"fristFerdigstillelse\": \"2020-04-01\",\n" +
+            "  \"aktivFra\": \"${LocalDate.now()}\",\n" +
+            "  \"beskrivelse\": \"${beskrivelse}\",\n" +
+            "  \"prioritet\": \"NORM\"\n" +
+            "}"
     }
 
     companion object {

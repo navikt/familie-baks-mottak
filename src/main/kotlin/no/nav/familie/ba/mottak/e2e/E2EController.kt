@@ -27,32 +27,32 @@ import java.util.UUID
 import kotlin.random.Random
 import kotlin.random.nextUInt
 
-
 @RestController
 @RequestMapping("/internal/e2e")
 @Profile(value = ["dev", "postgres", "e2e"])
-class E2EController(private val leesahService: LeesahService,
-                    private val journalhendelseService: JournalhendelseService,
-                    private val hendelsesloggRepository: HendelsesloggRepository,
-                    private val taskRepository: TaskRepository,
-                    private val databaseCleanupService: DatabaseCleanupService) {
+class E2EController(
+    private val leesahService: LeesahService,
+    private val journalhendelseService: JournalhendelseService,
+    private val hendelsesloggRepository: HendelsesloggRepository,
+    private val taskRepository: TaskRepository,
+    private val databaseCleanupService: DatabaseCleanupService
+) {
 
     val logger: Logger = LoggerFactory.getLogger(E2EController::class.java)
-
-
 
     @PostMapping(path = ["/pdl/foedsel"], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun pdlHendelseFødsel(@RequestBody personIdenter: List<String>): String {
         logger.info("Oppretter fødselshendelse e2e")
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse = PdlHendelse(
-                offset = Random.nextUInt().toLong(),
-                gjeldendeAktørId = personIdenter.first { it.length == 13 },
-                hendelseId = hendelseId,
-                personIdenter = personIdenter,
-                endringstype = LeesahService.OPPRETTET,
-                opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
-                fødselsdato = LocalDate.now())
+            offset = Random.nextUInt().toLong(),
+            gjeldendeAktørId = personIdenter.first { it.length == 13 },
+            hendelseId = hendelseId,
+            personIdenter = personIdenter,
+            endringstype = LeesahService.OPPRETTET,
+            opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
+            fødselsdato = LocalDate.now()
+        )
 
         leesahService.prosesserNyHendelse(pdlHendelse)
         return hendelseId
@@ -63,13 +63,14 @@ class E2EController(private val leesahService: LeesahService,
         logger.info("Oppretter dødshendelse e2e")
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse = PdlHendelse(
-                offset = Random.nextUInt().toLong(),
-                gjeldendeAktørId = personIdenter.first { it.length == 13 },
-                hendelseId = hendelseId,
-                personIdenter = personIdenter,
-                endringstype = LeesahService.OPPRETTET,
-                opplysningstype = LeesahService.OPPLYSNINGSTYPE_DØDSFALL,
-                dødsdato = LocalDate.now())
+            offset = Random.nextUInt().toLong(),
+            gjeldendeAktørId = personIdenter.first { it.length == 13 },
+            hendelseId = hendelseId,
+            personIdenter = personIdenter,
+            endringstype = LeesahService.OPPRETTET,
+            opplysningstype = LeesahService.OPPLYSNINGSTYPE_DØDSFALL,
+            dødsdato = LocalDate.now()
+        )
 
         leesahService.prosesserNyHendelse(pdlHendelse)
         return hendelseId
@@ -80,13 +81,14 @@ class E2EController(private val leesahService: LeesahService,
         logger.info("Oppretter utflyttingshendlse e2e")
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse = PdlHendelse(
-                offset = Random.nextUInt().toLong(),
-                gjeldendeAktørId = personIdenter.first { it.length == 13 },
-                hendelseId = hendelseId,
-                personIdenter = personIdenter,
-                endringstype = LeesahService.OPPRETTET,
-                opplysningstype = LeesahService.OPPLYSNINGSTYPE_UTFLYTTING,
-                utflyttingsdato = LocalDate.now())
+            offset = Random.nextUInt().toLong(),
+            gjeldendeAktørId = personIdenter.first { it.length == 13 },
+            hendelseId = hendelseId,
+            personIdenter = personIdenter,
+            endringstype = LeesahService.OPPRETTET,
+            opplysningstype = LeesahService.OPPLYSNINGSTYPE_UTFLYTTING,
+            utflyttingsdato = LocalDate.now()
+        )
 
         leesahService.prosesserNyHendelse(pdlHendelse)
         return hendelseId
@@ -97,16 +99,17 @@ class E2EController(private val leesahService: LeesahService,
         logger.info("Oppretter journalhendelse e2e")
         val hendelseid = UUID.randomUUID().toString()
         var journalHendelse = JournalfoeringHendelseRecord(
-                hendelseid,
-                1,
-                "MidlertidigJournalført",
-                journalpost.journalpostId,
-                null, //Må settes på selve journalposten
-                "BAR",
-                "BAR",
-                null, //Må settes på selve journalposten
-                "e2e-$hendelseid",
-                null) //Kan settes på selve journalposten
+            hendelseid,
+            1,
+            "MidlertidigJournalført",
+            journalpost.journalpostId,
+            null, // Må settes på selve journalposten
+            "BAR",
+            "BAR",
+            null, // Må settes på selve journalposten
+            "e2e-$hendelseid",
+            null
+        ) // Kan settes på selve journalposten
 
         val cr = ConsumerRecord("topic", 1, 1, 1L, journalHendelse)
         val acknowledgment = E2EAcknowledgment()
@@ -122,14 +125,18 @@ class E2EController(private val leesahService: LeesahService,
     }
 
     @GetMapping(path = ["/hendelselogg/{hendelseId}/{consumer}"])
-    fun hentHendelselogg(@PathVariable(name = "hendelseId", required = true) hendelseId: String,
-                         @PathVariable(name = "consumer", required = true) consumer: HendelseConsumer): Boolean {
+    fun hentHendelselogg(
+        @PathVariable(name = "hendelseId", required = true) hendelseId: String,
+        @PathVariable(name = "consumer", required = true) consumer: HendelseConsumer
+    ): Boolean {
         return hendelsesloggRepository.existsByHendelseIdAndConsumer(hendelseId, consumer)
     }
 
     @GetMapping(path = ["/task/{key}/{value}"])
-    fun hentTaskMedProperty(@PathVariable(name = "key", required = true) key: String,
-                            @PathVariable(name = "value", required = true) value: String): List<Task> {
+    fun hentTaskMedProperty(
+        @PathVariable(name = "key", required = true) key: String,
+        @PathVariable(name = "value", required = true) value: String
+    ): List<Task> {
         return taskRepository.findAll().filter { it.metadata[key] == value }
     }
 
@@ -146,7 +153,6 @@ class E2EController(private val leesahService: LeesahService,
         override fun acknowledge() {
             ack = true
         }
-
     }
 
     data class Journalpost(val journalpostId: Long)

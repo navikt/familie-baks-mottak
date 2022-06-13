@@ -17,23 +17,29 @@ import java.util.Locale
 private val logger = LoggerFactory.getLogger(OppgaveMapper::class.java)
 
 @Service
-class OppgaveMapper(private val hentEnhetClient: HentEnhetClient,
-                    private val pdlClient: PdlClient) {
+class OppgaveMapper(
+    private val hentEnhetClient: HentEnhetClient,
+    private val pdlClient: PdlClient
+) {
 
-    fun mapTilOpprettOppgave(oppgavetype: Oppgavetype,
-                             journalpost: Journalpost,
-                             beskrivelse: String? = null): OpprettOppgaveRequest {
+    fun mapTilOpprettOppgave(
+        oppgavetype: Oppgavetype,
+        journalpost: Journalpost,
+        beskrivelse: String? = null
+    ): OpprettOppgaveRequest {
         val ident = tilOppgaveIdent(journalpost, oppgavetype)
-        return OpprettOppgaveRequest(ident = ident,
-                                     saksId = journalpost.sak?.fagsakId,
-                                     journalpostId = journalpost.journalpostId,
-                                     tema = Tema.BAR,
-                                     oppgavetype = oppgavetype,
-                                     fristFerdigstillelse = fristFerdigstillelse(),
-                                     beskrivelse = tilBeskrivelse(journalpost, beskrivelse),
-                                     enhetsnummer = utledEnhetsnummer(journalpost),
-                                     behandlingstema = hentBehandlingstema(journalpost),
-                                     behandlingstype = hentBehandlingstype(journalpost))
+        return OpprettOppgaveRequest(
+            ident = ident,
+            saksId = journalpost.sak?.fagsakId,
+            journalpostId = journalpost.journalpostId,
+            tema = Tema.BAR,
+            oppgavetype = oppgavetype,
+            fristFerdigstillelse = fristFerdigstillelse(),
+            beskrivelse = tilBeskrivelse(journalpost, beskrivelse),
+            enhetsnummer = utledEnhetsnummer(journalpost),
+            behandlingstema = hentBehandlingstema(journalpost),
+            behandlingstype = hentBehandlingstype(journalpost)
+        )
     }
 
     private fun tilOppgaveIdent(journalpost: Journalpost, oppgavetype: Oppgavetype): OppgaveIdentV2? {
@@ -47,9 +53,9 @@ class OppgaveMapper(private val hentEnhetClient: HentEnhetClient,
         return when (journalpost.bruker.type) {
             BrukerIdType.FNR -> {
                 hentAktørIdFraPdl(journalpost.bruker.id.trim())?.let { OppgaveIdentV2(ident = it, gruppe = IdentGruppe.AKTOERID) }
-                ?: if (oppgavetype == Oppgavetype.BehandleSak) {
-                    throw IntegrasjonException(msg = "Fant ikke aktørId på person i PDL", ident = journalpost.bruker.id)
-                } else null
+                    ?: if (oppgavetype == Oppgavetype.BehandleSak) {
+                        throw IntegrasjonException(msg = "Fant ikke aktørId på person i PDL", ident = journalpost.bruker.id)
+                    } else null
             }
             BrukerIdType.ORGNR -> {
                 if (erOrgnr(journalpost.bruker.id.trim())) {
@@ -66,7 +72,6 @@ class OppgaveMapper(private val hentEnhetClient: HentEnhetClient,
         } else ""
 
         return "${journalpost.hentHovedDokumentTittel().orEmpty()} $bindestrek ${beskrivelse.orEmpty()}".trim()
-
     }
 
     private fun hentBehandlingstema(journalpost: Journalpost): String? {
@@ -89,8 +94,8 @@ class OppgaveMapper(private val hentEnhetClient: HentEnhetClient,
 
     private fun utledEnhetsnummer(journalpost: Journalpost): String? {
         return when {
-            journalpost.journalforendeEnhet == "2101" -> "4806" //Enhet 2101 er nedlagt. Rutes til 4806
-            journalpost.journalforendeEnhet == "4847" -> "4817" //Enhet 4847 skal legges ned. Rutes til 4817
+            journalpost.journalforendeEnhet == "2101" -> "4806" // Enhet 2101 er nedlagt. Rutes til 4806
+            journalpost.journalforendeEnhet == "4847" -> "4817" // Enhet 4847 skal legges ned. Rutes til 4817
             journalpost.journalforendeEnhet.isNullOrBlank() -> null
             hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).status.uppercase(Locale.getDefault()) == "NEDLAGT" -> null
             hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).oppgavebehandler -> journalpost.journalforendeEnhet

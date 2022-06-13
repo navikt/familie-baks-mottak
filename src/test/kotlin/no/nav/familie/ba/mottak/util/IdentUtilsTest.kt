@@ -4,7 +4,6 @@ import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-
 class IdentUtilsTest {
     @Test
     fun testErDnummer() {
@@ -23,5 +22,4 @@ class IdentUtilsTest {
         Assertions.assertFalse(erFDatnummer(PersonIdent(id = "10102022222")))
         Assertions.assertTrue(erFDatnummer(PersonIdent(id = "10201000000")))
     }
-
 }

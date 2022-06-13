@@ -16,10 +16,12 @@ import java.net.URI
 private val logger = LoggerFactory.getLogger(HentEnhetClient::class.java)
 
 @Component
-class HentEnhetClient(@param:Value("\${NORG2_API_URL}") private val norg2Uri: URI,
-                      @Qualifier("restTemplateUnsecured") restOperations: RestOperations)
+class HentEnhetClient(
+    @param:Value("\${NORG2_API_URL}") private val norg2Uri: URI,
+    @Qualifier("restTemplateUnsecured") restOperations: RestOperations
+) :
 
-    : AbstractRestClient(restOperations, "norg2") {
+    AbstractRestClient(restOperations, "norg2") {
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
     @Cacheable("enhet")
@@ -37,7 +39,9 @@ class HentEnhetClient(@param:Value("\${NORG2_API_URL}") private val norg2Uri: UR
     }
 }
 
-data class Enhet(val enhetId: String,
-                 val navn: String,
-                 val oppgavebehandler: Boolean,
-                 val status: String)
+data class Enhet(
+    val enhetId: String,
+    val navn: String,
+    val oppgavebehandler: Boolean,
+    val status: String
+)

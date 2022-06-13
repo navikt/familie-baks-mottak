@@ -30,7 +30,7 @@ class PropertiesToStringConverter : AttributeConverter<Properties, String> {
             try {
                 props.load(StringReader(dbData))
             } catch (e: IOException) {
-                throw IllegalArgumentException("Kan ikke lese properties til string:$props", e) //$NON-NLS-1$
+                throw IllegalArgumentException("Kan ikke lese properties til string:$props", e) // $NON-NLS-1$
             }
         }
         return props

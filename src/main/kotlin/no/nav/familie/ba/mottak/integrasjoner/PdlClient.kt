@@ -23,9 +23,9 @@ import java.time.LocalDateTime
 
 @Service
 class PdlClient(
-        @Value("\${PDL_URL}") pdlBaseUrl: URI,
-        @Qualifier("sts") val restTemplate: RestOperations,
-        private val stsRestClient: StsRestClient
+    @Value("\${PDL_URL}") pdlBaseUrl: URI,
+    @Qualifier("sts") val restTemplate: RestOperations,
+    private val stsRestClient: StsRestClient
 ) : AbstractRestClient(restTemplate, "pdl.personinfo") {
 
     private val pdlUri = UriUtil.uri(pdlBaseUrl, PATH_GRAPHQL)
@@ -36,9 +36,9 @@ class PdlClient(
 
         if (!response.harFeil()) return response.data.pdlIdenter?.identer.orEmpty()
         throw IntegrasjonException(
-                msg = "Fant ikke identer på person: ${response.errorMessages()}",
-                uri = pdlUri,
-                ident = personIdent
+            msg = "Fant ikke identer på person: ${response.errorMessages()}",
+            uri = pdlUri,
+            ident = personIdent
         )
     }
 
@@ -52,53 +52,53 @@ class PdlClient(
 
         try {
             val response = postForEntity<PdlHentPersonResponse>(
-                    pdlUri,
-                    pdlPersonRequest,
-                    httpHeaders()
+                pdlUri,
+                pdlPersonRequest,
+                httpHeaders()
             )
             if (!response.harFeil()) {
                 return Result.runCatching {
                     val forelderBarnRelasjoner: Set<ForelderBarnRelasjon> =
-                            response.data.person!!.forelderBarnRelasjon.map { relasjon ->
-                                ForelderBarnRelasjon(
-                                        relatertPersonsIdent = relasjon.relatertPersonsIdent,
-                                        relatertPersonsRolle = relasjon.relatertPersonsRolle
-                                )
-                            }.toSet()
+                        response.data.person!!.forelderBarnRelasjon.map { relasjon ->
+                            ForelderBarnRelasjon(
+                                relatertPersonsIdent = relasjon.relatertPersonsIdent,
+                                relatertPersonsRolle = relasjon.relatertPersonsRolle
+                            )
+                        }.toSet()
 
                     response.data.person.let {
                         Person(
-                                navn = null,
-                                forelderBarnRelasjoner = forelderBarnRelasjoner,
-                                adressebeskyttelseGradering = it.adressebeskyttelse.firstOrNull()?.gradering?.name,
-                                bostedsadresse = it.bostedsadresse.firstOrNull()
+                            navn = null,
+                            forelderBarnRelasjoner = forelderBarnRelasjoner,
+                            adressebeskyttelseGradering = it.adressebeskyttelse.firstOrNull()?.gradering?.name,
+                            bostedsadresse = it.bostedsadresse.firstOrNull()
                         )
                     }
                 }.fold(
-                        onSuccess = { it },
-                        onFailure = {
-                            throw IntegrasjonException(
-                                    "Fant ikke forespurte data på person.",
-                                    it,
-                                    pdlUri,
-                                    personIdent
-                            )
-                        }
+                    onSuccess = { it },
+                    onFailure = {
+                        throw IntegrasjonException(
+                            "Fant ikke forespurte data på person.",
+                            it,
+                            pdlUri,
+                            personIdent
+                        )
+                    }
                 )
             } else {
                 throw IntegrasjonException(
-                        msg = "Feil ved oppslag på person: ${response.errorMessages()}",
-                        uri = pdlUri,
-                        ident = personIdent
+                    msg = "Feil ved oppslag på person: ${response.errorMessages()}",
+                    uri = pdlUri,
+                    ident = personIdent
                 )
             }
         } catch (e: Exception) {
             when (e) {
                 is IntegrasjonException -> throw e
                 else -> throw IntegrasjonException(
-                        msg = "Feil ved oppslag på person. Gav feil: ${e.message}",
-                        uri = pdlUri,
-                        ident = personIdent
+                    msg = "Feil ved oppslag på person. Gav feil: ${e.message}",
+                    uri = pdlUri,
+                    ident = personIdent
                 )
             }
         }
@@ -109,17 +109,17 @@ class PdlClient(
 
         val response = try {
             postForEntity<PdlHentPersonResponse>(
-                    pdlUri,
-                    pdlPersonRequest,
-                    httpHeaders()
+                pdlUri,
+                pdlPersonRequest,
+                httpHeaders()
             )
         } catch (e: Exception) {
             when (e) {
                 is IntegrasjonException -> throw e
                 else -> throw IntegrasjonException(
-                        msg = "Feil ved oppslag på hentPerson mot PDL. Gav feil: ${e.message}",
-                        uri = pdlUri,
-                        ident = personIdent
+                    msg = "Feil ved oppslag på hentPerson mot PDL. Gav feil: ${e.message}",
+                    uri = pdlUri,
+                    ident = personIdent
                 )
             }
         }
@@ -128,22 +128,19 @@ class PdlClient(
             return response.data.person!!
         } else {
             throw IntegrasjonException(
-                    msg = "Feil ved oppslag på hentPerson mot PDL: ${response.errorMessages()}",
-                    uri = pdlUri,
-                    ident = personIdent
+                msg = "Feil ved oppslag på hentPerson mot PDL: ${response.errorMessages()}",
+                uri = pdlUri,
+                ident = personIdent
             )
         }
-
-
     }
 
-
     private fun mapTilPdlPersonRequest(
-            personIdent: String,
-            personInfoQuery: String
+        personIdent: String,
+        personInfoQuery: String
     ) = mapOf(
-            "variables" to mapOf("ident" to personIdent),
-            "query" to personInfoQuery
+        "variables" to mapOf("ident" to personIdent),
+        "query" to personInfoQuery
     )
 
     protected fun httpHeaders(): HttpHeaders {
@@ -180,13 +177,13 @@ interface PdlBaseResponse {
 data class PdlError(val message: String)
 
 data class PdlHentPersonResponse(
-        val data: PdlPerson,
-        override val errors: List<PdlError>?
+    val data: PdlPerson,
+    override val errors: List<PdlError>?
 ) : PdlBaseResponse
 
 data class PdlHentIdenterResponse(
-        val data: Data,
-        override val errors: List<PdlError>?
+    val data: Data,
+    override val errors: List<PdlError>?
 ) : PdlBaseResponse
 
 data class Data(val pdlIdenter: PdlIdenter?)
@@ -194,9 +191,9 @@ data class Data(val pdlIdenter: PdlIdenter?)
 data class PdlIdenter(val identer: List<IdentInformasjon>)
 
 data class IdentInformasjon(
-        val ident: String,
-        val historisk: Boolean,
-        val gruppe: String
+    val ident: String,
+    val historisk: Boolean,
+    val gruppe: String
 )
 
 data class PdlPerson(val person: PdlPersonData?)
@@ -214,24 +211,24 @@ data class PdlPersonData(
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PdlForeldreBarnRelasjon(
-        val relatertPersonsIdent: String?,
-        val relatertPersonsRolle: FORELDERBARNRELASJONROLLE,
-        val minRolleForPerson: FORELDERBARNRELASJONROLLE? = null
+    val relatertPersonsIdent: String?,
+    val relatertPersonsRolle: FORELDERBARNRELASJONROLLE,
+    val minRolleForPerson: FORELDERBARNRELASJONROLLE? = null
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Adressebeskyttelse(
-        val gradering: Adressebeskyttelsesgradering
+    val gradering: Adressebeskyttelsesgradering
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Dødsfall(
-        @JsonProperty(value = "doedsdato") val dødsdato: LocalDate
+    @JsonProperty(value = "doedsdato") val dødsdato: LocalDate
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Fødsel(
-        @JsonProperty(value = "foedselsdato") val fødselsdato: LocalDate
+    @JsonProperty(value = "foedselsdato") val fødselsdato: LocalDate
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)

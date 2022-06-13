@@ -49,7 +49,8 @@ class FjernGamleHendelseLoggInnslagTest {
                     offset = idx.toLong(),
                     hendelseId = idx.toString(),
                     consumer = HendelseConsumer.values()[idx],
-                    opprettetTidspunkt = dato.atStartOfDay())
+                    opprettetTidspunkt = dato.atStartOfDay()
+                )
             }
         )
         fjernGamleHendelseLoggInnslag.slettHendelserEldreEnn2MånederFraTopicsMedMindreRetentionTid()

@@ -68,7 +68,6 @@ class PdlClientTest {
         assertThat(pdlPersonData.fødsel.first().fødselsdato).isEqualTo(LocalDate.of(1998, 5, 9))
     }
 
-
     @Test
     fun hentPersonFeilerMedInternalServerOgKasterIntegrasjonsException() {
         stubFor(
@@ -84,7 +83,6 @@ class PdlClientTest {
             pdlClient.hentPerson(testIdent, "hentperson-relasjon-dødsfall")
         }.isInstanceOf(IntegrasjonException::class.java)
             .hasMessageContaining("Feil ved oppslag på hentPerson mot PDL. Gav feil: 500 Server Error")
-
     }
 
     @Test
@@ -98,7 +96,6 @@ class PdlClientTest {
             pdlClient.hentPerson(testIdent, "hentperson-relasjon-dødsfall")
         }.isInstanceOf(IntegrasjonException::class.java)
             .hasMessageContaining("Feil ved oppslag på hentPerson mot PDL: Fant ikke person")
-
     }
 
     companion object {

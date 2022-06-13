@@ -17,7 +17,6 @@ import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
-
 @SpringBootTest(classes = [DevLauncher::class], properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api"])
 @ActiveProfiles("dev", "mock-oauth")
 @AutoConfigureWireMock(port = 28085)
@@ -30,20 +29,22 @@ class JournalpostClientTest {
     @Test
     @Tag("integration")
     fun `hentJournalpost skal returnere journalpost`() {
-        stubFor(get(urlEqualTo("/api/journalpost?journalpostId=123"))
-                        .willReturn(aResponse()
-                                            .withHeader("Content-Type", "application/json")
-                                            .withBody(gyldigResponse())))
+        stubFor(
+            get(urlEqualTo("/api/journalpost?journalpostId=123"))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(gyldigResponse())
+                )
+        )
 
         val opprettOppgaveResponse = journalpostClient.hentJournalpost("123")
-
-
     }
-
 
     @Throws(IOException::class) private fun gyldigResponse(): String {
-        return Files.readString(ClassPathResource("testdata/hentJournalpost-response.json").file.toPath(),
-                                StandardCharsets.UTF_8)
+        return Files.readString(
+            ClassPathResource("testdata/hentJournalpost-response.json").file.toPath(),
+            StandardCharsets.UTF_8
+        )
     }
-
 }

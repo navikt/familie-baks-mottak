@@ -21,9 +21,7 @@ import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
-
 
 @Service
 @TaskStepBeskrivelse(
@@ -42,7 +40,6 @@ class MottaFødselshendelseTask(
     val forsørgerHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.forsorger.har.dnr.eller.fdatnr")
     val barnetManglerBostedsadresse: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.bostedsadresse.null")
 
-
     override fun doTask(task: Task) {
         val barnetsId = task.payload
 
@@ -55,7 +52,6 @@ class MottaFødselshendelseTask(
         try {
             val personMedRelasjoner = pdlClient.hentPersonMedRelasjoner(barnetsId)
 
-
             val morsIdent = hentMor(personMedRelasjoner)
 
             if (morsIdent != null) {
@@ -65,13 +61,11 @@ class MottaFødselshendelseTask(
                     return
                 }
 
-
                 if (skalFiltrerePåBostedsadresse(personMedRelasjoner)) {
                     log.info("Ignorer fødselshendelse: Barnet har ukjent bostedsadresse. task=${task.id}")
                     barnetManglerBostedsadresse.increment()
                     return
                 }
-
 
                 task.metadata["morsIdent"] = morsIdent.id
                 val nesteTask = Task(
@@ -107,7 +101,6 @@ class MottaFødselshendelseTask(
         return if (person.harAdresseGradering()) false
         else !person.harBostedsadresse()
     }
-
 
     companion object {
 

@@ -49,7 +49,6 @@ class OpprettBehandleSakOppgaveTaskTest {
             mockJournalpostClient.hentJournalpost(any())
         } returns lagTestJournalpost(Journalstatus.MOTTATT)
 
-
         assertThatThrownBy {
             taskStep.doTask(Task(type = TASK_STEP_TYPE, payload = "mockJournalpostId"))
         }.hasMessage("Kan ikke opprette oppgave før tilhørende journalpost 111 er ferdigstilt")
@@ -64,7 +63,6 @@ class OpprettBehandleSakOppgaveTaskTest {
         every {
             mockOppgaveClient.finnOppgaver(JournalføringHendelseServiceTest.JOURNALPOST_PAPIRSØKNAD, null)
         } returns listOf(Oppgave())
-
 
         assertThatThrownBy {
             taskStep.doTask(Task(type = TASK_STEP_TYPE, payload = "mockJournalpostId"))
@@ -86,14 +84,11 @@ class OpprettBehandleSakOppgaveTaskTest {
             mockOppgaveClient.opprettBehandleSakOppgave(journalpost, "Tittel")
         } returns OppgaveResponse(123)
 
-
         val task = Task(type = TASK_STEP_TYPE, payload = "mockJournalpostId")
         taskStep.doTask(task)
 
         assertThat(task.metadata["oppgaveId"]).isEqualTo("123")
-
     }
-
 
     @Test
     fun `Skal opprette behandle sak oppgave, beskrivelse lik tittel på hoveddokument og markere at den skal behandles i fagsystem BA-sak`() {
@@ -110,26 +105,30 @@ class OpprettBehandleSakOppgaveTaskTest {
             mockOppgaveClient.opprettBehandleSakOppgave(journalpost, "Må behandles i BA-sak.\n Tittel")
         } returns OppgaveResponse(321)
 
-
         val task = Task(type = TASK_STEP_TYPE, payload = "mockJournalpostId")
         task.metadata["fagsystem"] = "BA"
         taskStep.doTask(task)
 
         assertThat(task.metadata["oppgaveId"]).isEqualTo("321")
-
     }
 
-    private fun lagTestJournalpost(status: Journalstatus) = Journalpost(journalpostId = JournalføringHendelseServiceTest.JOURNALPOST_PAPIRSØKNAD,
-                                                                        journalposttype = Journalposttype.I,
-                                                                        journalstatus = status,
-                                                                        bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-                                                                        tema = "BAR",
-                                                                        kanal = "NAV_NO",
-                                                                        behandlingstema = null,
-                                                                        dokumenter = listOf(DokumentInfo("Tittel",
-                                                                                           "",
-                                                                                           Dokumentstatus.FERDIGSTILT,
-                                                                                           emptyList())),
-                                                                        journalforendeEnhet = null,
-                                                                        sak = null)
+    private fun lagTestJournalpost(status: Journalstatus) = Journalpost(
+        journalpostId = JournalføringHendelseServiceTest.JOURNALPOST_PAPIRSØKNAD,
+        journalposttype = Journalposttype.I,
+        journalstatus = status,
+        bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+        tema = "BAR",
+        kanal = "NAV_NO",
+        behandlingstema = null,
+        dokumenter = listOf(
+            DokumentInfo(
+                "Tittel",
+                "",
+                Dokumentstatus.FERDIGSTILT,
+                emptyList()
+            )
+        ),
+        journalforendeEnhet = null,
+        sak = null
+    )
 }

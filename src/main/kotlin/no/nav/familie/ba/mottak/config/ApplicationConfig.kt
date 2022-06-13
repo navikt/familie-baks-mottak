@@ -16,9 +16,9 @@ import org.springframework.scheduling.annotation.EnableScheduling
 
 @SpringBootConfiguration
 @ComponentScan(
-        "no.nav.familie.prosessering",
-        "no.nav.familie.sikkerhet",
-        "no.nav.familie.ba.mottak"
+    "no.nav.familie.prosessering",
+    "no.nav.familie.sikkerhet",
+    "no.nav.familie.ba.mottak"
 )
 @EntityScan("no.nav.familie.prosessering", "no.nav.familie")
 @ConfigurationPropertiesScan("no.nav.familie")

@@ -15,31 +15,38 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.client.RestOperations
 
 @Configuration
-@Import(BearerTokenClientInterceptor::class,
-        MdcValuesPropagatingClientInterceptor::class,
-        RestTemplateSts::class,
-        NaisProxyCustomizer::class)
+@Import(
+    BearerTokenClientInterceptor::class,
+    MdcValuesPropagatingClientInterceptor::class,
+    RestTemplateSts::class,
+    NaisProxyCustomizer::class
+)
 class RestTemplateConfig {
 
     @Profile("!dev || !e2e || !postgres")
     @Bean("clientCredentials")
-    fun restTemplateClientCredentials(consumerIdClientInterceptor: ConsumerIdClientInterceptor,
-                                      bearerTokenClientInterceptor: BearerTokenClientInterceptor,
-                                      naisProxyCustomizer: NaisProxyCustomizer): RestOperations {
+    fun restTemplateClientCredentials(
+        consumerIdClientInterceptor: ConsumerIdClientInterceptor,
+        bearerTokenClientInterceptor: BearerTokenClientInterceptor,
+        naisProxyCustomizer: NaisProxyCustomizer
+    ): RestOperations {
         return RestTemplateBuilder()
             .additionalCustomizers(naisProxyCustomizer)
-            .interceptors(consumerIdClientInterceptor,
+            .interceptors(
+                consumerIdClientInterceptor,
                 bearerTokenClientInterceptor,
-                MdcValuesPropagatingClientInterceptor())
+                MdcValuesPropagatingClientInterceptor()
+            )
             .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
             .build()
     }
 
     @Bean("restTemplateUnsecured")
-    fun restTemplate(restTemplateBuilder: RestTemplateBuilder,
-                     mdcInterceptor: MdcValuesPropagatingClientInterceptor,
-                     consumerIdClientInterceptor: ConsumerIdClientInterceptor): RestOperations {
+    fun restTemplate(
+        restTemplateBuilder: RestTemplateBuilder,
+        mdcInterceptor: MdcValuesPropagatingClientInterceptor,
+        consumerIdClientInterceptor: ConsumerIdClientInterceptor
+    ): RestOperations {
         return restTemplateBuilder.interceptors(mdcInterceptor, consumerIdClientInterceptor).build()
     }
-
 }

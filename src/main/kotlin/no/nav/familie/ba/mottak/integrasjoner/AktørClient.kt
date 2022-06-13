@@ -1,6 +1,5 @@
 package no.nav.familie.ba.mottak.integrasjoner
 
-
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.log.NavHttpHeaders
@@ -15,9 +14,11 @@ import org.springframework.web.client.RestOperations
 import java.net.URI
 
 @Component
-class AktørClient(@Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonUri: URI,
-                  @Qualifier("clientCredentials") restOperations: RestOperations)
-    : AbstractRestClient(restOperations, "aktør") {
+class AktørClient(
+    @Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonUri: URI,
+    @Qualifier("clientCredentials") restOperations: RestOperations
+) :
+    AbstractRestClient(restOperations, "aktør") {
 
     @Retryable(value = [IntegrasjonException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
     fun hentAktørId(personident: String): String {

@@ -7,17 +7,21 @@ import org.springframework.web.client.RestClientResponseException
 import java.net.URI
 
 @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
-class IntegrasjonException(msg: String,
-                           throwable: Throwable? = null,
-                           uri: URI? = null,
-                           ident: String? = null) : RuntimeException(responseFra(uri, throwable) ?: msg, throwable) {
+class IntegrasjonException(
+    msg: String,
+    throwable: Throwable? = null,
+    uri: URI? = null,
+    ident: String? = null
+) : RuntimeException(responseFra(uri, throwable) ?: msg, throwable) {
 
     init {
         val detaljertMelding = responseFra(uri, throwable)
-        secureLogger.info("$msg. ident={} {} {}",
-                          ident,
-                          detaljertMelding ?: uri,
-                          throwable)
+        secureLogger.info(
+            "$msg. ident={} {} {}",
+            ident,
+            detaljertMelding ?: uri,
+            throwable
+        )
         logger.warn("$msg. {}", detaljertMelding ?: uri)
     }
 
@@ -26,7 +30,8 @@ class IntegrasjonException(msg: String,
         private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
         fun responseFra(uri: URI?, e: Throwable?): String? {
-            return when (e) { is RestClientResponseException
+            return when (e) {
+                is RestClientResponseException
                 -> "Error mot $uri status=${e.getRawStatusCode()} body=${e.responseBodyAsString}" else
                 -> null
             }

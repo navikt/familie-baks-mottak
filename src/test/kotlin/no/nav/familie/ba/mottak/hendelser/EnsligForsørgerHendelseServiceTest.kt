@@ -36,7 +36,6 @@ class EnsligForsørgerHendelseServiceTest {
     fun `Skal gjøre kall mot ba-sak hvis det er en overgangstønad som ikke er prosessert før`() {
         service.prosesserEfVedtakHendelse(42, EnsligForsørgerVedtakhendelse(100, "01020300110", StønadType.OVERGANGSSTØNAD))
 
-
         verify(exactly = 1) {
             mockSakClient.sendVedtakOmOvergangsstønadHendelseTilSak("01020300110")
         }
@@ -51,7 +50,6 @@ class EnsligForsørgerHendelseServiceTest {
         every { mockHendelsesloggRepository.existsByHendelseIdAndConsumer("200", HendelseConsumer.EF_VEDTAK_V1) } returns true
 
         service.prosesserEfVedtakHendelse(42, EnsligForsørgerVedtakhendelse(200, "01020300110", StønadType.OVERGANGSSTØNAD))
-
 
         verify(exactly = 0) {
             mockSakClient.sendVedtakOmOvergangsstønadHendelseTilSak("01020300110")

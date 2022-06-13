@@ -21,11 +21,11 @@ import kotlin.test.assertNull
 @ActiveProfiles("dev", "mock-pdl")
 class OppgaveMapperTest(
 
-        @Autowired
-        private val journalpostClient: JournalpostClient,
+    @Autowired
+    private val journalpostClient: JournalpostClient,
 
-        @Autowired
-        private val mockPdlClient: PdlClient,
+    @Autowired
+    private val mockPdlClient: PdlClient,
 ) {
 
     private val mockHentEnhetClient: HentEnhetClient = mockk(relaxed = true)
@@ -34,9 +34,10 @@ class OppgaveMapperTest(
     fun `skal kaste exception dersom dokumentlisten er tom`() {
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         Assertions.assertThrows(IllegalStateException::class.java) {
-            oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                               journalpostClient.hentJournalpost("123")
-                                                       .copy(dokumenter = listOf())
+            oppgaveMapper.mapTilOpprettOppgave(
+                Oppgavetype.Journalføring,
+                journalpostClient.hentJournalpost("123")
+                    .copy(dokumenter = listOf())
             )
         }
     }
@@ -45,14 +46,20 @@ class OppgaveMapperTest(
     fun `skal kaste exception dersom brukerid ikke er satt når oppgavetype er BehandleSak`() {
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         Assertions.assertThrows(IllegalStateException::class.java) {
-            oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.BehandleSak,
-                                               journalpostClient.hentJournalpost("123")
-                                                       .copy(dokumenter = listOf(DokumentInfo(
-                                                               tittel = null,
-                                                               brevkode = "",
-                                                               dokumentstatus = null,
-                                                               dokumentvarianter = null)),
-                                                             bruker = null)
+            oppgaveMapper.mapTilOpprettOppgave(
+                Oppgavetype.BehandleSak,
+                journalpostClient.hentJournalpost("123")
+                    .copy(
+                        dokumenter = listOf(
+                            DokumentInfo(
+                                tittel = null,
+                                brevkode = "",
+                                dokumentstatus = null,
+                                dokumentvarianter = null
+                            )
+                        ),
+                        bruker = null
+                    )
             )
         }
     }
@@ -62,14 +69,19 @@ class OppgaveMapperTest(
         every { mockPdlClient.hentIdenter(any()) } throws IntegrasjonException("Fant ikke person")
 
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
-        val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                                         journalpostClient.hentJournalpost("321")
-                                                                 .copy(dokumenter = listOf(DokumentInfo(
-                                                                         tittel = null,
-                                                                         brevkode = "NAV 33-00.07",
-                                                                         dokumentstatus = null,
-                                                                         dokumentvarianter = null))
-                                                                 )
+        val oppgave = oppgaveMapper.mapTilOpprettOppgave(
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("321")
+                .copy(
+                    dokumenter = listOf(
+                        DokumentInfo(
+                            tittel = null,
+                            brevkode = "NAV 33-00.07",
+                            dokumentstatus = null,
+                            dokumentvarianter = null
+                        )
+                    )
+                )
         )
         assertNull(oppgave.ident)
     }
@@ -78,14 +90,20 @@ class OppgaveMapperTest(
     fun `skal ikke kaste exception selvom brukerid mangler når oppgavetype er Journalføring`() {
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         Assertions.assertDoesNotThrow {
-            oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                               journalpostClient.hentJournalpost("123")
-                                                       .copy(dokumenter = listOf(DokumentInfo(
-                                                               tittel = null,
-                                                               brevkode = "",
-                                                               dokumentstatus = null,
-                                                               dokumentvarianter = null)),
-                                                             bruker = null)
+            oppgaveMapper.mapTilOpprettOppgave(
+                Oppgavetype.Journalføring,
+                journalpostClient.hentJournalpost("123")
+                    .copy(
+                        dokumenter = listOf(
+                            DokumentInfo(
+                                tittel = null,
+                                brevkode = "",
+                                dokumentstatus = null,
+                                dokumentvarianter = null
+                            )
+                        ),
+                        bruker = null
+                    )
             )
         }
     }
@@ -93,31 +111,40 @@ class OppgaveMapperTest(
     @Test
     fun `skal sette behandlingstema Ordinær`() {
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
-        val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                                         journalpostClient.hentJournalpost("123")
-                                                                 .copy(dokumenter = listOf(DokumentInfo(
-                                                                         tittel = null,
-                                                                         brevkode = "NAV 33-00.07",
-                                                                         dokumentstatus = null,
-                                                                         dokumentvarianter = null))
-                                                                 )
+        val oppgave = oppgaveMapper.mapTilOpprettOppgave(
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("123")
+                .copy(
+                    dokumenter = listOf(
+                        DokumentInfo(
+                            tittel = null,
+                            brevkode = "NAV 33-00.07",
+                            dokumentstatus = null,
+                            dokumentvarianter = null
+                        )
+                    )
+                )
         )
         assertEquals(Behandlingstema.OrdinærBarnetrygd.value, oppgave.behandlingstema)
     }
 
-
     @Test
     fun `skal sette behandlingstema Ordinær uavhengig av journalpost`() {
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
-        val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                                         journalpostClient.hentJournalpost("123")
-                                                                 .copy(dokumenter = listOf(DokumentInfo(
-                                                                         tittel = null,
-                                                                         brevkode = null,
-                                                                         dokumentstatus = null,
-                                                                         dokumentvarianter = null)),
-                                                                       behandlingstema = "btema"
-                                                                 )
+        val oppgave = oppgaveMapper.mapTilOpprettOppgave(
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("123")
+                .copy(
+                    dokumenter = listOf(
+                        DokumentInfo(
+                            tittel = null,
+                            brevkode = null,
+                            dokumentstatus = null,
+                            dokumentvarianter = null
+                        )
+                    ),
+                    behandlingstema = "btema"
+                )
         )
         assertEquals(Behandlingstema.OrdinærBarnetrygd.value, oppgave.behandlingstema)
     }
@@ -125,16 +152,23 @@ class OppgaveMapperTest(
     @Test
     fun `skal sette behandlingstema EØS`() {
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
-        val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                                         journalpostClient.hentJournalpost("123")
-                                                                 .copy(dokumenter = listOf(DokumentInfo(
-                                                                         tittel = null,
-                                                                         brevkode = null,
-                                                                         dokumentstatus = null,
-                                                                         dokumentvarianter = null)),
-                                                                       bruker = Bruker(id = "42345678910",
-                                                                                       type = BrukerIdType.FNR)
-                                                                 )
+        val oppgave = oppgaveMapper.mapTilOpprettOppgave(
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("123")
+                .copy(
+                    dokumenter = listOf(
+                        DokumentInfo(
+                            tittel = null,
+                            brevkode = null,
+                            dokumentstatus = null,
+                            dokumentvarianter = null
+                        )
+                    ),
+                    bruker = Bruker(
+                        id = "42345678910",
+                        type = BrukerIdType.FNR
+                    )
+                )
         )
         assertNull(oppgave.behandlingstype)
         assertEquals(Behandlingstema.BarnetrygdEØS.value, oppgave.behandlingstema)
@@ -143,21 +177,26 @@ class OppgaveMapperTest(
     @Test
     fun `skal sette behandlingstype Utland`() {
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
-        val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                                         journalpostClient.hentJournalpost("123")
-                                                                 .copy(dokumenter = listOf(
-                                                                         DokumentInfo(
-                                                                                 tittel = null,
-                                                                                 brevkode = null,
-                                                                                 dokumentstatus = null,
-                                                                                 dokumentvarianter = null),
-                                                                         DokumentInfo(
-                                                                                 tittel = null,
-                                                                                 brevkode = "NAV 33-00.15",
-                                                                                 dokumentstatus = null,
-                                                                                 dokumentvarianter = null)),
-                                                                       behandlingstema = Behandlingstema.OrdinærBarnetrygd.value
-                                                                 )
+        val oppgave = oppgaveMapper.mapTilOpprettOppgave(
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("123")
+                .copy(
+                    dokumenter = listOf(
+                        DokumentInfo(
+                            tittel = null,
+                            brevkode = null,
+                            dokumentstatus = null,
+                            dokumentvarianter = null
+                        ),
+                        DokumentInfo(
+                            tittel = null,
+                            brevkode = "NAV 33-00.15",
+                            dokumentstatus = null,
+                            dokumentvarianter = null
+                        )
+                    ),
+                    behandlingstema = Behandlingstema.OrdinærBarnetrygd.value
+                )
         )
         assertNull(oppgave.behandlingstema)
         assertEquals(Behandlingstype.Utland.value, oppgave.behandlingstype)
@@ -167,20 +206,20 @@ class OppgaveMapperTest(
     fun `skal sette beskrivelse til kun tittel på journalpost når beskrivelse i input er null, brevkode på journalpost er satt og dokumentet har tittel`() {
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         val oppgave = oppgaveMapper.mapTilOpprettOppgave(
-                Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
-                        .copy(
-                                dokumenter = listOf(
-                                        DokumentInfo(
-                                                tittel = "Whatever",
-                                                brevkode = "kode",
-                                                dokumentstatus = null,
-                                                dokumentvarianter = null
-                                        )
-                                ),
-                                behandlingstema = "btema"
-                        ),
-                beskrivelse = null
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("123")
+                .copy(
+                    dokumenter = listOf(
+                        DokumentInfo(
+                            tittel = "Whatever",
+                            brevkode = "kode",
+                            dokumentstatus = null,
+                            dokumentvarianter = null
+                        )
+                    ),
+                    behandlingstema = "btema"
+                ),
+            beskrivelse = null
         )
         assertEquals("Whatever", oppgave.beskrivelse)
     }
@@ -190,19 +229,19 @@ class OppgaveMapperTest(
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
 
         val oppgaveUtenBeskrivelse1 = oppgaveMapper.mapTilOpprettOppgave(
-                Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
-                        .copy(
-                                dokumenter = listOf(
-                                        DokumentInfo(
-                                                tittel = "Whatever",
-                                                brevkode = null,
-                                                dokumentstatus = null,
-                                                dokumentvarianter = null
-                                        )
-                                ),
-                                behandlingstema = "btema"
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("123")
+                .copy(
+                    dokumenter = listOf(
+                        DokumentInfo(
+                            tittel = "Whatever",
+                            brevkode = null,
+                            dokumentstatus = null,
+                            dokumentvarianter = null
                         )
+                    ),
+                    behandlingstema = "btema"
+                )
         )
         assertEquals("", oppgaveUtenBeskrivelse1.beskrivelse)
     }
@@ -210,67 +249,86 @@ class OppgaveMapperTest(
     @Test
     fun `skal sette beskrivelse til tom når beskrivelse i input er null, brevkode på journalpost er ikke satt og dokumentet ikke har tittel`() {
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
-        val oppgaveUtenBeskrivelse2 = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                                                         journalpostClient.hentJournalpost("123")
-                                                                                 .copy(dokumenter = listOf(DokumentInfo(
-                                                                                         tittel = null,
-                                                                                         brevkode = "kode",
-                                                                                         dokumentstatus = null,
-                                                                                         dokumentvarianter = null)),
-                                                                                       behandlingstema = "btema"
-                                                                                 )
+        val oppgaveUtenBeskrivelse2 = oppgaveMapper.mapTilOpprettOppgave(
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("123")
+                .copy(
+                    dokumenter = listOf(
+                        DokumentInfo(
+                            tittel = null,
+                            brevkode = "kode",
+                            dokumentstatus = null,
+                            dokumentvarianter = null
+                        )
+                    ),
+                    behandlingstema = "btema"
+                )
         )
         assertEquals("", oppgaveUtenBeskrivelse2.beskrivelse)
-
     }
 
     @Test
     fun `skal sette beskrivelse til tittel og beskrivelse når beskrivelse i input er satt, brevkode på journalpost er satt og dokumentet har tittel`() {
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
-        val oppgaveUtenBeskrivelse2 = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                                                         journalpostClient.hentJournalpost("123")
-                                                                                 .copy(dokumenter = listOf(DokumentInfo(
-                                                                                         tittel = "Whatever",
-                                                                                         brevkode = "kode",
-                                                                                         dokumentstatus = null,
-                                                                                         dokumentvarianter = null)),
-                                                                                       behandlingstema = "btema"
-                                                                                 ), "beskrivelsefelt"
+        val oppgaveUtenBeskrivelse2 = oppgaveMapper.mapTilOpprettOppgave(
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("123")
+                .copy(
+                    dokumenter = listOf(
+                        DokumentInfo(
+                            tittel = "Whatever",
+                            brevkode = "kode",
+                            dokumentstatus = null,
+                            dokumentvarianter = null
+                        )
+                    ),
+                    behandlingstema = "btema"
+                ),
+            "beskrivelsefelt"
         )
         assertEquals("Whatever - beskrivelsefelt", oppgaveUtenBeskrivelse2.beskrivelse)
-
     }
 
     @Test
     fun `skal sette beskrivelse til kun beskrivelse fra input når dokumentet mangler tittel`() {
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
-        val oppgaveUtenBeskrivelse2 = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                                                         journalpostClient.hentJournalpost("123")
-                                                                                 .copy(dokumenter = listOf(DokumentInfo(
-                                                                                         tittel = null,
-                                                                                         brevkode = "kode",
-                                                                                         dokumentstatus = null,
-                                                                                         dokumentvarianter = null)),
-                                                                                       behandlingstema = "btema"
-                                                                                 ), "beskrivelsefelt"
+        val oppgaveUtenBeskrivelse2 = oppgaveMapper.mapTilOpprettOppgave(
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("123")
+                .copy(
+                    dokumenter = listOf(
+                        DokumentInfo(
+                            tittel = null,
+                            brevkode = "kode",
+                            dokumentstatus = null,
+                            dokumentvarianter = null
+                        )
+                    ),
+                    behandlingstema = "btema"
+                ),
+            "beskrivelsefelt"
         )
         assertEquals("beskrivelsefelt", oppgaveUtenBeskrivelse2.beskrivelse)
-
     }
 
     @Test
     fun `skal sette enhet 4806 hvis enhet på journalpost er 2101`() {
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
-        val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                                         journalpostClient.hentJournalpost("123")
-                                                                 .copy(journalforendeEnhet = "2101",
-                                                                       dokumenter = listOf(DokumentInfo(
-                                                                               tittel = null,
-                                                                               brevkode = "kode",
-                                                                               dokumentstatus = null,
-                                                                               dokumentvarianter = null)),
-                                                                       behandlingstema = "btema"
-                                                                 )
+        val oppgave = oppgaveMapper.mapTilOpprettOppgave(
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("123")
+                .copy(
+                    journalforendeEnhet = "2101",
+                    dokumenter = listOf(
+                        DokumentInfo(
+                            tittel = null,
+                            brevkode = "kode",
+                            dokumentstatus = null,
+                            dokumentvarianter = null
+                        )
+                    ),
+                    behandlingstema = "btema"
+                )
         )
         assertThat(oppgave.enhetsnummer).isEqualTo("4806")
     }
@@ -278,16 +336,21 @@ class OppgaveMapperTest(
     @Test
     fun `skal sette enhet null hvis enhet på journalpost er null`() {
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
-        val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                                         journalpostClient.hentJournalpost("123")
-                                                                 .copy(journalforendeEnhet = null,
-                                                                       dokumenter = listOf(DokumentInfo(
-                                                                               tittel = null,
-                                                                               brevkode = "kode",
-                                                                               dokumentstatus = null,
-                                                                               dokumentvarianter = null)),
-                                                                       behandlingstema = "btema"
-                                                                 )
+        val oppgave = oppgaveMapper.mapTilOpprettOppgave(
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("123")
+                .copy(
+                    journalforendeEnhet = null,
+                    dokumenter = listOf(
+                        DokumentInfo(
+                            tittel = null,
+                            brevkode = "kode",
+                            dokumentstatus = null,
+                            dokumentvarianter = null
+                        )
+                    ),
+                    behandlingstema = "btema"
+                )
         )
         assertThat(oppgave.enhetsnummer).isNull()
     }
@@ -296,16 +359,21 @@ class OppgaveMapperTest(
     fun `skal sette enhet fra journalpost hvis enhet kan behandle oppgaver`() {
         every { mockHentEnhetClient.hentEnhet("4") } returns Enhet("4", "enhetnavn", true, "Aktiv")
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
-        val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                                         journalpostClient.hentJournalpost("123")
-                                                                 .copy(journalforendeEnhet = "4",
-                                                                       dokumenter = listOf(DokumentInfo(
-                                                                               tittel = null,
-                                                                               brevkode = "kode",
-                                                                               dokumentstatus = null,
-                                                                               dokumentvarianter = null)),
-                                                                       behandlingstema = "btema"
-                                                                 )
+        val oppgave = oppgaveMapper.mapTilOpprettOppgave(
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("123")
+                .copy(
+                    journalforendeEnhet = "4",
+                    dokumenter = listOf(
+                        DokumentInfo(
+                            tittel = null,
+                            brevkode = "kode",
+                            dokumentstatus = null,
+                            dokumentvarianter = null
+                        )
+                    ),
+                    behandlingstema = "btema"
+                )
         )
         assertThat(oppgave.enhetsnummer).isEqualTo("4")
     }
@@ -314,16 +382,21 @@ class OppgaveMapperTest(
     fun `skal sette enhet null hvis enhet ikke kan behandle oppgaver`() {
         every { mockHentEnhetClient.hentEnhet("5") } returns Enhet("4", "enhetnavn", false, "Aktiv")
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
-        val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                                         journalpostClient.hentJournalpost("123")
-                                                                 .copy(journalforendeEnhet = "5",
-                                                                       dokumenter = listOf(DokumentInfo(
-                                                                               tittel = null,
-                                                                               brevkode = "kode",
-                                                                               dokumentstatus = null,
-                                                                               dokumentvarianter = null)),
-                                                                       behandlingstema = "btema"
-                                                                 )
+        val oppgave = oppgaveMapper.mapTilOpprettOppgave(
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("123")
+                .copy(
+                    journalforendeEnhet = "5",
+                    dokumenter = listOf(
+                        DokumentInfo(
+                            tittel = null,
+                            brevkode = "kode",
+                            dokumentstatus = null,
+                            dokumentvarianter = null
+                        )
+                    ),
+                    behandlingstema = "btema"
+                )
         )
         assertThat(oppgave.enhetsnummer).isNull()
     }
@@ -332,16 +405,21 @@ class OppgaveMapperTest(
     fun `skal sette enhet null hvis enhet er nedlagt`() {
         every { mockHentEnhetClient.hentEnhet("5") } returns Enhet("4", "enhetnavn", true, "Nedlagt")
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
-        val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                                         journalpostClient.hentJournalpost("123")
-                                                                 .copy(journalforendeEnhet = "5",
-                                                                       dokumenter = listOf(DokumentInfo(
-                                                                               tittel = null,
-                                                                               brevkode = "kode",
-                                                                               dokumentstatus = null,
-                                                                               dokumentvarianter = null)),
-                                                                       behandlingstema = "btema"
-                                                                 )
+        val oppgave = oppgaveMapper.mapTilOpprettOppgave(
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("123")
+                .copy(
+                    journalforendeEnhet = "5",
+                    dokumenter = listOf(
+                        DokumentInfo(
+                            tittel = null,
+                            brevkode = "kode",
+                            dokumentstatus = null,
+                            dokumentvarianter = null
+                        )
+                    ),
+                    behandlingstema = "btema"
+                )
         )
         assertThat(oppgave.enhetsnummer).isNull()
     }
@@ -349,17 +427,22 @@ class OppgaveMapperTest(
     @Test
     fun `skal sette bruker null hvis Orgnr  er 000000000`() {
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
-        val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                                         journalpostClient.hentJournalpost("123")
-                                                                 .copy(journalforendeEnhet = "5",
-                                                                       bruker = Bruker("000000000", BrukerIdType.ORGNR),
-                                                                       dokumenter = listOf(DokumentInfo(
-                                                                               tittel = null,
-                                                                               brevkode = "kode",
-                                                                               dokumentstatus = null,
-                                                                               dokumentvarianter = null)),
-                                                                       behandlingstema = "btema"
-                                                                 )
+        val oppgave = oppgaveMapper.mapTilOpprettOppgave(
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("123")
+                .copy(
+                    journalforendeEnhet = "5",
+                    bruker = Bruker("000000000", BrukerIdType.ORGNR),
+                    dokumenter = listOf(
+                        DokumentInfo(
+                            tittel = null,
+                            brevkode = "kode",
+                            dokumentstatus = null,
+                            dokumentvarianter = null
+                        )
+                    ),
+                    behandlingstema = "btema"
+                )
         )
         assertThat(oppgave.ident).isNull()
     }
@@ -367,17 +450,22 @@ class OppgaveMapperTest(
     @Test
     fun `skal sette orgnr hvis Orgnr  er satt`() {
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
-        val oppgave = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring,
-                                                         journalpostClient.hentJournalpost("123")
-                                                                 .copy(journalforendeEnhet = "5",
-                                                                       bruker = Bruker("900000000", BrukerIdType.ORGNR),
-                                                                       dokumenter = listOf(DokumentInfo(
-                                                                               tittel = null,
-                                                                               brevkode = "kode",
-                                                                               dokumentstatus = null,
-                                                                               dokumentvarianter = null)),
-                                                                       behandlingstema = "btema"
-                                                                 )
+        val oppgave = oppgaveMapper.mapTilOpprettOppgave(
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("123")
+                .copy(
+                    journalforendeEnhet = "5",
+                    bruker = Bruker("900000000", BrukerIdType.ORGNR),
+                    dokumenter = listOf(
+                        DokumentInfo(
+                            tittel = null,
+                            brevkode = "kode",
+                            dokumentstatus = null,
+                            dokumentvarianter = null
+                        )
+                    ),
+                    behandlingstema = "btema"
+                )
         )
         assertThat(oppgave.ident).isEqualTo(OppgaveIdentV2("900000000", IdentGruppe.ORGNR))
     }

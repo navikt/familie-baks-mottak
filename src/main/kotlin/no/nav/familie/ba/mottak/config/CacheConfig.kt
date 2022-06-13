@@ -18,11 +18,11 @@ class CacheConfig {
     fun cacheManager(): CacheManager = object : ConcurrentMapCacheManager() {
         override fun createConcurrentMapCache(name: String): Cache {
             val concurrentMap = Caffeine
-                    .newBuilder()
-                    .initialCapacity(100)
-                    .maximumSize(1000)
-                    .expireAfterWrite(24, TimeUnit.HOURS)
-                    .recordStats().build<Any, Any>().asMap()
+                .newBuilder()
+                .initialCapacity(100)
+                .maximumSize(1000)
+                .expireAfterWrite(24, TimeUnit.HOURS)
+                .recordStats().build<Any, Any>().asMap()
             return ConcurrentMapCache(name, concurrentMap, true)
         }
     }

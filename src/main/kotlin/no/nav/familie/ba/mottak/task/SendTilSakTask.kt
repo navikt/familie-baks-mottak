@@ -16,7 +16,6 @@ class SendTilSakTask(private val sakClient: SakClient) : AsyncTaskStep {
 
     val logger: Logger = LoggerFactory.getLogger(SendTilSakTask::class.java)
 
-
     override fun doTask(task: Task) {
         sakClient.sendTilSak(jacksonObjectMapper().readValue(task.payload, NyBehandling::class.java))
     }

@@ -20,7 +20,7 @@ class EnsligForsørgerVedtakHendelseConsumerTest {
     lateinit var mockHendelsesloggRepository: HendelsesloggRepository
     lateinit var mockSakClient: SakClient
     lateinit var mockPdlClient: PdlClient
-    lateinit var service:EnsligForsørgerHendelseService
+    lateinit var service: EnsligForsørgerHendelseService
 
     lateinit var consumer: EnsligForsørgerVedtakHendelseConsumer
 
@@ -36,25 +36,25 @@ class EnsligForsørgerVedtakHendelseConsumerTest {
 
     @Test
     fun `Skal lese melding, konvertere, sende til ba-sak og ACKe melding `() {
-        val ack:Acknowledgment = mockk(relaxed = true)
+        val ack: Acknowledgment = mockk(relaxed = true)
         val consumerRecord = ConsumerRecord("topic", 1, 1, "42", """{"behandlingId":42,"personIdent":"12345678910","stønadType":"OVERGANGSSTØNAD"}""")
         consumer.listen(consumerRecord, ack)
         verify(exactly = 1) {
             mockSakClient.sendVedtakOmOvergangsstønadHendelseTilSak("12345678910")
         }
-        verify(exactly = 1) {ack.acknowledge()}
+        verify(exactly = 1) { ack.acknowledge() }
     }
 
     @Test
     fun `Skal ikke ACKe melding ved feil`() {
-        val ack:Acknowledgment = mockk(relaxed = true)
+        val ack: Acknowledgment = mockk(relaxed = true)
         val consumerRecord = ConsumerRecord("topic", 1, 1, "42", """{"json": "Ugyldig"}""")
-         val e= Assertions.assertThrows(RuntimeException::class.java) {
+        val e = Assertions.assertThrows(RuntimeException::class.java) {
             consumer.listen(consumerRecord, ack)
         }
 
         assertThat(e.message).isEqualTo("Feil i prosessering av aapen-ensligforsorger-iverksatt-vedtak")
 
-        verify(exactly = 0) {ack.acknowledge()}
+        verify(exactly = 0) { ack.acknowledge() }
     }
 }

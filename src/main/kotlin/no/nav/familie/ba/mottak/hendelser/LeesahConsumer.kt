@@ -28,7 +28,6 @@ class LeesahConsumer(val leesahService: LeesahService) {
 
     val leesahFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesha.feilet")
 
-
     @KafkaListener(
         groupId = "srvfamilie-ba-mottak",
         topics = ["aapen-person-pdl-leesah-v1"],
@@ -72,7 +71,6 @@ class LeesahConsumer(val leesahService: LeesahService) {
     private fun GenericRecord.hentOpplysningstype() =
         get("opplysningstype").toString()
 
-
     private fun GenericRecord.hentPersonidenter() =
         (get("personidenter") as GenericData.Array<*>)
             .map { it.toString() }
@@ -110,7 +108,7 @@ class LeesahConsumer(val leesahService: LeesahService) {
     private fun GenericRecord.hentSivilstandDato(): LocalDate? {
         return deserialiserDatofeltFraSubrecord("sivilstand", "gyldigFraOgMed")
             ?: deserialiserDatofeltFraSubrecord("sivilstand", "bekreftelsesdato")
-            // Fra pdldocs: bekreftelsesdato kun tilgjengelig når gyldighetsdato er ukjent.
+        // Fra pdldocs: bekreftelsesdato kun tilgjengelig når gyldighetsdato er ukjent.
     }
 
     private fun GenericRecord.deserialiserDatofeltFraSubrecord(
