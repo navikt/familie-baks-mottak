@@ -45,12 +45,15 @@ class OppgaveMapper(
     private fun tilOppgaveIdent(journalpost: Journalpost, oppgavetype: Oppgavetype): OppgaveIdentV2? {
         if (journalpost.bruker == null) {
             when (oppgavetype) {
-                Oppgavetype.BehandleSak -> throw error("Journalpost ${journalpost.journalpostId} mangler bruker")
+                Oppgavetype.BehandleSak -> error("Journalpost ${journalpost.journalpostId} mangler bruker")
                 Oppgavetype.Journalføring -> return null
+                else -> {
+                    // NOP
+                }
             }
         }
 
-        return when (journalpost.bruker.type) {
+        return when (journalpost.bruker?.type) {
             BrukerIdType.FNR -> {
                 hentAktørIdFraPdl(journalpost.bruker.id.trim())?.let { OppgaveIdentV2(ident = it, gruppe = IdentGruppe.AKTOERID) }
                     ?: if (oppgavetype == Oppgavetype.BehandleSak) {
@@ -63,6 +66,7 @@ class OppgaveMapper(
                 } else null
             }
             BrukerIdType.AKTOERID -> OppgaveIdentV2(ident = journalpost.bruker.id.trim(), gruppe = IdentGruppe.AKTOERID)
+            else -> null
         }
     }
 
