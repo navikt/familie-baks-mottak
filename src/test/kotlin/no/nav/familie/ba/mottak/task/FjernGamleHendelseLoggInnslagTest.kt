@@ -40,7 +40,7 @@ class FjernGamleHendelseLoggInnslagTest {
         val opprettetDatoer = listOf(
             now(),
             now().minusMonths(1),
-            now().minusMonths(2),
+            now().minusMonths(3),
             now().minusYears(1)
         )
         val hendelserFørRyddeJobb = hendelseLoggRepository.saveAll(
