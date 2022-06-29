@@ -43,7 +43,7 @@ class FjernGamleHendelseLoggInnslagTest {
             now().minusMonths(3),
             now().minusYears(1)
         )
-        val hendelserFørRyddeJobb = hendelseLoggRepository.saveAll(
+        val hendelserFørRyddeJobb = hendelseLoggRepository.saveAllAndFlush(
             opprettetDatoer.mapIndexed { idx, dato ->
                 Hendelseslogg(
                     offset = idx.toLong(),
