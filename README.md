@@ -31,7 +31,8 @@ Topicene vi lytter på må da opprettes via deres api med følgende data:
   ]
 }
 ```
-Dette kan enkelt gjøres via følgende kommandoer:
+Dette kan gjøres via følgende kommandoer:\
+(for Windows, kjør disse via Cygwin)
 ```
 curl -X POST "http://igroup:itest@localhost:8840/api/v1/topics" -H "Accept: application/json" -H "Content-Type: application/json" --data "{"name": "aapen-person-pdl-leesah-v1", "members": [{ "member": "srvc01", "role": "CONSUMER" }], "numPartitions": 3 }"
 
