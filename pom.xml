@@ -30,6 +30,7 @@
         <spring.vault.version>2.3.2</spring.vault.version>
         <spring.cloud.version>3.1.1</spring.cloud.version>
         <token-validation-spring.version>2.1.2</token-validation-spring.version>
+        <avro.version>1.11.1</avro.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
@@ -155,7 +156,7 @@
         <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
-            <version>1.11.0</version>
+            <version>${avro.version}</version>
         </dependency>
         <dependency>
             <groupId>io.confluent</groupId>
@@ -327,7 +328,7 @@
             <plugin>
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro-maven-plugin</artifactId>
-                <version>1.11.0</version>
+                <version>${avro.version}</version>
 
                 <executions>
                     <execution>
