@@ -319,9 +319,11 @@ class JournalføringHendelseServiceTest {
     @Test
     fun `Skal ignorere hendelse fordi den eksisterer i hendelseslogg`() {
         val consumerRecord = ConsumerRecord(
-            "topic", 1,
+            "topic",
+            1,
             OFFSET,
-            42L, opprettRecord(JOURNALPOST_PAPIRSØKNAD)
+            42L,
+            opprettRecord(JOURNALPOST_PAPIRSØKNAD)
         )
         every {
             mockHendelsesloggRepository.existsByHendelseIdAndConsumer("hendelseId", HendelseConsumer.JOURNAL_AIVEN)
@@ -339,9 +341,11 @@ class JournalføringHendelseServiceTest {
     @Test
     fun `Mottak av gyldig hendelse skal delegeres til service`() {
         val consumerRecord = ConsumerRecord(
-            "topic", 1,
+            "topic",
+            1,
             OFFSET,
-            42L, opprettRecord(JOURNALPOST_PAPIRSØKNAD)
+            42L,
+            opprettRecord(JOURNALPOST_PAPIRSØKNAD)
         )
 
         service.prosesserNyHendelse(consumerRecord, ack)
@@ -365,9 +369,11 @@ class JournalføringHendelseServiceTest {
     fun `Ikke gyldige hendelsetyper skal ignoreres`() {
         val ugyldigHendelsetypeRecord = opprettRecord(journalpostId = JOURNALPOST_PAPIRSØKNAD, hendelseType = "UgyldigType", temaNytt = "BAR")
         val consumerRecord = ConsumerRecord(
-            "topic", 1,
+            "topic",
+            1,
             OFFSET,
-            42L, ugyldigHendelsetypeRecord
+            42L,
+            ugyldigHendelsetypeRecord
         )
 
         service.prosesserNyHendelse(consumerRecord, ack)
@@ -383,9 +389,11 @@ class JournalføringHendelseServiceTest {
         val ukjentTemaRecord = opprettRecord(journalpostId = JOURNALPOST_PAPIRSØKNAD, temaNytt = "UKJ")
 
         val consumerRecord = ConsumerRecord(
-            "topic", 1,
+            "topic",
+            1,
             OFFSET,
-            42L, ukjentTemaRecord
+            42L,
+            ukjentTemaRecord
         )
 
         service.prosesserNyHendelse(consumerRecord, ack)

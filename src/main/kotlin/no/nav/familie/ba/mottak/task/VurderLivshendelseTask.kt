@@ -129,12 +129,15 @@ class VurderLivshendelseTask(
             .filter { it.resultat == RESULTAT_INNVILGET && it.steg == STEG_TYPE_BEHANDLING_AVSLUTTET }
             .minByOrNull { it.opprettetTidspunkt } ?: return false
 
-        if (dato.isAfter(tidligsteVedtakIBaSak.opprettetTidspunkt.toLocalDate()))
+        if (dato.isAfter(tidligsteVedtakIBaSak.opprettetTidspunkt.toLocalDate())) {
             return true
+        }
 
         val erEtterTidligsteInfotrygdVedtak = if (tidligsteVedtakIBaSak.type == BEHANDLING_TYPE_MIGRERING) {
             hentTidligsteVedtaksdatoFraInfotrygd(personIdent)?.isBefore(dato) ?: false
-        } else false
+        } else {
+            false
+        }
 
         return erEtterTidligsteInfotrygdVedtak
             .also { if (!it) hentOgLoggRelevantInfoOmÅrsakenKanVæreInnflytting(personIdent, dato) }
@@ -164,7 +167,6 @@ class VurderLivshendelseTask(
         personIdent: String,
         pdlPersonData: PdlPersonData
     ): Set<Bruker> {
-
         val brukereMedSakRelatertTilPerson = mutableSetOf<Bruker>()
 
         val familierelasjoner = pdlPersonData.forelderBarnRelasjon

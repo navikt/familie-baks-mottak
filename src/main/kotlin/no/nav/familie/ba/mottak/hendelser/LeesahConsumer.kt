@@ -50,7 +50,7 @@ class LeesahConsumer(val leesahService: LeesahService) {
             cr.value().hentUtflyttingsdato(),
             cr.value().hentTidligereHendelseId(),
             cr.value().hentSivilstandType(),
-            cr.value().hentSivilstandDato(),
+            cr.value().hentSivilstandDato()
         )
 
         try {

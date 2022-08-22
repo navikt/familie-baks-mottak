@@ -38,7 +38,7 @@ class JournalhendelseRutingTask(
     private val pdlClient: PdlClient,
     private val sakClient: SakClient,
     private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,
-    private val taskRepository: TaskRepository,
+    private val taskRepository: TaskRepository
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(JournalhendelseRutingTask::class.java)
@@ -133,7 +133,7 @@ private fun personErMigrert(saker: List<no.nav.familie.kontrakter.ba.infotrygd.S
 
 enum class Sakspart(val part: String) {
     SØKER("Bruker"),
-    ANNEN("Søsken"),
+    ANNEN("Søsken")
 }
 
 private fun List<RestFagsakDeltager>.sakspart(sakClient: SakClient): Sakspart? = when {

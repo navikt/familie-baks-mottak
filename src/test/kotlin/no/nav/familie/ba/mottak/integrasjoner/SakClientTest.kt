@@ -42,7 +42,8 @@ class SakClientTest {
         Assertions.assertThat(response).isEqualTo(fagsakId.toString())
     }
 
-    @Throws(IOException::class) private fun gyldigResponse(): String {
+    @Throws(IOException::class)
+    private fun gyldigResponse(): String {
         return "{\n" +
             "    \"data\": {\n" +
             "        \"opprettetTidspunkt\": \"2020-03-19T10:36:21.678775\",\n" +

@@ -107,7 +107,7 @@ class LeesahServiceTest {
             endringstype = LeesahService.OPPRETTET,
             opplysningstype = LeesahService.OPPLYSNINGSTYPE_SIVILSTAND,
             sivilstand = "GIFT",
-            sivilstandDato = LocalDate.of(2022, 2, 22),
+            sivilstandDato = LocalDate.of(2022, 2, 22)
         )
 
         service.prosesserNyHendelse(pdlHendelse)

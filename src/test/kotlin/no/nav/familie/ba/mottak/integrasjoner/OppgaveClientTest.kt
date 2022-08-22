@@ -106,7 +106,8 @@ class OppgaveClientTest {
                             behandlingstema = Behandlingstema.OrdinærBarnetrygd.value,
                             beskrivelse = "Tittel"
                         ),
-                        true, true
+                        true,
+                        true
                     )
                 )
         )
@@ -145,7 +146,8 @@ class OppgaveClientTest {
                             behandlingstema = Behandlingstema.OrdinærBarnetrygd.value,
                             beskrivelse = "Tittel"
                         ),
-                        true, true
+                        true,
+                        true
                     )
                 )
         )

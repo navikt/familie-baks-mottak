@@ -72,7 +72,7 @@ class OppgaveClient @Autowired constructor(
             enhetsnummer = dto.enhetsId,
             behandlingstema = dto.behandlingstema,
             behandlingstype = null,
-            behandlesAvApplikasjon = dto.behandlesAvApplikasjon,
+            behandlesAvApplikasjon = dto.behandlesAvApplikasjon
         )
 
         secureLog.info("Oppretter vurderLivshendlseOppgave $request")
@@ -208,5 +208,5 @@ data class OppgaveVurderLivshendelseDto(
     val saksId: String,
     val behandlingstema: String,
     val enhetsId: String? = null,
-    val behandlesAvApplikasjon: String? = null,
+    val behandlesAvApplikasjon: String? = null
 )

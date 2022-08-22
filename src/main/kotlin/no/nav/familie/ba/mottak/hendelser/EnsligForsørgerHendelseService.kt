@@ -27,7 +27,6 @@ class EnsligForsørgerHendelseService(
         Metrics.counter("ef.hendelse.infotrygd.vedtak", "type", "overgangstønad")
 
     fun prosesserEfVedtakHendelse(offset: Long, ensligForsørgerVedtakhendelse: EnsligForsørgerVedtakhendelse) {
-
         when (ensligForsørgerVedtakhendelse.stønadType) {
             StønadType.OVERGANGSSTØNAD -> {
                 if (!hendelsesloggRepository.existsByHendelseIdAndConsumer(

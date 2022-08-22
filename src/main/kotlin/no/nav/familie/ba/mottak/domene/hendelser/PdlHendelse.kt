@@ -15,7 +15,7 @@ data class PdlHendelse(
     val utflyttingsdato: LocalDate? = null,
     val tidligereHendelseId: String? = null,
     val sivilstand: String? = null,
-    val sivilstandDato: LocalDate? = null,
+    val sivilstandDato: LocalDate? = null
 ) {
 
     // TODO: Skal gjøres tydeligere og mer robust.

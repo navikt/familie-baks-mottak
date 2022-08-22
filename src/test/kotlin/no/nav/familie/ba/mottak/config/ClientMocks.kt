@@ -28,7 +28,6 @@ class ClientMocks {
     @Bean
     @Primary
     fun mockOppgaveClient(): OppgaveClient {
-
         val mockOppgaveClient = mockk<OppgaveClient>(relaxed = true)
 
         every {
@@ -41,7 +40,6 @@ class ClientMocks {
     @Bean
     @Primary
     fun mockAktørClient(): AktørClient {
-
         val mockAktørClient = mockk<AktørClient>(relaxed = true)
 
         every {
@@ -83,7 +81,6 @@ class ClientMocks {
     @Bean
     @Primary
     fun mockJournalpostClient(): JournalpostClient {
-
         val mockJournalpostClient = mockk<JournalpostClient>(relaxed = true)
 
         every {

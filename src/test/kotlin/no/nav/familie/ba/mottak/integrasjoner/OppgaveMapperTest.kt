@@ -25,7 +25,7 @@ class OppgaveMapperTest(
     private val journalpostClient: JournalpostClient,
 
     @Autowired
-    private val mockPdlClient: PdlClient,
+    private val mockPdlClient: PdlClient
 ) {
 
     private val mockHentEnhetClient: HentEnhetClient = mockk(relaxed = true)

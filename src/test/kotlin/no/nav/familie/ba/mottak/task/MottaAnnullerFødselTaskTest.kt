@@ -41,7 +41,7 @@ class MottaAnnullerFødselTaskTest {
         every { taskRepository.findByStatusIn(any(), any()) } returns listOf(
             journalførSøknadTask,
             sendTilSakTask,
-            mottaFødselshendelseTask,
+            mottaFødselshendelseTask
         )
         every { taskRepository.findById(eq(0)) } returns Optional.of(journalførSøknadTask)
         every { taskRepository.findById(eq(1)) } returns Optional.of(sendTilSakTask)
@@ -83,7 +83,7 @@ class MottaAnnullerFødselTaskTest {
 
         every { taskRepository.findByStatusIn(any(), any()) } returns listOf(
             task0,
-            task1,
+            task1
         )
         every { taskRepository.findById(eq(0)) } returns Optional.of(task0)
         every { taskRepository.findById(eq(1)) } returns Optional.of(task1)
@@ -94,7 +94,7 @@ class MottaAnnullerFødselTaskTest {
         MottaAnnullerFødselTask(taskRepository, sakClient).doTask(
             Task(
                 type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
-                payload = objectMapper.writeValueAsString(RestAnnullerFødsel(listOf("12345678910"), "ooo")),
+                payload = objectMapper.writeValueAsString(RestAnnullerFødsel(listOf("12345678910"), "ooo"))
             )
         )
         verify(exactly = 1) { taskRepository.save(any()) }
@@ -111,7 +111,7 @@ class MottaAnnullerFødselTaskTest {
         MottaAnnullerFødselTask(taskRepository, sakClient).doTask(
             Task(
                 type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
-                payload = objectMapper.writeValueAsString(RestAnnullerFødsel(listOf("12345678910"), "ooo")),
+                payload = objectMapper.writeValueAsString(RestAnnullerFødsel(listOf("12345678910"), "ooo"))
             )
         )
         verify(exactly = 1) { taskRepository.findByStatusIn(any(), any()) }
@@ -139,7 +139,7 @@ class MottaAnnullerFødselTaskTest {
         MottaAnnullerFødselTask(taskRepository, sakClient).doTask(
             Task(
                 type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
-                payload = objectMapper.writeValueAsString(RestAnnullerFødsel(barnsIdenter, "ooo")),
+                payload = objectMapper.writeValueAsString(RestAnnullerFødsel(barnsIdenter, "ooo"))
             )
         )
 

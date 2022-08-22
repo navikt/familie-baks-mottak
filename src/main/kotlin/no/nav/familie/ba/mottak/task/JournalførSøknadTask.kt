@@ -44,8 +44,11 @@ class JournalførSøknadTask(
                 is SøknadV8 -> versjonertSøknad.søknad.originalSpråk
             }
 
-            val orginalspråkPdf: ByteArray = if (orginalspråk != "nb")
-                pdfService.lagPdf(versjonertSøknad, dbSøknad, orginalspråk) else ByteArray(0)
+            val orginalspråkPdf: ByteArray = if (orginalspråk != "nb") {
+                pdfService.lagPdf(versjonertSøknad, dbSøknad, orginalspråk)
+            } else {
+                ByteArray(0)
+            }
             journalføringService.journalførSøknad(dbSøknad, bokmålPdf, orginalspråkPdf)
         } catch (e: HttpClientErrorException.Conflict) {
             log.error("409 conflict for eksternReferanseId ved journalføring av søknad. taskId=${task.id}. Se task eller securelog")
