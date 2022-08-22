@@ -28,7 +28,6 @@ class SøknadService(
     @Transactional
     @Throws(FødselsnummerErNullException::class)
     fun motta(versjonertSøknad: VersjonertSøknad): DBSøknad {
-
         val (dbSøknad, dokumentasjon) = when (versjonertSøknad) {
             is SøknadV7 -> {
                 Pair(versjonertSøknad.søknad.tilDBSøknad(), versjonertSøknad.søknad.dokumentasjon)

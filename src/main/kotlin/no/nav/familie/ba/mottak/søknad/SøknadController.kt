@@ -27,7 +27,7 @@ import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadKontraktV8
 @RequestMapping(path = ["/api"], produces = [APPLICATION_JSON_VALUE])
 @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 class SøknadController(
-    private val søknadService: SøknadService,
+    private val søknadService: SøknadService
 ) {
 
     // Metrics for ordinær barnetrygd
@@ -61,7 +61,6 @@ class SøknadController(
         mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad = SøknadV8(søknad = søknad))
 
     fun mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad: VersjonertSøknad): ResponseEntity<Ressurs<Kvittering>> {
-
         val søknadstype = when (versjonertSøknad) {
             is SøknadV7 -> versjonertSøknad.søknad.søknadstype
             is SøknadV8 -> versjonertSøknad.søknad.søknadstype
@@ -110,7 +109,6 @@ class SøknadController(
 
     private fun sendMetricsDokumentasjon(erUtvidet: Boolean, dokumentasjon: List<Søknaddokumentasjon>) {
         if (dokumentasjon.isNotEmpty()) {
-
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val dokumentasjonsbehovUtenAnnenDokumentasjon =
                 dokumentasjon.filter { it.dokumentasjonsbehov != Dokumentasjonsbehov.ANNEN_DOKUMENTASJON }

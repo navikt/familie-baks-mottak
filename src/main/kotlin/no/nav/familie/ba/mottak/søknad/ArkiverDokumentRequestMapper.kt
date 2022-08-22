@@ -22,7 +22,6 @@ object ArkiverDokumentRequestMapper {
         vedleggMap: Map<String, DBVedlegg>,
         pdfOriginalSpråk: ByteArray
     ): ArkiverDokumentRequest {
-
         val (søknadstype, dokumentasjon) = when (versjonertSøknad) {
             is SøknadV7 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
             is SøknadV8 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)

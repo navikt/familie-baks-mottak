@@ -54,7 +54,7 @@ object SøknadTestData {
                 alder = søknadsfelt("alder", "4 år"),
                 spørsmål = mapOf(),
                 utenlandsperioder = listOf(),
-                eøsBarnetrygdsperioder = listOf(),
+                eøsBarnetrygdsperioder = listOf()
             ),
             BarnV8(
                 harEøsSteg = false,
@@ -64,7 +64,7 @@ object SøknadTestData {
                 alder = søknadsfelt("alder", "1 år"),
                 spørsmål = mapOf(),
                 utenlandsperioder = listOf(),
-                eøsBarnetrygdsperioder = listOf(),
+                eøsBarnetrygdsperioder = listOf()
             ),
             BarnV8(
                 harEøsSteg = true,
@@ -74,7 +74,7 @@ object SøknadTestData {
                 alder = søknadsfelt("alder", "2 år"),
                 spørsmål = mapOf(),
                 utenlandsperioder = listOf(),
-                eøsBarnetrygdsperioder = listOf(),
+                eøsBarnetrygdsperioder = listOf()
             )
         )
     }

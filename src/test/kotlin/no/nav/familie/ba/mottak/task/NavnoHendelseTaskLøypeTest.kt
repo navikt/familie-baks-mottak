@@ -157,7 +157,6 @@ class NavnoHendelseTaskLøypeTest {
 
     @Test
     fun `Skal opprette JFR-oppgave uten tekst siden bruker ikke har sak i noen system`() {
-
         kjørRutingTaskOgReturnerNesteTask().run { journalføringSteg.doTask(this) }
 
         val oppgaveBeskrivelse = slot<String>()

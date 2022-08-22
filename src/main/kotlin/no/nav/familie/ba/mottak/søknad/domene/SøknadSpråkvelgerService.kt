@@ -24,7 +24,6 @@ class SøknadSpråkvelgerService {
     }
 
     fun velgSøknadSpråk(versjonertSøknad: VersjonertSøknad, språk: String): String {
-
         valgtLocale = språk
 
         val asMap = objectMapper.convertValue<MutableMap<String, Any>>(

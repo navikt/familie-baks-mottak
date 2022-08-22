@@ -47,7 +47,6 @@ class PdlClient(
     }
 
     fun hentPersonMedRelasjoner(personIdent: String): Person {
-
         val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery("hentperson-med-relasjoner"))
 
         try {
@@ -206,7 +205,7 @@ data class PdlPersonData(
     @JsonProperty(value = "doedsfall") val dødsfall: List<Dødsfall> = emptyList(),
     @JsonProperty(value = "foedsel") val fødsel: List<Fødsel> = emptyList(),
     val sivilstand: List<Sivilstand> = emptyList(),
-    val innflyttingTilNorge: List<InnflyttingTilNorge> = emptyList(),
+    val innflyttingTilNorge: List<InnflyttingTilNorge> = emptyList()
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -235,7 +234,7 @@ data class Fødsel(
 data class Sivilstand(
     val type: SIVILSTAND,
     val gyldigFraOgMed: LocalDate? = null,
-    val bekreftelsesdato: LocalDate? = null,
+    val bekreftelsesdato: LocalDate? = null
 )
 
 data class InnflyttingTilNorge(
@@ -259,5 +258,5 @@ enum class Adressebeskyttelsesgradering {
 enum class Identgruppe {
     AKTORID,
     FOLKEREGISTERIDENT,
-    ORGNR,
+    ORGNR
 }

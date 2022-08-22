@@ -101,5 +101,5 @@ data class InfotrygdHendelse(
     @JsonProperty("IDENTDATO") val identdato: String,
     @JsonProperty("FOM") val fom: String,
     @JsonProperty("SATS") val sats: Double,
-    @JsonProperty("KOBLING_ID") val koblingId: Long,
+    @JsonProperty("KOBLING_ID") val koblingId: Long
 )

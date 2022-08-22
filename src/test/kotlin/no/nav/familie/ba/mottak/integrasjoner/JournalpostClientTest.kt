@@ -41,7 +41,8 @@ class JournalpostClientTest {
         val opprettOppgaveResponse = journalpostClient.hentJournalpost("123")
     }
 
-    @Throws(IOException::class) private fun gyldigResponse(): String {
+    @Throws(IOException::class)
+    private fun gyldigResponse(): String {
         return Files.readString(
             ClassPathResource("testdata/hentJournalpost-response.json").file.toPath(),
             StandardCharsets.UTF_8
