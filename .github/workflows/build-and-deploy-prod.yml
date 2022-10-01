@@ -4,8 +4,8 @@ on:
     branches:
       - master
 env:
-  IMAGE: ghcr.io/navikt/familie-ba-mottak:${{ github.sha }}
-  IMAGE_LATEST: ghcr.io/navikt/familie-ba-mottak:latest
+  IMAGE: ghcr.io/navikt/familie-baks-mottak:${{ github.sha }}
+  IMAGE_LATEST: ghcr.io/navikt/familie-baks-mottak:latest
 jobs:
   deploy-to-prod:
     name: Bygg app/image, push til github, deploy til dev-fss

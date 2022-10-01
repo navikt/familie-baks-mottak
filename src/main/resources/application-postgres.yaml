@@ -42,7 +42,7 @@ no.nav.security.jwt:
 
 
 credential:
-  username: "srv-ba-mottak"
+  username: "srv-baks-mottak"
   password: "not-a-real-password"
 funksjonsbrytere:
   kafka.enabled: false
@@ -55,7 +55,7 @@ logging:
   config: "classpath:logback-test.xml"
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/familie-ba-mottak
+    url: jdbc:postgresql://localhost:5432/familie-baks-mottak
     hikari:
       password: test
       username: postgres

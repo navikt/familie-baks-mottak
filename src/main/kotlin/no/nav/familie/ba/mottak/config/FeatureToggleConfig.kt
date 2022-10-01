@@ -87,7 +87,7 @@ class FeatureToggleConfig(
     }
 
     companion object {
-        const val TOGGLE_IDENTHENDELSER = "familie-ba-mottak.sende-identhendelser-til-ba-sak"
+        const val TOGGLE_IDENTHENDELSER = "familie-baks-mottak.sende-identhendelser-til-ba-sak"
     }
 }
 

@@ -1,4 +1,4 @@
-# familie-ba-mottak
+# familie-baks-mottak
 Mottaksapplikasjon for barnetrygd. Lytter på ulike hendelser (fødsler, dødsfall mm) og mottar søknader. 
 
 ## Lokal kjøring
@@ -46,11 +46,11 @@ Se README i navkafka-docker-compose for mer info om hvordan man kjører den og k
 ## Lokal kjøring med Postgres
 For å kjøre mot lokal postgress så kan man kjøre DevLauncherPostgress.
 ```
-docker run --name familie-ba-mottak -p 5432:5432 -e POSTGRES_PASSWORD=test -d postgres
+docker run --name familie-baks-mottak -p 5432:5432 -e POSTGRES_PASSWORD=test -d postgres
 docker ps (finn container id)
 docker exec -it <container_id> bash
 psql -U postgres
-CREATE DATABASE "familie-ba-mottak";
+CREATE DATABASE "familie-baks-mottak";
 ```
 
 Man må legge følgende endring til i application-postgres.yaml under spring-seksjonen

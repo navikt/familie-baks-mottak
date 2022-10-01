@@ -1,7 +1,7 @@
 FROM navikt/java:17-appdynamics
 
 ENV APPD_ENABLED=true
-ENV APP_NAME=familie-ba-mottak
+ENV APP_NAME=familie-baks-mottak
 ENV JAVA_OPTS="-XX:MaxRAMPercentage=75"
 
-COPY ./target/familie-ba-mottak.jar "app.jar"
+COPY ./target/familie-baks-mottak.jar "app.jar"

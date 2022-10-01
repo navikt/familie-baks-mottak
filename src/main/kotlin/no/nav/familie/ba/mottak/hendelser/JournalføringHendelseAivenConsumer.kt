@@ -24,8 +24,8 @@ class JournalføringHendelseAivenConsumer(val journalhendelseService: Journalhen
     val journalføringshendelseAivenConsumerFeilCounter: Counter = Metrics.counter("joark.hendelse.journalføring.feil")
 
     @KafkaListener(
-        groupId = "familie-ba-mottak-jfr",
-        id = "ba-mottak-journal-hendelser-aiven",
+        groupId = "familie-baks-mottak-jfr",
+        id = "baks-mottak-journal-hendelser-aiven",
         topics = ["\${JOURNALFOERINGHENDELSE_V1_TOPIC_AIVEN_URL}"],
         containerFactory = "kafkaAivenHendelseListenerAvroContainerFactory",
         idIsGroup = false

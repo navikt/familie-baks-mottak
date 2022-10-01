@@ -97,7 +97,7 @@ class OppgaveClientTest {
         verify(
             anyRequestedFor(anyUrl())
                 .withHeader(NavHttpHeaders.NAV_CALL_ID.asString(), equalTo("opprettJournalføringsoppgave"))
-                .withHeader(NavHttpHeaders.NAV_CONSUMER_ID.asString(), equalTo("familie-ba-mottak"))
+                .withHeader(NavHttpHeaders.NAV_CONSUMER_ID.asString(), equalTo("familie-baks-mottak"))
                 .withRequestBody(
                     equalToJson(
                         forventetOpprettOppgaveRequestJson(
@@ -136,7 +136,7 @@ class OppgaveClientTest {
         verify(
             anyRequestedFor(anyUrl())
                 .withHeader(NavHttpHeaders.NAV_CALL_ID.asString(), equalTo("opprettJournalføringsoppgave"))
-                .withHeader(NavHttpHeaders.NAV_CONSUMER_ID.asString(), equalTo("familie-ba-mottak"))
+                .withHeader(NavHttpHeaders.NAV_CONSUMER_ID.asString(), equalTo("familie-baks-mottak"))
                 .withRequestBody(
                     equalToJson(
                         forventetOpprettOppgaveRequestJson(

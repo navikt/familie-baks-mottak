@@ -12,15 +12,15 @@ spring:
           expiry-threshold: 2m
       database:
         enabled: true
-        role: familie-ba-mottak-admin
+        role: familie-baks-mottak-admin
         backend: postgresql/prod-fss
       authentication: KUBERNETES
       kubernetes:
-        role: familie-ba-mottak
+        role: familie-baks-mottak
         kubernetes-path: kubernetes/prod/fss
         service-account-token-file: /var/run/secrets/kubernetes.io/serviceaccount/token
       generic:
         enabled: true
         backend: kv/prod/fss
-        application-name: familie-ba-mottak/default
-        default-context: familie-ba-mottak/default
+        application-name: familie-baks-mottak/default
+        default-context: familie-baks-mottak/default

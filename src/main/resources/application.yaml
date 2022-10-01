@@ -1,5 +1,5 @@
 application:
-  name: familie-ba-mottak
+  name: familie-baks-mottak
 
 server:
   servlet:
@@ -11,7 +11,7 @@ spring:
   autoconfigure.exclude: org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
   main.banner-mode: "off"
   kafka:
-    client-id: familie-ba-mottak
+    client-id: familie-baks-mottak
     properties:
       security.protocol: SASL_SSL
       sasl:

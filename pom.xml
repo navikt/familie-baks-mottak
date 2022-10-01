@@ -6,7 +6,7 @@
 
     <groupId>no.nav</groupId>
     <packaging>jar</packaging>
-    <artifactId>familie-ba-mottak</artifactId>
+    <artifactId>familie-baks-mottak</artifactId>
     <version>${revision}${sha1}${changelist}</version>
     <parent>
         <groupId>org.springframework.boot</groupId>

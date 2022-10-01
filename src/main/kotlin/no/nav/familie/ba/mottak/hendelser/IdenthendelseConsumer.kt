@@ -31,7 +31,7 @@ class IdenthendelseConsumer(
     val identhendelseFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.ident.feilet")
 
     @KafkaListener(
-        groupId = "familie-ba-mottak-ident",
+        groupId = "familie-baks-mottak-ident",
         topics = ["aapen-person-pdl-aktor-v1"],
         id = "identhendelse",
         idIsGroup = false,

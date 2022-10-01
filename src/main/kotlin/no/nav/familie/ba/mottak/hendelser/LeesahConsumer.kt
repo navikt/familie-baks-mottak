@@ -29,7 +29,7 @@ class LeesahConsumer(val leesahService: LeesahService) {
     val leesahFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesha.feilet")
 
     @KafkaListener(
-        groupId = "srvfamilie-ba-mottak",
+        groupId = "srvfamilie-baks-mottak",
         topics = ["aapen-person-pdl-leesah-v1"],
         id = "personhendelse",
         idIsGroup = false,
