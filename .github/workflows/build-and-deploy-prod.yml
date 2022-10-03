@@ -1,4 +1,4 @@
-name: Build-Deploy-Prod
+name: Build-Deploy-Prod-gcp
 on:
   push:
     branches:
