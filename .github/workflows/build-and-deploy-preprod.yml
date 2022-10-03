@@ -72,7 +72,7 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
-          RESOURCE: app-preprod.yaml
+          RESOURCE: .deploy/nais/app-preprod.yaml
   bygg-sonar:
     if: ${{ false }}  # disable for now
     #if: github.event.pull_request.user.login != 'dependabot[bot]'

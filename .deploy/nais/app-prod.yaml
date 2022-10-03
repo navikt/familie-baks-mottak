@@ -52,9 +52,7 @@ spec:
         - application: familie-ba-sak
           cluster: prod-fss
   ingresses: # Optional. List of ingress URLs that will route HTTP traffic to the application.
-    - https://familie-baks-mottak.nais.adeo.no
-    - https://familie-baks-mottak.prod-fss-pub.nais.io
-    - https://familie-baks-mottak.prod-fss.nais.io
+    - https://familie-baks-mottak.intern.nav.no
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: prod

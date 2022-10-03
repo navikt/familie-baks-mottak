@@ -35,8 +35,7 @@ spec:
       memory: 1024Mi
       cpu: 200m
   ingresses:
-    - https://familie-baks-mottak.dev-fss-pub.nais.io
-    - https://familie-baks-mottak.dev.adeo.no
+    - https://familie-baks-mottak.dev.intern.nav.no
   secureLogs:
     enabled: true
   tokenx:
