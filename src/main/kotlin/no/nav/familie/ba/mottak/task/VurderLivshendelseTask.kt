@@ -2,7 +2,6 @@ package no.nav.familie.ba.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.ba.mottak.integrasjoner.AktørClient
 import no.nav.familie.ba.mottak.integrasjoner.BehandlesAvApplikasjon
 import no.nav.familie.ba.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.ba.mottak.integrasjoner.BehandlingUnderkategori
@@ -55,7 +54,6 @@ class VurderLivshendelseTask(
     private val oppgaveClient: OppgaveClient,
     private val pdlClient: PdlClient,
     private val sakClient: SakClient,
-    private val aktørClient: AktørClient,
     private val infotrygdClient: InfotrygdBarnetrygdClient
 ) : AsyncTaskStep {
 
@@ -233,7 +231,7 @@ class VurderLivshendelseTask(
         personIdent: String,
         task: Task
     ): Boolean {
-        val aktørId = aktørClient.hentAktørId(bruker.ident)
+        val aktørId = pdlClient.hentAktørId(bruker.ident)
         val åpenOppgave = søkEtterÅpenOppgavePåAktør(aktørId, hendelseType)
 
         if (åpenOppgave == null) {
@@ -280,7 +278,7 @@ class VurderLivshendelseTask(
         )
         val beskrivelse = SIVILSTAND.beskrivelse + " fra " + (formatertDato ?: "ukjent dato")
 
-        val aktørId = aktørClient.hentAktørId(personIdent)
+        val aktørId = pdlClient.hentAktørId(personIdent)
         val oppgave = søkEtterÅpenOppgavePåAktør(aktørId, SIVILSTAND)
             ?: opprettOppgavePåAktør(aktørId, fagsakId, beskrivelse, Behandlingstema.UtvidetBarnetrygd)
 

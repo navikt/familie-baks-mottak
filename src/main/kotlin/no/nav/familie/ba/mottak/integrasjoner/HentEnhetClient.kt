@@ -24,7 +24,7 @@ class HentEnhetClient(
     AbstractRestClient(restOperations, "norg2") {
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
-    @Cacheable("enhet")
+    @Cacheable("enhet", cacheManager = "dailyCacheManager")
     fun hentEnhet(enhetId: String): Enhet {
         val uri = URI.create("$norg2Uri/api/v1/enhet/$enhetId")
         logger.info("henter enhet med id $enhetId")

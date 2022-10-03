@@ -11,7 +11,6 @@ import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.Hendelseslogg
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
-import no.nav.familie.ba.mottak.integrasjoner.AktørClient
 import no.nav.familie.ba.mottak.integrasjoner.Bruker
 import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
@@ -22,6 +21,7 @@ import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.ba.mottak.integrasjoner.Journalposttype
 import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
 import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
+import no.nav.familie.ba.mottak.integrasjoner.PdlClient
 import no.nav.familie.ba.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.ba.mottak.task.JournalhendelseRutingTask
@@ -59,7 +59,7 @@ class JournalføringHendelseServiceTest {
     lateinit var infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient
 
     @MockK
-    lateinit var aktørClient: AktørClient
+    lateinit var pdlClient: PdlClient
 
     @MockK(relaxed = true)
     lateinit var mockTaskRepository: TaskRepository
@@ -240,7 +240,7 @@ class JournalføringHendelseServiceTest {
         } returns null
 
         every {
-            aktørClient.hentPersonident(any())
+            pdlClient.hentPersonident(any())
         } returns "12345678910"
 
         every {
