@@ -52,8 +52,8 @@ no.nav.security.jwt:
           client-auth-method: private_key_jwt
           client-jwk: ${TOKEN_X_PRIVATE_JWK}
 
-
-
+funksjonsbrytere:
+  kafka.enabled: false
 
 spring:
   kafka:
@@ -63,7 +63,9 @@ spring:
     consumer:
       auto-offset-reset: latest
   datasource:
-    url: jdbc:postgresql://b27dbvl009.preprod.local:5432/familie-baks-mottak
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/familie-baks-mottak
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
 FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1
 FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 1
@@ -72,9 +74,9 @@ FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 1
 MOTTAK_ROLLE: ${MOTTAK_ROLLE}
 JOURNALFOERINGHENDELSE_V1_TOPIC_AIVEN_URL: teamdokumenthandtering.aapen-dok-journalfoering-q1
 PDL_URL: http://pdl-api-q1.pdl
-FAMILIE_INTEGRASJONER_API_URL: http://familie-integrasjoner-q1/api
-FAMILIE_BA_SAK_API_URL: https://familie-ba-sak.dev.intern.nav.no/api
+FAMILIE_INTEGRASJONER_API_URL: https://familie-integrasjoner-q1.dev-fss-pub.nais.io/api
+FAMILIE_BA_SAK_API_URL: http://familie-ba-sak/api
 
 NORG2_API_URL: https://app-q1.adeo.no/norg2
-FAMILIE_DOKUMENT_API_URL: https://familie-dokument.dev.intern.nav.no/familie/dokument
-FAMILIE_BA_DOKGEN_API_URL: https://familie-ba-dokgen.dev.intern.nav.no
+FAMILIE_DOKUMENT_API_URL: http://familie-dokument/familie/dokument
+FAMILIE_BA_DOKGEN_API_URL: http://familie-ba-dokgen

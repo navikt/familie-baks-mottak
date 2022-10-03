@@ -7,6 +7,8 @@ metadata:
     team: teamfamilie
 
 spec:
+  envFrom:
+    - secret: familie-baks-mottak
   image: {{ image }}
   port: 8090
   leaderElection: true
@@ -49,13 +51,30 @@ spec:
         - application: familie-prosessering
           namespace: teamfamilie
           cluster: dev-gcp
+      external:
+        - host: kafka-schema-registry.nais-q.adeo.no
+        - host: pdl-api.dev-fss-pub.nais.io
+        - host: familie-integrasjoner.dev-fss-pub.nais.io
     outbound:
       rules:
         - application: familie-ba-sak
           cluster: dev-gcp
+
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: preprod
+  gcp: # Database
+    sqlInstances:
+      - type: POSTGRES_14 # IF This is changed, all data will be lost. Read on nais.io how to upgrade
+        tier: db-custom-1-3840
+        name: familie-baks-mottak
+        autoBackupTime: "02:00"
+        pointInTimeRecovery: true
+        diskAutoresize: true
+        highAvailability: false
+        databases:
+          - name: familie-baks-mottak
+            envVarPrefix: DB
   azure:
     application:
       enabled: true

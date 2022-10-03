@@ -60,7 +60,12 @@ spring:
     properties:
       schema.registry.url: http://kafka-schema-registry.tpa:8081
   datasource:
-    url: jdbc:postgresql://A01DBVL010.adeo.no:5432/familie-baks-mottak
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/familie-baks-mottak
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+funksjonsbrytere:
+  kafka.enabled: false
 
 FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1440
 FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 180
@@ -70,6 +75,6 @@ MOTTAK_ROLLE: ${MOTTAK_ROLLE}
 
 JOURNALFOERINGHENDELSE_V1_TOPIC_AIVEN_URL: teamdokumenthandtering.aapen-dok-journalfoering
 NORG2_API_URL: https://app.adeo.no/norg2/
-FAMILIE_DOKUMENT_API_URL: https://familie-dokument.intern.nav.no/familie/dokument
-FAMILIE_BA_DOKGEN_API_URL: https://familie-ba-dokgen.intern.nav.no
-FAMILIE_BA_SAK_API_URL: https://familie-ba-sak.intern.nav.no/api
+FAMILIE_DOKUMENT_API_URL: http://familie-dokument/familie/dokument
+FAMILIE_BA_DOKGEN_API_URL: http://familie-ba-dokgen
+FAMILIE_BA_SAK_API_URL: http://familie-ba-sak/api
