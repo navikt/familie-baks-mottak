@@ -50,7 +50,7 @@ spec:
     outbound:
       rules:
         - application: familie-ba-sak
-          cluster: prod-fss
+          cluster: prod-gcp
   ingresses: # Optional. List of ingress URLs that will route HTTP traffic to the application.
     - https://familie-baks-mottak.intern.nav.no
   env:
