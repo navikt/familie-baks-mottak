@@ -8,7 +8,7 @@ env:
   IMAGE_LATEST: ghcr.io/navikt/familie-baks-mottak:latest
 jobs:
   deploy-to-prod:
-    name: Bygg app/image, push til github, deploy til dev-fss
+    name: Bygg app/image, push til github, deploy til dev-gcp
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -36,19 +36,19 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Push Docker image
         run: docker push $IMAGE
-      - name: Deploy til dev-fss
+      - name: Deploy til dev-gcp
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: dev-fss
+          CLUSTER: dev-gcp
           RESOURCE: app-preprod.yaml
       - name: Push Docker image med 'latest' tag
         if: github.ref == 'refs/heads/master'
         run: docker push ${IMAGE_LATEST}
-      - name: Deploy til prod-fss
+      - name: Deploy til prod-gcp
         if: github.ref == 'refs/heads/master'
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: prod-fss
+          CLUSTER: prod-gcp
           RESOURCE: app-prod.yaml

@@ -7,7 +7,7 @@ env:
   IMAGE_LATEST: ghcr.io/navikt/familie-baks-mottak:latest
 jobs:
   deploy-to-prod:
-    name: Bygg app/image, push til github, deploy til prod-fss (MÅ KUN BRUKES VED KRISE)
+    name: Bygg app/image, push til github, deploy til prod-gcp (MÅ KUN BRUKES VED KRISE)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -37,10 +37,10 @@ jobs:
       - name: Push Docker image med 'latest' tag
         if: github.ref == 'refs/heads/master'
         run: docker push ${IMAGE_LATEST}
-      - name: Deploy til prod-fss
+      - name: Deploy til prod-gcp
         if: github.ref == 'refs/heads/master'
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: prod-fss
+          CLUSTER: prod-gcp
           RESOURCE: app-prod.yaml
