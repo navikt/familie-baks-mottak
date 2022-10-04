@@ -8,6 +8,7 @@ import org.springframework.cache.concurrent.ConcurrentMapCache
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
 import java.util.concurrent.TimeUnit
 
 @Configuration
@@ -15,13 +16,27 @@ import java.util.concurrent.TimeUnit
 class CacheConfig {
 
     @Bean
-    fun cacheManager(): CacheManager = object : ConcurrentMapCacheManager() {
+    fun dailyCacheManager(): CacheManager = object : ConcurrentMapCacheManager() {
         override fun createConcurrentMapCache(name: String): Cache {
             val concurrentMap = Caffeine
                 .newBuilder()
                 .initialCapacity(100)
                 .maximumSize(1000)
                 .expireAfterWrite(24, TimeUnit.HOURS)
+                .recordStats().build<Any, Any>().asMap()
+            return ConcurrentMapCache(name, concurrentMap, true)
+        }
+    }
+
+    @Bean
+    @Primary
+    fun hourlyCacheManager(): CacheManager = object : ConcurrentMapCacheManager() {
+        override fun createConcurrentMapCache(name: String): Cache {
+            val concurrentMap = Caffeine
+                .newBuilder()
+                .initialCapacity(100)
+                .maximumSize(1000)
+                .expireAfterWrite(1, TimeUnit.HOURS)
                 .recordStats().build<Any, Any>().asMap()
             return ConcurrentMapCache(name, concurrentMap, true)
         }

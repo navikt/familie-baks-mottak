@@ -28,7 +28,7 @@ import java.util.Properties
 class JournalhendelseService(
     val journalpostClient: JournalpostClient,
     val taskRepository: TaskRepository,
-    val hendelsesloggRepository: HendelsesloggRepository,
+    val hendelsesloggRepository: HendelsesloggRepository
 ) {
 
     val kanalCounter = mutableMapOf<String, Counter>()
@@ -119,7 +119,6 @@ class JournalhendelseService(
         val journalpostId = hendelseRecord.journalpostId.toString()
         val journalpost = journalpostClient.hentJournalpost(journalpostId)
         if (skalBehandleJournalpost(journalpost)) {
-
             when (journalpost.journalstatus) {
                 Journalstatus.MOTTATT -> {
                     when {

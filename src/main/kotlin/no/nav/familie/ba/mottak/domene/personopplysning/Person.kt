@@ -7,7 +7,7 @@ data class Person(
     val navn: String?,
     val forelderBarnRelasjoner: Set<ForelderBarnRelasjon>,
     val bostedsadresse: Bostedsadresse? = null,
-    val adressebeskyttelseGradering: String? = null,
+    val adressebeskyttelseGradering: String? = null
 )
 
 data class Familierelasjon(
@@ -20,8 +20,11 @@ data class PersonIdent(
 )
 
 fun Person.harAdresseGradering(): Boolean {
-    return if (this.adressebeskyttelseGradering == null) false
-    else this.adressebeskyttelseGradering != "UGRADERT"
+    return if (this.adressebeskyttelseGradering == null) {
+        false
+    } else {
+        this.adressebeskyttelseGradering != "UGRADERT"
+    }
 }
 
 fun Person.harBostedsadresse(): Boolean {

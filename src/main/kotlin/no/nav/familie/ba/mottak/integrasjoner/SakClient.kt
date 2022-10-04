@@ -128,7 +128,7 @@ class SakClient @Autowired constructor(
                 uri,
                 RestAnnullerFødsel(
                     barnasIdenter = barnasIdenter,
-                    tidligereHendelseId = tidligereHendelseId,
+                    tidligereHendelseId = tidligereHendelseId
                 )
             )
             logger.info("Annuller fødselshendelse sendt til sak. Status=${response.status}")
@@ -176,7 +176,7 @@ class RestVisningBehandling(
     val type: String,
     val status: String,
     val resultat: String? = null,
-    val vedtaksdato: LocalDateTime? = null,
+    val vedtaksdato: LocalDateTime? = null
 )
 
 data class RestFagsak(
@@ -193,11 +193,11 @@ data class RestUtvidetBehandling(
     val resultat: String,
     val steg: String,
     val type: String,
-    val underkategori: BehandlingUnderkategori,
+    val underkategori: BehandlingUnderkategori
 )
 
 data class RestArbeidsfordelingPåBehandling(
-    val behandlendeEnhetId: String,
+    val behandlendeEnhetId: String
 )
 
 enum class BehandlingKategori {
@@ -219,7 +219,7 @@ data class RestFagsakDeltager(
     val ident: String,
     val rolle: FagsakDeltagerRolle,
     val fagsakId: Long,
-    val fagsakStatus: FagsakStatus,
+    val fagsakStatus: FagsakStatus
 
 )
 

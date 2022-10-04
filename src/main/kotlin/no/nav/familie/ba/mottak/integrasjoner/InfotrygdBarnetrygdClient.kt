@@ -46,8 +46,11 @@ class InfotrygdBarnetrygdClient(
         request: () -> InfotrygdSøkResponse<T>,
         onFailure: (Throwable) -> RuntimeException
     ): InfotrygdSøkResponse<T> {
-        return if (environment.activeProfiles.contains("e2e")) InfotrygdSøkResponse(emptyList(), emptyList())
-        else runCatching(request).getOrElse { throw onFailure(it) }
+        return if (environment.activeProfiles.contains("e2e")) {
+            InfotrygdSøkResponse(emptyList(), emptyList())
+        } else {
+            runCatching(request).getOrElse { throw onFailure(it) }
+        }
     }
 
     private fun uri(endepunkt: String) = URI.create("$clientUri/$endepunkt")
@@ -70,5 +73,5 @@ enum class StatusKode(val beskrivelse: String) {
     ST("sendt til"),
     VD("videresendt Direktoratet"),
     VI("venter på iverksetting"),
-    VT("videresendt Trygderetten"),
+    VT("videresendt Trygderetten")
 }

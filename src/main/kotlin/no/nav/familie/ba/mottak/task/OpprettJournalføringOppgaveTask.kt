@@ -41,7 +41,9 @@ class OpprettJournalføringOppgaveTask(
                         Oppgavetype.Journalføring
                     } else if (oppgaveClient.finnOppgaver(journalpost.journalpostId, Oppgavetype.Fordeling).isNotEmpty()) {
                         Oppgavetype.Fordeling
-                    } else null
+                    } else {
+                        null
+                    }
 
                 if (oppgaveTypeForEksisterendeOppgave == null) {
                     val nyOppgave = oppgaveClient.opprettJournalføringsoppgave(

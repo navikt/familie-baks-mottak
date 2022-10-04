@@ -11,7 +11,6 @@ import no.nav.familie.ba.mottak.config.FeatureToggleService
 import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.Hendelseslogg
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
-import no.nav.familie.ba.mottak.integrasjoner.AktørClient
 import no.nav.familie.ba.mottak.integrasjoner.Bruker
 import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
@@ -22,6 +21,7 @@ import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.ba.mottak.integrasjoner.Journalposttype
 import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
 import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
+import no.nav.familie.ba.mottak.integrasjoner.PdlClient
 import no.nav.familie.ba.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.ba.mottak.task.JournalhendelseRutingTask
@@ -59,7 +59,7 @@ class JournalføringHendelseServiceTest {
     lateinit var infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient
 
     @MockK
-    lateinit var aktørClient: AktørClient
+    lateinit var pdlClient: PdlClient
 
     @MockK(relaxed = true)
     lateinit var mockTaskRepository: TaskRepository
@@ -240,7 +240,7 @@ class JournalføringHendelseServiceTest {
         } returns null
 
         every {
-            aktørClient.hentPersonident(any())
+            pdlClient.hentPersonident(any())
         } returns "12345678910"
 
         every {
@@ -319,9 +319,11 @@ class JournalføringHendelseServiceTest {
     @Test
     fun `Skal ignorere hendelse fordi den eksisterer i hendelseslogg`() {
         val consumerRecord = ConsumerRecord(
-            "topic", 1,
+            "topic",
+            1,
             OFFSET,
-            42L, opprettRecord(JOURNALPOST_PAPIRSØKNAD)
+            42L,
+            opprettRecord(JOURNALPOST_PAPIRSØKNAD)
         )
         every {
             mockHendelsesloggRepository.existsByHendelseIdAndConsumer("hendelseId", HendelseConsumer.JOURNAL_AIVEN)
@@ -339,9 +341,11 @@ class JournalføringHendelseServiceTest {
     @Test
     fun `Mottak av gyldig hendelse skal delegeres til service`() {
         val consumerRecord = ConsumerRecord(
-            "topic", 1,
+            "topic",
+            1,
             OFFSET,
-            42L, opprettRecord(JOURNALPOST_PAPIRSØKNAD)
+            42L,
+            opprettRecord(JOURNALPOST_PAPIRSØKNAD)
         )
 
         service.prosesserNyHendelse(consumerRecord, ack)
@@ -365,9 +369,11 @@ class JournalføringHendelseServiceTest {
     fun `Ikke gyldige hendelsetyper skal ignoreres`() {
         val ugyldigHendelsetypeRecord = opprettRecord(journalpostId = JOURNALPOST_PAPIRSØKNAD, hendelseType = "UgyldigType", temaNytt = "BAR")
         val consumerRecord = ConsumerRecord(
-            "topic", 1,
+            "topic",
+            1,
             OFFSET,
-            42L, ugyldigHendelsetypeRecord
+            42L,
+            ugyldigHendelsetypeRecord
         )
 
         service.prosesserNyHendelse(consumerRecord, ack)
@@ -383,9 +389,11 @@ class JournalføringHendelseServiceTest {
         val ukjentTemaRecord = opprettRecord(journalpostId = JOURNALPOST_PAPIRSØKNAD, temaNytt = "UKJ")
 
         val consumerRecord = ConsumerRecord(
-            "topic", 1,
+            "topic",
+            1,
             OFFSET,
-            42L, ukjentTemaRecord
+            42L,
+            ukjentTemaRecord
         )
 
         service.prosesserNyHendelse(consumerRecord, ack)

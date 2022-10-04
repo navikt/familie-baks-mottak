@@ -18,11 +18,11 @@ import org.springframework.stereotype.Service
 @TaskStepBeskrivelse(
     taskStepType = MottaAnnullerFødselTask.TASK_STEP_TYPE,
     beskrivelse = "Motta annuller fødsel",
-    maxAntallFeil = 3,
+    maxAntallFeil = 3
 )
 class MottaAnnullerFødselTask(
     private val taskRepository: TaskRepository,
-    private val sakClient: SakClient,
+    private val sakClient: SakClient
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(MottaAnnullerFødselTask::class.java)

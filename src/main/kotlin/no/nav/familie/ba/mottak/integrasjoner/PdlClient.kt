@@ -13,8 +13,11 @@ import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.retry.annotation.Backoff
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
 import java.net.URI
@@ -30,6 +33,8 @@ class PdlClient(
 
     private val pdlUri = UriUtil.uri(pdlBaseUrl, PATH_GRAPHQL)
 
+    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
+    @Cacheable("hentIdenter", cacheManager = "hourlyCacheManager")
     fun hentIdenter(personIdent: String): List<IdentInformasjon> {
         val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery("hentIdenter"))
         val response = postForEntity<PdlHentIdenterResponse>(pdlUri, pdlPersonRequest, httpHeaders())
@@ -46,8 +51,11 @@ class PdlClient(
         return hentIdenter(aktørId).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name && !it.historisk }.last().ident
     }
 
-    fun hentPersonMedRelasjoner(personIdent: String): Person {
+    fun hentAktørId(personIdent: String): String {
+        return hentIdenter(personIdent).filter { it.gruppe == Identgruppe.AKTORID.name && !it.historisk }.last().ident
+    }
 
+    fun hentPersonMedRelasjoner(personIdent: String): Person {
         val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery("hentperson-med-relasjoner"))
 
         try {
@@ -206,7 +214,7 @@ data class PdlPersonData(
     @JsonProperty(value = "doedsfall") val dødsfall: List<Dødsfall> = emptyList(),
     @JsonProperty(value = "foedsel") val fødsel: List<Fødsel> = emptyList(),
     val sivilstand: List<Sivilstand> = emptyList(),
-    val innflyttingTilNorge: List<InnflyttingTilNorge> = emptyList(),
+    val innflyttingTilNorge: List<InnflyttingTilNorge> = emptyList()
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -235,7 +243,7 @@ data class Fødsel(
 data class Sivilstand(
     val type: SIVILSTAND,
     val gyldigFraOgMed: LocalDate? = null,
-    val bekreftelsesdato: LocalDate? = null,
+    val bekreftelsesdato: LocalDate? = null
 )
 
 data class InnflyttingTilNorge(
@@ -259,5 +267,5 @@ enum class Adressebeskyttelsesgradering {
 enum class Identgruppe {
     AKTORID,
     FOLKEREGISTERIDENT,
-    ORGNR,
+    ORGNR
 }

@@ -26,7 +26,7 @@ import kotlin.test.assertNotEquals
 @Tag("integration")
 @SpringBootTest(classes = [DevLauncherPostgres::class])
 class SøknadsfeltSpråkTest(
-    @Autowired val søknadSpråkvelgerService: SøknadSpråkvelgerService,
+    @Autowired val søknadSpråkvelgerService: SøknadSpråkvelgerService
 ) {
     @Test
     fun `Kan velge språk for søknadsfelter`() {

@@ -6,7 +6,6 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.ba.mottak.hendelser.JournalføringHendelseServiceTest
-import no.nav.familie.ba.mottak.integrasjoner.AktørClient
 import no.nav.familie.ba.mottak.integrasjoner.Bruker
 import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.ba.mottak.integrasjoner.FagsakDeltagerRolle.BARN
@@ -38,7 +37,6 @@ class SkanHendelseTaskLøypeTest {
     private val mockJournalpostClient: JournalpostClient = mockk()
     private val mockOppgaveClient: OppgaveClient = mockk()
     private val mockSakClient: SakClient = mockk()
-    private val mockAktørClient: AktørClient = mockk()
     private val mockTaskRepository: TaskRepository = mockk(relaxed = true)
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
@@ -83,7 +81,7 @@ class SkanHendelseTaskLøypeTest {
         } returns null
 
         every {
-            mockAktørClient.hentPersonident(any())
+            mockPdlClient.hentPersonident(any())
         } returns "12345678910"
 
         every {

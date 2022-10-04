@@ -1,11 +1,11 @@
 package no.nav.familie.ba.mottak.task
 
-import no.nav.familie.ba.mottak.integrasjoner.AktørClient
 import no.nav.familie.ba.mottak.integrasjoner.Bruker
 import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.ba.mottak.integrasjoner.DokarkivClient
 import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
+import no.nav.familie.ba.mottak.integrasjoner.PdlClient
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -24,8 +24,8 @@ class OppdaterOgFerdigstillJournalpostTask(
     private val journalpostClient: JournalpostClient,
     private val dokarkivClient: DokarkivClient,
     private val sakClient: SakClient,
-    private val aktørClient: AktørClient,
-    private val taskRepository: TaskRepository
+    private val taskRepository: TaskRepository,
+    private val pdlClient: PdlClient
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(OppdaterOgFerdigstillJournalpostTask::class.java)
@@ -78,7 +78,7 @@ class OppdaterOgFerdigstillJournalpostTask(
 
     private fun tilPersonIdent(bruker: Bruker): String {
         return when (bruker.type) {
-            BrukerIdType.AKTOERID -> aktørClient.hentPersonident(bruker.id)
+            BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id)
             else -> bruker.id
         }
     }

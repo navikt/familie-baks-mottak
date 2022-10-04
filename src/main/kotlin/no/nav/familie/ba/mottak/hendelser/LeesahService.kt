@@ -75,7 +75,6 @@ class LeesahService(
 
         when (pdlHendelse.endringstype) {
             OPPRETTET -> {
-
                 if (pdlHendelse.dødsdato == null) {
                     log.error("Mangler dødsdato. Ignorerer hendelse ${pdlHendelse.hendelseId}")
                     dødsfallIgnorertCounter.increment()
@@ -122,7 +121,7 @@ class LeesahService(
                                 this["callId"] = pdlHendelse.hendelseId
                             }
                         ).medTriggerTid(
-                            nesteGyldigeTriggertidFødselshendelser(triggerTidForTps, environment),
+                            nesteGyldigeTriggertidFødselshendelser(triggerTidForTps, environment)
                         )
                         taskRepository.save(task)
                     }

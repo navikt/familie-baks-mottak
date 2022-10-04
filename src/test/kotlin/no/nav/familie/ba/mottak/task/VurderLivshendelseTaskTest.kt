@@ -5,7 +5,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.familie.ba.mottak.integrasjoner.AktørClient
 import no.nav.familie.ba.mottak.integrasjoner.BehandlesAvApplikasjon
 import no.nav.familie.ba.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.ba.mottak.integrasjoner.BehandlingUnderkategori
@@ -52,12 +51,11 @@ class VurderLivshendelseTaskTest {
 
     private val mockOppgaveClient: OppgaveClient = mockk()
     private val mockSakClient: SakClient = mockk()
-    private val mockAktørClient: AktørClient = mockk()
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdClient: InfotrygdBarnetrygdClient = mockk()
 
     private val vurderLivshendelseTask =
-        VurderLivshendelseTask(mockOppgaveClient, mockPdlClient, mockSakClient, mockAktørClient, mockInfotrygdClient)
+        VurderLivshendelseTask(mockOppgaveClient, mockPdlClient, mockSakClient, mockInfotrygdClient)
 
     @BeforeEach
     internal fun setUp() {
@@ -68,15 +66,15 @@ class VurderLivshendelseTaskTest {
         } returns listOf()
 
         every {
-            mockAktørClient.hentAktørId(PERSONIDENT_MOR)
+            mockPdlClient.hentAktørId(PERSONIDENT_MOR)
         } returns PERSONIDENT_MOR + "00"
 
         every {
-            mockAktørClient.hentAktørId(PERSONIDENT_FAR)
+            mockPdlClient.hentAktørId(PERSONIDENT_FAR)
         } returns PERSONIDENT_FAR + "00"
 
         every {
-            mockAktørClient.hentAktørId(PERSONIDENT_BARN)
+            mockPdlClient.hentAktørId(PERSONIDENT_BARN)
         } returns PERSONIDENT_BARN + "00"
 
         every { mockOppgaveClient.finnOppgaverPåAktørId(any(), any()) } returns emptyList()
@@ -134,7 +132,6 @@ class VurderLivshendelseTaskTest {
 
     @Test
     fun `Ignorer livshendelser på person som har barn og som ikke har sak i ba-sak`() {
-
         every {
             mockPdlClient.hentPerson(
                 PERSONIDENT_MOR,
@@ -178,7 +175,6 @@ class VurderLivshendelseTaskTest {
 
     @Test
     fun `Skal opprette oppgave på forelderen barnet er registrert på i ba-sak`() {
-
         every {
             mockPdlClient.hentPerson(
                 PERSONIDENT_BARN,
@@ -240,7 +236,6 @@ class VurderLivshendelseTaskTest {
 
     @Test
     fun `Livshendelser på person som har sak i ba-sak`() {
-
         every {
             mockPdlClient.hentPerson(
                 any(),
@@ -344,7 +339,6 @@ class VurderLivshendelseTaskTest {
 
     @Test
     fun `Skal bruke sivilstandobjekt fra PdlPersonData med nyest dato`() {
-
         every {
             mockPdlClient.hentPerson(
                 any(),
@@ -434,7 +428,6 @@ class VurderLivshendelseTaskTest {
 
     @Test
     fun `Livshendelser på BARN som har sak i ba-sak`() {
-
         every {
             mockPdlClient.hentPerson(
                 PERSONIDENT_BARN,
@@ -467,9 +460,9 @@ class VurderLivshendelseTaskTest {
                 PdlForeldreBarnRelasjon(
                     minRolleForPerson = FORELDERBARNRELASJONROLLE.MOR,
                     relatertPersonsIdent = PERSONIDENT_BARN,
-                    relatertPersonsRolle = FORELDERBARNRELASJONROLLE.BARN,
+                    relatertPersonsRolle = FORELDERBARNRELASJONROLLE.BARN
                 )
-            ),
+            )
         )
 
         every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN)) } returns
@@ -691,7 +684,7 @@ class VurderLivshendelseTaskTest {
                     minRolleForPerson = FORELDERBARNRELASJONROLLE.BARN,
                     relatertPersonsIdent = PERSONIDENT_MOR,
                     relatertPersonsRolle = FORELDERBARNRELASJONROLLE.MOR
-                ),
+                )
             ),
             dødsfall = if (barn1Død) listOf(Dødsfall(dødsdato = LocalDate.now())) else emptyList(),
             fødsel = listOf(Fødsel(LocalDate.now().minusYears(3)))
@@ -708,7 +701,7 @@ class VurderLivshendelseTaskTest {
                     minRolleForPerson = FORELDERBARNRELASJONROLLE.BARN,
                     relatertPersonsIdent = PERSONIDENT_MOR,
                     relatertPersonsRolle = FORELDERBARNRELASJONROLLE.MOR
-                ),
+                )
             ),
             dødsfall = if (barn2Død) listOf(Dødsfall(dødsdato = LocalDate.now())) else emptyList(),
             fødsel = listOf(Fødsel(LocalDate.now().minusYears(3)))
@@ -727,7 +720,7 @@ class VurderLivshendelseTaskTest {
                 "RESULTAT",
                 "BEHANDLING_AVSLUTTET",
                 "TYPE",
-                BehandlingUnderkategori.ORDINÆR,
+                BehandlingUnderkategori.ORDINÆR
             )
         )
     )

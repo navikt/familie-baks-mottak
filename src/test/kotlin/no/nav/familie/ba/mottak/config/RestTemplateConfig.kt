@@ -23,7 +23,7 @@ import java.nio.charset.StandardCharsets
     ConsumerIdClientInterceptor::class,
     MdcValuesPropagatingClientInterceptor::class,
     StsBearerTokenClientInterceptor::class,
-    NaisProxyCustomizer::class,
+    NaisProxyCustomizer::class
 )
 class RestTemplateConfig {
 
@@ -38,7 +38,6 @@ class RestTemplateConfig {
         mdcValuesPropagatingClientInterceptor: MdcValuesPropagatingClientInterceptor,
         naisProxyCustomizer: NaisProxyCustomizer
     ): RestOperations {
-
         return RestTemplateBuilder()
             .additionalCustomizers(naisProxyCustomizer)
             .additionalInterceptors(consumerIdClientInterceptor, mdcValuesPropagatingClientInterceptor)
@@ -72,7 +71,6 @@ class RestTemplateConfig {
         stsBearerTokenClientInterceptor: StsBearerTokenClientInterceptor,
         consumerIdClientInterceptor: ConsumerIdClientInterceptor
     ): RestOperations {
-
         return RestTemplateBuilder()
             .interceptors(
                 consumerIdClientInterceptor,

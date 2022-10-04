@@ -22,7 +22,6 @@ class PdfService(
 ) {
 
     fun lagPdf(versjonertSøknad: VersjonertSøknad, dbSøknad: DBSøknad, språk: String = "nb"): ByteArray {
-
         val søknadJson = søknadSpråkvelgerService.velgSøknadSpråk(versjonertSøknad, språk)
 
         val (søknadstype, navn) = when (versjonertSøknad) {

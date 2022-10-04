@@ -98,8 +98,11 @@ class MottaFødselshendelseTask(
     }
 
     fun skalFiltrerePåBostedsadresse(person: Person): Boolean {
-        return if (person.harAdresseGradering()) false
-        else !person.harBostedsadresse()
+        return if (person.harAdresseGradering()) {
+            false
+        } else {
+            !person.harBostedsadresse()
+        }
     }
 
     companion object {

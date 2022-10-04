@@ -58,12 +58,16 @@ class OppgaveMapper(
                 hentAktørIdFraPdl(journalpost.bruker.id.trim())?.let { OppgaveIdentV2(ident = it, gruppe = IdentGruppe.AKTOERID) }
                     ?: if (oppgavetype == Oppgavetype.BehandleSak) {
                         throw IntegrasjonException(msg = "Fant ikke aktørId på person i PDL", ident = journalpost.bruker.id)
-                    } else null
+                    } else {
+                        null
+                    }
             }
             BrukerIdType.ORGNR -> {
                 if (erOrgnr(journalpost.bruker.id.trim())) {
                     OppgaveIdentV2(ident = journalpost.bruker.id.trim(), gruppe = IdentGruppe.ORGNR)
-                } else null
+                } else {
+                    null
+                }
             }
             BrukerIdType.AKTOERID -> OppgaveIdentV2(ident = journalpost.bruker.id.trim(), gruppe = IdentGruppe.AKTOERID)
             else -> null
@@ -73,7 +77,9 @@ class OppgaveMapper(
     private fun tilBeskrivelse(journalpost: Journalpost, beskrivelse: String?): String {
         val bindestrek = if (!beskrivelse.isNullOrEmpty() && !journalpost.hentHovedDokumentTittel().isNullOrEmpty()) {
             "-"
-        } else ""
+        } else {
+            ""
+        }
 
         return "${journalpost.hentHovedDokumentTittel().orEmpty()} $bindestrek ${beskrivelse.orEmpty()}".trim()
     }
