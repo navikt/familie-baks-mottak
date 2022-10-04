@@ -1,6 +1,5 @@
 package no.nav.familie.ba.mottak.config
 
-import no.nav.familie.http.config.NaisProxyCustomizer
 import no.nav.familie.http.interceptor.ConsumerIdClientInterceptor
 import no.nav.familie.http.interceptor.MdcValuesPropagatingClientInterceptor
 import no.nav.familie.http.interceptor.StsBearerTokenClientInterceptor
@@ -23,7 +22,6 @@ import java.nio.charset.StandardCharsets
     ConsumerIdClientInterceptor::class,
     MdcValuesPropagatingClientInterceptor::class,
     StsBearerTokenClientInterceptor::class,
-    NaisProxyCustomizer::class
 )
 class RestTemplateConfig {
 
@@ -36,10 +34,8 @@ class RestTemplateConfig {
     fun restTemplateJwtBearer(
         consumerIdClientInterceptor: ConsumerIdClientInterceptor,
         mdcValuesPropagatingClientInterceptor: MdcValuesPropagatingClientInterceptor,
-        naisProxyCustomizer: NaisProxyCustomizer
     ): RestOperations {
         return RestTemplateBuilder()
-            .additionalCustomizers(naisProxyCustomizer)
             .additionalInterceptors(consumerIdClientInterceptor, mdcValuesPropagatingClientInterceptor)
             .build()
     }
@@ -48,10 +44,8 @@ class RestTemplateConfig {
     fun restTemplateClientCredentials(
         consumerIdClientInterceptor: ConsumerIdClientInterceptor,
         mdcValuesPropagatingClientInterceptor: MdcValuesPropagatingClientInterceptor,
-        naisProxyCustomizer: NaisProxyCustomizer
     ): RestOperations {
         return RestTemplateBuilder()
-            .additionalCustomizers(naisProxyCustomizer)
             .additionalInterceptors(consumerIdClientInterceptor, mdcValuesPropagatingClientInterceptor)
             .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
             .build()

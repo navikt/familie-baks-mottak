@@ -1,6 +1,5 @@
 package no.nav.familie.ba.mottak.config
 
-import no.nav.familie.http.config.NaisProxyCustomizer
 import no.nav.familie.http.config.RestTemplateSts
 import no.nav.familie.http.interceptor.BearerTokenClientInterceptor
 import no.nav.familie.http.interceptor.ConsumerIdClientInterceptor
@@ -19,7 +18,6 @@ import org.springframework.web.client.RestOperations
     BearerTokenClientInterceptor::class,
     MdcValuesPropagatingClientInterceptor::class,
     RestTemplateSts::class,
-    NaisProxyCustomizer::class
 )
 class RestTemplateConfig {
 
@@ -28,10 +26,8 @@ class RestTemplateConfig {
     fun restTemplateClientCredentials(
         consumerIdClientInterceptor: ConsumerIdClientInterceptor,
         bearerTokenClientInterceptor: BearerTokenClientInterceptor,
-        naisProxyCustomizer: NaisProxyCustomizer
     ): RestOperations {
         return RestTemplateBuilder()
-            .additionalCustomizers(naisProxyCustomizer)
             .interceptors(
                 consumerIdClientInterceptor,
                 bearerTokenClientInterceptor,
