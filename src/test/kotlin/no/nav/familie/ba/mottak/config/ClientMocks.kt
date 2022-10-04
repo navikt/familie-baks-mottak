@@ -2,7 +2,6 @@ package no.nav.familie.ba.mottak.config
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.ba.mottak.integrasjoner.AktørClient
 import no.nav.familie.ba.mottak.integrasjoner.Bruker
 import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.ba.mottak.integrasjoner.DokarkivClient
@@ -35,22 +34,6 @@ class ClientMocks {
         } returns OppgaveResponse(1L)
 
         return mockOppgaveClient
-    }
-
-    @Bean
-    @Primary
-    fun mockAktørClient(): AktørClient {
-        val mockAktørClient = mockk<AktørClient>(relaxed = true)
-
-        every {
-            mockAktørClient.hentAktørId(any())
-        } returns "42"
-
-        every {
-            mockAktørClient.hentPersonident(any())
-        } returns "12345678910"
-
-        return mockAktørClient
     }
 
     @Bean

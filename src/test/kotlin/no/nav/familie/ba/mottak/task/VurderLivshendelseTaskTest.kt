@@ -5,7 +5,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.familie.ba.mottak.integrasjoner.AktørClient
 import no.nav.familie.ba.mottak.integrasjoner.BehandlesAvApplikasjon
 import no.nav.familie.ba.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.ba.mottak.integrasjoner.BehandlingUnderkategori
@@ -52,12 +51,11 @@ class VurderLivshendelseTaskTest {
 
     private val mockOppgaveClient: OppgaveClient = mockk()
     private val mockSakClient: SakClient = mockk()
-    private val mockAktørClient: AktørClient = mockk()
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdClient: InfotrygdBarnetrygdClient = mockk()
 
     private val vurderLivshendelseTask =
-        VurderLivshendelseTask(mockOppgaveClient, mockPdlClient, mockSakClient, mockAktørClient, mockInfotrygdClient)
+        VurderLivshendelseTask(mockOppgaveClient, mockPdlClient, mockSakClient, mockInfotrygdClient)
 
     @BeforeEach
     internal fun setUp() {
@@ -68,15 +66,15 @@ class VurderLivshendelseTaskTest {
         } returns listOf()
 
         every {
-            mockAktørClient.hentAktørId(PERSONIDENT_MOR)
+            mockPdlClient.hentAktørId(PERSONIDENT_MOR)
         } returns PERSONIDENT_MOR + "00"
 
         every {
-            mockAktørClient.hentAktørId(PERSONIDENT_FAR)
+            mockPdlClient.hentAktørId(PERSONIDENT_FAR)
         } returns PERSONIDENT_FAR + "00"
 
         every {
-            mockAktørClient.hentAktørId(PERSONIDENT_BARN)
+            mockPdlClient.hentAktørId(PERSONIDENT_BARN)
         } returns PERSONIDENT_BARN + "00"
 
         every { mockOppgaveClient.finnOppgaverPåAktørId(any(), any()) } returns emptyList()
