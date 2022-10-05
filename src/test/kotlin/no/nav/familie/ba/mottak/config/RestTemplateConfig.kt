@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets
 @Import(
     ConsumerIdClientInterceptor::class,
     MdcValuesPropagatingClientInterceptor::class,
-    StsBearerTokenClientInterceptor::class,
+    StsBearerTokenClientInterceptor::class
 )
 class RestTemplateConfig {
 
@@ -33,7 +33,7 @@ class RestTemplateConfig {
     @Bean("jwtBearer")
     fun restTemplateJwtBearer(
         consumerIdClientInterceptor: ConsumerIdClientInterceptor,
-        mdcValuesPropagatingClientInterceptor: MdcValuesPropagatingClientInterceptor,
+        mdcValuesPropagatingClientInterceptor: MdcValuesPropagatingClientInterceptor
     ): RestOperations {
         return RestTemplateBuilder()
             .additionalInterceptors(consumerIdClientInterceptor, mdcValuesPropagatingClientInterceptor)
@@ -43,7 +43,7 @@ class RestTemplateConfig {
     @Bean("clientCredentials")
     fun restTemplateClientCredentials(
         consumerIdClientInterceptor: ConsumerIdClientInterceptor,
-        mdcValuesPropagatingClientInterceptor: MdcValuesPropagatingClientInterceptor,
+        mdcValuesPropagatingClientInterceptor: MdcValuesPropagatingClientInterceptor
     ): RestOperations {
         return RestTemplateBuilder()
             .additionalInterceptors(consumerIdClientInterceptor, mdcValuesPropagatingClientInterceptor)

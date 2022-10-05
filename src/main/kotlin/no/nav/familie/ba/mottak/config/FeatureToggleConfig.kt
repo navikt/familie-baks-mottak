@@ -85,10 +85,6 @@ class FeatureToggleConfig(
             }
         }
     }
-
-    companion object {
-        const val TOGGLE_IDENTHENDELSER = "familie-baks-mottak.sende-identhendelser-til-ba-sak"
-    }
 }
 
 interface FeatureToggleService {

@@ -17,7 +17,7 @@ import org.springframework.web.client.RestOperations
 @Import(
     BearerTokenClientInterceptor::class,
     MdcValuesPropagatingClientInterceptor::class,
-    RestTemplateSts::class,
+    RestTemplateSts::class
 )
 class RestTemplateConfig {
 
@@ -25,7 +25,7 @@ class RestTemplateConfig {
     @Bean("clientCredentials")
     fun restTemplateClientCredentials(
         consumerIdClientInterceptor: ConsumerIdClientInterceptor,
-        bearerTokenClientInterceptor: BearerTokenClientInterceptor,
+        bearerTokenClientInterceptor: BearerTokenClientInterceptor
     ): RestOperations {
         return RestTemplateBuilder()
             .interceptors(

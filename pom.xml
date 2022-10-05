@@ -27,7 +27,7 @@
         <felles.version>1.20220930133126_14f75ec</felles.version>
         <kontrakter.version>2.0_20220916130234_aa8ba65</kontrakter.version>
         <main-class>no.nav.familie.ba.mottak.LauncherKt</main-class>
-        <spring.cloud.version>3.1.1</spring.cloud.version>
+        <spring.cloud.version>3.1.4</spring.cloud.version>
         <token-validation-spring.version>2.1.4</token-validation-spring.version>
         <avro.version>1.11.1</avro.version>
 
@@ -54,11 +54,6 @@
                     <artifactId>spring-boot-starter-tomcat</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-bootstrap</artifactId>
-            <version>3.1.4</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
