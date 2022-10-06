@@ -34,7 +34,7 @@ class EnsligForsørgerHendelseServiceTest {
     }
 
     @Test
-    @Disabled //FIXME, enables når vi merger til master med hendelser på
+    @Disabled // FIXME, enables når vi merger til master med hendelser på
     fun `Skal gjøre kall mot ba-sak hvis det er en overgangstønad som ikke er prosessert før`() {
         service.prosesserEfVedtakHendelse(42, EnsligForsørgerVedtakhendelse(100, "01020300110", StønadType.OVERGANGSSTØNAD))
 

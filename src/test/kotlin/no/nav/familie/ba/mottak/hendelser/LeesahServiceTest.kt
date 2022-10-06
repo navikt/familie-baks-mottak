@@ -24,7 +24,7 @@ import kotlin.random.Random
 import kotlin.random.nextUInt
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Disabled //FIXME, enables når vi merger til master med hendelser på
+@Disabled // FIXME, enables når vi merger til master med hendelser på
 class LeesahServiceTest {
 
     lateinit var mockHendelsesloggRepository: HendelsesloggRepository

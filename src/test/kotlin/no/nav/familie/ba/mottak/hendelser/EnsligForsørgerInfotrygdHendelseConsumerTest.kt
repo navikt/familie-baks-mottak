@@ -76,7 +76,7 @@ class EnsligForsørgerInfotrygdHendelseConsumerTest {
     }
 
     @Test
-    @Disabled //FIXME, enables når vi merger til master med hendelser på
+    @Disabled // FIXME, enables når vi merger til master med hendelser på
     fun `Skal lese melding, konvertere, sende til ba-sak og ACKe melding `() {
         val ack: Acknowledgment = mockk(relaxed = true)
         val consumerRecord = ConsumerRecord("topic", 1, 1, "42", json)
