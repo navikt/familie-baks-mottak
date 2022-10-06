@@ -12,6 +12,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.kafka.support.Acknowledgment
@@ -75,6 +76,7 @@ class EnsligForsørgerInfotrygdHendelseConsumerTest {
     }
 
     @Test
+    @Disabled //FIXME, enables når vi merger til master med hendelser på
     fun `Skal lese melding, konvertere, sende til ba-sak og ACKe melding `() {
         val ack: Acknowledgment = mockk(relaxed = true)
         val consumerRecord = ConsumerRecord("topic", 1, 1, "42", json)

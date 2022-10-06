@@ -11,6 +11,7 @@ import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.ef.EnsligForsørgerVedtakhendelse
 import no.nav.familie.kontrakter.felles.ef.StønadType
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
@@ -33,6 +34,7 @@ class EnsligForsørgerHendelseServiceTest {
     }
 
     @Test
+    @Disabled //FIXME, enables når vi merger til master med hendelser på
     fun `Skal gjøre kall mot ba-sak hvis det er en overgangstønad som ikke er prosessert før`() {
         service.prosesserEfVedtakHendelse(42, EnsligForsørgerVedtakhendelse(100, "01020300110", StønadType.OVERGANGSSTØNAD))
 
