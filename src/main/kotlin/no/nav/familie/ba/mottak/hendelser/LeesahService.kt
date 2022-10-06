@@ -6,16 +6,10 @@ import no.nav.familie.ba.mottak.domene.HendelseConsumer
 import no.nav.familie.ba.mottak.domene.Hendelseslogg
 import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
 import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
-import no.nav.familie.ba.mottak.integrasjoner.RestAnnullerFødsel
-import no.nav.familie.ba.mottak.task.MottaAnnullerFødselTask
-import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.ba.mottak.task.VurderLivshendelseTask
 import no.nav.familie.ba.mottak.task.VurderLivshendelseTaskDTO
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType
-import no.nav.familie.ba.mottak.task.VurderLivshendelseType.DØDSFALL
 import no.nav.familie.ba.mottak.task.VurderLivshendelseType.SIVILSTAND
-import no.nav.familie.ba.mottak.task.VurderLivshendelseType.UTFLYTTING
-import no.nav.familie.ba.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND.GIFT
 import no.nav.familie.prosessering.domene.Task
@@ -79,7 +73,9 @@ class LeesahService(
                     log.error("Mangler dødsdato. Ignorerer hendelse ${pdlHendelse.hendelseId}")
                     dødsfallIgnorertCounter.increment()
                 } else {
-                    opprettVurderLivshendelseTaskForHendelse(DØDSFALL, pdlHendelse)
+                    // FIXME midleridig deaktivert til vi overtar helt for ba-mottak
+                    // Må skrus på før merge til master
+                    // opprettVurderLivshendelseTaskForHendelse(DØDSFALL, pdlHendelse)
                 }
             }
             else -> {
@@ -113,7 +109,9 @@ class LeesahService(
                             KORRIGERT -> fødselKorrigertCounter.increment()
                         }
 
-                        val task = Task(
+                        // FIXME midleridig deaktivert til vi overtar helt for ba-mottak
+                        // Må skrus på før merge til master
+/*                        val task = Task(
                             type = MottaFødselshendelseTask.TASK_STEP_TYPE,
                             payload = pdlHendelse.hentPersonident(),
                             properties = Properties().apply {
@@ -123,7 +121,7 @@ class LeesahService(
                         ).medTriggerTid(
                             nesteGyldigeTriggertidFødselshendelser(triggerTidForTps, environment)
                         )
-                        taskRepository.save(task)
+                        taskRepository.save(task)*/
                     }
                 } else if (erUnder18år(fødselsdato)) {
                     fødselIgnorertUnder18årCounter.increment()
@@ -134,7 +132,9 @@ class LeesahService(
             ANNULLERT -> {
                 fødselAnnullertCounter.increment()
                 if (pdlHendelse.tidligereHendelseId != null) {
-                    val task = Task(
+                    // FIXME midleridig deaktivert til vi overtar helt for ba-mottak
+                    // Må skrus på før merge til master
+                    /*val task = Task(
                         type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
                         payload = objectMapper.writeValueAsString(
                             RestAnnullerFødsel(
@@ -148,7 +148,7 @@ class LeesahService(
                             this["tidligereHendelseId"] = pdlHendelse.tidligereHendelseId
                         }
                     )
-                    taskRepository.save(task)
+                    taskRepository.save(task)*/
                 } else {
                     log.warn("Mottatt annuller fødsel uten tidligereHendelseId, hendelseId ${pdlHendelse.hendelseId}")
                 }
@@ -171,7 +171,9 @@ class LeesahService(
                 logHendelse(pdlHendelse, "utflyttingsdato: ${pdlHendelse.utflyttingsdato}")
                 utflyttingOpprettetCounter.increment()
 
-                opprettVurderLivshendelseTaskForHendelse(UTFLYTTING, pdlHendelse)
+                // FIXME midleridig deaktivert til vi overtar helt for ba-mottak
+                // Må skrus på før merge til master
+                // opprettVurderLivshendelseTaskForHendelse(UTFLYTTING, pdlHendelse)
             }
             else -> {
                 logHendelse(pdlHendelse, "Ikke av type OPPRETTET.")
@@ -195,7 +197,9 @@ class LeesahService(
                 logHendelse(pdlHendelse, "sivilstandDato: ${pdlHendelse.sivilstandDato}")
                 sivilstandOpprettetCounter.increment()
 
-                opprettTaskHvisSivilstandErGift(pdlHendelse)
+                // FIXME midleridig deaktivert til vi overtar helt for ba-mottak
+                // Må skrus på før merge til master
+                // opprettTaskHvisSivilstandErGift(pdlHendelse)
             }
             else -> {
                 logHendelse(pdlHendelse, "Ikke av type OPPRETTET.")

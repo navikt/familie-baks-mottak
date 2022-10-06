@@ -3,7 +3,6 @@ package no.nav.familie.ba.mottak.hendelser
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.ba.mottak.integrasjoner.SakClient
-import no.nav.familie.kontrakter.felles.PersonIdent
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.person.pdl.aktor.v2.Aktor
 import no.nav.person.pdl.aktor.v2.Type
@@ -55,7 +54,9 @@ class IdenthendelseConsumer(
                 ident.type == Type.FOLKEREGISTERIDENT && ident.gjeldende
             }?.also { folkeregisterident ->
                 SECURE_LOGGER.info("Sender ident-hendelse til ba-sak for ident $folkeregisterident")
-                sakClient.sendIdenthendelseTilSak(PersonIdent(ident = folkeregisterident.idnummer.toString()))
+                // FIXME midleridig deaktivert til vi overtar helt for ba-mottak
+                // Må skrus på før merge til master
+                // sakClient.sendIdenthendelseTilSak(PersonIdent(ident = folkeregisterident.idnummer.toString()))
             }
         } catch (e: RuntimeException) {
             identhendelseFeiletCounter.increment()

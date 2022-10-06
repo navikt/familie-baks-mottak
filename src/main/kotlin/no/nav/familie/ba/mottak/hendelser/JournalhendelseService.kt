@@ -55,7 +55,10 @@ class JournalhendelseService(
                 }
 
                 secureLogger.info("Behandler gyldig journalhendelse: $hendelseRecord")
-                behandleJournalhendelse(hendelseRecord)
+
+                // FIXME midleridig deaktivert til vi overtar helt for ba-mottak
+                // Må skrus på før merge til master
+                // behandleJournalhendelse(hendelseRecord)
 
                 lagreHendelseslogg(consumerRecord, hendelseRecord, CONSUMER_JOURNAL)
             }
@@ -90,23 +93,6 @@ class JournalhendelseService(
 
     fun CharSequence.toStringOrNull(): String? {
         return if (this.isNotBlank()) this.toString() else null
-    }
-
-    fun bareLagreLoggOgAckAiven(
-        consumerRecord: ConsumerRecord<Long, JournalfoeringHendelseRecord>,
-        ack: Acknowledgment
-    ) {
-        val hendelseRecord = consumerRecord.value()
-        if (erGyldigHendelsetype(hendelseRecord)) {
-            if (!hendelsesloggRepository.existsByHendelseIdAndConsumer(
-                    hendelseRecord.hendelsesId.toString(),
-                    HendelseConsumer.JOURNAL_AIVEN
-                )
-            ) {
-                lagreHendelseslogg(consumerRecord, hendelseRecord, HendelseConsumer.JOURNAL_AIVEN)
-            }
-        }
-        ack.acknowledge()
     }
 
     private fun erGyldigHendelsetype(hendelseRecord: JournalfoeringHendelseRecord): Boolean {
