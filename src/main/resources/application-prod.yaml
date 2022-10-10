@@ -62,9 +62,6 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
-funksjonsbrytere:
-  kafka.enabled: false
-
 FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1440
 FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 180
 
