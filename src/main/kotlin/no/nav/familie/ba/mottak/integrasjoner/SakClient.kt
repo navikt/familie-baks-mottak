@@ -115,39 +115,6 @@ class SakClient @Autowired constructor(
         )
     }
 
-    @Retryable(
-        value = [RuntimeException::class],
-        maxAttempts = 3,
-        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}")
-    )
-    fun sendAnnullerFødselshendelseTilSak(barnasIdenter: List<String>, tidligereHendelseId: String) {
-        val uri = URI.create("$sakServiceUri/fagsaker/annullerFoedsel")
-        logger.info("Sender annuller fødselshendelse til {}", uri)
-        try {
-            val response = postForEntity<Ressurs<String>>(
-                uri,
-                RestAnnullerFødsel(
-                    barnasIdenter = barnasIdenter,
-                    tidligereHendelseId = tidligereHendelseId
-                )
-            )
-            logger.info("Annuller fødselshendelse sendt til sak. Status=${response.status}")
-        } catch (e: RestClientResponseException) {
-            logger.warn(
-                "Sending annuller fødselshendelse til sak feilet. Responskode: {}, body: {}",
-                e.rawStatusCode,
-                e.responseBodyAsString
-            )
-            throw IllegalStateException(
-                "Sending annuller fødselshendelse til sak feilet. Status: " + e.rawStatusCode +
-                    ", body: " + e.responseBodyAsString,
-                e
-            )
-        } catch (e: RestClientException) {
-            throw IllegalStateException("Sending annuller fødselshendelse til sak feilet.", e)
-        }
-    }
-
     fun sendVedtakOmOvergangsstønadHendelseTilSak(personIdent: String) {
         val uri = URI.create("$sakServiceUri/overgangsstonad")
         logger.info("sender ident fra vedtak om overgangsstønad til {}", uri)

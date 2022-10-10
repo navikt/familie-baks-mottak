@@ -1,13 +1,10 @@
 package no.nav.familie.ba.mottak.task
 
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
-import io.mockk.runs
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.ba.mottak.integrasjoner.RestAnnullerFødsel
-import no.nav.familie.ba.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.domene.Avvikstype
@@ -22,8 +19,6 @@ import java.util.Optional
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MottaAnnullerFødselTaskTest {
-
-    private val sakClient = mockk<SakClient>()
 
     @Test
     fun `Skal endre status av Task med riktig type`() {
@@ -50,7 +45,7 @@ class MottaAnnullerFødselTaskTest {
         val taskSlot = mutableListOf<Task>()
         every { taskRepository.save(capture(taskSlot)) } returns mottaFødselshendelseTask
 
-        MottaAnnullerFødselTask(taskRepository, sakClient).doTask(
+        MottaAnnullerFødselTask(taskRepository).doTask(
             Task(
                 type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
                 payload = objectMapper.writeValueAsString(RestAnnullerFødsel(listOf("12345678910"), "ooo"))
@@ -91,7 +86,7 @@ class MottaAnnullerFødselTaskTest {
         val taskSlot = mutableListOf<Task>()
         every { taskRepository.save(capture(taskSlot)) } returns task0
 
-        MottaAnnullerFødselTask(taskRepository, sakClient).doTask(
+        MottaAnnullerFødselTask(taskRepository).doTask(
             Task(
                 type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
                 payload = objectMapper.writeValueAsString(RestAnnullerFødsel(listOf("12345678910"), "ooo"))
@@ -108,7 +103,7 @@ class MottaAnnullerFødselTaskTest {
 
         val statusSlot = slot<List<Status>>()
         every { taskRepository.findByStatusIn(capture(statusSlot), any()) } returns emptyList()
-        MottaAnnullerFødselTask(taskRepository, sakClient).doTask(
+        MottaAnnullerFødselTask(taskRepository).doTask(
             Task(
                 type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
                 payload = objectMapper.writeValueAsString(RestAnnullerFødsel(listOf("12345678910"), "ooo"))
@@ -119,33 +114,5 @@ class MottaAnnullerFødselTaskTest {
         assertThat(statusSlot.captured).contains(Status.KLAR_TIL_PLUKK)
         assertThat(statusSlot.captured).contains(Status.UBEHANDLET)
         assertThat(statusSlot.captured).contains(Status.FEILET)
-    }
-
-    @Test
-    fun `Skal send annuller fødsel til ba-sak hvis det er ikke finnes åpen Task i repository`() {
-        val taskRepository = mockk<TaskRepository>()
-
-        every { taskRepository.findByStatusIn(any(), any()) } returns emptyList()
-        val barnasIdenterSlot = slot<List<String>>()
-        val tidligereHendelseIdSlot = slot<String>()
-        every {
-            sakClient.sendAnnullerFødselshendelseTilSak(
-                capture(barnasIdenterSlot),
-                capture(tidligereHendelseIdSlot)
-            )
-        } just runs
-
-        val barnsIdenter = listOf("12345678910", "12345678911")
-        MottaAnnullerFødselTask(taskRepository, sakClient).doTask(
-            Task(
-                type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
-                payload = objectMapper.writeValueAsString(RestAnnullerFødsel(barnsIdenter, "ooo"))
-            )
-        )
-
-        assertThat(barnasIdenterSlot.captured).hasSize(2)
-        assertThat(barnasIdenterSlot.captured.any { it == barnsIdenter[0] }).isTrue()
-        assertThat(barnasIdenterSlot.captured.any { it == barnsIdenter[1] }).isTrue()
-        assertThat(tidligereHendelseIdSlot.captured).isEqualTo("ooo")
     }
 }
