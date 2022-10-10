@@ -54,7 +54,7 @@ spring:
   kafka:
     bootstrap-servers: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443
     properties:
-      schema.registry.url: https://kafka-schema-registry.nais.preprod.local
+      schema.registry.url: https://kafka-schema-registry.nais-q.adeo.no
     consumer:
       auto-offset-reset: latest
   datasource:
