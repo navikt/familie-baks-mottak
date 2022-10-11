@@ -77,8 +77,8 @@ FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 1
 #Brukes til tilgangskontroll av familie-ks-mottak-frontend
 JOURNALFOERINGHENDELSE_V1_TOPIC_AIVEN_URL: teamdokumenthandtering.aapen-dok-journalfoering-q1
 
-PDL_URL: https://pdl-api-q1.dev-fss-pub.nais.io
-PDL_SCOPE: api://dev-fss.pdl.pdl-api-q1/.default
+PDL_URL: https://pdl-api.dev-fss-pub.nais.io
+PDL_SCOPE: api://dev-fss.pdl.pdl-api/.default
 FAMILIE_INTEGRASJONER_API_URL: https://familie-integrasjoner-q1.dev-fss-pub.nais.io/api
 FAMILIE_INTEGRASJONER_SCOPE: api://dev-fss.teamfamilie.familie-integrasjoner-q1/.default
 
