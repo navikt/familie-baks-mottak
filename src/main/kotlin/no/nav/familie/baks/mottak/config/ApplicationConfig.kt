@@ -1,6 +1,7 @@
 package no.nav.familie.baks.mottak.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import no.nav.familie.http.config.RestTemplateAzure
 import no.nav.familie.log.filter.LogFilter
 import no.nav.security.token.support.client.core.http.OAuth2HttpClient
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
@@ -16,6 +17,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.retry.annotation.EnableRetry
@@ -36,6 +38,7 @@ import java.time.temporal.ChronoUnit
 @EnableJwtTokenValidation(ignore = ["org.springframework", "no.nav.familie.baks.mottak.e2e"])
 @EnableOAuth2Client(cacheEnabled = true)
 @EnableRetry
+@Import(RestTemplateAzure::class)
 class ApplicationConfig {
 
     @Bean
