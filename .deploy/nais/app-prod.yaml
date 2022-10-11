@@ -55,6 +55,8 @@ spec:
           cluster: prod-gcp
         - application: familie-integrasjoner
           cluster: prod-gcp
+        - application: familie-dokument
+          cluster: prod-gcp
       external:
         - host: kafka-schema-registry.nais.adeo.no
         - host: pdl-api.prod-fss-pub.nais.io
