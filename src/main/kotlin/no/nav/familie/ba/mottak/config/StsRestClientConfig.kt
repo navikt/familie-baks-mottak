@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.config
+package no.nav.familie.baks.mottak.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.familie.http.sts.StsRestClient

@@ -1,8 +1,8 @@
-package no.nav.familie.ba.mottak.task
+package no.nav.familie.baks.mottak.task
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.familie.ba.mottak.domene.NyBehandling
-import no.nav.familie.ba.mottak.integrasjoner.SakClient
+import no.nav.familie.baks.mottak.domene.NyBehandling
+import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task

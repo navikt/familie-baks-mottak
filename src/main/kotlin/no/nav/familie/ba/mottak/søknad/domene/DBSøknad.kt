@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.søknad.domene
+package no.nav.familie.baks.mottak.søknad.domene
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg

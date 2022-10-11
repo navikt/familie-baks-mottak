@@ -1,7 +1,7 @@
-package no.nav.familie.ba.mottak.task
+package no.nav.familie.baks.mottak.task
 
-import no.nav.familie.ba.mottak.integrasjoner.RestAnnullerFødsel
-import no.nav.familie.ba.mottak.integrasjoner.SakClient
+import no.nav.familie.baks.mottak.integrasjoner.RestAnnullerFødsel
+import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse

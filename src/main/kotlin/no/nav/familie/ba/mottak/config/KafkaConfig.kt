@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.config
+package no.nav.familie.baks.mottak.config
 
 import no.nav.person.pdl.aktor.v2.Aktor
 import org.apache.avro.generic.GenericRecord

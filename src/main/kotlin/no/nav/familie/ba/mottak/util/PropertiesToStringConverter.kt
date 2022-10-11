@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.util
+package no.nav.familie.baks.mottak.util
 
 import java.io.IOException
 import java.io.StringReader

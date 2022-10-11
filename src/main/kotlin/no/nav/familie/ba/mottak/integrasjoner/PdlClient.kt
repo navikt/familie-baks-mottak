@@ -1,8 +1,8 @@
-package no.nav.familie.ba.mottak.integrasjoner
+package no.nav.familie.baks.mottak.integrasjoner
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import no.nav.familie.ba.mottak.domene.personopplysning.Person
+import no.nav.familie.baks.mottak.domene.personopplysning.Person
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.http.sts.StsRestClient
 import no.nav.familie.http.util.UriUtil

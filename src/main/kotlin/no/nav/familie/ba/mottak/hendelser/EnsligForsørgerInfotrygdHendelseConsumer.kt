@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.hendelser
+package no.nav.familie.baks.mottak.hendelser
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.micrometer.core.instrument.Counter

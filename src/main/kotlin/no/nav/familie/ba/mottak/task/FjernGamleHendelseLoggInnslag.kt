@@ -1,7 +1,7 @@
-package no.nav.familie.ba.mottak.task
+package no.nav.familie.baks.mottak.task
 
-import no.nav.familie.ba.mottak.domene.HendelseConsumer
-import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
+import no.nav.familie.baks.mottak.domene.HendelseConsumer
+import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
 import no.nav.familie.leader.LeaderClient
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled

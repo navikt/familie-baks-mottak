@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.config
+package no.nav.familie.baks.mottak.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.familie.log.filter.LogFilter
@@ -28,12 +28,12 @@ import java.time.temporal.ChronoUnit
 @ComponentScan(
     "no.nav.familie.prosessering",
     "no.nav.familie.sikkerhet",
-    "no.nav.familie.ba.mottak"
+    "no.nav.familie.baks.mottak"
 )
 @EntityScan("no.nav.familie.prosessering", "no.nav.familie")
 @ConfigurationPropertiesScan("no.nav.familie")
 @EnableScheduling
-@EnableJwtTokenValidation(ignore = ["org.springframework", "no.nav.familie.ba.mottak.e2e"])
+@EnableJwtTokenValidation(ignore = ["org.springframework", "no.nav.familie.baks.mottak.e2e"])
 @EnableOAuth2Client(cacheEnabled = true)
 @EnableRetry
 class ApplicationConfig {

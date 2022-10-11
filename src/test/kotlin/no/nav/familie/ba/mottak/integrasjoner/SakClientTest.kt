@@ -1,11 +1,11 @@
-package no.nav.familie.ba.mottak.integrasjoner
+package no.nav.familie.baks.mottak.integrasjoner
 
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
-import no.nav.familie.ba.mottak.DevLauncher
+import no.nav.familie.baks.mottak.DevLauncher
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test

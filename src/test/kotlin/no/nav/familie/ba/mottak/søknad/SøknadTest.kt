@@ -1,11 +1,11 @@
-package no.nav.familie.ba.mottak.søknad
+package no.nav.familie.baks.mottak.søknad
 
-import no.nav.familie.ba.mottak.DevLauncherPostgres
-import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
-import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
-import no.nav.familie.ba.mottak.søknad.domene.SøknadV8
-import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
-import no.nav.familie.ba.mottak.util.DbContainerInitializer
+import no.nav.familie.baks.mottak.DevLauncherPostgres
+import no.nav.familie.baks.mottak.søknad.domene.DBSøknad
+import no.nav.familie.baks.mottak.søknad.domene.SøknadV7
+import no.nav.familie.baks.mottak.søknad.domene.SøknadV8
+import no.nav.familie.baks.mottak.søknad.domene.tilDBSøknad
+import no.nav.familie.baks.mottak.util.DbContainerInitializer
 import no.nav.familie.kontrakter.felles.objectMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag

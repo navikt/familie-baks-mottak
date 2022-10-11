@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.domene.personopplysning
+package no.nav.familie.baks.mottak.domene.personopplysning
 
 import java.time.LocalDate
 import java.util.Collections

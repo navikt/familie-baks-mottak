@@ -1,10 +1,10 @@
-package no.nav.familie.ba.mottak.integrasjoner
+package no.nav.familie.baks.mottak.integrasjoner
 
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
-import no.nav.familie.ba.mottak.DevLauncher
+import no.nav.familie.baks.mottak.DevLauncher
 import no.nav.familie.kontrakter.felles.objectMapper
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat

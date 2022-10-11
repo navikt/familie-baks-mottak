@@ -1,17 +1,17 @@
-package no.nav.familie.ba.mottak.task
+package no.nav.familie.baks.mottak.task
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.ba.mottak.domene.NyBehandling
-import no.nav.familie.ba.mottak.domene.personopplysning.Person
-import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
-import no.nav.familie.ba.mottak.domene.personopplysning.harAdresseGradering
-import no.nav.familie.ba.mottak.domene.personopplysning.harBostedsadresse
-import no.nav.familie.ba.mottak.integrasjoner.PdlClient
-import no.nav.familie.ba.mottak.util.erBostNummer
-import no.nav.familie.ba.mottak.util.erDnummer
-import no.nav.familie.ba.mottak.util.erFDatnummer
+import no.nav.familie.baks.mottak.domene.NyBehandling
+import no.nav.familie.baks.mottak.domene.personopplysning.Person
+import no.nav.familie.baks.mottak.domene.personopplysning.PersonIdent
+import no.nav.familie.baks.mottak.domene.personopplysning.harAdresseGradering
+import no.nav.familie.baks.mottak.domene.personopplysning.harBostedsadresse
+import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.util.erBostNummer
+import no.nav.familie.baks.mottak.util.erDnummer
+import no.nav.familie.baks.mottak.util.erFDatnummer
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.kontrakter.felles.personopplysning.ForelderBarnRelasjon
 import no.nav.familie.prosessering.AsyncTaskStep

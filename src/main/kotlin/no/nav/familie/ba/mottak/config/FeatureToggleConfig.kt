@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.config
+package no.nav.familie.baks.mottak.config
 
 import no.finn.unleash.DefaultUnleash
 import no.finn.unleash.UnleashContext

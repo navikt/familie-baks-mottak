@@ -1,12 +1,12 @@
-package no.nav.familie.ba.mottak.søknad
+package no.nav.familie.baks.mottak.søknad
 
 import com.fasterxml.jackson.core.type.TypeReference
-import no.nav.familie.ba.mottak.integrasjoner.PdfClient
-import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
-import no.nav.familie.ba.mottak.søknad.domene.SøknadSpråkvelgerService
-import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
-import no.nav.familie.ba.mottak.søknad.domene.SøknadV8
-import no.nav.familie.ba.mottak.søknad.domene.VersjonertSøknad
+import no.nav.familie.baks.mottak.integrasjoner.PdfClient
+import no.nav.familie.baks.mottak.søknad.domene.DBSøknad
+import no.nav.familie.baks.mottak.søknad.domene.SøknadSpråkvelgerService
+import no.nav.familie.baks.mottak.søknad.domene.SøknadV7
+import no.nav.familie.baks.mottak.søknad.domene.SøknadV8
+import no.nav.familie.baks.mottak.søknad.domene.VersjonertSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.felles.objectMapper

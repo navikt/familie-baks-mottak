@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.søknad
+package no.nav.familie.baks.mottak.søknad
 
 import no.nav.familie.kontrakter.ba.søknad.SIVILSTANDTYPE
 import no.nav.familie.kontrakter.ba.søknad.SøknadAdresse

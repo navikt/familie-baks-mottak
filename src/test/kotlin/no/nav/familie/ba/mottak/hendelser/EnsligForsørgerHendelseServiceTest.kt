@@ -1,13 +1,13 @@
-package no.nav.familie.ba.mottak.hendelser
+package no.nav.familie.baks.mottak.hendelser
 
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.familie.ba.mottak.domene.HendelseConsumer
-import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
-import no.nav.familie.ba.mottak.integrasjoner.PdlClient
-import no.nav.familie.ba.mottak.integrasjoner.SakClient
+import no.nav.familie.baks.mottak.domene.HendelseConsumer
+import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
+import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.ef.EnsligForsørgerVedtakhendelse
 import no.nav.familie.kontrakter.felles.ef.StønadType
 import org.junit.jupiter.api.BeforeEach

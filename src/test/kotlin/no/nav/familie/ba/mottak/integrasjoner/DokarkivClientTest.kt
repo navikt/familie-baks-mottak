@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.integrasjoner
+package no.nav.familie.baks.mottak.integrasjoner
 
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
@@ -6,7 +6,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.put
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
-import no.nav.familie.ba.mottak.DevLauncher
+import no.nav.familie.baks.mottak.DevLauncher
 import no.nav.familie.http.client.RessursException
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentResponse

@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.config
+package no.nav.familie.baks.mottak.config
 
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Profile

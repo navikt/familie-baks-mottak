@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.domene
+package no.nav.familie.baks.mottak.domene
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Lock

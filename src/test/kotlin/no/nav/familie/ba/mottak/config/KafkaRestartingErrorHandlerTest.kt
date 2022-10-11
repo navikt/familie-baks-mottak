@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.config
+package no.nav.familie.baks.mottak.config
 
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks

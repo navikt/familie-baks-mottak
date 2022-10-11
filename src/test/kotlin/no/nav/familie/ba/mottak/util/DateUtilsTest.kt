@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.util
+package no.nav.familie.baks.mottak.util
 
 import io.mockk.every
 import io.mockk.mockk

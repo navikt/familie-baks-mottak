@@ -1,7 +1,7 @@
-package no.nav.familie.ba.mottak.søknad
+package no.nav.familie.baks.mottak.søknad
 
-import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
-import no.nav.familie.ba.mottak.søknad.domene.DBVedlegg
+import no.nav.familie.baks.mottak.søknad.domene.DBSøknad
+import no.nav.familie.baks.mottak.søknad.domene.DBVedlegg
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query

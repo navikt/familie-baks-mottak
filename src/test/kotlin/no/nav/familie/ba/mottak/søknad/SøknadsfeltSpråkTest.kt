@@ -1,11 +1,11 @@
-package no.nav.familie.ba.mottak.søknad
+package no.nav.familie.baks.mottak.søknad
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.ba.mottak.DevLauncherPostgres
-import no.nav.familie.ba.mottak.søknad.domene.SøknadSpråkvelgerService
-import no.nav.familie.ba.mottak.søknad.domene.SøknadV8
-import no.nav.familie.ba.mottak.util.DbContainerInitializer
+import no.nav.familie.baks.mottak.DevLauncherPostgres
+import no.nav.familie.baks.mottak.søknad.domene.SøknadSpråkvelgerService
+import no.nav.familie.baks.mottak.søknad.domene.SøknadV8
+import no.nav.familie.baks.mottak.util.DbContainerInitializer
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt
 import no.nav.familie.kontrakter.ba.søknad.v8.Søknad
 import no.nav.familie.kontrakter.felles.objectMapper

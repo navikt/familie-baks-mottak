@@ -1,12 +1,12 @@
-package no.nav.familie.ba.mottak.hendelser
+package no.nav.familie.baks.mottak.hendelser
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.ba.mottak.domene.HendelseConsumer
-import no.nav.familie.ba.mottak.domene.Hendelseslogg
-import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
-import no.nav.familie.ba.mottak.integrasjoner.PdlClient
-import no.nav.familie.ba.mottak.integrasjoner.SakClient
+import no.nav.familie.baks.mottak.domene.HendelseConsumer
+import no.nav.familie.baks.mottak.domene.Hendelseslogg
+import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
+import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.ef.EnsligForsørgerVedtakhendelse
 import no.nav.familie.kontrakter.felles.ef.StønadType
 import org.slf4j.Logger

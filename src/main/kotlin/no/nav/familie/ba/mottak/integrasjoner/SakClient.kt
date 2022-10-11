@@ -1,6 +1,6 @@
-package no.nav.familie.ba.mottak.integrasjoner
+package no.nav.familie.baks.mottak.integrasjoner
 
-import no.nav.familie.ba.mottak.domene.NyBehandling
+import no.nav.familie.baks.mottak.domene.NyBehandling
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.PersonIdent
 import no.nav.familie.kontrakter.felles.Ressurs

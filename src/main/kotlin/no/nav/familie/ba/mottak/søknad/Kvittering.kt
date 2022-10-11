@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.søknad
+package no.nav.familie.baks.mottak.søknad
 
 import java.time.LocalDateTime
 

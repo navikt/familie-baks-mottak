@@ -1,6 +1,6 @@
-package no.nav.familie.ba.mottak.util
+package no.nav.familie.baks.mottak.util
 
-import no.nav.familie.ba.mottak.domene.personopplysning.PersonIdent
+import no.nav.familie.baks.mottak.domene.personopplysning.PersonIdent
 
 fun erDnummer(personIdent: PersonIdent): Boolean {
     return erDnummer(personIdent.id)

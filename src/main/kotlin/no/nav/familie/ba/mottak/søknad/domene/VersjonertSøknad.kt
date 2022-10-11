@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.søknad.domene
+package no.nav.familie.baks.mottak.søknad.domene
 
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknad as SøknadV7
 import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadV8

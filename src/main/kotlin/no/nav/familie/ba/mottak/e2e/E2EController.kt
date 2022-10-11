@@ -1,10 +1,10 @@
-package no.nav.familie.ba.mottak.e2e
+package no.nav.familie.baks.mottak.e2e
 
-import no.nav.familie.ba.mottak.domene.HendelseConsumer
-import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
-import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
-import no.nav.familie.ba.mottak.hendelser.JournalhendelseService
-import no.nav.familie.ba.mottak.hendelser.LeesahService
+import no.nav.familie.baks.mottak.domene.HendelseConsumer
+import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
+import no.nav.familie.baks.mottak.domene.hendelser.PdlHendelse
+import no.nav.familie.baks.mottak.hendelser.JournalhendelseService
+import no.nav.familie.baks.mottak.hendelser.LeesahService
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository

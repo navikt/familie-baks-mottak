@@ -1,8 +1,8 @@
-package no.nav.familie.ba.mottak.hendelser
+package no.nav.familie.baks.mottak.hendelser
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.ba.mottak.integrasjoner.SakClient
+import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.PersonIdent
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.person.pdl.aktor.v2.Aktor

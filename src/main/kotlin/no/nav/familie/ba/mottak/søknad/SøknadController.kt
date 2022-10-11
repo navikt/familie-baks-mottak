@@ -1,10 +1,10 @@
-package no.nav.familie.ba.mottak.søknad
+package no.nav.familie.baks.mottak.søknad
 
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
-import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
-import no.nav.familie.ba.mottak.søknad.domene.SøknadV8
-import no.nav.familie.ba.mottak.søknad.domene.VersjonertSøknad
+import no.nav.familie.baks.mottak.søknad.domene.FødselsnummerErNullException
+import no.nav.familie.baks.mottak.søknad.domene.SøknadV7
+import no.nav.familie.baks.mottak.søknad.domene.SøknadV8
+import no.nav.familie.baks.mottak.søknad.domene.VersjonertSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon

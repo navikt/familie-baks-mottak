@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.domene
+package no.nav.familie.baks.mottak.domene
 
 data class NyBehandling(
     val morsIdent: String,

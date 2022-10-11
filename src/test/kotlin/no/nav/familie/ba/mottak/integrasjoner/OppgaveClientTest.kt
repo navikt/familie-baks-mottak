@@ -1,6 +1,6 @@
 @file:Suppress("LongLine")
 
-package no.nav.familie.ba.mottak.integrasjoner
+package no.nav.familie.baks.mottak.integrasjoner
 
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.anyRequestedFor
@@ -15,7 +15,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import com.github.tomakehurst.wiremock.client.WireMock.verify
 import io.mockk.every
 import io.mockk.mockkStatic
-import no.nav.familie.ba.mottak.DevLauncher
+import no.nav.familie.baks.mottak.DevLauncher
 import no.nav.familie.http.client.RessursException
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Ressurs

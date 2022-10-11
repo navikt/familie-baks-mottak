@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.task
+package no.nav.familie.baks.mottak.task
 
 import no.nav.familie.leader.LeaderClient
 import no.nav.familie.prosessering.domene.Avvikstype

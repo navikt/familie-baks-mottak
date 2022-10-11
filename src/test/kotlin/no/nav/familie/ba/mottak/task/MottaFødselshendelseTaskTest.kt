@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.task
+package no.nav.familie.baks.mottak.task
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
@@ -6,16 +6,16 @@ import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import io.mockk.clearAllMocks
-import no.nav.familie.ba.mottak.DevLauncher
-import no.nav.familie.ba.mottak.domene.NyBehandling
-import no.nav.familie.ba.mottak.integrasjoner.Adressebeskyttelse
-import no.nav.familie.ba.mottak.integrasjoner.Adressebeskyttelsesgradering
-import no.nav.familie.ba.mottak.integrasjoner.IntegrasjonException
-import no.nav.familie.ba.mottak.integrasjoner.PdlError
-import no.nav.familie.ba.mottak.integrasjoner.PdlForeldreBarnRelasjon
-import no.nav.familie.ba.mottak.integrasjoner.PdlHentPersonResponse
-import no.nav.familie.ba.mottak.integrasjoner.PdlPerson
-import no.nav.familie.ba.mottak.integrasjoner.PdlPersonData
+import no.nav.familie.baks.mottak.DevLauncher
+import no.nav.familie.baks.mottak.domene.NyBehandling
+import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelse
+import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelsesgradering
+import no.nav.familie.baks.mottak.integrasjoner.IntegrasjonException
+import no.nav.familie.baks.mottak.integrasjoner.PdlError
+import no.nav.familie.baks.mottak.integrasjoner.PdlForeldreBarnRelasjon
+import no.nav.familie.baks.mottak.integrasjoner.PdlHentPersonResponse
+import no.nav.familie.baks.mottak.integrasjoner.PdlPerson
+import no.nav.familie.baks.mottak.integrasjoner.PdlPersonData
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE

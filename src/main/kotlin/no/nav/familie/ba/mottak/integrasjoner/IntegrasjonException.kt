@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.integrasjoner
+package no.nav.familie.baks.mottak.integrasjoner
 
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus

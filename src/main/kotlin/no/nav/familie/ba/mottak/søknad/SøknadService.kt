@@ -1,15 +1,15 @@
-package no.nav.familie.ba.mottak.søknad
+package no.nav.familie.baks.mottak.søknad
 
-import no.nav.familie.ba.mottak.integrasjoner.FamilieDokumentClient
-import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
-import no.nav.familie.ba.mottak.søknad.domene.DBVedlegg
-import no.nav.familie.ba.mottak.søknad.domene.FødselsnummerErNullException
-import no.nav.familie.ba.mottak.søknad.domene.SøknadV7
-import no.nav.familie.ba.mottak.søknad.domene.SøknadV8
-import no.nav.familie.ba.mottak.søknad.domene.VersjonertSøknad
-import no.nav.familie.ba.mottak.søknad.domene.tilDBSøknad
-import no.nav.familie.ba.mottak.søknad.domene.tilDBVedlegg
-import no.nav.familie.ba.mottak.task.JournalførSøknadTask
+import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClient
+import no.nav.familie.baks.mottak.søknad.domene.DBSøknad
+import no.nav.familie.baks.mottak.søknad.domene.DBVedlegg
+import no.nav.familie.baks.mottak.søknad.domene.FødselsnummerErNullException
+import no.nav.familie.baks.mottak.søknad.domene.SøknadV7
+import no.nav.familie.baks.mottak.søknad.domene.SøknadV8
+import no.nav.familie.baks.mottak.søknad.domene.VersjonertSøknad
+import no.nav.familie.baks.mottak.søknad.domene.tilDBSøknad
+import no.nav.familie.baks.mottak.søknad.domene.tilDBVedlegg
+import no.nav.familie.baks.mottak.task.JournalførSøknadTask
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository

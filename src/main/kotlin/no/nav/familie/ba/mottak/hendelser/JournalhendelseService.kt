@@ -1,16 +1,16 @@
-package no.nav.familie.ba.mottak.hendelser
+package no.nav.familie.baks.mottak.hendelser
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.ba.mottak.domene.HendelseConsumer
-import no.nav.familie.ba.mottak.domene.Hendelseslogg
-import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
-import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType.ORGNR
-import no.nav.familie.ba.mottak.integrasjoner.Journalpost
-import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
-import no.nav.familie.ba.mottak.integrasjoner.Journalposttype
-import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
-import no.nav.familie.ba.mottak.task.JournalhendelseRutingTask
+import no.nav.familie.baks.mottak.domene.HendelseConsumer
+import no.nav.familie.baks.mottak.domene.Hendelseslogg
+import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
+import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType.ORGNR
+import no.nav.familie.baks.mottak.integrasjoner.Journalpost
+import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
+import no.nav.familie.baks.mottak.integrasjoner.Journalposttype
+import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
+import no.nav.familie.baks.mottak.task.JournalhendelseRutingTask
 import no.nav.familie.log.IdUtils
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.domene.Task

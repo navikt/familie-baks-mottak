@@ -1,8 +1,8 @@
-package no.nav.familie.ba.mottak.søknad
+package no.nav.familie.baks.mottak.søknad
 
-import no.nav.familie.ba.mottak.integrasjoner.DokarkivClient
-import no.nav.familie.ba.mottak.søknad.domene.DBSøknad
-import no.nav.familie.ba.mottak.søknad.domene.DBVedlegg
+import no.nav.familie.baks.mottak.integrasjoner.DokarkivClient
+import no.nav.familie.baks.mottak.søknad.domene.DBSøknad
+import no.nav.familie.baks.mottak.søknad.domene.DBVedlegg
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service

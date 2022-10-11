@@ -1,6 +1,6 @@
-package no.nav.familie.ba.mottak.domene
+package no.nav.familie.baks.mottak.domene
 
-import no.nav.familie.ba.mottak.util.PropertiesToStringConverter
+import no.nav.familie.baks.mottak.util.PropertiesToStringConverter
 import java.time.LocalDateTime
 import java.util.Properties
 import javax.persistence.Column

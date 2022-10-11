@@ -1,8 +1,8 @@
-package no.nav.familie.ba.mottak.integrasjoner
+package no.nav.familie.baks.mottak.integrasjoner
 
-import no.nav.familie.ba.mottak.util.erDnummer
-import no.nav.familie.ba.mottak.util.erOrgnr
-import no.nav.familie.ba.mottak.util.fristFerdigstillelse
+import no.nav.familie.baks.mottak.util.erDnummer
+import no.nav.familie.baks.mottak.util.erOrgnr
+import no.nav.familie.baks.mottak.util.fristFerdigstillelse
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype

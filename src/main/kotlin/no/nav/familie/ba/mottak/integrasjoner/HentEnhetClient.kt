@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.integrasjoner
+package no.nav.familie.baks.mottak.integrasjoner
 
 import no.nav.familie.http.client.AbstractRestClient
 import org.slf4j.LoggerFactory

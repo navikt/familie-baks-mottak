@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.e2e
+package no.nav.familie.baks.mottak.e2e
 
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.InitializingBean

@@ -1,8 +1,8 @@
-package no.nav.familie.ba.mottak.integrasjoner
+package no.nav.familie.baks.mottak.integrasjoner
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.ba.mottak.DevLauncher
+import no.nav.familie.baks.mottak.DevLauncher
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe

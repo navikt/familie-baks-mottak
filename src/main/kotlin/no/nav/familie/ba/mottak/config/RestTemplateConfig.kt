@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.config
+package no.nav.familie.baks.mottak.config
 
 import no.nav.familie.http.config.RestTemplateSts
 import no.nav.familie.http.interceptor.BearerTokenClientInterceptor

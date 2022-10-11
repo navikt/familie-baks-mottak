@@ -1,12 +1,12 @@
-package no.nav.familie.ba.mottak.task
+package no.nav.familie.baks.mottak.task
 
-import no.nav.familie.ba.mottak.integrasjoner.Bruker
-import no.nav.familie.ba.mottak.integrasjoner.BrukerIdType
-import no.nav.familie.ba.mottak.integrasjoner.DokarkivClient
-import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
-import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
-import no.nav.familie.ba.mottak.integrasjoner.PdlClient
-import no.nav.familie.ba.mottak.integrasjoner.SakClient
+import no.nav.familie.baks.mottak.integrasjoner.Bruker
+import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
+import no.nav.familie.baks.mottak.integrasjoner.DokarkivClient
+import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
+import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
+import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task

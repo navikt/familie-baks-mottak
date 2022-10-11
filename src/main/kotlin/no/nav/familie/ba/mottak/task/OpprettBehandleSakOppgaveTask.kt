@@ -1,8 +1,8 @@
-package no.nav.familie.ba.mottak.task
+package no.nav.familie.baks.mottak.task
 
-import no.nav.familie.ba.mottak.integrasjoner.JournalpostClient
-import no.nav.familie.ba.mottak.integrasjoner.Journalstatus
-import no.nav.familie.ba.mottak.integrasjoner.OppgaveClient
+import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
+import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
+import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task

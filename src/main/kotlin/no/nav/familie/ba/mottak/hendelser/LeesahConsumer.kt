@@ -1,8 +1,8 @@
-package no.nav.familie.ba.mottak.hendelser
+package no.nav.familie.baks.mottak.hendelser
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
+import no.nav.familie.baks.mottak.domene.hendelser.PdlHendelse
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.person.pdl.leesah.Personhendelse
 import org.apache.avro.generic.GenericData

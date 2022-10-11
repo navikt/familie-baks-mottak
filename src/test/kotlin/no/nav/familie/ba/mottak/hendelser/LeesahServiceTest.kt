@@ -1,15 +1,15 @@
-package no.nav.familie.ba.mottak.hendelser
+package no.nav.familie.baks.mottak.hendelser
 
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.familie.ba.mottak.domene.HendelsesloggRepository
-import no.nav.familie.ba.mottak.domene.hendelser.PdlHendelse
-import no.nav.familie.ba.mottak.task.MottaAnnullerFødselTask
-import no.nav.familie.ba.mottak.task.MottaFødselshendelseTask
-import no.nav.familie.ba.mottak.task.VurderLivshendelseTask
+import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
+import no.nav.familie.baks.mottak.domene.hendelser.PdlHendelse
+import no.nav.familie.baks.mottak.task.MottaAnnullerFødselTask
+import no.nav.familie.baks.mottak.task.MottaFødselshendelseTask
+import no.nav.familie.baks.mottak.task.VurderLivshendelseTask
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.assertj.core.api.Assertions.assertThat

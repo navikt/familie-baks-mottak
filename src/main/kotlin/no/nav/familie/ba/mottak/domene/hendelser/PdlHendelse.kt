@@ -1,4 +1,4 @@
-package no.nav.familie.ba.mottak.domene.hendelser
+package no.nav.familie.baks.mottak.domene.hendelser
 
 import java.time.LocalDate
 
