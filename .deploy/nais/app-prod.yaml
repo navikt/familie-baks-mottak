@@ -53,8 +53,6 @@ spec:
       rules:
         - application: familie-ba-sak
           cluster: prod-gcp
-        - application: familie-integrasjoner
-          cluster: prod-gcp
         - application: familie-dokument
           cluster: prod-gcp
       external:
