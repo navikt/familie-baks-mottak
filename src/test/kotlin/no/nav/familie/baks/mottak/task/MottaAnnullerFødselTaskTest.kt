@@ -5,7 +5,6 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.baks.mottak.integrasjoner.RestAnnullerFødsel
-import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.domene.Avvikstype

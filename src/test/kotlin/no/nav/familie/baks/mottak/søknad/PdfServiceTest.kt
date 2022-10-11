@@ -35,7 +35,7 @@ internal class PdfServiceTest {
         mapper.registerKotlinModule()
         mapper.registerModule(JavaTimeModule())
 
-        val jsonString: String = File("./src/test/kotlin/no/nav/familie/ba/mottak/søknad/testdata/testdata1.json")
+        val jsonString: String = File("./src/test/kotlin/no/nav/familie/baks/mottak/søknad/testdata/testdata1.json")
             .readText(Charsets.UTF_8)
         val søknad: SøknadKontraktV8 = mapper.readValue(jsonString)
         val dbSøknad: DBSøknad = søknad.tilDBSøknad()
