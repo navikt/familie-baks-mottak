@@ -55,11 +55,16 @@ spec:
       rules:
         - application: familie-ba-sak
           cluster: dev-gcp
+<<<<<<< Updated upstream:.deploy/nais/app-preprod.yaml
       external:
         - host: kafka-schema-registry.nais-q.adeo.no
         - host: pdl-api.dev-fss-pub.nais.io
         - host: familie-integrasjoner.dev-fss-pub.nais.io
 
+=======
+        - application: familie-integrasjoner
+          cluster: dev-gcp
+>>>>>>> Stashed changes:app-preprod.yaml
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: preprod

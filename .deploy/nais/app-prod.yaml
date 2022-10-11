@@ -53,11 +53,16 @@ spec:
       rules:
         - application: familie-ba-sak
           cluster: prod-gcp
+<<<<<<< Updated upstream:.deploy/nais/app-prod.yaml
       external:
         - host: kafka-schema-registry.nais.adeo.no
         - host: pdl-api.prod-fss-pub.nais.io
         - host: familie-integrasjoner.prod-fss-pub.nais.io
 
+=======
+        - application: familie-integrasjoner
+          cluster: prod-gcp
+>>>>>>> Stashed changes:app-prod.yaml
   ingresses: # Optional. List of ingress URLs that will route HTTP traffic to the application.
     - https://familie-baks-mottak.intern.nav.no
   env:
