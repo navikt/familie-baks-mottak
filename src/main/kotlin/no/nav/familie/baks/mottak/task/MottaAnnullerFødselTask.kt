@@ -1,7 +1,6 @@
 package no.nav.familie.baks.mottak.task
 
 import no.nav.familie.baks.mottak.integrasjoner.RestAnnullerFødsel
-import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -21,8 +20,7 @@ import org.springframework.stereotype.Service
     maxAntallFeil = 3
 )
 class MottaAnnullerFødselTask(
-    private val taskRepository: TaskRepository,
-    private val sakClient: SakClient
+    private val taskRepository: TaskRepository
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(MottaAnnullerFødselTask::class.java)
@@ -30,9 +28,8 @@ class MottaAnnullerFødselTask(
     override fun doTask(task: Task) {
         val restAnnullerFødsel = objectMapper.readValue(task.payload, RestAnnullerFødsel::class.java)
         val tidligereHendelseId = restAnnullerFødsel.tidligereHendelseId
-        var barnasIdenter = restAnnullerFødsel.barnasIdenter
 
-        var tasker =
+        val tasker =
             taskRepository.findByStatusIn(
                 listOf(Status.KLAR_TIL_PLUKK, Status.UBEHANDLET, Status.FEILET),
                 Pageable.unpaged()
@@ -41,15 +38,11 @@ class MottaAnnullerFødselTask(
                     it.callId == tidligereHendelseId &&
                         (it.type == MottaFødselshendelseTask.TASK_STEP_TYPE || it.type == SendTilSakTask.TASK_STEP_TYPE)
                 }
-        if (tasker.isEmpty()) {
-            sakClient.sendAnnullerFødselshendelseTilSak(barnasIdenter, tidligereHendelseId)
-        } else {
-            tasker.forEach {
-                taskRepository.save(
-                    taskRepository.findById(it.id!!).get()
-                        .avvikshåndter(avvikstype = Avvikstype.ANNET, årsak = AVVIKSÅRSAK, endretAv = "VL")
-                )
-            }
+        tasker.forEach {
+            taskRepository.save(
+                taskRepository.findById(it.id).get()
+                    .avvikshåndter(avvikstype = Avvikstype.ANNET, årsak = AVVIKSÅRSAK, endretAv = "VL")
+            )
         }
     }
 
