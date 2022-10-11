@@ -73,4 +73,4 @@ FAMILIE_BA_SAK_API_URL: http://familie-ba-sak/api
 
 NORG2_API_URL: https://app-q1.adeo.no/norg2
 FAMILIE_DOKUMENT_API_URL: http://familie-dokument/familie/dokument
-FAMILIE_BA_DOKGEN_API_URL: http://familie-ba-dokgen
+FAMILIE_BA_DOKGEN_API_URL: https://familie-ba-dokgen.dev.intern.nav.no

@@ -56,9 +56,7 @@ class JournalhendelseService(
 
                 secureLogger.info("Behandler gyldig journalhendelse: $hendelseRecord")
 
-                // FIXME midleridig deaktivert til vi overtar helt for ba-mottak
-                // Må skrus på før merge til master
-                // behandleJournalhendelse(hendelseRecord)
+                behandleJournalhendelse(hendelseRecord)
 
                 lagreHendelseslogg(consumerRecord, hendelseRecord, CONSUMER_JOURNAL)
             }

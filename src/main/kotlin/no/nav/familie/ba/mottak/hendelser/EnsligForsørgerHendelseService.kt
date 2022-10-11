@@ -36,9 +36,7 @@ class EnsligForsørgerHendelseService(
                 ) {
                     secureLogger.info("Mottatt vedtak om overgangsstønad hendelse: $ensligForsørgerVedtakhendelse")
 
-                    // FIXME midleridig deaktivert til vi overtar helt for ba-mottak
-                    // Må skrus på før merge til master
-                    // sakClient.sendVedtakOmOvergangsstønadHendelseTilSak(ensligForsørgerVedtakhendelse.personIdent)
+                    sakClient.sendVedtakOmOvergangsstønadHendelseTilSak(ensligForsørgerVedtakhendelse.personIdent)
 
                     hendelsesloggRepository.save(
                         Hendelseslogg(
@@ -76,9 +74,8 @@ class EnsligForsørgerHendelseService(
             secureLogger.info("Mottatt infotrygdvedtak om overgangsstønad: $hendelse")
 
             val personIdent = pdlClient.hentPersonident(hendelse.aktørId.toString())
-            // FIXME midleridig deaktivert til vi overtar helt for ba-mottak
-            // Må skrus på før merge til master
-            // sakClient.sendVedtakOmOvergangsstønadHendelseTilSak(personIdent)
+
+            sakClient.sendVedtakOmOvergangsstønadHendelseTilSak(personIdent)
 
             hendelsesloggRepository.save(
                 Hendelseslogg(

@@ -14,7 +14,6 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.core.env.Environment
@@ -24,7 +23,6 @@ import kotlin.random.Random
 import kotlin.random.nextUInt
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Disabled // FIXME, enables når vi merger til master med hendelser på
 class LeesahServiceTest {
 
     lateinit var mockHendelsesloggRepository: HendelsesloggRepository
