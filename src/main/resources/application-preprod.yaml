@@ -87,6 +87,6 @@ FAMILIE_BA_INFOTRYGD_API_URL: https://familie-ba-infotrygd.dev-fss-pub.nais.io
 FAMILIE_BA_SAK_API_URL: http://familie-ba-sak/api
 BA_SAK_SCOPE: api://dev-gcp.teamfamilie.familie-ba-sak/.default
 
-NORG2_API_URL: https://app-q1.adeo.no/norg2
+NORG2_API_URL: https://norg2.dev-fss-pub.nais.io
 FAMILIE_DOKUMENT_API_URL: http://familie-dokument/familie/dokument
 FAMILIE_BA_DOKGEN_API_URL: https://familie-ba-dokgen.dev.intern.nav.no
