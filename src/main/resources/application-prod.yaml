@@ -81,6 +81,7 @@ FAMILIE_BA_DOKGEN_API_URL: https://familie-ba-dokgen.intern.nav.no
 
 FAMILIE_BA_SAK_API_URL: https://familie-ba-sak.intern.nav.no/api
 BA_SAK_SCOPE: api://prod-gcp.teamfamilie.familie-ba-sak/.default
+FAMILIE_BA_INFOTRYGD_API_URL: https://familie-ba-infotrygd.prod-fss-pub.nais.io
 FAMILIE_INTEGRASJONER_API_URL: https://familie-integrasjoner.prod-fss-pub.nais.io/api
 FAMILIE_INTEGRASJONER_SCOPE: api://prod-fss.teamfamilie.familie-integrasjoner/.default
 PDL_URL: https://pdl-api.prod-fss-pub.nais.io

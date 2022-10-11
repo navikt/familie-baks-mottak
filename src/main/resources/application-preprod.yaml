@@ -82,6 +82,8 @@ PDL_SCOPE: api://dev-fss.pdl.pdl-api/.default
 FAMILIE_INTEGRASJONER_API_URL: https://familie-integrasjoner-q1.dev-fss-pub.nais.io/api
 FAMILIE_INTEGRASJONER_SCOPE: api://dev-fss.teamfamilie.familie-integrasjoner-q1/.default
 
+FAMILIE_BA_INFOTRYGD_API_URL: https://familie-ba-infotrygd.dev-fss-pub.nais.io
+
 FAMILIE_BA_SAK_API_URL: http://familie-ba-sak/api
 BA_SAK_SCOPE: api://dev-gcp.teamfamilie.familie-ba-sak/.default
 
