@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.familie.baks.mottak.domene.personopplysning.Person
 import no.nav.familie.http.client.AbstractRestClient
-import no.nav.familie.http.sts.StsRestClient
 import no.nav.familie.http.util.UriUtil
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
@@ -27,8 +26,7 @@ import java.time.LocalDateTime
 @Service
 class PdlClient(
     @Value("\${PDL_URL}") pdlBaseUrl: URI,
-    @Qualifier("clientCredentials") val restTemplate: RestOperations,
-    private val stsRestClient: StsRestClient
+    @Qualifier("clientCredentials") val restTemplate: RestOperations
 ) : AbstractRestClient(restTemplate, "pdl.personinfo") {
 
     private val pdlUri = UriUtil.uri(pdlBaseUrl, PATH_GRAPHQL)
@@ -155,7 +153,6 @@ class PdlClient(
         return HttpHeaders().apply {
             contentType = MediaType.APPLICATION_JSON
             accept = listOf(MediaType.APPLICATION_JSON)
-            add("Nav-Consumer-Token", "Bearer ${stsRestClient.systemOIDCToken}")
             add("Tema", TEMA)
         }
     }
