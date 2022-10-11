@@ -75,7 +75,7 @@ FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1440
 FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 180
 
 JOURNALFOERINGHENDELSE_V1_TOPIC_AIVEN_URL: teamdokumenthandtering.aapen-dok-journalfoering
-NORG2_API_URL: https://norg2.prod-fss-pub.nais.io
+NORG2_API_URL: https://norg2.prod-fss-pub.nais.io/norg2
 FAMILIE_DOKUMENT_API_URL: http://familie-dokument/familie/dokument
 FAMILIE_BA_DOKGEN_API_URL: https://familie-ba-dokgen.intern.nav.no
 
