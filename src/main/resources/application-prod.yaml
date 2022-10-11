@@ -69,13 +69,10 @@ JOURNALFOERINGHENDELSE_V1_TOPIC_AIVEN_URL: teamdokumenthandtering.aapen-dok-jour
 NORG2_API_URL: https://app.adeo.no/norg2/
 FAMILIE_DOKUMENT_API_URL: http://familie-dokument/familie/dokument
 FAMILIE_BA_DOKGEN_API_URL: https://familie-ba-dokgen.intern.nav.no
-<<<<<<< Updated upstream
-FAMILIE_BA_SAK_API_URL: http://familie-ba-sak/api
-=======
+
 FAMILIE_BA_SAK_API_URL: https://familie-ba-sak.intern.nav.no/api
 BA_SAK_SCOPE: api://prod-gcp.teamfamilie.familie-ba-sak/.default
 FAMILIE_INTEGRASJONER_API_URL: https://familie-integrasjoner.prod-fss-pub.nais.io/api
 FAMILIE_INTEGRASJONER_SCOPE: api://prod-fss.teamfamilie.familie-integrasjoner/.default
 PDL_URL: https://pdl-api.prod-fss-pub.nais.io
 PDL_SCOPE: api://prod-fss.pdl.pdl-api/.default
->>>>>>> Stashed changes

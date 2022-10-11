@@ -67,19 +67,14 @@ FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 1
 
 #Brukes til tilgangskontroll av familie-ks-mottak-frontend
 JOURNALFOERINGHENDELSE_V1_TOPIC_AIVEN_URL: teamdokumenthandtering.aapen-dok-journalfoering-q1
-<<<<<<< Updated upstream
-PDL_URL: http://pdl-api-q1.pdl
-FAMILIE_INTEGRASJONER_API_URL: https://familie-integrasjoner-q1.dev-fss-pub.nais.io/api
-FAMILIE_BA_SAK_API_URL: http://familie-ba-sak/api
-=======
+
 PDL_URL: https://pdl-api-q1.dev-fss-pub.nais.io
 PDL_SCOPE: api://dev-fss.pdl.pdl-api-q1/.default
 FAMILIE_INTEGRASJONER_API_URL: https://familie-integrasjoner.prod-fss-pub.nais.io/api
 FAMILIE_INTEGRASJONER_SCOPE: api://dev-fss.teamfamilie.familie-integrasjoner-q1/.default
 
-FAMILIE_BA_SAK_API_URL: https://familie-ba-sak.dev.intern.nav.no/api
+FAMILIE_BA_SAK_API_URL: http://familie-ba-sak/api
 BA_SAK_SCOPE: api://dev-gcp.teamfamilie.familie-ba-sak/.default
->>>>>>> Stashed changes
 
 NORG2_API_URL: https://app-q1.adeo.no/norg2
 FAMILIE_DOKUMENT_API_URL: http://familie-dokument/familie/dokument
