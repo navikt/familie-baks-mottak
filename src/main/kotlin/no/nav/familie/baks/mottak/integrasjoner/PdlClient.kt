@@ -27,7 +27,7 @@ import java.time.LocalDateTime
 @Service
 class PdlClient(
     @Value("\${PDL_URL}") pdlBaseUrl: URI,
-    @Qualifier("azureClientCredential") val restTemplate: RestOperations,
+    @Qualifier("clientCredentials") val restTemplate: RestOperations,
     private val stsRestClient: StsRestClient
 ) : AbstractRestClient(restTemplate, "pdl.personinfo") {
 

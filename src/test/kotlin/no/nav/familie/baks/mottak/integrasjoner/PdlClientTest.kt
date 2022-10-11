@@ -19,7 +19,7 @@ import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 
 @SpringBootTest(classes = [DevLauncher::class], properties = ["PDL_URL=http://localhost:28085/api"])
-@ActiveProfiles("dev", "mock-oauth", "mock-sts")
+@ActiveProfiles("dev", "mock-oauth")
 @AutoConfigureWireMock(port = 28085)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PdlClientTest {

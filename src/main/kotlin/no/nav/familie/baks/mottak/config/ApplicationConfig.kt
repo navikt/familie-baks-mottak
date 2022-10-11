@@ -38,7 +38,6 @@ import java.time.temporal.ChronoUnit
 @EnableJwtTokenValidation(ignore = ["org.springframework", "no.nav.familie.baks.mottak.e2e"])
 @EnableOAuth2Client(cacheEnabled = true)
 @EnableRetry
-@Import(RestTemplateAzure::class)
 class ApplicationConfig {
 
     @Bean
