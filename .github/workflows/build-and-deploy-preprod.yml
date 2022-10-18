@@ -59,7 +59,7 @@ jobs:
       - name: Push Docker image
         run: docker push $IMAGE
   deploy-dev:
-    if: ${{ github.event.pull_request.draft == false || github.triggering_actor != 'dependabot[bot]' }}
+    if: github.event.pull_request.draft == false
     name: Deploy to dev-gcp
     needs: build-dev
     runs-on: ubuntu-latest
@@ -68,6 +68,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Deploy til dev-gcp team namespace
+        if: github.triggering_actor != 'dependabot[bot]'
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
