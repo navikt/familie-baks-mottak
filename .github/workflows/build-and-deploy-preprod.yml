@@ -59,7 +59,7 @@ jobs:
       - name: Push Docker image
         run: docker push $IMAGE
   deploy-dev:
-    if: github.event.pull_request.draft == false || github.triggering_actor != 'dependabot[bot]'
+    if: ${{ github.event.pull_request.draft == false || github.triggering_actor != 'dependabot[bot]' }}
     name: Deploy to dev-gcp
     needs: build-dev
     runs-on: ubuntu-latest
