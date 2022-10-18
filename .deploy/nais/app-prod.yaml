@@ -1,0 +1,89 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: familie-baks-mottak
+  namespace: teamfamilie
+  labels:
+    team: teamfamilie
+
+spec:
+  envFrom:
+    - secret: familie-baks-mottak
+  image: {{ image }}
+  port: 8090
+  leaderElection: true
+  liveness:
+    path: /internal/health
+    initialDelay: 50
+    failureThreshold: 10
+  readiness:
+    path: /internal/health
+    initialDelay: 50
+    failureThreshold: 10
+  prometheus:
+    enabled: true
+    path: /internal/prometheus
+  vault:
+    enabled: false
+  replicas:
+    min: 2
+    max: 2
+    cpuThresholdPercentage: 50
+  resources:
+    limits:
+      memory: 4Gi
+      cpu: "1"
+    requests:
+      memory: 2Gi
+      cpu: 200m
+  secureLogs:
+    enabled: true
+  tokenx:
+    enabled: true
+  accessPolicy:
+    inbound:
+      rules:
+        - application: familie-ba-soknad-api
+          namespace: teamfamilie
+          cluster: prod-gcp
+        - application: familie-prosessering
+          namespace: teamfamilie
+          cluster: prod-gcp
+    outbound:
+      rules:
+        - application: familie-ba-sak
+          cluster: prod-gcp
+        - application: familie-dokument
+          cluster: prod-gcp
+      external:
+        - host: kafka-schema-registry.nais.adeo.no
+        - host: pdl-api.prod-fss-pub.nais.io
+        - host: norg2.prod-fss-pub.nais.io
+        - host: familie-integrasjoner.prod-fss-pub.nais.io
+  ingresses: # Optional. List of ingress URLs that will route HTTP traffic to the application.
+    - https://familie-baks-mottak.intern.nav.no
+  env:
+    - name: SPRING_PROFILES_ACTIVE
+      value: prod
+  gcp: # Database
+    sqlInstances:
+      - type: POSTGRES_14 # IF This is changed, all data will be lost. Read on nais.io how to upgrade
+        tier: db-custom-1-3840
+        name: familie-baks-mottak
+        autoBackupTime: "02:00"
+        pointInTimeRecovery: true
+        diskAutoresize: true
+        highAvailability: true
+        databases:
+          - name: familie-baks-mottak
+            envVarPrefix: DB
+  azure:
+    application:
+      enabled: true
+      allowAllUsers: false
+      claims:
+        groups:
+          - id: "87190cf3-b278-457d-8ab7-1a5c55a9edd7"  # Group_87190cf3-b278-457d-8ab7-1a5c55a9edd7 tilgang til prosessering
+
+  kafka:
+    pool: nav-prod

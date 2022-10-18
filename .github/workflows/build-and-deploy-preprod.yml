@@ -4,7 +4,7 @@ on:
     types: [ opened, synchronize, reopened, ready_for_review ]
   workflow_dispatch:
 env:
-  IMAGE: ghcr.io/navikt/familie-ba-mottak:${{ github.sha }}
+  IMAGE: ghcr.io/navikt/familie-baks-mottak:${{ github.sha }}
 
 jobs:
   ktlint:
@@ -60,19 +60,19 @@ jobs:
         run: docker push $IMAGE
   deploy-dev:
     if: github.event.pull_request.draft == false
-    name: Deploy to dev-fss
+    name: Deploy to dev-gcp
     needs: build-dev
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@v3
-      - name: Deploy til dev-fss team namespace
+      - name: Deploy til dev-gcp team namespace
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: dev-fss
-          RESOURCE: app-preprod.yaml
+          CLUSTER: dev-gcp
+          RESOURCE: .deploy/nais/app-preprod.yaml
   bygg-sonar:
     if: ${{ false }}  # disable for now
     #if: github.event.pull_request.user.login != 'dependabot[bot]'

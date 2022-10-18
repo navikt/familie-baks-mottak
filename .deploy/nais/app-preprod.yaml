@@ -1,0 +1,88 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: familie-baks-mottak
+  namespace: teamfamilie
+  labels:
+    team: teamfamilie
+
+spec:
+  envFrom:
+    - secret: familie-baks-mottak
+  image: {{ image }}
+  port: 8090
+  leaderElection: true
+  liveness:
+    path: /internal/health
+    initialDelay: 50
+    failureThreshold: 10
+  readiness:
+    path: /internal/health
+    initialDelay: 50
+    failureThreshold: 10
+  prometheus:
+    enabled: true
+    path: /internal/prometheus
+  vault:
+    enabled: false
+  replicas:
+    min: 2
+    max: 2
+    cpuThresholdPercentage: 50
+  resources:
+    limits:
+      memory: 2048Mi
+      cpu: "2"
+    requests:
+      memory: 1024Mi
+      cpu: 200m
+  ingresses:
+    - https://familie-baks-mottak.dev.intern.nav.no
+  secureLogs:
+    enabled: true
+  tokenx:
+    enabled: true
+  accessPolicy:
+    inbound:
+      rules:
+        - application: familie-ba-soknad-api
+          namespace: teamfamilie
+          cluster: dev-gcp
+        - application: familie-prosessering
+          namespace: teamfamilie
+          cluster: dev-gcp
+    outbound:
+      rules:
+        - application: familie-ba-sak
+          cluster: dev-gcp
+        - application: familie-dokument
+          cluster: dev-gcp
+      external:
+        - host: kafka-schema-registry.nais-q.adeo.no
+        - host: pdl-api.dev-fss-pub.nais.io
+        - host: familie-integrasjoner.dev-fss-pub.nais.io
+        - host: norg2.dev-fss-pub.nais.io
+  env:
+    - name: SPRING_PROFILES_ACTIVE
+      value: preprod
+  gcp: # Database
+    sqlInstances:
+      - type: POSTGRES_14 # IF This is changed, all data will be lost. Read on nais.io how to upgrade
+        tier: db-custom-1-3840
+        name: familie-baks-mottak
+        autoBackupTime: "02:00"
+        pointInTimeRecovery: true
+        diskAutoresize: true
+        highAvailability: false
+        databases:
+          - name: familie-baks-mottak
+            envVarPrefix: DB
+  azure:
+    application:
+      enabled: true
+      allowAllUsers: false
+      claims:
+        groups:
+          - id: "928636f4-fd0d-4149-978e-a6fb68bb19de"  # 0000-GA-STDAPPS
+  kafka:
+    pool: nav-dev
