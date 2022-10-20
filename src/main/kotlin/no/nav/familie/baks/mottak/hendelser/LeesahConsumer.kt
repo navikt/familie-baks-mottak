@@ -37,7 +37,22 @@ class LeesahConsumer(val leesahService: LeesahService) {
     )
     @Transactional
     fun listen(cr: ConsumerRecord<String, Personhendelse>, ack: Acknowledgment) {
-        SECURE_LOGGER.info("LeesahConsumer har mottatt hendelse $cr")
+        val pdlHendelse = PdlHendelse(
+            cr.value().hentHendelseId(),
+            cr.key().substring(6),
+            cr.offset(),
+            cr.value().hentOpplysningstype(),
+            cr.value().hentEndringstype(),
+            cr.value().hentPersonidenter(),
+            cr.value().hentDødsdato(),
+            cr.value().hentFødselsdato(),
+            cr.value().hentFødeland(),
+            cr.value().hentUtflyttingsdato(),
+            cr.value().hentTidligereHendelseId(),
+            cr.value().hentSivilstandType(),
+            cr.value().hentSivilstandDato()
+        )
+        SECURE_LOGGER.info("LeesahConsumer har mottatt hendelse $pdlHendelse $cr")
     }
 
     private fun GenericRecord.hentOpplysningstype() =
