@@ -24,20 +24,48 @@ import javax.transaction.Transactional
     havingValue = "true",
     matchIfMissing = true
 )
-class LeesahConsumer(val leesahService: LeesahService) {
+class LeesahOnpremConsumer(val leesahService: LeesahService) {
 
     val leesahFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesha.feilet")
 
     @KafkaListener(
-        groupId = "baks-mottak-leesah-1",
-        topics = ["pdl.leesah-v1"],
-        id = "leesah-1",
+        groupId = "srvfamilie-baks-mottak",
+        topics = ["aapen-person-pdl-leesah-v1"],
+        id = "personhendelse",
         idIsGroup = false,
-        containerFactory = "kafkaAivenHendelseListenerContainerFactory"
+        containerFactory = "kafkaLeesahListenerContainerFactory"
     )
     @Transactional
     fun listen(cr: ConsumerRecord<String, Personhendelse>, ack: Acknowledgment) {
-        SECURE_LOGGER.info("LeesahConsumer har mottatt hendelse $cr")
+        val pdlHendelse = PdlHendelse(
+            cr.value().hentHendelseId(),
+            cr.key().substring(6),
+            cr.offset(),
+            cr.value().hentOpplysningstype(),
+            cr.value().hentEndringstype(),
+            cr.value().hentPersonidenter(),
+            cr.value().hentDødsdato(),
+            cr.value().hentFødselsdato(),
+            cr.value().hentFødeland(),
+            cr.value().hentUtflyttingsdato(),
+            cr.value().hentTidligereHendelseId(),
+            cr.value().hentSivilstandType(),
+            cr.value().hentSivilstandDato()
+        )
+
+        try {
+            MDC.put(MDCConstants.MDC_CALL_ID, pdlHendelse.hendelseId)
+            SECURE_LOGGER.info("Har mottatt leesah-hendelse $cr")
+            leesahService.prosesserNyHendelse(pdlHendelse)
+        } catch (e: RuntimeException) {
+            leesahFeiletCounter.increment()
+            SECURE_LOGGER.error("Feil i prosessering av leesah-hendelser", e)
+            throw RuntimeException("Feil i prosessering av leesah-hendelser")
+        } finally {
+            MDC.clear()
+        }
+
+        ack.acknowledge()
     }
 
     private fun GenericRecord.hentOpplysningstype() =
@@ -106,6 +134,6 @@ class LeesahConsumer(val leesahService: LeesahService) {
     companion object {
 
         val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
-        val log: Logger = LoggerFactory.getLogger(LeesahConsumer::class.java)
+        val log: Logger = LoggerFactory.getLogger(LeesahOnpremConsumer::class.java)
     }
 }
