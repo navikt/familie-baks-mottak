@@ -27,7 +27,7 @@ class JournalføringHendelseAivenConsumer(val journalhendelseService: Journalhen
         groupId = "familie-baks-mottak-jfr",
         id = "baks-mottak-journal-hendelser-aiven",
         topics = ["\${JOURNALFOERINGHENDELSE_V1_TOPIC_AIVEN_URL}"],
-        containerFactory = "kafkaAivenHendelseListenerAvroContainerFactory",
+        containerFactory = "kafkaAivenHendelseListenerAvroLatestContainerFactory",
         idIsGroup = false
     )
     @Transactional

@@ -33,7 +33,7 @@ class LeesahConsumer(val leesahService: LeesahService) {
         topics = ["pdl.leesah-v1"],
         id = "leesah-1",
         idIsGroup = false,
-        containerFactory = "kafkaAivenHendelseListenerAvroContainerFactory"
+        containerFactory = "kafkaAivenHendelseListenerAvroLatestContainerFactory" // TODO byttest til Earliest etter at onprem er av
     )
     @Transactional
     fun listen(cr: ConsumerRecord<String, Personhendelse>, ack: Acknowledgment) {
@@ -52,7 +52,20 @@ class LeesahConsumer(val leesahService: LeesahService) {
             cr.value().hentSivilstandType(),
             cr.value().hentSivilstandDato()
         )
-        SECURE_LOGGER.info("LeesahConsumer har mottatt hendelse $pdlHendelse $cr")
+
+        try {
+            MDC.put(MDCConstants.MDC_CALL_ID, pdlHendelse.hendelseId)
+            SECURE_LOGGER.info("LeeasahConsumer har mottatt leesah-hendelse $cr")
+//            leesahService.prosesserNyHendelse(pdlHendelse) //TODO kommenteres inn igjen etter at onprem er av
+        } catch (e: RuntimeException) {
+            leesahFeiletCounter.increment()
+            SECURE_LOGGER.error("Feil i prosessering av leesah-hendelser", e)
+            throw RuntimeException("Feil i prosessering av leesah-hendelser")
+        } finally {
+            MDC.clear()
+        }
+
+        ack.acknowledge()
     }
 
     private fun GenericRecord.hentOpplysningstype() =
