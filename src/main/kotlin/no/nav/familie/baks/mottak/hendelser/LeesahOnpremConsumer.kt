@@ -24,16 +24,16 @@ import javax.transaction.Transactional
     havingValue = "true",
     matchIfMissing = true
 )
-class LeesahConsumer(val leesahService: LeesahService) {
+class LeesahOnpremConsumer(val leesahService: LeesahService) {
 
     val leesahFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesha.feilet")
 
     @KafkaListener(
-        groupId = "baks-mottak-leesah-1",
-        topics = ["pdl.leesah-v1"],
-        id = "leesah-1",
+        groupId = "srvfamilie-baks-mottak",
+        topics = ["aapen-person-pdl-leesah-v1"],
+        id = "personhendelse",
         idIsGroup = false,
-        containerFactory = "kafkaAivenHendelseListenerAvroLatestContainerFactory" // TODO byttest til Earliest etter at onprem er av
+        containerFactory = "kafkaLeesahListenerContainerFactory"
     )
     @Transactional
     fun listen(cr: ConsumerRecord<String, Personhendelse>, ack: Acknowledgment) {
@@ -55,8 +55,8 @@ class LeesahConsumer(val leesahService: LeesahService) {
 
         try {
             MDC.put(MDCConstants.MDC_CALL_ID, pdlHendelse.hendelseId)
-            SECURE_LOGGER.info("LeeasahConsumer har mottatt leesah-hendelse $cr")
-//            leesahService.prosesserNyHendelse(pdlHendelse) //TODO kommenteres inn igjen etter at onprem er av
+            SECURE_LOGGER.info("Har mottatt leesah-hendelse $cr")
+            leesahService.prosesserNyHendelse(pdlHendelse)
         } catch (e: RuntimeException) {
             leesahFeiletCounter.increment()
             SECURE_LOGGER.error("Feil i prosessering av leesah-hendelser", e)
@@ -134,6 +134,6 @@ class LeesahConsumer(val leesahService: LeesahService) {
     companion object {
 
         val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
-        val log: Logger = LoggerFactory.getLogger(LeesahConsumer::class.java)
+        val log: Logger = LoggerFactory.getLogger(LeesahOnpremConsumer::class.java)
     }
 }
