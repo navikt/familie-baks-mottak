@@ -33,7 +33,7 @@ class LeesahConsumer(val leesahService: LeesahService) {
         topics = ["pdl.leesah-v1"],
         id = "leesah-1",
         idIsGroup = false,
-        containerFactory = "kafkaAivenHendelseListenerContainerFactory"
+        containerFactory = "kafkaAivenHendelseListenerAvroContainerFactory"
     )
     @Transactional
     fun listen(cr: ConsumerRecord<String, Personhendelse>, ack: Acknowledgment) {
