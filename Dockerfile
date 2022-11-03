@@ -1,6 +1,5 @@
-FROM navikt/java:17
+FROM ghcr.io/navikt/baseimages/temurin:17
 
-ENV APPD_ENABLED=true
 ENV APP_NAME=familie-baks-mottak
 ENV JAVA_OPTS="-XX:MaxRAMPercentage=75"
 
