@@ -18,8 +18,13 @@ fun erFDatnummer(personIdent: PersonIdent): Boolean {
     return erFDatnummer(personIdent.id)
 }
 
+/**
+ * BOST-nr har måned mellom 21 og 32
+ */
 fun erBostNummer(personIdent: String): Boolean {
-    return personIdent.substring(2, 3).toInt() > 1
+    personIdent.substring(2, 4).toInt().also { måned ->
+        return måned in 21..32
+    }
 }
 
 fun erBostNummer(personIdent: PersonIdent): Boolean {
