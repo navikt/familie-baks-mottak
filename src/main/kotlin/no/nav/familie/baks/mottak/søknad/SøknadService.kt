@@ -12,7 +12,7 @@ import no.nav.familie.baks.mottak.søknad.domene.tilDBVedlegg
 import no.nav.familie.baks.mottak.task.JournalførSøknadTask
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.internal.TaskService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.Properties
@@ -21,7 +21,7 @@ import java.util.Properties
 class SøknadService(
     private val søknadRepository: SøknadRepository,
     private val vedleggRepository: SøknadVedleggRepository,
-    private val taskRepository: TaskRepository,
+    private val taskService: TaskService,
     private val vedleggClient: FamilieDokumentClient
 ) {
 
@@ -44,7 +44,7 @@ class SøknadService(
         // Vi må hente vedleggene nå mens vi har gyldig on-behalf-of-token for brukeren
         hentOgLagreSøknadvedlegg(dbSøknad = dbSøknad, søknaddokumentasjonsliste = dokumentasjon)
 
-        taskRepository.save(
+        taskService.save(
             Task(
                 type = JournalførSøknadTask.JOURNALFØR_SØKNAD,
                 payload = dbSøknad.id.toString(),

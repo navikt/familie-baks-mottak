@@ -7,7 +7,7 @@ import no.nav.familie.baks.mottak.hendelser.JournalhendelseService
 import no.nav.familie.baks.mottak.hendelser.LeesahService
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
@@ -34,7 +34,7 @@ class E2EController(
     private val leesahService: LeesahService,
     private val journalhendelseService: JournalhendelseService,
     private val hendelsesloggRepository: HendelsesloggRepository,
-    private val taskRepository: TaskRepository,
+    private val taskService: TaskService,
     private val databaseCleanupService: DatabaseCleanupService
 ) {
 
@@ -137,7 +137,7 @@ class E2EController(
         @PathVariable(name = "key", required = true) key: String,
         @PathVariable(name = "value", required = true) value: String
     ): List<Task> {
-        return taskRepository.findAll().filter { it.metadata[key] == value }
+        return taskService.findAll().filter { it.metadata[key] == value }
     }
 
     @GetMapping(path = ["/truncate"])

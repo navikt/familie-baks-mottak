@@ -11,7 +11,7 @@ import no.nav.familie.baks.mottak.task.MottaAnnullerFødselTask
 import no.nav.familie.baks.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.baks.mottak.task.VurderLivshendelseTask
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.internal.TaskService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,18 +26,20 @@ import kotlin.random.nextUInt
 class LeesahServiceTest {
 
     lateinit var mockHendelsesloggRepository: HendelsesloggRepository
-    lateinit var mockTaskRepository: TaskRepository
+    lateinit var mockTaskService: TaskService
     lateinit var mockenv: Environment
     lateinit var service: LeesahService
 
     @BeforeEach
     internal fun setUp() {
         mockHendelsesloggRepository = mockk(relaxed = true)
-        mockTaskRepository = mockk(relaxed = true)
+        mockTaskService = mockk(relaxed = true)
         mockenv = mockk<Environment>(relaxed = true)
-        service = LeesahService(mockHendelsesloggRepository, mockTaskRepository, 1, mockenv)
+        service = LeesahService(mockHendelsesloggRepository, mockTaskService, 1, mockenv)
         clearAllMocks()
-        every { mockTaskRepository.save(any()) } returns null
+        every {
+            mockTaskService.save(any<Task>())
+        } returns Task("dummy", "payload")
     }
 
     @Test
@@ -57,7 +59,7 @@ class LeesahServiceTest {
 
         val taskSlot = slot<Task>()
         verify {
-            mockTaskRepository.save(capture(taskSlot))
+            mockTaskService.save(capture(taskSlot))
         }
         assertThat(taskSlot.captured).isNotNull
         assertThat(taskSlot.captured.payload).contains("\"personIdent\":\"12345678901\",\"type\":\"DØDSFALL\"")
@@ -85,7 +87,7 @@ class LeesahServiceTest {
 
         val taskSlot = slot<Task>()
         verify {
-            mockTaskRepository.save(capture(taskSlot))
+            mockTaskService.save(capture(taskSlot))
         }
         assertThat(taskSlot.captured).isNotNull
         assertThat(taskSlot.captured.payload).contains("\"personIdent\":\"12345678901\",\"type\":\"UTFLYTTING\"")
@@ -115,7 +117,7 @@ class LeesahServiceTest {
 
         val taskSlot = slot<Task>()
         verify(exactly = 1) {
-            mockTaskRepository.save(capture(taskSlot))
+            mockTaskService.save(capture(taskSlot))
         }
         assertThat(taskSlot.captured).isNotNull
         assertThat(taskSlot.captured.payload)
@@ -145,7 +147,7 @@ class LeesahServiceTest {
 
         val taskSlot = slot<Task>()
         verify {
-            mockTaskRepository.save(capture(taskSlot))
+            mockTaskService.save(capture(taskSlot))
         }
 
         assertThat(taskSlot.captured).isNotNull
@@ -173,15 +175,15 @@ class LeesahServiceTest {
 
         service.prosesserNyHendelse(pdlHendelse)
 
-        verify(exactly = 0) { mockTaskRepository.save(any()) }
+        verify(exactly = 0) { mockTaskService.save(any()) }
 
         service.prosesserNyHendelse(pdlHendelse.copy(fødeland = "NOR"))
 
-        verify(exactly = 1) { mockTaskRepository.save(any()) }
+        verify(exactly = 1) { mockTaskService.save(any()) }
 
         service.prosesserNyHendelse(pdlHendelse.copy(fødeland = null))
 
-        verify(exactly = 2) { mockTaskRepository.save(any()) }
+        verify(exactly = 2) { mockTaskService.save(any()) }
     }
 
     @Test
@@ -203,7 +205,7 @@ class LeesahServiceTest {
 
         val taskSlot = slot<Task>()
         verify {
-            mockTaskRepository.save(capture(taskSlot))
+            mockTaskService.save(capture(taskSlot))
         }
 
         assertThat(taskSlot.captured).isNotNull

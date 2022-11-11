@@ -23,7 +23,7 @@ import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.internal.TaskService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,7 +37,7 @@ class SkanHendelseTaskLøypeTest {
     private val mockJournalpostClient: JournalpostClient = mockk()
     private val mockOppgaveClient: OppgaveClient = mockk()
     private val mockSakClient: SakClient = mockk()
-    private val mockTaskRepository: TaskRepository = mockk(relaxed = true)
+    private val mockTaskService: TaskService = mockk(relaxed = true)
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
 
@@ -45,7 +45,7 @@ class SkanHendelseTaskLøypeTest {
         mockPdlClient,
         mockSakClient,
         mockInfotrygdBarnetrygdClient,
-        mockTaskRepository
+        mockTaskService
     )
 
     private val journalføringSteg = OpprettJournalføringOppgaveTask(
@@ -77,8 +77,8 @@ class SkanHendelseTaskLøypeTest {
         } returns listOf()
 
         every {
-            mockTaskRepository.save(any<Task>())
-        } returns null
+            mockTaskService.save(any<Task>())
+        } returns Task("dummy", "payload")
 
         every {
             mockPdlClient.hentPersonident(any())
@@ -208,7 +208,7 @@ class SkanHendelseTaskLøypeTest {
 
         val nesteTask = slot<Task>().let { nyTask ->
             verify(exactly = 1) {
-                mockTaskRepository.save(capture(nyTask))
+                mockTaskService.save(capture(nyTask))
             }
             nyTask.captured
         }

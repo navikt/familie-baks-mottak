@@ -14,7 +14,7 @@ import no.nav.familie.baks.mottak.task.JournalhendelseRutingTask
 import no.nav.familie.log.IdUtils
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
@@ -27,7 +27,7 @@ import java.util.Properties
 @Service
 class JournalhendelseService(
     val journalpostClient: JournalpostClient,
-    val taskRepository: TaskRepository,
+    val taskService: TaskService,
     val hendelsesloggRepository: HendelsesloggRepository
 ) {
 
@@ -161,7 +161,7 @@ class JournalhendelseService(
             payload = journalpost.kanal!!,
             properties = opprettMetadata(journalpost)
         ).apply {
-            taskRepository.save(this)
+            taskService.save(this)
         }
     }
 

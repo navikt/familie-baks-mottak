@@ -1,11 +1,12 @@
 package no.nav.familie.baks.mottak.task
 
 import no.nav.familie.leader.LeaderClient
-import no.nav.familie.prosessering.domene.Avvikstype
+import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import org.springframework.context.annotation.Profile
 import org.springframework.data.domain.PageRequest
 import org.springframework.scheduling.annotation.Scheduled
@@ -15,7 +16,7 @@ import java.time.LocalDateTime
 
 @Component
 @Profile("!prod")
-class FjernGamleFeiledeTasksIPreprod(val taskRepository: TaskRepository) {
+class FjernGamleFeiledeTasksIPreprod(val taskService: TaskService) {
 
     @Scheduled(cron = "0 0 10 * * *")
     @Transactional
@@ -25,10 +26,15 @@ class FjernGamleFeiledeTasksIPreprod(val taskRepository: TaskRepository) {
         if (isLeader != null && isLeader) {
             LOG.info("Fjerner gamle feilede tasks")
 
-            for (task: Task in taskRepository.findByStatusIn(listOf(Status.FEILET), PageRequest.of(0, 200))) {
+            for (task: Task in taskService.finnTasksMedStatus(listOf(Status.FEILET), null, PageRequest.of(0, 200))) {
                 if (task.opprettetTid.isBefore(LocalDateTime.now().minusMonths(1))) {
-                    task.avvikshåndter(avvikstype = Avvikstype.ANNET, årsak = "Rydder", endretAv = "VL")
-                    taskRepository.save(task)
+                    try {
+                        MDC.put(MDCConstants.MDC_CALL_ID, task.callId)
+                        LOG.info("Sletter gammel feilet task i preprod ${task.id} ${task.type}")
+                        taskService.delete(task)
+                    } finally {
+                        MDC.clear()
+                    }
                 }
             }
         }

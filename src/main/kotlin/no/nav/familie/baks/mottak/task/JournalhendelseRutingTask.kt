@@ -21,7 +21,7 @@ import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROL
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -38,7 +38,7 @@ class JournalhendelseRutingTask(
     private val pdlClient: PdlClient,
     private val sakClient: SakClient,
     private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,
-    private val taskRepository: TaskRepository
+    private val taskService: TaskService
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(JournalhendelseRutingTask::class.java)
@@ -72,7 +72,7 @@ class JournalhendelseRutingTask(
             type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
             payload = sakssystemMarkering,
             properties = task.metadata
-        ).apply { taskRepository.save(this) }
+        ).apply { taskService.save(this) }
     }
 
     private fun incrementSakssystemMarkering(saksystem: String) {

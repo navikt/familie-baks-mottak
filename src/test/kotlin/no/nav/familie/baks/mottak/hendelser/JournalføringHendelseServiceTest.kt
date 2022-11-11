@@ -5,6 +5,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
+import io.mockk.justRun
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.baks.mottak.config.FeatureToggleService
@@ -32,7 +33,7 @@ import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.assertj.core.api.Assertions.assertThat
@@ -62,7 +63,7 @@ class JournalføringHendelseServiceTest {
     lateinit var pdlClient: PdlClient
 
     @MockK(relaxed = true)
-    lateinit var mockTaskRepository: TaskRepository
+    lateinit var mockTaskService: TaskService
 
     @MockK(relaxed = true)
     lateinit var mockFeatureToggleService: FeatureToggleService
@@ -163,7 +164,7 @@ class JournalføringHendelseServiceTest {
 
         every { mockFeatureToggleService.isEnabled(any()) } returns true
         every { mockFeatureToggleService.isEnabled(any(), true) } returns true
-        every { mockTaskRepository.save(any()) } returns null
+        every { mockTaskService.save(any()) } returns Task("dummy", "payload")
     }
 
     @Test
@@ -175,7 +176,7 @@ class JournalføringHendelseServiceTest {
 
         val taskSlot = slot<Task>()
         verify {
-            mockTaskRepository.save(capture(taskSlot))
+            mockTaskService.save(capture(taskSlot))
         }
 
         assertThat(taskSlot.captured).isNotNull
@@ -193,7 +194,7 @@ class JournalføringHendelseServiceTest {
 
         val taskSlot = slot<Task>()
         verify {
-            mockTaskRepository.save(capture(taskSlot))
+            mockTaskService.save(capture(taskSlot))
         }
 
         assertThat(taskSlot.captured).isNotNull
@@ -209,7 +210,7 @@ class JournalføringHendelseServiceTest {
         service.behandleJournalhendelse(record)
 
         verify(exactly = 0) {
-            mockTaskRepository.save(any())
+            mockTaskService.save(any())
         }
     }
 
@@ -220,7 +221,7 @@ class JournalføringHendelseServiceTest {
         service.behandleJournalhendelse(record)
 
         verify(exactly = 0) {
-            mockTaskRepository.save(any())
+            mockTaskService.save(any())
         }
     }
 
@@ -235,9 +236,9 @@ class JournalføringHendelseServiceTest {
             mockOppgaveClient.opprettJournalføringsoppgave(any(), capture(sakssystemMarkering))
         } returns OppgaveResponse(1)
 
-        every {
-            mockTaskRepository.save(any<Task>())
-        } returns null
+        justRun {
+            mockTaskService.save(any<Task>())
+        }
 
         every {
             pdlClient.hentPersonident(any())
@@ -296,7 +297,7 @@ class JournalføringHendelseServiceTest {
         )
 
         verify(exactly = 0) {
-            mockTaskRepository.save(any<Task>())
+            mockTaskService.save(any<Task>())
         }
     }
 
