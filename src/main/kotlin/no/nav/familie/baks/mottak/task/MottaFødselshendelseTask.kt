@@ -17,7 +17,7 @@ import no.nav.familie.kontrakter.felles.personopplysning.ForelderBarnRelasjon
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service
     maxAntallFeil = 3
 )
 class MottaFødselshendelseTask(
-    private val taskRepository: TaskRepository,
+    private val taskService: TaskService,
     private val pdlClient: PdlClient,
     @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: Long
 ) : AsyncTaskStep {
@@ -79,7 +79,7 @@ class MottaFødselshendelseTask(
                     task.metadata
                 )
 
-                taskRepository.save(nesteTask)
+                taskService.save(nesteTask)
             } else {
                 log.info("Skipper fødselshendelse fordi man ikke fant en mor")
             }

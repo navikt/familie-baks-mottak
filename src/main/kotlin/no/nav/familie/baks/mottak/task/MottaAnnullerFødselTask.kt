@@ -7,7 +7,8 @@ import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Avvikstype
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.internal.TaskService
+import no.nav.familie.prosessering.rest.RestTaskService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Pageable
@@ -20,7 +21,8 @@ import org.springframework.stereotype.Service
     maxAntallFeil = 3
 )
 class MottaAnnullerFødselTask(
-    private val taskRepository: TaskRepository
+    private val taskService: TaskService,
+    private val restTaskService: RestTaskService
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(MottaAnnullerFødselTask::class.java)
@@ -30,18 +32,22 @@ class MottaAnnullerFødselTask(
         val tidligereHendelseId = restAnnullerFødsel.tidligereHendelseId
 
         val tasker =
-            taskRepository.findByStatusIn(
+            taskService.finnTasksMedStatus(
                 listOf(Status.KLAR_TIL_PLUKK, Status.UBEHANDLET, Status.FEILET),
+                null,
                 Pageable.unpaged()
             )
                 .filter {
                     it.callId == tidligereHendelseId &&
                         (it.type == MottaFødselshendelseTask.TASK_STEP_TYPE || it.type == SendTilSakTask.TASK_STEP_TYPE)
                 }
+
         tasker.forEach {
-            taskRepository.save(
-                taskRepository.findById(it.id).get()
-                    .avvikshåndter(avvikstype = Avvikstype.ANNET, årsak = AVVIKSÅRSAK, endretAv = "VL")
+            restTaskService.avvikshåndterTask(
+                taskId = it.id,
+                avvikstype = Avvikstype.ANNET,
+                årsak = AVVIKSÅRSAK,
+                saksbehandlerId = "VL"
             )
         }
     }

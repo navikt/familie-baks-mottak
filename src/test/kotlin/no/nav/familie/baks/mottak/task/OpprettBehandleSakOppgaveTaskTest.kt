@@ -1,6 +1,7 @@
 package no.nav.familie.baks.mottak.task
 
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import no.nav.familie.baks.mottak.hendelser.JournalføringHendelseServiceTest
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
@@ -16,7 +17,7 @@ import no.nav.familie.baks.mottak.task.OpprettJournalføringOppgaveTask.Companio
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.internal.TaskService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeAll
@@ -28,7 +29,7 @@ class OpprettBehandleSakOppgaveTaskTest {
 
     private val mockJournalpostClient: JournalpostClient = mockk()
     private val mockOppgaveClient: OppgaveClient = mockk()
-    private val mockTaskRepository: TaskRepository = mockk(relaxed = true)
+    private val mockTaskService: TaskService = mockk(relaxed = true)
 
     private val taskStep = OpprettBehandleSakOppgaveTask(mockJournalpostClient, mockOppgaveClient)
 
@@ -38,9 +39,9 @@ class OpprettBehandleSakOppgaveTaskTest {
             mockOppgaveClient.finnOppgaver(any(), any())
         } returns listOf()
 
-        every {
-            mockTaskRepository.save(any())
-        } returns null
+        justRun {
+            mockTaskService.save(any())
+        }
     }
 
     @Test

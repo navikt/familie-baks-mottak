@@ -17,7 +17,7 @@ import no.nav.familie.baks.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND.GIFT
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -30,7 +30,7 @@ import java.util.Properties
 @Service
 class LeesahService(
     private val hendelsesloggRepository: HendelsesloggRepository,
-    private val taskRepository: TaskRepository,
+    private val taskService: TaskService,
     @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") private val triggerTidForTps: Long,
     private val environment: Environment
 ) {
@@ -121,7 +121,7 @@ class LeesahService(
                         ).medTriggerTid(
                             nesteGyldigeTriggertidFødselshendelser(triggerTidForTps, environment)
                         )
-                        taskRepository.save(task)
+                        taskService.save(task)
                     }
                 } else if (erUnder18år(fødselsdato)) {
                     fødselIgnorertUnder18årCounter.increment()
@@ -146,7 +146,7 @@ class LeesahService(
                             this["tidligereHendelseId"] = pdlHendelse.tidligereHendelseId
                         }
                     )
-                    taskRepository.save(task)
+                    taskService.save(task)
                 } else {
                     log.warn("Mottatt annuller fødsel uten tidligereHendelseId, hendelseId ${pdlHendelse.hendelseId}")
                 }
@@ -259,7 +259,7 @@ class LeesahService(
             }
         ).medTriggerTid(LocalDateTime.now().run { if (environment.activeProfiles.contains("prod")) this.plusHours(1) else this })
             .also {
-                taskRepository.save(it)
+                taskService.save(it)
             }
     }
 

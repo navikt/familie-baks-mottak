@@ -5,25 +5,28 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.baks.mottak.integrasjoner.RestAnnullerFødsel
+import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.domene.Avvikstype
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.internal.TaskService
+import no.nav.familie.prosessering.rest.RestTaskService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.slf4j.MDC
-import java.util.Optional
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MottaAnnullerFødselTaskTest {
 
     @Test
     fun `Skal endre status av Task med riktig type`() {
-        val taskRepository = mockk<TaskRepository>()
+        val taskService = mockk<TaskService>()
+        val restTaskService = mockk<RestTaskService>()
 
+        MDC.put(MDCConstants.MDC_CALL_ID, "ooo")
         val journalførSøknadTask = Task(type = JournalførSøknadTask.JOURNALFØR_SØKNAD, payload = "").copy(
             id = 0
         )
@@ -33,39 +36,33 @@ class MottaAnnullerFødselTaskTest {
         val mottaFødselshendelseTask = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = "").copy(
             id = 2
         )
-        every { taskRepository.findByStatusIn(any(), any()) } returns listOf(
+        every { taskService.finnTasksMedStatus(any(), any(), any()) } returns listOf(
             journalførSøknadTask,
             sendTilSakTask,
             mottaFødselshendelseTask
         )
-        every { taskRepository.findById(eq(0)) } returns Optional.of(journalførSøknadTask)
-        every { taskRepository.findById(eq(1)) } returns Optional.of(sendTilSakTask)
-        every { taskRepository.findById(eq(2)) } returns Optional.of(mottaFødselshendelseTask)
+        every { taskService.findById(eq(0)) } returns journalførSøknadTask
+        every { taskService.findById(eq(1)) } returns sendTilSakTask
+        every { taskService.findById(eq(2)) } returns mottaFødselshendelseTask
 
         val taskSlot = mutableListOf<Task>()
-        every { taskRepository.save(capture(taskSlot)) } returns mottaFødselshendelseTask
+        every { taskService.save(capture(taskSlot)) } returns mottaFødselshendelseTask
+        every { restTaskService.avvikshåndterTask(any(), any(), any(), any()) } returns Ressurs.success("OK")
 
-        MottaAnnullerFødselTask(taskRepository).doTask(
+        MottaAnnullerFødselTask(taskService, restTaskService).doTask(
             Task(
                 type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
                 payload = objectMapper.writeValueAsString(RestAnnullerFødsel(listOf("12345678910"), "ooo"))
             )
         )
-        verify(exactly = 2) { taskRepository.save(any()) }
-        assertThat(taskSlot.find { it.id == 1L }!!.status).isEqualTo(Status.AVVIKSHÅNDTERT)
-        assertThat(taskSlot.find { it.id == 1L }!!.avvikstype).isEqualTo(Avvikstype.ANNET)
-        var logg = taskSlot.find { it.id == 1L }!!.logg.toList()
-        var avvikslogg = logg.get(logg.size - 1)
-        assertThat(avvikslogg.endretAv).isEqualTo("VL")
-        assertThat(avvikslogg.melding).isEqualTo(MottaAnnullerFødselTask.AVVIKSÅRSAK)
-
-        assertThat(taskSlot.find { it.id == 2L }!!.status).isEqualTo(Status.AVVIKSHÅNDTERT)
-        assertThat(taskSlot.find { it.id == 2L }!!.avvikstype).isEqualTo(Avvikstype.ANNET)
+        verify(exactly = 1) { restTaskService.avvikshåndterTask(1L, Avvikstype.ANNET, any(), any()) }
+        verify(exactly = 1) { restTaskService.avvikshåndterTask(2L, Avvikstype.ANNET, any(), any()) }
     }
 
     @Test
     fun `Skal endre status av Task med riktig callId`() {
-        val taskRepository = mockk<TaskRepository>()
+        val taskService = mockk<TaskService>()
+        val restTaskService = mockk<RestTaskService>()
 
         MDC.put(MDCConstants.MDC_CALL_ID, "xxx")
         val task0 = Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "").copy(
@@ -76,40 +73,41 @@ class MottaAnnullerFødselTaskTest {
             id = 1
         )
 
-        every { taskRepository.findByStatusIn(any(), any()) } returns listOf(
+        every { taskService.finnTasksMedStatus(any(), any(), any()) } returns listOf(
             task0,
             task1
         )
-        every { taskRepository.findById(eq(0)) } returns Optional.of(task0)
-        every { taskRepository.findById(eq(1)) } returns Optional.of(task1)
+        every { taskService.findById(eq(0)) } returns task0
+        every { taskService.findById(eq(1)) } returns task1
 
         val taskSlot = mutableListOf<Task>()
-        every { taskRepository.save(capture(taskSlot)) } returns task0
+        every { taskService.save(capture(taskSlot)) } returns task0
 
-        MottaAnnullerFødselTask(taskRepository).doTask(
+        every { restTaskService.avvikshåndterTask(any(), any(), any(), any()) } returns Ressurs.success("OK")
+
+        MottaAnnullerFødselTask(taskService, restTaskService).doTask(
             Task(
                 type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
                 payload = objectMapper.writeValueAsString(RestAnnullerFødsel(listOf("12345678910"), "ooo"))
             )
         )
-        verify(exactly = 1) { taskRepository.save(any()) }
-        assertThat(taskSlot.find { it.id == 1L }!!.status).isEqualTo(Status.AVVIKSHÅNDTERT)
-        assertThat(taskSlot.find { it.id == 1L }!!.avvikstype).isEqualTo(Avvikstype.ANNET)
+        verify(exactly = 1) { restTaskService.avvikshåndterTask(1L, any(), any(), any()) }
     }
 
     @Test
     fun `Skal finn Task med riktig Status`() {
-        val taskRepository = mockk<TaskRepository>()
+        val taskService = mockk<TaskService>()
+        val restTaskService = mockk<RestTaskService>()
 
         val statusSlot = slot<List<Status>>()
-        every { taskRepository.findByStatusIn(capture(statusSlot), any()) } returns emptyList()
-        MottaAnnullerFødselTask(taskRepository).doTask(
+        every { taskService.finnTasksMedStatus(capture(statusSlot), any(), any()) } returns emptyList()
+        MottaAnnullerFødselTask(taskService, restTaskService).doTask(
             Task(
                 type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
                 payload = objectMapper.writeValueAsString(RestAnnullerFødsel(listOf("12345678910"), "ooo"))
             )
         )
-        verify(exactly = 1) { taskRepository.findByStatusIn(any(), any()) }
+        verify(exactly = 1) { taskService.finnTasksMedStatus(any(), any(), any()) }
         assertThat(statusSlot.captured.size).isEqualTo(3)
         assertThat(statusSlot.captured).contains(Status.KLAR_TIL_PLUKK)
         assertThat(statusSlot.captured).contains(Status.UBEHANDLET)

@@ -10,7 +10,7 @@ import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -24,7 +24,7 @@ class OppdaterOgFerdigstillJournalpostTask(
     private val journalpostClient: JournalpostClient,
     private val dokarkivClient: DokarkivClient,
     private val sakClient: SakClient,
-    private val taskRepository: TaskRepository,
+    private val taskService: TaskService,
     private val pdlClient: PdlClient
 ) : AsyncTaskStep {
 
@@ -54,7 +54,7 @@ class OppdaterOgFerdigstillJournalpostTask(
                             OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
                             journalpost.journalpostId,
                             task.metadata
-                        ).also { taskRepository.save(it) }
+                        ).also { taskService.save(it) }
                         return
                     }
                 )
@@ -73,7 +73,7 @@ class OppdaterOgFerdigstillJournalpostTask(
                 this["fagsystem"] = "BA"
             }
         )
-        taskRepository.save(nyTask)
+        taskService.save(nyTask)
     }
 
     private fun tilPersonIdent(bruker: Bruker): String {

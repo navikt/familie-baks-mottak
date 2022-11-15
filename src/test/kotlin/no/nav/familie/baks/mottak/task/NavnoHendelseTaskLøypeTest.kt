@@ -22,7 +22,7 @@ import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.baks.mottak.integrasjoner.StatusKode
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.internal.TaskService
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,7 +37,7 @@ class NavnoHendelseTaskLøypeTest {
     private val mockJournalpostClient: JournalpostClient = mockk()
     private val mockSakClient: SakClient = mockk()
     private val mockOppgaveClient: OppgaveClient = mockk(relaxed = true)
-    private val mockTaskRepository: TaskRepository = mockk(relaxed = true)
+    private val mockTaskService: TaskService = mockk(relaxed = true)
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
 
@@ -45,7 +45,7 @@ class NavnoHendelseTaskLøypeTest {
         mockPdlClient,
         mockSakClient,
         mockInfotrygdBarnetrygdClient,
-        mockTaskRepository
+        mockTaskService
     )
 
     private val journalføringSteg = OpprettJournalføringOppgaveTask(
@@ -73,8 +73,8 @@ class NavnoHendelseTaskLøypeTest {
         )
 
         every {
-            mockTaskRepository.save(any<Task>())
-        } returns null
+            mockTaskService.save(any<Task>())
+        } returns Task("dummy", "payload")
 
         every {
             mockOppgaveClient.finnOppgaver(any(), any())
@@ -210,7 +210,7 @@ class NavnoHendelseTaskLøypeTest {
 
         val nesteTask = slot<Task>().let { nyTask ->
             verify(atMost = 1) {
-                mockTaskRepository.save(capture(nyTask))
+                mockTaskService.save(capture(nyTask))
             }
             nyTask.captured
         }
