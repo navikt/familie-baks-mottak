@@ -5,7 +5,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.familie.baks.mottak.integrasjoner.BehandlesAvApplikasjon
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingUnderkategori
 import no.nav.familie.baks.mottak.integrasjoner.Dødsfall
@@ -290,7 +289,7 @@ class VurderLivshendelseTaskTest {
         assertThat(oppgaveDto).allMatch { it.saksId == "$SAKS_ID" }
         assertThat(oppgaveDto).allMatch { it.enhetsId == null }
         assertThat(oppgaveDto).allMatch { it.behandlingstema == Behandlingstema.UtvidetBarnetrygd.value }
-        assertThat(oppgaveDto).allMatch { it.behandlesAvApplikasjon == BehandlesAvApplikasjon.BA_SAK.applikasjon }
+        assertThat(oppgaveDto).allMatch { it.behandlesAvApplikasjon == null }
     }
 
     @Test
@@ -502,7 +501,7 @@ class VurderLivshendelseTaskTest {
         assertThat(oppgaveDto).allMatch { it.saksId == "$SAKS_ID" }
         assertThat(oppgaveDto).allMatch { it.enhetsId == null }
         assertThat(oppgaveDto).allMatch { it.behandlingstema == Behandlingstema.UtvidetBarnetrygd.value }
-        assertThat(oppgaveDto).allMatch { it.behandlesAvApplikasjon == BehandlesAvApplikasjon.BA_SAK.applikasjon }
+        assertThat(oppgaveDto).allMatch { it.behandlesAvApplikasjon == null }
     }
 
     @Test
