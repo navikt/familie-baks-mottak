@@ -2,7 +2,6 @@ package no.nav.familie.baks.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.baks.mottak.integrasjoner.BehandlesAvApplikasjon
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingUnderkategori
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.BARN
@@ -353,8 +352,7 @@ class VurderLivshendelseTask(
                 aktørId = aktørId,
                 beskrivelse = beskrivelse,
                 saksId = fagsakId.toString(),
-                behandlingstema = behandlingstema.value,
-                behandlesAvApplikasjon = BehandlesAvApplikasjon.BA_SAK.applikasjon
+                behandlingstema = behandlingstema.value
             )
         )
     }
