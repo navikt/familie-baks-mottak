@@ -238,6 +238,14 @@ class VurderLivshendelseTask(
         }.map { Bruker(it.ident, it.fagsakId) }
     }
 
+    private fun finnBrukereBerørtAvHendelseForIdent(
+        personIdent: String
+    ): List<SakClient.RestFagsakIdOgTilknyttetAktørId> {
+        val listeMedFagsakIdOgTilknyttetAktør = sakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(personIdent)
+        secureLog.info("Aktører og fagsaker berørt av hendelse for personIdent=$personIdent: ${listeMedFagsakIdOgTilknyttetAktør.map { "(aktørId=${it.aktørId}, fagsakId=${it.fagsakId}),"}}")
+        return listeMedFagsakIdOgTilknyttetAktør
+    }
+
     private fun opprettEllerOppdaterVurderLivshendelseOppgave(
         hendelseType: VurderLivshendelseType,
         aktørIdForOppgave: String,
