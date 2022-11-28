@@ -2,6 +2,8 @@ package no.nav.familie.baks.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
+import no.nav.familie.baks.mottak.config.FeatureToggleConfig
+import no.nav.familie.baks.mottak.config.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingUnderkategori
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.BARN
@@ -53,7 +55,8 @@ class VurderLivshendelseTask(
     private val oppgaveClient: OppgaveClient,
     private val pdlClient: PdlClient,
     private val sakClient: SakClient,
-    private val infotrygdClient: InfotrygdBarnetrygdClient
+    private val infotrygdClient: InfotrygdBarnetrygdClient,
+    private val featureToggleService: FeatureToggleService
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -75,37 +78,73 @@ class VurderLivshendelseTask(
                     secureLog.info("Har mottatt dødsfallshendelse uten dødsdato $pdlPersonData")
                     error("Har mottatt dødsfallshendelse uten dødsdato")
                 }
-                val berørteBrukereIBaSak = finnBrukereMedSakRelatertTilPerson(personIdent, pdlPersonData)
-                secureLog.info(
-                    "berørteBrukereIBaSak count = ${berørteBrukereIBaSak.size}, identer = ${
-                    berørteBrukereIBaSak.fold("") { identer, it -> identer + " " + it.ident }
-                    }"
-                )
-                berørteBrukereIBaSak.forEach {
-                    if (opprettEllerOppdaterVurderLivshendelseOppgave(
-                            hendelseType = DØDSFALL,
-                            aktørIdForOppgave = pdlClient.hentAktørId(it.ident),
-                            fagsakIdForOppgave = it.fagsakId,
-                            personIdent = personIdent,
-                            task = task
-                        )
-                    ) {
-                        oppgaveOpprettetDødsfallCounter.increment()
+                if (featureToggleService.isEnabled(FeatureToggleConfig.NY_MÅTE_Å_FINNE_BERØRTE_FAGSAKER_VED_LEESAH_HENDELSER, false)) {
+                    val berørteBrukereIBaSak = finnBrukereBerørtAvHendelseForIdent(personIdent)
+                    secureLog.info(
+                        "berørteBrukereIBaSak count = ${berørteBrukereIBaSak.size}, aktørIder = ${
+                        berørteBrukereIBaSak.fold("") { aktørIder, it -> aktørIder + " " + it.aktørId }
+                        }"
+                    )
+                    berørteBrukereIBaSak.forEach {
+                        if (opprettEllerOppdaterVurderLivshendelseOppgave(
+                                hendelseType = DØDSFALL,
+                                aktørIdForOppgave = it.aktørId,
+                                fagsakIdForOppgave = it.fagsakId,
+                                personIdent = personIdent,
+                                task = task
+                            )
+                        ) {
+                            oppgaveOpprettetDødsfallCounter.increment()
+                        }
+                    }
+                } else {
+                    val berørteBrukereIBaSak = finnBrukereMedSakRelatertTilPerson(personIdent, pdlPersonData)
+                    secureLog.info(
+                        "berørteBrukereIBaSak count = ${berørteBrukereIBaSak.size}, identer = ${
+                        berørteBrukereIBaSak.fold("") { identer, it -> identer + " " + it.ident }
+                        }"
+                    )
+                    berørteBrukereIBaSak.forEach {
+                        if (opprettEllerOppdaterVurderLivshendelseOppgave(
+                                hendelseType = DØDSFALL,
+                                aktørIdForOppgave = pdlClient.hentAktørId(it.ident),
+                                fagsakIdForOppgave = it.fagsakId,
+                                personIdent = personIdent,
+                                task = task
+                            )
+                        ) {
+                            oppgaveOpprettetDødsfallCounter.increment()
+                        }
                     }
                 }
             }
             UTFLYTTING -> {
-                val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-utflytting")
-                finnBrukereMedSakRelatertTilPerson(personIdent, pdlPersonData).forEach {
-                    if (opprettEllerOppdaterVurderLivshendelseOppgave(
-                            hendelseType = UTFLYTTING,
-                            aktørIdForOppgave = pdlClient.hentAktørId(it.ident),
-                            fagsakIdForOppgave = it.fagsakId,
-                            personIdent = personIdent,
-                            task = task
-                        )
-                    ) {
-                        oppgaveOpprettetUtflyttingCounter.increment()
+                if (featureToggleService.isEnabled(FeatureToggleConfig.NY_MÅTE_Å_FINNE_BERØRTE_FAGSAKER_VED_LEESAH_HENDELSER, false)) {
+                    finnBrukereBerørtAvHendelseForIdent(personIdent).forEach {
+                        if (opprettEllerOppdaterVurderLivshendelseOppgave(
+                                hendelseType = UTFLYTTING,
+                                aktørIdForOppgave = it.aktørId,
+                                fagsakIdForOppgave = it.fagsakId,
+                                personIdent = personIdent,
+                                task = task
+                            )
+                        ) {
+                            oppgaveOpprettetUtflyttingCounter.increment()
+                        }
+                    }
+                } else {
+                    val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-utflytting")
+                    finnBrukereMedSakRelatertTilPerson(personIdent, pdlPersonData).forEach {
+                        if (opprettEllerOppdaterVurderLivshendelseOppgave(
+                                hendelseType = UTFLYTTING,
+                                aktørIdForOppgave = pdlClient.hentAktørId(it.ident),
+                                fagsakIdForOppgave = it.fagsakId,
+                                personIdent = personIdent,
+                                task = task
+                            )
+                        ) {
+                            oppgaveOpprettetUtflyttingCounter.increment()
+                        }
                     }
                 }
             }
