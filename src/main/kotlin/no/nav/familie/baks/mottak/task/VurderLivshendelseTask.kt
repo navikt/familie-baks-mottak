@@ -82,7 +82,14 @@ class VurderLivshendelseTask(
                     }"
                 )
                 berørteBrukereIBaSak.forEach {
-                    if (opprettEllerOppdaterVurderLivshendelseOppgave(DØDSFALL, it, personIdent, task)) {
+                    if (opprettEllerOppdaterVurderLivshendelseOppgave(
+                            hendelseType = DØDSFALL,
+                            aktørIdForOppgave = pdlClient.hentAktørId(it.ident),
+                            fagsakIdForOppgave = it.fagsakId,
+                            personIdent = personIdent,
+                            task = task
+                        )
+                    ) {
                         oppgaveOpprettetDødsfallCounter.increment()
                     }
                 }
@@ -90,7 +97,14 @@ class VurderLivshendelseTask(
             UTFLYTTING -> {
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-utflytting")
                 finnBrukereMedSakRelatertTilPerson(personIdent, pdlPersonData).forEach {
-                    if (opprettEllerOppdaterVurderLivshendelseOppgave(UTFLYTTING, it, personIdent, task)) {
+                    if (opprettEllerOppdaterVurderLivshendelseOppgave(
+                            hendelseType = UTFLYTTING,
+                            aktørIdForOppgave = pdlClient.hentAktørId(it.ident),
+                            fagsakIdForOppgave = it.fagsakId,
+                            personIdent = personIdent,
+                            task = task
+                        )
+                    ) {
                         oppgaveOpprettetUtflyttingCounter.increment()
                     }
                 }
@@ -226,31 +240,31 @@ class VurderLivshendelseTask(
 
     private fun opprettEllerOppdaterVurderLivshendelseOppgave(
         hendelseType: VurderLivshendelseType,
-        bruker: Bruker,
+        aktørIdForOppgave: String,
+        fagsakIdForOppgave: Long,
         personIdent: String,
         task: Task
     ): Boolean {
-        val aktørId = pdlClient.hentAktørId(bruker.ident)
-        val åpenOppgave = søkEtterÅpenOppgavePåAktør(aktørId, hendelseType)
+        val åpenOppgave = søkEtterÅpenOppgavePåAktør(aktørIdForOppgave, hendelseType)
 
         if (åpenOppgave == null) {
             val beskrivelse = leggTilNyPersonIBeskrivelse(
                 beskrivelse = "${hendelseType.beskrivelse}:",
                 personIdent = personIdent,
-                personErBruker = personIdent == bruker.ident
+                personErBruker = pdlClient.hentAktørId(personIdent) == aktørIdForOppgave
             )
-            val restFagsak = hentRestFagsak(bruker.fagsakId)
+            val restFagsak = hentRestFagsak(fagsakIdForOppgave)
             val restBehandling = hentSisteBehandlingSomErIverksatt(restFagsak) ?: hentAktivBehandling(restFagsak)
             val behandlingstema = tilBehandlingstema(restBehandling)
-            val oppgave = opprettOppgavePåAktør(aktørId, bruker.fagsakId, beskrivelse, behandlingstema)
+            val oppgave = opprettOppgavePåAktør(aktørIdForOppgave, fagsakIdForOppgave, beskrivelse, behandlingstema)
             task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
             secureLog.info(
-                "Opprettet VurderLivshendelse-oppgave (${oppgave.oppgaveId}) for $hendelseType-hendelse (person ident:  ${bruker.ident})" +
+                "Opprettet VurderLivshendelse-oppgave (${oppgave.oppgaveId}) for $hendelseType-hendelse (person aktørId:  $aktørIdForOppgave)" +
                     ", beskrivelsestekst: $beskrivelse"
             )
             return true
         } else {
-            log.info("Fant åpen oppgave på aktørId=$aktørId oppgaveId=${åpenOppgave.id}")
+            log.info("Fant åpen oppgave på aktørId=$aktørIdForOppgave oppgaveId=${åpenOppgave.id}")
             secureLog.info("Fant åpen oppgave: $åpenOppgave")
             val beskrivelse = leggTilNyPersonIBeskrivelse(
                 beskrivelse = åpenOppgave.beskrivelse!!,
