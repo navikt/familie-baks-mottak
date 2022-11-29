@@ -84,7 +84,7 @@ class VurderLivshendelseTaskTest {
 
         every { mockInfotrygdClient.hentVedtak(any()) } returns lagInfotrygdResponse()
 
-        every { mockFeatureToggleService.isEnabled(any()) } returns false
+        every { mockFeatureToggleService.isEnabled(any(), any()) } returns false
     }
 
     @Test
@@ -762,10 +762,10 @@ class VurderLivshendelseTaskTest {
         private val SAKS_ID = 123L
         private val ENHET_ID = "3049"
     }
+
+    private val Sivilstand.data: PdlPersonData
+        get() = PdlPersonData(sivilstand = listOf(this))
+
+    private val YearMonth.tilSeqFormat: String
+        get() = "${999999 - ("$year" + "$monthValue".padStart(2, '0')).toInt()}"
 }
-
-private val Sivilstand.data: PdlPersonData
-    get() = PdlPersonData(sivilstand = listOf(this))
-
-private val YearMonth.tilSeqFormat: String
-    get() = "${999999 - ("$year" + "$monthValue".padStart(2, '0')).toInt()}"
