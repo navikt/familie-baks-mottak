@@ -83,6 +83,8 @@ class VurderLivshendelseTaskTest {
         every { mockOppgaveClient.opprettVurderLivshendelseOppgave(any()) } returns OppgaveResponse(42)
 
         every { mockInfotrygdClient.hentVedtak(any()) } returns lagInfotrygdResponse()
+
+        every { mockFeatureToggleService.isEnabled(any()) } returns false
     }
 
     @Test
