@@ -80,7 +80,7 @@ class VurderLivshendelseTask(
                     error("Har mottatt dødsfallshendelse uten dødsdato")
                 }
                 if (featureToggleService.isEnabled(FeatureToggleConfig.NY_MÅTE_Å_FINNE_BERØRTE_FAGSAKER_VED_LEESAH_HENDELSER, false)) {
-                    val berørteBrukereIBaSak = finnBrukereBerørtAvHendelseForIdent(personIdent)
+                    val berørteBrukereIBaSak = finnBrukereBerørtAvDødsfallEllerUtflyttingHendelseForIdent(personIdent)
                     secureLog.info(
                         "berørteBrukereIBaSak count = ${berørteBrukereIBaSak.size}, aktørIder = ${
                         berørteBrukereIBaSak.fold("") { aktørIder, it -> aktørIder + " " + it.aktørId }
@@ -121,7 +121,7 @@ class VurderLivshendelseTask(
             }
             UTFLYTTING -> {
                 if (featureToggleService.isEnabled(FeatureToggleConfig.NY_MÅTE_Å_FINNE_BERØRTE_FAGSAKER_VED_LEESAH_HENDELSER, false)) {
-                    finnBrukereBerørtAvHendelseForIdent(personIdent).forEach {
+                    finnBrukereBerørtAvDødsfallEllerUtflyttingHendelseForIdent(personIdent).forEach {
                         if (opprettEllerOppdaterVurderLivshendelseOppgave(
                                 hendelseType = UTFLYTTING,
                                 aktørIdForOppgave = it.aktørId,
@@ -278,7 +278,7 @@ class VurderLivshendelseTask(
         }.map { Bruker(it.ident, it.fagsakId) }
     }
 
-    private fun finnBrukereBerørtAvHendelseForIdent(
+    private fun finnBrukereBerørtAvDødsfallEllerUtflyttingHendelseForIdent(
         personIdent: String
     ): List<RestFagsakIdOgTilknyttetAktørId> {
         val listeMedFagsakIdOgTilknyttetAktør = sakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(personIdent)
