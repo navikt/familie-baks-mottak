@@ -85,6 +85,10 @@ class FeatureToggleConfig(
             }
         }
     }
+
+    companion object {
+        const val NY_MÅTE_Å_FINNE_BERØRTE_FAGSAKER_VED_LEESAH_HENDELSER = "familie-ba-mottak.ny-metode-finne-berorte-fagsaker-ved-leesah-hendelse"
+    }
 }
 
 interface FeatureToggleService {

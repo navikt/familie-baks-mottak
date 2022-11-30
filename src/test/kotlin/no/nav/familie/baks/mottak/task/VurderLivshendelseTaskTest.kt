@@ -5,6 +5,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.familie.baks.mottak.config.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingUnderkategori
 import no.nav.familie.baks.mottak.integrasjoner.Dødsfall
@@ -52,9 +53,10 @@ class VurderLivshendelseTaskTest {
     private val mockSakClient: SakClient = mockk()
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdClient: InfotrygdBarnetrygdClient = mockk()
+    private val mockFeatureToggleService: FeatureToggleService = mockk()
 
     private val vurderLivshendelseTask =
-        VurderLivshendelseTask(mockOppgaveClient, mockPdlClient, mockSakClient, mockInfotrygdClient)
+        VurderLivshendelseTask(mockOppgaveClient, mockPdlClient, mockSakClient, mockInfotrygdClient, mockFeatureToggleService)
 
     @BeforeEach
     internal fun setUp() {
@@ -81,6 +83,8 @@ class VurderLivshendelseTaskTest {
         every { mockOppgaveClient.opprettVurderLivshendelseOppgave(any()) } returns OppgaveResponse(42)
 
         every { mockInfotrygdClient.hentVedtak(any()) } returns lagInfotrygdResponse()
+
+        every { mockFeatureToggleService.isEnabled(any(), any()) } returns false
     }
 
     @Test
@@ -758,10 +762,10 @@ class VurderLivshendelseTaskTest {
         private val SAKS_ID = 123L
         private val ENHET_ID = "3049"
     }
+
+    private val Sivilstand.data: PdlPersonData
+        get() = PdlPersonData(sivilstand = listOf(this))
+
+    private val YearMonth.tilSeqFormat: String
+        get() = "${999999 - ("$year" + "$monthValue".padStart(2, '0')).toInt()}"
 }
-
-private val Sivilstand.data: PdlPersonData
-    get() = PdlPersonData(sivilstand = listOf(this))
-
-private val YearMonth.tilSeqFormat: String
-    get() = "${999999 - ("$year" + "$monthValue".padStart(2, '0')).toInt()}"
