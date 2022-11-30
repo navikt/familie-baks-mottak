@@ -107,15 +107,6 @@ class SakClient @Autowired constructor(
         )
     }
 
-    data class RestPersonIdent(
-        val personIdent: String
-    )
-
-    data class RestFagsakIdOgTilknyttetAktørId(
-        val aktørId: String,
-        val fagsakId: Long
-    )
-
     fun hentMinimalRestFagsak(fagsakId: Long): RestMinimalFagsak {
         val uri = URI.create("$sakServiceUri/fagsaker/minimal/$fagsakId")
         return runCatching {
@@ -150,6 +141,15 @@ class SakClient @Autowired constructor(
         }
     }
 }
+
+data class RestPersonIdent(
+    val personIdent: String
+)
+
+data class RestFagsakIdOgTilknyttetAktørId(
+    val aktørId: String,
+    val fagsakId: Long
+)
 
 data class RestMinimalFagsak(
     val id: Long,
