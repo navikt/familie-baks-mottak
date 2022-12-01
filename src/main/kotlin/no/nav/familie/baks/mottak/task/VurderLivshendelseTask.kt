@@ -342,6 +342,9 @@ class VurderLivshendelseTask(
         }
     }
 
+    private fun hentInitiellBeskrivelseForSivilstandOppgave(personErBruker: Boolean, formatertDato: String, personIdent: String): String =
+        "${SIVILSTAND.beskrivelse}: ${if (personErBruker) "bruker" else "barn $personIdent"} er registrert gift fra $formatertDato"
+
     private fun opprettEllerOppdaterEndringISivilstandOppgave(
         endringsdato: LocalDate,
         fagsakIdForOppgave: Long,
@@ -351,17 +354,27 @@ class VurderLivshendelseTask(
     ) {
         val formatertDato = endringsdato.format(
             DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no"))
+        ) ?: "ukjent dato"
+
+        val initiellBeskrivelse = hentInitiellBeskrivelseForSivilstandOppgave(
+            personErBruker = pdlClient.hentAktørId(personIdent) == aktørIdForOppgave,
+            formatertDato = formatertDato,
+            personIdent = personIdent
         )
-        val beskrivelse = SIVILSTAND.beskrivelse + " fra " + (formatertDato ?: "ukjent dato")
 
         val oppgave = søkEtterÅpenOppgavePåAktør(aktørIdForOppgave, SIVILSTAND)
-            ?: opprettOppgavePåAktør(aktørIdForOppgave, fagsakIdForOppgave, beskrivelse, Behandlingstema.UtvidetBarnetrygd)
+            ?: opprettOppgavePåAktør(
+                aktørId = aktørIdForOppgave,
+                fagsakId = fagsakIdForOppgave,
+                beskrivelse = initiellBeskrivelse,
+                behandlingstema = Behandlingstema.UtvidetBarnetrygd
+            )
 
         when (oppgave) {
             is OppgaveResponse -> {
                 secureLog.info(
                     "Opprettet VurderLivshendelse-oppgave (${oppgave.oppgaveId}) for $SIVILSTAND-hendelse (person i hendelse:  $personIdent, oppgave på person: $aktørIdForOppgave)" +
-                        ", beskrivelsestekst: $beskrivelse"
+                        ", beskrivelsestekst: $initiellBeskrivelse"
                 )
                 oppgaveOpprettetSivilstandCounter.increment()
                 task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
@@ -369,7 +382,7 @@ class VurderLivshendelseTask(
             is Oppgave -> {
                 log.info("Fant åpen oppgave på aktørId=$aktørIdForOppgave oppgaveId=${oppgave.id}")
                 secureLog.info("Fant åpen oppgave: $oppgave")
-                oppdaterOppgaveMedNyBeskrivelse(oppgave, beskrivelse)
+                oppdaterOppgaveMedNyBeskrivelse(oppgave = oppgave, beskrivelse = "${SIVILSTAND.beskrivelse}: Bruker eller barn er registrert gift")
                 task.metadata["oppgaveId"] = oppgave.id.toString()
                 task.metadata["info"] = "Fant åpen oppgave"
             }
@@ -495,7 +508,7 @@ data class VurderLivshendelseTaskDTO(val personIdent: String, val type: VurderLi
 
 enum class VurderLivshendelseType(val beskrivelse: String) {
     DØDSFALL("Dødsfall"),
-    SIVILSTAND("Endring i sivilstand. Bruker eller barn er registrert som gift"),
+    SIVILSTAND("Endring i sivilstand"),
     ADDRESSE("Addresse"),
     UTFLYTTING("Utflytting")
 }
