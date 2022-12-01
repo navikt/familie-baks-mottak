@@ -95,6 +95,27 @@ class SakClient @Autowired constructor(
         )
     }
 
+    fun hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(
+        personIdent: String
+    ): List<RestFagsakIdOgTilknyttetAktørId> {
+        val uri = URI.create("$sakServiceUri/fagsaker/sok/fagsaker-hvor-person-er-deltaker")
+        return runCatching {
+            postForEntity<Ressurs<List<RestFagsakIdOgTilknyttetAktørId>>>(uri, RestPersonIdent(personIdent))
+        }.fold(
+            onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
+            onFailure = { throw IntegrasjonException("Feil ved henting av fagsakId og aktørId fra ba-sak.", it, uri, personIdent) }
+        )
+    }
+
+    data class RestPersonIdent(
+        val personIdent: String
+    )
+
+    data class RestFagsakIdOgTilknyttetAktørId(
+        val aktørId: String,
+        val fagsakId: Long
+    )
+
     fun hentMinimalRestFagsak(fagsakId: Long): RestMinimalFagsak {
         val uri = URI.create("$sakServiceUri/fagsaker/minimal/$fagsakId")
         return runCatching {
