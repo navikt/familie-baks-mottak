@@ -48,6 +48,9 @@ spec:
         - application: familie-ba-soknad-api
           namespace: teamfamilie
           cluster: dev-gcp
+        - application: familie-baks-soknad-api
+          namespace: teamfamilie
+          cluster: dev-gcp
         - application: familie-prosessering
           namespace: teamfamilie
           cluster: dev-gcp
