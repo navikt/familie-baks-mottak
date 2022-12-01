@@ -159,22 +159,34 @@ class VurderLivshendelseTask(
                     secureLog.info("Endringen til sivilstand GIFT for $personIdent er korrigert/annulert: $pdlPersonData")
                     return
                 }
-                val aktivFaksak = sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
-                    secureLog.info("Hentet Fagsak for person $personIdent: ${it.fagsakId} ${it.fagsakStatus}")
-                    it.fagsakStatus == LØPENDE
-                }.singleOrNull()?.let { hentRestFagsak(it.fagsakId) }
+                if (featureToggleService.isEnabled(FeatureToggleConfig.NY_MÅTE_Å_FINNE_BERØRTE_FAGSAKER_VED_LEESAH_HENDELSER, false)) {
+                    finnBrukereBerørtAvSivilstandHendelseForIdent(personIdent).forEach {
+                        opprettEllerOppdaterEndringISivilstandOppgave(
+                            endringsdato = sivilstand.dato!!,
+                            fagsakIdForOppgave = it.fagsakId,
+                            aktørIdForOppgave = it.aktørId,
+                            personIdent = personIdent,
+                            task = task
+                        )
+                    }
+                } else {
+                    val aktivFaksak = sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
+                        secureLog.info("Hentet Fagsak for person $personIdent: ${it.fagsakId} ${it.fagsakStatus}")
+                        it.fagsakStatus == LØPENDE
+                    }.singleOrNull()?.let { hentRestFagsak(it.fagsakId) }
 
-                if (aktivFaksak != null &&
-                    tilBehandlingstema(hentSisteBehandlingSomErIverksatt(aktivFaksak)) == Behandlingstema.UtvidetBarnetrygd &&
-                    sjekkOmDatoErEtterEldsteVedtaksdato(sivilstand.dato!!, aktivFaksak, personIdent)
-                ) {
-                    opprettEllerOppdaterEndringISivilstandOppgave(
-                        endringsdato = sivilstand.dato!!,
-                        fagsakIdForOppgave = aktivFaksak.id,
-                        aktørIdForOppgave = pdlClient.hentAktørId(personIdent),
-                        personIdent = personIdent,
-                        task = task
-                    )
+                    if (aktivFaksak != null &&
+                        tilBehandlingstema(hentSisteBehandlingSomErIverksatt(aktivFaksak)) == Behandlingstema.UtvidetBarnetrygd &&
+                        sjekkOmDatoErEtterEldsteVedtaksdato(sivilstand.dato!!, aktivFaksak, personIdent)
+                    ) {
+                        opprettEllerOppdaterEndringISivilstandOppgave(
+                            endringsdato = sivilstand.dato!!,
+                            fagsakIdForOppgave = aktivFaksak.id,
+                            aktørIdForOppgave = pdlClient.hentAktørId(personIdent),
+                            personIdent = personIdent,
+                            task = task
+                        )
+                    }
                 }
             }
             else -> log.debug("Behandlinger enda ikke livshendelse av type ${payload.type}")
