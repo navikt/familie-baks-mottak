@@ -161,13 +161,15 @@ class VurderLivshendelseTask(
                 }
                 if (featureToggleService.isEnabled(FeatureToggleConfig.NY_MÅTE_Å_FINNE_BERØRTE_FAGSAKER_VED_LEESAH_HENDELSER, false)) {
                     finnBrukereBerørtAvSivilstandHendelseForIdent(personIdent).forEach {
-                        opprettEllerOppdaterEndringISivilstandOppgave(
-                            endringsdato = sivilstand.dato!!,
-                            fagsakIdForOppgave = it.fagsakId,
-                            aktørIdForOppgave = it.aktørId,
-                            personIdent = personIdent,
-                            task = task
-                        )
+                        if (sjekkOmDatoErEtterEldsteVedtaksdato(dato = sivilstand.dato!!, aktivFaksak = hentRestFagsak(it.fagsakId), personIdent = personIdent)) { // Trenger denne sjekken for å unngå "gamle" hendelser som feks kan skyldes innflytting
+                            opprettEllerOppdaterEndringISivilstandOppgave(
+                                endringsdato = sivilstand.dato!!,
+                                fagsakIdForOppgave = it.fagsakId,
+                                aktørIdForOppgave = it.aktørId,
+                                personIdent = personIdent,
+                                task = task
+                            )
+                        }
                     }
                 } else {
                     val aktivFaksak = sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
