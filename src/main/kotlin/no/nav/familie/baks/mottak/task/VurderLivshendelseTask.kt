@@ -357,7 +357,7 @@ class VurderLivshendelseTask(
     }
 
     private fun hentInitiellBeskrivelseForSivilstandOppgave(personErBruker: Boolean, formatertDato: String, personIdent: String): String =
-        "${SIVILSTAND.beskrivelse}: ${if (personErBruker) "bruker" else "barn $personIdent"} er registrert gift fra $formatertDato"
+        "${SIVILSTAND.beskrivelse}: ${if (personErBruker) "bruker" else "barn $personIdent"} er registrert som gift fra $formatertDato"
 
     private fun opprettEllerOppdaterEndringISivilstandOppgave(
         endringsdato: LocalDate,
