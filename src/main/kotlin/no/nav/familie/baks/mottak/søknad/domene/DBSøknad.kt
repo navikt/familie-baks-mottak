@@ -65,11 +65,17 @@ data class DBSøknad(
 data class DBVedlegg(
     @Id
     @Column(name = "dokument_id")
-    val dokumentId: String,
+    override val dokumentId: String,
     @Column(name = "soknad_id")
-    val søknadId: Long,
+    override val søknadId: Long,
+    override val data: ByteArray
+) : Vedlegg
+
+interface Vedlegg {
+    val dokumentId: String
+    val søknadId: Long
     val data: ByteArray
-)
+}
 
 fun SøknadV7.tilDBSøknad(): DBSøknad {
     try {

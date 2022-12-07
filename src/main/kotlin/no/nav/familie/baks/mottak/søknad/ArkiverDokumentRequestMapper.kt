@@ -4,7 +4,11 @@ import no.nav.familie.baks.mottak.søknad.domene.DBSøknad
 import no.nav.familie.baks.mottak.søknad.domene.DBVedlegg
 import no.nav.familie.baks.mottak.søknad.domene.SøknadV7
 import no.nav.familie.baks.mottak.søknad.domene.SøknadV8
+import no.nav.familie.baks.mottak.søknad.domene.Vedlegg
 import no.nav.familie.baks.mottak.søknad.domene.VersjonertSøknad
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteVedlegg
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
@@ -58,15 +62,51 @@ object ArkiverDokumentRequestMapper {
             fnr = dbSøknad.fnr,
             forsøkFerdigstill = false,
             hoveddokumentvarianter = listOf(søknadsdokumentPdf, søknadsdokumentJson),
-            vedleggsdokumenter = hentVedleggListeTilArkivering(dokumentasjon, vedleggMap, pdfOriginalSpråk),
+            vedleggsdokumenter = hentVedleggListeTilArkivering(dokumentasjon, vedleggMap, pdfOriginalSpråk, Dokumenttype.BARNETRYGD_VEDLEGG),
             eksternReferanseId = dbSøknad.id.toString()
+        )
+    }
+
+    fun toDto(
+        dbKontantstøtteSøknad: DBKontantstøtteSøknad,
+        kontantstøtteSøknad: KontantstøtteSøknad,
+        pdf: ByteArray,
+        vedleggMap: Map<String, DBKontantstotteVedlegg>,
+        pdfOriginalSpråk: ByteArray
+    ): ArkiverDokumentRequest {
+        val dokumenttype = Dokumenttype.KONTANTSTØTTE_SØKNAD
+
+        val søknadsdokumentJson =
+            Dokument(
+                dokument = dbKontantstøtteSøknad.søknadJson.toByteArray(),
+                filtype = Filtype.JSON,
+                filnavn = null,
+                tittel = "SØKNAD_${dokumenttype}_JSON",
+                dokumenttype = dokumenttype
+            )
+        val søknadsdokumentPdf =
+            Dokument(
+                dokument = pdf,
+                filtype = Filtype.PDFA,
+                filnavn = null,
+                tittel = "Søknad om kontantstøtte",
+                dokumenttype = dokumenttype
+            )
+
+        return ArkiverDokumentRequest(
+            fnr = dbKontantstøtteSøknad.fnr,
+            forsøkFerdigstill = false,
+            hoveddokumentvarianter = listOf(søknadsdokumentPdf, søknadsdokumentJson),
+            vedleggsdokumenter = hentVedleggListeTilArkivering(kontantstøtteSøknad.dokumentasjon, vedleggMap, pdfOriginalSpråk, Dokumenttype.KONTANTSTØTTE_VEDLEGG),
+            eksternReferanseId = dbKontantstøtteSøknad.id.toString()
         )
     }
 
     private fun hentVedleggListeTilArkivering(
         dokumentasjon: List<Søknaddokumentasjon>,
-        vedleggMap: Map<String, DBVedlegg>,
-        pdfOriginalSpråk: ByteArray
+        vedleggMap: Map<String, Vedlegg>,
+        pdfOriginalSpråk: ByteArray,
+        dokumenttype: Dokumenttype
     ): List<Dokument> {
         val vedlegg = mutableListOf<Dokument>()
 
@@ -76,7 +116,7 @@ object ArkiverDokumentRequestMapper {
                     vedlegg.add(
                         Dokument(
                             dokument = dbFil.data,
-                            dokumenttype = Dokumenttype.BARNETRYGD_VEDLEGG,
+                            dokumenttype = dokumenttype,
                             filtype = Filtype.PDFA,
                             tittel = dokumentasjonsbehovTilTittel(opplastaVedlegg.tittel)
                         )
@@ -89,7 +129,7 @@ object ArkiverDokumentRequestMapper {
             vedlegg.add(
                 Dokument(
                     dokument = pdfOriginalSpråk,
-                    dokumenttype = Dokumenttype.BARNETRYGD_VEDLEGG,
+                    dokumenttype = dokumenttype,
                     filtype = Filtype.PDFA,
                     tittel = "Søknad på originalt utfylt språk"
                 )

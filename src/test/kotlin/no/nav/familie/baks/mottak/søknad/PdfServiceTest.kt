@@ -39,7 +39,7 @@ internal class PdfServiceTest {
             .readText(Charsets.UTF_8)
         val søknad: SøknadKontraktV8 = mapper.readValue(jsonString)
         val dbSøknad: DBSøknad = søknad.tilDBSøknad()
-        pdfService.lagPdf(SøknadV8(søknad = søknad), dbSøknad, språk = "nb")
+        pdfService.lagBarnetrygdPdf(SøknadV8(søknad = søknad), dbSøknad, språk = "nb")
 
         // Kommenter inn dette for å logge generert json til console
         // val jsonToDokgen: String = mapper.writeValueAsString(jsonSlot)

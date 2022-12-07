@@ -1,16 +1,16 @@
 package no.nav.familie.baks.mottak.søknad
 
-import com.fasterxml.jackson.core.type.TypeReference
 import no.nav.familie.baks.mottak.integrasjoner.PdfClient
 import no.nav.familie.baks.mottak.søknad.domene.DBSøknad
 import no.nav.familie.baks.mottak.søknad.domene.SøknadSpråkvelgerService
 import no.nav.familie.baks.mottak.søknad.domene.SøknadV7
 import no.nav.familie.baks.mottak.søknad.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.domene.VersjonertSøknad
-import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
-import no.nav.familie.kontrakter.felles.objectMapper
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
@@ -21,8 +21,8 @@ class PdfService(
     private val søknadSpråkvelgerService: SøknadSpråkvelgerService
 ) {
 
-    fun lagPdf(versjonertSøknad: VersjonertSøknad, dbSøknad: DBSøknad, språk: String = "nb"): ByteArray {
-        val søknadJson = søknadSpråkvelgerService.velgSøknadSpråk(versjonertSøknad, språk)
+    fun lagBarnetrygdPdf(versjonertSøknad: VersjonertSøknad, dbSøknad: DBSøknad, språk: String = "nb"): ByteArray {
+        val barnetrygdSøknadMapForSpråk = søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(versjonertSøknad, språk)
 
         val (søknadstype, navn) = when (versjonertSøknad) {
             is SøknadV7 -> {
@@ -34,13 +34,29 @@ class PdfService(
         }
 
         val path: String = søknadstypeTilPath(søknadstype)
-        val feltMap = objectMapper.readValue(søknadJson, object : TypeReference<Map<String, Any>>() {})
-        val utvidetFeltMap = feltMap + hentEkstraFelter(
-            dbSøknad = dbSøknad,
-            navn = navn,
-            søknadstype = søknadstype
+        val ekstraFelterMap = hentEkstraFelter(
+            navn = navn.verdi.getValue("nb"),
+            opprettetTid = dbSøknad.opprettetTid,
+            fnr = dbSøknad.fnr,
+            label = when (søknadstype) {
+                Søknadstype.UTVIDET -> "Søknad om utvidet barnetrygd"
+                else -> "Søknad om ordinær barnetrygd"
+            }
         )
-        return pdfClient.lagPdf(utvidetFeltMap, path)
+        return pdfClient.lagPdf(barnetrygdSøknadMapForSpråk + ekstraFelterMap, path)
+    }
+
+    fun lagKontantstøttePdf(kontantstøtteSøknad: KontantstøtteSøknad, dbKontantstøtteSøknad: DBKontantstøtteSøknad, språk: String = "nb"): ByteArray {
+        val kontantstøtteSøknadMapForSpråk = søknadSpråkvelgerService.konverterKontantstøtteSøknadTilMapForSpråk(kontantstøtteSøknad, språk)
+
+        val ekstraFelterMap = hentEkstraFelter(
+            navn = kontantstøtteSøknad.søker.navn.verdi.getValue("nb"),
+            opprettetTid = dbKontantstøtteSøknad.opprettetTid,
+            fnr = dbKontantstøtteSøknad.fnr,
+            label = "Søknad om kontantstøtte"
+        )
+
+        return pdfClient.lagPdf(kontantstøtteSøknadMapForSpråk + ekstraFelterMap, "kontantstotte")
     }
 
     private fun søknadstypeTilPath(søknadstype: Søknadstype): String {
@@ -51,20 +67,18 @@ class PdfService(
     }
 
     private fun hentEkstraFelter(
-        dbSøknad: DBSøknad,
-        navn: Søknadsfelt<String>,
-        søknadstype: Søknadstype
+        opprettetTid: LocalDateTime,
+        navn: String,
+        fnr: String,
+        label: String
     ): Map<String, String> {
         return mapOf(
-            "dokumentDato" to dbSøknad.opprettetTid.format(
+            "dokumentDato" to opprettetTid.format(
                 DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no"))
             ),
-            "navn" to navn.verdi.getValue("nb"),
-            "fodselsnummer" to dbSøknad.fnr,
-            "label" to when (søknadstype) {
-                Søknadstype.UTVIDET -> "Søknad om utvidet barnetrygd"
-                else -> "Søknad om ordinær barnetrygd"
-            }
+            "navn" to navn,
+            "fodselsnummer" to fnr,
+            "label" to label
         )
     }
 }

@@ -31,7 +31,14 @@ class JournalføringTest(
 
     @Test
     fun `arkiverSøknad returnerer riktig journalpostId`() {
-        val journalPostId = journalføringService.arkiverSøknad(dbSøknad, testPDF, emptyMap())
+        val arkiverDokumentRequest = ArkiverDokumentRequestMapper.toDto(
+            dbSøknad = dbSøknad,
+            versjonertSøknad = dbSøknad.hentVersjonertSøknad(),
+            pdf = testPDF,
+            vedleggMap = emptyMap(),
+            pdfOriginalSpråk = ByteArray(0)
+        )
+        val journalPostId = journalføringService.arkiverSøknad(arkiverDokumentRequest)
 
         assertEquals("123", journalPostId)
     }
@@ -40,7 +47,7 @@ class JournalføringTest(
     fun `journalPostId blir lagt på dbSøknaden`() {
         val dbSøknadFraDB = søknadService.lagreDBSøknad(dbSøknad)
         assertEquals(null, dbSøknadFraDB.journalpostId)
-        journalføringService.journalførSøknad(dbSøknadFraDB, testPDF)
+        journalføringService.journalførKontantstøtteSøknad(dbSøknadFraDB, testPDF)
         val overskrevetDBSøknad = søknadService.hentDBSøknad(dbSøknadFraDB.id)
 
         assertEquals("123", overskrevetDBSøknad!!.journalpostId)
@@ -51,7 +58,7 @@ class JournalføringTest(
         val dbSøknadMedJournalpostId = dbSøknad.copy(journalpostId = "1")
         val dbSøknadFraDB = søknadService.lagreDBSøknad(dbSøknadMedJournalpostId)
 
-        journalføringService.journalførSøknad(dbSøknadFraDB, testPDF)
+        journalføringService.journalførKontantstøtteSøknad(dbSøknadFraDB, testPDF)
         val ikkeOverskrevetDBSøknad = søknadService.hentDBSøknad(dbSøknadFraDB.id)
 
         assertEquals("1", ikkeOverskrevetDBSøknad!!.journalpostId)
