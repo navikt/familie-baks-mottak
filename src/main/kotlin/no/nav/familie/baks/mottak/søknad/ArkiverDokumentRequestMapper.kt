@@ -1,11 +1,11 @@
 package no.nav.familie.baks.mottak.søknad
 
-import no.nav.familie.baks.mottak.søknad.domene.DBSøknad
-import no.nav.familie.baks.mottak.søknad.domene.DBVedlegg
-import no.nav.familie.baks.mottak.søknad.domene.SøknadV7
-import no.nav.familie.baks.mottak.søknad.domene.SøknadV8
-import no.nav.familie.baks.mottak.søknad.domene.Vedlegg
-import no.nav.familie.baks.mottak.søknad.domene.VersjonertSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBVedlegg
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.Vedlegg
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteVedlegg
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknad

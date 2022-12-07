@@ -1,7 +1,8 @@
 package no.nav.familie.baks.mottak.søknad
 
 import no.nav.familie.baks.mottak.DevLauncherPostgres
-import no.nav.familie.baks.mottak.søknad.domene.tilDBSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.SøknadService
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
 import no.nav.familie.baks.mottak.util.DbContainerInitializer
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test

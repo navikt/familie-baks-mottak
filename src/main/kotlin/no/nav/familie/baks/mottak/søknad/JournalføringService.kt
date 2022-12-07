@@ -1,7 +1,8 @@
 package no.nav.familie.baks.mottak.søknad
 
 import no.nav.familie.baks.mottak.integrasjoner.DokarkivClient
-import no.nav.familie.baks.mottak.søknad.domene.DBSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.SøknadService
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadService
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.ArkiverDokumentRequest

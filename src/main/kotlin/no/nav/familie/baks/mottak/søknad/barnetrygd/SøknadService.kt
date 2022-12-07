@@ -1,14 +1,16 @@
-package no.nav.familie.baks.mottak.søknad
+package no.nav.familie.baks.mottak.søknad.barnetrygd
 
 import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClient
-import no.nav.familie.baks.mottak.søknad.domene.DBSøknad
-import no.nav.familie.baks.mottak.søknad.domene.DBVedlegg
-import no.nav.familie.baks.mottak.søknad.domene.FødselsnummerErNullException
-import no.nav.familie.baks.mottak.søknad.domene.SøknadV7
-import no.nav.familie.baks.mottak.søknad.domene.SøknadV8
-import no.nav.familie.baks.mottak.søknad.domene.VersjonertSøknad
-import no.nav.familie.baks.mottak.søknad.domene.tilDBSøknad
-import no.nav.familie.baks.mottak.søknad.domene.tilDBVedlegg
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBVedlegg
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.FødselsnummerErNullException
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadVedleggRepository
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBVedlegg
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadService
 import no.nav.familie.baks.mottak.task.JournalførSøknadTask
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
