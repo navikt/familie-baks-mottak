@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.module.SimpleModule
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.Søknadsfelt
-import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
+import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
+import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsfelt
 
 class KontantstøtteObjectMapperModule(språk: String) : SimpleModule() {
 

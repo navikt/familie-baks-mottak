@@ -3,6 +3,8 @@ package no.nav.familie.baks.mottak.søknad.kontantstøtte.domene
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.Vedlegg
 import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
+import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsvedlegg
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -11,7 +13,6 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.SequenceGenerator
 import javax.persistence.Table
-import no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg
 
 @Entity(name = "kontantstotte_soknad")
 @Table(name = "kontantstotte_soknad")
