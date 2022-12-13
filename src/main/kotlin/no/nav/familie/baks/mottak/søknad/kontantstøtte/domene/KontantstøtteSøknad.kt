@@ -121,7 +121,7 @@ data class Søknaddokumentasjon(
     val dokumentasjonsbehov: Dokumentasjonsbehov,
     val harSendtInn: Boolean,
     val opplastedeVedlegg: List<Søknadsvedlegg>,
-    val dokumentasjonSpråkTittel: Map<Locale, String>
+    val dokumentasjonSpråkTittel: TekstPåSpråkMap
 )
 
 data class SøknadAdresse(
