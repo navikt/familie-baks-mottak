@@ -3,8 +3,6 @@ package no.nav.familie.baks.mottak.søknad.kontantstøtte.domene
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.Vedlegg
 import no.nav.familie.kontrakter.felles.objectMapper
-import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
-import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsvedlegg
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity

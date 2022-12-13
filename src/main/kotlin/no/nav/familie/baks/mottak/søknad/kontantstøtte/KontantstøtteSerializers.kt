@@ -4,14 +4,16 @@ import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.module.SimpleModule
-import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
-import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsfelt
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.Søknaddokumentasjon
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.Søknadsfelt
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.TekstPåSpråkMap
 
 class KontantstøtteObjectMapperModule(språk: String) : SimpleModule() {
 
     init {
         addSerializer(Søknaddokumentasjon::class.java, SøknaddokumentasjonSerializer(språk))
         addSerializer(Søknadsfelt::class.java, SøknadsfeltSerializer(språk))
+        addSerializer(TekstPåSpråkMap::class.java, TekstPåSpråkMapSerializer(språk))
     }
 }
 
@@ -35,6 +37,14 @@ class SøknadsfeltSerializer(private val språk: String) : JsonSerializer<Søkna
                 "label" to søknadsFelt.label[språk],
                 "verdi" to søknadsFelt.verdi[språk]
             )
+        )
+    }
+}
+
+class TekstPåSpråkMapSerializer(private val språk: String) : JsonSerializer<TekstPåSpråkMap>() {
+    override fun serialize(tekstPåSpråkMap: TekstPåSpråkMap, jsonGenerator: JsonGenerator, serializerProvider: SerializerProvider) {
+        return jsonGenerator.writeObject(
+            tekstPåSpråkMap[språk]
         )
     }
 }

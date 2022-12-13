@@ -2,8 +2,6 @@ package no.nav.familie.baks.mottak.søknad.kontantstøtte.domene
 
 import no.nav.familie.baks.mottak.søknad.ISøknaddokumentasjon
 import no.nav.familie.baks.mottak.søknad.Søknadsvedlegg
-import no.nav.familie.kontrakter.ks.søknad.v1.Dokumentasjonsbehov
-import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
 
 data class KontantstøtteSøknaddokumentasjon(val søknaddokumentasjon: Søknaddokumentasjon) :
     ISøknaddokumentasjon {

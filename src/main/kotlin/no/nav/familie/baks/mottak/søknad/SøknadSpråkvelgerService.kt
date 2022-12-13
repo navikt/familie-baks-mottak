@@ -7,7 +7,7 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteObjectMapperModule
-import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknad
 import org.springframework.stereotype.Service
 import no.nav.familie.kontrakter.felles.objectMapper as getObjectMapper
 
@@ -35,7 +35,6 @@ class SøknadSpråkvelgerService {
         val objectMapperForSpråk = hentObjectMapperForSpråk(språk)
 
         val kontantstøtteSøknadMapForSpråk = objectMapperForSpråk.convertValue<MutableMap<String, Any>>(kontantstøtteSøknad)
-        kontantstøtteSøknadMapForSpråk["teksterTilPdf"] = kontantstøtteSøknad.teksterTilPdf.mapValues { it.value[språk] }
 
         return kontantstøtteSøknadMapForSpråk
     }

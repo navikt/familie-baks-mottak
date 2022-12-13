@@ -6,8 +6,9 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
-import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -54,8 +55,7 @@ class PdfService(
             fnr = dbKontantstøtteSøknad.fnr,
             label = "Søknad om kontantstøtte"
         )
-
-        return pdfClient.lagPdf(kontantstøtteSøknadMapForSpråk + ekstraFelterMap, "kontantstotte")
+        return pdfClient.lagPdf(kontantstøtteSøknadMapForSpråk + ekstraFelterMap, "kontantstotte-soknad")
     }
 
     private fun søknadstypeTilPath(søknadstype: Søknadstype): String {
@@ -79,5 +79,9 @@ class PdfService(
             "fodselsnummer" to fnr,
             "label" to label
         )
+    }
+
+    companion object {
+        val logger = LoggerFactory.getLogger(this::class.java)
     }
 }

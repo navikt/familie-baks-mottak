@@ -54,6 +54,11 @@ funksjonsbrytere:
 logging:
   config: "classpath:logback-test.xml"
 spring:
+  cloud:
+    vault:
+      enabled: false
+      database:
+        role: postgres
   datasource:
     url: jdbc:postgresql://localhost:5432/familie-baks-mottak
     hikari:
@@ -78,6 +83,8 @@ spring:
       schema.registry.url: ${KAFKA_BROKERS}
     consumer:
       group-id: srvc01
+
+
 #Brukes til tilgangskontroll av familie-ks-mottak-frontend
 MOTTAK_ROLLE: group1
 FAMILIE_BA_DOKGEN_API_URL: http://localhost:5914
