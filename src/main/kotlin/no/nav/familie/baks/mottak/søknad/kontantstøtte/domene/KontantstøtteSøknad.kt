@@ -93,6 +93,7 @@ data class Barn(
 )
 
 typealias Locale = String
+
 data class Søknadsfelt<T>(
     val label: Map<Locale, String>,
     val verdi: Map<Locale, T>
@@ -220,6 +221,7 @@ data class AndreForelder(
     val idNummer: List<Søknadsfelt<IdNummer>> = listOf(),
     val adresse: Søknadsfelt<String>?
 )
+
 data class Arbeidsperiode(
     val arbeidsperiodeAvsluttet: Søknadsfelt<String>?,
     val arbeidsperiodeland: Søknadsfelt<String>?,
