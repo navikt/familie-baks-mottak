@@ -1,9 +1,9 @@
 package no.nav.familie.baks.mottak.søknad.kontantstøtte
 
 import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClient
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.FødselsnummerErNullException
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteVedlegg
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.FødselsnummerErNullException
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteVedleggRepository
@@ -35,7 +35,10 @@ class KontantstøtteSøknadService(
 
         val properties = Properties().apply { this["søkersFødselsnummer"] = dbKontantstøtteSøknad.fnr }
 
-        hentOgLagreSøknadvedlegg(dbKontantstøtteSøknad = dbKontantstøtteSøknad, søknaddokumentasjonsliste = dokumentasjon)
+        hentOgLagreSøknadvedlegg(
+            dbKontantstøtteSøknad = dbKontantstøtteSøknad,
+            søknaddokumentasjonsliste = dokumentasjon
+        )
 
         taskService.save(
             Task(
@@ -67,12 +70,20 @@ class KontantstøtteSøknadService(
         kontantstøtteVedleggRepository.slettAlleVedlegg(søknad.id)
     }
 
-    private fun hentOgLagreSøknadvedlegg(dbKontantstøtteSøknad: DBKontantstøtteSøknad, søknaddokumentasjonsliste: List<Søknaddokumentasjon>) {
+    private fun hentOgLagreSøknadvedlegg(
+        dbKontantstøtteSøknad: DBKontantstøtteSøknad,
+        søknaddokumentasjonsliste: List<Søknaddokumentasjon>
+    ) {
         søknaddokumentasjonsliste.forEach { søknaddokumentasjon ->
             søknaddokumentasjon.opplastedeVedlegg.forEach { vedlegg ->
                 logger.debug("Henter ${vedlegg.navn} for dokumentasjonsbehov ${vedlegg.tittel}")
                 val vedleggDokument = vedleggClient.hentVedlegg(dokumentId = vedlegg.dokumentId)
-                kontantstøtteVedleggRepository.save(vedlegg.tilDBKontantstøtteVedlegg(dbKontantstøtteSøknad, vedleggDokument))
+                kontantstøtteVedleggRepository.save(
+                    vedlegg.tilDBKontantstøtteVedlegg(
+                        dbKontantstøtteSøknad,
+                        vedleggDokument
+                    )
+                )
             }
         }
     }
