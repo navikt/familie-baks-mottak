@@ -1,9 +1,9 @@
 package no.nav.familie.baks.mottak.søknad
 
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.FødselsnummerErNullException
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadService
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.Dokumentasjonsbehov
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.FødselsnummerErNullException
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.Søknaddokumentasjon
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.Søknadsvedlegg

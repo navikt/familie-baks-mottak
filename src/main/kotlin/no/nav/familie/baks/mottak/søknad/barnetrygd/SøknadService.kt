@@ -11,12 +11,10 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadVedleggReposi
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBVedlegg
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadService
 import no.nav.familie.baks.mottak.task.JournalførSøknadTask
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.Properties
@@ -36,6 +34,7 @@ class SøknadService(
             is SøknadV7 -> {
                 Pair(versjonertSøknad.søknad.tilDBSøknad(), versjonertSøknad.søknad.dokumentasjon)
             }
+
             is SøknadV8 -> {
                 Pair(versjonertSøknad.søknad.tilDBSøknad(), versjonertSøknad.søknad.dokumentasjon)
             }
@@ -81,14 +80,9 @@ class SøknadService(
     private fun hentOgLagreSøknadvedlegg(dbSøknad: DBSøknad, søknaddokumentasjonsliste: List<Søknaddokumentasjon>) {
         søknaddokumentasjonsliste.forEach { søknaddokumentasjon ->
             søknaddokumentasjon.opplastedeVedlegg.forEach { vedlegg ->
-                logger.debug("Henter ${vedlegg.navn} for dokumentasjonsbehov ${vedlegg.tittel}")
                 val vedleggDokument = vedleggClient.hentVedlegg(dokumentId = vedlegg.dokumentId)
                 vedleggRepository.save(vedlegg.tilDBVedlegg(dbSøknad, vedleggDokument))
             }
         }
-    }
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(KontantstøtteSøknadService::class.java)
     }
 }

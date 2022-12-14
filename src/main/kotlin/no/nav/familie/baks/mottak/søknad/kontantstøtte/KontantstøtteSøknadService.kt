@@ -13,7 +13,6 @@ import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.tilDBKontantstø
 import no.nav.familie.baks.mottak.task.JournalførKontantstøtteSøknadTask
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -76,7 +75,6 @@ class KontantstøtteSøknadService(
     ) {
         søknaddokumentasjonsliste.forEach { søknaddokumentasjon ->
             søknaddokumentasjon.opplastedeVedlegg.forEach { vedlegg ->
-                logger.debug("Henter ${vedlegg.navn} for dokumentasjonsbehov ${vedlegg.tittel}")
                 val vedleggDokument = vedleggClient.hentVedlegg(dokumentId = vedlegg.dokumentId)
                 kontantstøtteVedleggRepository.save(
                     vedlegg.tilDBKontantstøtteVedlegg(
@@ -86,9 +84,5 @@ class KontantstøtteSøknadService(
                 )
             }
         }
-    }
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(KontantstøtteSøknadService::class.java)
     }
 }
