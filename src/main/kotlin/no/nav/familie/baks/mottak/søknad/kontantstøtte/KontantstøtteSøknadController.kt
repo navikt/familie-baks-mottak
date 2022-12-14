@@ -36,7 +36,7 @@ class KontantstøtteSøknadController(
     val harManglerIDokumentasjonsbehov = Metrics.counter("kontantstotte.soknad.harManglerIDokumentasjonsbehov")
 
     // Metrics for EØS kontantstotte
-    val ordinærSøknadEøs = Metrics.counter("kontantstotte.ordinaer.soknad.eos")
+    val søknadEøs = Metrics.counter("kontantstotte.soknad.eos")
 
     @PostMapping(value = ["/soknad"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(@RequestPart("søknad") søknad: KontantstøtteSøknad): ResponseEntity<Ressurs<Kvittering>> =
@@ -46,7 +46,14 @@ class KontantstøtteSøknadController(
         return try {
             val dbKontantstøtteSøknad = kontantstøtteSøknadService.mottaKontantstøtteSøknad(kontantstøtteSøknad)
             sendMetrics(kontantstøtteSøknad)
-            ResponseEntity.ok(Ressurs.success(Kvittering("Søknad om kontantstøtte er mottatt", dbKontantstøtteSøknad.opprettetTid)))
+            ResponseEntity.ok(
+                Ressurs.success(
+                    Kvittering(
+                        "Søknad om kontantstøtte er mottatt",
+                        dbKontantstøtteSøknad.opprettetTid
+                    )
+                )
+            )
         } catch (e: FødselsnummerErNullException) {
             søknadMottattFeil.increment()
             ResponseEntity.status(500).body(Ressurs.failure("Lagring av søknad om kontantstøtte feilet"))
@@ -66,7 +73,7 @@ class KontantstøtteSøknadController(
     private fun sendMetricsSøknad(harEøsSteg: Boolean) {
         søknadMottattOk.increment()
         if (harEøsSteg) {
-            ordinærSøknadEøs.increment()
+            søknadEøs.increment()
         }
     }
 

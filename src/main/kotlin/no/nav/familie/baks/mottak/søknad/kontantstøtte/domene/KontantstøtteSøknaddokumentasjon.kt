@@ -17,7 +17,6 @@ data class KontantstøtteSøknaddokumentasjon(val søknaddokumentasjon: Søknadd
             Dokumentasjonsbehov.AVTALE_DELT_BOSTED -> "Avtale om delt bosted"
             Dokumentasjonsbehov.VEDTAK_OPPHOLDSTILLATELSE -> "Vedtak om oppholdstillatelse"
             Dokumentasjonsbehov.ADOPSJON_DATO -> "Adopsjonsdato"
-            Dokumentasjonsbehov.BEKREFTELSE_FRA_BARNEVERN -> "Bekreftelse fra barnevern"
             Dokumentasjonsbehov.BOR_FAST_MED_SØKER -> "Bor fast med søker"
             Dokumentasjonsbehov.ANNEN_DOKUMENTASJON -> "" // Random dokumentasjon skal saksbehandler sette tittel på
             Dokumentasjonsbehov.BEKREFTELESE_PÅ_BARNEHAGEPLASS -> "Bekreftelse på barnehageplass"
