@@ -49,10 +49,13 @@ class JournalførSøknadTask(
             } else {
                 ByteArray(0)
             }
-            journalføringService.journalførKontantstøtteSøknad(dbSøknad, bokmålPdf, orginalspråkPdf)
+            journalføringService.journalførBarnetrygdSøknad(dbSøknad, bokmålPdf, orginalspråkPdf)
         } catch (e: HttpClientErrorException.Conflict) {
             log.error("409 conflict for eksternReferanseId ved journalføring av søknad. taskId=${task.id}. Se task eller securelog")
-            SECURE_LOGGER.error("409 conflict for eksternReferanseId ved journalføring søknad $task ${e.responseBodyAsString}", e)
+            SECURE_LOGGER.error(
+                "409 conflict for eksternReferanseId ved journalføring søknad $task ${e.responseBodyAsString}",
+                e
+            )
         } catch (e: Exception) {
             log.error("Uventet feil ved journalføring av søknad. taskId=${task.id}. Se task eller securelog")
             SECURE_LOGGER.error("Uventet feil ved journalføring søknad $task", e)

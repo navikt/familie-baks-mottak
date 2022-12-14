@@ -17,7 +17,7 @@ class JournalføringService(
     private val kontantstøtteSøknadService: KontantstøtteSøknadService
 ) {
 
-    fun journalførKontantstøtteSøknad(dbSøknad: DBSøknad, pdf: ByteArray, pdfOriginalSpråk: ByteArray = ByteArray(0)) {
+    fun journalførBarnetrygdSøknad(dbSøknad: DBSøknad, pdf: ByteArray, pdfOriginalSpråk: ByteArray = ByteArray(0)) {
         if (dbSøknad.journalpostId == null) {
             val vedlegg = søknadService.hentLagredeVedlegg(dbSøknad)
 
@@ -40,7 +40,11 @@ class JournalføringService(
         }
     }
 
-    fun journalførKontantstøtteSøknad(dbKontantstøtteSøknad: DBKontantstøtteSøknad, pdf: ByteArray, pdfOriginalSpråk: ByteArray = ByteArray(0)) {
+    fun journalførKontantstøtteSøknad(
+        dbKontantstøtteSøknad: DBKontantstøtteSøknad,
+        pdf: ByteArray,
+        pdfOriginalSpråk: ByteArray = ByteArray(0)
+    ) {
         if (dbKontantstøtteSøknad.journalpostId == null) {
             val vedlegg = kontantstøtteSøknadService.hentLagredeDBKontantstøtteVedlegg(dbKontantstøtteSøknad)
 

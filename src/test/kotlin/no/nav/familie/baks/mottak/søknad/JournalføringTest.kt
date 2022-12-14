@@ -48,7 +48,7 @@ class JournalføringTest(
     fun `journalPostId blir lagt på dbSøknaden`() {
         val dbSøknadFraDB = søknadService.lagreDBSøknad(dbSøknad)
         assertEquals(null, dbSøknadFraDB.journalpostId)
-        journalføringService.journalførKontantstøtteSøknad(dbSøknadFraDB, testPDF)
+        journalføringService.journalførBarnetrygdSøknad(dbSøknadFraDB, testPDF)
         val overskrevetDBSøknad = søknadService.hentDBSøknad(dbSøknadFraDB.id)
 
         assertEquals("123", overskrevetDBSøknad!!.journalpostId)
@@ -59,7 +59,7 @@ class JournalføringTest(
         val dbSøknadMedJournalpostId = dbSøknad.copy(journalpostId = "1")
         val dbSøknadFraDB = søknadService.lagreDBSøknad(dbSøknadMedJournalpostId)
 
-        journalføringService.journalførKontantstøtteSøknad(dbSøknadFraDB, testPDF)
+        journalføringService.journalførBarnetrygdSøknad(dbSøknadFraDB, testPDF)
         val ikkeOverskrevetDBSøknad = søknadService.hentDBSøknad(dbSøknadFraDB.id)
 
         assertEquals("1", ikkeOverskrevetDBSøknad!!.journalpostId)
