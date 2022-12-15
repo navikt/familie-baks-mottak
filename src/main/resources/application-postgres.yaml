@@ -78,6 +78,8 @@ spring:
       schema.registry.url: ${KAFKA_BROKERS}
     consumer:
       group-id: srvc01
+
+
 #Brukes til tilgangskontroll av familie-ks-mottak-frontend
 MOTTAK_ROLLE: group1
 FAMILIE_BA_DOKGEN_API_URL: http://localhost:5914

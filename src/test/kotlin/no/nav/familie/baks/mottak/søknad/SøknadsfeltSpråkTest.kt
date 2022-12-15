@@ -1,10 +1,10 @@
 package no.nav.familie.baks.mottak.søknad
 
+import com.fasterxml.jackson.databind.JsonNode
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.baks.mottak.DevLauncherPostgres
-import no.nav.familie.baks.mottak.søknad.domene.SøknadSpråkvelgerService
-import no.nav.familie.baks.mottak.søknad.domene.SøknadV8
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.util.DbContainerInitializer
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt
 import no.nav.familie.kontrakter.ba.søknad.v8.Søknad
@@ -46,13 +46,13 @@ class SøknadsfeltSpråkTest(
         )
         every { søknad.teksterUtenomSpørsmål } returns mapOf()
 
-        var asJson = søknadSpråkvelgerService.velgSøknadSpråk(SøknadV8(søknad = søknad), "en")
-        assertNotEquals(-1, asJson.indexOf("TestAnswer"))
-        assertEquals(-1, asJson.indexOf("TestSvar"))
+        var barnetrygdSøknadMap = søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(SøknadV8(søknad = søknad), "en")
+        var barnetrygdSøknadJsonNode = objectMapper.valueToTree<JsonNode>(barnetrygdSøknadMap)
+        assertEquals("TestAnswer", barnetrygdSøknadJsonNode["spørsmål"]["testSpørsmål"]["verdi"].textValue())
 
-        asJson = søknadSpråkvelgerService.velgSøknadSpråk(SøknadV8(søknad = søknad), "nb")
-        assertEquals(-1, asJson.indexOf("TestAnswer"))
-        assertNotEquals(-1, asJson.indexOf("TestSvar"))
+        barnetrygdSøknadMap = søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(SøknadV8(søknad = søknad), "nb")
+        barnetrygdSøknadJsonNode = objectMapper.valueToTree<JsonNode>(barnetrygdSøknadMap)
+        assertEquals("TestSvar", barnetrygdSøknadJsonNode["spørsmål"]["testSpørsmål"]["verdi"].textValue())
     }
 
     @Test
@@ -115,12 +115,9 @@ class SøknadsfeltSpråkTest(
         )
         every { søknad.teksterUtenomSpørsmål } returns mapOf()
 
-        val asJson = søknadSpråkvelgerService.velgSøknadSpråk(SøknadV8(søknad = søknad), "nb")
-        assertNotEquals(-1, asJson.indexOf("TestNøstetVerdi"))
-        assertEquals(-1, asJson.indexOf("TestNestedValue"))
-
-        val asMap = objectMapper.readTree(asJson)
-        assertEquals("TestNøstetVerdi", asMap["spørsmål"]["testSpørsmål"]["verdi"]["verdi"].textValue())
+        val barnetrygdSøknadMap = søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(SøknadV8(søknad = søknad), "nb")
+        val barnetrygdSøknadJsonNode = objectMapper.valueToTree<JsonNode>(barnetrygdSøknadMap)
+        assertEquals("TestNøstetVerdi", barnetrygdSøknadJsonNode["spørsmål"]["testSpørsmål"]["verdi"]["verdi"].textValue())
     }
 
     @Test
@@ -134,9 +131,8 @@ class SøknadsfeltSpråkTest(
             )
         )
 
-        val asJson = søknadSpråkvelgerService.velgSøknadSpråk(SøknadV8(søknad = søknad), "nb")
-
-        assertEquals(-1, asJson.indexOf("Text"))
-        assertNotEquals(-1, asJson.indexOf("Tekst"))
+        val barnetrygdSøknadMap = søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(SøknadV8(søknad = søknad), "nb")
+        val barnetrygdSøknadJsonNode = objectMapper.valueToTree<JsonNode>(barnetrygdSøknadMap)
+        assertEquals("TestTekst", barnetrygdSøknadJsonNode["teksterUtenomSpørsmål"]["test.tekst"].textValue())
     }
 }

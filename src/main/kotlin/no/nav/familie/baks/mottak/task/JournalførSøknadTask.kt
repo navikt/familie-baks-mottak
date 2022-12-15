@@ -2,11 +2,11 @@ package no.nav.familie.baks.mottak.task
 
 import no.nav.familie.baks.mottak.søknad.JournalføringService
 import no.nav.familie.baks.mottak.søknad.PdfService
-import no.nav.familie.baks.mottak.søknad.SøknadRepository
-import no.nav.familie.baks.mottak.søknad.domene.DBSøknad
-import no.nav.familie.baks.mottak.søknad.domene.SøknadV7
-import no.nav.familie.baks.mottak.søknad.domene.SøknadV8
-import no.nav.familie.baks.mottak.søknad.domene.VersjonertSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -32,7 +32,7 @@ class JournalførSøknadTask(
             val versjonertSøknad: VersjonertSøknad = dbSøknad.hentVersjonertSøknad()
 
             log.info("Generer pdf og journalfør søknad")
-            val bokmålPdf = pdfService.lagPdf(
+            val bokmålPdf = pdfService.lagBarnetrygdPdf(
                 versjonertSøknad = versjonertSøknad,
                 dbSøknad = dbSøknad,
                 språk = "nb"
@@ -45,14 +45,17 @@ class JournalførSøknadTask(
             }
 
             val orginalspråkPdf: ByteArray = if (orginalspråk != "nb") {
-                pdfService.lagPdf(versjonertSøknad, dbSøknad, orginalspråk)
+                pdfService.lagBarnetrygdPdf(versjonertSøknad, dbSøknad, orginalspråk)
             } else {
                 ByteArray(0)
             }
-            journalføringService.journalførSøknad(dbSøknad, bokmålPdf, orginalspråkPdf)
+            journalføringService.journalførBarnetrygdSøknad(dbSøknad, bokmålPdf, orginalspråkPdf)
         } catch (e: HttpClientErrorException.Conflict) {
             log.error("409 conflict for eksternReferanseId ved journalføring av søknad. taskId=${task.id}. Se task eller securelog")
-            SECURE_LOGGER.error("409 conflict for eksternReferanseId ved journalføring søknad $task ${e.responseBodyAsString}", e)
+            SECURE_LOGGER.error(
+                "409 conflict for eksternReferanseId ved journalføring søknad $task ${e.responseBodyAsString}",
+                e
+            )
         } catch (e: Exception) {
             log.error("Uventet feil ved journalføring av søknad. taskId=${task.id}. Se task eller securelog")
             SECURE_LOGGER.error("Uventet feil ved journalføring søknad $task", e)

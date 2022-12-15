@@ -1,14 +1,16 @@
-package no.nav.familie.baks.mottak.søknad
+package no.nav.familie.baks.mottak.søknad.barnetrygd
 
 import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClient
-import no.nav.familie.baks.mottak.søknad.domene.DBSøknad
-import no.nav.familie.baks.mottak.søknad.domene.DBVedlegg
-import no.nav.familie.baks.mottak.søknad.domene.FødselsnummerErNullException
-import no.nav.familie.baks.mottak.søknad.domene.SøknadV7
-import no.nav.familie.baks.mottak.søknad.domene.SøknadV8
-import no.nav.familie.baks.mottak.søknad.domene.VersjonertSøknad
-import no.nav.familie.baks.mottak.søknad.domene.tilDBSøknad
-import no.nav.familie.baks.mottak.søknad.domene.tilDBVedlegg
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBVedlegg
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.FødselsnummerErNullException
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadVedleggRepository
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBVedlegg
 import no.nav.familie.baks.mottak.task.JournalførSøknadTask
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
 import no.nav.familie.prosessering.domene.Task
@@ -32,6 +34,7 @@ class SøknadService(
             is SøknadV7 -> {
                 Pair(versjonertSøknad.søknad.tilDBSøknad(), versjonertSøknad.søknad.dokumentasjon)
             }
+
             is SøknadV8 -> {
                 Pair(versjonertSøknad.søknad.tilDBSøknad(), versjonertSøknad.søknad.dokumentasjon)
             }
@@ -77,7 +80,7 @@ class SøknadService(
     private fun hentOgLagreSøknadvedlegg(dbSøknad: DBSøknad, søknaddokumentasjonsliste: List<Søknaddokumentasjon>) {
         søknaddokumentasjonsliste.forEach { søknaddokumentasjon ->
             søknaddokumentasjon.opplastedeVedlegg.forEach { vedlegg ->
-                val vedleggDokument = vedleggClient.hentVedlegg(vedlegg)
+                val vedleggDokument = vedleggClient.hentVedlegg(dokumentId = vedlegg.dokumentId)
                 vedleggRepository.save(vedlegg.tilDBVedlegg(dbSøknad, vedleggDokument))
             }
         }

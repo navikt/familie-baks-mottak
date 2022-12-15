@@ -1,13 +1,17 @@
 package no.nav.familie.baks.mottak.søknad
 
-import no.nav.familie.baks.mottak.søknad.domene.DBSøknad
-import no.nav.familie.baks.mottak.søknad.domene.DBVedlegg
-import no.nav.familie.baks.mottak.søknad.domene.SøknadV7
-import no.nav.familie.baks.mottak.søknad.domene.SøknadV8
-import no.nav.familie.baks.mottak.søknad.domene.VersjonertSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknaddokumentasjon
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBVedlegg
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.Vedlegg
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteVedlegg
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknad
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
-import no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov
-import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
 import no.nav.familie.kontrakter.felles.dokarkiv.Dokumenttype
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.ArkiverDokumentRequest
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.Dokument
@@ -23,8 +27,8 @@ object ArkiverDokumentRequestMapper {
         pdfOriginalSpråk: ByteArray
     ): ArkiverDokumentRequest {
         val (søknadstype, dokumentasjon) = when (versjonertSøknad) {
-            is SøknadV7 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
-            is SøknadV8 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
+            is SøknadV7 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon.map { BarnetrygdSøknaddokumentasjon(it) })
+            is SøknadV8 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon.map { BarnetrygdSøknaddokumentasjon(it) })
         }
 
         val dokumenttype = when (søknadstype) {
@@ -58,15 +62,51 @@ object ArkiverDokumentRequestMapper {
             fnr = dbSøknad.fnr,
             forsøkFerdigstill = false,
             hoveddokumentvarianter = listOf(søknadsdokumentPdf, søknadsdokumentJson),
-            vedleggsdokumenter = hentVedleggListeTilArkivering(dokumentasjon, vedleggMap, pdfOriginalSpråk),
+            vedleggsdokumenter = hentVedleggListeTilArkivering(dokumentasjon, vedleggMap, pdfOriginalSpråk, Dokumenttype.BARNETRYGD_VEDLEGG),
             eksternReferanseId = dbSøknad.id.toString()
         )
     }
 
-    private fun hentVedleggListeTilArkivering(
-        dokumentasjon: List<Søknaddokumentasjon>,
-        vedleggMap: Map<String, DBVedlegg>,
+    fun toDto(
+        dbKontantstøtteSøknad: DBKontantstøtteSøknad,
+        kontantstøtteSøknad: KontantstøtteSøknad,
+        pdf: ByteArray,
+        vedleggMap: Map<String, DBKontantstotteVedlegg>,
         pdfOriginalSpråk: ByteArray
+    ): ArkiverDokumentRequest {
+        val dokumenttype = Dokumenttype.KONTANTSTØTTE_SØKNAD
+
+        val søknadsdokumentJson =
+            Dokument(
+                dokument = dbKontantstøtteSøknad.søknadJson.toByteArray(),
+                filtype = Filtype.JSON,
+                filnavn = null,
+                tittel = "SØKNAD_${dokumenttype}_JSON",
+                dokumenttype = dokumenttype
+            )
+        val søknadsdokumentPdf =
+            Dokument(
+                dokument = pdf,
+                filtype = Filtype.PDFA,
+                filnavn = null,
+                tittel = "Søknad om kontantstøtte",
+                dokumenttype = dokumenttype
+            )
+
+        return ArkiverDokumentRequest(
+            fnr = dbKontantstøtteSøknad.fnr,
+            forsøkFerdigstill = false,
+            hoveddokumentvarianter = listOf(søknadsdokumentPdf, søknadsdokumentJson),
+            vedleggsdokumenter = hentVedleggListeTilArkivering(kontantstøtteSøknad.dokumentasjon.map { KontantstøtteSøknaddokumentasjon(it) }, vedleggMap, pdfOriginalSpråk, Dokumenttype.KONTANTSTØTTE_VEDLEGG),
+            eksternReferanseId = dbKontantstøtteSøknad.id.toString()
+        )
+    }
+
+    private fun hentVedleggListeTilArkivering(
+        dokumentasjon: List<ISøknaddokumentasjon>,
+        vedleggMap: Map<String, Vedlegg>,
+        pdfOriginalSpråk: ByteArray,
+        dokumenttype: Dokumenttype
     ): List<Dokument> {
         val vedlegg = mutableListOf<Dokument>()
 
@@ -76,9 +116,9 @@ object ArkiverDokumentRequestMapper {
                     vedlegg.add(
                         Dokument(
                             dokument = dbFil.data,
-                            dokumenttype = Dokumenttype.BARNETRYGD_VEDLEGG,
+                            dokumenttype = dokumenttype,
                             filtype = Filtype.PDFA,
-                            tittel = dokumentasjonsbehovTilTittel(opplastaVedlegg.tittel)
+                            tittel = opplastaVedlegg.tittel
                         )
                     )
                 }
@@ -89,7 +129,7 @@ object ArkiverDokumentRequestMapper {
             vedlegg.add(
                 Dokument(
                     dokument = pdfOriginalSpråk,
-                    dokumenttype = Dokumenttype.BARNETRYGD_VEDLEGG,
+                    dokumenttype = dokumenttype,
                     filtype = Filtype.PDFA,
                     tittel = "Søknad på originalt utfylt språk"
                 )
@@ -98,17 +138,12 @@ object ArkiverDokumentRequestMapper {
 
         return vedlegg
     }
-
-    private fun dokumentasjonsbehovTilTittel(dokumentasjonsbehov: Dokumentasjonsbehov): String {
-        return when (dokumentasjonsbehov) {
-            Dokumentasjonsbehov.ADOPSJON_DATO -> "Adopsjonsdato"
-            Dokumentasjonsbehov.AVTALE_DELT_BOSTED -> "Avtale om delt bosted"
-            Dokumentasjonsbehov.VEDTAK_OPPHOLDSTILLATELSE -> "Vedtak om oppholdstillatelse"
-            Dokumentasjonsbehov.BEKREFTELSE_FRA_BARNEVERN -> "Bekreftelse fra barnevern"
-            Dokumentasjonsbehov.BOR_FAST_MED_SØKER -> "Bor fast med søker"
-            Dokumentasjonsbehov.SEPARERT_SKILT_ENKE -> "Dokumentasjon på separasjon, skilsmisse eller dødsfall"
-            Dokumentasjonsbehov.MEKLINGSATTEST -> "Meklingsattest"
-            Dokumentasjonsbehov.ANNEN_DOKUMENTASJON -> "" // Random dokumentasjon skal saksbehandler sette tittel på
-        }
-    }
 }
+
+interface ISøknaddokumentasjon {
+    val opplastedeVedlegg: List<Søknadsvedlegg>
+}
+data class Søknadsvedlegg(
+    val dokumentId: String,
+    val tittel: String
+)
