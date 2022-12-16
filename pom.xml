@@ -27,7 +27,7 @@
         <felles.version>1.20221101085322_cc4d556</felles.version>
         <kontrakter.version>2.0_20221213124351_7c53585</kontrakter.version>
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
-        <spring.cloud.version>3.1.5</spring.cloud.version>
+        <spring.cloud.version>4.0.0</spring.cloud.version>
         <token-validation-spring.version>2.1.4</token-validation-spring.version>
         <avro.version>1.11.1</avro.version>
 
