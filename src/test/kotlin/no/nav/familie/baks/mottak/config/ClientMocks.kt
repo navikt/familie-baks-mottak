@@ -12,6 +12,8 @@ import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.baks.mottak.integrasjoner.PdfClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.http.client.RessursException
+import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentResponse
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import org.springframework.context.annotation.Bean
@@ -56,7 +58,11 @@ class ClientMocks {
         every {
             mockDokarkivClientConflict.arkiver(any())
         } answers {
-            throw HttpClientErrorException.Conflict.create(HttpStatus.CONFLICT, null, null, null, null)
+            throw RessursException(
+                Ressurs(status = Ressurs.Status.FEILET, data = null, melding = "", stacktrace = ""),
+                HttpClientErrorException.Conflict.create(HttpStatus.CONFLICT, null, null, null, null),
+                HttpStatus.CONFLICT
+            )
         }
         return mockDokarkivClientConflict
     }
