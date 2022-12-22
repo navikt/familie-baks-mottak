@@ -7,6 +7,7 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
+import no.nav.familie.http.client.RessursException
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -50,12 +51,19 @@ class JournalførSøknadTask(
                 ByteArray(0)
             }
             journalføringService.journalførBarnetrygdSøknad(dbSøknad, bokmålPdf, orginalspråkPdf)
-        } catch (e: HttpClientErrorException.Conflict) {
-            log.error("409 conflict for eksternReferanseId ved journalføring av søknad. taskId=${task.id}. Se task eller securelog")
-            SECURE_LOGGER.error(
-                "409 conflict for eksternReferanseId ved journalføring søknad $task ${e.responseBodyAsString}",
-                e
-            )
+        } catch (e: RessursException) {
+            when (e.cause) {
+                is HttpClientErrorException.Conflict -> {
+                    // Dersom søknaden allerede er journalført får vi 409-Conflict. Vi ønsker ikke å feile tasken når dette skjer.
+                    log.error("409 conflict for eksternReferanseId ved journalføring av søknad. taskId=${task.id}. Se task eller securelog")
+                    SECURE_LOGGER.error(
+                        "409 conflict for eksternReferanseId ved journalføring søknad $task ${(e.cause as HttpClientErrorException.Conflict).responseBodyAsString}",
+                        e
+                    )
+                }
+
+                else -> throw e
+            }
         } catch (e: Exception) {
             log.error("Uventet feil ved journalføring av søknad. taskId=${task.id}. Se task eller securelog")
             SECURE_LOGGER.error("Uventet feil ved journalføring søknad $task", e)
