@@ -5,6 +5,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
@@ -18,7 +19,6 @@ import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.baks.mottak.integrasjoner.Opphørsgrunn.MIGRERT
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
-import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.baks.mottak.integrasjoner.StatusKode
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.prosessering.domene.Task
@@ -35,15 +35,15 @@ import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 class NavnoHendelseTaskLøypeTest {
 
     private val mockJournalpostClient: JournalpostClient = mockk()
-    private val mockSakClient: SakClient = mockk()
+    private val mockBaSakClient: BaSakClient = mockk()
     private val mockOppgaveClient: OppgaveClient = mockk(relaxed = true)
     private val mockTaskService: TaskService = mockk(relaxed = true)
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
 
-    private val rutingSteg = JournalhendelseRutingTask(
+    private val rutingSteg = JournalhendelseBarnetrygdRutingTask(
         mockPdlClient,
-        mockSakClient,
+        mockBaSakClient,
         mockInfotrygdBarnetrygdClient,
         mockTaskService
     )
@@ -81,7 +81,7 @@ class NavnoHendelseTaskLøypeTest {
         } returns listOf()
 
         every {
-            mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
+            mockBaSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
         } returns emptyList()
 
         every {
@@ -96,10 +96,10 @@ class NavnoHendelseTaskLøypeTest {
     @Test
     fun `Skal opprette JFR-oppgave med tekst om at bruker har sak i BA-sak`() {
         every {
-            mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
+            mockBaSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
         } returns listOf(RestFagsakDeltager("12345678901", FORELDER, FAGSAK_ID.toLong(), LØPENDE))
 
-        every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
+        every { mockBaSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
 
         kjørRutingTaskOgReturnerNesteTask().run {
             Assertions.assertThat(this.type).isEqualTo(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE)
@@ -136,10 +136,10 @@ class NavnoHendelseTaskLøypeTest {
     @Test
     fun `Skal opprette JFR-oppgave med tekst om at bruker har sak begge steder`() {
         every {
-            mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
+            mockBaSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
         } returns listOf(RestFagsakDeltager("12345678901", FORELDER, FAGSAK_ID.toLong(), LØPENDE))
 
-        every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
+        every { mockBaSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
 
         every {
             mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
@@ -169,10 +169,10 @@ class NavnoHendelseTaskLøypeTest {
     @Test
     fun `Skal opprette JFR-oppgave med henvisning til BA-sak når bruker er migrert fra Infotrygd`() {
         every {
-            mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
+            mockBaSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
         } returns listOf(RestFagsakDeltager("12345678901", FORELDER, FAGSAK_ID.toLong(), LØPENDE))
 
-        every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
+        every { mockBaSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
 
         every {
             mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
@@ -200,7 +200,7 @@ class NavnoHendelseTaskLøypeTest {
     private fun kjørRutingTaskOgReturnerNesteTask(): Task {
         rutingSteg.doTask(
             Task(
-                type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+                type = JournalhendelseBarnetrygdRutingTask.TASK_STEP_TYPE,
                 payload = MOTTAK_KANAL
             ).apply {
                 this.metadata["personIdent"] = "12345678901"

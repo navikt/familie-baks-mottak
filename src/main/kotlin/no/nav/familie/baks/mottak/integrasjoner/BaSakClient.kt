@@ -17,10 +17,10 @@ import org.springframework.web.client.RestOperations
 import java.net.URI
 import java.time.LocalDateTime
 
-private val logger = LoggerFactory.getLogger(SakClient::class.java)
+private val logger = LoggerFactory.getLogger(BaSakClient::class.java)
 
 @Component
-class SakClient @Autowired constructor(
+class BaSakClient @Autowired constructor(
     @param:Value("\${FAMILIE_BA_SAK_API_URL}") private val sakServiceUri: String,
     @Qualifier("clientCredentials") restOperations: RestOperations
 ) : AbstractRestClient(restOperations, "integrasjon") {
@@ -59,8 +59,16 @@ class SakClient @Autowired constructor(
             val response = postForEntity<Ressurs<String>>(uri, personIdent)
             secureLogger.info("Identhendelse sendt til sak for $personIdent. Status=${response.status}")
         } catch (e: RestClientResponseException) {
-            logger.info("Innsending av identhendelse til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
-            secureLogger.info("Innsending av identhendelse til sak feilet for $personIdent. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
+            logger.info(
+                "Innsending av identhendelse til sak feilet. Responskode: {}, body: {}",
+                e.rawStatusCode,
+                e.responseBodyAsString
+            )
+            secureLogger.info(
+                "Innsending av identhendelse til sak feilet for $personIdent. Responskode: {}, body: {}",
+                e.rawStatusCode,
+                e.responseBodyAsString
+            )
             throw IllegalStateException(
                 "Innsending av identhendelse til sak feilet. Status: " + e.rawStatusCode +
                     ", body: " + e.responseBodyAsString,
@@ -78,7 +86,14 @@ class SakClient @Autowired constructor(
             postForEntity<Ressurs<RestFagsak>>(uri, mapOf("personIdent" to personIdent))
         }.fold(
             onSuccess = { it.data?.id?.toString() ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
-            onFailure = { throw IntegrasjonException("Feil ved henting av saksnummer fra ba-sak.", it, uri, personIdent) }
+            onFailure = {
+                throw IntegrasjonException(
+                    "Feil ved henting av saksnummer fra ba-sak.",
+                    it,
+                    uri,
+                    personIdent
+                )
+            }
         )
     }
 
@@ -91,7 +106,14 @@ class SakClient @Autowired constructor(
             postForEntity<Ressurs<List<RestFagsakDeltager>>>(uri, RestSøkParam(personIdent, barnasIdenter))
         }.fold(
             onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
-            onFailure = { throw IntegrasjonException("Feil ved henting av fagsakdeltagere fra ba-sak.", it, uri, personIdent) }
+            onFailure = {
+                throw IntegrasjonException(
+                    "Feil ved henting av fagsakdeltagere fra ba-sak.",
+                    it,
+                    uri,
+                    personIdent
+                )
+            }
         )
     }
 
@@ -103,7 +125,14 @@ class SakClient @Autowired constructor(
             postForEntity<Ressurs<List<RestFagsakIdOgTilknyttetAktørId>>>(uri, RestPersonIdent(personIdent))
         }.fold(
             onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
-            onFailure = { throw IntegrasjonException("Feil ved henting av fagsakId og aktørId fra ba-sak.", it, uri, personIdent) }
+            onFailure = {
+                throw IntegrasjonException(
+                    "Feil ved henting av fagsakId og aktørId fra ba-sak.",
+                    it,
+                    uri,
+                    personIdent
+                )
+            }
         )
     }
 
@@ -115,7 +144,14 @@ class SakClient @Autowired constructor(
             postForEntity<Ressurs<List<RestFagsakIdOgTilknyttetAktørId>>>(uri, RestPersonIdent(personIdent))
         }.fold(
             onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
-            onFailure = { throw IntegrasjonException("Feil ved henting av fagsakId og aktørId fra ba-sak.", it, uri, personIdent) }
+            onFailure = {
+                throw IntegrasjonException(
+                    "Feil ved henting av fagsakId og aktørId fra ba-sak.",
+                    it,
+                    uri,
+                    personIdent
+                )
+            }
         )
     }
 
@@ -147,7 +183,10 @@ class SakClient @Autowired constructor(
             logger.info("Ident fra vedtak om overgangsstønad sendt til sak. Status=${response.status}")
         } catch (e: RestClientResponseException) {
             logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
-            throw IllegalStateException("Innsending til sak feilet. Status: ${e.rawStatusCode}, body: ${e.responseBodyAsString}", e)
+            throw IllegalStateException(
+                "Innsending til sak feilet. Status: ${e.rawStatusCode}, body: ${e.responseBodyAsString}",
+                e
+            )
         } catch (e: RestClientException) {
             throw IllegalStateException("Innsending til sak feilet.", e)
         }

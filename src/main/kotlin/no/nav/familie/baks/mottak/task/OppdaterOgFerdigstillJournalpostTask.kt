@@ -1,12 +1,12 @@
 package no.nav.familie.baks.mottak.task
 
+import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.DokarkivClient
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
-import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service
 class OppdaterOgFerdigstillJournalpostTask(
     private val journalpostClient: JournalpostClient,
     private val dokarkivClient: DokarkivClient,
-    private val sakClient: SakClient,
+    private val baSakClient: BaSakClient,
     private val taskService: TaskService,
     private val pdlClient: PdlClient
 ) : AsyncTaskStep {
@@ -36,7 +36,7 @@ class OppdaterOgFerdigstillJournalpostTask(
 
         when (journalpost.journalstatus) {
             Journalstatus.MOTTATT -> {
-                val fagsakId = sakClient.hentSaksnummer(tilPersonIdent(journalpost.bruker!!))
+                val fagsakId = baSakClient.hentSaksnummer(tilPersonIdent(journalpost.bruker!!))
                 runCatching { // forsøk å journalføre automatisk
                     dokarkivClient.oppdaterJournalpostSak(journalpost, fagsakId)
                     dokarkivClient.ferdigstillJournalpost(journalpost.journalpostId)
@@ -59,10 +59,12 @@ class OppdaterOgFerdigstillJournalpostTask(
                     }
                 )
             }
+
             Journalstatus.JOURNALFOERT -> log.info(
                 "Skipper oppdatering og ferdigstilling av " +
                     "journalpost ${journalpost.journalpostId} som alt er ferdig journalført"
             )
+
             else -> error("Uventet journalstatus ${journalpost.journalstatus} for journalpost ${journalpost.journalpostId}")
         }
 

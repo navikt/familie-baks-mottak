@@ -6,6 +6,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.baks.mottak.config.FeatureToggleService
+import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingUnderkategori
 import no.nav.familie.baks.mottak.integrasjoner.Dødsfall
@@ -23,7 +24,6 @@ import no.nav.familie.baks.mottak.integrasjoner.RestArbeidsfordelingPåBehandlin
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsak
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.integrasjoner.RestUtvidetBehandling
-import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.baks.mottak.integrasjoner.Sivilstand
 import no.nav.familie.baks.mottak.task.VurderLivshendelseType.DØDSFALL
 import no.nav.familie.baks.mottak.task.VurderLivshendelseType.SIVILSTAND
@@ -50,13 +50,19 @@ import java.time.YearMonth
 class VurderLivshendelseTaskTest {
 
     private val mockOppgaveClient: OppgaveClient = mockk()
-    private val mockSakClient: SakClient = mockk()
+    private val mockBaSakClient: BaSakClient = mockk()
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdClient: InfotrygdBarnetrygdClient = mockk()
     private val mockFeatureToggleService: FeatureToggleService = mockk()
 
     private val vurderLivshendelseTask =
-        VurderLivshendelseTask(mockOppgaveClient, mockPdlClient, mockSakClient, mockInfotrygdClient, mockFeatureToggleService)
+        VurderLivshendelseTask(
+            mockOppgaveClient,
+            mockPdlClient,
+            mockBaSakClient,
+            mockInfotrygdClient,
+            mockFeatureToggleService
+        )
 
     @BeforeEach
     internal fun setUp() {
@@ -127,9 +133,9 @@ class VurderLivshendelseTaskTest {
 
         verify(exactly = 0) {
             mockOppgaveClient.opprettVurderLivshendelseOppgave(any())
-            mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_BARN, listOf())
-            mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN))
-            mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_FAR, listOf(PERSONIDENT_BARN))
+            mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_BARN, listOf())
+            mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN))
+            mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_FAR, listOf(PERSONIDENT_BARN))
         }
     }
 
@@ -151,7 +157,7 @@ class VurderLivshendelseTaskTest {
             dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now()))
         )
 
-        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns emptyList()
+        every { mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns emptyList()
 
         listOf(UTFLYTTING, DØDSFALL).forEach {
             vurderLivshendelseTask.doTask(
@@ -172,7 +178,7 @@ class VurderLivshendelseTaskTest {
         }
 
         verify(exactly = 2) {
-            mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList())
+            mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList())
         }
     }
 
@@ -199,19 +205,19 @@ class VurderLivshendelseTaskTest {
             dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now()))
         )
 
-        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN)) } returns
+        every { mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN)) } returns
             listOf(
                 RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE),
                 RestFagsakDeltager(PERSONIDENT_BARN, BARN, SAKS_ID, LØPENDE)
             )
 
-        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_FAR, listOf(PERSONIDENT_BARN)) } returns
+        every { mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_FAR, listOf(PERSONIDENT_BARN)) } returns
             listOf(
                 RestFagsakDeltager(PERSONIDENT_FAR, FORELDER, SAKS_ID + 50, LØPENDE),
                 RestFagsakDeltager(PERSONIDENT_BARN, BARN, SAKS_ID, LØPENDE)
             )
 
-        every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivOrdinær()
+        every { mockBaSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivOrdinær()
 
         listOf(UTFLYTTING, DØDSFALL).forEach {
             vurderLivshendelseTask.doTask(
@@ -230,8 +236,8 @@ class VurderLivshendelseTaskTest {
         val oppgaveDto = mutableListOf<OppgaveVurderLivshendelseDto>()
         verify(exactly = 2) {
             mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDto))
-            mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN))
-            mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_FAR, listOf(PERSONIDENT_BARN))
+            mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN))
+            mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_FAR, listOf(PERSONIDENT_BARN))
         }
 
         assertThat(oppgaveDto).allMatch { it.aktørId.contains(PERSONIDENT_MOR) }
@@ -261,10 +267,10 @@ class VurderLivshendelseTaskTest {
             )
         )
 
-        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
+        every { mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
             listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE))
 
-        every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
+        every { mockBaSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
 
         listOf(DØDSFALL, UTFLYTTING, SIVILSTAND).forEach {
             vurderLivshendelseTask.doTask(
@@ -312,10 +318,10 @@ class VurderLivshendelseTaskTest {
             )
         )
 
-        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
+        every { mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
             listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE))
 
-        every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivOrdinær() andThen lagAktivUtvidet()
+        every { mockBaSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivOrdinær() andThen lagAktivUtvidet()
 
         listOf(1, 2).forEach {
             vurderLivshendelseTask.doTask(
@@ -361,10 +367,10 @@ class VurderLivshendelseTaskTest {
             )
         )
 
-        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
+        every { mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
             listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE))
 
-        every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
+        every { mockBaSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
 
         vurderLivshendelseTask.doTask(
             Task(
@@ -401,10 +407,10 @@ class VurderLivshendelseTaskTest {
             sivilstandMedDagensDato.data andThen
             sivilstandEldreEnnBasakVedtakMenNyereEnnInfotrygdVedtak.data
 
-        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
+        every { mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
             listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE))
 
-        every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
+        every { mockBaSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
 
         listOf(1, 2, 3, 4).forEach {
             vurderLivshendelseTask.doTask(
@@ -468,16 +474,16 @@ class VurderLivshendelseTaskTest {
             )
         )
 
-        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN)) } returns
+        every { mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN)) } returns
             listOf(
                 RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE),
                 RestFagsakDeltager(PERSONIDENT_BARN, BARN, SAKS_ID, LØPENDE)
             )
 
-        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_FAR, listOf(PERSONIDENT_BARN)) } returns
+        every { mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_FAR, listOf(PERSONIDENT_BARN)) } returns
             listOf(RestFagsakDeltager(PERSONIDENT_BARN, BARN, SAKS_ID, LØPENDE))
 
-        every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
+        every { mockBaSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
 
         listOf(DØDSFALL, UTFLYTTING).forEach {
             vurderLivshendelseTask.doTask(
@@ -510,22 +516,22 @@ class VurderLivshendelseTaskTest {
 
     @Test
     fun `Skal sett riktig beskrivelsestekster for ny dødsfall oppgave`() {
-        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
+        every { mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
             listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE))
 
-        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN)) } returns
+        every { mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN)) } returns
             listOf(
                 RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE),
                 RestFagsakDeltager(PERSONIDENT_BARN, BARN, SAKS_ID, LØPENDE)
             )
 
-        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN2)) } returns
+        every { mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN2)) } returns
             listOf(
                 RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE),
                 RestFagsakDeltager(PERSONIDENT_BARN2, BARN, SAKS_ID, LØPENDE)
             )
 
-        every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
+        every { mockBaSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
         val oppgaveDto = slot<OppgaveVurderLivshendelseDto>()
         every { mockOppgaveClient.opprettVurderLivshendelseOppgave(capture(oppgaveDto)) } returns OppgaveResponse(
             oppgaveId = 1
@@ -579,12 +585,17 @@ class VurderLivshendelseTaskTest {
 
     @Test
     fun `Skal sett riktig beskrivelsestekster når oppdater dødsfall oppgave`() {
-        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
+        every { mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, emptyList()) } returns
             listOf(RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE))
 
-        every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
+        every { mockBaSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
         val oppgavebeskrivelseSlot = slot<String>()
-        every { mockOppgaveClient.oppdaterOppgaveBeskrivelse(any(), capture(oppgavebeskrivelseSlot)) } returns OppgaveResponse(
+        every {
+            mockOppgaveClient.oppdaterOppgaveBeskrivelse(
+                any(),
+                capture(oppgavebeskrivelseSlot)
+            )
+        } returns OppgaveResponse(
             oppgaveId = 1
         )
 
@@ -605,7 +616,7 @@ class VurderLivshendelseTaskTest {
             Oppgave(beskrivelse = DØDSFALL.beskrivelse + ": bruker")
         )
 
-        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN)) } returns
+        every { mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN)) } returns
             listOf(
                 RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE),
                 RestFagsakDeltager(PERSONIDENT_BARN, BARN, SAKS_ID, LØPENDE)
@@ -630,7 +641,7 @@ class VurderLivshendelseTaskTest {
             Oppgave(beskrivelse = DØDSFALL.beskrivelse + ": bruker og barn $PERSONIDENT_BARN")
         )
 
-        every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN2)) } returns
+        every { mockBaSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN2)) } returns
             listOf(
                 RestFagsakDeltager(PERSONIDENT_MOR, FORELDER, SAKS_ID, LØPENDE),
                 RestFagsakDeltager(PERSONIDENT_BARN2, BARN, SAKS_ID, LØPENDE)

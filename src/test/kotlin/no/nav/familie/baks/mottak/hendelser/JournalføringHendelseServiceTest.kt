@@ -12,6 +12,7 @@ import no.nav.familie.baks.mottak.config.FeatureToggleService
 import no.nav.familie.baks.mottak.domene.HendelseConsumer
 import no.nav.familie.baks.mottak.domene.Hendelseslogg
 import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
+import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
@@ -24,8 +25,7 @@ import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
-import no.nav.familie.baks.mottak.integrasjoner.SakClient
-import no.nav.familie.baks.mottak.task.JournalhendelseRutingTask
+import no.nav.familie.baks.mottak.task.JournalhendelseBarnetrygdRutingTask
 import no.nav.familie.baks.mottak.task.OpprettJournalføringOppgaveTask
 import no.nav.familie.baks.mottak.task.SendTilSakTask
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
@@ -54,7 +54,7 @@ class JournalføringHendelseServiceTest {
     lateinit var mockOppgaveClient: OppgaveClient
 
     @MockK
-    lateinit var sakClient: SakClient
+    lateinit var baSakClient: BaSakClient
 
     @MockK
     lateinit var infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient
@@ -182,7 +182,7 @@ class JournalføringHendelseServiceTest {
         assertThat(taskSlot.captured).isNotNull
         assertThat(taskSlot.captured.payload).isEqualTo("SKAN_NETS")
         assertThat(taskSlot.captured.metadata.getProperty("callId")).isEqualTo("papir")
-        assertThat(taskSlot.captured.type).isEqualTo(JournalhendelseRutingTask.TASK_STEP_TYPE)
+        assertThat(taskSlot.captured.type).isEqualTo(JournalhendelseBarnetrygdRutingTask.TASK_STEP_TYPE)
     }
 
     @Test
@@ -200,7 +200,7 @@ class JournalføringHendelseServiceTest {
         assertThat(taskSlot.captured).isNotNull
         assertThat(taskSlot.captured.payload).isEqualTo("NAV_NO")
         assertThat(taskSlot.captured.metadata.getProperty("callId")).isEqualTo("digital")
-        assertThat(taskSlot.captured.type).isEqualTo(JournalhendelseRutingTask.TASK_STEP_TYPE)
+        assertThat(taskSlot.captured.type).isEqualTo(JournalhendelseBarnetrygdRutingTask.TASK_STEP_TYPE)
     }
 
     @Test
@@ -245,7 +245,7 @@ class JournalføringHendelseServiceTest {
         } returns "12345678910"
 
         every {
-            sakClient.hentRestFagsakDeltagerListe(any(), emptyList())
+            baSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
         } returns listOf(RestFagsakDeltager("12345678910", FORELDER, 1L, LØPENDE))
 
         every {
@@ -368,7 +368,8 @@ class JournalføringHendelseServiceTest {
 
     @Test
     fun `Ikke gyldige hendelsetyper skal ignoreres`() {
-        val ugyldigHendelsetypeRecord = opprettRecord(journalpostId = JOURNALPOST_PAPIRSØKNAD, hendelseType = "UgyldigType", temaNytt = "BAR")
+        val ugyldigHendelsetypeRecord =
+            opprettRecord(journalpostId = JOURNALPOST_PAPIRSØKNAD, hendelseType = "UgyldigType", temaNytt = "BAR")
         val consumerRecord = ConsumerRecord(
             "topic",
             1,

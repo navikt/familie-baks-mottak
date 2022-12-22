@@ -6,6 +6,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.baks.mottak.hendelser.JournalføringHendelseServiceTest
+import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.BARN
@@ -19,7 +20,6 @@ import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
-import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.prosessering.domene.Task
@@ -36,14 +36,14 @@ class SkanHendelseTaskLøypeTest {
 
     private val mockJournalpostClient: JournalpostClient = mockk()
     private val mockOppgaveClient: OppgaveClient = mockk()
-    private val mockSakClient: SakClient = mockk()
+    private val mockBaSakClient: BaSakClient = mockk()
     private val mockTaskService: TaskService = mockk(relaxed = true)
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
 
-    private val rutingSteg = JournalhendelseRutingTask(
+    private val rutingSteg = JournalhendelseBarnetrygdRutingTask(
         mockPdlClient,
-        mockSakClient,
+        mockBaSakClient,
         mockInfotrygdBarnetrygdClient,
         mockTaskService
     )
@@ -85,7 +85,7 @@ class SkanHendelseTaskLøypeTest {
         } returns "12345678910"
 
         every {
-            mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
+            mockBaSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
         } returns emptyList()
 
         every {
@@ -105,7 +105,7 @@ class SkanHendelseTaskLøypeTest {
         } returns OppgaveResponse(1)
 
         every {
-            mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
+            mockBaSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
         } returns listOf(RestFagsakDeltager("12345678910", FORELDER, 1L, LØPENDE))
 
         kjørRutingTaskOgReturnerNesteTask().run {
@@ -122,7 +122,7 @@ class SkanHendelseTaskLøypeTest {
         } returns OppgaveResponse(1)
 
         every {
-            mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
+            mockBaSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
         } returns listOf(RestFagsakDeltager("12345678910", BARN, 1L, LØPENDE))
 
         kjørRutingTaskOgReturnerNesteTask().run {
@@ -196,7 +196,7 @@ class SkanHendelseTaskLøypeTest {
     private fun kjørRutingTaskOgReturnerNesteTask(brukerId: String? = "12345678901"): Task {
         rutingSteg.doTask(
             Task(
-                type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+                type = JournalhendelseBarnetrygdRutingTask.TASK_STEP_TYPE,
                 payload = MOTTAK_KANAL
             ).apply {
                 if (brukerId != null) {

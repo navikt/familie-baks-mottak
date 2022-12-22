@@ -4,8 +4,8 @@ import io.mockk.clearAllMocks
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
+import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
-import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
@@ -18,7 +18,7 @@ import org.springframework.kafka.support.Acknowledgment
 class EnsligForsørgerVedtakHendelseConsumerTest {
 
     lateinit var mockHendelsesloggRepository: HendelsesloggRepository
-    lateinit var mockSakClient: SakClient
+    lateinit var mockBaSakClient: BaSakClient
     lateinit var mockPdlClient: PdlClient
     lateinit var service: EnsligForsørgerHendelseService
 
@@ -27,9 +27,9 @@ class EnsligForsørgerVedtakHendelseConsumerTest {
     @BeforeEach
     internal fun setUp() {
         mockHendelsesloggRepository = mockk(relaxed = true)
-        mockSakClient = mockk(relaxed = true)
+        mockBaSakClient = mockk(relaxed = true)
         mockPdlClient = mockk(relaxed = true)
-        service = EnsligForsørgerHendelseService(mockSakClient, mockPdlClient, mockHendelsesloggRepository)
+        service = EnsligForsørgerHendelseService(mockBaSakClient, mockPdlClient, mockHendelsesloggRepository)
         consumer = EnsligForsørgerVedtakHendelseConsumer(service)
         clearAllMocks()
     }
@@ -37,10 +37,16 @@ class EnsligForsørgerVedtakHendelseConsumerTest {
     @Test
     fun `Skal lese melding, konvertere, sende til ba-sak og ACKe melding `() {
         val ack: Acknowledgment = mockk(relaxed = true)
-        val consumerRecord = ConsumerRecord("topic", 1, 1, "42", """{"behandlingId":42,"personIdent":"12345678910","stønadType":"OVERGANGSSTØNAD"}""")
+        val consumerRecord = ConsumerRecord(
+            "topic",
+            1,
+            1,
+            "42",
+            """{"behandlingId":42,"personIdent":"12345678910","stønadType":"OVERGANGSSTØNAD"}"""
+        )
         consumer.listen(consumerRecord, ack)
         verify(exactly = 1) {
-            mockSakClient.sendVedtakOmOvergangsstønadHendelseTilSak("12345678910")
+            mockBaSakClient.sendVedtakOmOvergangsstønadHendelseTilSak("12345678910")
         }
         verify(exactly = 1) { ack.acknowledge() }
     }

@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.config.FeatureToggleConfig
 import no.nav.familie.baks.mottak.config.FeatureToggleService
+import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingUnderkategori
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.BARN
@@ -20,7 +21,6 @@ import no.nav.familie.baks.mottak.integrasjoner.RestFagsak
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakIdOgTilknyttetAktørId
 import no.nav.familie.baks.mottak.integrasjoner.RestUtvidetBehandling
-import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.baks.mottak.integrasjoner.Sivilstand
 import no.nav.familie.baks.mottak.task.VurderLivshendelseType.DØDSFALL
 import no.nav.familie.baks.mottak.task.VurderLivshendelseType.SIVILSTAND
@@ -55,7 +55,7 @@ import java.util.Locale
 class VurderLivshendelseTask(
     private val oppgaveClient: OppgaveClient,
     private val pdlClient: PdlClient,
-    private val sakClient: SakClient,
+    private val baSakClient: BaSakClient,
     private val infotrygdClient: InfotrygdBarnetrygdClient,
     private val featureToggleService: FeatureToggleService
 ) : AsyncTaskStep {
@@ -79,7 +79,11 @@ class VurderLivshendelseTask(
                     secureLog.info("Har mottatt dødsfallshendelse uten dødsdato $pdlPersonData")
                     error("Har mottatt dødsfallshendelse uten dødsdato")
                 }
-                if (featureToggleService.isEnabled(FeatureToggleConfig.NY_MÅTE_Å_FINNE_BERØRTE_FAGSAKER_VED_LEESAH_HENDELSER, false)) {
+                if (featureToggleService.isEnabled(
+                        FeatureToggleConfig.NY_MÅTE_Å_FINNE_BERØRTE_FAGSAKER_VED_LEESAH_HENDELSER,
+                        false
+                    )
+                ) {
                     val berørteBrukereIBaSak = finnBrukereBerørtAvDødsfallEllerUtflyttingHendelseForIdent(personIdent)
                     secureLog.info(
                         "berørteBrukereIBaSak count = ${berørteBrukereIBaSak.size}, aktørIder = ${
@@ -119,8 +123,13 @@ class VurderLivshendelseTask(
                     }
                 }
             }
+
             UTFLYTTING -> {
-                if (featureToggleService.isEnabled(FeatureToggleConfig.NY_MÅTE_Å_FINNE_BERØRTE_FAGSAKER_VED_LEESAH_HENDELSER, false)) {
+                if (featureToggleService.isEnabled(
+                        FeatureToggleConfig.NY_MÅTE_Å_FINNE_BERØRTE_FAGSAKER_VED_LEESAH_HENDELSER,
+                        false
+                    )
+                ) {
                     finnBrukereBerørtAvDødsfallEllerUtflyttingHendelseForIdent(personIdent).forEach {
                         if (opprettEllerOppdaterVurderLivshendelseOppgave(
                                 hendelseType = UTFLYTTING,
@@ -149,6 +158,7 @@ class VurderLivshendelseTask(
                     }
                 }
             }
+
             SIVILSTAND -> {
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-sivilstand")
                 val sivilstand = finnNyesteSivilstandEndring(pdlPersonData) ?: run {
@@ -159,9 +169,18 @@ class VurderLivshendelseTask(
                     secureLog.info("Endringen til sivilstand GIFT for $personIdent er korrigert/annulert: $pdlPersonData")
                     return
                 }
-                if (featureToggleService.isEnabled(FeatureToggleConfig.NY_MÅTE_Å_FINNE_BERØRTE_FAGSAKER_VED_LEESAH_HENDELSER, false)) {
+                if (featureToggleService.isEnabled(
+                        FeatureToggleConfig.NY_MÅTE_Å_FINNE_BERØRTE_FAGSAKER_VED_LEESAH_HENDELSER,
+                        false
+                    )
+                ) {
                     finnBrukereBerørtAvSivilstandHendelseForIdent(personIdent).forEach {
-                        if (sjekkOmDatoErEtterEldsteVedtaksdato(dato = sivilstand.dato!!, aktivFaksak = hentRestFagsak(it.fagsakId), personIdent = personIdent)) { // Trenger denne sjekken for å unngå "gamle" hendelser som feks kan skyldes innflytting
+                        if (sjekkOmDatoErEtterEldsteVedtaksdato(
+                                dato = sivilstand.dato!!,
+                                aktivFaksak = hentRestFagsak(it.fagsakId),
+                                personIdent = personIdent
+                            )
+                        ) { // Trenger denne sjekken for å unngå "gamle" hendelser som feks kan skyldes innflytting
                             opprettEllerOppdaterEndringISivilstandOppgave(
                                 endringsdato = sivilstand.dato!!,
                                 fagsakIdForOppgave = it.fagsakId,
@@ -172,7 +191,7 @@ class VurderLivshendelseTask(
                         }
                     }
                 } else {
-                    val aktivFaksak = sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
+                    val aktivFaksak = baSakClient.hentRestFagsakDeltagerListe(personIdent).filter {
                         secureLog.info("Hentet Fagsak for person $personIdent: ${it.fagsakId} ${it.fagsakStatus}")
                         it.fagsakStatus == LØPENDE
                     }.singleOrNull()?.let { hentRestFagsak(it.fagsakId) }
@@ -191,11 +210,16 @@ class VurderLivshendelseTask(
                     }
                 }
             }
+
             else -> log.debug("Behandlinger enda ikke livshendelse av type ${payload.type}")
         }
     }
 
-    private fun sjekkOmDatoErEtterEldsteVedtaksdato(dato: LocalDate, aktivFaksak: RestFagsak, personIdent: String): Boolean {
+    private fun sjekkOmDatoErEtterEldsteVedtaksdato(
+        dato: LocalDate,
+        aktivFaksak: RestFagsak,
+        personIdent: String
+    ): Boolean {
         val tidligsteVedtakIBaSak = aktivFaksak.behandlinger
             .filter { it.resultat == RESULTAT_INNVILGET && it.steg == STEG_TYPE_BEHANDLING_AVSLUTTET }
             .minByOrNull { it.opprettetTidspunkt } ?: return false
@@ -252,7 +276,7 @@ class VurderLivshendelseTask(
         }
 
         if (personHarBarn) {
-            brukereMedSakRelatertTilPerson += sakClient.hentRestFagsakDeltagerListe(personIdent).filter {
+            brukereMedSakRelatertTilPerson += baSakClient.hentRestFagsakDeltagerListe(personIdent).filter {
                 secureLog.info("finnBrukereMedSakRelatertTilPerson(): Hentet Fagsak for person $personIdent: ${it.fagsakId} ${it.fagsakStatus}")
                 it.fagsakStatus == LØPENDE
             }.map { Bruker(personIdent, it.fagsakId) }
@@ -275,8 +299,9 @@ class VurderLivshendelseTask(
         return brukereMedSakRelatertTilPerson
     }
 
-    private fun personErBarn(pdlPersonData: PdlPersonData) = pdlPersonData.fødsel.isEmpty() || // Kan anta barn når data mangler
-        pdlPersonData.fødsel.first().fødselsdato.isAfter(LocalDate.now().minusYears(19))
+    private fun personErBarn(pdlPersonData: PdlPersonData) =
+        pdlPersonData.fødsel.isEmpty() || // Kan anta barn når data mangler
+            pdlPersonData.fødsel.first().fødselsdato.isAfter(LocalDate.now().minusYears(19))
 
     private fun finnForeldreMedLøpendeSak(
         personIdent: String,
@@ -289,7 +314,7 @@ class VurderLivshendelseTask(
             )
         }.mapNotNull { forelder ->
             forelder.relatertPersonsIdent?.let {
-                sakClient.hentRestFagsakDeltagerListe(it, barnasIdenter = listOf(personIdent))
+                baSakClient.hentRestFagsakDeltagerListe(it, barnasIdenter = listOf(personIdent))
                     .filter { it.fagsakStatus == LØPENDE }
                     .groupBy { it.fagsakId }.values
                     .firstOrNull { it.inneholderBådeForelderOgBarn }
@@ -301,15 +326,17 @@ class VurderLivshendelseTask(
     private fun finnBrukereBerørtAvDødsfallEllerUtflyttingHendelseForIdent(
         personIdent: String
     ): List<RestFagsakIdOgTilknyttetAktørId> {
-        val listeMedFagsakIdOgTilknyttetAktør = sakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(personIdent)
-        secureLog.info("Aktører og fagsaker berørt av hendelse for personIdent=$personIdent: ${listeMedFagsakIdOgTilknyttetAktør.map { "(aktørId=${it.aktørId}, fagsakId=${it.fagsakId}),"}}")
+        val listeMedFagsakIdOgTilknyttetAktør =
+            baSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(personIdent)
+        secureLog.info("Aktører og fagsaker berørt av hendelse for personIdent=$personIdent: ${listeMedFagsakIdOgTilknyttetAktør.map { "(aktørId=${it.aktørId}, fagsakId=${it.fagsakId})," }}")
         return listeMedFagsakIdOgTilknyttetAktør
     }
 
     private fun finnBrukereBerørtAvSivilstandHendelseForIdent(
         personIdent: String
     ): List<RestFagsakIdOgTilknyttetAktørId> {
-        val listeMedFagsakIdOgTilknyttetAktørId = sakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(personIdent)
+        val listeMedFagsakIdOgTilknyttetAktørId =
+            baSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(personIdent)
         secureLog.info("Aktører og fagsaker berørt av hendelse for personIdent=$personIdent: ${listeMedFagsakIdOgTilknyttetAktørId.map { "(aktørId=${it.aktørId}, fagsakId=${it.fagsakId})," }}")
         return listeMedFagsakIdOgTilknyttetAktørId
     }
@@ -356,7 +383,11 @@ class VurderLivshendelseTask(
         }
     }
 
-    private fun hentInitiellBeskrivelseForSivilstandOppgave(personErBruker: Boolean, formatertDato: String, personIdent: String): String =
+    private fun hentInitiellBeskrivelseForSivilstandOppgave(
+        personErBruker: Boolean,
+        formatertDato: String,
+        personIdent: String
+    ): String =
         "${SIVILSTAND.beskrivelse}: ${if (personErBruker) "bruker" else "barn $personIdent"} er registrert som gift fra $formatertDato"
 
     private fun opprettEllerOppdaterEndringISivilstandOppgave(
@@ -393,20 +424,31 @@ class VurderLivshendelseTask(
                 oppgaveOpprettetSivilstandCounter.increment()
                 task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
             }
+
             is Oppgave -> {
                 log.info("Fant åpen oppgave på aktørId=$aktørIdForOppgave oppgaveId=${oppgave.id}")
                 secureLog.info("Fant åpen oppgave: $oppgave")
-                oppdaterOppgaveMedNyBeskrivelse(oppgave = oppgave, beskrivelse = "${SIVILSTAND.beskrivelse}: Bruker eller barn er registrert som gift")
+                oppdaterOppgaveMedNyBeskrivelse(
+                    oppgave = oppgave,
+                    beskrivelse = "${SIVILSTAND.beskrivelse}: Bruker eller barn er registrert som gift"
+                )
                 task.metadata["oppgaveId"] = oppgave.id.toString()
                 task.metadata["info"] = "Fant åpen oppgave"
             }
         }
     }
 
-    private fun leggTilNyPersonIBeskrivelse(beskrivelse: String, personIdent: String, personErBruker: Boolean?): String {
+    private fun leggTilNyPersonIBeskrivelse(
+        beskrivelse: String,
+        personIdent: String,
+        personErBruker: Boolean?
+    ): String {
         return when (personErBruker) {
             true -> if (!beskrivelse.contains("bruker")) leggTilBrukerIBeskrivelse(beskrivelse) else beskrivelse
-            else -> if (!beskrivelse.contains(personIdent)) leggTilBarnIBeskrivelse(beskrivelse, personIdent) else beskrivelse
+            else -> if (!beskrivelse.contains(personIdent)) leggTilBarnIBeskrivelse(
+                beskrivelse,
+                personIdent
+            ) else beskrivelse
         }
     }
 
@@ -471,7 +513,7 @@ class VurderLivshendelseTask(
     }
 
     private fun hentRestFagsak(fagsakId: Long): RestFagsak {
-        return sakClient.hentRestFagsak(fagsakId).also {
+        return baSakClient.hentRestFagsak(fagsakId).also {
             secureLog.info("Hentet rest fagsak: $it")
         }
     }

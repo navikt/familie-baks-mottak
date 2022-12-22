@@ -2,7 +2,7 @@ package no.nav.familie.baks.mottak.hendelser
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.baks.mottak.integrasjoner.SakClient
+import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.kontrakter.felles.PersonIdent
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.person.pdl.aktor.v2.Aktor
@@ -25,7 +25,7 @@ import javax.transaction.Transactional
     matchIfMissing = true
 )
 class IdenthendelseConsumer(
-    private val sakClient: SakClient
+    private val baSakClient: BaSakClient
 ) {
 
     val identhendelseFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.ident.feilet")
@@ -56,7 +56,7 @@ class IdenthendelseConsumer(
             }?.also { folkeregisterident ->
                 SECURE_LOGGER.info("Sender ident-hendelse til ba-sak for ident $folkeregisterident")
 
-                sakClient.sendIdenthendelseTilSak(PersonIdent(ident = folkeregisterident.idnummer.toString()))
+                baSakClient.sendIdenthendelseTilSak(PersonIdent(ident = folkeregisterident.idnummer.toString()))
             }
         } catch (e: RuntimeException) {
             identhendelseFeiletCounter.increment()
