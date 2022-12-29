@@ -3,6 +3,8 @@ package no.nav.familie.baks.mottak.søknad.kontantstøtte.domene
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.Vedlegg
 import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
+import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsvedlegg
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -17,7 +19,11 @@ import javax.persistence.Table
 data class DBKontantstøtteSøknad(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "kontantstotte_soknad_seq_generator")
-    @SequenceGenerator(name = "kontantstotte_soknad_seq_generator", sequenceName = "kontantstotte_soknad_seq", allocationSize = 50)
+    @SequenceGenerator(
+        name = "kontantstotte_soknad_seq_generator",
+        sequenceName = "kontantstotte_soknad_seq",
+        allocationSize = 50
+    )
     val id: Long = 0,
     @Column(name = "soknad_json")
     val søknadJson: String,

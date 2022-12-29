@@ -2,12 +2,11 @@ package no.nav.familie.baks.mottak.søknad
 
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadService
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.Dokumentasjonsbehov
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.FødselsnummerErNullException
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknad
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.Søknaddokumentasjon
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.Søknadsvedlegg
 import no.nav.familie.kontrakter.felles.Ressurs
+import no.nav.familie.kontrakter.ks.søknad.v1.Dokumentasjonsbehov
+import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
+import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
@@ -87,7 +86,7 @@ class KontantstøtteSøknadController(
                     dokumentasjonsbehov = dokumentasjonsbehovUtenAnnenDokumentasjon
                 )
             }
-            val alleVedlegg: List<Søknadsvedlegg> = dokumentasjon.map { it.opplastedeVedlegg }.flatten()
+            val alleVedlegg = dokumentasjon.map { it.opplastedeVedlegg }.flatten()
             if (alleVedlegg.isNotEmpty()) {
                 søknadHarVedlegg.increment()
                 antallVedlegg.increment(alleVedlegg.size.toDouble())

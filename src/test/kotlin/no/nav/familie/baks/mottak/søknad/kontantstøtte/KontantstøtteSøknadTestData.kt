@@ -1,9 +1,9 @@
 package no.nav.familie.baks.mottak.søknad.kontantstøtte
 
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknad
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.SIVILSTANDTYPE
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.Søker
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.Søknadsfelt
+import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
+import no.nav.familie.kontrakter.ks.søknad.v1.SIVILSTANDTYPE
+import no.nav.familie.kontrakter.ks.søknad.v1.Søker
+import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsfelt
 
 fun <T> søknadsfelt(label: String, verdi: T): Søknadsfelt<T> {
     return Søknadsfelt(label = mapOf("nb" to label), verdi = mapOf("nb" to verdi))

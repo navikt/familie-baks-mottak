@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.Barn
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknad
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.Søknaddokumentasjon
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.Søknadsfelt
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.TekstPåSpråkMap
 import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.kontrakter.ks.søknad.v1.Barn
+import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
+import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
+import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsfelt
+import no.nav.familie.kontrakter.ks.søknad.v1.TekstPåSpråkMap
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import kotlin.test.assertEquals
