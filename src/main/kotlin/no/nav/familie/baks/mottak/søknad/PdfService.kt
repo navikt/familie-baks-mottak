@@ -6,8 +6,8 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
+import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -22,12 +22,14 @@ class PdfService(
 ) {
 
     fun lagBarnetrygdPdf(versjonertSøknad: VersjonertSøknad, dbSøknad: DBSøknad, språk: String = "nb"): ByteArray {
-        val barnetrygdSøknadMapForSpråk = søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(versjonertSøknad, språk)
+        val barnetrygdSøknadMapForSpråk =
+            søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(versjonertSøknad, språk)
 
         val (søknadstype, navn) = when (versjonertSøknad) {
             is SøknadV7 -> {
                 Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.søker.navn)
             }
+
             is SøknadV8 -> {
                 Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.søker.navn)
             }
@@ -46,8 +48,13 @@ class PdfService(
         return pdfClient.lagPdf(barnetrygdSøknadMapForSpråk + ekstraFelterMap, path)
     }
 
-    fun lagKontantstøttePdf(kontantstøtteSøknad: KontantstøtteSøknad, dbKontantstøtteSøknad: DBKontantstøtteSøknad, språk: String = "nb"): ByteArray {
-        val kontantstøtteSøknadMapForSpråk = søknadSpråkvelgerService.konverterKontantstøtteSøknadTilMapForSpråk(kontantstøtteSøknad, språk)
+    fun lagKontantstøttePdf(
+        kontantstøtteSøknad: KontantstøtteSøknad,
+        dbKontantstøtteSøknad: DBKontantstøtteSøknad,
+        språk: String = "nb"
+    ): ByteArray {
+        val kontantstøtteSøknadMapForSpråk =
+            søknadSpråkvelgerService.konverterKontantstøtteSøknadTilMapForSpråk(kontantstøtteSøknad, språk)
 
         val ekstraFelterMap = hentEkstraFelter(
             navn = kontantstøtteSøknad.søker.navn.verdi.getValue("nb"),
