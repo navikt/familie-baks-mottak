@@ -2,13 +2,11 @@ package no.nav.familie.baks.mottak.søknad
 
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadService
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.Dokumentasjonsbehov
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.FødselsnummerErNullException
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknad
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.Søknaddokumentasjon
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.Søknadsvedlegg
 import no.nav.familie.kontrakter.felles.Ressurs
-import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.familie.kontrakter.ks.søknad.v1.Dokumentasjonsbehov
+import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
+import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
@@ -21,7 +19,8 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping(path = ["/api/kontantstotte/"], produces = [APPLICATION_JSON_VALUE])
-@ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
+// @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
+@Unprotected
 class KontantstøtteSøknadController(
     private val kontantstøtteSøknadService: KontantstøtteSøknadService
 ) {
@@ -87,7 +86,7 @@ class KontantstøtteSøknadController(
                     dokumentasjonsbehov = dokumentasjonsbehovUtenAnnenDokumentasjon
                 )
             }
-            val alleVedlegg: List<Søknadsvedlegg> = dokumentasjon.map { it.opplastedeVedlegg }.flatten()
+            val alleVedlegg = dokumentasjon.map { it.opplastedeVedlegg }.flatten()
             if (alleVedlegg.isNotEmpty()) {
                 søknadHarVedlegg.increment()
                 antallVedlegg.increment(alleVedlegg.size.toDouble())
