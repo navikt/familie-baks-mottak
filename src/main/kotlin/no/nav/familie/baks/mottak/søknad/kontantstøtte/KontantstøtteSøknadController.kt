@@ -7,6 +7,7 @@ import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.ks.søknad.v1.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
+import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
@@ -19,8 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping(path = ["/api/kontantstotte/"], produces = [APPLICATION_JSON_VALUE])
-// @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
-@Unprotected
+@ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 class KontantstøtteSøknadController(
     private val kontantstøtteSøknadService: KontantstøtteSøknadService
 ) {
