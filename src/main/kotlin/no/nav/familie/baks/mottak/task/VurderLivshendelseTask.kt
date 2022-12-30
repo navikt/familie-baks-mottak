@@ -445,10 +445,14 @@ class VurderLivshendelseTask(
     ): String {
         return when (personErBruker) {
             true -> if (!beskrivelse.contains("bruker")) leggTilBrukerIBeskrivelse(beskrivelse) else beskrivelse
-            else -> if (!beskrivelse.contains(personIdent)) leggTilBarnIBeskrivelse(
-                beskrivelse,
-                personIdent
-            ) else beskrivelse
+            else -> if (!beskrivelse.contains(personIdent)) {
+                leggTilBarnIBeskrivelse(
+                    beskrivelse,
+                    personIdent
+                )
+            } else {
+                beskrivelse
+            }
         }
     }
 
