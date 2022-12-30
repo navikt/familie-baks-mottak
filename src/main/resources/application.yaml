@@ -77,6 +77,7 @@ FAMILIE_BA_DOKGEN_API_URL: http://familie-ba-dokgen.default
 FAMILIE_INTEGRASJONER_API_URL: https://familie-integrasjoner.prod-fss-pub.nais.io/api
 FAMILIE_DOKUMENT_API_URL: http://familie-dokument
 FAMILIE_BA_INFOTRYGD_API_URL: http://familie-ba-infotrygd
+FAMILIE_KS_INFOTRYGD_API_URL: http://familie-ks-infotrygd
 STS_URL: http://security-token-service.default.svc.nais.local/rest/v1/sts/token
 PDL_URL: http://pdl-api.pdl
 ACCEPTEDAUDIENCE: dummy
