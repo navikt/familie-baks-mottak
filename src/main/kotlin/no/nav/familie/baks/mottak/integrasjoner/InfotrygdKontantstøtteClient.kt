@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
+import org.springframework.web.client.postForObject
 import java.net.URI
 import java.time.YearMonth
 
@@ -21,7 +22,12 @@ class InfotrygdKontantstøtteClient(
         barnasIdenter: List<String>
     ): Boolean {
         return infotrygdResponseFra(
-            request = postForEntity(uri("harLøpendeKontantstotteIInfotrygd"), InnsynRequest(barnasIdenter)),
+            request = {
+                operations.postForObject(
+                    uri("harLøpendeKontantstotteIInfotrygd"),
+                    InnsynRequest(barnasIdenter)
+                )
+            },
             onFailure = { ex ->
                 IntegrasjonException(
                     "Feil ved søk etter stønad i infotrygd.",
