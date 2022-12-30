@@ -1,5 +1,6 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
+import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.familie.http.client.AbstractRestClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -81,4 +82,4 @@ data class BarnDto(
     val fnr: Foedselsnummer
 )
 
-data class Foedselsnummer(val asString: String)
+data class Foedselsnummer(@get:JsonValue val asString: String)
