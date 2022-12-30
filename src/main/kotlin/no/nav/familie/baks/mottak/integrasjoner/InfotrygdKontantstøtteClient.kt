@@ -12,7 +12,7 @@ import java.time.YearMonth
 @Service
 class InfotrygdKontantstøtteClient(
     @Qualifier("clientCredentials") restOperations: RestOperations,
-    @Value("FAMILIE_KS_INFOTRYGD_API_URL") private val clientUri: URI,
+    @Value("\${FAMILIE_KS_INFOTRYGD_API_URL}/api") private val clientUri: URI,
     private val environment: Environment
 ) :
     AbstractRestClient(restOperations, "familie-ks-infotrygd") {
