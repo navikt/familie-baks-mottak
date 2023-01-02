@@ -2,6 +2,8 @@ package no.nav.familie.baks.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
+import no.nav.familie.baks.mottak.config.FeatureToggleConfig
+import no.nav.familie.baks.mottak.config.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.Identgruppe
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdKontantstøtteClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
@@ -24,34 +26,37 @@ import java.time.YearMonth
 class JournalhendelseKontantstøtteRutingTask(
     private val pdlClient: PdlClient,
     private val infotrygdKontantstøtteClient: InfotrygdKontantstøtteClient,
-    private val taskService: TaskService
+    private val taskService: TaskService,
+    private val featureToggleService: FeatureToggleService
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(JournalhendelseKontantstøtteRutingTask::class.java)
     val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
 
     override fun doTask(task: Task) {
-        val brukersIdent = task.metadata["personIdent"] as String?
+        if (featureToggleService.isEnabled(FeatureToggleConfig.OPPRETTE_JOURNALFØRINGSOPPGAVE_KONTANTSTØTTE, false)) {
+            val brukersIdent = task.metadata["personIdent"] as String?
 
-        val harLøpendeSakIInfotrygd = brukersIdent?.run { søkEtterSakIInfotrygd(this) } ?: false
+            val harLøpendeSakIInfotrygd = brukersIdent?.run { søkEtterSakIInfotrygd(this) } ?: false
 
-        val sakssystemMarkering = when {
-            harLøpendeSakIInfotrygd -> {
-                incrementSakssystemMarkering("Infotrygd")
-                "Et eller flere av barna har løpende sak i Infotrygd"
+            val sakssystemMarkering = when {
+                harLøpendeSakIInfotrygd -> {
+                    incrementSakssystemMarkering("Infotrygd")
+                    "Et eller flere av barna har løpende sak i Infotrygd"
+                }
+
+                else -> {
+                    incrementSakssystemMarkering("Ingen")
+                    ""
+                }
             }
 
-            else -> {
-                incrementSakssystemMarkering("Ingen")
-                ""
-            }
+            Task(
+                type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
+                payload = sakssystemMarkering,
+                properties = task.metadata
+            ).apply { taskService.save(this) }
         }
-
-        Task(
-            type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
-            payload = sakssystemMarkering,
-            properties = task.metadata
-        ).apply { taskService.save(this) }
     }
 
     private fun incrementSakssystemMarkering(saksystem: String) {
@@ -80,6 +85,7 @@ class JournalhendelseKontantstøtteRutingTask(
 
     companion object {
         const val TASK_STEP_TYPE = "journalhendelseKontantstøtteRuting"
+        val logger = LoggerFactory.getLogger(this::class.java)
     }
 }
 
