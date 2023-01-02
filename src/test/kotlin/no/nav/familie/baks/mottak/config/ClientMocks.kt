@@ -5,6 +5,7 @@ import io.mockk.mockk
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.DokarkivClient
+import no.nav.familie.baks.mottak.integrasjoner.DokumentInfo
 import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.Journalposttype
@@ -96,6 +97,26 @@ class ClientMocks {
             bruker = Bruker("12345678901", BrukerIdType.FNR),
             tema = "BAR",
             kanal = "SKAN_NETS"
+        )
+
+        every { mockJournalpostClient.hentJournalpost("456") } returns Journalpost(
+            journalpostId = "1456",
+            journalposttype = Journalposttype.I,
+            journalstatus = Journalstatus.MOTTATT,
+            bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+            tema = "KON",
+            kanal = "NO_NAV",
+            behandlingstema = null,
+            dokumenter = listOf(
+                DokumentInfo(
+                    tittel = "Søknad om kontantstøtte til småbarnsforeldre",
+                    brevkode = "34-00.08",
+                    dokumentstatus = null,
+                    dokumentvarianter = emptyList()
+                )
+            ),
+            journalforendeEnhet = null,
+            sak = null
         )
 
         return mockJournalpostClient

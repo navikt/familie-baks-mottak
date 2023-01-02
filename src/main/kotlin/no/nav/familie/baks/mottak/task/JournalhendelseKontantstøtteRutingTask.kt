@@ -85,7 +85,6 @@ class JournalhendelseKontantstøtteRutingTask(
 
     companion object {
         const val TASK_STEP_TYPE = "journalhendelseKontantstøtteRuting"
-        val logger = LoggerFactory.getLogger(this::class.java)
     }
 }
 
