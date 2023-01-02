@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.baks.mottak.DevLauncher
 import no.nav.familie.kontrakter.felles.Behandlingstema
+import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveIdentV2
@@ -11,6 +12,7 @@ import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -468,5 +470,68 @@ class OppgaveMapperTest(
                 )
         )
         assertThat(oppgave.ident).isEqualTo(OppgaveIdentV2("900000000", IdentGruppe.ORGNR))
+    }
+
+    @Test
+    fun `skal kaste feil dersom tema ikke er satt`() {
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
+        val exception = assertThrows<RuntimeException> {
+            oppgaveMapper.mapTilOpprettOppgave(
+                Oppgavetype.Journalføring,
+                journalpostClient.hentJournalpost("456")
+                    .copy(
+                        tema = null
+                    )
+            )
+        }
+        assertEquals(
+            "Feil ved mapping til OpprettOppgaveRequest. Tema for journalpost er tomt eller ugyldig: ${null}",
+            exception.message
+        )
+    }
+
+    @Test
+    fun `skal kaste feil dersom tema ikke er finnes i Tema enum`() {
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
+        val exception = assertThrows<RuntimeException> {
+            oppgaveMapper.mapTilOpprettOppgave(
+                Oppgavetype.Journalføring,
+                journalpostClient.hentJournalpost("456")
+                    .copy(
+                        tema = "UGYLDIG"
+                    )
+            )
+        }
+        assertEquals(
+            "Feil ved mapping til OpprettOppgaveRequest. Tema for journalpost er tomt eller ugyldig: UGYLDIG",
+            exception.message
+        )
+    }
+
+    @Test
+    fun `skal sette riktig tema og behandlingstema på OpprettOppgaveRequest for kontantstøtte`() {
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
+        val opprettOppgaveRequest = oppgaveMapper.mapTilOpprettOppgave(
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("456")
+        )
+        assertEquals(Tema.KON, opprettOppgaveRequest.tema)
+        assertEquals(Behandlingstema.Kontantstøtte.value, opprettOppgaveRequest.behandlingstema)
+    }
+
+    @Test
+    fun `skal sette behandlingstema KontantstøtteEØS dersom tema er KON og bruker id er Dnummer`() {
+        val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
+        val opprettOppgaveRequest = oppgaveMapper.mapTilOpprettOppgave(
+            Oppgavetype.Journalføring,
+            journalpostClient.hentJournalpost("456").copy(
+                bruker = Bruker(
+                    id = "42345678910",
+                    type = BrukerIdType.FNR
+                )
+            )
+        )
+        assertEquals(Tema.KON, opprettOppgaveRequest.tema)
+        assertEquals(Behandlingstema.KontantstøtteEØS.value, opprettOppgaveRequest.behandlingstema)
     }
 }

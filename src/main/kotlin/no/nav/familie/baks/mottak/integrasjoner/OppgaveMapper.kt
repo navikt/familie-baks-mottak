@@ -28,8 +28,12 @@ class OppgaveMapper(
         beskrivelse: String? = null
     ): OpprettOppgaveRequest {
         val ident = tilOppgaveIdent(journalpost, oppgavetype)
-        val tema = journalpost.tema?.let { Tema.valueOf(it) }
-            ?: throw RuntimeException("Feil ved mapping til OpprettOppgaveRequest. Tema for journalpost er tomt eller ugyldig: ${journalpost.tema}")
+        val tema = runCatching { Tema.valueOf(journalpost.tema!!) }.getOrElse { exception ->
+            throw RuntimeException(
+                "Feil ved mapping til OpprettOppgaveRequest. Tema for journalpost er tomt eller ugyldig: ${journalpost.tema}",
+                exception
+            )
+        }
         return OpprettOppgaveRequest(
             ident = ident,
             saksId = journalpost.sak?.fagsakId,
