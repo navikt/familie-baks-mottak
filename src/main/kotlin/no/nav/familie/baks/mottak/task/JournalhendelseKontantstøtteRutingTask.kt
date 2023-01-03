@@ -73,7 +73,9 @@ class JournalhendelseKontantstøtteRutingTask(
 
         return if (infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(alleBarnasIdenter)) {
             infotrygdKontantstøtteClient.hentPerioderMedKontantstøtteIInfotrygd(alleBarnasIdenter).data.harPågåendeSak()
-        } else false
+        } else {
+            false
+        }
     }
 
     companion object {
