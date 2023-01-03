@@ -10,6 +10,7 @@ import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.Journalposttype
 import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
+import no.nav.familie.baks.mottak.task.JournalhendelseKontantstøtteRutingTask
 import no.nav.familie.baks.mottak.task.JournalhendelseRutingTask
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.log.IdUtils
@@ -180,8 +181,12 @@ class JournalhendelseService(
         GYLDIGE_JOURNALPOST_TEMAER.contains(journalpost.tema) && journalpost.journalposttype == Journalposttype.I
 
     private fun opprettJournalhendelseRutingTask(journalpost: Journalpost) {
+        val taskType = when (journalpost.tema) {
+            Tema.BAR.name -> JournalhendelseRutingTask.TASK_STEP_TYPE
+            else -> JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE
+        }
         Task(
-            type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+            type = taskType,
             payload = journalpost.kanal!!,
             properties = opprettMetadata(journalpost)
         ).apply {
