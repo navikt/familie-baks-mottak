@@ -28,16 +28,18 @@ class OppgaveMapper(
         beskrivelse: String? = null
     ): OpprettOppgaveRequest {
         val ident = tilOppgaveIdent(journalpost, oppgavetype)
+        val tema = journalpost.tema?.let { Tema.valueOf(it) }
+            ?: throw RuntimeException("Feil ved mapping til OpprettOppgaveRequest. Tema for journalpost er tomt eller ugyldig: ${journalpost.tema}")
         return OpprettOppgaveRequest(
             ident = ident,
             saksId = journalpost.sak?.fagsakId,
             journalpostId = journalpost.journalpostId,
-            tema = Tema.BAR,
+            tema = tema,
             oppgavetype = oppgavetype,
             fristFerdigstillelse = fristFerdigstillelse(),
             beskrivelse = tilBeskrivelse(journalpost, beskrivelse),
             enhetsnummer = utledEnhetsnummer(journalpost),
-            behandlingstema = hentBehandlingstema(journalpost),
+            behandlingstema = hentBehandlingstema(journalpost, tema),
             behandlingstype = hentBehandlingstype(journalpost)
         )
     }
@@ -55,13 +57,22 @@ class OppgaveMapper(
 
         return when (journalpost.bruker?.type) {
             BrukerIdType.FNR -> {
-                hentAktørIdFraPdl(journalpost.bruker.id.trim())?.let { OppgaveIdentV2(ident = it, gruppe = IdentGruppe.AKTOERID) }
+                hentAktørIdFraPdl(journalpost.bruker.id.trim())?.let {
+                    OppgaveIdentV2(
+                        ident = it,
+                        gruppe = IdentGruppe.AKTOERID
+                    )
+                }
                     ?: if (oppgavetype == Oppgavetype.BehandleSak) {
-                        throw IntegrasjonException(msg = "Fant ikke aktørId på person i PDL", ident = journalpost.bruker.id)
+                        throw IntegrasjonException(
+                            msg = "Fant ikke aktørId på person i PDL",
+                            ident = journalpost.bruker.id
+                        )
                     } else {
                         null
                     }
             }
+
             BrukerIdType.ORGNR -> {
                 if (erOrgnr(journalpost.bruker.id.trim())) {
                     OppgaveIdentV2(ident = journalpost.bruker.id.trim(), gruppe = IdentGruppe.ORGNR)
@@ -69,6 +80,7 @@ class OppgaveMapper(
                     null
                 }
             }
+
             BrukerIdType.AKTOERID -> OppgaveIdentV2(ident = journalpost.bruker.id.trim(), gruppe = IdentGruppe.AKTOERID)
             else -> null
         }
@@ -84,16 +96,23 @@ class OppgaveMapper(
         return "${journalpost.hentHovedDokumentTittel().orEmpty()} $bindestrek ${beskrivelse.orEmpty()}".trim()
     }
 
-    private fun hentBehandlingstema(journalpost: Journalpost): String? {
+    private fun hentBehandlingstema(journalpost: Journalpost, tema: Tema): String? {
         if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
 
         if (journalpost.bruker?.type == BrukerIdType.FNR && erDnummer(journalpost.bruker.id)) {
-            return Behandlingstema.BarnetrygdEØS.value
+            return when (tema) {
+                Tema.BAR -> Behandlingstema.BarnetrygdEØS.value
+                else -> Behandlingstema.KontantstøtteEØS.value
+            }
         }
 
         return when (journalpost.dokumenter.firstOrNull { it.brevkode != null }?.brevkode) {
+            // Tilleggsskjema ved krav om utbetaling av barnetrygd og/eller kontantstøtte på grunnlag av regler om eksport etter EØS-avtalen
             "NAV 33-00.15" -> null
-            else -> Behandlingstema.OrdinærBarnetrygd.value
+            else -> when (tema) {
+                Tema.BAR -> Behandlingstema.OrdinærBarnetrygd.value
+                else -> Behandlingstema.Kontantstøtte.value
+            }
         }
     }
 
@@ -118,7 +137,8 @@ class OppgaveMapper(
 
     private fun hentAktørIdFraPdl(brukerId: String): String? {
         return try {
-            pdlClient.hentIdenter(brukerId).filter { it.gruppe == Identgruppe.AKTORID.name && !it.historisk }.lastOrNull()?.ident
+            pdlClient.hentIdenter(brukerId).filter { it.gruppe == Identgruppe.AKTORID.name && !it.historisk }
+                .lastOrNull()?.ident
         } catch (e: IntegrasjonException) {
             null
         }
