@@ -491,7 +491,7 @@ class OppgaveMapperTest(
     }
 
     @Test
-    fun `skal kaste feil dersom tema ikke er finnes i Tema enum`() {
+    fun `skal kaste feil dersom tema ikke finnes i Tema enum`() {
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         val exception = assertThrows<RuntimeException> {
             oppgaveMapper.mapTilOpprettOppgave(
