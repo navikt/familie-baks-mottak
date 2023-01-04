@@ -485,7 +485,7 @@ class OppgaveMapperTest(
             )
         }
         assertEquals(
-            "Feil ved mapping til OpprettOppgaveRequest. Tema for journalpost er tomt eller ugyldig: ${null}",
+            "Tema for journalpost er tomt eller ugyldig: ${null}",
             exception.message
         )
     }
@@ -503,7 +503,7 @@ class OppgaveMapperTest(
             )
         }
         assertEquals(
-            "Feil ved mapping til OpprettOppgaveRequest. Tema for journalpost er tomt eller ugyldig: UGYLDIG",
+            "Tema for journalpost er tomt eller ugyldig: UGYLDIG",
             exception.message
         )
     }
@@ -520,7 +520,7 @@ class OppgaveMapperTest(
     }
 
     @Test
-    fun `skal sette behandlingstema KontantstøtteEØS dersom tema er KON og bruker id er Dnummer`() {
+    fun `skal sette behandlingstype EØS dersom tema er KON og bruker id er Dnummer`() {
         val oppgaveMapper = OppgaveMapper(mockHentEnhetClient, mockPdlClient)
         val opprettOppgaveRequest = oppgaveMapper.mapTilOpprettOppgave(
             Oppgavetype.Journalføring,
@@ -532,6 +532,7 @@ class OppgaveMapperTest(
             )
         )
         assertEquals(Tema.KON, opprettOppgaveRequest.tema)
-        assertEquals(Behandlingstema.KontantstøtteEØS.value, opprettOppgaveRequest.behandlingstema)
+        assertEquals(null, opprettOppgaveRequest.behandlingstema)
+        assertEquals(Behandlingstype.EØS.value, opprettOppgaveRequest.behandlingstype)
     }
 }

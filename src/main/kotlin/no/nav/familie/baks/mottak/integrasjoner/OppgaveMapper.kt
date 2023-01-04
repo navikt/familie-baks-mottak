@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.Locale
 
-private val logger = LoggerFactory.getLogger(OppgaveMapper::class.java)
-
 @Service
 class OppgaveMapper(
     private val hentEnhetClient: HentEnhetClient,
@@ -27,13 +25,9 @@ class OppgaveMapper(
         journalpost: Journalpost,
         beskrivelse: String? = null
     ): OpprettOppgaveRequest {
+        validerJournalpost(journalpost)
         val ident = tilOppgaveIdent(journalpost, oppgavetype)
-        val tema = runCatching { Tema.valueOf(journalpost.tema!!) }.getOrElse { exception ->
-            throw RuntimeException(
-                "Feil ved mapping til OpprettOppgaveRequest. Tema for journalpost er tomt eller ugyldig: ${journalpost.tema}",
-                exception
-            )
-        }
+        val tema = Tema.valueOf(journalpost.tema!!)
         return OpprettOppgaveRequest(
             ident = ident,
             saksId = journalpost.sak?.fagsakId,
@@ -44,7 +38,7 @@ class OppgaveMapper(
             beskrivelse = tilBeskrivelse(journalpost, beskrivelse),
             enhetsnummer = utledEnhetsnummer(journalpost),
             behandlingstema = hentBehandlingstema(journalpost, tema),
-            behandlingstype = hentBehandlingstype(journalpost)
+            behandlingstype = hentBehandlingstype(journalpost, tema)
         )
     }
 
@@ -101,18 +95,17 @@ class OppgaveMapper(
     }
 
     private fun hentBehandlingstema(journalpost: Journalpost, tema: Tema): String? {
-        if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
-
-        if (journalpost.bruker?.type == BrukerIdType.FNR && erDnummer(journalpost.bruker.id)) {
+        if (erEØS(journalpost)) {
+            // Liker ikke at vi må håndtere dette ulikt for barnetrygd og kontantstøtte. Vurdere om vi alltid kan sette behandlingstema = null når søknad er EØS søknad.
             return when (tema) {
                 Tema.BAR -> Behandlingstema.BarnetrygdEØS.value
-                else -> Behandlingstema.KontantstøtteEØS.value
+                else -> null
             }
         }
 
-        return when (journalpost.dokumenter.firstOrNull { it.brevkode != null }?.brevkode) {
+        return when {
             // Tilleggsskjema ved krav om utbetaling av barnetrygd og/eller kontantstøtte på grunnlag av regler om eksport etter EØS-avtalen
-            "NAV 33-00.15" -> null
+            hoveddokumentErEØSTilleggsskjema(journalpost) -> null
             else -> when (tema) {
                 Tema.BAR -> Behandlingstema.OrdinærBarnetrygd.value
                 else -> Behandlingstema.Kontantstøtte.value
@@ -120,9 +113,13 @@ class OppgaveMapper(
         }
     }
 
-    private fun hentBehandlingstype(journalpost: Journalpost): String? {
-        if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
-        return if (journalpost.dokumenter.any { it.brevkode == "NAV 33-00.15" }) Behandlingstype.Utland.value else null
+    private fun hentBehandlingstype(journalpost: Journalpost, tema: Tema): String? {
+        return when {
+            harEØSTilleggsskjema(journalpost) -> Behandlingstype.Utland.value
+            // Liker ikke dette.. vil egentlig alltid sette behandlingstype = Behadlingstype.EØS når søknad er EØS søknad.
+            erEØS(journalpost) && tema == Tema.KON -> Behandlingstype.EØS.value
+            else -> null
+        }
     }
 
     private fun utledEnhetsnummer(journalpost: Journalpost): String? {
@@ -139,6 +136,24 @@ class OppgaveMapper(
         }
     }
 
+    private fun erEØS(journalpost: Journalpost) =
+        journalpost.bruker?.type == BrukerIdType.FNR && erDnummer(journalpost.bruker.id)
+
+    private fun harEØSTilleggsskjema(journalpost: Journalpost) =
+        journalpost.dokumenter!!.any { it.brevkode == EØS_TILLEGGSDOKUMENT_BREVKODE }
+
+    private fun hoveddokumentErEØSTilleggsskjema(journalpost: Journalpost) =
+        journalpost.dokumenter!!.firstOrNull { it.brevkode != null }?.brevkode == EØS_TILLEGGSDOKUMENT_BREVKODE
+
+    private fun validerJournalpost(journalpost: Journalpost) {
+        if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
+        runCatching { Tema.valueOf(journalpost.tema!!) }.getOrElse { exception ->
+            error(
+                "Tema for journalpost er tomt eller ugyldig: ${journalpost.tema}"
+            )
+        }
+    }
+
     private fun hentAktørIdFraPdl(brukerId: String): String? {
         return try {
             pdlClient.hentIdenter(brukerId).filter { it.gruppe == Identgruppe.AKTORID.name && !it.historisk }
@@ -146,5 +161,10 @@ class OppgaveMapper(
         } catch (e: IntegrasjonException) {
             null
         }
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(OppgaveMapper::class.java)
+        private val EØS_TILLEGGSDOKUMENT_BREVKODE = "NAV 33-00.15"
     }
 }
