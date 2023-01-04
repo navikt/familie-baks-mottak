@@ -15,7 +15,7 @@ Topicene vi lytter på må da opprettes via deres api med følgende data:
       "numPartitions": 3
     },
     {
-      "topicName": "aapen-dok-journalfoering-v1-q1",
+      "topicName": "aapen-dok-journalfoering-v1",
       "members": [
         {"member":"srvc01", "role":"CONSUMER"}
       ],
@@ -36,7 +36,7 @@ Dette kan gjøres via følgende kommandoer:\
 ```
 curl -X POST "http://igroup:itest@localhost:8840/api/v1/topics" -H "Accept: application/json" -H "Content-Type: application/json" --data "{"name": "aapen-person-pdl-leesah-v1", "members": [{ "member": "srvc01", "role": "CONSUMER" }], "numPartitions": 3 }"
 
-curl -X POST "http://igroup:itest@localhost:8840/api/v1/topics" -H "Accept: application/json" -H "Content-Type: application/json" --data "{"name": "aapen-dok-journalfoering-v1-q1", "members": [{ "member": "srvc01", "role": "CONSUMER" }], "numPartitions": 3 }"
+curl -X POST "http://igroup:itest@localhost:8840/api/v1/topics" -H "Accept: application/json" -H "Content-Type: application/json" --data "{"name": "aapen-dok-journalfoering-v1", "members": [{ "member": "srvc01", "role": "CONSUMER" }], "numPartitions": 3 }"
 
 curl -X POST "http://igroup:itest@localhost:8840/api/v1/topics" -H "Accept: application/json" -H "Content-Type: application/json" --data "{"name": "aapen-person-pdl-aktor-v1", "members": [{ "member": "srvc01", "role": "CONSUMER" }], "numPartitions": 3 }"
 ```
