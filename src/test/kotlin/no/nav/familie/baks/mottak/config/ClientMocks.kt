@@ -33,7 +33,7 @@ class ClientMocks {
         val mockOppgaveClient = mockk<OppgaveClient>(relaxed = true)
 
         every {
-            mockOppgaveClient.opprettJournalføringsoppgave(any())
+            mockOppgaveClient.opprettJournalføringsoppgave(any(), any())
         } returns OppgaveResponse(1L)
 
         return mockOppgaveClient

@@ -30,15 +30,22 @@ private val logger = LoggerFactory.getLogger(OppgaveClient::class.java)
 class OppgaveClient @Autowired constructor(
     @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonUri: URI,
     @Qualifier("clientCredentials") restOperations: RestOperations,
-    private val oppgaveMapper: OppgaveMapper
+    private val oppgaveMappers: List<IOppgaveMapper>
 ) : AbstractRestClient(restOperations, "integrasjon") {
 
     val secureLog: Logger = LoggerFactory.getLogger("secureLogger")
 
-    fun opprettJournalføringsoppgave(journalpost: Journalpost, beskrivelse: String? = null): OppgaveResponse {
+    fun opprettJournalføringsoppgave(
+        journalpost: Journalpost,
+        beskrivelse: String? = null
+    ): OppgaveResponse {
         logger.info("Oppretter journalføringsoppgave for ${if (journalpost.kanal == "NAV_NO") "digital søknad" else "papirsøknad"}")
         val uri = URI.create("$integrasjonUri/oppgave/opprett")
-        val request = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.Journalføring, journalpost, beskrivelse)
+        val request = oppgaveMapperForTema(journalpost).tilOpprettOppgaveRequest(
+            Oppgavetype.Journalføring,
+            journalpost,
+            beskrivelse
+        )
         secureLog.info("Oppretter journalføringsoppgave for ${journalpost.journalpostId} ${request.beskrivelse}")
 
         return responseFraOpprettOppgave(uri, request)
@@ -47,10 +54,17 @@ class OppgaveClient @Autowired constructor(
     fun opprettBehandleSakOppgave(journalpost: Journalpost, beskrivelse: String? = null): OppgaveResponse {
         logger.info("Oppretter \"Behandle sak\"-oppgave for digital søknad")
         val uri = URI.create("$integrasjonUri/oppgave/opprett")
-        val request = oppgaveMapper.mapTilOpprettOppgave(Oppgavetype.BehandleSak, journalpost, beskrivelse)
+        val request = oppgaveMapperForTema(journalpost).tilOpprettOppgaveRequest(
+            Oppgavetype.BehandleSak,
+            journalpost,
+            beskrivelse
+        )
 
         return responseFraOpprettOppgave(uri, request)
     }
+
+    private fun oppgaveMapperForTema(journalpost: Journalpost) =
+        oppgaveMappers.tilMapperForTema(Tema.valueOf(journalpost.tema!!))
 
     @Retryable(
         value = [RuntimeException::class],

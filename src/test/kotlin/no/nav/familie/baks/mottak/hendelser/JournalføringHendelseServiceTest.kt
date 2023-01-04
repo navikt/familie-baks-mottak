@@ -368,7 +368,8 @@ class JournalføringHendelseServiceTest {
 
     @Test
     fun `Ikke gyldige hendelsetyper skal ignoreres`() {
-        val ugyldigHendelsetypeRecord = opprettRecord(journalpostId = JOURNALPOST_PAPIRSØKNAD, hendelseType = "UgyldigType", temaNytt = "BAR")
+        val ugyldigHendelsetypeRecord =
+            opprettRecord(journalpostId = JOURNALPOST_PAPIRSØKNAD, hendelseType = "UgyldigType", temaNytt = "BAR")
         val consumerRecord = ConsumerRecord(
             "topic",
             1,

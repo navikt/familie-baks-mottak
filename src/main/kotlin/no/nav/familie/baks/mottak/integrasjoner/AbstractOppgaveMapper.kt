@@ -3,31 +3,25 @@ package no.nav.familie.baks.mottak.integrasjoner
 import no.nav.familie.baks.mottak.util.erDnummer
 import no.nav.familie.baks.mottak.util.erOrgnr
 import no.nav.familie.baks.mottak.util.fristFerdigstillelse
-import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
-import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveIdentV2
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.kontrakter.felles.oppgave.OpprettOppgaveRequest
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Service
-import java.util.Locale
+import java.util.*
 
-@Service
-class OppgaveMapper(
+abstract class AbstractOppgaveMapper(
     private val hentEnhetClient: HentEnhetClient,
     private val pdlClient: PdlClient
-) {
-
-    fun mapTilOpprettOppgave(
+) : IOppgaveMapper {
+    override fun tilOpprettOppgaveRequest(
         oppgavetype: Oppgavetype,
         journalpost: Journalpost,
-        beskrivelse: String? = null
+        beskrivelse: String?
     ): OpprettOppgaveRequest {
         validerJournalpost(journalpost)
         val ident = tilOppgaveIdent(journalpost, oppgavetype)
-        val tema = Tema.valueOf(journalpost.tema!!)
         return OpprettOppgaveRequest(
             ident = ident,
             saksId = journalpost.sak?.fagsakId,
@@ -37,10 +31,14 @@ class OppgaveMapper(
             fristFerdigstillelse = fristFerdigstillelse(),
             beskrivelse = tilBeskrivelse(journalpost, beskrivelse),
             enhetsnummer = utledEnhetsnummer(journalpost),
-            behandlingstema = hentBehandlingstema(journalpost, tema),
-            behandlingstype = hentBehandlingstype(journalpost, tema)
+            behandlingstema = hentBehandlingstema(journalpost),
+            behandlingstype = hentBehandlingstype(journalpost)
         )
     }
+
+    abstract fun hentBehandlingstema(journalpost: Journalpost): String?
+
+    abstract fun hentBehandlingstype(journalpost: Journalpost): String?
 
     private fun tilOppgaveIdent(journalpost: Journalpost, oppgavetype: Oppgavetype): OppgaveIdentV2? {
         if (journalpost.bruker == null) {
@@ -94,34 +92,6 @@ class OppgaveMapper(
         return "${journalpost.hentHovedDokumentTittel().orEmpty()} $bindestrek ${beskrivelse.orEmpty()}".trim()
     }
 
-    private fun hentBehandlingstema(journalpost: Journalpost, tema: Tema): String? {
-        if (erEØS(journalpost)) {
-            // Liker ikke at vi må håndtere dette ulikt for barnetrygd og kontantstøtte. Vurdere om vi alltid kan sette behandlingstema = null når søknad er EØS søknad.
-            return when (tema) {
-                Tema.BAR -> Behandlingstema.BarnetrygdEØS.value
-                else -> null
-            }
-        }
-
-        return when {
-            // Tilleggsskjema ved krav om utbetaling av barnetrygd og/eller kontantstøtte på grunnlag av regler om eksport etter EØS-avtalen
-            hoveddokumentErEØSTilleggsskjema(journalpost) -> null
-            else -> when (tema) {
-                Tema.BAR -> Behandlingstema.OrdinærBarnetrygd.value
-                else -> Behandlingstema.Kontantstøtte.value
-            }
-        }
-    }
-
-    private fun hentBehandlingstype(journalpost: Journalpost, tema: Tema): String? {
-        return when {
-            harEØSTilleggsskjema(journalpost) -> Behandlingstype.Utland.value
-            // Liker ikke dette.. vil egentlig alltid sette behandlingstype = Behadlingstype.EØS når søknad er EØS søknad.
-            erEØS(journalpost) && tema == Tema.KON -> Behandlingstype.EØS.value
-            else -> null
-        }
-    }
-
     private fun utledEnhetsnummer(journalpost: Journalpost): String? {
         return when {
             journalpost.journalforendeEnhet == "2101" -> "4806" // Enhet 2101 er nedlagt. Rutes til 4806
@@ -136,24 +106,6 @@ class OppgaveMapper(
         }
     }
 
-    private fun erEØS(journalpost: Journalpost) =
-        journalpost.bruker?.type == BrukerIdType.FNR && erDnummer(journalpost.bruker.id)
-
-    private fun harEØSTilleggsskjema(journalpost: Journalpost) =
-        journalpost.dokumenter!!.any { it.brevkode == EØS_TILLEGGSDOKUMENT_BREVKODE }
-
-    private fun hoveddokumentErEØSTilleggsskjema(journalpost: Journalpost) =
-        journalpost.dokumenter!!.firstOrNull { it.brevkode != null }?.brevkode == EØS_TILLEGGSDOKUMENT_BREVKODE
-
-    private fun validerJournalpost(journalpost: Journalpost) {
-        if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
-        runCatching { Tema.valueOf(journalpost.tema!!) }.getOrElse { exception ->
-            error(
-                "Tema for journalpost er tomt eller ugyldig: ${journalpost.tema}"
-            )
-        }
-    }
-
     private fun hentAktørIdFraPdl(brukerId: String): String? {
         return try {
             pdlClient.hentIdenter(brukerId).filter { it.gruppe == Identgruppe.AKTORID.name && !it.historisk }
@@ -163,8 +115,28 @@ class OppgaveMapper(
         }
     }
 
+    fun erEØS(journalpost: Journalpost) =
+        journalpost.bruker?.type == BrukerIdType.FNR && erDnummer(journalpost.bruker.id)
+
+    private fun validerJournalpost(journalpost: Journalpost) {
+        if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
+    }
+
     companion object {
-        private val logger = LoggerFactory.getLogger(OppgaveMapper::class.java)
-        private val EØS_TILLEGGSDOKUMENT_BREVKODE = "NAV 33-00.15"
+        private val logger = LoggerFactory.getLogger(this::class.java)
     }
 }
+
+interface IOppgaveMapper {
+    val tema: Tema
+
+    fun tilOpprettOppgaveRequest(
+        oppgavetype: Oppgavetype,
+        journalpost: Journalpost,
+        beskrivelse: String? = null
+    ): OpprettOppgaveRequest
+
+    fun støtterTema(tema: Tema) = this.tema == tema
+}
+
+fun List<IOppgaveMapper>.tilMapperForTema(tema: Tema): IOppgaveMapper = this.first { it.støtterTema(tema) }

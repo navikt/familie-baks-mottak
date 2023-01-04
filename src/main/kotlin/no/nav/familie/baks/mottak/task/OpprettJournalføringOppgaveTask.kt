@@ -2,7 +2,6 @@ package no.nav.familie.baks.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
@@ -37,8 +36,8 @@ class OpprettJournalføringOppgaveTask(
 
     override fun doTask(task: Task) {
         val sakssystemMarkering = task.payload
-
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
+        val tema = Tema.valueOf(journalpost.tema!!)
         when (journalpost.journalstatus) {
             Journalstatus.MOTTATT -> {
                 val journalføringsOppgaver =
@@ -60,13 +59,13 @@ class OpprettJournalføringOppgaveTask(
                     )
                     task.metadata["oppgaveId"] = "${nyOppgave.oppgaveId}"
                     log.info("Oppretter ny journalførings-oppgave med id ${nyOppgave.oppgaveId} for journalpost ${journalpost.journalpostId}")
-                    incrementOppgaverOpprettet(journalpost)
+                    incrementOppgaverOpprettet(tema)
                 } else {
                     log.info("Skipper oppretting av journalførings-oppgave. Fant åpen oppgave av type $oppgaveTypeForEksisterendeOppgave for ${journalpost.journalpostId}")
                     if (sakssystemMarkering.isNotEmpty()) {
                         journalføringsOppgaver.forEach {
                             it.oppdaterOppgavebeskrivelse(sakssystemMarkering)
-                            incrementOppgaverOppdatert(journalpost)
+                            incrementOppgaverOppdatert(tema)
                         }
                     }
                 }
@@ -74,7 +73,7 @@ class OpprettJournalføringOppgaveTask(
 
             Journalstatus.JOURNALFOERT -> {
                 log.info("Skipper journalpost ${journalpost.journalpostId} som alt er i status JOURNALFOERT")
-                incrementOppgaverSkippet(journalpost)
+                incrementOppgaverSkippet(tema)
             }
 
             else -> {
@@ -87,27 +86,27 @@ class OpprettJournalføringOppgaveTask(
         }
     }
 
-    private fun incrementOppgaverOpprettet(journalpost: Journalpost) {
-        if (journalpost.tema == Tema.BAR.name) {
-            barnetrygdOppgaverOpprettetCounter.increment()
-        } else {
-            kontantstøtteOppgaverOpprettetCounter.increment()
+    private fun incrementOppgaverOpprettet(tema: Tema) {
+        when (tema) {
+            Tema.BAR -> barnetrygdOppgaverOpprettetCounter.increment()
+            Tema.KON -> kontantstøtteOppgaverOpprettetCounter.increment()
+            else -> error("Tema $tema støttes ikke")
         }
     }
 
-    private fun incrementOppgaverOppdatert(journalpost: Journalpost) {
-        if (journalpost.tema == Tema.BAR.name) {
-            barnetrygdOppgaverOppdatertCounter.increment()
-        } else {
-            kontantstøtteOppgaverOppdatertCounter.increment()
+    private fun incrementOppgaverOppdatert(tema: Tema) {
+        when (tema) {
+            Tema.BAR -> barnetrygdOppgaverOppdatertCounter.increment()
+            Tema.KON -> kontantstøtteOppgaverOppdatertCounter.increment()
+            else -> error("Tema $tema støttes ikke")
         }
     }
 
-    private fun incrementOppgaverSkippet(journalpost: Journalpost) {
-        if (journalpost.tema == Tema.BAR.name) {
-            barnetrygdOppgaverSkippetCounter.increment()
-        } else {
-            kontantstøtteOppgaverSkippetCounter.increment()
+    private fun incrementOppgaverSkippet(tema: Tema) {
+        when (tema) {
+            Tema.BAR -> barnetrygdOppgaverSkippetCounter.increment()
+            Tema.KON -> kontantstøtteOppgaverSkippetCounter.increment()
+            else -> error("Tema $tema støttes ikke")
         }
     }
 
