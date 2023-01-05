@@ -154,7 +154,7 @@ class JournalføringHendelseServiceTest {
             journalposttype = Journalposttype.U,
             journalstatus = Journalstatus.FERDIGSTILT,
             bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-            tema = "FOR",
+            tema = "BAR",
             kanal = "NAV_NO",
             behandlingstema = null,
             dokumenter = null,

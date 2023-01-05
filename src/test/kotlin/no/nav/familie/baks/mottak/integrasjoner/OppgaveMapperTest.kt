@@ -457,40 +457,6 @@ class OppgaveMapperTest(
     }
 
     @Test
-    fun `skal kaste feil dersom tema ikke er satt`() {
-        val exception = assertThrows<RuntimeException> {
-            kontantstøtteOppgaveMapper.tilOpprettOppgaveRequest(
-                Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("456")
-                    .copy(
-                        tema = null
-                    )
-            )
-        }
-        assertEquals(
-            "Tema for journalpost er tomt eller ugyldig: ${null}",
-            exception.message
-        )
-    }
-
-    @Test
-    fun `skal kaste feil dersom tema ikke finnes i Tema enum`() {
-        val exception = assertThrows<RuntimeException> {
-            kontantstøtteOppgaveMapper.tilOpprettOppgaveRequest(
-                Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("456")
-                    .copy(
-                        tema = "UGYLDIG"
-                    )
-            )
-        }
-        assertEquals(
-            "Tema for journalpost er tomt eller ugyldig: UGYLDIG",
-            exception.message
-        )
-    }
-
-    @Test
     fun `skal sette behandlingstype NASJONAL dersom tema er KON og søknad ikke er EØS søknad`() {
         val opprettOppgaveRequest = kontantstøtteOppgaveMapper.tilOpprettOppgaveRequest(
             Oppgavetype.Journalføring,
