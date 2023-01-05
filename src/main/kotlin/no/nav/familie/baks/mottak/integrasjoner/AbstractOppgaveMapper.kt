@@ -9,6 +9,7 @@ import no.nav.familie.kontrakter.felles.oppgave.OppgaveIdentV2
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.kontrakter.felles.oppgave.OpprettOppgaveRequest
 import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Service
 import java.util.*
 
 abstract class AbstractOppgaveMapper(
@@ -139,4 +140,13 @@ interface IOppgaveMapper {
     fun støtterTema(tema: Tema) = this.tema == tema
 }
 
-fun List<IOppgaveMapper>.tilMapperForTema(tema: Tema): IOppgaveMapper = this.first { it.støtterTema(tema) }
+@Service
+class OppgaveMapperService(val oppgaveMappers: Collection<IOppgaveMapper>) {
+    fun tilOpprettOppgaveRequest(
+        oppgavetype: Oppgavetype,
+        journalpost: Journalpost,
+        beskrivelse: String? = null
+    ): OpprettOppgaveRequest =
+        oppgaveMappers.first { it.støtterTema(Tema.valueOf(journalpost.tema!!)) }
+            .tilOpprettOppgaveRequest(oppgavetype, journalpost, beskrivelse)
+}
