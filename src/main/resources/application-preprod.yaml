@@ -48,6 +48,15 @@ no.nav.security.jwt:
           client-id: ${AZURE_APP_CLIENT_ID}
           client-secret: ${AZURE_APP_CLIENT_SECRET}
           client-auth-method: client_secret_basic
+      familie-ks-infotrygd-clientcredentials:
+        resource-url: ${FAMILIE_KS_INFOTRYGD_API_URL}
+        token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
+        grant-type: client_credentials
+        scope: api://dev-fss.teamfamilie.familie-ks-infotrygd/.default
+        authentication:
+          client-id: ${AZURE_APP_CLIENT_ID}
+          client-secret: ${AZURE_APP_CLIENT_SECRET}
+          client-auth-method: client_secret_basic
       dokument-clientauth:
         resource-url: ${FAMILIE_DOKUMENT_API_URL}
         well-known-url: ${TOKEN_X_WELL_KNOWN_URL}
@@ -83,6 +92,7 @@ FAMILIE_INTEGRASJONER_API_URL: https://familie-integrasjoner.dev-fss-pub.nais.io
 FAMILIE_INTEGRASJONER_SCOPE: api://dev-fss.teamfamilie.familie-integrasjoner/.default
 
 FAMILIE_BA_INFOTRYGD_API_URL: https://familie-ba-infotrygd.dev-fss-pub.nais.io
+FAMILIE_KS_INFOTRYGD_API_URL: https://familie-ks-infotrygd.dev-fss-pub.nais.io
 
 FAMILIE_BA_SAK_API_URL: http://familie-ba-sak/api
 BA_SAK_SCOPE: api://dev-gcp.teamfamilie.familie-ba-sak/.default
