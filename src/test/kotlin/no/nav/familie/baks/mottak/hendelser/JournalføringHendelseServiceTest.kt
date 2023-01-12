@@ -154,7 +154,7 @@ class JournalføringHendelseServiceTest {
             journalposttype = Journalposttype.U,
             journalstatus = Journalstatus.FERDIGSTILT,
             bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-            tema = "FOR",
+            tema = "BAR",
             kanal = "NAV_NO",
             behandlingstema = null,
             dokumenter = null,
@@ -368,7 +368,8 @@ class JournalføringHendelseServiceTest {
 
     @Test
     fun `Ikke gyldige hendelsetyper skal ignoreres`() {
-        val ugyldigHendelsetypeRecord = opprettRecord(journalpostId = JOURNALPOST_PAPIRSØKNAD, hendelseType = "UgyldigType", temaNytt = "BAR")
+        val ugyldigHendelsetypeRecord =
+            opprettRecord(journalpostId = JOURNALPOST_PAPIRSØKNAD, hendelseType = "UgyldigType", temaNytt = "BAR")
         val consumerRecord = ConsumerRecord(
             "topic",
             1,

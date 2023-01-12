@@ -10,7 +10,9 @@ import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.Journalposttype
 import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
+import no.nav.familie.baks.mottak.task.JournalhendelseKontantstøtteRutingTask
 import no.nav.familie.baks.mottak.task.JournalhendelseRutingTask
+import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.log.IdUtils
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.domene.Task
@@ -31,9 +33,13 @@ class JournalhendelseService(
     val hendelsesloggRepository: HendelsesloggRepository
 ) {
 
-    val kanalCounter = mutableMapOf<String, Counter>()
-    val skannetOrdinæreSøknaderCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skan.ny.ordinaer.soknad")
-    val skannetUtvidedeSøknaderCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.kanal.skan.ny.utvidet.soknad")
+    val barnetrygdKanalCounter = mutableMapOf<String, Counter>()
+    val kontantstøtteKanalCounter = mutableMapOf<String, Counter>()
+    val skannetOrdinærBarnetrygdSøknadCounter: Counter =
+        Metrics.counter("barnetrygd.journalhendelse.kanal.skan.ny.ordinaer.soknad")
+    val skannetUtvidetBarnetrygdSøknadCounter: Counter =
+        Metrics.counter("barnetrygd.journalhendelse.kanal.skan.ny.utvidet.soknad")
+    val skannetKontantstøtteSøknadCounter = Metrics.counter("kontantstotte.journalhendelse.kanal.skan.ny.soknad")
     val ignorerteCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.ignorerte")
     val feilCounter: Counter = Metrics.counter("barnetrygd.journalhendelse.feilet")
     val logger: Logger = LoggerFactory.getLogger(JournalhendelseService::class.java)
@@ -49,7 +55,11 @@ class JournalhendelseService(
             MDC.put(MDCConstants.MDC_CALL_ID, callId)
 
             if (erGyldigHendelsetype(hendelseRecord)) {
-                if (hendelsesloggRepository.existsByHendelseIdAndConsumer(hendelseRecord.hendelsesId.toString(), CONSUMER_JOURNAL)) {
+                if (hendelsesloggRepository.existsByHendelseIdAndConsumer(
+                        hendelseRecord.hendelsesId.toString(),
+                        CONSUMER_JOURNAL
+                    )
+                ) {
                     ack.acknowledge()
                     return
                 }
@@ -95,7 +105,7 @@ class JournalhendelseService(
 
     private fun erGyldigHendelsetype(hendelseRecord: JournalfoeringHendelseRecord): Boolean {
         return GYLDIGE_HENDELSE_TYPER.contains(hendelseRecord.hendelsesType.toString()) &&
-            (hendelseRecord.temaNytt != null && hendelseRecord.temaNytt.toString() == "BAR")
+            (hendelseRecord.temaNytt != null && GYLDIGE_JOURNALPOST_TEMAER.contains(hendelseRecord.temaNytt.toString()))
     }
 
     fun behandleJournalhendelse(hendelseRecord: JournalfoeringHendelseRecord) {
@@ -116,10 +126,11 @@ class JournalhendelseService(
 
                         else -> {
                             logger.info("Ny journalhendelse med journalpostId=$journalpostId med status MOTTATT og kanal ${journalpost.kanal}")
-                            incrementKanalCounter(journalpost.kanal.toString())
+                            incrementKanalCounter(journalpost)
                         }
                     }
                 }
+
                 else -> {
                     logger.debug("Ignorer journalhendelse hvor journalpost=$journalpostId har status ${journalpost.journalstatus}")
                     ignorerteCounter.count()
@@ -130,34 +141,52 @@ class JournalhendelseService(
 
     private fun behandleNavnoHendelser(journalpost: Journalpost) {
         opprettJournalhendelseRutingTask(journalpost)
-        incrementKanalCounter(journalpost.kanal!!)
+        incrementKanalCounter(journalpost)
     }
 
     private fun behandleSkanningHendelser(journalpost: Journalpost) {
         logger.info("Ny Journalhendelse med [journalpostId=${journalpost.journalpostId}, status=${journalpost.journalstatus}, tema=${journalpost.tema}, kanal=${journalpost.kanal}]")
-        val erOrdinærSønad = journalpost.dokumenter?.find { it.brevkode == "NAV 33-00.07" } != null
-        val erUtvidetSøknad = journalpost.dokumenter?.find { it.brevkode == "NAV 33-00.09" } != null
+        val erOrdinærBarnetrygdSøknad = journalpost.dokumenter?.find { it.brevkode == "NAV 33-00.07" } != null
+        val erUtvidetBarnetrygdSøknad = journalpost.dokumenter?.find { it.brevkode == "NAV 33-00.09" } != null
+        val erKontantstøtteSøknad = journalpost.dokumenter?.find { it.brevkode == "NAV 34-00.08" } != null
 
         opprettJournalhendelseRutingTask(journalpost)
 
-        if (erOrdinærSønad) skannetOrdinæreSøknaderCounter.increment()
-        if (erUtvidetSøknad) skannetUtvidedeSøknaderCounter.increment()
-        incrementKanalCounter(journalpost.kanal!!)
+        if (erOrdinærBarnetrygdSøknad) skannetOrdinærBarnetrygdSøknadCounter.increment()
+        if (erUtvidetBarnetrygdSøknad) skannetUtvidetBarnetrygdSøknadCounter.increment()
+        if (erKontantstøtteSøknad) skannetKontantstøtteSøknadCounter.increment()
+
+        incrementKanalCounter(journalpost)
     }
 
-    private fun incrementKanalCounter(kanal: String) {
-        if (!kanalCounter.containsKey(kanal)) {
-            kanalCounter[kanal] = Metrics.counter("barnetrygd.journalhendelse.mottatt", "kanal", kanal)
+    private fun incrementKanalCounter(
+        journalpost: Journalpost
+    ) {
+        val (søknadKanalCounter, counterName) = getKanalCounter(journalpost)
+        val kanal = journalpost.kanal!!
+        if (!søknadKanalCounter.containsKey(kanal)) {
+            søknadKanalCounter[kanal] = Metrics.counter(counterName, "kanal", kanal)
         }
-        kanalCounter[kanal]!!.increment()
+        søknadKanalCounter[kanal]!!.increment()
     }
+
+    private fun getKanalCounter(journalpost: Journalpost) =
+        if (journalpost.tema == Tema.BAR.name) {
+            Pair(barnetrygdKanalCounter, "barnetrygd.journalhendelse.mottatt")
+        } else {
+            Pair(kontantstøtteKanalCounter, "kontantstotte.journalhendelse.mottatt")
+        }
 
     private fun skalBehandleJournalpost(journalpost: Journalpost) =
-        journalpost.tema == "BAR" && journalpost.journalposttype == Journalposttype.I
+        GYLDIGE_JOURNALPOST_TEMAER.contains(journalpost.tema) && journalpost.journalposttype == Journalposttype.I
 
     private fun opprettJournalhendelseRutingTask(journalpost: Journalpost) {
+        val taskType = when (journalpost.tema) {
+            Tema.BAR.name -> JournalhendelseRutingTask.TASK_STEP_TYPE
+            else -> JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE
+        }
         Task(
-            type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+            type = taskType,
             payload = journalpost.kanal!!,
             properties = opprettMetadata(journalpost)
         ).apply {
@@ -180,6 +209,7 @@ class JournalhendelseService(
     companion object {
 
         private val GYLDIGE_HENDELSE_TYPER = arrayOf("JournalpostMottatt", "TemaEndret")
+        private val GYLDIGE_JOURNALPOST_TEMAER = listOf(Tema.BAR.name, Tema.KON.name)
         private val CONSUMER_JOURNAL = HendelseConsumer.JOURNAL_AIVEN
     }
 }
