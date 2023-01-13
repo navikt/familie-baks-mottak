@@ -10,19 +10,6 @@ spring:
     allow-bean-definition-overriding: true
   autoconfigure.exclude: org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
   main.banner-mode: "off"
-  kafka:
-    client-id: familie-baks-mottak
-    properties:
-      security.protocol: SASL_SSL
-      sasl:
-        mechanism: PLAIN
-        jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${CREDENTIAL_USERNAME}" password="${CREDENTIAL_PASSWORD}";
-    consumer:
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
-      max-poll-records: 1
-      auto-offset-reset: none
-      enable-auto-commit: false
   datasource:
     hikari:
       maximum-pool-size: 10
