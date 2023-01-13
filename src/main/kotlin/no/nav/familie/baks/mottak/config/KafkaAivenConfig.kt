@@ -90,9 +90,9 @@ class KafkaAivenConfig(val environment: Environment) {
             ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
             ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java,
             ConsumerConfig.CLIENT_ID_CONFIG to "consumer-familie-baks-mottak-2",
-            ConsumerConfig.MAX_POLL_RECORDS_CONFIG to "50",
+            ConsumerConfig.MAX_POLL_RECORDS_CONFIG to "1",
             ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "latest",
-            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false
+            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to "false"
         )
         if (environment.activeProfiles.none { it.contains("dev") || it.contains("postgres") }) {
             return consumerConfigs + securityConfig()
