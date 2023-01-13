@@ -54,7 +54,7 @@ class EnsligForsørgerInfotrygdHendelseConsumerTest {
         mockSakClient = mockk(relaxed = true)
         mockPdlClient = mockk(relaxed = true)
         service = EnsligForsørgerHendelseService(mockSakClient, mockPdlClient, mockHendelsesloggRepository)
-        consumer = EnsligForsørgerInfotrygdHendelseConsumer(service)
+        consumer = EnsligForsørgerInfotrygdHendelseConsumer(service, mockk(relaxed = true))
         clearAllMocks()
 
         every { mockPdlClient.hentPersonident("2424242424241") } returns "12345678910"
