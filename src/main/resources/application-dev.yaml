@@ -48,6 +48,8 @@ spring:
       sasl:
         jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="igroup" password="itest";
       schema.registry.url: http://localhost:8081
+    consumer:
+      group-id: srvc01
   jpa:
     show-sql: false
     properties:
