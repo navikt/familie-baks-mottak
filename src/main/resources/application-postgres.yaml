@@ -68,16 +68,7 @@ spring:
         format_sql=false
     hibernate:
       ddl-auto: none
-  kafka:
-    bootstrap-servers: ${KAFKA_BROKERS}
-    properties:
-      security.protocol: SASL_PLAINTEXT
-      sasl:
-        mechanism: PLAIN
-        jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="igroup" password="itest";
-      schema.registry.url: ${KAFKA_BROKERS}
-    consumer:
-      group-id: srvc01
+
 
 
 #Brukes til tilgangskontroll av familie-ks-mottak-frontend
