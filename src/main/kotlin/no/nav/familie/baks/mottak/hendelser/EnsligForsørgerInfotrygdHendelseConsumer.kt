@@ -3,6 +3,7 @@ package no.nav.familie.baks.mottak.hendelser
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
+import no.nav.familie.baks.mottak.integrasjoner.IntegrasjonException
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.log.mdc.MDCConstants
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -10,6 +11,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.core.env.Environment
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Service
@@ -51,7 +53,10 @@ import javax.transaction.Transactional
     havingValue = "true",
     matchIfMissing = true
 )
-class EnsligForsørgerInfotrygdHendelseConsumer(val vedtakOmOvergangsstønadService: EnsligForsørgerHendelseService) {
+class EnsligForsørgerInfotrygdHendelseConsumer(
+    val vedtakOmOvergangsstønadService: EnsligForsørgerHendelseService,
+    val environment: Environment
+) {
 
     val ensligForsørgerInfotrygdHendelseConsumerFeilCounter: Counter = Metrics.counter("ef.hendelse.infotrygdvedtak.feil")
 
@@ -76,7 +81,12 @@ class EnsligForsørgerInfotrygdHendelseConsumer(val vedtakOmOvergangsstønadServ
         } catch (e: Exception) {
             ensligForsørgerInfotrygdHendelseConsumerFeilCounter.increment()
             secureLogger.error("Feil i prosessering av $TOPIC_INFOTRYGD_VEDTAK consumerRecord=$consumerRecord", e)
-            throw RuntimeException("Feil i prosessering av $TOPIC_INFOTRYGD_VEDTAK")
+
+            if (environment.activeProfiles.any { it == "preprod" } && e is IntegrasjonException) {
+                logger.info("Ident ikke funnet ved lesing av $TOPIC_INFOTRYGD_VEDTAK i preprod. Skipper sending til sak siden topic er q1, mens man går mot syntetisk testmiljø")
+            } else {
+                throw RuntimeException("Feil i prosessering av $TOPIC_INFOTRYGD_VEDTAK")
+            }
         } finally {
             MDC.clear()
         }
