@@ -34,7 +34,7 @@ class LeesahConsumer(val leesahService: LeesahService) {
         id = "leesah-1",
         idIsGroup = false,
         containerFactory = "kafkaAivenHendelseListenerAvroEarliestContainerFactory",
-        autoStartup = "false"
+        autoStartup = "true"
     )
     @Transactional
     fun listen(cr: ConsumerRecord<String, Personhendelse>, ack: Acknowledgment) {
