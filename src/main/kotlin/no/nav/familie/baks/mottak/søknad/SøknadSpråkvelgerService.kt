@@ -7,7 +7,9 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteObjectMapperModule
-import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV1
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV2
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import org.springframework.stereotype.Service
 import no.nav.familie.kontrakter.felles.objectMapper as getObjectMapper
 
@@ -32,14 +34,17 @@ class SøknadSpråkvelgerService {
     }
 
     fun konverterKontantstøtteSøknadTilMapForSpråk(
-        kontantstøtteSøknad: KontantstøtteSøknad,
+        versjonertSøknad: VersjonertKontantstøtteSøknad,
         språk: String
     ): Map<String, Any> {
         val objectMapperForSpråk = hentObjectMapperForSpråk(språk)
 
-        val kontantstøtteSøknadMapForSpråk =
-            objectMapperForSpråk.convertValue<MutableMap<String, Any>>(kontantstøtteSøknad)
-
+        val kontantstøtteSøknadMapForSpråk = objectMapperForSpråk.convertValue<MutableMap<String, Any>>(
+            when (versjonertSøknad) {
+                is KontantstøtteSøknadV1 -> versjonertSøknad.søknad
+                is KontantstøtteSøknadV2 -> versjonertSøknad.søknad
+            }
+        )
         return kontantstøtteSøknadMapForSpråk
     }
 

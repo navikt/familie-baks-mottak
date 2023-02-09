@@ -6,8 +6,10 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV1
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV2
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
-import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -49,15 +51,20 @@ class PdfService(
     }
 
     fun lagKontantstøttePdf(
-        kontantstøtteSøknad: KontantstøtteSøknad,
+        versjonertSøknad: VersjonertKontantstøtteSøknad,
         dbKontantstøtteSøknad: DBKontantstøtteSøknad,
         språk: String = "nb"
     ): ByteArray {
         val kontantstøtteSøknadMapForSpråk =
-            søknadSpråkvelgerService.konverterKontantstøtteSøknadTilMapForSpråk(kontantstøtteSøknad, språk)
+            søknadSpråkvelgerService.konverterKontantstøtteSøknadTilMapForSpråk(versjonertSøknad, språk)
+
+        val navn = when (versjonertSøknad) {
+            is KontantstøtteSøknadV1 -> versjonertSøknad.søknad.søker.navn
+            is KontantstøtteSøknadV2 -> versjonertSøknad.søknad.søker.navn
+        }
 
         val ekstraFelterMap = hentEkstraFelter(
-            navn = kontantstøtteSøknad.søker.navn.verdi.getValue("nb"),
+            navn = navn.verdi.getValue("nb"),
             opprettetTid = dbKontantstøtteSøknad.opprettetTid,
             fnr = dbKontantstøtteSøknad.fnr,
             label = "Søknad om kontantstøtte"

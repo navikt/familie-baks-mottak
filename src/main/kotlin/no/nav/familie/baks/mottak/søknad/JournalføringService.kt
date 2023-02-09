@@ -50,7 +50,7 @@ class JournalføringService(
 
             val arkiverDokumentRequest = ArkiverDokumentRequestMapper.toDto(
                 dbKontantstøtteSøknad = dbKontantstøtteSøknad,
-                kontantstøtteSøknad = dbKontantstøtteSøknad.hentSøknad(),
+                versjonertSøknad = dbKontantstøtteSøknad.hentVersjonertKontantstøtteSøknad(),
                 pdf = pdf,
                 vedleggMap = vedlegg,
                 pdfOriginalSpråk = pdfOriginalSpråk

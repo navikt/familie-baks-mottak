@@ -4,9 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV2
 import no.nav.familie.kontrakter.felles.objectMapper
-import no.nav.familie.kontrakter.ks.søknad.v1.Barn
-import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
+import no.nav.familie.kontrakter.ks.søknad.v2.Barn
+import no.nav.familie.kontrakter.ks.søknad.v2.KontantstøtteSøknad
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsfelt
 import no.nav.familie.kontrakter.ks.søknad.v1.TekstPåSpråkMap
@@ -48,9 +49,11 @@ class SøknadSpråkvelgerServiceTest {
             dokumentasjon
         )
 
+        val versjonertKontantstøtteSøknad = KontantstøtteSøknadV2(søknad = kontantstøtteSøknad)
+
         // Bokmål
         var kontantstøtteMapForSpråk =
-            søknadSpråkvelgerService.konverterKontantstøtteSøknadTilMapForSpråk(kontantstøtteSøknad, "nb")
+            søknadSpråkvelgerService.konverterKontantstøtteSøknadTilMapForSpråk(versjonertKontantstøtteSøknad, "nb")
         var kontantstøtteSøknadJsonNode: JsonNode = objectMapper.valueToTree(kontantstøtteMapForSpråk)
 
         // Tester TekstPåSpråkMapSerializer
@@ -67,7 +70,7 @@ class SøknadSpråkvelgerServiceTest {
 
         // Nynorsk
         kontantstøtteMapForSpråk =
-            søknadSpråkvelgerService.konverterKontantstøtteSøknadTilMapForSpråk(kontantstøtteSøknad, "nn")
+            søknadSpråkvelgerService.konverterKontantstøtteSøknadTilMapForSpråk(versjonertKontantstøtteSøknad, "nn")
         kontantstøtteSøknadJsonNode = objectMapper.valueToTree(kontantstøtteMapForSpråk)
 
         // Tester TekstPåSpråkMapSerializer
@@ -84,7 +87,7 @@ class SøknadSpråkvelgerServiceTest {
 
         // Engelsk
         kontantstøtteMapForSpråk =
-            søknadSpråkvelgerService.konverterKontantstøtteSøknadTilMapForSpråk(kontantstøtteSøknad, "en")
+            søknadSpråkvelgerService.konverterKontantstøtteSøknadTilMapForSpråk(versjonertKontantstøtteSøknad, "en")
         kontantstøtteSøknadJsonNode = objectMapper.valueToTree(kontantstøtteMapForSpråk)
 
         // Tester TekstPåSpråkMapSerializer

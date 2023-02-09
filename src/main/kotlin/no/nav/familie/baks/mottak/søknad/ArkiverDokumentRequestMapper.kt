@@ -10,12 +10,14 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteVedlegg
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknaddokumentasjon
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV1
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV2
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.felles.dokarkiv.Dokumenttype
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.ArkiverDokumentRequest
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.Dokument
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.Filtype
-import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
 
 object ArkiverDokumentRequestMapper {
 
@@ -85,12 +87,19 @@ object ArkiverDokumentRequestMapper {
 
     fun toDto(
         dbKontantstøtteSøknad: DBKontantstøtteSøknad,
-        kontantstøtteSøknad: KontantstøtteSøknad,
+        versjonertSøknad: VersjonertKontantstøtteSøknad,
         pdf: ByteArray,
         vedleggMap: Map<String, DBKontantstotteVedlegg>,
         pdfOriginalSpråk: ByteArray
     ): ArkiverDokumentRequest {
         val dokumenttype = Dokumenttype.KONTANTSTØTTE_SØKNAD
+
+        val dokumentasjon = when (versjonertSøknad) {
+            is KontantstøtteSøknadV1 ->
+                versjonertSøknad.søknad.dokumentasjon.map { KontantstøtteSøknaddokumentasjon(it) }
+            is KontantstøtteSøknadV2 ->
+                versjonertSøknad.søknad.dokumentasjon.map { KontantstøtteSøknaddokumentasjon(it) }
+        }
 
         val søknadsdokumentJson =
             Dokument(
@@ -114,11 +123,7 @@ object ArkiverDokumentRequestMapper {
             forsøkFerdigstill = false,
             hoveddokumentvarianter = listOf(søknadsdokumentPdf, søknadsdokumentJson),
             vedleggsdokumenter = hentVedleggListeTilArkivering(
-                kontantstøtteSøknad.dokumentasjon.map {
-                    KontantstøtteSøknaddokumentasjon(
-                        it
-                    )
-                },
+                dokumentasjon,
                 vedleggMap,
                 pdfOriginalSpråk,
                 Dokumenttype.KONTANTSTØTTE_VEDLEGG

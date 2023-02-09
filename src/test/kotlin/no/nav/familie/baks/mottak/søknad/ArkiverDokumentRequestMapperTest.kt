@@ -8,12 +8,13 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBVedlegg
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteVedlegg
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV2
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.v8.Søknad
 import no.nav.familie.kontrakter.felles.dokarkiv.Dokumenttype
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.Filtype
 import no.nav.familie.kontrakter.ks.søknad.v1.Dokumentasjonsbehov
-import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
+import no.nav.familie.kontrakter.ks.søknad.v2.KontantstøtteSøknad
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ks.søknad.v1.TekstPåSpråkMap
 import org.junit.jupiter.api.Test
@@ -53,7 +54,7 @@ class ArkiverDokumentRequestMapperTest {
         )
         val arkiverDokumentRequest = ArkiverDokumentRequestMapper.toDto(
             dbKontantstøtteSøknad,
-            kontantstøtteSøknad,
+            KontantstøtteSøknadV2(søknad = kontantstøtteSøknad),
             ByteArray(0),
             vedleggMap,
             ByteArray(0)
