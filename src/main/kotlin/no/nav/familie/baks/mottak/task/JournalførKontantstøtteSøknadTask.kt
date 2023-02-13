@@ -4,6 +4,8 @@ import no.nav.familie.baks.mottak.søknad.JournalføringService
 import no.nav.familie.baks.mottak.søknad.PdfService
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV1
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV2
 import no.nav.familie.http.client.RessursException
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -31,20 +33,24 @@ class JournalførKontantstøtteSøknadTask(
             val dbKontantstøtteSøknad: DBKontantstøtteSøknad =
                 kontantstøtteSøknadRepository.hentSøknad(id.toLong())
                     ?: error("Kunne ikke finne søknad ($id) i database")
-            val kontantstøtteSøknad = dbKontantstøtteSøknad.hentSøknad()
+            val versjonertSøknad = dbKontantstøtteSøknad.hentVersjonertKontantstøtteSøknad()
 
             logger.info("Generer pdf og journalfør søknad")
             val bokmålPdf = pdfService.lagKontantstøttePdf(
-                kontantstøtteSøknad = kontantstøtteSøknad,
+                versjonertSøknad = versjonertSøknad,
                 dbKontantstøtteSøknad = dbKontantstøtteSøknad,
                 språk = "nb"
             )
             logger.info("Generert pdf med størrelse ${bokmålPdf.size}")
 
-            val orginalspråk = kontantstøtteSøknad.originalSpråk
+            val orginalspråk = when (versjonertSøknad) {
+                is KontantstøtteSøknadV1 -> versjonertSøknad.søknad.originalSpråk
+                is KontantstøtteSøknadV2 -> versjonertSøknad.søknad.originalSpråk
+            }
+
             val orginalspråkPdf: ByteArray = if (orginalspråk != "nb") {
                 pdfService.lagKontantstøttePdf(
-                    kontantstøtteSøknad = kontantstøtteSøknad,
+                    versjonertSøknad = versjonertSøknad,
                     dbKontantstøtteSøknad = dbKontantstøtteSøknad,
                     språk = orginalspråk
                 )

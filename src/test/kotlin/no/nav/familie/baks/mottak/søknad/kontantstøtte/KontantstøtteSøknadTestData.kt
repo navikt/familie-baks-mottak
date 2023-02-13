@@ -1,9 +1,9 @@
 package no.nav.familie.baks.mottak.søknad.kontantstøtte
 
-import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
 import no.nav.familie.kontrakter.ks.søknad.v1.SIVILSTANDTYPE
-import no.nav.familie.kontrakter.ks.søknad.v1.Søker
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsfelt
+import no.nav.familie.kontrakter.ks.søknad.v2.KontantstøtteSøknad
+import no.nav.familie.kontrakter.ks.søknad.v2.Søker
 
 fun <T> søknadsfelt(label: String, verdi: T): Søknadsfelt<T> {
     return Søknadsfelt(label = mapOf("nb" to label), verdi = mapOf("nb" to verdi))
@@ -28,7 +28,7 @@ object KontantstøtteSøknadTestData {
         erAvdødPartnerForelder = null
     )
 
-    fun lagSøker(): Søker = Søker(
+    private fun lagSøker(): Søker = Søker(
         harEøsSteg = false,
         ident = søknadsfelt("Fødselsnummer", "12345678910"),
         navn = søknadsfelt("Navn", "Ola Norman"),

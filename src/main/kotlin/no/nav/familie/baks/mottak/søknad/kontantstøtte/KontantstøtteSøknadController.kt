@@ -1,11 +1,13 @@
-package no.nav.familie.baks.mottak.søknad
+package no.nav.familie.baks.mottak.søknad.kontantstøtte
 
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadService
+import no.nav.familie.baks.mottak.søknad.Kvittering
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.FødselsnummerErNullException
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV1
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV2
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.ks.søknad.v1.Dokumentasjonsbehov
-import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
+import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad as KontantstøtteSøknadKontraktV1
+import no.nav.familie.kontrakter.ks.søknad.v2.KontantstøtteSøknad as KontantstøtteSøknadKontraktV2
 
 @RestController
 @RequestMapping(path = ["/api/kontantstotte/"], produces = [APPLICATION_JSON_VALUE])
@@ -37,14 +41,19 @@ class KontantstøtteSøknadController(
     // Metrics for EØS kontantstotte
     val søknadEøs = Metrics.counter("kontantstotte.soknad.eos")
 
+    @Deprecated("Endepunkt for utdatert versjon av ks-søknad")
     @PostMapping(value = ["/soknad"], consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun taImotSøknad(@RequestPart("søknad") søknad: KontantstøtteSøknad): ResponseEntity<Ressurs<Kvittering>> =
-        mottaVersjonertSøknadOgSendMetrikker(søknad)
+    fun taImotSøknad(@RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV1): ResponseEntity<Ressurs<Kvittering>> =
+        mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = KontantstøtteSøknadV1(søknad = søknad))
 
-    fun mottaVersjonertSøknadOgSendMetrikker(kontantstøtteSøknad: KontantstøtteSøknad): ResponseEntity<Ressurs<Kvittering>> {
+    @PostMapping(value = ["/soknad/v2"], consumes = [MULTIPART_FORM_DATA_VALUE])
+    fun taImotSøknad(@RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV2): ResponseEntity<Ressurs<Kvittering>> =
+        mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = KontantstøtteSøknadV2(søknad = søknad))
+
+    fun mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad): ResponseEntity<Ressurs<Kvittering>> {
         return try {
-            val dbKontantstøtteSøknad = kontantstøtteSøknadService.mottaKontantstøtteSøknad(kontantstøtteSøknad)
-            sendMetrics(kontantstøtteSøknad)
+            val dbKontantstøtteSøknad = kontantstøtteSøknadService.mottaKontantstøtteSøknad(versjonertKontantstøtteSøknad = versjonertKontantstøtteSøknad)
+            sendMetrics(versjonertKontantstøtteSøknad = versjonertKontantstøtteSøknad)
             ResponseEntity.ok(
                 Ressurs.success(
                     Kvittering(
@@ -59,10 +68,16 @@ class KontantstøtteSøknadController(
         }
     }
 
-    private fun sendMetrics(kontantstøtteSøknad: KontantstøtteSøknad) {
-        val dokumentasjon = kontantstøtteSøknad.dokumentasjon
+    private fun sendMetrics(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad) {
+        val dokumentasjon = when (versjonertKontantstøtteSøknad) {
+            is KontantstøtteSøknadV1 -> versjonertKontantstøtteSøknad.søknad.dokumentasjon
+            is KontantstøtteSøknadV2 -> versjonertKontantstøtteSøknad.søknad.dokumentasjon
+        }
 
-        val harEøsSteg = kontantstøtteSøknad.antallEøsSteg > 0
+        val harEøsSteg = when (versjonertKontantstøtteSøknad) {
+            is KontantstøtteSøknadV1 -> versjonertKontantstøtteSøknad.søknad.antallEøsSteg > 0
+            is KontantstøtteSøknadV2 -> versjonertKontantstøtteSøknad.søknad.antallEøsSteg > 0
+        }
 
         sendMetricsSøknad(harEøsSteg)
 

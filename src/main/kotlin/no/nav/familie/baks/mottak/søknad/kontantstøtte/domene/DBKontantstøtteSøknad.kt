@@ -3,7 +3,6 @@ package no.nav.familie.baks.mottak.søknad.kontantstøtte.domene
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.Vedlegg
 import no.nav.familie.kontrakter.felles.objectMapper
-import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsvedlegg
 import java.time.LocalDateTime
 import javax.persistence.Column
@@ -13,6 +12,8 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.SequenceGenerator
 import javax.persistence.Table
+import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad as KontantstøtteSøknadV1
+import no.nav.familie.kontrakter.ks.søknad.v2.KontantstøtteSøknad as KontantstøtteSøknadV2
 
 @Entity(name = "kontantstotte_soknad")
 @Table(name = "kontantstotte_soknad")
@@ -34,8 +35,33 @@ data class DBKontantstøtteSøknad(
     val journalpostId: String? = null
 ) {
 
-    fun hentSøknad(): KontantstøtteSøknad {
+    private fun hentSøknadV1(): KontantstøtteSøknadV1 {
         return objectMapper.readValue(søknadJson)
+    }
+
+    private fun hentSøknadV2(): KontantstøtteSøknadV2 {
+        return objectMapper.readValue(søknadJson)
+    }
+
+    private fun hentSøknadVersjon(): String {
+        return try {
+            val søknad = objectMapper.readTree(søknadJson)
+            if (søknad.get("kontraktVersjon")?.asInt() == 2) {
+                "v2"
+            } else {
+                "v1"
+            }
+        } catch (e: Error) {
+            "v1"
+        }
+    }
+
+    fun hentVersjonertKontantstøtteSøknad(): VersjonertKontantstøtteSøknad {
+        val versjon = this.hentSøknadVersjon()
+        if (versjon == "v2") {
+            return KontantstøtteSøknadV2(søknad = hentSøknadV2())
+        }
+        return KontantstøtteSøknadV1(søknad = hentSøknadV1())
     }
 }
 
@@ -50,7 +76,18 @@ data class DBKontantstotteVedlegg(
     override val data: ByteArray
 ) : Vedlegg
 
-fun KontantstøtteSøknad.tilDBKontantstøtteSøknad(): DBKontantstøtteSøknad {
+fun KontantstøtteSøknadV1.tilDBKontantstøtteSøknad(): DBKontantstøtteSøknad {
+    try {
+        return DBKontantstøtteSøknad(
+            søknadJson = objectMapper.writeValueAsString(this),
+            fnr = this.søker.ident.verdi.getValue("nb")
+        )
+    } catch (e: KotlinNullPointerException) {
+        throw FødselsnummerErNullException()
+    }
+}
+
+fun KontantstøtteSøknadV2.tilDBKontantstøtteSøknad(): DBKontantstøtteSøknad {
     try {
         return DBKontantstøtteSøknad(
             søknadJson = objectMapper.writeValueAsString(this),

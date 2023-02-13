@@ -5,11 +5,13 @@ import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteV
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.FødselsnummerErNullException
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV1
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV2
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteVedleggRepository
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.tilDBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.tilDBKontantstøtteVedlegg
 import no.nav.familie.baks.mottak.task.JournalførKontantstøtteSøknadTask
-import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
@@ -26,9 +28,16 @@ class KontantstøtteSøknadService(
 ) {
     @Transactional
     @Throws(FødselsnummerErNullException::class)
-    fun mottaKontantstøtteSøknad(kontantstøtteSøknad: KontantstøtteSøknad): DBKontantstøtteSøknad {
-        val dbKontantstøtteSøknad = kontantstøtteSøknad.tilDBKontantstøtteSøknad()
-        val dokumentasjon = kontantstøtteSøknad.dokumentasjon
+    fun mottaKontantstøtteSøknad(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad): DBKontantstøtteSøknad {
+        val (dbKontantstøtteSøknad, dokumentasjon) = when (versjonertKontantstøtteSøknad) {
+            is KontantstøtteSøknadV1 -> {
+                Pair(versjonertKontantstøtteSøknad.søknad.tilDBKontantstøtteSøknad(), versjonertKontantstøtteSøknad.søknad.dokumentasjon)
+            }
+
+            is KontantstøtteSøknadV2 -> {
+                Pair(versjonertKontantstøtteSøknad.søknad.tilDBKontantstøtteSøknad(), versjonertKontantstøtteSøknad.søknad.dokumentasjon)
+            }
+        }
 
         lagreDBKontantstøtteSøknad(dbKontantstøtteSøknad)
 
