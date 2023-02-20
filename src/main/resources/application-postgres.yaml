@@ -73,7 +73,7 @@ spring:
 
 #Brukes til tilgangskontroll av familie-ks-mottak-frontend
 MOTTAK_ROLLE: group1
-FAMILIE_BA_DOKGEN_API_URL: http://localhost:5914
+FAMILIE_BAKS_DOKGEN_API_URL: http://localhost:5914
 FAMILIE_INTEGRASJONER_API_URL: http://localhost:8085/api
 FAMILIE_BA_SAK_API_URL: http://localhost:8090/api
 FAMILIE_DOKUMENT_API_URL: http://localhost:8082
