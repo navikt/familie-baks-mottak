@@ -28,18 +28,18 @@ class MottaAnnullerFødselTaskTest {
 
         MDC.put(MDCConstants.MDC_CALL_ID, "ooo")
         val journalførSøknadTask = Task(type = JournalførSøknadTask.JOURNALFØR_SØKNAD, payload = "").copy(
-            id = 0
+            id = 0,
         )
         val sendTilSakTask = Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "").copy(
-            id = 1
+            id = 1,
         )
         val mottaFødselshendelseTask = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = "").copy(
-            id = 2
+            id = 2,
         )
         every { taskService.finnTasksMedStatus(any(), any(), any()) } returns listOf(
             journalførSøknadTask,
             sendTilSakTask,
-            mottaFødselshendelseTask
+            mottaFødselshendelseTask,
         )
         every { taskService.findById(eq(0)) } returns journalførSøknadTask
         every { taskService.findById(eq(1)) } returns sendTilSakTask
@@ -52,8 +52,8 @@ class MottaAnnullerFødselTaskTest {
         MottaAnnullerFødselTask(taskService, restTaskService).doTask(
             Task(
                 type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
-                payload = objectMapper.writeValueAsString(RestAnnullerFødsel(listOf("12345678910"), "ooo"))
-            )
+                payload = objectMapper.writeValueAsString(RestAnnullerFødsel(listOf("12345678910"), "ooo")),
+            ),
         )
         verify(exactly = 1) { restTaskService.avvikshåndterTask(1L, Avvikstype.ANNET, any(), any()) }
         verify(exactly = 1) { restTaskService.avvikshåndterTask(2L, Avvikstype.ANNET, any(), any()) }
@@ -66,16 +66,16 @@ class MottaAnnullerFødselTaskTest {
 
         MDC.put(MDCConstants.MDC_CALL_ID, "xxx")
         val task0 = Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "").copy(
-            id = 0
+            id = 0,
         )
         MDC.put(MDCConstants.MDC_CALL_ID, "ooo")
         val task1 = Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "").copy(
-            id = 1
+            id = 1,
         )
 
         every { taskService.finnTasksMedStatus(any(), any(), any()) } returns listOf(
             task0,
-            task1
+            task1,
         )
         every { taskService.findById(eq(0)) } returns task0
         every { taskService.findById(eq(1)) } returns task1
@@ -88,8 +88,8 @@ class MottaAnnullerFødselTaskTest {
         MottaAnnullerFødselTask(taskService, restTaskService).doTask(
             Task(
                 type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
-                payload = objectMapper.writeValueAsString(RestAnnullerFødsel(listOf("12345678910"), "ooo"))
-            )
+                payload = objectMapper.writeValueAsString(RestAnnullerFødsel(listOf("12345678910"), "ooo")),
+            ),
         )
         verify(exactly = 1) { restTaskService.avvikshåndterTask(1L, any(), any(), any()) }
     }
@@ -104,8 +104,8 @@ class MottaAnnullerFødselTaskTest {
         MottaAnnullerFødselTask(taskService, restTaskService).doTask(
             Task(
                 type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
-                payload = objectMapper.writeValueAsString(RestAnnullerFødsel(listOf("12345678910"), "ooo"))
-            )
+                payload = objectMapper.writeValueAsString(RestAnnullerFødsel(listOf("12345678910"), "ooo")),
+            ),
         )
         verify(exactly = 1) { taskService.finnTasksMedStatus(any(), any(), any()) }
         assertThat(statusSlot.captured.size).isEqualTo(3)

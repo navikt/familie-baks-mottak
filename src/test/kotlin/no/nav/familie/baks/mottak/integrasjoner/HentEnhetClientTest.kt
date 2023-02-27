@@ -33,8 +33,8 @@ class HentEnhetClientTest {
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(Enhet("1234", "enhetNavn", true, "Aktiv")))
-                )
+                        .withBody(objectMapper.writeValueAsString(Enhet("1234", "enhetNavn", true, "Aktiv"))),
+                ),
         )
 
         val response = client.hentEnhet("1234")
@@ -52,8 +52,8 @@ class HentEnhetClientTest {
                 .willReturn(
                     aResponse()
                         .withStatus(500)
-                        .withBody("feilmelding")
-                )
+                        .withBody("feilmelding"),
+                ),
         )
 
         Assertions.assertThatThrownBy { client.hentEnhet("4321") }
@@ -69,8 +69,8 @@ class HentEnhetClientTest {
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(Enhet("1234", "gammeltNavn", true, "Aktiv")))
-                )
+                        .withBody(objectMapper.writeValueAsString(Enhet("1234", "gammeltNavn", true, "Aktiv"))),
+                ),
         )
 
         assertThat(client.hentEnhet("1111").navn).isEqualTo("gammeltNavn")
@@ -80,8 +80,8 @@ class HentEnhetClientTest {
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(Enhet("1234", "Nytt navn", true, "Aktiv")))
-                )
+                        .withBody(objectMapper.writeValueAsString(Enhet("1234", "Nytt navn", true, "Aktiv"))),
+                ),
         )
 
         assertThat(client.hentEnhet("1111").navn).isEqualTo("gammeltNavn")

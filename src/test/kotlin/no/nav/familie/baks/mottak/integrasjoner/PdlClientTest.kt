@@ -31,7 +31,7 @@ class PdlClientTest {
     fun hentIdenter() {
         mockResponseForPdlQuery(
             pdlRequestBody = gyldigRequest("hentIdenter.graphql", testIdent),
-            mockResponse = readfile("mockIdentInformasjonResponse.json")
+            mockResponse = readfile("mockIdentInformasjonResponse.json"),
         )
 
         val identer = pdlClient.hentIdenter(testIdent)
@@ -44,7 +44,7 @@ class PdlClientTest {
     fun hentPersonMedRelasjoner() {
         mockResponseForPdlQuery(
             pdlRequestBody = gyldigRequest("hentperson-med-relasjoner.graphql", testIdent),
-            mockResponse = readfile("mockPersonResponse.json")
+            mockResponse = readfile("mockPersonResponse.json"),
         )
 
         val personInfo = pdlClient.hentPersonMedRelasjoner(testIdent)
@@ -57,7 +57,7 @@ class PdlClientTest {
     fun hentPersonDødsfallFamilierelasjon() {
         mockResponseForPdlQuery(
             pdlRequestBody = gyldigRequest("hentperson-relasjon-dødsfall.graphql", testIdent),
-            mockResponse = readfile("mock-hentperson-relasjon-dødsfall.json")
+            mockResponse = readfile("mock-hentperson-relasjon-dødsfall.json"),
         )
 
         val pdlPersonData = pdlClient.hentPerson(testIdent, "hentperson-relasjon-dødsfall")
@@ -75,8 +75,8 @@ class PdlClientTest {
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withStatus(500)
-                )
+                        .withStatus(500),
+                ),
         )
 
         assertThatThrownBy {
@@ -89,7 +89,7 @@ class PdlClientTest {
     fun hentPersonGraphqlReturnererFeilmeldingOgDetKastesEnIntegrajonsException() {
         mockResponseForPdlQuery(
             pdlRequestBody = gyldigRequest("hentperson-relasjon-dødsfall.graphql", testIdent),
-            mockResponse = readfile("mock-error-response.json")
+            mockResponse = readfile("mock-error-response.json"),
         )
 
         assertThatThrownBy {
@@ -109,8 +109,8 @@ class PdlClientTest {
                     .willReturn(
                         aResponse()
                             .withHeader("Content-Type", "application/json")
-                            .withBody(mockResponse)
-                    )
+                            .withBody(mockResponse),
+                    ),
             )
         }
 

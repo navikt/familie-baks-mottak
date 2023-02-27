@@ -18,7 +18,7 @@ private val logger = LoggerFactory.getLogger(HentEnhetClient::class.java)
 @Component
 class HentEnhetClient(
     @param:Value("\${NORG2_API_URL}") private val norg2Uri: URI,
-    @Qualifier("restTemplateUnsecured") restOperations: RestOperations
+    @Qualifier("restTemplateUnsecured") restOperations: RestOperations,
 ) :
 
     AbstractRestClient(restOperations, "norg2") {
@@ -43,5 +43,5 @@ data class Enhet(
     val enhetId: String,
     val navn: String,
     val oppgavebehandler: Boolean,
-    val status: String
+    val status: String,
 )

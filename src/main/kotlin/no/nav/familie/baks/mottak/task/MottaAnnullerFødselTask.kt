@@ -18,11 +18,11 @@ import org.springframework.stereotype.Service
 @TaskStepBeskrivelse(
     taskStepType = MottaAnnullerFødselTask.TASK_STEP_TYPE,
     beskrivelse = "Motta annuller fødsel",
-    maxAntallFeil = 3
+    maxAntallFeil = 3,
 )
 class MottaAnnullerFødselTask(
     private val taskService: TaskService,
-    private val restTaskService: RestTaskService
+    private val restTaskService: RestTaskService,
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(MottaAnnullerFødselTask::class.java)
@@ -35,7 +35,7 @@ class MottaAnnullerFødselTask(
             taskService.finnTasksMedStatus(
                 listOf(Status.KLAR_TIL_PLUKK, Status.UBEHANDLET, Status.FEILET),
                 null,
-                Pageable.unpaged()
+                Pageable.unpaged(),
             )
                 .filter {
                     it.callId == tidligereHendelseId &&
@@ -47,7 +47,7 @@ class MottaAnnullerFødselTask(
                 taskId = it.id,
                 avvikstype = Avvikstype.ANNET,
                 årsak = AVVIKSÅRSAK,
-                saksbehandlerId = "VL"
+                saksbehandlerId = "VL",
             )
         }
     }

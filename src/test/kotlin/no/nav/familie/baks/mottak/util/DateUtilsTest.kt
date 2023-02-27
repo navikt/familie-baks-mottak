@@ -21,7 +21,7 @@ class DateUtilsTest {
         "2021-05-15T00:00:00, 2021-05-18", // 14 mai er fredag, 17 mai er mandag og fridag, skal returnere 18 mai
         "2020-12-25T00:00:00, 2020-12-28", // første arbeidsdag er mandag 28
         "2020-12-26T00:00:00, 2020-12-28", // første arbeidsdag er mandag 28
-        "2020-01-01T00:00:00, 2020-01-02"
+        "2020-01-01T00:00:00, 2020-01-02",
     )
     fun `fristFerdigstillelese skal returnere neste arbeidsdag`(input: LocalDateTime, expected: LocalDate) {
         mockkStatic(LocalDateTime::class)
@@ -38,7 +38,7 @@ class DateUtilsTest {
         "2020-06-13T13:37:00, 2020-06-15T13:37", // Neste dag er en søndag. Venter til mandag samme tid
         "2020-06-13T06:37:00, 2020-06-15T10:37", // Ikke kjøre før kl 10 mandag
         "2020-06-11T16:01:00, 2020-06-15T10:01", // Ikke kjøre fredag etter 16. Vent til mandag
-        "2021-05-14T00:00:00, 2021-05-18T10:00" // 14 mai er fredag, 17 mai er mandag og fridag, skal returnere 18 mai
+        "2021-05-14T00:00:00, 2021-05-18T10:00", // 14 mai er fredag, 17 mai er mandag og fridag, skal returnere 18 mai
     )
     fun `skal returnere neste arbeidsdag `(input: LocalDateTime, expected: LocalDateTime) {
         mockkStatic(LocalDateTime::class)

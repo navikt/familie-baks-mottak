@@ -19,13 +19,13 @@ class SøknadsfeltSerializer(private val språk: String) : JsonSerializer<Søkna
     override fun serialize(
         søknadsFelt: Søknadsfelt<*>,
         jsonGenerator: JsonGenerator,
-        serializerProvider: SerializerProvider
+        serializerProvider: SerializerProvider,
     ) {
         return jsonGenerator.writeObject(
             mapOf(
                 "label" to søknadsFelt.label[språk],
-                "verdi" to søknadsFelt.verdi[språk]
-            )
+                "verdi" to søknadsFelt.verdi[språk],
+            ),
         )
     }
 }
@@ -34,10 +34,10 @@ class TekstPåSpråkMapSerializer(private val språk: String) : JsonSerializer<T
     override fun serialize(
         tekstPåSpråkMap: TekstPåSpråkMap,
         jsonGenerator: JsonGenerator,
-        serializerProvider: SerializerProvider
+        serializerProvider: SerializerProvider,
     ) {
         return jsonGenerator.writeObject(
-            tekstPåSpråkMap[språk]
+            tekstPåSpråkMap[språk],
         )
     }
 }

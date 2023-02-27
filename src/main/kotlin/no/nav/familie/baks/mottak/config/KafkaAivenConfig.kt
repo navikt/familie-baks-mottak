@@ -20,7 +20,7 @@ import java.time.Duration
 @ConditionalOnProperty(
     value = ["funksjonsbrytere.kafka.enabled"],
     havingValue = "true",
-    matchIfMissing = true
+    matchIfMissing = true,
 )
 class KafkaAivenConfig(val environment: Environment) {
 
@@ -68,7 +68,7 @@ class KafkaAivenConfig(val environment: Environment) {
             ConsumerConfig.CLIENT_ID_CONFIG to "consumer-familie-baks-mottak-1",
             ConsumerConfig.MAX_POLL_RECORDS_CONFIG to "50",
             ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "latest",
-            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false
+            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
         )
         if (environment.activeProfiles.none { it.contains("dev") || it.contains("postgres") }) {
             return consumerConfigs + securityConfig()
@@ -92,7 +92,7 @@ class KafkaAivenConfig(val environment: Environment) {
             ConsumerConfig.CLIENT_ID_CONFIG to "consumer-familie-baks-mottak-2",
             ConsumerConfig.MAX_POLL_RECORDS_CONFIG to "1",
             ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "latest",
-            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to "false"
+            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to "false",
         )
         if (environment.activeProfiles.none { it.contains("dev") || it.contains("postgres") }) {
             return consumerConfigs + securityConfig()
@@ -116,7 +116,7 @@ class KafkaAivenConfig(val environment: Environment) {
             ConsumerConfig.CLIENT_ID_CONFIG to "consumer-familie-baks-mottak-2",
             ConsumerConfig.MAX_POLL_RECORDS_CONFIG to "50",
             ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
-            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false
+            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
         )
         if (environment.activeProfiles.none { it.contains("dev") || it.contains("postgres") }) {
             return consumerConfigs + securityConfig()
@@ -137,7 +137,7 @@ class KafkaAivenConfig(val environment: Environment) {
             SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG to kafkaCredstorePassword,
             SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG to kafkaKeystorePath,
             SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG to kafkaCredstorePassword,
-            SslConfigs.SSL_KEY_PASSWORD_CONFIG to kafkaCredstorePassword
+            SslConfigs.SSL_KEY_PASSWORD_CONFIG to kafkaCredstorePassword,
         )
     }
 }

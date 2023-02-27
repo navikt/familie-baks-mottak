@@ -51,11 +51,11 @@ import javax.transaction.Transactional
 @ConditionalOnProperty(
     value = ["funksjonsbrytere.kafka.enabled"],
     havingValue = "true",
-    matchIfMissing = true
+    matchIfMissing = true,
 )
 class EnsligForsørgerInfotrygdHendelseConsumer(
     val vedtakOmOvergangsstønadService: EnsligForsørgerHendelseService,
-    val environment: Environment
+    val environment: Environment,
 ) {
 
     val ensligForsørgerInfotrygdHendelseConsumerFeilCounter: Counter = Metrics.counter("ef.hendelse.infotrygdvedtak.feil")
@@ -65,7 +65,7 @@ class EnsligForsørgerInfotrygdHendelseConsumer(
         id = "ef-infotrygd-overgangstonad",
         topics = ["teamfamilie.$TOPIC_INFOTRYGD_VEDTAK"],
         containerFactory = "kafkaAivenHendelseListenerContainerFactory",
-        idIsGroup = false
+        idIsGroup = false,
     )
     @Transactional
     fun listen(consumerRecord: ConsumerRecord<String, String>, ack: Acknowledgment) {
@@ -111,5 +111,5 @@ data class InfotrygdHendelse(
     @JsonProperty("IDENTDATO") val identdato: String,
     @JsonProperty("FOM") val fom: String,
     @JsonProperty("SATS") val sats: Double,
-    @JsonProperty("KOBLING_ID") val koblingId: Long
+    @JsonProperty("KOBLING_ID") val koblingId: Long,
 )

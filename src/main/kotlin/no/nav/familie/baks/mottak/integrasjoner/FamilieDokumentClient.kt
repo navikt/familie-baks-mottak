@@ -16,12 +16,12 @@ private val logger = LoggerFactory.getLogger(FamilieDokumentClient::class.java)
 @Component
 class FamilieDokumentClient(
     @param:Value("\${FAMILIE_DOKUMENT_API_URL}") private val dokumentUri: URI,
-    @Qualifier("clientCredentials") restOperations: RestOperations
+    @Qualifier("clientCredentials") restOperations: RestOperations,
 ) : AbstractRestClient(restOperations, "integrasjon") {
 
     @Retryable(
         value = [RuntimeException::class],
-        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}")
+        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
     )
     fun hentVedlegg(dokumentId: String): ByteArray {
         val uri = URI.create("$dokumentUri/api/mapper/ANYTHING/$dokumentId")

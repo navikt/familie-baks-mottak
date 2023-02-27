@@ -27,7 +27,7 @@ data class DBSøknad(
     @Column(name = "opprettet_tid")
     val opprettetTid: LocalDateTime = LocalDateTime.now(),
     @Column(name = "journalpost_id")
-    val journalpostId: String? = null
+    val journalpostId: String? = null,
 ) {
 
     private fun hentSøknadV7(): SøknadV7 {
@@ -68,7 +68,7 @@ data class DBVedlegg(
     override val dokumentId: String,
     @Column(name = "soknad_id")
     override val søknadId: Long,
-    override val data: ByteArray
+    override val data: ByteArray,
 ) : Vedlegg
 
 interface Vedlegg {
@@ -81,7 +81,7 @@ fun SøknadV7.tilDBSøknad(): DBSøknad {
     try {
         return DBSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
-            fnr = this.søker.ident.verdi.getValue("nb")
+            fnr = this.søker.ident.verdi.getValue("nb"),
         )
     } catch (e: KotlinNullPointerException) {
         throw FødselsnummerErNullException()
@@ -92,7 +92,7 @@ fun SøknadV8.tilDBSøknad(): DBSøknad {
     try {
         return DBSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
-            fnr = this.søker.ident.verdi.getValue("nb")
+            fnr = this.søker.ident.verdi.getValue("nb"),
         )
     } catch (e: KotlinNullPointerException) {
         throw FødselsnummerErNullException()
@@ -103,7 +103,7 @@ fun Søknadsvedlegg.tilDBVedlegg(søknad: DBSøknad, data: ByteArray): DBVedlegg
     return DBVedlegg(
         dokumentId = this.dokumentId,
         søknadId = søknad.id,
-        data = data
+        data = data,
     )
 }
 

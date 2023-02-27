@@ -28,7 +28,7 @@ import java.time.temporal.ChronoUnit
 @ComponentScan(
     "no.nav.familie.prosessering",
     "no.nav.familie.sikkerhet",
-    "no.nav.familie.baks.mottak"
+    "no.nav.familie.baks.mottak",
 )
 @EntityScan("no.nav.familie.prosessering", "no.nav.familie")
 @ConfigurationPropertiesScan("no.nav.familie")
@@ -75,7 +75,7 @@ class ApplicationConfig {
         return DefaultOAuth2HttpClient(
             RestTemplateBuilder()
                 .setConnectTimeout(Duration.of(2, ChronoUnit.SECONDS))
-                .setReadTimeout(Duration.of(4, ChronoUnit.SECONDS))
+                .setReadTimeout(Duration.of(4, ChronoUnit.SECONDS)),
         )
     }
 }

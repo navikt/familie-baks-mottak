@@ -32,13 +32,13 @@ import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 @Service
 @TaskStepBeskrivelse(
     taskStepType = JournalhendelseRutingTask.TASK_STEP_TYPE,
-    beskrivelse = "Håndterer ruting og markering av sakssystem"
+    beskrivelse = "Håndterer ruting og markering av sakssystem",
 )
 class JournalhendelseRutingTask(
     private val pdlClient: PdlClient,
     private val sakClient: SakClient,
     private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,
-    private val taskService: TaskService
+    private val taskService: TaskService,
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(JournalhendelseRutingTask::class.java)
@@ -71,7 +71,7 @@ class JournalhendelseRutingTask(
         Task(
             type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
             payload = sakssystemMarkering,
-            properties = task.metadata
+            properties = task.metadata,
         ).apply { taskService.save(this) }
     }
 
@@ -99,7 +99,7 @@ class JournalhendelseRutingTask(
         return Pair(
             first = sakClient.hentRestFagsakDeltagerListe(brukersIdent, barnasIdenter).sakspart(sakClient),
             second = infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, alleBarnasIdenter).sakspart
-                ?: infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).sakspart
+                ?: infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).sakspart,
         )
     }
 
@@ -133,7 +133,7 @@ private fun personErMigrert(saker: List<no.nav.familie.kontrakter.ba.infotrygd.S
 
 enum class Sakspart(val part: String) {
     SØKER("Bruker"),
-    ANNEN("Søsken")
+    ANNEN("Søsken"),
 }
 
 private fun List<RestFagsakDeltager>.sakspart(sakClient: SakClient): Sakspart? = when {

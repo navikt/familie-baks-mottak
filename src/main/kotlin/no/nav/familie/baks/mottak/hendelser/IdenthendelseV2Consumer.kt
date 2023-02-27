@@ -22,10 +22,10 @@ import javax.transaction.Transactional
 @ConditionalOnProperty(
     value = ["funksjonsbrytere.kafka.enabled"],
     havingValue = "true",
-    matchIfMissing = true
+    matchIfMissing = true,
 )
 class IdenthendelseV2Consumer(
-    private val sakClient: SakClient
+    private val sakClient: SakClient,
 ) {
 
     val identhendelseFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.ident.feilet")
@@ -35,7 +35,7 @@ class IdenthendelseV2Consumer(
         topics = ["pdl.aktor-v2"],
         id = "baks-aktor-v2",
         idIsGroup = false,
-        containerFactory = "kafkaAivenHendelseListenerAvroLatestContainerFactory"
+        containerFactory = "kafkaAivenHendelseListenerAvroLatestContainerFactory",
     )
     @Transactional
     fun listen(consumerRecord: ConsumerRecord<String, Aktor?>, ack: Acknowledgment) {

@@ -27,12 +27,12 @@ import org.springframework.stereotype.Service
 @TaskStepBeskrivelse(
     taskStepType = MottaFødselshendelseTask.TASK_STEP_TYPE,
     beskrivelse = "Motta fødselshendelse",
-    maxAntallFeil = 3
+    maxAntallFeil = 3,
 )
 class MottaFødselshendelseTask(
     private val taskService: TaskService,
     private val pdlClient: PdlClient,
-    @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: Long
+    @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: Long,
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
@@ -73,10 +73,10 @@ class MottaFødselshendelseTask(
                     jacksonObjectMapper().writeValueAsString(
                         NyBehandling(
                             morsIdent = morsIdent.id,
-                            barnasIdenter = arrayOf(barnetsId)
-                        )
+                            barnasIdenter = arrayOf(barnetsId),
+                        ),
                     ),
-                    task.metadata
+                    task.metadata,
                 )
 
                 taskService.save(nesteTask)

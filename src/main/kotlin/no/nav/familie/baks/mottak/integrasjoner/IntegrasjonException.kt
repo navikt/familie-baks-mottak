@@ -11,7 +11,7 @@ class IntegrasjonException(
     msg: String,
     throwable: Throwable? = null,
     uri: URI? = null,
-    ident: String? = null
+    ident: String? = null,
 ) : RuntimeException(responseFra(uri, throwable) ?: msg, throwable) {
 
     init {
@@ -20,7 +20,7 @@ class IntegrasjonException(
             "$msg. ident={} {} {}",
             ident,
             detaljertMelding ?: uri,
-            throwable
+            throwable,
         )
         logger.warn("$msg. {}", detaljertMelding ?: uri)
     }
@@ -31,7 +31,7 @@ class IntegrasjonException(
 
         fun responseFra(uri: URI?, e: Throwable?): String? {
             return when (e) {
-                is RestClientResponseException
+                is RestClientResponseException,
                 -> "Error mot $uri status=${e.getRawStatusCode()} body=${e.responseBodyAsString}" else
                 -> null
             }

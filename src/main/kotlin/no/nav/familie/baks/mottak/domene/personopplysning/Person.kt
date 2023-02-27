@@ -7,16 +7,16 @@ data class Person(
     val navn: String?,
     val forelderBarnRelasjoner: Set<ForelderBarnRelasjon>,
     val bostedsadresse: Bostedsadresse? = null,
-    val adressebeskyttelseGradering: String? = null
+    val adressebeskyttelseGradering: String? = null,
 )
 
 data class Familierelasjon(
     val personIdent: PersonIdent,
-    val relasjonsrolle: String
+    val relasjonsrolle: String,
 )
 
 data class PersonIdent(
-    val id: String
+    val id: String,
 )
 
 fun Person.harAdresseGradering(): Boolean {

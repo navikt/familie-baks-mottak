@@ -22,7 +22,7 @@ import javax.transaction.Transactional
 @ConditionalOnProperty(
     value = ["funksjonsbrytere.kafka.enabled"],
     havingValue = "true",
-    matchIfMissing = true
+    matchIfMissing = true,
 )
 class LeesahConsumer(val leesahService: LeesahService) {
 
@@ -34,7 +34,7 @@ class LeesahConsumer(val leesahService: LeesahService) {
         id = "leesah-1",
         idIsGroup = false,
         containerFactory = "kafkaAivenHendelseListenerAvroEarliestContainerFactory",
-        autoStartup = "true"
+        autoStartup = "true",
     )
     @Transactional
     fun listen(cr: ConsumerRecord<String, Personhendelse>, ack: Acknowledgment) {
@@ -51,7 +51,7 @@ class LeesahConsumer(val leesahService: LeesahService) {
             cr.value().hentUtflyttingsdato(),
             cr.value().hentTidligereHendelseId(),
             cr.value().hentSivilstandType(),
-            cr.value().hentSivilstandDato()
+            cr.value().hentSivilstandDato(),
         )
 
         try {
@@ -114,7 +114,7 @@ class LeesahConsumer(val leesahService: LeesahService) {
 
     private fun GenericRecord.deserialiserDatofeltFraSubrecord(
         subrecord: String,
-        datofelt: String
+        datofelt: String,
     ): LocalDate? {
         return try {
             val dato = (get(subrecord) as GenericRecord?)?.get(datofelt)

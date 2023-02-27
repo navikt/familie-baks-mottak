@@ -25,7 +25,7 @@ import kotlin.test.assertEquals
 @Tag("integration")
 @SpringBootTest(classes = [DevLauncherPostgres::class])
 class SøknadTest(
-    @Autowired val søknadService: SøknadService
+    @Autowired val søknadService: SøknadService,
 ) {
 
     val søknadV8 = SøknadTestData.søknadV8()
@@ -65,7 +65,7 @@ class SøknadTest(
         val v8dbSøknad = DBSøknad(
             id = 2L,
             søknadJson = lagraV8SøknadData,
-            fnr = "1234123412"
+            fnr = "1234123412",
         )
         assertThat(v8dbSøknad.hentVersjonertSøknad() is SøknadV8).isTrue
     }

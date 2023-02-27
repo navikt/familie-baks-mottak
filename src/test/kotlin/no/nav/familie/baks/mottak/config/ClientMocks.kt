@@ -62,7 +62,7 @@ class ClientMocks {
             throw RessursException(
                 Ressurs(status = Ressurs.Status.FEILET, data = null, melding = "", stacktrace = ""),
                 HttpClientErrorException.Conflict.create(HttpStatus.CONFLICT, null, null, null, null),
-                HttpStatus.CONFLICT
+                HttpStatus.CONFLICT,
             )
         }
         return mockDokarkivClientConflict
@@ -85,7 +85,7 @@ class ClientMocks {
             behandlingstema = null,
             dokumenter = null,
             journalforendeEnhet = null,
-            sak = null
+            sak = null,
         )
 
         every {
@@ -96,7 +96,7 @@ class ClientMocks {
             journalstatus = Journalstatus.MOTTATT,
             bruker = Bruker("12345678901", BrukerIdType.FNR),
             tema = "BAR",
-            kanal = "SKAN_NETS"
+            kanal = "SKAN_NETS",
         )
 
         every { mockJournalpostClient.hentJournalpost("456") } returns Journalpost(
@@ -112,11 +112,11 @@ class ClientMocks {
                     tittel = "Søknad om kontantstøtte til småbarnsforeldre",
                     brevkode = "34-00.08",
                     dokumentstatus = null,
-                    dokumentvarianter = emptyList()
-                )
+                    dokumentvarianter = emptyList(),
+                ),
             ),
             journalforendeEnhet = null,
-            sak = null
+            sak = null,
         )
 
         return mockJournalpostClient

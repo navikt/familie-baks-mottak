@@ -10,7 +10,7 @@ data class KontantstøtteSøknaddokumentasjon(val søknaddokumentasjon: Søknadd
     override val opplastedeVedlegg: List<Søknadsvedlegg> = søknaddokumentasjon.opplastedeVedlegg.map {
         Søknadsvedlegg(
             it.dokumentId,
-            dokumentasjonsbehovTilTittel(it.tittel)
+            dokumentasjonsbehovTilTittel(it.tittel),
         )
     }
 

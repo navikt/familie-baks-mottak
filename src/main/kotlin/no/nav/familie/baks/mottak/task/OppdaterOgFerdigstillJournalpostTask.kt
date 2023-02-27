@@ -18,14 +18,14 @@ import org.springframework.stereotype.Service
 @Service
 @TaskStepBeskrivelse(
     taskStepType = OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE,
-    beskrivelse = "Legger til Sak og ferdigstiller journalpost"
+    beskrivelse = "Legger til Sak og ferdigstiller journalpost",
 )
 class OppdaterOgFerdigstillJournalpostTask(
     private val journalpostClient: JournalpostClient,
     private val dokarkivClient: DokarkivClient,
     private val sakClient: SakClient,
     private val taskService: TaskService,
-    private val pdlClient: PdlClient
+    private val pdlClient: PdlClient,
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(OppdaterOgFerdigstillJournalpostTask::class.java)
@@ -48,20 +48,20 @@ class OppdaterOgFerdigstillJournalpostTask(
                     onFailure = {
                         log.warn(
                             "Automatisk ferdigstilling feilet. Oppretter ny journalføringsoppgave for journalpost " +
-                                "${journalpost.journalpostId}."
+                                "${journalpost.journalpostId}.",
                         )
                         Task(
                             OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
                             journalpost.journalpostId,
-                            task.metadata
+                            task.metadata,
                         ).also { taskService.save(it) }
                         return
-                    }
+                    },
                 )
             }
             Journalstatus.JOURNALFOERT -> log.info(
                 "Skipper oppdatering og ferdigstilling av " +
-                    "journalpost ${journalpost.journalpostId} som alt er ferdig journalført"
+                    "journalpost ${journalpost.journalpostId} som alt er ferdig journalført",
             )
             else -> error("Uventet journalstatus ${journalpost.journalstatus} for journalpost ${journalpost.journalpostId}")
         }
@@ -71,7 +71,7 @@ class OppdaterOgFerdigstillJournalpostTask(
             payload = task.payload,
             properties = task.metadata.apply {
                 this["fagsystem"] = "BA"
-            }
+            },
         )
         taskService.save(nyTask)
     }

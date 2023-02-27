@@ -35,7 +35,7 @@ class E2EController(
     private val journalhendelseService: JournalhendelseService,
     private val hendelsesloggRepository: HendelsesloggRepository,
     private val taskService: TaskService,
-    private val databaseCleanupService: DatabaseCleanupService
+    private val databaseCleanupService: DatabaseCleanupService,
 ) {
 
     val logger: Logger = LoggerFactory.getLogger(E2EController::class.java)
@@ -51,7 +51,7 @@ class E2EController(
             personIdenter = personIdenter,
             endringstype = LeesahService.OPPRETTET,
             opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
-            fødselsdato = LocalDate.now()
+            fødselsdato = LocalDate.now(),
         )
 
         leesahService.prosesserNyHendelse(pdlHendelse)
@@ -69,7 +69,7 @@ class E2EController(
             personIdenter = personIdenter,
             endringstype = LeesahService.OPPRETTET,
             opplysningstype = LeesahService.OPPLYSNINGSTYPE_DØDSFALL,
-            dødsdato = LocalDate.now()
+            dødsdato = LocalDate.now(),
         )
 
         leesahService.prosesserNyHendelse(pdlHendelse)
@@ -87,7 +87,7 @@ class E2EController(
             personIdenter = personIdenter,
             endringstype = LeesahService.OPPRETTET,
             opplysningstype = LeesahService.OPPLYSNINGSTYPE_UTFLYTTING,
-            utflyttingsdato = LocalDate.now()
+            utflyttingsdato = LocalDate.now(),
         )
 
         leesahService.prosesserNyHendelse(pdlHendelse)
@@ -108,7 +108,7 @@ class E2EController(
             "BAR",
             null, // Må settes på selve journalposten
             "e2e-$hendelseid",
-            null
+            null,
         ) // Kan settes på selve journalposten
 
         val cr = ConsumerRecord("topic", 1, 1, 1L, journalHendelse)
@@ -127,7 +127,7 @@ class E2EController(
     @GetMapping(path = ["/hendelselogg/{hendelseId}/{consumer}"])
     fun hentHendelselogg(
         @PathVariable(name = "hendelseId", required = true) hendelseId: String,
-        @PathVariable(name = "consumer", required = true) consumer: HendelseConsumer
+        @PathVariable(name = "consumer", required = true) consumer: HendelseConsumer,
     ): Boolean {
         return hendelsesloggRepository.existsByHendelseIdAndConsumer(hendelseId, consumer)
     }
@@ -135,7 +135,7 @@ class E2EController(
     @GetMapping(path = ["/task/{key}/{value}"])
     fun hentTaskMedProperty(
         @PathVariable(name = "key", required = true) key: String,
-        @PathVariable(name = "value", required = true) value: String
+        @PathVariable(name = "value", required = true) value: String,
     ): List<Task> {
         return taskService.findAll().filter { it.metadata[key] == value }
     }

@@ -14,12 +14,12 @@ import java.util.*
 
 abstract class AbstractOppgaveMapper(
     private val hentEnhetClient: HentEnhetClient,
-    private val pdlClient: PdlClient
+    private val pdlClient: PdlClient,
 ) : IOppgaveMapper {
     override fun tilOpprettOppgaveRequest(
         oppgavetype: Oppgavetype,
         journalpost: Journalpost,
-        beskrivelse: String?
+        beskrivelse: String?,
     ): OpprettOppgaveRequest {
         validerJournalpost(journalpost)
         val ident = tilOppgaveIdent(journalpost, oppgavetype)
@@ -33,7 +33,7 @@ abstract class AbstractOppgaveMapper(
             beskrivelse = tilBeskrivelse(journalpost, beskrivelse),
             enhetsnummer = utledEnhetsnummer(journalpost),
             behandlingstema = hentBehandlingstema(journalpost),
-            behandlingstype = hentBehandlingstype(journalpost)
+            behandlingstype = hentBehandlingstype(journalpost),
         )
     }
 
@@ -57,13 +57,13 @@ abstract class AbstractOppgaveMapper(
                 hentAktørIdFraPdl(journalpost.bruker.id.trim())?.let {
                     OppgaveIdentV2(
                         ident = it,
-                        gruppe = IdentGruppe.AKTOERID
+                        gruppe = IdentGruppe.AKTOERID,
                     )
                 }
                     ?: if (oppgavetype == Oppgavetype.BehandleSak) {
                         throw IntegrasjonException(
                             msg = "Fant ikke aktørId på person i PDL",
-                            ident = journalpost.bruker.id
+                            ident = journalpost.bruker.id,
                         )
                     } else {
                         null
@@ -134,7 +134,7 @@ interface IOppgaveMapper {
     fun tilOpprettOppgaveRequest(
         oppgavetype: Oppgavetype,
         journalpost: Journalpost,
-        beskrivelse: String? = null
+        beskrivelse: String? = null,
     ): OpprettOppgaveRequest
 
     fun støtterTema(tema: Tema) = this.tema == tema
@@ -145,7 +145,7 @@ class OppgaveMapperService(val oppgaveMappers: Collection<IOppgaveMapper>) {
     fun tilOpprettOppgaveRequest(
         oppgavetype: Oppgavetype,
         journalpost: Journalpost,
-        beskrivelse: String? = null
+        beskrivelse: String? = null,
     ): OpprettOppgaveRequest =
         oppgaveMappers.first { it.støtterTema(Tema.valueOf(journalpost.tema!!)) }
             .tilOpprettOppgaveRequest(oppgavetype, journalpost, beskrivelse)

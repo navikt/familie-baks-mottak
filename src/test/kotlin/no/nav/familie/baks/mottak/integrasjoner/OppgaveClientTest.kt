@@ -45,7 +45,7 @@ import java.time.LocalDateTime
 
 @SpringBootTest(
     classes = [DevLauncher::class],
-    properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api", "NORG2_API_URL=http://localhost:28085/norg2/"]
+    properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api", "NORG2_API_URL=http://localhost:28085/norg2/"],
 )
 @ActiveProfiles("dev", "mock-oauth")
 @AutoConfigureWireMock(port = 28085)
@@ -63,8 +63,8 @@ class OppgaveClientTest {
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(Enhet("9999", "enhetNavn", true, "Aktiv")))
-                )
+                        .withBody(objectMapper.writeValueAsString(Enhet("9999", "enhetNavn", true, "Aktiv"))),
+                ),
         )
     }
 
@@ -84,9 +84,9 @@ class OppgaveClientTest {
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
-                            objectMapper.writeValueAsString(success(OppgaveResponse(oppgaveId = 1234)))
-                        )
-                )
+                            objectMapper.writeValueAsString(success(OppgaveResponse(oppgaveId = 1234))),
+                        ),
+                ),
         )
         mockkStatic(LocalDateTime::class)
         every { LocalDateTime.now() } returns LocalDateTime.of(2020, 4, 1, 0, 0)
@@ -105,12 +105,12 @@ class OppgaveClientTest {
                             journalpostId = "1234567",
                             oppgavetype = "Journalføring",
                             behandlingstema = Behandlingstema.OrdinærBarnetrygd.value,
-                            beskrivelse = "Tittel"
+                            beskrivelse = "Tittel",
                         ),
                         true,
-                        true
-                    )
-                )
+                        true,
+                    ),
+                ),
         )
     }
 
@@ -124,9 +124,9 @@ class OppgaveClientTest {
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
-                            objectMapper.writeValueAsString(success(OppgaveResponse(oppgaveId = 1234)))
-                        )
-                )
+                            objectMapper.writeValueAsString(success(OppgaveResponse(oppgaveId = 1234))),
+                        ),
+                ),
         )
         mockkStatic(LocalDateTime::class)
         every { LocalDateTime.now() } returns LocalDateTime.of(2020, 4, 1, 0, 0)
@@ -145,12 +145,12 @@ class OppgaveClientTest {
                             journalpostId = "1234567",
                             oppgavetype = "BehandleSak",
                             behandlingstema = Behandlingstema.OrdinærBarnetrygd.value,
-                            beskrivelse = "Tittel"
+                            beskrivelse = "Tittel",
                         ),
                         true,
-                        true
-                    )
-                )
+                        true,
+                    ),
+                ),
         )
     }
 
@@ -162,8 +162,8 @@ class OppgaveClientTest {
                 .willReturn(
                     aResponse()
                         .withStatus(500)
-                        .withBody(objectMapper.writeValueAsString(Ressurs.failure<String>("test")))
-                )
+                        .withBody(objectMapper.writeValueAsString(Ressurs.failure<String>("test"))),
+                ),
         )
 
         assertThatThrownBy {
@@ -202,12 +202,12 @@ class OppgaveClientTest {
                                 success(
                                     FinnOppgaveResponseDto(
                                         antallTreffTotalt = 1,
-                                        oppgaver = listOf(Oppgave(id = 1234))
-                                    )
-                                )
-                            )
-                        )
-                )
+                                        oppgaver = listOf(Oppgave(id = 1234)),
+                                    ),
+                                ),
+                            ),
+                        ),
+                ),
         )
 
         val oppgaveListe = oppgaveClient.finnOppgaver(journalPost.journalpostId, Oppgavetype.Journalføring)
@@ -229,12 +229,12 @@ class OppgaveClientTest {
                                 success(
                                     FinnOppgaveResponseDto(
                                         antallTreffTotalt = 0,
-                                        oppgaver = emptyList()
-                                    )
-                                )
-                            )
-                        )
-                )
+                                        oppgaver = emptyList(),
+                                    ),
+                                ),
+                            ),
+                        ),
+                ),
         )
 
         val oppgaveListe = oppgaveClient.finnOppgaver(journalPost.journalpostId, Oppgavetype.Journalføring)
@@ -246,7 +246,7 @@ class OppgaveClientTest {
         journalpostId: String,
         oppgavetype: String,
         behandlingstema: String,
-        beskrivelse: String
+        beskrivelse: String,
     ): String {
         return "{\n" +
             "  \"ident\": {\n" +
@@ -282,9 +282,9 @@ class OppgaveClientTest {
                     "Tittel",
                     "NAV- 99.00.07",
                     null,
-                    null
-                )
-            )
+                    null,
+                ),
+            ),
         )
     }
 }

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service
 class JournalføringService(
     private val dokarkivClient: DokarkivClient,
     private val søknadService: SøknadService,
-    private val kontantstøtteSøknadService: KontantstøtteSøknadService
+    private val kontantstøtteSøknadService: KontantstøtteSøknadService,
 ) {
 
     fun journalførBarnetrygdSøknad(dbSøknad: DBSøknad, pdf: ByteArray, pdfOriginalSpråk: ByteArray = ByteArray(0)) {
@@ -26,7 +26,7 @@ class JournalføringService(
                 versjonertSøknad = dbSøknad.hentVersjonertSøknad(),
                 pdf = pdf,
                 vedleggMap = vedlegg,
-                pdfOriginalSpråk = pdfOriginalSpråk
+                pdfOriginalSpråk = pdfOriginalSpråk,
             )
             val journalpostId: String = arkiverSøknad(arkiverDokumentRequest)
             val dbSøknadMedJournalpostId = dbSøknad.copy(journalpostId = journalpostId)
@@ -43,7 +43,7 @@ class JournalføringService(
     fun journalførKontantstøtteSøknad(
         dbKontantstøtteSøknad: DBKontantstøtteSøknad,
         pdf: ByteArray,
-        pdfOriginalSpråk: ByteArray = ByteArray(0)
+        pdfOriginalSpråk: ByteArray = ByteArray(0),
     ) {
         if (dbKontantstøtteSøknad.journalpostId == null) {
             val vedlegg = kontantstøtteSøknadService.hentLagredeDBKontantstøtteVedlegg(dbKontantstøtteSøknad)
@@ -53,7 +53,7 @@ class JournalføringService(
                 versjonertSøknad = dbKontantstøtteSøknad.hentVersjonertKontantstøtteSøknad(),
                 pdf = pdf,
                 vedleggMap = vedlegg,
-                pdfOriginalSpråk = pdfOriginalSpråk
+                pdfOriginalSpråk = pdfOriginalSpråk,
             )
             val journalpostId: String = arkiverSøknad(arkiverDokumentRequest)
             val dbSøknadMedJournalpostId = dbKontantstøtteSøknad.copy(journalpostId = journalpostId)

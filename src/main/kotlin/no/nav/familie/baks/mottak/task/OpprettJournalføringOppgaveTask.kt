@@ -18,11 +18,11 @@ import org.springframework.stereotype.Service
 @Service
 @TaskStepBeskrivelse(
     taskStepType = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
-    beskrivelse = "Opprett journalføringsoppgave"
+    beskrivelse = "Opprett journalføringsoppgave",
 )
 class OpprettJournalføringOppgaveTask(
     private val journalpostClient: JournalpostClient,
-    private val oppgaveClient: OppgaveClient
+    private val oppgaveClient: OppgaveClient,
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(OpprettJournalføringOppgaveTask::class.java)
@@ -46,7 +46,7 @@ class OpprettJournalføringOppgaveTask(
                     if (journalføringsOppgaver.isNotEmpty()) {
                         Oppgavetype.Journalføring
                     } else if (oppgaveClient.finnOppgaver(journalpost.journalpostId, Oppgavetype.Fordeling)
-                        .isNotEmpty()
+                            .isNotEmpty()
                     ) {
                         Oppgavetype.Fordeling
                     } else {
@@ -55,7 +55,7 @@ class OpprettJournalføringOppgaveTask(
                 if (oppgaveTypeForEksisterendeOppgave == null) {
                     val nyOppgave = oppgaveClient.opprettJournalføringsoppgave(
                         journalpost = journalpost,
-                        beskrivelse = task.payload.takeIf { it.isNotEmpty() }
+                        beskrivelse = task.payload.takeIf { it.isNotEmpty() },
                     )
                     task.metadata["oppgaveId"] = "${nyOppgave.oppgaveId}"
                     log.info("Oppretter ny journalførings-oppgave med id ${nyOppgave.oppgaveId} for journalpost ${journalpost.journalpostId}")
@@ -78,7 +78,7 @@ class OpprettJournalføringOppgaveTask(
 
             else -> {
                 val error = IllegalStateException(
-                    "Journalpost ${journalpost.journalpostId} har endret status fra MOTTATT til ${journalpost.journalstatus.name}"
+                    "Journalpost ${journalpost.journalpostId} har endret status fra MOTTATT til ${journalpost.journalstatus.name}",
                 )
                 log.info("OpprettJournalføringOppgaveTask feilet.", error)
                 throw error

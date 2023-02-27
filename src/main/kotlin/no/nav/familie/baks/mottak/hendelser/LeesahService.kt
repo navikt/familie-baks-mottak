@@ -32,7 +32,7 @@ class LeesahService(
     private val hendelsesloggRepository: HendelsesloggRepository,
     private val taskService: TaskService,
     @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") private val triggerTidForTps: Long,
-    private val environment: Environment
+    private val environment: Environment,
 ) {
 
     val dødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall")
@@ -117,9 +117,9 @@ class LeesahService(
                             properties = Properties().apply {
                                 this["ident"] = pdlHendelse.hentPersonident()
                                 this["callId"] = pdlHendelse.hendelseId
-                            }
+                            },
                         ).medTriggerTid(
-                            nesteGyldigeTriggertidFødselshendelser(triggerTidForTps, environment)
+                            nesteGyldigeTriggertidFødselshendelser(triggerTidForTps, environment),
                         )
                         taskService.save(task)
                     }
@@ -137,14 +137,14 @@ class LeesahService(
                         payload = objectMapper.writeValueAsString(
                             RestAnnullerFødsel(
                                 barnasIdenter = pdlHendelse.hentPersonidenter(),
-                                tidligereHendelseId = pdlHendelse.tidligereHendelseId
-                            )
+                                tidligereHendelseId = pdlHendelse.tidligereHendelseId,
+                            ),
                         ),
                         properties = Properties().apply {
                             this["ident"] = pdlHendelse.hentPersonident()
                             this["callId"] = pdlHendelse.hendelseId
                             this["tidligereHendelseId"] = pdlHendelse.tidligereHendelseId
-                        }
+                        },
                     )
                     taskService.save(task)
                 } else {
@@ -221,7 +221,7 @@ class LeesahService(
                 "offset: ${pdlHendelse.offset}, " +
                 "opplysningstype: ${pdlHendelse.opplysningstype}, " +
                 "aktørid: ${pdlHendelse.gjeldendeAktørId}, " +
-                "endringstype: ${pdlHendelse.endringstype}, $ekstraInfo"
+                "endringstype: ${pdlHendelse.endringstype}, $ekstraInfo",
         )
     }
 
@@ -229,7 +229,7 @@ class LeesahService(
         val metadata = mutableMapOf(
             "aktørId" to pdlHendelse.gjeldendeAktørId,
             "opplysningstype" to pdlHendelse.opplysningstype,
-            "endringstype" to pdlHendelse.endringstype
+            "endringstype" to pdlHendelse.endringstype,
         )
 
         if (pdlHendelse.fødeland != null) {
@@ -242,8 +242,8 @@ class LeesahService(
                 pdlHendelse.hendelseId,
                 CONSUMER_PDL,
                 metadata.toProperties(),
-                ident = pdlHendelse.hentPersonident()
-            )
+                ident = pdlHendelse.hentPersonident(),
+            ),
         )
     }
 
@@ -256,7 +256,7 @@ class LeesahService(
                 this["ident"] = pdlHendelse.hentPersonident()
                 this["callId"] = pdlHendelse.hendelseId
                 this["type"] = type.name
-            }
+            },
         ).medTriggerTid(LocalDateTime.now().run { if (environment.activeProfiles.contains("prod")) this.plusHours(1) else this })
             .also {
                 taskService.save(it)

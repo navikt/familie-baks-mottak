@@ -28,25 +28,25 @@ class SøknadSpråkvelgerServiceTest {
         val tekstPåSpråk = mapOf(
             "nb" to "Norge",
             "nn" to "Noreg",
-            "en" to "Norway"
+            "en" to "Norway",
         )
         val teksterTilPdf = mapOf(
             "testApiNavn" to TekstPåSpråkMap(
-                tekstPåSpråk
-            )
+                tekstPåSpråk,
+            ),
         )
         every { barn.teksterTilPdf } returns teksterTilPdf
         every { kontantstøtteSøknad.barn } returns listOf(
-            barn
+            barn,
         )
         every { kontantstøtteSøknad.teksterTilPdf } returns teksterTilPdf
         every { kontantstøtteSøknad.erBarnAdoptert } returns Søknadsfelt(
             label = tekstPåSpråk,
-            verdi = tekstPåSpråk
+            verdi = tekstPåSpråk,
         )
         every { dokumentasjon.dokumentasjonSpråkTittel } returns TekstPåSpråkMap(tekstPåSpråk)
         every { kontantstøtteSøknad.dokumentasjon } returns listOf(
-            dokumentasjon
+            dokumentasjon,
         )
 
         val versjonertKontantstøtteSøknad = KontantstøtteSøknadV2(søknad = kontantstøtteSøknad)
@@ -61,7 +61,7 @@ class SøknadSpråkvelgerServiceTest {
         assertEquals("Norge", kontantstøtteSøknadJsonNode["barn"][0]["teksterTilPdf"]["testApiNavn"].textValue())
         assertEquals(
             "Norge",
-            kontantstøtteSøknadJsonNode["dokumentasjon"][0]["dokumentasjonSpråkTittel"].textValue()
+            kontantstøtteSøknadJsonNode["dokumentasjon"][0]["dokumentasjonSpråkTittel"].textValue(),
         )
 
         // Tester SøknadsfeltSerializer
@@ -78,7 +78,7 @@ class SøknadSpråkvelgerServiceTest {
         assertEquals("Noreg", kontantstøtteSøknadJsonNode["barn"][0]["teksterTilPdf"]["testApiNavn"].textValue())
         assertEquals(
             "Noreg",
-            kontantstøtteSøknadJsonNode["dokumentasjon"][0]["dokumentasjonSpråkTittel"].textValue()
+            kontantstøtteSøknadJsonNode["dokumentasjon"][0]["dokumentasjonSpråkTittel"].textValue(),
         )
 
         // Tester SøknadsfeltSerializer
@@ -95,7 +95,7 @@ class SøknadSpråkvelgerServiceTest {
         assertEquals("Norway", kontantstøtteSøknadJsonNode["barn"][0]["teksterTilPdf"]["testApiNavn"].textValue())
         assertEquals(
             "Norway",
-            kontantstøtteSøknadJsonNode["dokumentasjon"][0]["dokumentasjonSpråkTittel"].textValue()
+            kontantstøtteSøknadJsonNode["dokumentasjon"][0]["dokumentasjonSpråkTittel"].textValue(),
         )
 
         // Tester SøknadsfeltSerializer

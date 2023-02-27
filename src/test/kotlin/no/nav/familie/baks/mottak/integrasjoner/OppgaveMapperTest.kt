@@ -27,7 +27,7 @@ class OppgaveMapperTest(
     private val journalpostClient: JournalpostClient,
 
     @Autowired
-    private val mockPdlClient: PdlClient
+    private val mockPdlClient: PdlClient,
 ) {
 
     private val mockHentEnhetClient: HentEnhetClient = mockk(relaxed = true)
@@ -43,7 +43,7 @@ class OppgaveMapperTest(
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
                 journalpostClient.hentJournalpost("123")
-                    .copy(dokumenter = listOf())
+                    .copy(dokumenter = listOf()),
             )
         }
     }
@@ -60,11 +60,11 @@ class OppgaveMapperTest(
                                 tittel = null,
                                 brevkode = "",
                                 dokumentstatus = null,
-                                dokumentvarianter = null
-                            )
+                                dokumentvarianter = null,
+                            ),
                         ),
-                        bruker = null
-                    )
+                        bruker = null,
+                    ),
             )
         }
     }
@@ -82,10 +82,10 @@ class OppgaveMapperTest(
                             tittel = null,
                             brevkode = "NAV 33-00.07",
                             dokumentstatus = null,
-                            dokumentvarianter = null
-                        )
-                    )
-                )
+                            dokumentvarianter = null,
+                        ),
+                    ),
+                ),
         )
         assertNull(oppgave.ident)
     }
@@ -102,11 +102,11 @@ class OppgaveMapperTest(
                                 tittel = null,
                                 brevkode = "",
                                 dokumentstatus = null,
-                                dokumentvarianter = null
-                            )
+                                dokumentvarianter = null,
+                            ),
                         ),
-                        bruker = null
-                    )
+                        bruker = null,
+                    ),
             )
         }
     }
@@ -122,10 +122,10 @@ class OppgaveMapperTest(
                             tittel = null,
                             brevkode = "NAV 33-00.07",
                             dokumentstatus = null,
-                            dokumentvarianter = null
-                        )
-                    )
-                )
+                            dokumentvarianter = null,
+                        ),
+                    ),
+                ),
         )
         assertEquals(Behandlingstema.OrdinærBarnetrygd.value, oppgave.behandlingstema)
     }
@@ -141,11 +141,11 @@ class OppgaveMapperTest(
                             tittel = null,
                             brevkode = null,
                             dokumentstatus = null,
-                            dokumentvarianter = null
-                        )
+                            dokumentvarianter = null,
+                        ),
                     ),
-                    behandlingstema = "btema"
-                )
+                    behandlingstema = "btema",
+                ),
         )
         assertEquals(Behandlingstema.OrdinærBarnetrygd.value, oppgave.behandlingstema)
     }
@@ -161,14 +161,14 @@ class OppgaveMapperTest(
                             tittel = null,
                             brevkode = null,
                             dokumentstatus = null,
-                            dokumentvarianter = null
-                        )
+                            dokumentvarianter = null,
+                        ),
                     ),
                     bruker = Bruker(
                         id = "42345678910",
-                        type = BrukerIdType.FNR
-                    )
-                )
+                        type = BrukerIdType.FNR,
+                    ),
+                ),
         )
         assertNull(oppgave.behandlingstype)
         assertEquals(Behandlingstema.BarnetrygdEØS.value, oppgave.behandlingstema)
@@ -185,17 +185,17 @@ class OppgaveMapperTest(
                             tittel = null,
                             brevkode = null,
                             dokumentstatus = null,
-                            dokumentvarianter = null
+                            dokumentvarianter = null,
                         ),
                         DokumentInfo(
                             tittel = null,
                             brevkode = "NAV 33-00.15",
                             dokumentstatus = null,
-                            dokumentvarianter = null
-                        )
+                            dokumentvarianter = null,
+                        ),
                     ),
-                    behandlingstema = Behandlingstema.OrdinærBarnetrygd.value
-                )
+                    behandlingstema = Behandlingstema.OrdinærBarnetrygd.value,
+                ),
         )
         assertNull(oppgave.behandlingstema)
         assertEquals(Behandlingstype.Utland.value, oppgave.behandlingstype)
@@ -212,12 +212,12 @@ class OppgaveMapperTest(
                             tittel = "Whatever",
                             brevkode = "kode",
                             dokumentstatus = null,
-                            dokumentvarianter = null
-                        )
+                            dokumentvarianter = null,
+                        ),
                     ),
-                    behandlingstema = "btema"
+                    behandlingstema = "btema",
                 ),
-            beskrivelse = null
+            beskrivelse = null,
         )
         assertEquals("Whatever", oppgave.beskrivelse)
     }
@@ -233,11 +233,11 @@ class OppgaveMapperTest(
                             tittel = "Whatever",
                             brevkode = null,
                             dokumentstatus = null,
-                            dokumentvarianter = null
-                        )
+                            dokumentvarianter = null,
+                        ),
                     ),
-                    behandlingstema = "btema"
-                )
+                    behandlingstema = "btema",
+                ),
         )
         assertEquals("", oppgaveUtenBeskrivelse1.beskrivelse)
     }
@@ -253,11 +253,11 @@ class OppgaveMapperTest(
                             tittel = null,
                             brevkode = "kode",
                             dokumentstatus = null,
-                            dokumentvarianter = null
-                        )
+                            dokumentvarianter = null,
+                        ),
                     ),
-                    behandlingstema = "btema"
-                )
+                    behandlingstema = "btema",
+                ),
         )
         assertEquals("", oppgaveUtenBeskrivelse2.beskrivelse)
     }
@@ -273,12 +273,12 @@ class OppgaveMapperTest(
                             tittel = "Whatever",
                             brevkode = "kode",
                             dokumentstatus = null,
-                            dokumentvarianter = null
-                        )
+                            dokumentvarianter = null,
+                        ),
                     ),
-                    behandlingstema = "btema"
+                    behandlingstema = "btema",
                 ),
-            "beskrivelsefelt"
+            "beskrivelsefelt",
         )
         assertEquals("Whatever - beskrivelsefelt", oppgaveUtenBeskrivelse2.beskrivelse)
     }
@@ -294,12 +294,12 @@ class OppgaveMapperTest(
                             tittel = null,
                             brevkode = "kode",
                             dokumentstatus = null,
-                            dokumentvarianter = null
-                        )
+                            dokumentvarianter = null,
+                        ),
                     ),
-                    behandlingstema = "btema"
+                    behandlingstema = "btema",
                 ),
-            "beskrivelsefelt"
+            "beskrivelsefelt",
         )
         assertEquals("beskrivelsefelt", oppgaveUtenBeskrivelse2.beskrivelse)
     }
@@ -316,11 +316,11 @@ class OppgaveMapperTest(
                             tittel = null,
                             brevkode = "kode",
                             dokumentstatus = null,
-                            dokumentvarianter = null
-                        )
+                            dokumentvarianter = null,
+                        ),
                     ),
-                    behandlingstema = "btema"
-                )
+                    behandlingstema = "btema",
+                ),
         )
         assertThat(oppgave.enhetsnummer).isEqualTo("4806")
     }
@@ -337,11 +337,11 @@ class OppgaveMapperTest(
                             tittel = null,
                             brevkode = "kode",
                             dokumentstatus = null,
-                            dokumentvarianter = null
-                        )
+                            dokumentvarianter = null,
+                        ),
                     ),
-                    behandlingstema = "btema"
-                )
+                    behandlingstema = "btema",
+                ),
         )
         assertThat(oppgave.enhetsnummer).isNull()
     }
@@ -359,11 +359,11 @@ class OppgaveMapperTest(
                             tittel = null,
                             brevkode = "kode",
                             dokumentstatus = null,
-                            dokumentvarianter = null
-                        )
+                            dokumentvarianter = null,
+                        ),
                     ),
-                    behandlingstema = "btema"
-                )
+                    behandlingstema = "btema",
+                ),
         )
         assertThat(oppgave.enhetsnummer).isEqualTo("4")
     }
@@ -381,11 +381,11 @@ class OppgaveMapperTest(
                             tittel = null,
                             brevkode = "kode",
                             dokumentstatus = null,
-                            dokumentvarianter = null
-                        )
+                            dokumentvarianter = null,
+                        ),
                     ),
-                    behandlingstema = "btema"
-                )
+                    behandlingstema = "btema",
+                ),
         )
         assertThat(oppgave.enhetsnummer).isNull()
     }
@@ -403,11 +403,11 @@ class OppgaveMapperTest(
                             tittel = null,
                             brevkode = "kode",
                             dokumentstatus = null,
-                            dokumentvarianter = null
-                        )
+                            dokumentvarianter = null,
+                        ),
                     ),
-                    behandlingstema = "btema"
-                )
+                    behandlingstema = "btema",
+                ),
         )
         assertThat(oppgave.enhetsnummer).isNull()
     }
@@ -425,11 +425,11 @@ class OppgaveMapperTest(
                             tittel = null,
                             brevkode = "kode",
                             dokumentstatus = null,
-                            dokumentvarianter = null
-                        )
+                            dokumentvarianter = null,
+                        ),
                     ),
-                    behandlingstema = "btema"
-                )
+                    behandlingstema = "btema",
+                ),
         )
         assertThat(oppgave.ident).isNull()
     }
@@ -447,11 +447,11 @@ class OppgaveMapperTest(
                             tittel = null,
                             brevkode = "kode",
                             dokumentstatus = null,
-                            dokumentvarianter = null
-                        )
+                            dokumentvarianter = null,
+                        ),
                     ),
-                    behandlingstema = "btema"
-                )
+                    behandlingstema = "btema",
+                ),
         )
         assertThat(oppgave.ident).isEqualTo(OppgaveIdentV2("900000000", IdentGruppe.ORGNR))
     }
@@ -460,7 +460,7 @@ class OppgaveMapperTest(
     fun `skal sette behandlingstype NASJONAL dersom tema er KON og søknad ikke er EØS søknad`() {
         val opprettOppgaveRequest = kontantstøtteOppgaveMapper.tilOpprettOppgaveRequest(
             Oppgavetype.Journalføring,
-            journalpostClient.hentJournalpost("456")
+            journalpostClient.hentJournalpost("456"),
         )
         assertEquals(Tema.KON, opprettOppgaveRequest.tema)
         assertEquals(Behandlingstype.NASJONAL.value, opprettOppgaveRequest.behandlingstype)
@@ -473,9 +473,9 @@ class OppgaveMapperTest(
             journalpostClient.hentJournalpost("456").copy(
                 bruker = Bruker(
                     id = "42345678910",
-                    type = BrukerIdType.FNR
-                )
-            )
+                    type = BrukerIdType.FNR,
+                ),
+            ),
         )
         assertEquals(Tema.KON, opprettOppgaveRequest.tema)
         assertEquals(null, opprettOppgaveRequest.behandlingstema)

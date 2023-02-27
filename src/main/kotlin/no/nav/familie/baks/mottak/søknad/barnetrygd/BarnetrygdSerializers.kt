@@ -22,8 +22,8 @@ class SøknaddokumentasjonSerializer(private val språk: String) : JsonSerialize
                 "dokumentasjonsbehov" to dokumentasjon.dokumentasjonsbehov,
                 "harSendtInn" to dokumentasjon.harSendtInn,
                 "opplastedeVedlegg" to dokumentasjon.opplastedeVedlegg,
-                "dokumentasjonSpråkTittel" to dokumentasjon.dokumentasjonSpråkTittel[språk]
-            )
+                "dokumentasjonSpråkTittel" to dokumentasjon.dokumentasjonSpråkTittel[språk],
+            ),
         )
     }
 }
@@ -33,8 +33,8 @@ class SøknadsfeltSerializer(private val språk: String) : JsonSerializer<Søkna
         return jsonGenerator.writeObject(
             mapOf(
                 "label" to søknadsFelt.label[språk],
-                "verdi" to søknadsFelt.verdi[språk]
-            )
+                "verdi" to søknadsFelt.verdi[språk],
+            ),
         )
     }
 }

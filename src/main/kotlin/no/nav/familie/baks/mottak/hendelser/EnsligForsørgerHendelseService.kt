@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service
 class EnsligForsørgerHendelseService(
     val sakClient: SakClient,
     val pdlClient: PdlClient,
-    val hendelsesloggRepository: HendelsesloggRepository
+    val hendelsesloggRepository: HendelsesloggRepository,
 ) {
 
     val ensligForsørgerVedtakhendelseOvergangstønadCounter: Counter =
@@ -31,7 +31,7 @@ class EnsligForsørgerHendelseService(
             StønadType.OVERGANGSSTØNAD -> {
                 if (!hendelsesloggRepository.existsByHendelseIdAndConsumer(
                         ensligForsørgerVedtakhendelse.behandlingId.toString(),
-                        HendelseConsumer.EF_VEDTAK_V1
+                        HendelseConsumer.EF_VEDTAK_V1,
                     )
                 ) {
                     secureLogger.info("Mottatt vedtak om overgangsstønad hendelse: $ensligForsørgerVedtakhendelse")
@@ -45,10 +45,10 @@ class EnsligForsørgerHendelseService(
                             HendelseConsumer.EF_VEDTAK_V1,
                             mapOf(
                                 "behandlingId" to ensligForsørgerVedtakhendelse.behandlingId.toString(),
-                                "stønadstype" to ensligForsørgerVedtakhendelse.stønadType.toString()
+                                "stønadstype" to ensligForsørgerVedtakhendelse.stønadType.toString(),
                             ).toProperties(),
-                            ident = ensligForsørgerVedtakhendelse.personIdent
-                        )
+                            ident = ensligForsørgerVedtakhendelse.personIdent,
+                        ),
                     )
                     ensligForsørgerVedtakhendelseOvergangstønadCounter.increment()
                 }
@@ -68,7 +68,7 @@ class EnsligForsørgerHendelseService(
 
         if (!hendelsesloggRepository.existsByHendelseIdAndConsumer(
                 hendelse.hendelseId,
-                HendelseConsumer.EF_VEDTAK_INFOTRYGD_V1
+                HendelseConsumer.EF_VEDTAK_INFOTRYGD_V1,
             )
         ) {
             secureLogger.info("Mottatt infotrygdvedtak om overgangsstønad: $hendelse")
@@ -85,10 +85,10 @@ class EnsligForsørgerHendelseService(
                     mapOf(
                         "personIdent" to personIdent,
                         "hendelseId" to hendelse.hendelseId,
-                        "sats" to hendelse.sats.toString()
+                        "sats" to hendelse.sats.toString(),
                     ).toProperties(),
-                    ident = personIdent
-                )
+                    ident = personIdent,
+                ),
             )
             ensligForsørgerInfotrygdVedtakhendelseOvergangstønadCounter.increment()
         }

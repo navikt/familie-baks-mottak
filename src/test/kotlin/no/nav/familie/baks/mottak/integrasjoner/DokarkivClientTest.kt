@@ -42,8 +42,8 @@ class DokarkivClientTest {
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withBody(response)
-                )
+                        .withBody(response),
+                ),
         )
 
         dokarkivClient.oppdaterJournalpostSak(jp, "11111111")
@@ -63,8 +63,8 @@ class DokarkivClientTest {
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withStatus(200)
-                        .withBody(objectMapper.writeValueAsString(Ressurs.success(ArkiverDokumentResponse("123456", false))))
-                )
+                        .withBody(objectMapper.writeValueAsString(Ressurs.success(ArkiverDokumentResponse("123456", false)))),
+                ),
         )
         dokarkivClient.arkiver(ArkiverDokumentRequest(jp.bruker!!.id, false, hoveddokumentvarianter))
     }
@@ -78,8 +78,8 @@ class DokarkivClientTest {
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withBody(response)
-                )
+                        .withBody(response),
+                ),
         )
 
         dokarkivClient.ferdigstillJournalpost("12345678")
@@ -94,8 +94,8 @@ class DokarkivClientTest {
                 .willReturn(
                     aResponse()
                         .withStatus(500)
-                        .withBody(objectMapper.writeValueAsString(Ressurs.failure<String>("test")))
-                )
+                        .withBody(objectMapper.writeValueAsString(Ressurs.failure<String>("test"))),
+                ),
         )
 
         Assertions.assertThatThrownBy {
@@ -124,7 +124,7 @@ class DokarkivClientTest {
             journalpostId = "12345678",
             journalposttype = Journalposttype.I,
             journalstatus = Journalstatus.MOTTATT,
-            bruker = Bruker("12345678910", BrukerIdType.FNR)
+            bruker = Bruker("12345678910", BrukerIdType.FNR),
         )
     }
 }

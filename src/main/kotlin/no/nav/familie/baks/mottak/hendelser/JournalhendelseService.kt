@@ -30,7 +30,7 @@ import java.util.Properties
 class JournalhendelseService(
     val journalpostClient: JournalpostClient,
     val taskService: TaskService,
-    val hendelsesloggRepository: HendelsesloggRepository
+    val hendelsesloggRepository: HendelsesloggRepository,
 ) {
 
     val barnetrygdKanalCounter = mutableMapOf<String, Counter>()
@@ -47,7 +47,7 @@ class JournalhendelseService(
 
     fun prosesserNyHendelse(
         consumerRecord: ConsumerRecord<Long, JournalfoeringHendelseRecord>,
-        ack: Acknowledgment
+        ack: Acknowledgment,
     ) {
         try {
             val hendelseRecord = consumerRecord.value()
@@ -57,7 +57,7 @@ class JournalhendelseService(
             if (erGyldigHendelsetype(hendelseRecord)) {
                 if (hendelsesloggRepository.existsByHendelseIdAndConsumer(
                         hendelseRecord.hendelsesId.toString(),
-                        CONSUMER_JOURNAL
+                        CONSUMER_JOURNAL,
                     )
                 ) {
                     ack.acknowledge()
@@ -84,7 +84,7 @@ class JournalhendelseService(
     private fun lagreHendelseslogg(
         consumerRecord: ConsumerRecord<Long, JournalfoeringHendelseRecord>,
         hendelseRecord: JournalfoeringHendelseRecord,
-        hendelseConsumer: HendelseConsumer
+        hendelseConsumer: HendelseConsumer,
     ) {
         hendelsesloggRepository.save(
             Hendelseslogg(
@@ -93,9 +93,9 @@ class JournalhendelseService(
                 hendelseConsumer,
                 mapOf(
                     "journalpostId" to hendelseRecord.journalpostId.toString(),
-                    "hendelsesType" to hendelseRecord.hendelsesType.toString()
-                ).toProperties()
-            )
+                    "hendelsesType" to hendelseRecord.hendelsesType.toString(),
+                ).toProperties(),
+            ),
         )
     }
 
@@ -160,7 +160,7 @@ class JournalhendelseService(
     }
 
     private fun incrementKanalCounter(
-        journalpost: Journalpost
+        journalpost: Journalpost,
     ) {
         val (søknadKanalCounter, counterName) = getKanalCounter(journalpost)
         val kanal = journalpost.kanal!!
@@ -188,7 +188,7 @@ class JournalhendelseService(
         Task(
             type = taskType,
             payload = journalpost.kanal!!,
-            properties = opprettMetadata(journalpost)
+            properties = opprettMetadata(journalpost),
         ).apply {
             taskService.save(this)
         }
