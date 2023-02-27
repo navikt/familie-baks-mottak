@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 @Service
 class KontantstøtteOppgaveMapper(
     hentEnhetClient: HentEnhetClient,
-    pdlClient: PdlClient
+    pdlClient: PdlClient,
 ) : AbstractOppgaveMapper(hentEnhetClient, pdlClient) {
 
     override val tema: Tema = Tema.KON

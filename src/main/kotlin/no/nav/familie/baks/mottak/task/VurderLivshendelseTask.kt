@@ -50,14 +50,14 @@ import java.util.Locale
     taskStepType = VurderLivshendelseTask.TASK_STEP_TYPE,
     beskrivelse = "Vurder livshendelse",
     maxAntallFeil = 3,
-    triggerTidVedFeilISekunder = 3600
+    triggerTidVedFeilISekunder = 3600,
 )
 class VurderLivshendelseTask(
     private val oppgaveClient: OppgaveClient,
     private val pdlClient: PdlClient,
     private val sakClient: SakClient,
     private val infotrygdClient: InfotrygdBarnetrygdClient,
-    private val featureToggleService: FeatureToggleService
+    private val featureToggleService: FeatureToggleService,
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -83,8 +83,8 @@ class VurderLivshendelseTask(
                     val berørteBrukereIBaSak = finnBrukereBerørtAvDødsfallEllerUtflyttingHendelseForIdent(personIdent)
                     secureLog.info(
                         "berørteBrukereIBaSak count = ${berørteBrukereIBaSak.size}, aktørIder = ${
-                        berørteBrukereIBaSak.fold("") { aktørIder, it -> aktørIder + " " + it.aktørId }
-                        }"
+                            berørteBrukereIBaSak.fold("") { aktørIder, it -> aktørIder + " " + it.aktørId }
+                        }",
                     )
                     berørteBrukereIBaSak.forEach {
                         if (opprettEllerOppdaterVurderLivshendelseOppgave(
@@ -92,7 +92,7 @@ class VurderLivshendelseTask(
                                 aktørIdForOppgave = it.aktørId,
                                 fagsakIdForOppgave = it.fagsakId,
                                 personIdent = personIdent,
-                                task = task
+                                task = task,
                             )
                         ) {
                             oppgaveOpprettetDødsfallCounter.increment()
@@ -102,8 +102,8 @@ class VurderLivshendelseTask(
                     val berørteBrukereIBaSak = finnBrukereMedSakRelatertTilPerson(personIdent, pdlPersonData)
                     secureLog.info(
                         "berørteBrukereIBaSak count = ${berørteBrukereIBaSak.size}, identer = ${
-                        berørteBrukereIBaSak.fold("") { identer, it -> identer + " " + it.ident }
-                        }"
+                            berørteBrukereIBaSak.fold("") { identer, it -> identer + " " + it.ident }
+                        }",
                     )
                     berørteBrukereIBaSak.forEach {
                         if (opprettEllerOppdaterVurderLivshendelseOppgave(
@@ -111,7 +111,7 @@ class VurderLivshendelseTask(
                                 aktørIdForOppgave = pdlClient.hentAktørId(it.ident),
                                 fagsakIdForOppgave = it.fagsakId,
                                 personIdent = personIdent,
-                                task = task
+                                task = task,
                             )
                         ) {
                             oppgaveOpprettetDødsfallCounter.increment()
@@ -127,7 +127,7 @@ class VurderLivshendelseTask(
                                 aktørIdForOppgave = it.aktørId,
                                 fagsakIdForOppgave = it.fagsakId,
                                 personIdent = personIdent,
-                                task = task
+                                task = task,
                             )
                         ) {
                             oppgaveOpprettetUtflyttingCounter.increment()
@@ -141,7 +141,7 @@ class VurderLivshendelseTask(
                                 aktørIdForOppgave = pdlClient.hentAktørId(it.ident),
                                 fagsakIdForOppgave = it.fagsakId,
                                 personIdent = personIdent,
-                                task = task
+                                task = task,
                             )
                         ) {
                             oppgaveOpprettetUtflyttingCounter.increment()
@@ -167,7 +167,7 @@ class VurderLivshendelseTask(
                                 fagsakIdForOppgave = it.fagsakId,
                                 aktørIdForOppgave = it.aktørId,
                                 personIdent = personIdent,
-                                task = task
+                                task = task,
                             )
                         }
                     }
@@ -186,7 +186,7 @@ class VurderLivshendelseTask(
                             fagsakIdForOppgave = aktivFaksak.id,
                             aktørIdForOppgave = pdlClient.hentAktørId(personIdent),
                             personIdent = personIdent,
-                            task = task
+                            task = task,
                         )
                     }
                 }
@@ -236,7 +236,7 @@ class VurderLivshendelseTask(
 
     private fun finnBrukereMedSakRelatertTilPerson(
         personIdent: String,
-        pdlPersonData: PdlPersonData
+        pdlPersonData: PdlPersonData,
     ): Set<Bruker> {
         val brukereMedSakRelatertTilPerson = mutableSetOf<Bruker>()
 
@@ -246,7 +246,7 @@ class VurderLivshendelseTask(
         val personHarBarn = familierelasjoner.filter { it.erBarn }.let { listeMedBarn ->
             secureLog.info(
                 "finnBrukereMedSakRelatertTilPerson(): listeMedBarn size = ${listeMedBarn.size} identer = " +
-                    listeMedBarn.fold("") { identer, it -> identer + " " + it.relatertPersonsIdent }
+                    listeMedBarn.fold("") { identer, it -> identer + " " + it.relatertPersonsIdent },
             )
             listeMedBarn.isNotEmpty()
         }
@@ -265,7 +265,7 @@ class VurderLivshendelseTask(
 
         secureLog.info(
             "finnBrukereMedSakRelatertTilPerson(): brukere.size = ${brukereMedSakRelatertTilPerson.size} " +
-                "identer = ${brukereMedSakRelatertTilPerson.fold("") { identer, it -> identer + " " + it.ident }}"
+                "identer = ${brukereMedSakRelatertTilPerson.fold("") { identer, it -> identer + " " + it.ident }}",
         )
 
         if (brukereMedSakRelatertTilPerson.isNotEmpty()) {
@@ -280,12 +280,12 @@ class VurderLivshendelseTask(
 
     private fun finnForeldreMedLøpendeSak(
         personIdent: String,
-        familierelasjoner: List<PdlForeldreBarnRelasjon>
+        familierelasjoner: List<PdlForeldreBarnRelasjon>,
     ): List<Bruker> {
         return familierelasjoner.filter { !it.erBarn }.also { listeMedForeldreForBarn ->
             secureLog.info(
                 "finnForeldreMedLøpendeSak(): listeMedForeldreForBarn.size = ${listeMedForeldreForBarn.size} " +
-                    "identer = ${listeMedForeldreForBarn.fold("") { identer, it -> identer + " " + it.relatertPersonsIdent }}"
+                    "identer = ${listeMedForeldreForBarn.fold("") { identer, it -> identer + " " + it.relatertPersonsIdent }}",
             )
         }.mapNotNull { forelder ->
             forelder.relatertPersonsIdent?.let {
@@ -299,7 +299,7 @@ class VurderLivshendelseTask(
     }
 
     private fun finnBrukereBerørtAvDødsfallEllerUtflyttingHendelseForIdent(
-        personIdent: String
+        personIdent: String,
     ): List<RestFagsakIdOgTilknyttetAktørId> {
         val listeMedFagsakIdOgTilknyttetAktør = sakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(personIdent)
         secureLog.info("Aktører og fagsaker berørt av hendelse for personIdent=$personIdent: ${listeMedFagsakIdOgTilknyttetAktør.map { "(aktørId=${it.aktørId}, fagsakId=${it.fagsakId}),"}}")
@@ -307,7 +307,7 @@ class VurderLivshendelseTask(
     }
 
     private fun finnBrukereBerørtAvSivilstandHendelseForIdent(
-        personIdent: String
+        personIdent: String,
     ): List<RestFagsakIdOgTilknyttetAktørId> {
         val listeMedFagsakIdOgTilknyttetAktørId = sakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(personIdent)
         secureLog.info("Aktører og fagsaker berørt av hendelse for personIdent=$personIdent: ${listeMedFagsakIdOgTilknyttetAktørId.map { "(aktørId=${it.aktørId}, fagsakId=${it.fagsakId})," }}")
@@ -319,7 +319,7 @@ class VurderLivshendelseTask(
         aktørIdForOppgave: String,
         fagsakIdForOppgave: Long,
         personIdent: String,
-        task: Task
+        task: Task,
     ): Boolean {
         val åpenOppgave = søkEtterÅpenOppgavePåAktør(aktørIdForOppgave, hendelseType)
 
@@ -327,7 +327,7 @@ class VurderLivshendelseTask(
             val beskrivelse = leggTilNyPersonIBeskrivelse(
                 beskrivelse = "${hendelseType.beskrivelse}:",
                 personIdent = personIdent,
-                personErBruker = pdlClient.hentAktørId(personIdent) == aktørIdForOppgave
+                personErBruker = pdlClient.hentAktørId(personIdent) == aktørIdForOppgave,
             )
             val restFagsak = hentRestFagsak(fagsakIdForOppgave)
             val restBehandling = hentSisteBehandlingSomErIverksatt(restFagsak) ?: hentAktivBehandling(restFagsak)
@@ -336,7 +336,7 @@ class VurderLivshendelseTask(
             task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
             secureLog.info(
                 "Opprettet VurderLivshendelse-oppgave (${oppgave.oppgaveId}) for $hendelseType-hendelse (person aktørId:  $aktørIdForOppgave)" +
-                    ", beskrivelsestekst: $beskrivelse"
+                    ", beskrivelsestekst: $beskrivelse",
             )
             return true
         } else {
@@ -346,7 +346,7 @@ class VurderLivshendelseTask(
                 beskrivelse = åpenOppgave.beskrivelse!!,
                 personIdent = personIdent,
                 personErBruker = åpenOppgave.identer?.map { it.ident }
-                    ?.contains(personIdent)
+                    ?.contains(personIdent),
             )
 
             oppdaterOppgaveMedNyBeskrivelse(åpenOppgave, beskrivelse)
@@ -364,16 +364,16 @@ class VurderLivshendelseTask(
         fagsakIdForOppgave: Long,
         aktørIdForOppgave: String,
         personIdent: String,
-        task: Task
+        task: Task,
     ) {
         val formatertDato = endringsdato.format(
-            DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no"))
+            DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no")),
         ) ?: "ukjent dato"
 
         val initiellBeskrivelse = hentInitiellBeskrivelseForSivilstandOppgave(
             personErBruker = pdlClient.hentAktørId(personIdent) == aktørIdForOppgave,
             formatertDato = formatertDato,
-            personIdent = personIdent
+            personIdent = personIdent,
         )
 
         val oppgave = søkEtterÅpenOppgavePåAktør(aktørIdForOppgave, SIVILSTAND)
@@ -381,14 +381,14 @@ class VurderLivshendelseTask(
                 aktørId = aktørIdForOppgave,
                 fagsakId = fagsakIdForOppgave,
                 beskrivelse = initiellBeskrivelse,
-                behandlingstema = Behandlingstema.UtvidetBarnetrygd
+                behandlingstema = Behandlingstema.UtvidetBarnetrygd,
             )
 
         when (oppgave) {
             is OppgaveResponse -> {
                 secureLog.info(
                     "Opprettet VurderLivshendelse-oppgave (${oppgave.oppgaveId}) for $SIVILSTAND-hendelse (person i hendelse:  $personIdent, oppgave på person: $aktørIdForOppgave)" +
-                        ", beskrivelsestekst: $initiellBeskrivelse"
+                        ", beskrivelsestekst: $initiellBeskrivelse",
                 )
                 oppgaveOpprettetSivilstandCounter.increment()
                 task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
@@ -431,7 +431,7 @@ class VurderLivshendelseTask(
 
     private fun søkEtterÅpenOppgavePåAktør(
         aktørId: String,
-        type: VurderLivshendelseType
+        type: VurderLivshendelseType,
     ): Oppgave? {
         val vurderLivshendelseOppgaver = oppgaveClient.finnOppgaverPåAktørId(aktørId, Oppgavetype.VurderLivshendelse)
         secureLog.info("Fant følgende oppgaver: $vurderLivshendelseOppgaver")
@@ -446,7 +446,7 @@ class VurderLivshendelseTask(
         aktørId: String,
         fagsakId: Long,
         beskrivelse: String,
-        behandlingstema: Behandlingstema
+        behandlingstema: Behandlingstema,
     ): OppgaveResponse {
         log.info("Oppretter oppgave for aktørId=$aktørId")
 
@@ -455,14 +455,14 @@ class VurderLivshendelseTask(
                 aktørId = aktørId,
                 beskrivelse = beskrivelse,
                 saksId = fagsakId.toString(),
-                behandlingstema = behandlingstema.value
-            )
+                behandlingstema = behandlingstema.value,
+            ),
         )
     }
 
     private fun oppdaterOppgaveMedNyBeskrivelse(
         oppgave: Oppgave,
-        beskrivelse: String
+        beskrivelse: String,
     ) {
         if (oppgave.beskrivelse == beskrivelse) return
 
@@ -524,5 +524,5 @@ enum class VurderLivshendelseType(val beskrivelse: String) {
     DØDSFALL("Dødsfall"),
     SIVILSTAND("Endring i sivilstand"),
     ADDRESSE("Addresse"),
-    UTFLYTTING("Utflytting")
+    UTFLYTTING("Utflytting"),
 }

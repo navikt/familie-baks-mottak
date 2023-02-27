@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service
 @TaskStepBeskrivelse(taskStepType = OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE, beskrivelse = "Opprett \"BehandleSak\"-oppgave")
 class OpprettBehandleSakOppgaveTask(
     private val journalpostClient: JournalpostClient,
-    private val oppgaveClient: OppgaveClient
+    private val oppgaveClient: OppgaveClient,
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(OpprettBehandleSakOppgaveTask::class.java)

@@ -52,7 +52,7 @@ class LeesahServiceTest {
             personIdenter = listOf("12345678901", "1234567890123"),
             endringstype = LeesahService.OPPRETTET,
             opplysningstype = LeesahService.OPPLYSNINGSTYPE_DØDSFALL,
-            dødsdato = LocalDate.now()
+            dødsdato = LocalDate.now(),
         )
 
         service.prosesserNyHendelse(pdlHendelse)
@@ -80,7 +80,7 @@ class LeesahServiceTest {
             personIdenter = listOf("12345678901", "1234567890123"),
             endringstype = LeesahService.OPPRETTET,
             opplysningstype = LeesahService.OPPLYSNINGSTYPE_UTFLYTTING,
-            utflyttingsdato = LocalDate.now()
+            utflyttingsdato = LocalDate.now(),
         )
 
         service.prosesserNyHendelse(pdlHendelse)
@@ -109,7 +109,7 @@ class LeesahServiceTest {
             endringstype = LeesahService.OPPRETTET,
             opplysningstype = LeesahService.OPPLYSNINGSTYPE_SIVILSTAND,
             sivilstand = "GIFT",
-            sivilstandDato = LocalDate.of(2022, 2, 22)
+            sivilstandDato = LocalDate.of(2022, 2, 22),
         )
 
         service.prosesserNyHendelse(pdlHendelse)
@@ -140,7 +140,7 @@ class LeesahServiceTest {
             endringstype = LeesahService.OPPRETTET,
             opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
             fødselsdato = LocalDate.now(),
-            fødeland = "NOR"
+            fødeland = "NOR",
         )
 
         service.prosesserNyHendelse(pdlHendelse)
@@ -170,7 +170,7 @@ class LeesahServiceTest {
             endringstype = LeesahService.OPPRETTET,
             opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
             fødselsdato = LocalDate.now(),
-            fødeland = "POL"
+            fødeland = "POL",
         )
 
         service.prosesserNyHendelse(pdlHendelse)
@@ -198,7 +198,7 @@ class LeesahServiceTest {
             opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
             fødselsdato = LocalDate.now(),
             fødeland = "NOR",
-            tidligereHendelseId = "unknown"
+            tidligereHendelseId = "unknown",
         )
 
         service.prosesserNyHendelse(pdlHendelse)

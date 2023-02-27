@@ -20,7 +20,7 @@ import kotlin.reflect.full.findAnnotation
 @Profile("dev", "e2e", "postgres")
 class DatabaseCleanupService(
     private val entityManager: EntityManager,
-    private val environment: Environment
+    private val environment: Environment,
 ) : InitializingBean {
 
     private val logger = LoggerFactory.getLogger(this::class.java)

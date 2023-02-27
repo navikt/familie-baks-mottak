@@ -18,7 +18,7 @@ data class Personinfo(
     var utlandsadresse: String?,
     var geografiskTilknytning: String?,
     var diskresjonskode: String?,
-    var adresseLandkode: String?
+    var adresseLandkode: String?,
 )
 
 data class Adresseinfo(
@@ -31,7 +31,7 @@ data class Adresseinfo(
     var postNr: String?,
     var poststed: String?,
     var land: String?,
-    var personstatus: PersonstatusType?
+    var personstatus: PersonstatusType?,
 )
 
 enum class PersonstatusType {

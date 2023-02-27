@@ -64,10 +64,10 @@ class JournalhendelseKontantstøtteRutingTaskTest {
                     belop = 1000,
                     listOf(
                         BarnDto(Foedselsnummer(barn1Fnr)),
-                        BarnDto(Foedselsnummer(barn2Fnr))
-                    )
-                )
-            )
+                        BarnDto(Foedselsnummer(barn2Fnr)),
+                    ),
+                ),
+            ),
         )
         every { taskService.save(capture(taskSlot)) } returns mockk()
 
@@ -75,8 +75,8 @@ class JournalhendelseKontantstøtteRutingTaskTest {
             Task(
                 type = JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE,
                 payload = "NAV_NO",
-                properties = Properties().apply { this["personIdent"] = søkerFnr }
-            )
+                properties = Properties().apply { this["personIdent"] = søkerFnr },
+            ),
         )
 
         assertEquals("Et eller flere av barna har løpende sak i Infotrygd", taskSlot.captured.payload)
@@ -97,10 +97,10 @@ class JournalhendelseKontantstøtteRutingTaskTest {
                     belop = 1000,
                     listOf(
                         BarnDto(Foedselsnummer(barn1Fnr)),
-                        BarnDto(Foedselsnummer(barn2Fnr))
-                    )
-                )
-            )
+                        BarnDto(Foedselsnummer(barn2Fnr)),
+                    ),
+                ),
+            ),
         )
         every { taskService.save(capture(taskSlot)) } returns mockk()
 
@@ -108,8 +108,8 @@ class JournalhendelseKontantstøtteRutingTaskTest {
             Task(
                 type = JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE,
                 payload = "NAV_NO",
-                properties = Properties().apply { this["personIdent"] = søkerFnr }
-            )
+                properties = Properties().apply { this["personIdent"] = søkerFnr },
+            ),
         )
 
         assertEquals("", taskSlot.captured.payload)
@@ -128,8 +128,8 @@ class JournalhendelseKontantstøtteRutingTaskTest {
             Task(
                 type = JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE,
                 payload = "NAV_NO",
-                properties = Properties().apply { this["personIdent"] = søkerFnr }
-            )
+                properties = Properties().apply { this["personIdent"] = søkerFnr },
+            ),
         )
 
         assertEquals("", taskSlot.captured.payload)
@@ -140,22 +140,22 @@ class JournalhendelseKontantstøtteRutingTaskTest {
             navn = "Ola Norman",
             forelderBarnRelasjoner = setOf(
                 ForelderBarnRelasjon(barn1Fnr, FORELDERBARNRELASJONROLLE.BARN),
-                ForelderBarnRelasjon(barn2Fnr, FORELDERBARNRELASJONROLLE.BARN)
-            )
+                ForelderBarnRelasjon(barn2Fnr, FORELDERBARNRELASJONROLLE.BARN),
+            ),
         )
         every { pdlClient.hentIdenter(barn1Fnr) } returns listOf(
             IdentInformasjon(
                 ident = barn1Fnr,
                 gruppe = IdentGruppe.FOLKEREGISTERIDENT.name,
-                historisk = false
-            )
+                historisk = false,
+            ),
         )
         every { pdlClient.hentIdenter(barn2Fnr) } returns listOf(
             IdentInformasjon(
                 ident = barn2Fnr,
                 gruppe = IdentGruppe.FOLKEREGISTERIDENT.name,
-                historisk = false
-            )
+                historisk = false,
+            ),
         )
     }
 
@@ -163,7 +163,7 @@ class JournalhendelseKontantstøtteRutingTaskTest {
         every {
             featureToggleService.isEnabled(
                 FeatureToggleConfig.OPPRETTE_JOURNALFØRINGSOPPGAVE_KONTANTSTØTTE,
-                false
+                false,
             )
         } returns true
     }

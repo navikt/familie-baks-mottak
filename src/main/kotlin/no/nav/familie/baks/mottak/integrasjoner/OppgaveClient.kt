@@ -30,21 +30,21 @@ private val logger = LoggerFactory.getLogger(OppgaveClient::class.java)
 class OppgaveClient @Autowired constructor(
     @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonUri: URI,
     @Qualifier("clientCredentials") restOperations: RestOperations,
-    private val oppgaveMapperService: OppgaveMapperService
+    private val oppgaveMapperService: OppgaveMapperService,
 ) : AbstractRestClient(restOperations, "integrasjon") {
 
     val secureLog: Logger = LoggerFactory.getLogger("secureLogger")
 
     fun opprettJournalføringsoppgave(
         journalpost: Journalpost,
-        beskrivelse: String? = null
+        beskrivelse: String? = null,
     ): OppgaveResponse {
         logger.info("Oppretter journalføringsoppgave for ${if (journalpost.kanal == "NAV_NO") "digital søknad" else "papirsøknad"}")
         val uri = URI.create("$integrasjonUri/oppgave/opprett")
         val request = oppgaveMapperService.tilOpprettOppgaveRequest(
             Oppgavetype.Journalføring,
             journalpost,
-            beskrivelse
+            beskrivelse,
         )
         secureLog.info("Oppretter journalføringsoppgave for ${journalpost.journalpostId} ${request.beskrivelse}")
 
@@ -57,7 +57,7 @@ class OppgaveClient @Autowired constructor(
         val request = oppgaveMapperService.tilOpprettOppgaveRequest(
             Oppgavetype.BehandleSak,
             journalpost,
-            beskrivelse
+            beskrivelse,
         )
 
         return responseFraOpprettOppgave(uri, request)
@@ -66,7 +66,7 @@ class OppgaveClient @Autowired constructor(
     @Retryable(
         value = [RuntimeException::class],
         maxAttempts = 3,
-        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}")
+        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
     )
     fun opprettVurderLivshendelseOppgave(dto: OppgaveVurderLivshendelseDto): OppgaveResponse {
         logger.info("Oppretter \"Vurder livshendelse\"-oppgave")
@@ -83,7 +83,7 @@ class OppgaveClient @Autowired constructor(
             enhetsnummer = dto.enhetsId,
             behandlingstema = dto.behandlingstema,
             behandlingstype = null,
-            behandlesAvApplikasjon = dto.behandlesAvApplikasjon
+            behandlesAvApplikasjon = dto.behandlesAvApplikasjon,
         )
 
         secureLog.info("Oppretter vurderLivshendlseOppgave $request")
@@ -94,7 +94,7 @@ class OppgaveClient @Autowired constructor(
     @Retryable(
         value = [RuntimeException::class],
         maxAttempts = 3,
-        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}")
+        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
     )
     fun oppdaterOppgaveBeskrivelse(patchOppgave: Oppgave, beskrivelse: String): OppgaveResponse {
         val uri = URI.create("$integrasjonUri/oppgave/${patchOppgave.id}/oppdater")
@@ -108,16 +108,16 @@ class OppgaveClient @Autowired constructor(
                     "Patch-kall mot $uri feilet ved oppdatering av oppgave",
                     it,
                     uri,
-                    null
+                    null,
                 )
-            }
+            },
         )
     }
 
     @Retryable(
         value = [RuntimeException::class],
         maxAttempts = 3,
-        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}")
+        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
     )
     fun finnOppgaver(journalpostId: String, oppgavetype: Oppgavetype?): List<Oppgave> {
         logger.info("Søker etter aktive oppgaver for $journalpostId")
@@ -125,7 +125,7 @@ class OppgaveClient @Autowired constructor(
         val request = FinnOppgaveRequest(
             journalpostId = journalpostId,
             tema = Tema.BAR,
-            oppgavetype = oppgavetype
+            oppgavetype = oppgavetype,
         )
 
         return Result.runCatching {
@@ -135,22 +135,22 @@ class OppgaveClient @Autowired constructor(
             onFailure = {
                 secureLogger.error(
                     "Finn oppgaver feilet mot $uri og request: $request",
-                    NestedExceptionUtils.getMostSpecificCause(it)
+                    NestedExceptionUtils.getMostSpecificCause(it),
                 )
                 throw IntegrasjonException(
                     "GET $uri feilet ved henting av oppgaver",
                     it,
                     uri,
-                    null
+                    null,
                 )
-            }
+            },
         )
     }
 
     @Retryable(
         value = [RuntimeException::class],
         maxAttempts = 3,
-        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}")
+        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
     )
     fun finnOppgaverPåAktørId(aktørId: String, oppgavetype: Oppgavetype): List<Oppgave> {
         logger.info("Søker etter aktive oppgaver for aktørId $aktørId")
@@ -158,7 +158,7 @@ class OppgaveClient @Autowired constructor(
         val request = FinnOppgaveRequest(
             aktørId = aktørId,
             tema = Tema.BAR,
-            oppgavetype = oppgavetype
+            oppgavetype = oppgavetype,
         )
 
         return Result.runCatching {
@@ -168,15 +168,15 @@ class OppgaveClient @Autowired constructor(
             onFailure = {
                 secureLogger.error(
                     "Finn oppgave feilet for $aktørId og $oppgavetype",
-                    NestedExceptionUtils.getMostSpecificCause(it)
+                    NestedExceptionUtils.getMostSpecificCause(it),
                 )
                 throw IntegrasjonException(
                     "GET $uri feilet ved henting av oppgaver",
                     it,
                     uri,
-                    null
+                    null,
                 )
-            }
+            },
         )
     }
 
@@ -189,16 +189,16 @@ class OppgaveClient @Autowired constructor(
             onFailure = {
                 secureLogger.error(
                     "Opprett oppgave feilet mot $uri og request: $request",
-                    NestedExceptionUtils.getMostSpecificCause(it)
+                    NestedExceptionUtils.getMostSpecificCause(it),
                 )
                 log.warn("Post-kall mot $uri feilet ved opprettelse av oppgave", it)
                 throw IntegrasjonException(
                     "Post-kall mot $uri feilet ved opprettelse av oppgave",
                     it,
                     uri,
-                    null
+                    null,
                 )
-            }
+            },
         )
     }
 
@@ -219,5 +219,5 @@ data class OppgaveVurderLivshendelseDto(
     val saksId: String,
     val behandlingstema: String,
     val enhetsId: String? = null,
-    val behandlesAvApplikasjon: String? = null
+    val behandlesAvApplikasjon: String? = null,
 )

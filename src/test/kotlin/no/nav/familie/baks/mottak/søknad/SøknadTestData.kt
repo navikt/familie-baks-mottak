@@ -33,14 +33,14 @@ object SøknadTestData {
                     husbokstav = null,
                     bruksenhetsnummer = null,
                     husnummer = null,
-                    poststed = null
-                )
+                    poststed = null,
+                ),
             ),
             sivilstand = søknadsfelt("sivilstand", SIVILSTANDTYPE.GIFT),
             spørsmål = mapOf(),
             nåværendeSamboer = null,
             tidligereSamboere = listOf(),
-            arbeidsperioderUtland = listOf()
+            arbeidsperioderUtland = listOf(),
         )
     }
 
@@ -54,7 +54,7 @@ object SøknadTestData {
                 alder = søknadsfelt("alder", "4 år"),
                 spørsmål = mapOf(),
                 utenlandsperioder = listOf(),
-                eøsBarnetrygdsperioder = listOf()
+                eøsBarnetrygdsperioder = listOf(),
             ),
             BarnV8(
                 harEøsSteg = false,
@@ -64,7 +64,7 @@ object SøknadTestData {
                 alder = søknadsfelt("alder", "1 år"),
                 spørsmål = mapOf(),
                 utenlandsperioder = listOf(),
-                eøsBarnetrygdsperioder = listOf()
+                eøsBarnetrygdsperioder = listOf(),
             ),
             BarnV8(
                 harEøsSteg = true,
@@ -74,8 +74,8 @@ object SøknadTestData {
                 alder = søknadsfelt("alder", "2 år"),
                 spørsmål = mapOf(),
                 utenlandsperioder = listOf(),
-                eøsBarnetrygdsperioder = listOf()
-            )
+                eøsBarnetrygdsperioder = listOf(),
+            ),
         )
     }
 
@@ -94,13 +94,13 @@ object SøknadTestData {
                     Søknadsvedlegg(
                         dokumentId = "en-slags-uuid",
                         navn = "IMG 1337.png",
-                        tittel = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
-                    )
+                        tittel = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON,
+                    ),
                 ),
-                dokumentasjonSpråkTittel = mapOf("nb" to "Bekreftelse fra barnevernet")
-            )
+                dokumentasjonSpråkTittel = mapOf("nb" to "Bekreftelse fra barnevernet"),
+            ),
         ),
         originalSpråk = "nb",
-        teksterUtenomSpørsmål = mapOf()
+        teksterUtenomSpørsmål = mapOf(),
     )
 }

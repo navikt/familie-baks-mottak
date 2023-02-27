@@ -24,7 +24,7 @@ class KontantstøtteSøknadService(
     private val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
     private val kontantstøtteVedleggRepository: KontantstøtteVedleggRepository,
     private val taskService: TaskService,
-    private val vedleggClient: FamilieDokumentClient
+    private val vedleggClient: FamilieDokumentClient,
 ) {
     @Transactional
     @Throws(FødselsnummerErNullException::class)
@@ -45,15 +45,15 @@ class KontantstøtteSøknadService(
 
         hentOgLagreSøknadvedlegg(
             dbKontantstøtteSøknad = dbKontantstøtteSøknad,
-            søknaddokumentasjonsliste = dokumentasjon
+            søknaddokumentasjonsliste = dokumentasjon,
         )
 
         taskService.save(
             Task(
                 type = JournalførKontantstøtteSøknadTask.JOURNALFØR_KONTANTSTØTTE_SØKNAD,
                 payload = dbKontantstøtteSøknad.id.toString(),
-                properties = properties
-            )
+                properties = properties,
+            ),
         )
         return dbKontantstøtteSøknad
     }
@@ -80,7 +80,7 @@ class KontantstøtteSøknadService(
 
     private fun hentOgLagreSøknadvedlegg(
         dbKontantstøtteSøknad: DBKontantstøtteSøknad,
-        søknaddokumentasjonsliste: List<Søknaddokumentasjon>
+        søknaddokumentasjonsliste: List<Søknaddokumentasjon>,
     ) {
         søknaddokumentasjonsliste.forEach { søknaddokumentasjon ->
             søknaddokumentasjon.opplastedeVedlegg.forEach { vedlegg ->
@@ -88,8 +88,8 @@ class KontantstøtteSøknadService(
                 kontantstøtteVedleggRepository.save(
                     vedlegg.tilDBKontantstøtteVedlegg(
                         dbKontantstøtteSøknad,
-                        vedleggDokument
-                    )
+                        vedleggDokument,
+                    ),
                 )
             }
         }

@@ -26,7 +26,7 @@ class EksternReferanseIdTest(
     @Autowired
     val søknadService: SøknadService,
     @Autowired
-    val journalførSøknadTask: JournalførSøknadTask
+    val journalførSøknadTask: JournalførSøknadTask,
 ) {
 
     val søknad = SøknadTestData.søknadV8()
@@ -42,8 +42,8 @@ class EksternReferanseIdTest(
                 Task(
                     type = JournalførSøknadTask.JOURNALFØR_SØKNAD,
                     payload = dbSøknadFraDBFirst.id.toString(),
-                    properties = properties
-                )
+                    properties = properties,
+                ),
             )
         }
     }

@@ -34,8 +34,8 @@ class SakClientTest {
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withBody(gyldigResponse())
-                )
+                        .withBody(gyldigResponse()),
+                ),
         )
 
         val response = sakClient.hentSaksnummer(personIdent)

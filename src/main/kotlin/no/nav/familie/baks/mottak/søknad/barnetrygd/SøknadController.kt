@@ -28,7 +28,7 @@ import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadKontraktV8
 @RequestMapping(path = ["/api"], produces = [APPLICATION_JSON_VALUE])
 @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 class SøknadController(
-    private val søknadService: SøknadService
+    private val søknadService: SøknadService,
 ) {
 
     // Metrics for ordinær barnetrygd
@@ -117,7 +117,7 @@ class SøknadController(
             if (dokumentasjonsbehovUtenAnnenDokumentasjon.isNotEmpty()) {
                 sendMetricsDokumentasjonsbehov(
                     erUtvidet = erUtvidet,
-                    dokumentasjonsbehov = dokumentasjonsbehovUtenAnnenDokumentasjon
+                    dokumentasjonsbehov = dokumentasjonsbehovUtenAnnenDokumentasjon,
                 )
             }
             // Inkluderer Dokumentasjonsbehov.ANNEN_DOKUMENTASJON for søknadHarVedlegg og antallVedlegg

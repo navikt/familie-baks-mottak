@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets
 @Import(
     ConsumerIdClientInterceptor::class,
     MdcValuesPropagatingClientInterceptor::class,
-    StsBearerTokenClientInterceptor::class
+    StsBearerTokenClientInterceptor::class,
 )
 class RestTemplateConfig {
 
@@ -33,7 +33,7 @@ class RestTemplateConfig {
     @Bean("jwtBearer")
     fun restTemplateJwtBearer(
         consumerIdClientInterceptor: ConsumerIdClientInterceptor,
-        mdcValuesPropagatingClientInterceptor: MdcValuesPropagatingClientInterceptor
+        mdcValuesPropagatingClientInterceptor: MdcValuesPropagatingClientInterceptor,
     ): RestOperations {
         return RestTemplateBuilder()
             .additionalInterceptors(consumerIdClientInterceptor, mdcValuesPropagatingClientInterceptor)
@@ -43,7 +43,7 @@ class RestTemplateConfig {
     @Bean("clientCredentials")
     fun restTemplateClientCredentials(
         consumerIdClientInterceptor: ConsumerIdClientInterceptor,
-        mdcValuesPropagatingClientInterceptor: MdcValuesPropagatingClientInterceptor
+        mdcValuesPropagatingClientInterceptor: MdcValuesPropagatingClientInterceptor,
     ): RestOperations {
         return RestTemplateBuilder()
             .additionalInterceptors(consumerIdClientInterceptor, mdcValuesPropagatingClientInterceptor)
@@ -55,7 +55,7 @@ class RestTemplateConfig {
     fun restTemplate(
         restTemplateBuilder: RestTemplateBuilder,
         mdcInterceptor: MdcValuesPropagatingClientInterceptor,
-        consumerIdClientInterceptor: ConsumerIdClientInterceptor
+        consumerIdClientInterceptor: ConsumerIdClientInterceptor,
     ): RestOperations {
         return restTemplateBuilder.interceptors(mdcInterceptor, consumerIdClientInterceptor).build()
     }
@@ -63,13 +63,13 @@ class RestTemplateConfig {
     @Bean("sts")
     fun restTemplateSts(
         stsBearerTokenClientInterceptor: StsBearerTokenClientInterceptor,
-        consumerIdClientInterceptor: ConsumerIdClientInterceptor
+        consumerIdClientInterceptor: ConsumerIdClientInterceptor,
     ): RestOperations {
         return RestTemplateBuilder()
             .interceptors(
                 consumerIdClientInterceptor,
                 stsBearerTokenClientInterceptor,
-                MdcValuesPropagatingClientInterceptor()
+                MdcValuesPropagatingClientInterceptor(),
             )
             .build()
     }

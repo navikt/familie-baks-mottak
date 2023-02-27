@@ -29,7 +29,7 @@ class JournalføringTest(
     @Autowired
     val søknadService: SøknadService,
     @Autowired
-    val kontantstøtteSøknadService: KontantstøtteSøknadService
+    val kontantstøtteSøknadService: KontantstøtteSøknadService,
 ) {
 
     val søknad = SøknadTestData.søknadV8()
@@ -45,7 +45,7 @@ class JournalføringTest(
             versjonertSøknad = dbSøknad.hentVersjonertSøknad(),
             pdf = testPDF,
             vedleggMap = emptyMap(),
-            pdfOriginalSpråk = ByteArray(0)
+            pdfOriginalSpråk = ByteArray(0),
         )
         val journalPostId = journalføringService.arkiverSøknad(arkiverDokumentRequest)
 
@@ -59,7 +59,7 @@ class JournalføringTest(
             versjonertSøknad = dbKontantstøtteSøknad.hentVersjonertKontantstøtteSøknad(),
             pdf = testPDF,
             vedleggMap = emptyMap(),
-            pdfOriginalSpråk = ByteArray(0)
+            pdfOriginalSpråk = ByteArray(0),
         )
         val journalPostId = journalføringService.arkiverSøknad(arkiverDokumentRequest)
 

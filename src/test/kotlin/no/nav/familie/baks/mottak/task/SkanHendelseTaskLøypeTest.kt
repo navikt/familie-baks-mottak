@@ -45,12 +45,12 @@ class SkanHendelseTaskLøypeTest {
         mockPdlClient,
         mockSakClient,
         mockInfotrygdBarnetrygdClient,
-        mockTaskService
+        mockTaskService,
     )
 
     private val journalføringSteg = OpprettJournalføringOppgaveTask(
         mockJournalpostClient,
-        mockOppgaveClient
+        mockOppgaveClient,
     )
 
     @BeforeEach
@@ -69,7 +69,7 @@ class SkanHendelseTaskLøypeTest {
             behandlingstema = null,
             dokumenter = null,
             journalforendeEnhet = null,
-            sak = null
+            sak = null,
         )
 
         every {
@@ -197,13 +197,13 @@ class SkanHendelseTaskLøypeTest {
         rutingSteg.doTask(
             Task(
                 type = JournalhendelseRutingTask.TASK_STEP_TYPE,
-                payload = MOTTAK_KANAL
+                payload = MOTTAK_KANAL,
             ).apply {
                 if (brukerId != null) {
                     this.metadata["personIdent"] = brukerId
                 }
                 this.metadata["journalpostId"] = "mockJournalpostId"
-            }
+            },
         )
 
         val nesteTask = slot<Task>().let { nyTask ->

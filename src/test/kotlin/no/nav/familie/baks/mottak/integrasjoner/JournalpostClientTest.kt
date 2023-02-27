@@ -34,8 +34,8 @@ class JournalpostClientTest {
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withBody(gyldigResponse())
-                )
+                        .withBody(gyldigResponse()),
+                ),
         )
 
         val opprettOppgaveResponse = journalpostClient.hentJournalpost("123")
@@ -45,7 +45,7 @@ class JournalpostClientTest {
     private fun gyldigResponse(): String {
         return Files.readString(
             ClassPathResource("testdata/hentJournalpost-response.json").file.toPath(),
-            StandardCharsets.UTF_8
+            StandardCharsets.UTF_8,
         )
     }
 }

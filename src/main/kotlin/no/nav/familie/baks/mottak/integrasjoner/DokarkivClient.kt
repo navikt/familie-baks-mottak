@@ -17,7 +17,7 @@ private val logger = LoggerFactory.getLogger(DokarkivClient::class.java)
 @Component
 class DokarkivClient(
     @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonUri: URI,
-    @Qualifier("clientCredentials") restOperations: RestOperations
+    @Qualifier("clientCredentials") restOperations: RestOperations,
 ) :
     AbstractRestClient(restOperations, "integrasjon") {
 
@@ -27,7 +27,7 @@ class DokarkivClient(
         val request = TilknyttFagsakRequest(
             bruker = Bruker(idType = IdType.valueOf(jp.bruker!!.type.name), id = jp.bruker.id),
             tema = "BAR",
-            sak = Sak(fagsakId, "BA")
+            sak = Sak(fagsakId, "BA"),
         )
 
         when (val response = utførRequest(uri, request)) {
@@ -35,7 +35,7 @@ class DokarkivClient(
                 "Oppdatering av journalpost ${jp.journalpostId} med fagsak $fagsakId feilet",
                 response,
                 uri,
-                jp.bruker.id
+                jp.bruker.id,
             )
         }
     }
@@ -61,7 +61,7 @@ class DokarkivClient(
             putForEntity<Ressurs<Any>>(uri, request)
         }.fold(
             onSuccess = { response -> assertGyldig(response) },
-            onFailure = { it }
+            onFailure = { it },
         )
     }
 
@@ -78,17 +78,17 @@ class DokarkivClient(
     data class TilknyttFagsakRequest(
         val bruker: Bruker,
         val tema: String,
-        val sak: Sak
+        val sak: Sak,
     )
 
     data class Sak(
         val fagsakId: String,
-        val fagsaksystem: String
+        val fagsaksystem: String,
     )
 
     data class Bruker(
         val idType: IdType,
-        val id: String
+        val id: String,
     )
 
     enum class IdType {

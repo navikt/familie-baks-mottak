@@ -36,14 +36,14 @@ class InfotrygdBarnetrygdClientTest {
                         "{\n" +
                             "  \"brukere\": [\"20086600000\"],\n" +
                             "  \"barn\": [\"31038600000\"]\n" +
-                            "}"
-                    )
+                            "}",
+                    ),
                 )
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withBody(gyldigSakResponse())
-                )
+                        .withBody(gyldigSakResponse()),
+                ),
         )
 
         val sakDto = infotrygdClient.hentSaker(brukersIdenter, barnasIdenter).bruker.first()
@@ -59,14 +59,14 @@ class InfotrygdBarnetrygdClientTest {
                         "{\n" +
                             "  \"brukere\": [\"20086600000\"],\n" +
                             "  \"barn\": [\"31038600000\"]\n" +
-                            "}"
-                    )
+                            "}",
+                    ),
                 )
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withBody(gyldigStønadResponse())
-                )
+                        .withBody(gyldigStønadResponse()),
+                ),
         )
 
         val stønadDto = infotrygdClient.hentLøpendeUtbetalinger(brukersIdenter, barnasIdenter).bruker.first()
@@ -75,14 +75,14 @@ class InfotrygdBarnetrygdClientTest {
     private fun gyldigStønadResponse(): String {
         return Files.readString(
             ClassPathResource("testdata/hentInfotrygdstønad-response.json").file.toPath(),
-            StandardCharsets.UTF_8
+            StandardCharsets.UTF_8,
         )
     }
 
     private fun gyldigSakResponse(): String {
         return Files.readString(
             ClassPathResource("testdata/hentInfotrygdsaker-response.json").file.toPath(),
-            StandardCharsets.UTF_8
+            StandardCharsets.UTF_8,
         )
     }
 

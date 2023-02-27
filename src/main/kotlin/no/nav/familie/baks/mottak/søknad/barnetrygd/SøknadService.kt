@@ -24,7 +24,7 @@ class SøknadService(
     private val søknadRepository: SøknadRepository,
     private val vedleggRepository: SøknadVedleggRepository,
     private val taskService: TaskService,
-    private val vedleggClient: FamilieDokumentClient
+    private val vedleggClient: FamilieDokumentClient,
 ) {
 
     @Transactional
@@ -51,8 +51,8 @@ class SøknadService(
             Task(
                 type = JournalførSøknadTask.JOURNALFØR_SØKNAD,
                 payload = dbSøknad.id.toString(),
-                properties = properties
-            )
+                properties = properties,
+            ),
         )
         return dbSøknad
     }

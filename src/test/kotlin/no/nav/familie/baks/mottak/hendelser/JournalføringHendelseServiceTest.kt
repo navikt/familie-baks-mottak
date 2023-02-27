@@ -95,7 +95,7 @@ class JournalføringHendelseServiceTest {
             behandlingstema = null,
             dokumenter = null,
             journalforendeEnhet = null,
-            sak = null
+            sak = null,
         )
 
         // Inngående digital, Mottatt
@@ -111,7 +111,7 @@ class JournalføringHendelseServiceTest {
             behandlingstema = null,
             dokumenter = null,
             journalforendeEnhet = null,
-            sak = null
+            sak = null,
         )
 
         // Utgående digital, Mottatt
@@ -127,7 +127,7 @@ class JournalføringHendelseServiceTest {
             behandlingstema = null,
             dokumenter = null,
             journalforendeEnhet = null,
-            sak = null
+            sak = null,
         )
 
         // Ikke barnetrygd
@@ -143,7 +143,7 @@ class JournalføringHendelseServiceTest {
             behandlingstema = null,
             dokumenter = null,
             journalforendeEnhet = null,
-            sak = null
+            sak = null,
         )
 
         // ferdigstilt journalpost
@@ -159,7 +159,7 @@ class JournalføringHendelseServiceTest {
             behandlingstema = null,
             dokumenter = null,
             journalforendeEnhet = null,
-            sak = null
+            sak = null,
         )
 
         every { mockFeatureToggleService.isEnabled(any()) } returns true
@@ -258,13 +258,13 @@ class JournalføringHendelseServiceTest {
 
         val task = OpprettJournalføringOppgaveTask(
             mockJournalpostClient,
-            mockOppgaveClient
+            mockOppgaveClient,
         )
 
         task.doTask(
             Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "oppgavebeskrivelse").apply {
                 this.metadata["journalpostId"] = JOURNALPOST_UTGÅENDE_DOKUMENT
-            }
+            },
         )
         assertThat(sakssystemMarkering.captured).contains("oppgavebeskrivelse")
     }
@@ -283,17 +283,17 @@ class JournalføringHendelseServiceTest {
 
         val task = OpprettJournalføringOppgaveTask(
             mockJournalpostClient,
-            mockOppgaveClient
+            mockOppgaveClient,
         )
         task.doTask(
             Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = JOURNALPOST_UTGÅENDE_DOKUMENT).apply {
                 this.metadata["journalpostId"] = JOURNALPOST_UTGÅENDE_DOKUMENT
-            }
+            },
         )
         task.doTask(
             Task(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_PAPIRSØKNAD).apply {
                 this.metadata["journalpostId"] = JOURNALPOST_PAPIRSØKNAD
-            }
+            },
         )
 
         verify(exactly = 0) {
@@ -305,14 +305,14 @@ class JournalføringHendelseServiceTest {
     fun `Kaster exception dersom journalstatus annet enn MOTTATT`() {
         val task = OpprettJournalføringOppgaveTask(
             mockJournalpostClient,
-            mockOppgaveClient
+            mockOppgaveClient,
         )
 
         Assertions.assertThrows(IllegalStateException::class.java) {
             task.doTask(
                 Task(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_FERDIGSTILT).apply {
                     this.metadata["journalpostId"] = JOURNALPOST_FERDIGSTILT
-                }
+                },
             )
         }
     }
@@ -324,7 +324,7 @@ class JournalføringHendelseServiceTest {
             1,
             OFFSET,
             42L,
-            opprettRecord(JOURNALPOST_PAPIRSØKNAD)
+            opprettRecord(JOURNALPOST_PAPIRSØKNAD),
         )
         every {
             mockHendelsesloggRepository.existsByHendelseIdAndConsumer("hendelseId", HendelseConsumer.JOURNAL_AIVEN)
@@ -346,7 +346,7 @@ class JournalføringHendelseServiceTest {
             1,
             OFFSET,
             42L,
-            opprettRecord(JOURNALPOST_PAPIRSØKNAD)
+            opprettRecord(JOURNALPOST_PAPIRSØKNAD),
         )
 
         service.prosesserNyHendelse(consumerRecord, ack)
@@ -375,7 +375,7 @@ class JournalføringHendelseServiceTest {
             1,
             OFFSET,
             42L,
-            ugyldigHendelsetypeRecord
+            ugyldigHendelsetypeRecord,
         )
 
         service.prosesserNyHendelse(consumerRecord, ack)
@@ -395,7 +395,7 @@ class JournalføringHendelseServiceTest {
             1,
             OFFSET,
             42L,
-            ukjentTemaRecord
+            ukjentTemaRecord,
         )
 
         service.prosesserNyHendelse(consumerRecord, ack)
@@ -409,7 +409,7 @@ class JournalføringHendelseServiceTest {
     private fun opprettRecord(
         journalpostId: String,
         hendelseType: String = "JournalpostMottatt",
-        temaNytt: String = "BAR"
+        temaNytt: String = "BAR",
     ): JournalfoeringHendelseRecord {
         return JournalfoeringHendelseRecord(
             HENDELSE_ID,
@@ -421,7 +421,7 @@ class JournalføringHendelseServiceTest {
             temaNytt,
             "SKAN_NETS",
             "kanalReferanseId",
-            "BAR"
+            "BAR",
         )
     }
 

@@ -126,10 +126,10 @@ class OpprettBehandleSakOppgaveTaskTest {
                 "Tittel",
                 "",
                 Dokumentstatus.FERDIGSTILT,
-                emptyList()
-            )
+                emptyList(),
+            ),
         ),
         journalforendeEnhet = null,
-        sak = null
+        sak = null,
     )
 }

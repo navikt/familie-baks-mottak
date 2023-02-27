@@ -26,7 +26,7 @@ import kotlin.test.assertNotEquals
 @Tag("integration")
 @SpringBootTest(classes = [DevLauncherPostgres::class])
 class SøknadsfeltSpråkTest(
-    @Autowired val søknadSpråkvelgerService: SøknadSpråkvelgerService
+    @Autowired val søknadSpråkvelgerService: SøknadSpråkvelgerService,
 ) {
     @Test
     fun `Kan velge språk for søknadsfelter`() {
@@ -36,13 +36,13 @@ class SøknadsfeltSpråkTest(
             "testSpørsmål" to Søknadsfelt(
                 label = mapOf(
                     "nb" to "TestSpørsmål",
-                    "en" to "TestQuestion"
+                    "en" to "TestQuestion",
                 ),
                 verdi = mapOf(
                     "nb" to "TestSvar",
-                    "en" to "TestAnswer"
-                )
-            )
+                    "en" to "TestAnswer",
+                ),
+            ),
         )
         every { søknad.teksterUtenomSpørsmål } returns mapOf()
 
@@ -63,13 +63,13 @@ class SøknadsfeltSpråkTest(
             "testSpørsmål" to Søknadsfelt(
                 label = mapOf(
                     "nb" to "TestSpørsmål",
-                    "en" to "TestQuestion"
+                    "en" to "TestQuestion",
                 ),
                 verdi = mapOf(
                     "nb" to "TestSvar",
-                    "en" to "TestAnswer"
-                )
-            )
+                    "en" to "TestAnswer",
+                ),
+            ),
         )
 
         val asJson = objectMapper.writeValueAsString(søknad)
@@ -87,31 +87,31 @@ class SøknadsfeltSpråkTest(
             "testSpørsmål" to Søknadsfelt(
                 label = mapOf(
                     "nb" to "TestSpørsmål",
-                    "en" to "TestQuestion"
+                    "en" to "TestQuestion",
                 ),
                 verdi = mapOf(
                     "nb" to Søknadsfelt(
                         label = mapOf(
                             "nb" to "TestNøstetLabel",
-                            "en" to "TestNestedLabel"
+                            "en" to "TestNestedLabel",
                         ),
                         verdi = mapOf(
                             "nb" to "TestNøstetVerdi",
-                            "en" to "TestNestedValue"
-                        )
+                            "en" to "TestNestedValue",
+                        ),
                     ),
                     "en" to Søknadsfelt(
                         label = mapOf(
                             "nb" to "TestNøstetLabel",
-                            "en" to "TestNestedLabel"
+                            "en" to "TestNestedLabel",
                         ),
                         verdi = mapOf(
                             "nb" to "TestNøstetVerdi",
-                            "en" to "TestNestedValue"
-                        )
-                    )
-                )
-            )
+                            "en" to "TestNestedValue",
+                        ),
+                    ),
+                ),
+            ),
         )
         every { søknad.teksterUtenomSpørsmål } returns mapOf()
 
@@ -127,8 +127,8 @@ class SøknadsfeltSpråkTest(
         every { søknad.teksterUtenomSpørsmål } returns mapOf(
             "test.tekst" to mapOf(
                 "nb" to "TestTekst",
-                "en" to "TestText"
-            )
+                "en" to "TestText",
+            ),
         )
 
         val barnetrygdSøknadMap = søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(SøknadV8(søknad = søknad), "nb")

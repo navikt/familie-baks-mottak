@@ -45,12 +45,12 @@ class NavnoHendelseTaskLøypeTest {
         mockPdlClient,
         mockSakClient,
         mockInfotrygdBarnetrygdClient,
-        mockTaskService
+        mockTaskService,
     )
 
     private val journalføringSteg = OpprettJournalføringOppgaveTask(
         mockJournalpostClient,
-        mockOppgaveClient
+        mockOppgaveClient,
     )
 
     @BeforeEach
@@ -69,7 +69,7 @@ class NavnoHendelseTaskLøypeTest {
             behandlingstema = null,
             dokumenter = null,
             journalforendeEnhet = null,
-            sak = null
+            sak = null,
         )
 
         every {
@@ -181,10 +181,10 @@ class NavnoHendelseTaskLøypeTest {
                 SakDto(
                     status = StatusKode.FB.name,
                     vedtaksdato = LocalDate.now(),
-                    stønad = StønadDto(opphørsgrunn = MIGRERT.kode)
-                )
+                    stønad = StønadDto(opphørsgrunn = MIGRERT.kode),
+                ),
             ),
-            emptyList()
+            emptyList(),
         )
 
         kjørRutingTaskOgReturnerNesteTask().run { journalføringSteg.doTask(this) }
@@ -201,11 +201,11 @@ class NavnoHendelseTaskLøypeTest {
         rutingSteg.doTask(
             Task(
                 type = JournalhendelseRutingTask.TASK_STEP_TYPE,
-                payload = MOTTAK_KANAL
+                payload = MOTTAK_KANAL,
             ).apply {
                 this.metadata["personIdent"] = "12345678901"
                 this.metadata["journalpostId"] = "mockJournalpostId"
-            }
+            },
         )
 
         val nesteTask = slot<Task>().let { nyTask ->

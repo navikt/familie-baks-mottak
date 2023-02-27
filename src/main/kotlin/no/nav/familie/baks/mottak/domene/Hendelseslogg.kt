@@ -40,12 +40,12 @@ data class Hendelseslogg(
     val opprettetTidspunkt: LocalDateTime = LocalDateTime.now(),
 
     @Column(name = "ident", nullable = true)
-    val ident: String? = null
+    val ident: String? = null,
 )
 
 enum class HendelseConsumer {
     PDL,
     JOURNAL_AIVEN,
     EF_VEDTAK_V1,
-    EF_VEDTAK_INFOTRYGD_V1
+    EF_VEDTAK_INFOTRYGD_V1,
 }

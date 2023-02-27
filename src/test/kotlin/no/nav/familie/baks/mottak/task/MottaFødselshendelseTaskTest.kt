@@ -44,7 +44,7 @@ import java.util.UUID
 
 @SpringBootTest(
     classes = [DevLauncherPostgres::class],
-    properties = ["PDL_URL=http://localhost:28085/api", "FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api"]
+    properties = ["PDL_URL=http://localhost:28085/api", "FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api"],
 )
 @ContextConfiguration(initializers = [DbContainerInitializer::class])
 @ActiveProfiles("postgres", "mock-oauth", "mock-sts")
@@ -73,8 +73,8 @@ class MottaFødselshendelseTaskTest {
             pdlRequestBody = gyldigRequest("hentperson-med-relasjoner.graphql", fnrBarn),
             mockResponse = PdlHentPersonResponse(
                 data = PdlPerson(lagTestPdlPerson()),
-                errors = emptyList()
-            )
+                errors = emptyList(),
+            ),
         )
 
         mottaFødselshendelseTask.doTask(Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn))
@@ -101,13 +101,13 @@ class MottaFødselshendelseTaskTest {
                         bostedsadresse = emptyList(),
                         adressebeskyttelse = listOf(
                             Adressebeskyttelse(
-                                Adressebeskyttelsesgradering.STRENGT_FORTROLIG
-                            )
-                        )
-                    )
+                                Adressebeskyttelsesgradering.STRENGT_FORTROLIG,
+                            ),
+                        ),
+                    ),
                 ),
-                errors = emptyList()
-            )
+                errors = emptyList(),
+            ),
         )
 
         mottaFødselshendelseTask.doTask(Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
@@ -150,13 +150,13 @@ class MottaFødselshendelseTaskTest {
                         forelderBarnRelasjon = listOf(
                             PdlForeldreBarnRelasjon(
                                 "40107678901",
-                                FORELDERBARNRELASJONROLLE.MOR
-                            )
-                        )
-                    )
+                                FORELDERBARNRELASJONROLLE.MOR,
+                            ),
+                        ),
+                    ),
                 ),
-                errors = emptyList()
-            )
+                errors = emptyList(),
+            ),
         )
 
         val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn)
@@ -184,13 +184,13 @@ class MottaFødselshendelseTaskTest {
                         listOf(
                             PdlForeldreBarnRelasjon(
                                 "20107678901",
-                                FORELDERBARNRELASJONROLLE.FAR
-                            )
-                        )
-                    )
+                                FORELDERBARNRELASJONROLLE.FAR,
+                            ),
+                        ),
+                    ),
                 ),
-                errors = emptyList()
-            )
+                errors = emptyList(),
+            ),
         )
 
         val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn)
@@ -213,8 +213,8 @@ class MottaFødselshendelseTaskTest {
             pdlRequestBody = gyldigRequest("hentperson-med-relasjoner.graphql", fnrBarn),
             mockResponse = PdlHentPersonResponse(
                 data = PdlPerson(lagTestPdlPerson().copy(bostedsadresse = emptyList())),
-                errors = emptyList()
-            )
+                errors = emptyList(),
+            ),
         )
 
         val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn)
@@ -240,13 +240,13 @@ class MottaFødselshendelseTaskTest {
                         forelderBarnRelasjon = listOf(
                             PdlForeldreBarnRelasjon(
                                 "40107678901",
-                                FORELDERBARNRELASJONROLLE.MOR
-                            )
-                        )
-                    )
+                                FORELDERBARNRELASJONROLLE.MOR,
+                            ),
+                        ),
+                    ),
                 ),
-                errors = listOf(PdlError("Feilmelding"))
-            )
+                errors = listOf(PdlError("Feilmelding")),
+            ),
         )
 
         val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = "02091901252")
@@ -260,10 +260,10 @@ class MottaFødselshendelseTaskTest {
             forelderBarnRelasjon = listOf(
                 PdlForeldreBarnRelasjon(
                     "20107678901",
-                    FORELDERBARNRELASJONROLLE.MOR
-                )
+                    FORELDERBARNRELASJONROLLE.MOR,
+                ),
             ),
-            bostedsadresse = listOf(Bostedsadresse(matrikkeladresse = Matrikkeladresse(1, "1", null, "0576", "3000")))
+            bostedsadresse = listOf(Bostedsadresse(matrikkeladresse = Matrikkeladresse(1, "1", null, "0576", "3000"))),
         )
     }
 
@@ -276,8 +276,8 @@ class MottaFødselshendelseTaskTest {
                     .willReturn(
                         aResponse()
                             .withHeader("Content-Type", "application/json")
-                            .withBody(objectMapper.writeValueAsString(mockResponse))
-                    )
+                            .withBody(objectMapper.writeValueAsString(mockResponse)),
+                    ),
             )
         }
 

@@ -25,7 +25,7 @@ object KontantstøtteSøknadTestData {
         erBarnAdoptert = søknadsfelt("Er barn adoptert", "NEI"),
         mottarKontantstøtteForBarnFraAnnetEøsland = søknadsfelt("Kontantstøtte annet land", "NEI"),
         harEllerTildeltBarnehageplass = søknadsfelt("Har barnehageplass", "NEI"),
-        erAvdødPartnerForelder = null
+        erAvdødPartnerForelder = null,
     )
 
     private fun lagSøker(): Søker = Søker(
@@ -53,6 +53,6 @@ object KontantstøtteSøknadTestData {
         andreUtbetalingsperioder = emptyList(),
         idNummer = emptyList(),
         andreUtbetalinger = søknadsfelt("Andre utbetalinger", "NEI"),
-        adresseISøkeperiode = søknadsfelt("Adresse i søknadsperiode", "Testgate 123")
+        adresseISøkeperiode = søknadsfelt("Adresse i søknadsperiode", "Testgate 123"),
     )
 }

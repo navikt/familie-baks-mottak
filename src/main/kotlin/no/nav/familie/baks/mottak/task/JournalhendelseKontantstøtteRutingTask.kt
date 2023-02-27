@@ -21,13 +21,13 @@ import java.time.YearMonth
 @Service
 @TaskStepBeskrivelse(
     taskStepType = JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE,
-    beskrivelse = "Håndterer ruting og markering av sakssystem"
+    beskrivelse = "Håndterer ruting og markering av sakssystem",
 )
 class JournalhendelseKontantstøtteRutingTask(
     private val pdlClient: PdlClient,
     private val infotrygdKontantstøtteClient: InfotrygdKontantstøtteClient,
     private val taskService: TaskService,
-    private val featureToggleService: FeatureToggleService
+    private val featureToggleService: FeatureToggleService,
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(JournalhendelseKontantstøtteRutingTask::class.java)
@@ -54,7 +54,7 @@ class JournalhendelseKontantstøtteRutingTask(
             Task(
                 type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
                 payload = sakssystemMarkering,
-                properties = task.metadata
+                properties = task.metadata,
             ).apply { taskService.save(this) }
         }
     }

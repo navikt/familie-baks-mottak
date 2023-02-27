@@ -17,7 +17,7 @@ import org.springframework.web.client.RestOperations
 @Import(
     BearerTokenClientInterceptor::class,
     MdcValuesPropagatingClientInterceptor::class,
-    RestTemplateSts::class
+    RestTemplateSts::class,
 )
 class RestTemplateConfig {
 
@@ -25,13 +25,13 @@ class RestTemplateConfig {
     @Bean("clientCredentials")
     fun restTemplateClientCredentials(
         consumerIdClientInterceptor: ConsumerIdClientInterceptor,
-        bearerTokenClientInterceptor: BearerTokenClientInterceptor
+        bearerTokenClientInterceptor: BearerTokenClientInterceptor,
     ): RestOperations {
         return RestTemplateBuilder()
             .interceptors(
                 consumerIdClientInterceptor,
                 bearerTokenClientInterceptor,
-                MdcValuesPropagatingClientInterceptor()
+                MdcValuesPropagatingClientInterceptor(),
             )
             .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
             .build()
@@ -41,7 +41,7 @@ class RestTemplateConfig {
     fun restTemplate(
         restTemplateBuilder: RestTemplateBuilder,
         mdcInterceptor: MdcValuesPropagatingClientInterceptor,
-        consumerIdClientInterceptor: ConsumerIdClientInterceptor
+        consumerIdClientInterceptor: ConsumerIdClientInterceptor,
     ): RestOperations {
         return restTemplateBuilder.interceptors(mdcInterceptor, consumerIdClientInterceptor).build()
     }

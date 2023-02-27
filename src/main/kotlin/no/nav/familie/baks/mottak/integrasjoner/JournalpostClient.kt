@@ -22,7 +22,7 @@ private const val OAUTH2_CLIENT_CONFIG_KEY = "integrasjoner-clientcredentials"
 class JournalpostClient @Autowired constructor(
     @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}")
     private val integrasjonerServiceUri: URI,
-    @Qualifier("clientCredentials") restOperations: RestOperations
+    @Qualifier("clientCredentials") restOperations: RestOperations,
 ) :
     AbstractRestClient(restOperations, "integrasjon.saf") {
 
@@ -38,7 +38,7 @@ class JournalpostClient @Autowired constructor(
             throw IllegalStateException(
                 "Henting av journalpost med id $journalpostId feilet. Status: " + e.rawStatusCode +
                     ", body: " + e.responseBodyAsString,
-                e
+                e,
             )
         } catch (e: RestClientException) {
             throw IllegalStateException("Henting av journalpost med id $journalpostId feilet.", e)
@@ -56,7 +56,7 @@ data class Journalpost(
     val bruker: Bruker? = null,
     val journalforendeEnhet: String? = null,
     val kanal: String? = null,
-    val dokumenter: List<DokumentInfo>? = null
+    val dokumenter: List<DokumentInfo>? = null,
 ) {
 
     fun hentHovedDokumentTittel(): String? {
@@ -69,19 +69,19 @@ data class Sak(
     val arkivsaksnummer: String?,
     var arkivsaksystem: String?,
     val fagsakId: String?,
-    val fagsaksystem: String?
+    val fagsaksystem: String?,
 )
 
 data class Bruker(
     val id: String,
-    val type: BrukerIdType
+    val type: BrukerIdType,
 )
 
 data class DokumentInfo(
     val tittel: String?,
     val brevkode: String?,
     val dokumentstatus: Dokumentstatus?,
-    val dokumentvarianter: List<Dokumentvariant>?
+    val dokumentvarianter: List<Dokumentvariant>?,
 )
 
 data class Dokumentvariant(val variantformat: String)
@@ -89,7 +89,7 @@ data class Dokumentvariant(val variantformat: String)
 enum class Journalposttype {
     I,
     U,
-    N
+    N,
 }
 
 enum class Journalstatus {
@@ -104,18 +104,18 @@ enum class Journalstatus {
     UKJENT_BRUKER,
     RESERVERT,
     OPPLASTING_DOKUMENT,
-    UKJENT
+    UKJENT,
 }
 
 enum class Dokumentstatus {
     FERDIGSTILT,
     AVBRUTT,
     UNDER_REDIGERING,
-    KASSERT
+    KASSERT,
 }
 
 enum class BrukerIdType {
     AKTOERID,
     FNR,
-    ORGNR
+    ORGNR,
 }

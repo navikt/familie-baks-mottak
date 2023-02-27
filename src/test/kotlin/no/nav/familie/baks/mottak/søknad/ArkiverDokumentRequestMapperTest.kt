@@ -34,30 +34,30 @@ class ArkiverDokumentRequestMapperTest {
                 no.nav.familie.kontrakter.ks.søknad.v1.Søknadsvedlegg(
                     "123",
                     "navn",
-                    Dokumentasjonsbehov.BEKREFTELESE_PÅ_BARNEHAGEPLASS
-                )
+                    Dokumentasjonsbehov.BEKREFTELESE_PÅ_BARNEHAGEPLASS,
+                ),
             ),
             TekstPåSpråkMap(
                 mapOf(
                     "nb" to "Norge",
                     "nn" to "Noreg",
-                    "en" to "Norway"
-                )
-            )
+                    "en" to "Norway",
+                ),
+            ),
         )
         every { kontantstøtteSøknad.dokumentasjon } returns listOf(
-            dokumentasjon
+            dokumentasjon,
         )
         val dbKontantstøtteSøknad = DBKontantstøtteSøknad(søknadJson = "{}", fnr = "12345678910")
         val vedleggMap = mapOf(
-            "123" to DBKontantstotteVedlegg(dokumentId = "123", søknadId = 0, data = ByteArray(0))
+            "123" to DBKontantstotteVedlegg(dokumentId = "123", søknadId = 0, data = ByteArray(0)),
         )
         val arkiverDokumentRequest = ArkiverDokumentRequestMapper.toDto(
             dbKontantstøtteSøknad,
             KontantstøtteSøknadV2(søknad = kontantstøtteSøknad),
             ByteArray(0),
             vedleggMap,
-            ByteArray(0)
+            ByteArray(0),
         )
         assertEquals("12345678910", arkiverDokumentRequest.fnr)
         assertEquals(false, arkiverDokumentRequest.forsøkFerdigstill)
@@ -67,18 +67,18 @@ class ArkiverDokumentRequestMapperTest {
             arkiverDokumentRequest.hoveddokumentvarianter.all {
                 it.filtype in listOf(
                     Filtype.PDFA,
-                    Filtype.JSON
+                    Filtype.JSON,
                 ) && it.dokumenttype == Dokumenttype.KONTANTSTØTTE_SØKNAD
-            }
+            },
         )
         assertEquals(1, arkiverDokumentRequest.vedleggsdokumenter.size)
         assertEquals(
             true,
-            arkiverDokumentRequest.vedleggsdokumenter.all { it.filtype == Filtype.PDFA && it.dokumenttype == Dokumenttype.KONTANTSTØTTE_VEDLEGG }
+            arkiverDokumentRequest.vedleggsdokumenter.all { it.filtype == Filtype.PDFA && it.dokumenttype == Dokumenttype.KONTANTSTØTTE_VEDLEGG },
         )
         assertEquals(
             1,
-            arkiverDokumentRequest.vedleggsdokumenter.filter { it.tittel == "Bekreftelse på barnehageplass" }.size
+            arkiverDokumentRequest.vedleggsdokumenter.filter { it.tittel == "Bekreftelse på barnehageplass" }.size,
         )
     }
 
@@ -93,32 +93,32 @@ class ArkiverDokumentRequestMapperTest {
                     no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg(
                         "123",
                         "navn",
-                        no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov.AVTALE_DELT_BOSTED
-                    )
+                        no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov.AVTALE_DELT_BOSTED,
+                    ),
                 ),
                 TekstPåSpråkMap(
                     mapOf(
                         "nb" to "Norge",
                         "nn" to "Noreg",
-                        "en" to "Norway"
-                    )
-                )
+                        "en" to "Norway",
+                    ),
+                ),
             )
         every { søknad.dokumentasjon } returns listOf(
-            dokumentasjon
+            dokumentasjon,
         )
         every { søknad.søknadstype } returns Søknadstype.ORDINÆR
 
         val dbSøknad = DBSøknad(søknadJson = "{}", fnr = "12345678910")
         val vedleggMap = mapOf(
-            "123" to DBVedlegg(dokumentId = "123", søknadId = 0, data = ByteArray(0))
+            "123" to DBVedlegg(dokumentId = "123", søknadId = 0, data = ByteArray(0)),
         )
         val arkiverDokumentRequest = ArkiverDokumentRequestMapper.toDto(
             dbSøknad,
             SøknadV8(søknad),
             ByteArray(0),
             vedleggMap,
-            ByteArray(0)
+            ByteArray(0),
         )
         assertEquals("12345678910", arkiverDokumentRequest.fnr)
         assertEquals(false, arkiverDokumentRequest.forsøkFerdigstill)
@@ -128,18 +128,18 @@ class ArkiverDokumentRequestMapperTest {
             arkiverDokumentRequest.hoveddokumentvarianter.all {
                 it.filtype in listOf(
                     Filtype.PDFA,
-                    Filtype.JSON
+                    Filtype.JSON,
                 ) && it.dokumenttype == Dokumenttype.BARNETRYGD_ORDINÆR
-            }
+            },
         )
         assertEquals(1, arkiverDokumentRequest.vedleggsdokumenter.size)
         assertEquals(
             true,
-            arkiverDokumentRequest.vedleggsdokumenter.all { it.filtype == Filtype.PDFA && it.dokumenttype == Dokumenttype.BARNETRYGD_VEDLEGG }
+            arkiverDokumentRequest.vedleggsdokumenter.all { it.filtype == Filtype.PDFA && it.dokumenttype == Dokumenttype.BARNETRYGD_VEDLEGG },
         )
         assertEquals(
             1,
-            arkiverDokumentRequest.vedleggsdokumenter.filter { it.tittel == "Avtale om delt bosted" }.size
+            arkiverDokumentRequest.vedleggsdokumenter.filter { it.tittel == "Avtale om delt bosted" }.size,
         )
     }
 }

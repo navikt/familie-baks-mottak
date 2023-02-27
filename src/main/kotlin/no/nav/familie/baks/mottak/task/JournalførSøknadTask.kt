@@ -21,7 +21,7 @@ import org.springframework.web.client.HttpClientErrorException
 class JournalførSøknadTask(
     private val pdfService: PdfService,
     private val journalføringService: JournalføringService,
-    private val søknadRepository: SøknadRepository
+    private val søknadRepository: SøknadRepository,
 ) : AsyncTaskStep {
 
     override fun doTask(task: Task) {
@@ -36,7 +36,7 @@ class JournalførSøknadTask(
             val bokmålPdf = pdfService.lagBarnetrygdPdf(
                 versjonertSøknad = versjonertSøknad,
                 dbSøknad = dbSøknad,
-                språk = "nb"
+                språk = "nb",
             )
             log.info("Generert pdf med størrelse ${bokmålPdf.size}")
 
@@ -58,7 +58,7 @@ class JournalførSøknadTask(
                     log.error("409 conflict for eksternReferanseId ved journalføring av søknad. taskId=${task.id}. Se task eller securelog")
                     SECURE_LOGGER.error(
                         "409 conflict for eksternReferanseId ved journalføring søknad $task ${(e.cause as HttpClientErrorException.Conflict).responseBodyAsString}",
-                        e
+                        e,
                     )
                 }
 

@@ -17,7 +17,7 @@ import javax.transaction.Transactional
 @ConditionalOnProperty(
     value = ["funksjonsbrytere.kafka.enabled"],
     havingValue = "true",
-    matchIfMissing = true
+    matchIfMissing = true,
 )
 class JournalføringHendelseAivenConsumer(val journalhendelseService: JournalhendelseService) {
 
@@ -28,7 +28,7 @@ class JournalføringHendelseAivenConsumer(val journalhendelseService: Journalhen
         id = "baks-mottak-journal-hendelser-aiven",
         topics = ["\${JOURNALFOERINGHENDELSE_V1_TOPIC_AIVEN_URL}"],
         containerFactory = "kafkaAivenHendelseListenerAvroLatestContainerFactory",
-        idIsGroup = false
+        idIsGroup = false,
     )
     @Transactional
     fun listen(consumerRecord: ConsumerRecord<Long, JournalfoeringHendelseRecord>, ack: Acknowledgment) {

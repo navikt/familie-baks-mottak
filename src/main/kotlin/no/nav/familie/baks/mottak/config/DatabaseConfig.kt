@@ -22,8 +22,8 @@ class DatabaseConfig : AbstractJdbcConfiguration() {
         return JdbcCustomConversions(
             listOf(
                 PropertiesWrapperTilStringConverter(),
-                StringTilPropertiesWrapperConverter()
-            )
+                StringTilPropertiesWrapperConverter(),
+            ),
         )
     }
 }
