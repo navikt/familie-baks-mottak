@@ -9,8 +9,8 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.Vedlegg
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteVedlegg
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV1
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV2
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV3
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknaddokumentasjon
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
@@ -95,9 +95,10 @@ object ArkiverDokumentRequestMapper {
         val dokumenttype = Dokumenttype.KONTANTSTØTTE_SØKNAD
 
         val dokumentasjon = when (versjonertSøknad) {
-            is KontantstøtteSøknadV1 ->
-                versjonertSøknad.søknad.dokumentasjon.map { KontantstøtteSøknaddokumentasjon(it) }
             is KontantstøtteSøknadV2 ->
+                versjonertSøknad.søknad.dokumentasjon.map { KontantstøtteSøknaddokumentasjon(it) }
+
+            is KontantstøtteSøknadV3 ->
                 versjonertSøknad.søknad.dokumentasjon.map { KontantstøtteSøknaddokumentasjon(it) }
         }
 

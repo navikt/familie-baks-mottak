@@ -4,8 +4,8 @@ import no.nav.familie.baks.mottak.søknad.JournalføringService
 import no.nav.familie.baks.mottak.søknad.PdfService
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV1
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV2
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV3
 import no.nav.familie.http.client.RessursException
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -44,8 +44,8 @@ class JournalførKontantstøtteSøknadTask(
             logger.info("Generert pdf med størrelse ${bokmålPdf.size}")
 
             val orginalspråk = when (versjonertSøknad) {
-                is KontantstøtteSøknadV1 -> versjonertSøknad.søknad.originalSpråk
                 is KontantstøtteSøknadV2 -> versjonertSøknad.søknad.originalSpråk
+                is KontantstøtteSøknadV3 -> versjonertSøknad.søknad.originalSpråk
             }
 
             val orginalspråkPdf: ByteArray = if (orginalspråk != "nb") {
