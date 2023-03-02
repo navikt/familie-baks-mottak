@@ -26,7 +26,7 @@ import no.nav.familie.kontrakter.ks.søknad.v3.KontantstøtteSøknad as Kontants
 @RequestMapping(path = ["/api/kontantstotte/"], produces = [APPLICATION_JSON_VALUE])
 @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 class KontantstøtteSøknadController(
-    private val kontantstøtteSøknadService: KontantstøtteSøknadService
+    private val kontantstøtteSøknadService: KontantstøtteSøknadService,
 ) {
 
     // Metrics for kontantstotte
@@ -58,9 +58,9 @@ class KontantstøtteSøknadController(
                 Ressurs.success(
                     Kvittering(
                         "Søknad om kontantstøtte er mottatt",
-                        dbKontantstøtteSøknad.opprettetTid
-                    )
-                )
+                        dbKontantstøtteSøknad.opprettetTid,
+                    ),
+                ),
             )
         } catch (e: FødselsnummerErNullException) {
             søknadMottattFeil.increment()
@@ -98,7 +98,7 @@ class KontantstøtteSøknadController(
 
             if (dokumentasjonsbehovUtenAnnenDokumentasjon.isNotEmpty()) {
                 sendMetricsDokumentasjonsbehov(
-                    dokumentasjonsbehov = dokumentasjonsbehovUtenAnnenDokumentasjon
+                    dokumentasjonsbehov = dokumentasjonsbehovUtenAnnenDokumentasjon,
                 )
             }
             val alleVedlegg = dokumentasjon.map { it.opplastedeVedlegg }.flatten()

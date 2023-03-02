@@ -18,12 +18,12 @@ import org.springframework.web.client.HttpClientErrorException
 @Service
 @TaskStepBeskrivelse(
     taskStepType = JournalførKontantstøtteSøknadTask.JOURNALFØR_KONTANTSTØTTE_SØKNAD,
-    beskrivelse = "Journalfør søknad om kontantstøtte"
+    beskrivelse = "Journalfør søknad om kontantstøtte",
 )
 class JournalførKontantstøtteSøknadTask(
     private val pdfService: PdfService,
     private val journalføringService: JournalføringService,
-    private val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository
+    private val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
 ) : AsyncTaskStep {
 
     override fun doTask(task: Task) {
@@ -39,7 +39,7 @@ class JournalførKontantstøtteSøknadTask(
             val bokmålPdf = pdfService.lagKontantstøttePdf(
                 versjonertSøknad = versjonertSøknad,
                 dbKontantstøtteSøknad = dbKontantstøtteSøknad,
-                språk = "nb"
+                språk = "nb",
             )
             logger.info("Generert pdf med størrelse ${bokmålPdf.size}")
 
@@ -52,7 +52,7 @@ class JournalførKontantstøtteSøknadTask(
                 pdfService.lagKontantstøttePdf(
                     versjonertSøknad = versjonertSøknad,
                     dbKontantstøtteSøknad = dbKontantstøtteSøknad,
-                    språk = orginalspråk
+                    språk = orginalspråk,
                 )
             } else {
                 ByteArray(0)
@@ -65,7 +65,7 @@ class JournalførKontantstøtteSøknadTask(
                     logger.error("409 conflict for eksternReferanseId ved journalføring av kontantstøtte-søknad. taskId=${task.id}. Se task eller securelog")
                     SECURE_LOGGER.error(
                         "409 conflict for eksternReferanseId ved journalføring av kontantstøtte-søknad $task ${(e.cause as HttpClientErrorException.Conflict).responseBodyAsString}",
-                        e
+                        e,
                     )
                 }
 

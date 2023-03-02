@@ -23,7 +23,7 @@ data class DBKontantstøtteSøknad(
     @SequenceGenerator(
         name = "kontantstotte_soknad_seq_generator",
         sequenceName = "kontantstotte_soknad_seq",
-        allocationSize = 50
+        allocationSize = 50,
     )
     val id: Long = 0,
     @Column(name = "soknad_json")
@@ -32,7 +32,7 @@ data class DBKontantstøtteSøknad(
     @Column(name = "opprettet_tid")
     val opprettetTid: LocalDateTime = LocalDateTime.now(),
     @Column(name = "journalpost_id")
-    val journalpostId: String? = null
+    val journalpostId: String? = null,
 ) {
 
     private fun hentSøknadV2(): KontantstøtteSøknadV2 {
@@ -73,14 +73,14 @@ data class DBKontantstotteVedlegg(
     override val dokumentId: String,
     @Column(name = "soknad_id")
     override val søknadId: Long,
-    override val data: ByteArray
+    override val data: ByteArray,
 ) : Vedlegg
 
 fun KontantstøtteSøknadV2.tilDBKontantstøtteSøknad(): DBKontantstøtteSøknad {
     try {
         return DBKontantstøtteSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
-            fnr = this.søker.ident.verdi.getValue("nb")
+            fnr = this.søker.ident.verdi.getValue("nb"),
         )
     } catch (e: KotlinNullPointerException) {
         throw FødselsnummerErNullException()
@@ -91,7 +91,7 @@ fun KontantstøtteSøknadV3.tilDBKontantstøtteSøknad(): DBKontantstøtteSøkna
     try {
         return DBKontantstøtteSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
-            fnr = this.søker.ident.verdi.getValue("nb")
+            fnr = this.søker.ident.verdi.getValue("nb"),
         )
     } catch (e: KotlinNullPointerException) {
         throw FødselsnummerErNullException()
@@ -102,7 +102,7 @@ fun Søknadsvedlegg.tilDBKontantstøtteVedlegg(søknad: DBKontantstøtteSøknad,
     return DBKontantstotteVedlegg(
         dokumentId = this.dokumentId,
         søknadId = søknad.id,
-        data = data
+        data = data,
     )
 }
 

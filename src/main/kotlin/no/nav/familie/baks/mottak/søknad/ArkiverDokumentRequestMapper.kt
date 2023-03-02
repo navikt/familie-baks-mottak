@@ -30,17 +30,17 @@ object ArkiverDokumentRequestMapper {
         versjonertSøknad: VersjonertSøknad,
         pdf: ByteArray,
         vedleggMap: Map<String, DBVedlegg>,
-        pdfOriginalSpråk: ByteArray
+        pdfOriginalSpråk: ByteArray,
     ): ArkiverDokumentRequest {
         val (søknadstype, dokumentasjon) = when (versjonertSøknad) {
             is SøknadV7 -> Pair(
                 versjonertSøknad.søknad.søknadstype,
-                versjonertSøknad.søknad.dokumentasjon.map { BarnetrygdSøknaddokumentasjon(it) }
+                versjonertSøknad.søknad.dokumentasjon.map { BarnetrygdSøknaddokumentasjon(it) },
             )
 
             is SøknadV8 -> Pair(
                 versjonertSøknad.søknad.søknadstype,
-                versjonertSøknad.søknad.dokumentasjon.map { BarnetrygdSøknaddokumentasjon(it) }
+                versjonertSøknad.søknad.dokumentasjon.map { BarnetrygdSøknaddokumentasjon(it) },
             )
         }
 
@@ -56,7 +56,7 @@ object ArkiverDokumentRequestMapper {
                 filtype = Filtype.JSON,
                 filnavn = null,
                 tittel = "SØKNAD_${dokumenttype}_JSON",
-                dokumenttype = dokumenttype
+                dokumenttype = dokumenttype,
             )
         val søknadsdokumentPdf =
             Dokument(
@@ -68,7 +68,7 @@ object ArkiverDokumentRequestMapper {
                     Dokumenttype.BARNETRYGD_ORDINÆR -> "Søknad om ordinær barnetrygd"
                     else -> "Søknad om ordinær barnetrygd"
                 },
-                dokumenttype = dokumenttype
+                dokumenttype = dokumenttype,
             )
 
         return ArkiverDokumentRequest(
@@ -79,9 +79,9 @@ object ArkiverDokumentRequestMapper {
                 dokumentasjon,
                 vedleggMap,
                 pdfOriginalSpråk,
-                Dokumenttype.BARNETRYGD_VEDLEGG
+                Dokumenttype.BARNETRYGD_VEDLEGG,
             ),
-            eksternReferanseId = genererEksternReferanseId(dbSøknad.id, dokumenttype)
+            eksternReferanseId = genererEksternReferanseId(dbSøknad.id, dokumenttype),
         )
     }
 
@@ -90,7 +90,7 @@ object ArkiverDokumentRequestMapper {
         versjonertSøknad: VersjonertKontantstøtteSøknad,
         pdf: ByteArray,
         vedleggMap: Map<String, DBKontantstotteVedlegg>,
-        pdfOriginalSpråk: ByteArray
+        pdfOriginalSpråk: ByteArray,
     ): ArkiverDokumentRequest {
         val dokumenttype = Dokumenttype.KONTANTSTØTTE_SØKNAD
 
@@ -108,7 +108,7 @@ object ArkiverDokumentRequestMapper {
                 filtype = Filtype.JSON,
                 filnavn = null,
                 tittel = "SØKNAD_${dokumenttype}_JSON",
-                dokumenttype = dokumenttype
+                dokumenttype = dokumenttype,
             )
         val søknadsdokumentPdf =
             Dokument(
@@ -116,7 +116,7 @@ object ArkiverDokumentRequestMapper {
                 filtype = Filtype.PDFA,
                 filnavn = null,
                 tittel = "Søknad om kontantstøtte",
-                dokumenttype = dokumenttype
+                dokumenttype = dokumenttype,
             )
 
         return ArkiverDokumentRequest(
@@ -127,9 +127,9 @@ object ArkiverDokumentRequestMapper {
                 dokumentasjon,
                 vedleggMap,
                 pdfOriginalSpråk,
-                Dokumenttype.KONTANTSTØTTE_VEDLEGG
+                Dokumenttype.KONTANTSTØTTE_VEDLEGG,
             ),
-            eksternReferanseId = genererEksternReferanseId(dbKontantstøtteSøknad.id, dokumenttype)
+            eksternReferanseId = genererEksternReferanseId(dbKontantstøtteSøknad.id, dokumenttype),
         )
     }
 
@@ -137,7 +137,7 @@ object ArkiverDokumentRequestMapper {
         dokumentasjon: List<ISøknaddokumentasjon>,
         vedleggMap: Map<String, Vedlegg>,
         pdfOriginalSpråk: ByteArray,
-        dokumenttype: Dokumenttype
+        dokumenttype: Dokumenttype,
     ): List<Dokument> {
         val vedlegg = mutableListOf<Dokument>()
 
@@ -149,8 +149,8 @@ object ArkiverDokumentRequestMapper {
                             dokument = dbFil.data,
                             dokumenttype = dokumenttype,
                             filtype = Filtype.PDFA,
-                            tittel = opplastaVedlegg.tittel
-                        )
+                            tittel = opplastaVedlegg.tittel,
+                        ),
                     )
                 }
             }
@@ -162,8 +162,8 @@ object ArkiverDokumentRequestMapper {
                     dokument = pdfOriginalSpråk,
                     dokumenttype = dokumenttype,
                     filtype = Filtype.PDFA,
-                    tittel = "Søknad på originalt utfylt språk"
-                )
+                    tittel = "Søknad på originalt utfylt språk",
+                ),
             )
         }
 
@@ -187,5 +187,5 @@ interface ISøknaddokumentasjon {
 
 data class Søknadsvedlegg(
     val dokumentId: String,
-    val tittel: String
+    val tittel: String,
 )
