@@ -23,7 +23,7 @@ class SøknadSpråkvelgerService {
             when (versjonertSøknad) {
                 is SøknadV7 -> versjonertSøknad.søknad
                 is SøknadV8 -> versjonertSøknad.søknad
-            },
+            }
         )
         barnetrygdSøknadMapForSpråk["teksterUtenomSpørsmål"] = when (versjonertSøknad) {
             is SøknadV7 -> versjonertSøknad.søknad.teksterUtenomSpørsmål
@@ -35,19 +35,15 @@ class SøknadSpråkvelgerService {
 
     fun konverterKontantstøtteSøknadTilMapForSpråk(
         versjonertSøknad: VersjonertKontantstøtteSøknad,
-        språk: String,
+        språk: String
     ): Map<String, Any> {
         val objectMapperForSpråk = hentObjectMapperForSpråk(språk)
 
         val kontantstøtteSøknadMapForSpråk = objectMapperForSpråk.convertValue<MutableMap<String, Any>>(
             when (versjonertSøknad) {
                 is KontantstøtteSøknadV2 -> versjonertSøknad.søknad
-<<<<<<< Updated upstream
-            },
-=======
                 is KontantstøtteSøknadV3 -> versjonertSøknad.søknad
             }
->>>>>>> Stashed changes
         )
         return kontantstøtteSøknadMapForSpråk
     }
@@ -55,7 +51,7 @@ class SøknadSpråkvelgerService {
     fun hentObjectMapperForSpråk(språk: String): ObjectMapper {
         return getObjectMapper.registerModules(
             BarnetrygdSøknadObjectMapperModule(språk),
-            KontantstøtteObjectMapperModule(språk),
+            KontantstøtteObjectMapperModule(språk)
         )
     }
 }
