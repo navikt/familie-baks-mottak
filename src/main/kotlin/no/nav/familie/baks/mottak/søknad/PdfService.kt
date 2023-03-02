@@ -20,7 +20,7 @@ import java.util.Locale
 @Service
 class PdfService(
     private val pdfClient: PdfClient,
-    private val søknadSpråkvelgerService: SøknadSpråkvelgerService,
+    private val søknadSpråkvelgerService: SøknadSpråkvelgerService
 ) {
 
     fun lagBarnetrygdPdf(versjonertSøknad: VersjonertSøknad, dbSøknad: DBSøknad, språk: String = "nb"): ByteArray {
@@ -45,7 +45,7 @@ class PdfService(
             label = when (søknadstype) {
                 Søknadstype.UTVIDET -> "Søknad om utvidet barnetrygd"
                 else -> "Søknad om ordinær barnetrygd"
-            },
+            }
         )
         return pdfClient.lagPdf(barnetrygdSøknadMapForSpråk + ekstraFelterMap, path)
     }
@@ -53,21 +53,21 @@ class PdfService(
     fun lagKontantstøttePdf(
         versjonertSøknad: VersjonertKontantstøtteSøknad,
         dbKontantstøtteSøknad: DBKontantstøtteSøknad,
-        språk: String = "nb",
+        språk: String = "nb"
     ): ByteArray {
         val kontantstøtteSøknadMapForSpråk =
             søknadSpråkvelgerService.konverterKontantstøtteSøknadTilMapForSpråk(versjonertSøknad, språk)
 
         val navn = when (versjonertSøknad) {
-            is KontantstøtteSøknadV2 -> versjonertSøknad.søknad.søker.navn
-            is KontantstøtteSøknadV3 -> versjonertSøknad.søknad.søker.navn
+            is KontantstøtteSøknadV2 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
+            is KontantstøtteSøknadV3 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
         }
 
         val ekstraFelterMap = hentEkstraFelter(
             navn = navn.verdi.getValue("nb"),
             opprettetTid = dbKontantstøtteSøknad.opprettetTid,
             fnr = dbKontantstøtteSøknad.fnr,
-            label = "Søknad om kontantstøtte",
+            label = "Søknad om kontantstøtte"
         )
         return pdfClient.lagPdf(kontantstøtteSøknadMapForSpråk + ekstraFelterMap, "kontantstotte-soknad")
     }
@@ -83,15 +83,15 @@ class PdfService(
         opprettetTid: LocalDateTime,
         navn: String,
         fnr: String,
-        label: String,
+        label: String
     ): Map<String, String> {
         return mapOf(
             "dokumentDato" to opprettetTid.format(
-                DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no")),
+                DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no"))
             ),
             "navn" to navn,
             "fodselsnummer" to fnr,
-            "label" to label,
+            "label" to label
         )
     }
 

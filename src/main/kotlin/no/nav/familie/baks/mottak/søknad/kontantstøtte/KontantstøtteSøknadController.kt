@@ -26,7 +26,7 @@ import no.nav.familie.kontrakter.ks.søknad.v3.KontantstøtteSøknad as Kontants
 @RequestMapping(path = ["/api/kontantstotte/"], produces = [APPLICATION_JSON_VALUE])
 @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 class KontantstøtteSøknadController(
-    private val kontantstøtteSøknadService: KontantstøtteSøknadService,
+    private val kontantstøtteSøknadService: KontantstøtteSøknadService
 ) {
 
     // Metrics for kontantstotte
@@ -43,11 +43,11 @@ class KontantstøtteSøknadController(
 
     @PostMapping(value = ["/soknad/v2"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(@RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV2): ResponseEntity<Ressurs<Kvittering>> =
-        mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = KontantstøtteSøknadV2(søknad = søknad))
+        mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = KontantstøtteSøknadV2(kontantstøtteSøknad = søknad))
 
     @PostMapping(value = ["/soknad/v3"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(@RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV3): ResponseEntity<Ressurs<Kvittering>> =
-        mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = KontantstøtteSøknadV3(søknad = søknad))
+        mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = KontantstøtteSøknadV3(kontantstøtteSøknad = søknad))
 
     fun mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad): ResponseEntity<Ressurs<Kvittering>> {
         return try {
@@ -58,9 +58,9 @@ class KontantstøtteSøknadController(
                 Ressurs.success(
                     Kvittering(
                         "Søknad om kontantstøtte er mottatt",
-                        dbKontantstøtteSøknad.opprettetTid,
-                    ),
-                ),
+                        dbKontantstøtteSøknad.opprettetTid
+                    )
+                )
             )
         } catch (e: FødselsnummerErNullException) {
             søknadMottattFeil.increment()
@@ -70,13 +70,13 @@ class KontantstøtteSøknadController(
 
     private fun sendMetrics(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad) {
         val dokumentasjon = when (versjonertKontantstøtteSøknad) {
-            is KontantstøtteSøknadV2 -> versjonertKontantstøtteSøknad.søknad.dokumentasjon
-            is KontantstøtteSøknadV3 -> versjonertKontantstøtteSøknad.søknad.dokumentasjon
+            is KontantstøtteSøknadV2 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon
+            is KontantstøtteSøknadV3 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon
         }
 
         val harEøsSteg = when (versjonertKontantstøtteSøknad) {
-            is KontantstøtteSøknadV2 -> versjonertKontantstøtteSøknad.søknad.antallEøsSteg > 0
-            is KontantstøtteSøknadV3 -> versjonertKontantstøtteSøknad.søknad.antallEøsSteg > 0
+            is KontantstøtteSøknadV2 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.antallEøsSteg > 0
+            is KontantstøtteSøknadV3 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.antallEøsSteg > 0
         }
 
         sendMetricsSøknad(harEøsSteg)
@@ -98,7 +98,7 @@ class KontantstøtteSøknadController(
 
             if (dokumentasjonsbehovUtenAnnenDokumentasjon.isNotEmpty()) {
                 sendMetricsDokumentasjonsbehov(
-                    dokumentasjonsbehov = dokumentasjonsbehovUtenAnnenDokumentasjon,
+                    dokumentasjonsbehov = dokumentasjonsbehovUtenAnnenDokumentasjon
                 )
             }
             val alleVedlegg = dokumentasjon.map { it.opplastedeVedlegg }.flatten()

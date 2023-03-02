@@ -41,8 +41,8 @@ class SøknadSpråkvelgerService {
 
         val kontantstøtteSøknadMapForSpråk = objectMapperForSpråk.convertValue<MutableMap<String, Any>>(
             when (versjonertSøknad) {
-                is KontantstøtteSøknadV2 -> versjonertSøknad.søknad
-                is KontantstøtteSøknadV3 -> versjonertSøknad.søknad
+                is KontantstøtteSøknadV2 -> versjonertSøknad.kontantstøtteSøknad
+                is KontantstøtteSøknadV3 -> versjonertSøknad.kontantstøtteSøknad
             }
         )
         return kontantstøtteSøknadMapForSpråk
