@@ -54,7 +54,7 @@ class ArkiverDokumentRequestMapperTest {
         )
         val arkiverDokumentRequest = ArkiverDokumentRequestMapper.toDto(
             dbKontantstøtteSøknad,
-            KontantstøtteSøknadV2(søknad = kontantstøtteSøknad),
+            KontantstøtteSøknadV2(kontantstøtteSøknad = kontantstøtteSøknad),
             ByteArray(0),
             vedleggMap,
             ByteArray(0),

@@ -12,8 +12,8 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.SequenceGenerator
 import javax.persistence.Table
-import no.nav.familie.kontrakter.ks.søknad.v1.KontantstøtteSøknad as KontantstøtteSøknadV1
 import no.nav.familie.kontrakter.ks.søknad.v2.KontantstøtteSøknad as KontantstøtteSøknadV2
+import no.nav.familie.kontrakter.ks.søknad.v3.KontantstøtteSøknad as KontantstøtteSøknadV3
 
 @Entity(name = "kontantstotte_soknad")
 @Table(name = "kontantstotte_soknad")
@@ -35,11 +35,11 @@ data class DBKontantstøtteSøknad(
     val journalpostId: String? = null,
 ) {
 
-    private fun hentSøknadV1(): KontantstøtteSøknadV1 {
+    private fun hentSøknadV2(): KontantstøtteSøknadV2 {
         return objectMapper.readValue(søknadJson)
     }
 
-    private fun hentSøknadV2(): KontantstøtteSøknadV2 {
+    private fun hentSøknadV3(): KontantstøtteSøknadV3 {
         return objectMapper.readValue(søknadJson)
     }
 
@@ -58,10 +58,10 @@ data class DBKontantstøtteSøknad(
 
     fun hentVersjonertKontantstøtteSøknad(): VersjonertKontantstøtteSøknad {
         val versjon = this.hentSøknadVersjon()
-        if (versjon == "v2") {
-            return KontantstøtteSøknadV2(søknad = hentSøknadV2())
+        if (versjon == "v3") {
+            return KontantstøtteSøknadV3(kontantstøtteSøknad = hentSøknadV3())
         }
-        return KontantstøtteSøknadV1(søknad = hentSøknadV1())
+        return KontantstøtteSøknadV2(kontantstøtteSøknad = hentSøknadV2())
     }
 }
 
@@ -76,7 +76,7 @@ data class DBKontantstotteVedlegg(
     override val data: ByteArray,
 ) : Vedlegg
 
-fun KontantstøtteSøknadV1.tilDBKontantstøtteSøknad(): DBKontantstøtteSøknad {
+fun KontantstøtteSøknadV2.tilDBKontantstøtteSøknad(): DBKontantstøtteSøknad {
     try {
         return DBKontantstøtteSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
@@ -87,7 +87,7 @@ fun KontantstøtteSøknadV1.tilDBKontantstøtteSøknad(): DBKontantstøtteSøkna
     }
 }
 
-fun KontantstøtteSøknadV2.tilDBKontantstøtteSøknad(): DBKontantstøtteSøknad {
+fun KontantstøtteSøknadV3.tilDBKontantstøtteSøknad(): DBKontantstøtteSøknad {
     try {
         return DBKontantstøtteSøknad(
             søknadJson = objectMapper.writeValueAsString(this),

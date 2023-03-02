@@ -6,8 +6,8 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV1
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV2
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV3
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import org.slf4j.LoggerFactory
@@ -59,8 +59,8 @@ class PdfService(
             søknadSpråkvelgerService.konverterKontantstøtteSøknadTilMapForSpråk(versjonertSøknad, språk)
 
         val navn = when (versjonertSøknad) {
-            is KontantstøtteSøknadV1 -> versjonertSøknad.søknad.søker.navn
-            is KontantstøtteSøknadV2 -> versjonertSøknad.søknad.søker.navn
+            is KontantstøtteSøknadV2 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
+            is KontantstøtteSøknadV3 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
         }
 
         val ekstraFelterMap = hentEkstraFelter(

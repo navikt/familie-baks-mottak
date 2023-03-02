@@ -49,7 +49,7 @@ class SøknadSpråkvelgerServiceTest {
             dokumentasjon,
         )
 
-        val versjonertKontantstøtteSøknad = KontantstøtteSøknadV2(søknad = kontantstøtteSøknad)
+        val versjonertKontantstøtteSøknad = KontantstøtteSøknadV2(kontantstøtteSøknad = kontantstøtteSøknad)
 
         // Bokmål
         var kontantstøtteMapForSpråk =
