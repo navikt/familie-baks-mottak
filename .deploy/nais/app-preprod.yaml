@@ -36,6 +36,8 @@ spec:
     requests:
       memory: 1024Mi
       cpu: 200m
+  ingresses:
+    - https://familie-baks-mottak.dev.intern.nav.no
   secureLogs:
     enabled: true
   tokenx:

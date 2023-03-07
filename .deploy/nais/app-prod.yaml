@@ -36,6 +36,8 @@ spec:
     requests:
       memory: 2Gi
       cpu: 200m
+  ingresses: # Optional. List of ingress URLs that will route HTTP traffic to the application.
+    - https://familie-baks-mottak.intern.nav.no
   secureLogs:
     enabled: true
   tokenx:
