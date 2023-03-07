@@ -93,4 +93,4 @@ BA_SAK_SCOPE: api://dev-gcp.teamfamilie.familie-ba-sak/.default
 
 NORG2_API_URL: https://norg2.dev-fss-pub.nais.io/norg2
 FAMILIE_DOKUMENT_API_URL: http://familie-dokument/familie/dokument
-FAMILIE_BAKS_DOKGEN_API_URL: https://familie-baks-dokgen.dev.intern.nav.no
+FAMILIE_BAKS_DOKGEN_API_URL: https://familie-baks-dokgen/

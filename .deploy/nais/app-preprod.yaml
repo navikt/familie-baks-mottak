@@ -58,6 +58,8 @@ spec:
           cluster: dev-gcp
         - application: familie-dokument
           cluster: dev-gcp
+        - application: familie-baks-dokgen
+          cluster: dev-gcp
       external:
         - host: kafka-schema-registry.nais-q.adeo.no
         - host: pdl-api.dev-fss-pub.nais.io
