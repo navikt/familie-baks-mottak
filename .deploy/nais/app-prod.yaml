@@ -63,8 +63,6 @@ spec:
         - host: pdl-api.prod-fss-pub.nais.io
         - host: norg2.prod-fss-pub.nais.io
         - host: familie-integrasjoner.prod-fss-pub.nais.io
-  ingresses: # Optional. List of ingress URLs that will route HTTP traffic to the application.
-    - https://familie-baks-mottak.intern.nav.no
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: prod

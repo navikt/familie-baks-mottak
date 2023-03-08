@@ -36,8 +36,6 @@ spec:
     requests:
       memory: 1024Mi
       cpu: 200m
-  ingresses:
-    - https://familie-baks-mottak.dev.intern.nav.no
   secureLogs:
     enabled: true
   tokenx:
@@ -59,6 +57,8 @@ spec:
         - application: familie-ba-sak
           cluster: dev-gcp
         - application: familie-dokument
+          cluster: dev-gcp
+        - application: familie-baks-dokgen
           cluster: dev-gcp
       external:
         - host: kafka-schema-registry.nais-q.adeo.no
