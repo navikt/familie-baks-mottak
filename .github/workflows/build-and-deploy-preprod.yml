@@ -60,10 +60,12 @@ jobs:
           docker_context: .
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+    outputs:
+      image: ${{ steps.docker-push.outputs.image }}
   deploy-dev:
     if: github.event.pull_request.draft == false
     name: Deploy to dev-gcp
-    needs: build-dev
+    needs: [build-dev]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -77,7 +79,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: .deploy/nais/app-preprod.yaml
-          IMAGE: ${{ steps.docker-push.outputs.image }}
+          IMAGE: ${{ needs.build-dev.outputs.image }}
   bygg-sonar:
     if: ${{ false }}  # disable for now
     #if: github.event.pull_request.user.login != 'dependabot[bot]'
