@@ -24,11 +24,11 @@
         <mockk.version>1.13.4</mockk.version>
         <confluent.version>6.2.9</confluent.version>
         <prosessering.version>1.20230228091402_e6ac3c2</prosessering.version>
-        <felles.version>1.20230116145510_2afcc20</felles.version>
-        <kontrakter.version>2.0_20230303130913_fd7de2a</kontrakter.version>
+        <felles.version>2.20230210162649_a258d57-SPRING_BOOT_3</felles.version>
+        <kontrakter.version>3.0_20230314075921_27fa962-JAKARTA</kontrakter.version>
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
-        <spring.cloud.version>3.1.5</spring.cloud.version>
-        <token-validation-spring.version>2.1.9</token-validation-spring.version>
+        <spring.cloud.version>4.0.0</spring.cloud.version>
+        <token-validation-spring.version>3.0.3</token-validation-spring.version>
         <avro.version>1.11.1</avro.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
@@ -201,6 +201,11 @@
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
         </dependency>
+        <!-- https://github.com/spring-projects/spring-boot/issues/33044#issuecomment-1379812611 -->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+        </dependency>
 
         <!-- Test -->
         <dependency>
@@ -240,8 +245,8 @@
         </dependency>
         <dependency>
             <groupId>no.nav.security</groupId>
-            <artifactId>token-validation-test-support</artifactId>
-            <version>2.0.5</version>
+            <artifactId>token-validation-spring-test</artifactId>
+            <version>${token-validation-spring.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
