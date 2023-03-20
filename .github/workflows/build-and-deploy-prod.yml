@@ -44,9 +44,6 @@ jobs:
           CLUSTER: dev-gcp
           RESOURCE: .deploy/nais/app-preprod.yaml
           IMAGE: ${{ steps.docker-push.outputs.image }}
-      - name: Push Docker image med 'latest' tag
-        if: github.ref == 'refs/heads/master'
-        run: docker push ${IMAGE_LATEST}
       - name: Deploy til prod-gcp
         if: github.ref == 'refs/heads/master'
         uses: nais/deploy/actions/deploy@v1
