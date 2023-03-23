@@ -32,6 +32,8 @@ jobs:
     name: Build and push
     runs-on: ubuntu-latest
     permissions:
+      contents: "read"
+      id-token: "write"
       packages: write
     steps:
       - uses: actions/checkout@v3
@@ -42,29 +44,32 @@ jobs:
           java-version: 17
           distribution: 'temurin'
           cache: 'maven'
+
       - name: Bygg med maven
         env:
           GITHUB_USERNAME: x-access-token
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn -B --no-transfer-progress package --settings .m2/maven-settings.xml --file pom.xml
-      - name: Bygg Docker image
-        run: |
-          docker build -t ${IMAGE} .
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+
+      - uses: nais/docker-build-push@v0
+        id: docker-push
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Push Docker image
-        run: docker push $IMAGE
+          team: teamfamilie
+          push_image: true
+          dockerfile: Dockerfile
+          docker_context: .
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+    outputs:
+      image: ${{ steps.docker-push.outputs.image }}
   deploy-dev:
     if: github.event.pull_request.draft == false
     name: Deploy to dev-gcp
-    needs: build-dev
+    needs: [build-dev]
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: "write"
     steps:
       - uses: actions/checkout@v3
       - name: Deploy til dev-gcp team namespace
@@ -74,24 +79,4 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: .deploy/nais/app-preprod.yaml
-  bygg-sonar:
-    if: ${{ false }}  # disable for now
-    #if: github.event.pull_request.user.login != 'dependabot[bot]'
-    name: Build sonar
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          persist-credentials: false
-      - uses: actions/setup-java@v3
-        with:
-          java-version: 17
-          distribution: 'temurin'
-          cache: 'maven'
-      - name: Bygg med maven
-        env:
-          GITHUB_USERNAME: x-access-token
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_PROJECTKEY: ${{ secrets.SONAR_PROJECTKEY }}
-          SONAR_LOGIN: ${{ secrets.SONAR_LOGIN }}
-        run: mvn -B --no-transfer-progress package verify sonar:sonar --settings .m2/maven-settings.xml --file pom.xml
+          IMAGE: ${{ needs.build-dev.outputs.image }}
