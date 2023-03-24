@@ -15,7 +15,7 @@ import org.springframework.core.env.Environment
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Service
-import javax.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Lytter på en kafka topic aapen-ef-overgangstonad-v1 fra infotrygd og sender til ba-sak. Retention på topic er satt til -1 i prod
