@@ -16,8 +16,8 @@ import org.springframework.web.client.RestOperations
 import org.springframework.web.client.RestTemplate
 import java.nio.charset.StandardCharsets
 
-@Configuration(enforceUniqueMethods = false)
-@Profile("dev", "postgres")
+@Configuration
+@Profile("dev")
 @Import(
     ConsumerIdClientInterceptor::class,
     MdcValuesPropagatingClientInterceptor::class,

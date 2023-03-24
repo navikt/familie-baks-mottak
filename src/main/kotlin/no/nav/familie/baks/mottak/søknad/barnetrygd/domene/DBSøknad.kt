@@ -1,16 +1,16 @@
 package no.nav.familie.baks.mottak.søknad.barnetrygd.domene
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.SequenceGenerator
-import jakarta.persistence.Table
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg
 import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.LocalDateTime
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.SequenceGenerator
+import javax.persistence.Table
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknad as SøknadV7
 import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadV8
 

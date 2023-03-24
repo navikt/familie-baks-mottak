@@ -1,9 +1,9 @@
 package no.nav.familie.baks.mottak.domene
 
-import jakarta.persistence.LockModeType
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Lock
 import org.springframework.stereotype.Repository
+import javax.persistence.LockModeType
 
 @Repository
 interface HendelsesloggRepository : JpaRepository<Hendelseslogg, Long> {

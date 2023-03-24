@@ -45,7 +45,7 @@ import java.time.LocalDateTime
 
 @SpringBootTest(
     classes = [DevLauncher::class],
-    properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api", "NORG2_API_URL=http://localhost:28085/norg2"],
+    properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api", "NORG2_API_URL=http://localhost:28085/norg2/"],
 )
 @ActiveProfiles("dev", "mock-oauth")
 @AutoConfigureWireMock(port = 28085)

@@ -1,12 +1,11 @@
 package no.nav.familie.baks.mottak
 
 import no.nav.familie.baks.mottak.config.ApplicationConfig
-import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
+import no.nav.security.token.support.test.spring.TokenGeneratorConfiguration
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.annotation.Import
 
-@Import(ApplicationConfig::class)
-@EnableMockOAuth2Server
+@Import(TokenGeneratorConfiguration::class, ApplicationConfig::class)
 class DevLauncher
 
 fun main(args: Array<String>) {

@@ -1,7 +1,7 @@
 no.nav.security.jwt:
   issuer:
     selvbetjening:
-      discoveryurl: http://localhost:${mock-oauth2-server.port}/selvbetjening/.well-known/openid-configuration
+      discoveryurl: http://metadata
       accepted_audience: aud-localhost
       cookie_name: localhost-idtoken
     # Kommenteres ut ved lokal testing av innsending av søknad
