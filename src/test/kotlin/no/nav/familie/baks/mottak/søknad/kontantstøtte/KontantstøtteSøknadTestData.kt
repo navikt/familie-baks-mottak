@@ -2,8 +2,8 @@ package no.nav.familie.baks.mottak.søknad.kontantstøtte
 
 import no.nav.familie.kontrakter.ks.søknad.v1.SIVILSTANDTYPE
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsfelt
-import no.nav.familie.kontrakter.ks.søknad.v2.KontantstøtteSøknad
-import no.nav.familie.kontrakter.ks.søknad.v2.Søker
+import no.nav.familie.kontrakter.ks.søknad.v4.KontantstøtteSøknad
+import no.nav.familie.kontrakter.ks.søknad.v4.Søker
 
 fun <T> søknadsfelt(label: String, verdi: T): Søknadsfelt<T> {
     return Søknadsfelt(label = mapOf("nb" to label), verdi = mapOf("nb" to verdi))
@@ -38,6 +38,7 @@ object KontantstøtteSøknadTestData {
         sivilstand = søknadsfelt("Sivilstand", SIVILSTANDTYPE.SEPARERT),
         borPåRegistrertAdresse = søknadsfelt("Bor på registrert adresse", "JA"),
         værtINorgeITolvMåneder = søknadsfelt("Norge 12 mnd", "JA"),
+        utenlandsoppholdUtenArbeid = søknadsfelt("Opphold i utlandet uten arbeid", "JA"),
         utenlandsperioder = emptyList(),
         planleggerÅBoINorgeTolvMnd = søknadsfelt("Planlegger å bo i Norge i 12 mnd", "JA"),
         yrkesaktivFemÅr = søknadsfelt("Yrkesaktiv 5 år", "JA"),

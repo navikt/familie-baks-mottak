@@ -4,13 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV2
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsfelt
 import no.nav.familie.kontrakter.ks.søknad.v1.TekstPåSpråkMap
-import no.nav.familie.kontrakter.ks.søknad.v2.Barn
-import no.nav.familie.kontrakter.ks.søknad.v2.KontantstøtteSøknad
+import no.nav.familie.kontrakter.ks.søknad.v4.Barn
+import no.nav.familie.kontrakter.ks.søknad.v4.KontantstøtteSøknad
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import kotlin.test.assertEquals
@@ -49,7 +49,7 @@ class SøknadSpråkvelgerServiceTest {
             dokumentasjon,
         )
 
-        val versjonertKontantstøtteSøknad = KontantstøtteSøknadV2(kontantstøtteSøknad = kontantstøtteSøknad)
+        val versjonertKontantstøtteSøknad = KontantstøtteSøknadV4(kontantstøtteSøknad = kontantstøtteSøknad)
 
         // Bokmål
         var kontantstøtteMapForSpråk =

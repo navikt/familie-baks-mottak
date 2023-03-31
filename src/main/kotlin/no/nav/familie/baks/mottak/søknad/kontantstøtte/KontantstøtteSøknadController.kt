@@ -3,8 +3,8 @@ package no.nav.familie.baks.mottak.søknad.kontantstøtte
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.søknad.Kvittering
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.FødselsnummerErNullException
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV2
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV3
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.ks.søknad.v1.Dokumentasjonsbehov
@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
-import no.nav.familie.kontrakter.ks.søknad.v2.KontantstøtteSøknad as KontantstøtteSøknadKontraktV2
 import no.nav.familie.kontrakter.ks.søknad.v3.KontantstøtteSøknad as KontantstøtteSøknadKontraktV3
+import no.nav.familie.kontrakter.ks.søknad.v4.KontantstøtteSøknad as KontantstøtteSøknadKontraktV4
 
 @RestController
 @RequestMapping(path = ["/api/kontantstotte/"], produces = [APPLICATION_JSON_VALUE])
@@ -41,13 +41,13 @@ class KontantstøtteSøknadController(
     // Metrics for EØS kontantstotte
     val søknadEøs = Metrics.counter("kontantstotte.soknad.eos")
 
-    @PostMapping(value = ["/soknad/v2"], consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun taImotSøknad(@RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV2): ResponseEntity<Ressurs<Kvittering>> =
-        mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = KontantstøtteSøknadV2(kontantstøtteSøknad = søknad))
-
     @PostMapping(value = ["/soknad/v3"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(@RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV3): ResponseEntity<Ressurs<Kvittering>> =
         mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = KontantstøtteSøknadV3(kontantstøtteSøknad = søknad))
+
+    @PostMapping(value = ["/soknad/v4"], consumes = [MULTIPART_FORM_DATA_VALUE])
+    fun taImotSøknad(@RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV4): ResponseEntity<Ressurs<Kvittering>> =
+        mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = KontantstøtteSøknadV4(kontantstøtteSøknad = søknad))
 
     fun mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad): ResponseEntity<Ressurs<Kvittering>> {
         return try {
@@ -70,13 +70,13 @@ class KontantstøtteSøknadController(
 
     private fun sendMetrics(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad) {
         val dokumentasjon = when (versjonertKontantstøtteSøknad) {
-            is KontantstøtteSøknadV2 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon
             is KontantstøtteSøknadV3 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon
+            is KontantstøtteSøknadV4 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon
         }
 
         val harEøsSteg = when (versjonertKontantstøtteSøknad) {
-            is KontantstøtteSøknadV2 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.antallEøsSteg > 0
             is KontantstøtteSøknadV3 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.antallEøsSteg > 0
+            is KontantstøtteSøknadV4 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.antallEøsSteg > 0
         }
 
         sendMetricsSøknad(harEøsSteg)

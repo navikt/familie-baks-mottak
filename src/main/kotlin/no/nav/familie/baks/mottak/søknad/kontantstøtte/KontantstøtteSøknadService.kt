@@ -5,8 +5,8 @@ import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteV
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.FødselsnummerErNullException
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV2
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV3
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteVedleggRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.tilDBKontantstøtteSøknad
@@ -30,14 +30,14 @@ class KontantstøtteSøknadService(
     @Throws(FødselsnummerErNullException::class)
     fun mottaKontantstøtteSøknad(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad): DBKontantstøtteSøknad {
         val (dbKontantstøtteSøknad, dokumentasjon) = when (versjonertKontantstøtteSøknad) {
-            is KontantstøtteSøknadV2 -> {
+            is KontantstøtteSøknadV3 -> {
                 Pair(
                     versjonertKontantstøtteSøknad.kontantstøtteSøknad.tilDBKontantstøtteSøknad(),
                     versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon,
                 )
             }
 
-            is KontantstøtteSøknadV3 -> {
+            is KontantstøtteSøknadV4 -> {
                 Pair(
                     versjonertKontantstøtteSøknad.kontantstøtteSøknad.tilDBKontantstøtteSøknad(),
                     versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon,
