@@ -12,8 +12,8 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.Vedlegg
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsvedlegg
 import java.time.LocalDateTime
-import no.nav.familie.kontrakter.ks.søknad.v2.KontantstøtteSøknad as KontantstøtteSøknadV2
 import no.nav.familie.kontrakter.ks.søknad.v3.KontantstøtteSøknad as KontantstøtteSøknadV3
+import no.nav.familie.kontrakter.ks.søknad.v4.KontantstøtteSøknad as KontantstøtteSøknadV4
 
 @Entity(name = "kontantstotte_soknad")
 @Table(name = "kontantstotte_soknad")
@@ -35,33 +35,29 @@ data class DBKontantstøtteSøknad(
     val journalpostId: String? = null,
 ) {
 
-    private fun hentSøknadV2(): KontantstøtteSøknadV2 {
-        return objectMapper.readValue(søknadJson)
-    }
-
     private fun hentSøknadV3(): KontantstøtteSøknadV3 {
         return objectMapper.readValue(søknadJson)
     }
 
+    private fun hentSøknadV4(): KontantstøtteSøknadV4 {
+        return objectMapper.readValue(søknadJson)
+    }
+
     private fun hentSøknadVersjon(): String {
-        return try {
-            val søknad = objectMapper.readTree(søknadJson)
-            if (søknad.get("kontraktVersjon")?.asInt() == 2) {
-                "v2"
-            } else {
-                "v1"
-            }
-        } catch (e: Error) {
-            "v1"
+        val søknad = objectMapper.readTree(søknadJson)
+        return if (søknad.get("kontraktVersjon")?.asInt() == 4) {
+            "v4"
+        } else {
+            "v3"
         }
     }
 
     fun hentVersjonertKontantstøtteSøknad(): VersjonertKontantstøtteSøknad {
         val versjon = this.hentSøknadVersjon()
-        if (versjon == "v3") {
-            return KontantstøtteSøknadV3(kontantstøtteSøknad = hentSøknadV3())
+        if (versjon == "v4") {
+            return KontantstøtteSøknadV4(kontantstøtteSøknad = hentSøknadV4())
         }
-        return KontantstøtteSøknadV2(kontantstøtteSøknad = hentSøknadV2())
+        return KontantstøtteSøknadV3(kontantstøtteSøknad = hentSøknadV3())
     }
 }
 
@@ -76,7 +72,7 @@ data class DBKontantstotteVedlegg(
     override val data: ByteArray,
 ) : Vedlegg
 
-fun KontantstøtteSøknadV2.tilDBKontantstøtteSøknad(): DBKontantstøtteSøknad {
+fun KontantstøtteSøknadV3.tilDBKontantstøtteSøknad(): DBKontantstøtteSøknad {
     try {
         return DBKontantstøtteSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
@@ -87,7 +83,7 @@ fun KontantstøtteSøknadV2.tilDBKontantstøtteSøknad(): DBKontantstøtteSøkna
     }
 }
 
-fun KontantstøtteSøknadV3.tilDBKontantstøtteSøknad(): DBKontantstøtteSøknad {
+fun KontantstøtteSøknadV4.tilDBKontantstøtteSøknad(): DBKontantstøtteSøknad {
     try {
         return DBKontantstøtteSøknad(
             søknadJson = objectMapper.writeValueAsString(this),

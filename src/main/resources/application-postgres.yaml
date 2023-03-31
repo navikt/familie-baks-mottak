@@ -54,6 +54,11 @@ funksjonsbrytere:
 logging:
   config: "classpath:logback-test.xml"
 spring:
+  cloud:
+    vault:
+      enabled: false
+      database:
+        role: postgres
   datasource:
     url: jdbc:postgresql://localhost:5432/familie-baks-mottak
     hikari:

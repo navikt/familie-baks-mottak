@@ -143,7 +143,7 @@
         <dependency>
             <groupId>no.nav.familie.kontrakter</groupId>
             <artifactId>kontantstotte</artifactId>
-            <version>${kontrakter.version}</version>
+            <version>6.1-SNAPSHOT</version>
         </dependency>
 
         <!-- Kafka -->
