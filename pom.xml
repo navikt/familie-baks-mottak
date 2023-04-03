@@ -22,7 +22,7 @@
         <jvmTarget>17</jvmTarget>
         <kotlin.version>1.8.20</kotlin.version>
         <mockk.version>1.13.4</mockk.version>
-        <confluent.version>6.2.9</confluent.version>
+        <confluent.version>6.2.10</confluent.version>
         <prosessering.version>2.20230214102837_4b63c2e-SPRING_BOOT_3</prosessering.version>
         <felles.version>2.20230210162649_a258d57-SPRING_BOOT_3</felles.version>
         <kontrakter.version>3.0_20230403093611_10cc82e-JAKARTA</kontrakter.version>
