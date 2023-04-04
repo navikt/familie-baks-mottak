@@ -27,8 +27,8 @@ import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadKontraktV8
 @RestController
 @RequestMapping(path = ["/api"], produces = [APPLICATION_JSON_VALUE])
 @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
-class SøknadController(
-    private val søknadService: SøknadService,
+class BarnetrygdSøknadController(
+    private val barnetrygdSøknadService: BarnetrygdSøknadService,
 ) {
 
     // Metrics for ordinær barnetrygd
@@ -47,7 +47,8 @@ class SøknadController(
     val utvidetAntallDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.utvidet.dokumentasjonsbehov.antall")
     val utvidetSøknadHarVedlegg = Metrics.counter("barnetrygd.soknad.utvidet.harVedlegg")
     val utvidetAntallVedlegg = Metrics.counter("barnetrygd.soknad.utvidet.harVedlegg.antall")
-    val utvidetHarManglerIDokumentasjonsbehov = Metrics.counter("barnetrygd.soknad.utvidet.harManglerIDokumentasjonsbehov")
+    val utvidetHarManglerIDokumentasjonsbehov =
+        Metrics.counter("barnetrygd.soknad.utvidet.harManglerIDokumentasjonsbehov")
 
     // Metrics for EØS barnetrygd
     val ordinærSøknadEøs = Metrics.counter("barnetrygd.ordinaer.soknad.eos")
@@ -68,7 +69,7 @@ class SøknadController(
         }
 
         return try {
-            val dbSøknad = søknadService.motta(versjonertSøknad = versjonertSøknad)
+            val dbSøknad = barnetrygdSøknadService.motta(versjonertSøknad = versjonertSøknad)
             sendMetrics(versjonertSøknad = versjonertSøknad)
             ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt", dbSøknad.opprettetTid)))
         } catch (e: FødselsnummerErNullException) {

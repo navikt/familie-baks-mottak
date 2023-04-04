@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.Properties
 
 @Service
-class SøknadService(
+class BarnetrygdSøknadService(
     private val søknadRepository: SøknadRepository,
     private val vedleggRepository: SøknadVedleggRepository,
     private val taskService: TaskService,

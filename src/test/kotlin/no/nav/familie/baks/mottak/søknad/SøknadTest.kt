@@ -1,7 +1,7 @@
 package no.nav.familie.baks.mottak.søknad
 
 import no.nav.familie.baks.mottak.DevLauncherPostgres
-import no.nav.familie.baks.mottak.søknad.barnetrygd.SøknadService
+import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
@@ -25,7 +25,7 @@ import kotlin.test.assertEquals
 @Tag("integration")
 @SpringBootTest(classes = [DevLauncherPostgres::class])
 class SøknadTest(
-    @Autowired val søknadService: SøknadService,
+    @Autowired val barnetrygdSøknadService: BarnetrygdSøknadService,
 ) {
 
     val søknadV8 = SøknadTestData.søknadV8()
@@ -35,8 +35,8 @@ class SøknadTest(
         val dbSøknadFraMapper = søknadV8.tilDBSøknad()
         assertThat(dbSøknadFraMapper.hentVersjonertSøknad() is SøknadV8).isTrue
 
-        val dbSøknadFraDB = søknadService.lagreDBSøknad(dbSøknadFraMapper)
-        val hentetSøknad = søknadService.hentDBSøknad(dbSøknadFraDB.id)
+        val dbSøknadFraDB = barnetrygdSøknadService.lagreDBSøknad(dbSøknadFraMapper)
+        val hentetSøknad = barnetrygdSøknadService.hentDBSøknad(dbSøknadFraDB.id)
         assertEquals(dbSøknadFraDB.id, hentetSøknad!!.id)
         assertThat(hentetSøknad.hentVersjonertSøknad() is SøknadV8)
     }
@@ -53,8 +53,8 @@ class SøknadTest(
         }
         assertEquals(søknadV8.kontraktVersjon, versjon)
 
-        val dbSøknadFraDB = søknadService.lagreDBSøknad(dbSøknadFraMapper)
-        val hentetSøknad = søknadService.hentDBSøknad(dbSøknadFraDB.id)
+        val dbSøknadFraDB = barnetrygdSøknadService.lagreDBSøknad(dbSøknadFraMapper)
+        val hentetSøknad = barnetrygdSøknadService.hentDBSøknad(dbSøknadFraDB.id)
         assertEquals(dbSøknadFraDB.id, hentetSøknad!!.id)
         assertThat(hentetSøknad.hentVersjonertSøknad() is SøknadV8).isTrue
     }
