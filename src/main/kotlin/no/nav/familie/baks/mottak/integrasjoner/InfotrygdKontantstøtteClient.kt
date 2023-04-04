@@ -8,6 +8,7 @@ import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
 import org.springframework.web.client.postForObject
+import org.springframework.web.util.UriUtils.encodePath
 import java.net.URI
 import java.time.YearMonth
 
@@ -65,7 +66,7 @@ class InfotrygdKontantstøtteClient(
         runCatching(request).getOrElse { throw onFailure(it) }
     }
 
-    private fun uri(endepunkt: String) = URI.create("$clientUri/$endepunkt")
+    private fun uri(endepunkt: String) = URI.create(encodePath("$clientUri/$endepunkt", "UTF-8"))
 }
 
 data class InnsynRequest(
