@@ -1,7 +1,7 @@
 package no.nav.familie.baks.mottak.søknad
 
 import no.nav.familie.baks.mottak.integrasjoner.DokarkivClient
-import no.nav.familie.baks.mottak.søknad.barnetrygd.SøknadService
+import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadService
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
@@ -13,13 +13,13 @@ import org.springframework.stereotype.Service
 @Service
 class JournalføringService(
     private val dokarkivClient: DokarkivClient,
-    private val søknadService: SøknadService,
+    private val barnetrygdSøknadService: BarnetrygdSøknadService,
     private val kontantstøtteSøknadService: KontantstøtteSøknadService,
 ) {
 
     fun journalførBarnetrygdSøknad(dbSøknad: DBSøknad, pdf: ByteArray, pdfOriginalSpråk: ByteArray = ByteArray(0)) {
         if (dbSøknad.journalpostId == null) {
-            val vedlegg = søknadService.hentLagredeVedlegg(dbSøknad)
+            val vedlegg = barnetrygdSøknadService.hentLagredeVedlegg(dbSøknad)
 
             val arkiverDokumentRequest = ArkiverDokumentRequestMapper.toDto(
                 dbSøknad = dbSøknad,
@@ -30,10 +30,10 @@ class JournalføringService(
             )
             val journalpostId: String = arkiverSøknad(arkiverDokumentRequest)
             val dbSøknadMedJournalpostId = dbSøknad.copy(journalpostId = journalpostId)
-            søknadService.lagreDBSøknad(dbSøknadMedJournalpostId)
+            barnetrygdSøknadService.lagreDBSøknad(dbSøknadMedJournalpostId)
             log.info("Søknaden er journalført og lagret til database")
 
-            søknadService.slettLagredeVedlegg(dbSøknad)
+            barnetrygdSøknadService.slettLagredeVedlegg(dbSøknad)
             log.info("Vedlegg for søknad slettet fra database etter journalføring")
         } else {
             log.warn("Søknaden har allerede blitt journalført med journalpostId: ${dbSøknad.journalpostId}")
