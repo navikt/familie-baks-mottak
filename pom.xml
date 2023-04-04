@@ -23,7 +23,7 @@
         <kotlin.version>1.8.20</kotlin.version>
         <mockk.version>1.13.4</mockk.version>
         <confluent.version>6.2.10</confluent.version>
-        <prosessering.version>2.20230214102837_4b63c2e-SPRING_BOOT_3</prosessering.version>
+        <prosessering.version>2.20230322091650_fb0187e-SPRING_BOOT_3</prosessering.version>
         <felles.version>2.20230210162649_a258d57-SPRING_BOOT_3</felles.version>
         <kontrakter.version>3.0_20230403093611_10cc82e-JAKARTA</kontrakter.version>
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
@@ -180,7 +180,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.5.4</version>
+            <version>42.6.0</version>
         </dependency>
         <dependency>
             <groupId>com.papertrailapp</groupId>
@@ -308,7 +308,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.8</version>
+                    <version>0.8.9</version>
                 </plugin>
             </plugins>
         </pluginManagement>
