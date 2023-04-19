@@ -1,14 +1,11 @@
 package no.nav.familie.baks.mottak.søknad.kontantstøtte
 
-import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.søknad.Kvittering
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.FødselsnummerErNullException
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV3
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.felles.Ressurs
-import no.nav.familie.kontrakter.ks.søknad.v1.Dokumentasjonsbehov
-import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
@@ -27,20 +24,8 @@ import no.nav.familie.kontrakter.ks.søknad.v4.KontantstøtteSøknad as Kontants
 @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 class KontantstøtteSøknadController(
     private val kontantstøtteSøknadService: KontantstøtteSøknadService,
+    private val kontantstøtteSøknadMetrikkService: KontantstøtteSøknadMetrikkService,
 ) {
-
-    // Metrics for kontantstotte
-    val søknadMottattOk = Metrics.counter("kontantstotte.soknad.mottatt.ok")
-    val søknadMottattFeil = Metrics.counter("kontantstotte.soknad.mottatt.feil")
-    val søknadHarDokumentasjonsbehov = Metrics.counter("kontantstotte.soknad.dokumentasjonsbehov")
-    val antallDokumentasjonsbehov = Metrics.counter("kontantstotte.soknad.dokumentasjonsbehov.antall")
-    val søknadHarVedlegg = Metrics.counter("kontantstotte.soknad.harVedlegg")
-    val antallVedlegg = Metrics.counter("kontantstotte.soknad.harVedlegg.antall")
-    val harManglerIDokumentasjonsbehov = Metrics.counter("kontantstotte.soknad.harManglerIDokumentasjonsbehov")
-
-    // Metrics for EØS kontantstotte
-    val søknadEøs = Metrics.counter("kontantstotte.soknad.eos")
-
     @PostMapping(value = ["/soknad/v3"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(@RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV3): ResponseEntity<Ressurs<Kvittering>> =
         mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = KontantstøtteSøknadV3(kontantstøtteSøknad = søknad))
@@ -52,8 +37,8 @@ class KontantstøtteSøknadController(
     fun mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad): ResponseEntity<Ressurs<Kvittering>> {
         return try {
             val dbKontantstøtteSøknad =
-                kontantstøtteSøknadService.mottaKontantstøtteSøknad(versjonertKontantstøtteSøknad = versjonertKontantstøtteSøknad)
-            sendMetrics(versjonertKontantstøtteSøknad = versjonertKontantstøtteSøknad)
+                kontantstøtteSøknadService.mottaKontantstøtteSøknad(versjonertKontantstøtteSøknad)
+            kontantstøtteSøknadMetrikkService.sendMottakMetrikker(versjonertKontantstøtteSøknad)
             ResponseEntity.ok(
                 Ressurs.success(
                     Kvittering(
@@ -63,61 +48,9 @@ class KontantstøtteSøknadController(
                 ),
             )
         } catch (e: FødselsnummerErNullException) {
-            søknadMottattFeil.increment()
+            kontantstøtteSøknadMetrikkService.sendMottakFeiletMetrikker()
             ResponseEntity.status(500).body(Ressurs.failure("Lagring av søknad om kontantstøtte feilet"))
         }
-    }
-
-    private fun sendMetrics(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad) {
-        val dokumentasjon = when (versjonertKontantstøtteSøknad) {
-            is KontantstøtteSøknadV3 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon
-            is KontantstøtteSøknadV4 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon
-        }
-
-        val harEøsSteg = when (versjonertKontantstøtteSøknad) {
-            is KontantstøtteSøknadV3 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.antallEøsSteg > 0
-            is KontantstøtteSøknadV4 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.antallEøsSteg > 0
-        }
-
-        sendMetricsSøknad(harEøsSteg)
-
-        sendMetricsDokumentasjon(dokumentasjon)
-    }
-
-    private fun sendMetricsSøknad(harEøsSteg: Boolean) {
-        søknadMottattOk.increment()
-        if (harEøsSteg) {
-            søknadEøs.increment()
-        }
-    }
-
-    private fun sendMetricsDokumentasjon(dokumentasjon: List<Søknaddokumentasjon>) {
-        if (dokumentasjon.isNotEmpty()) {
-            val dokumentasjonsbehovUtenAnnenDokumentasjon =
-                dokumentasjon.filter { it.dokumentasjonsbehov != Dokumentasjonsbehov.ANNEN_DOKUMENTASJON }
-
-            if (dokumentasjonsbehovUtenAnnenDokumentasjon.isNotEmpty()) {
-                sendMetricsDokumentasjonsbehov(
-                    dokumentasjonsbehov = dokumentasjonsbehovUtenAnnenDokumentasjon,
-                )
-            }
-            val alleVedlegg = dokumentasjon.map { it.opplastedeVedlegg }.flatten()
-            if (alleVedlegg.isNotEmpty()) {
-                søknadHarVedlegg.increment()
-                antallVedlegg.increment(alleVedlegg.size.toDouble())
-            }
-
-            val harMangler =
-                dokumentasjonsbehovUtenAnnenDokumentasjon.any { !it.harSendtInn && it.opplastedeVedlegg.isEmpty() }
-            if (harMangler) {
-                harManglerIDokumentasjonsbehov.increment()
-            }
-        }
-    }
-
-    private fun sendMetricsDokumentasjonsbehov(dokumentasjonsbehov: List<Søknaddokumentasjon>) {
-        søknadHarDokumentasjonsbehov.increment()
-        antallDokumentasjonsbehov.increment(dokumentasjonsbehov.size.toDouble())
     }
 
     @GetMapping(value = ["/ping"])

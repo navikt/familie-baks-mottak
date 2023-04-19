@@ -1,7 +1,7 @@
 package no.nav.familie.baks.mottak.søknad
 
 import no.nav.familie.baks.mottak.DevLauncherPostgres
-import no.nav.familie.baks.mottak.søknad.barnetrygd.SøknadService
+import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
 import no.nav.familie.baks.mottak.task.JournalførSøknadTask
 import no.nav.familie.baks.mottak.util.DbContainerInitializer
@@ -24,7 +24,7 @@ import java.util.Properties
 @SpringBootTest(classes = [DevLauncherPostgres::class])
 class EksternReferanseIdTest(
     @Autowired
-    val søknadService: SøknadService,
+    val barnetrygdSøknadService: BarnetrygdSøknadService,
     @Autowired
     val journalførSøknadTask: JournalførSøknadTask,
 ) {
@@ -34,7 +34,7 @@ class EksternReferanseIdTest(
 
     @Test
     fun `ved (409 Conflict) fra dokarkiv skal HttpClientErrorException Conflict catches og håndteres i task'en`() {
-        val dbSøknadFraDBFirst = søknadService.lagreDBSøknad(dbSøknad.copy(journalpostId = null))
+        val dbSøknadFraDBFirst = barnetrygdSøknadService.lagreDBSøknad(dbSøknad.copy(journalpostId = null))
         val properties = Properties().apply { this["søkersFødselsnummer"] = dbSøknadFraDBFirst.fnr }
 
         assertDoesNotThrow {

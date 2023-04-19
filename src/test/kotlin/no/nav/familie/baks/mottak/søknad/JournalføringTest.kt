@@ -2,7 +2,7 @@ package no.nav.familie.baks.mottak.søknad
 
 import io.mockk.junit5.MockKExtension
 import no.nav.familie.baks.mottak.DevLauncherPostgres
-import no.nav.familie.baks.mottak.søknad.barnetrygd.SøknadService
+import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadService
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadTestData
@@ -27,7 +27,7 @@ class JournalføringTest(
     @Autowired
     val journalføringService: JournalføringService,
     @Autowired
-    val søknadService: SøknadService,
+    val barnetrygdSøknadService: BarnetrygdSøknadService,
     @Autowired
     val kontantstøtteSøknadService: KontantstøtteSøknadService,
 ) {
@@ -68,10 +68,10 @@ class JournalføringTest(
 
     @Test
     fun `journalPostId blir lagt på dbSøknaden`() {
-        val dbSøknadFraDB = søknadService.lagreDBSøknad(dbSøknad)
+        val dbSøknadFraDB = barnetrygdSøknadService.lagreDBSøknad(dbSøknad)
         assertEquals(null, dbSøknadFraDB.journalpostId)
         journalføringService.journalførBarnetrygdSøknad(dbSøknadFraDB, testPDF)
-        val overskrevetDBSøknad = søknadService.hentDBSøknad(dbSøknadFraDB.id)
+        val overskrevetDBSøknad = barnetrygdSøknadService.hentDBSøknad(dbSøknadFraDB.id)
 
         assertEquals("123", overskrevetDBSøknad!!.journalpostId)
     }
@@ -90,10 +90,10 @@ class JournalføringTest(
     @Test
     fun `journalPostId skal ikke bli satt hvis den allerede finnes på dbSøknad`() {
         val dbSøknadMedJournalpostId = dbSøknad.copy(journalpostId = "1")
-        val dbSøknadFraDB = søknadService.lagreDBSøknad(dbSøknadMedJournalpostId)
+        val dbSøknadFraDB = barnetrygdSøknadService.lagreDBSøknad(dbSøknadMedJournalpostId)
 
         journalføringService.journalførBarnetrygdSøknad(dbSøknadFraDB, testPDF)
-        val ikkeOverskrevetDBSøknad = søknadService.hentDBSøknad(dbSøknadFraDB.id)
+        val ikkeOverskrevetDBSøknad = barnetrygdSøknadService.hentDBSøknad(dbSøknadFraDB.id)
 
         assertEquals("1", ikkeOverskrevetDBSøknad!!.journalpostId)
     }
