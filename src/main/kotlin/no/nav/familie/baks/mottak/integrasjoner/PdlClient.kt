@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.familie.baks.mottak.domene.personopplysning.Person
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.http.util.UriUtil
+import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.kontrakter.felles.personopplysning.ForelderBarnRelasjon
@@ -37,12 +38,16 @@ class PdlClient(
         val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery("hentIdenter"))
         val response = postForEntity<PdlHentIdenterResponse>(pdlUri, pdlPersonRequest, httpHeaders())
 
-        if (!response.harFeil()) return response.data.pdlIdenter?.identer.orEmpty()
-        throw IntegrasjonException(
+        if (response.harFeil()) throw IntegrasjonException(
             msg = "Fant ikke identer på person: ${response.errorMessages()}",
             uri = pdlUri,
             ident = personIdent,
         )
+        else if (response.harAdvarsel()) {
+            log.warn("Advarsel ved henting av identer fra PDL. Se securelogs for detaljer.")
+            secureLogger.warn("Advarsel ved henting av identer fra PDL: ${response.extensions?.warnings}")
+        }
+        return response.data.pdlIdenter?.identer.orEmpty()
     }
 
     fun hentPersonident(aktørId: String): String {
@@ -62,42 +67,44 @@ class PdlClient(
                 pdlPersonRequest,
                 httpHeaders(),
             )
-            if (!response.harFeil()) {
-                return Result.runCatching {
-                    val forelderBarnRelasjoner: Set<ForelderBarnRelasjon> =
-                        response.data.person!!.forelderBarnRelasjon.map { relasjon ->
-                            ForelderBarnRelasjon(
-                                relatertPersonsIdent = relasjon.relatertPersonsIdent,
-                                relatertPersonsRolle = relasjon.relatertPersonsRolle,
-                            )
-                        }.toSet()
-
-                    response.data.person.let {
-                        Person(
-                            navn = null,
-                            forelderBarnRelasjoner = forelderBarnRelasjoner,
-                            adressebeskyttelseGradering = it.adressebeskyttelse.firstOrNull()?.gradering?.name,
-                            bostedsadresse = it.bostedsadresse.firstOrNull(),
-                        )
-                    }
-                }.fold(
-                    onSuccess = { it },
-                    onFailure = {
-                        throw IntegrasjonException(
-                            "Fant ikke forespurte data på person.",
-                            it,
-                            pdlUri,
-                            personIdent,
-                        )
-                    },
-                )
-            } else {
+            if (response.harFeil()) {
                 throw IntegrasjonException(
                     msg = "Feil ved oppslag på person: ${response.errorMessages()}",
                     uri = pdlUri,
                     ident = personIdent,
                 )
+            } else if (response.harAdvarsel()) {
+                log.warn("Advarsel ved oppslag på person. Se securelogs for detaljer.")
+                secureLogger.warn("Advarsel ved oppslag på person: ${response.extensions?.warnings}")
             }
+            return Result.runCatching {
+                val forelderBarnRelasjoner: Set<ForelderBarnRelasjon> =
+                    response.data.person!!.forelderBarnRelasjon.map { relasjon ->
+                        ForelderBarnRelasjon(
+                            relatertPersonsIdent = relasjon.relatertPersonsIdent,
+                            relatertPersonsRolle = relasjon.relatertPersonsRolle,
+                        )
+                    }.toSet()
+
+                response.data.person.let {
+                    Person(
+                        navn = null,
+                        forelderBarnRelasjoner = forelderBarnRelasjoner,
+                        adressebeskyttelseGradering = it.adressebeskyttelse.firstOrNull()?.gradering?.name,
+                        bostedsadresse = it.bostedsadresse.firstOrNull(),
+                    )
+                }
+            }.fold(
+                onSuccess = { it },
+                onFailure = {
+                    throw IntegrasjonException(
+                        "Fant ikke forespurte data på person.",
+                        it,
+                        pdlUri,
+                        personIdent,
+                    )
+                },
+            )
         } catch (e: Exception) {
             when (e) {
                 is IntegrasjonException -> throw e
@@ -130,15 +137,17 @@ class PdlClient(
             }
         }
 
-        if (!response.harFeil()) {
-            return response.data.person!!
-        } else {
+        if (response.harFeil()) {
             throw IntegrasjonException(
                 msg = "Feil ved oppslag på hentPerson mot PDL: ${response.errorMessages()}",
                 uri = pdlUri,
                 ident = personIdent,
             )
+        } else if (response.harAdvarsel()) {
+            log.warn("Advarsel ved oppslag på hentPerson mot PDL. Se securelogs for detaljer.")
+            secureLogger.warn("Advarsel ved oppslag på hentPerson mot PDL: ${response.extensions?.warnings}")
         }
+        return response.data.person!!
     }
 
     private fun mapTilPdlPersonRequest(
@@ -154,6 +163,7 @@ class PdlClient(
             contentType = MediaType.APPLICATION_JSON
             accept = listOf(MediaType.APPLICATION_JSON)
             add("Tema", TEMA)
+            add("behandlingsnummer", Tema.valueOf(TEMA).behandlingsnummer)
         }
     }
 
@@ -173,22 +183,37 @@ class PdlClient(
 interface PdlBaseResponse {
 
     val errors: List<PdlError>?
+    val extensions: PdlExtensions?
 
     fun harFeil() = errors != null && errors!!.isNotEmpty()
+    fun harAdvarsel() = !extensions?.warnings.isNullOrEmpty()
     fun errorMessages() = errors?.joinToString { it -> it.message } ?: ""
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class PdlError(val message: String)
+data class PdlError(
+    val message: String,
+    val extensions: PdlErrorExtensions?
+)
+
+data class PdlErrorExtensions(val code: String?) {
+    fun notFound() = code == "not_found"
+}
+
+data class PdlExtensions(val warnings: List<PdlWarning>?)
+
+data class PdlWarning(val details: Any?, val id: String?, val message: String?, val query: String?)
 
 data class PdlHentPersonResponse(
     val data: PdlPerson,
     override val errors: List<PdlError>?,
+    override val extensions: PdlExtensions?,
 ) : PdlBaseResponse
 
 data class PdlHentIdenterResponse(
     val data: Data,
     override val errors: List<PdlError>?,
+    override val extensions: PdlExtensions?,
 ) : PdlBaseResponse
 
 data class Data(val pdlIdenter: PdlIdenter?)
