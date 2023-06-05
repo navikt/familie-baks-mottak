@@ -93,7 +93,7 @@ class VurderLivshendelseTaskTest {
             mockPdlClient.hentPerson(
                 PERSONIDENT_BARN,
                 any(),
-                any()
+                any(),
             )
         } returns PdlPersonData(
             forelderBarnRelasjon = listOf(
@@ -140,7 +140,7 @@ class VurderLivshendelseTaskTest {
             mockPdlClient.hentPerson(
                 PERSONIDENT_MOR,
                 any(),
-                any()
+                any(),
             )
         } returns PdlPersonData(
             forelderBarnRelasjon = listOf(
@@ -184,7 +184,7 @@ class VurderLivshendelseTaskTest {
             mockPdlClient.hentPerson(
                 PERSONIDENT_BARN,
                 any(),
-                any()
+                any(),
             )
         } returns PdlPersonData(
             forelderBarnRelasjon = listOf(
@@ -246,7 +246,7 @@ class VurderLivshendelseTaskTest {
             mockPdlClient.hentPerson(
                 any(),
                 any(),
-                any()
+                any(),
             )
         } returns PdlPersonData(
             forelderBarnRelasjon = listOf(
@@ -306,7 +306,7 @@ class VurderLivshendelseTaskTest {
             mockPdlClient.hentPerson(
                 any(),
                 any(),
-                any()
+                any(),
             )
         } returns PdlPersonData(
             sivilstand = listOf(
@@ -351,7 +351,7 @@ class VurderLivshendelseTaskTest {
             mockPdlClient.hentPerson(
                 any(),
                 any(),
-                any()
+                any(),
             )
         } returns PdlPersonData(
             sivilstand = listOf(
@@ -441,7 +441,7 @@ class VurderLivshendelseTaskTest {
             mockPdlClient.hentPerson(
                 PERSONIDENT_BARN,
                 any(),
-                any()
+                any(),
             )
         } returns PdlPersonData(
             forelderBarnRelasjon = listOf(
@@ -464,7 +464,7 @@ class VurderLivshendelseTaskTest {
             mockPdlClient.hentPerson(
                 PERSONIDENT_MOR,
                 any(),
-                any()
+                any(),
             )
         } returns PdlPersonData(
             forelderBarnRelasjon = listOf(
@@ -665,7 +665,7 @@ class VurderLivshendelseTaskTest {
             mockPdlClient.hentPerson(
                 PERSONIDENT_MOR,
                 any(),
-                any()
+                any(),
             )
         } returns PdlPersonData(
             forelderBarnRelasjon = listOf(
@@ -689,7 +689,7 @@ class VurderLivshendelseTaskTest {
             mockPdlClient.hentPerson(
                 PERSONIDENT_BARN,
                 any(),
-                any()
+                any(),
             )
         } returns PdlPersonData(
             forelderBarnRelasjon = listOf(
@@ -707,7 +707,7 @@ class VurderLivshendelseTaskTest {
             mockPdlClient.hentPerson(
                 PERSONIDENT_BARN2,
                 any(),
-                any()
+                any(),
             )
         } returns PdlPersonData(
             forelderBarnRelasjon = listOf(

@@ -38,12 +38,13 @@ class PdlClient(
         val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery("hentIdenter"))
         val response = postForEntity<PdlHentIdenterResponse>(pdlUri, pdlPersonRequest, httpHeaders(tema))
 
-        if (response.harFeil()) throw IntegrasjonException(
-            msg = "Fant ikke identer på person: ${response.errorMessages()}",
-            uri = pdlUri,
-            ident = personIdent,
-        )
-        else if (response.harAdvarsel()) {
+        if (response.harFeil()) {
+            throw IntegrasjonException(
+                msg = "Fant ikke identer på person: ${response.errorMessages()}",
+                uri = pdlUri,
+                ident = personIdent,
+            )
+        } else if (response.harAdvarsel()) {
             log.warn("Advarsel ved henting av identer fra PDL. Se securelogs for detaljer.")
             secureLogger.warn("Advarsel ved henting av identer fra PDL: ${response.extensions?.warnings}")
         }
@@ -193,7 +194,7 @@ interface PdlBaseResponse {
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PdlError(
     val message: String,
-    val extensions: PdlErrorExtensions?
+    val extensions: PdlErrorExtensions?,
 )
 
 data class PdlErrorExtensions(val code: String?) {
