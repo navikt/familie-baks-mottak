@@ -21,7 +21,7 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
-        dialect: "org.hibernate.dialect.PostgreSQL95Dialect"
+        dialect: "org.hibernate.dialect.PostgreSQLDialect"
   flyway:
     enabled: true
   http:
@@ -60,7 +60,7 @@ management:
     db:
       enabled: true
 
-FAMILIE_BAKS_DOKGEN_API_URL: http://familie-baks-dokgen.default
+FAMILIE_BAKS_DOKGEN_API_URL: http://familie-baks-dokgen
 FAMILIE_INTEGRASJONER_API_URL: https://familie-integrasjoner.prod-fss-pub.nais.io/api
 FAMILIE_DOKUMENT_API_URL: http://familie-dokument
 FAMILIE_BA_INFOTRYGD_API_URL: http://familie-ba-infotrygd
