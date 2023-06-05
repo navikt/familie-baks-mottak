@@ -7,6 +7,7 @@ import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.SakClient
+import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -36,7 +37,7 @@ class OppdaterOgFerdigstillJournalpostTask(
 
         when (journalpost.journalstatus) {
             Journalstatus.MOTTATT -> {
-                val fagsakId = sakClient.hentSaksnummer(tilPersonIdent(journalpost.bruker!!))
+                val fagsakId = sakClient.hentSaksnummer(tilPersonIdent(journalpost.bruker!!, journalpost.tema))
                 runCatching { // forsøk å journalføre automatisk
                     dokarkivClient.oppdaterJournalpostSak(journalpost, fagsakId)
                     dokarkivClient.ferdigstillJournalpost(journalpost.journalpostId)
@@ -76,9 +77,9 @@ class OppdaterOgFerdigstillJournalpostTask(
         taskService.save(nyTask)
     }
 
-    private fun tilPersonIdent(bruker: Bruker): String {
+    private fun tilPersonIdent(bruker: Bruker, tema: String?): String {
         return when (bruker.type) {
-            BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id)
+            BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema?.let { Tema.valueOf(tema) } ?: Tema.BAR)
             else -> bruker.id
         }
     }

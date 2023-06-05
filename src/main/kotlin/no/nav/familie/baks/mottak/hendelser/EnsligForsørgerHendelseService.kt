@@ -7,6 +7,7 @@ import no.nav.familie.baks.mottak.domene.Hendelseslogg
 import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.SakClient
+import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.ef.EnsligForsørgerVedtakhendelse
 import no.nav.familie.kontrakter.felles.ef.StønadType
 import org.slf4j.Logger
@@ -73,7 +74,7 @@ class EnsligForsørgerHendelseService(
         ) {
             secureLogger.info("Mottatt infotrygdvedtak om overgangsstønad: $hendelse")
 
-            val personIdent = pdlClient.hentPersonident(hendelse.aktørId.toString())
+            val personIdent = pdlClient.hentPersonident(hendelse.aktørId.toString(), Tema.BAR)
 
             sakClient.sendVedtakOmOvergangsstønadHendelseTilSak(personIdent)
 

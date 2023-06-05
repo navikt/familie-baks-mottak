@@ -34,9 +34,9 @@ class PdlClient(
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
     @Cacheable("hentIdenter", cacheManager = "hourlyCacheManager")
-    fun hentIdenter(personIdent: String): List<IdentInformasjon> {
+    fun hentIdenter(personIdent: String, tema: Tema): List<IdentInformasjon> {
         val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery("hentIdenter"))
-        val response = postForEntity<PdlHentIdenterResponse>(pdlUri, pdlPersonRequest, httpHeaders())
+        val response = postForEntity<PdlHentIdenterResponse>(pdlUri, pdlPersonRequest, httpHeaders(tema))
 
         if (response.harFeil()) throw IntegrasjonException(
             msg = "Fant ikke identer på person: ${response.errorMessages()}",
@@ -50,22 +50,22 @@ class PdlClient(
         return response.data.pdlIdenter?.identer.orEmpty()
     }
 
-    fun hentPersonident(aktørId: String): String {
-        return hentIdenter(aktørId).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name && !it.historisk }.last().ident
+    fun hentPersonident(aktørId: String, tema: Tema): String {
+        return hentIdenter(aktørId, tema).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name && !it.historisk }.last().ident
     }
 
-    fun hentAktørId(personIdent: String): String {
-        return hentIdenter(personIdent).filter { it.gruppe == Identgruppe.AKTORID.name && !it.historisk }.last().ident
+    fun hentAktørId(personIdent: String, tema: Tema): String {
+        return hentIdenter(personIdent, tema).filter { it.gruppe == Identgruppe.AKTORID.name && !it.historisk }.last().ident
     }
 
-    fun hentPersonMedRelasjoner(personIdent: String): Person {
+    fun hentPersonMedRelasjoner(personIdent: String, tema: Tema): Person {
         val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery("hentperson-med-relasjoner"))
 
         try {
             val response = postForEntity<PdlHentPersonResponse>(
                 pdlUri,
                 pdlPersonRequest,
-                httpHeaders(),
+                httpHeaders(tema),
             )
             if (response.harFeil()) {
                 throw IntegrasjonException(
@@ -117,14 +117,14 @@ class PdlClient(
         }
     }
 
-    fun hentPerson(personIdent: String, graphqlfil: String): PdlPersonData {
+    fun hentPerson(personIdent: String, graphqlfil: String, tema: Tema): PdlPersonData {
         val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery(graphqlfil))
 
         val response = try {
             postForEntity<PdlHentPersonResponse>(
                 pdlUri,
                 pdlPersonRequest,
-                httpHeaders(),
+                httpHeaders(tema),
             )
         } catch (e: Exception) {
             when (e) {
@@ -158,12 +158,12 @@ class PdlClient(
         "query" to personInfoQuery,
     )
 
-    protected fun httpHeaders(): HttpHeaders {
+    protected fun httpHeaders(tema: Tema): HttpHeaders {
         return HttpHeaders().apply {
             contentType = MediaType.APPLICATION_JSON
             accept = listOf(MediaType.APPLICATION_JSON)
             add("Tema", TEMA)
-            add("behandlingsnummer", Tema.valueOf(TEMA).behandlingsnummer)
+            add("behandlingsnummer", tema.behandlingsnummer)
         }
     }
 

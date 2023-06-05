@@ -7,6 +7,7 @@ import io.mockk.verify
 import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.SakClient
+import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.objectMapper
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.assertj.core.api.Assertions.assertThat
@@ -57,7 +58,7 @@ class EnsligForsørgerInfotrygdHendelseConsumerTest {
         consumer = EnsligForsørgerInfotrygdHendelseConsumer(service, mockk(relaxed = true))
         clearAllMocks()
 
-        every { mockPdlClient.hentPersonident("2424242424241") } returns "12345678910"
+        every { mockPdlClient.hentPersonident("2424242424241", Tema.BAR) } returns "12345678910"
     }
 
     @Test

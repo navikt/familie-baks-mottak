@@ -74,6 +74,7 @@ class MottaFødselshendelseTaskTest {
             mockResponse = PdlHentPersonResponse(
                 data = PdlPerson(lagTestPdlPerson()),
                 errors = emptyList(),
+                extensions = null
             ),
         )
 
@@ -107,6 +108,7 @@ class MottaFødselshendelseTaskTest {
                     ),
                 ),
                 errors = emptyList(),
+                extensions = null
             ),
         )
 
@@ -156,6 +158,7 @@ class MottaFødselshendelseTaskTest {
                     ),
                 ),
                 errors = emptyList(),
+                extensions = null
             ),
         )
 
@@ -190,6 +193,7 @@ class MottaFødselshendelseTaskTest {
                     ),
                 ),
                 errors = emptyList(),
+                extensions = null
             ),
         )
 
@@ -214,6 +218,7 @@ class MottaFødselshendelseTaskTest {
             mockResponse = PdlHentPersonResponse(
                 data = PdlPerson(lagTestPdlPerson().copy(bostedsadresse = emptyList())),
                 errors = emptyList(),
+                extensions = null
             ),
         )
 
@@ -245,7 +250,8 @@ class MottaFødselshendelseTaskTest {
                         ),
                     ),
                 ),
-                errors = listOf(PdlError("Feilmelding")),
+                errors = listOf(PdlError("Feilmelding", null)),
+                extensions = null
             ),
         )
 

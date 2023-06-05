@@ -81,7 +81,7 @@ class SkanHendelseTaskLøypeTest {
         } returns Task("dummy", "payload")
 
         every {
-            mockPdlClient.hentPersonident(any())
+            mockPdlClient.hentPersonident(any(), any())
         } returns "12345678910"
 
         every {
