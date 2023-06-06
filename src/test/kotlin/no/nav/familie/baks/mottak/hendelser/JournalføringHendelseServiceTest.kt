@@ -241,7 +241,7 @@ class JournalføringHendelseServiceTest {
         }
 
         every {
-            pdlClient.hentPersonident(any())
+            pdlClient.hentPersonident(any(), any())
         } returns "12345678910"
 
         every {
