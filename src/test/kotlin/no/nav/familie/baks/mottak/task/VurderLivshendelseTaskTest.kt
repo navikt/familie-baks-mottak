@@ -67,15 +67,15 @@ class VurderLivshendelseTaskTest {
         } returns listOf()
 
         every {
-            mockPdlClient.hentAktørId(PERSONIDENT_MOR)
+            mockPdlClient.hentAktørId(PERSONIDENT_MOR, any())
         } returns PERSONIDENT_MOR + "00"
 
         every {
-            mockPdlClient.hentAktørId(PERSONIDENT_FAR)
+            mockPdlClient.hentAktørId(PERSONIDENT_FAR, any())
         } returns PERSONIDENT_FAR + "00"
 
         every {
-            mockPdlClient.hentAktørId(PERSONIDENT_BARN)
+            mockPdlClient.hentAktørId(PERSONIDENT_BARN, any())
         } returns PERSONIDENT_BARN + "00"
 
         every { mockOppgaveClient.finnOppgaverPåAktørId(any(), any()) } returns emptyList()
@@ -92,6 +92,7 @@ class VurderLivshendelseTaskTest {
         every {
             mockPdlClient.hentPerson(
                 PERSONIDENT_BARN,
+                any(),
                 any(),
             )
         } returns PdlPersonData(
@@ -139,6 +140,7 @@ class VurderLivshendelseTaskTest {
             mockPdlClient.hentPerson(
                 PERSONIDENT_MOR,
                 any(),
+                any(),
             )
         } returns PdlPersonData(
             forelderBarnRelasjon = listOf(
@@ -181,6 +183,7 @@ class VurderLivshendelseTaskTest {
         every {
             mockPdlClient.hentPerson(
                 PERSONIDENT_BARN,
+                any(),
                 any(),
             )
         } returns PdlPersonData(
@@ -243,6 +246,7 @@ class VurderLivshendelseTaskTest {
             mockPdlClient.hentPerson(
                 any(),
                 any(),
+                any(),
             )
         } returns PdlPersonData(
             forelderBarnRelasjon = listOf(
@@ -302,6 +306,7 @@ class VurderLivshendelseTaskTest {
             mockPdlClient.hentPerson(
                 any(),
                 any(),
+                any(),
             )
         } returns PdlPersonData(
             sivilstand = listOf(
@@ -344,6 +349,7 @@ class VurderLivshendelseTaskTest {
     fun `Skal bruke sivilstandobjekt fra PdlPersonData med nyest dato`() {
         every {
             mockPdlClient.hentPerson(
+                any(),
                 any(),
                 any(),
             )
@@ -394,7 +400,7 @@ class VurderLivshendelseTaskTest {
         val sivilstandEldreEnnBasakVedtakMenNyereEnnInfotrygdVedtak = Sivilstand(GIFT, LocalDate.now().minusYears(4))
 
         every {
-            mockPdlClient.hentPerson(any(), "hentperson-sivilstand")
+            mockPdlClient.hentPerson(any(), "hentperson-sivilstand", any())
         } returns
             sivilstandUtenDato.data andThen
             sivilstandEldreEnnTidligsteInfotrygdVedtak.data andThen
@@ -435,6 +441,7 @@ class VurderLivshendelseTaskTest {
             mockPdlClient.hentPerson(
                 PERSONIDENT_BARN,
                 any(),
+                any(),
             )
         } returns PdlPersonData(
             forelderBarnRelasjon = listOf(
@@ -456,6 +463,7 @@ class VurderLivshendelseTaskTest {
         every {
             mockPdlClient.hentPerson(
                 PERSONIDENT_MOR,
+                any(),
                 any(),
             )
         } returns PdlPersonData(
@@ -657,6 +665,7 @@ class VurderLivshendelseTaskTest {
             mockPdlClient.hentPerson(
                 PERSONIDENT_MOR,
                 any(),
+                any(),
             )
         } returns PdlPersonData(
             forelderBarnRelasjon = listOf(
@@ -680,6 +689,7 @@ class VurderLivshendelseTaskTest {
             mockPdlClient.hentPerson(
                 PERSONIDENT_BARN,
                 any(),
+                any(),
             )
         } returns PdlPersonData(
             forelderBarnRelasjon = listOf(
@@ -696,6 +706,7 @@ class VurderLivshendelseTaskTest {
         every {
             mockPdlClient.hentPerson(
                 PERSONIDENT_BARN2,
+                any(),
                 any(),
             )
         } returns PdlPersonData(

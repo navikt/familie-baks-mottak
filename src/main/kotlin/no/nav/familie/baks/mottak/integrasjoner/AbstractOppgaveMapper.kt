@@ -54,7 +54,7 @@ abstract class AbstractOppgaveMapper(
 
         return when (journalpost.bruker?.type) {
             BrukerIdType.FNR -> {
-                hentAktørIdFraPdl(journalpost.bruker.id.trim())?.let {
+                hentAktørIdFraPdl(journalpost.bruker.id.trim(), Tema.valueOf(journalpost.tema!!))?.let {
                     OppgaveIdentV2(
                         ident = it,
                         gruppe = IdentGruppe.AKTOERID,
@@ -107,9 +107,9 @@ abstract class AbstractOppgaveMapper(
         }
     }
 
-    private fun hentAktørIdFraPdl(brukerId: String): String? {
+    private fun hentAktørIdFraPdl(brukerId: String, tema: Tema): String? {
         return try {
-            pdlClient.hentIdenter(brukerId).filter { it.gruppe == Identgruppe.AKTORID.name && !it.historisk }
+            pdlClient.hentIdenter(brukerId, tema).filter { it.gruppe == Identgruppe.AKTORID.name && !it.historisk }
                 .lastOrNull()?.ident
         } catch (e: IntegrasjonException) {
             null

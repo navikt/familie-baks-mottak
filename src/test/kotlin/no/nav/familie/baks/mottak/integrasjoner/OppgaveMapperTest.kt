@@ -12,7 +12,6 @@ import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -71,7 +70,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette brukerid til null dersom bruker ikke finnes i PDL når oppgavetype er Journalføring`() {
-        every { mockPdlClient.hentIdenter(any()) } throws IntegrasjonException("Fant ikke person")
+        every { mockPdlClient.hentIdenter(any(), any()) } throws IntegrasjonException("Fant ikke person")
 
         val oppgave = barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
             Oppgavetype.Journalføring,

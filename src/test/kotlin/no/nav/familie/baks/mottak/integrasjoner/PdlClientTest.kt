@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import no.nav.familie.baks.mottak.DevLauncher
+import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import org.apache.commons.lang3.StringUtils
 import org.assertj.core.api.Assertions.assertThat
@@ -34,7 +35,7 @@ class PdlClientTest {
             mockResponse = readfile("mockIdentInformasjonResponse.json"),
         )
 
-        val identer = pdlClient.hentIdenter(testIdent)
+        val identer = pdlClient.hentIdenter(testIdent, Tema.BAR)
         assertThat(identer).extracting("ident").contains(testIdent)
         assertThat(identer).extracting("gruppe").containsAll(listOf("FOLKEREGISTERIDENT", "AKTORID"))
         assertThat(identer).extracting("historisk").containsAll(listOf(true, false))
@@ -47,7 +48,7 @@ class PdlClientTest {
             mockResponse = readfile("mockPersonResponse.json"),
         )
 
-        val personInfo = pdlClient.hentPersonMedRelasjoner(testIdent)
+        val personInfo = pdlClient.hentPersonMedRelasjoner(testIdent, Tema.BAR)
         assertThat(personInfo.adressebeskyttelseGradering).isEqualTo(Adressebeskyttelsesgradering.UGRADERT.name)
         assertThat(personInfo.forelderBarnRelasjoner.size).isEqualTo(2)
         assertThat(personInfo.bostedsadresse?.vegadresse).isNotNull
@@ -60,7 +61,7 @@ class PdlClientTest {
             mockResponse = readfile("mock-hentperson-relasjon-dødsfall.json"),
         )
 
-        val pdlPersonData = pdlClient.hentPerson(testIdent, "hentperson-relasjon-dødsfall")
+        val pdlPersonData = pdlClient.hentPerson(testIdent, "hentperson-relasjon-dødsfall", Tema.BAR)
         assertThat(pdlPersonData.forelderBarnRelasjon.size).isEqualTo(1)
         assertThat(pdlPersonData.forelderBarnRelasjon.first().minRolleForPerson).isEqualTo(FORELDERBARNRELASJONROLLE.MOR)
         assertThat(pdlPersonData.forelderBarnRelasjon.first().relatertPersonsRolle).isEqualTo(FORELDERBARNRELASJONROLLE.BARN)
@@ -80,7 +81,7 @@ class PdlClientTest {
         )
 
         assertThatThrownBy {
-            pdlClient.hentPerson(testIdent, "hentperson-relasjon-dødsfall")
+            pdlClient.hentPerson(testIdent, "hentperson-relasjon-dødsfall", Tema.BAR)
         }.isInstanceOf(IntegrasjonException::class.java)
             .hasMessageContaining("Feil ved oppslag på hentPerson mot PDL. Gav feil: 500 Server Error")
     }
@@ -93,7 +94,7 @@ class PdlClientTest {
         )
 
         assertThatThrownBy {
-            pdlClient.hentPerson(testIdent, "hentperson-relasjon-dødsfall")
+            pdlClient.hentPerson(testIdent, "hentperson-relasjon-dødsfall", Tema.BAR)
         }.isInstanceOf(IntegrasjonException::class.java)
             .hasMessageContaining("Feil ved oppslag på hentPerson mot PDL: Fant ikke person")
     }

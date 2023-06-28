@@ -8,6 +8,7 @@ import no.nav.familie.baks.mottak.integrasjoner.Identgruppe
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdKontantstøtteClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.StonadDto
+import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -68,11 +69,11 @@ class JournalhendelseKontantstøtteRutingTask(
     }
 
     private fun søkEtterSakIInfotrygd(brukersIdent: String): Boolean {
-        val barnasIdenter = pdlClient.hentPersonMedRelasjoner(brukersIdent).forelderBarnRelasjoner
+        val barnasIdenter = pdlClient.hentPersonMedRelasjoner(brukersIdent, Tema.KON).forelderBarnRelasjoner
             .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
             .map { it.relatertPersonsIdent }
             .filterNotNull()
-        val alleBarnasIdenter = barnasIdenter.flatMap { pdlClient.hentIdenter(it) }
+        val alleBarnasIdenter = barnasIdenter.flatMap { pdlClient.hentIdenter(it, Tema.KON) }
             .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
             .map { it.ident }
 

@@ -17,6 +17,7 @@ import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.baks.mottak.integrasjoner.StatusKode
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
+import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -40,6 +41,8 @@ class JournalhendelseRutingTask(
     private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,
     private val taskService: TaskService,
 ) : AsyncTaskStep {
+
+    private val tema = Tema.BAR
 
     val log: Logger = LoggerFactory.getLogger(JournalhendelseRutingTask::class.java)
     val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
@@ -84,15 +87,15 @@ class JournalhendelseRutingTask(
 
     private fun søkEtterSakIBaSakOgInfotrygd(brukersIdent: String): Pair<Sakspart?, Sakspart?> {
         val brukersIdenter = try {
-            pdlClient.hentIdenter(brukersIdent).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }.map { it.ident }
+            pdlClient.hentIdenter(brukersIdent, tema).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }.map { it.ident }
         } catch (e: IntegrasjonException) {
             return Pair(null, null)
         }
-        val barnasIdenter = pdlClient.hentPersonMedRelasjoner(brukersIdent).forelderBarnRelasjoner
+        val barnasIdenter = pdlClient.hentPersonMedRelasjoner(brukersIdent, tema).forelderBarnRelasjoner
             .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
             .map { it.relatertPersonsIdent }
             .filterNotNull()
-        val alleBarnasIdenter = barnasIdenter.flatMap { pdlClient.hentIdenter(it) }
+        val alleBarnasIdenter = barnasIdenter.flatMap { pdlClient.hentIdenter(it, tema) }
             .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
             .map { it.ident }
 

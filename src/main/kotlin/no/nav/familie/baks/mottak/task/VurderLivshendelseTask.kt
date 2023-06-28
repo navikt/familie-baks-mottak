@@ -26,6 +26,7 @@ import no.nav.familie.baks.mottak.task.VurderLivshendelseType.DØDSFALL
 import no.nav.familie.baks.mottak.task.VurderLivshendelseType.SIVILSTAND
 import no.nav.familie.baks.mottak.task.VurderLivshendelseType.UTFLYTTING
 import no.nav.familie.kontrakter.felles.Behandlingstema
+import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
@@ -60,6 +61,8 @@ class VurderLivshendelseTask(
     private val featureToggleService: FeatureToggleService,
 ) : AsyncTaskStep {
 
+    private val tema = Tema.BAR
+
     val log: Logger = LoggerFactory.getLogger(this::class.java)
     val secureLog: Logger = LoggerFactory.getLogger("secureLogger")
     val oppgaveOpprettetDødsfallCounter: Counter = Metrics.counter("barnetrygd.dodsfall.oppgave.opprettet")
@@ -73,7 +76,7 @@ class VurderLivshendelseTask(
         when (payload.type) {
             DØDSFALL -> {
                 secureLog.info("Har mottat dødsfallshendelse for person $personIdent")
-                val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-dødsfall")
+                val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-dødsfall", tema)
                 secureLog.info("dødsfallshendelse person følselsdato = ${pdlPersonData.fødsel.firstOrNull()}")
                 if (pdlPersonData.dødsfall.firstOrNull()?.dødsdato == null) {
                     secureLog.info("Har mottatt dødsfallshendelse uten dødsdato $pdlPersonData")
@@ -108,7 +111,7 @@ class VurderLivshendelseTask(
                     berørteBrukereIBaSak.forEach {
                         if (opprettEllerOppdaterVurderLivshendelseOppgave(
                                 hendelseType = DØDSFALL,
-                                aktørIdForOppgave = pdlClient.hentAktørId(it.ident),
+                                aktørIdForOppgave = pdlClient.hentAktørId(it.ident, tema),
                                 fagsakIdForOppgave = it.fagsakId,
                                 personIdent = personIdent,
                                 task = task,
@@ -134,11 +137,11 @@ class VurderLivshendelseTask(
                         }
                     }
                 } else {
-                    val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-utflytting")
+                    val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-utflytting", tema)
                     finnBrukereMedSakRelatertTilPerson(personIdent, pdlPersonData).forEach {
                         if (opprettEllerOppdaterVurderLivshendelseOppgave(
                                 hendelseType = UTFLYTTING,
-                                aktørIdForOppgave = pdlClient.hentAktørId(it.ident),
+                                aktørIdForOppgave = pdlClient.hentAktørId(it.ident, tema),
                                 fagsakIdForOppgave = it.fagsakId,
                                 personIdent = personIdent,
                                 task = task,
@@ -150,7 +153,7 @@ class VurderLivshendelseTask(
                 }
             }
             SIVILSTAND -> {
-                val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-sivilstand")
+                val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-sivilstand", tema)
                 val sivilstand = finnNyesteSivilstandEndring(pdlPersonData) ?: run {
                     secureLog.info("Ignorerer sivilstandhendelse for $personIdent uten dato: $pdlPersonData")
                     return
@@ -184,7 +187,7 @@ class VurderLivshendelseTask(
                         opprettEllerOppdaterEndringISivilstandOppgave(
                             endringsdato = sivilstand.dato!!,
                             fagsakIdForOppgave = aktivFaksak.id,
-                            aktørIdForOppgave = pdlClient.hentAktørId(personIdent),
+                            aktørIdForOppgave = pdlClient.hentAktørId(personIdent, tema),
                             personIdent = personIdent,
                             task = task,
                         )
@@ -215,7 +218,7 @@ class VurderLivshendelseTask(
     }
 
     private fun hentTidligsteVedtaksdatoFraInfotrygd(personIdent: String): LocalDate? {
-        val personIdenter = pdlClient.hentIdenter(personIdent)
+        val personIdenter = pdlClient.hentIdenter(personIdent, tema)
             .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
             .map { it.ident }
         val tidligsteInfotrygdVedtak = infotrygdClient.hentVedtak(personIdenter).bruker
@@ -226,7 +229,7 @@ class VurderLivshendelseTask(
     }
 
     private fun hentOgLoggRelevantInfoOmÅrsakenKanVæreInnflytting(personIdent: String, dato: LocalDate) {
-        val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-innflytting")
+        val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-innflytting", tema)
         secureLog.info("Ignorerer sivilstandhendelse med gammel dato ($dato). Se om årsak kan være innflytting: $pdlPersonData")
     }
 
@@ -327,7 +330,7 @@ class VurderLivshendelseTask(
             val beskrivelse = leggTilNyPersonIBeskrivelse(
                 beskrivelse = "${hendelseType.beskrivelse}:",
                 personIdent = personIdent,
-                personErBruker = pdlClient.hentAktørId(personIdent) == aktørIdForOppgave,
+                personErBruker = pdlClient.hentAktørId(personIdent, tema) == aktørIdForOppgave,
             )
             val restFagsak = hentRestFagsak(fagsakIdForOppgave)
             val restBehandling = hentSisteBehandlingSomErIverksatt(restFagsak) ?: hentAktivBehandling(restFagsak)
@@ -371,7 +374,7 @@ class VurderLivshendelseTask(
         ) ?: "ukjent dato"
 
         val initiellBeskrivelse = hentInitiellBeskrivelseForSivilstandOppgave(
-            personErBruker = pdlClient.hentAktørId(personIdent) == aktørIdForOppgave,
+            personErBruker = pdlClient.hentAktørId(personIdent, tema) == aktørIdForOppgave,
             formatertDato = formatertDato,
             personIdent = personIdent,
         )

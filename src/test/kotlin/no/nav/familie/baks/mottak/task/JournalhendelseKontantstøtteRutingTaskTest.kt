@@ -136,21 +136,21 @@ class JournalhendelseKontantstøtteRutingTaskTest {
     }
 
     private fun setupPDLMocks() {
-        every { pdlClient.hentPersonMedRelasjoner(any()) } returns Person(
+        every { pdlClient.hentPersonMedRelasjoner(any(), any()) } returns Person(
             navn = "Ola Norman",
             forelderBarnRelasjoner = setOf(
                 ForelderBarnRelasjon(barn1Fnr, FORELDERBARNRELASJONROLLE.BARN),
                 ForelderBarnRelasjon(barn2Fnr, FORELDERBARNRELASJONROLLE.BARN),
             ),
         )
-        every { pdlClient.hentIdenter(barn1Fnr) } returns listOf(
+        every { pdlClient.hentIdenter(barn1Fnr, any()) } returns listOf(
             IdentInformasjon(
                 ident = barn1Fnr,
                 gruppe = IdentGruppe.FOLKEREGISTERIDENT.name,
                 historisk = false,
             ),
         )
-        every { pdlClient.hentIdenter(barn2Fnr) } returns listOf(
+        every { pdlClient.hentIdenter(barn2Fnr, any()) } returns listOf(
             IdentInformasjon(
                 ident = barn2Fnr,
                 gruppe = IdentGruppe.FOLKEREGISTERIDENT.name,

@@ -12,6 +12,7 @@ import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.util.erBostNummer
 import no.nav.familie.baks.mottak.util.erDnummer
 import no.nav.familie.baks.mottak.util.erFDatnummer
+import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.kontrakter.felles.personopplysning.ForelderBarnRelasjon
 import no.nav.familie.prosessering.AsyncTaskStep
@@ -50,7 +51,7 @@ class MottaFødselshendelseTask(
         }
 
         try {
-            val personMedRelasjoner = pdlClient.hentPersonMedRelasjoner(barnetsId)
+            val personMedRelasjoner = pdlClient.hentPersonMedRelasjoner(barnetsId, Tema.BAR)
 
             val morsIdent = hentMor(personMedRelasjoner)
 
