@@ -84,8 +84,6 @@ class FeatureToggleConfig(
     }
 
     companion object {
-        const val NY_MÅTE_Å_FINNE_BERØRTE_FAGSAKER_VED_LEESAH_HENDELSER =
-            "familie-ba-mottak.ny-metode-finne-berorte-fagsaker-ved-leesah-hendelse"
         const val OPPRETTE_JOURNALFØRINGSOPPGAVE_KONTANTSTØTTE =
             "familie-baks-mottak.opprett-journalforingsoppgave-kontantstotte"
     }
