@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.0</version>
+        <version>3.1.1</version>
     </parent>
 
     <properties>
@@ -20,14 +20,14 @@
         <changelist>-SNAPSHOT</changelist>
         <java.version>17</java.version>
         <jvmTarget>17</jvmTarget>
-        <kotlin.version>1.8.21</kotlin.version>
+        <kotlin.version>1.8.22</kotlin.version>
         <mockk.version>1.13.5</mockk.version>
         <confluent.version>6.2.10</confluent.version>
         <prosessering.version>2.20230621155918_9c5de0f</prosessering.version>
         <felles.version>2.20230210162649_a258d57-SPRING_BOOT_3</felles.version>
         <kontrakter.version>3.0_20230627152200_afdca38</kontrakter.version>
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
-        <spring.cloud.version>4.0.2</spring.cloud.version>
+        <spring.cloud.version>4.0.3</spring.cloud.version>
         <token-validation-spring.version>3.0.11</token-validation-spring.version>
         <avro.version>1.11.1</avro.version>
 
@@ -228,7 +228,7 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
-            <version>1.18.1</version>
+            <version>1.18.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
