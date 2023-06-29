@@ -51,7 +51,7 @@ class VurderLivshendelseTask(
     private val oppgaveClient: OppgaveClient,
     private val pdlClient: PdlClient,
     private val sakClient: SakClient,
-    private val infotrygdClient: InfotrygdBarnetrygdClient
+    private val infotrygdClient: InfotrygdBarnetrygdClient,
 ) : AsyncTaskStep {
 
     private val tema = Tema.BAR
