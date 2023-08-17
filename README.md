@@ -70,7 +70,7 @@ Ende til ende tester kjøres av GHA ved push. Ønsker du å hoppe over dise må 
 Ende til ende testene ligger her: https://github.com/navikt/familie-ba-e2e/tree/master/autotest 
 
 ## Produksjonssetting
-Appen blir produksjonssatt ved push til master
+Appen blir produksjonssatt ved push til main
 
 ## Henvendelser
 For NAV-interne kan henvendelser rettes til #team-familie på slack. Ellers kan henvendelser rettes via et issue her på github-repoet.
