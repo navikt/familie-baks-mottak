@@ -2,7 +2,7 @@ name: Build-Deploy-Prod
 on:
   push:
     branches:
-      - master
+      - main
 env:
   IMAGE: ghcr.io/navikt/familie-baks-mottak:${{ github.sha }}
   IMAGE_LATEST: ghcr.io/navikt/familie-baks-mottak:latest
