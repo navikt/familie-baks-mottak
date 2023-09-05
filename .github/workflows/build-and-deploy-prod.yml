@@ -3,9 +3,6 @@ on:
   push:
     branches:
       - main
-env:
-  IMAGE: ghcr.io/navikt/familie-baks-mottak:${{ github.sha }}
-  IMAGE_LATEST: ghcr.io/navikt/familie-baks-mottak:latest
 jobs:
   deploy-to-prod:
     name: Bygg app/image, push til github, deploy til dev-gcp
@@ -45,7 +42,7 @@ jobs:
           RESOURCE: .deploy/nais/app-preprod.yaml
           IMAGE: ${{ steps.docker-push.outputs.image }}
       - name: Deploy til prod-gcp
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
