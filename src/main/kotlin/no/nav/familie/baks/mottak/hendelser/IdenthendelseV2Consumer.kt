@@ -56,19 +56,17 @@ class IdenthendelseV2Consumer(
                 ident.type == Type.AKTORID && ident.gjeldende
             }?.idnummer.toString()
 
-            SECURE_LOGGER.info("aktivAktørid=$aktivAktørid aktørIdPåHendelse=$aktørIdPåHendelse ${aktørIdPåHendelse.contains(aktivAktørid)}")
+            if (aktørIdPåHendelse.contains(aktivAktørid)) { // I tilfeller som ved merge av hendelser vil man få både identhendelse på gammel og ny aktørid, så for å unngå duplikater så sender man bare på aktiv ident
+                aktør?.identifikatorer?.singleOrNull { ident ->
+                    ident.type == Type.FOLKEREGISTERIDENT && ident.gjeldende
+                }?.also { folkeregisterident ->
+                    SECURE_LOGGER.info("Sender ident-hendelse til ba-sak for ident $folkeregisterident")
 
-//            if (aktørIdPåHendelse == aktivAktørid) { // I tilfeller som ved merge av hendelser vil man få både identhendelse på gammel og ny aktørid, så for å unngå duplikater så sender man bare på aktiv ident
-            aktør?.identifikatorer?.singleOrNull { ident ->
-                ident.type == Type.FOLKEREGISTERIDENT && ident.gjeldende
-            }?.also { folkeregisterident ->
-                SECURE_LOGGER.info("Sender ident-hendelse til ba-sak for ident $folkeregisterident")
-
-                sakClient.sendIdenthendelseTilSak(PersonIdent(ident = folkeregisterident.idnummer.toString()))
+                    sakClient.sendIdenthendelseTilSak(PersonIdent(ident = folkeregisterident.idnummer.toString()))
+                }
+            } else {
+                SECURE_LOGGER.info("Ignorerer å sende ident-hendelse til ba-sak for aktør $aktørIdPåHendelse ikke lenger gyldig aktør")
             }
-//            } else {
-//                SECURE_LOGGER.info("Ignorerer å sende ident-hendelse til ba-sak for aktør $aktørIdPåHendelse ikke lenger gyldig aktør")
-//            }
         } catch (e: RuntimeException) {
             identhendelseFeiletCounter.increment()
             log.warn("Feil i prosessering av ident-hendelser", e)
