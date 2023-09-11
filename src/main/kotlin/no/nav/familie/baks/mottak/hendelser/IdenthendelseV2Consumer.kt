@@ -65,7 +65,7 @@ class IdenthendelseV2Consumer(
                     sakClient.sendIdenthendelseTilSak(PersonIdent(ident = folkeregisterident.idnummer.toString()))
                 }
             } else {
-                SECURE_LOGGER.info("Ignorerer å sende ident-hendelse til ba-sak for aktør $aktørIdPåHendelse ikke lenger gyldig aktø")
+                SECURE_LOGGER.info("Ignorerer å sende ident-hendelse til ba-sak for aktør $aktørIdPåHendelse ikke lenger gyldig aktør")
             }
         } catch (e: RuntimeException) {
             identhendelseFeiletCounter.increment()
