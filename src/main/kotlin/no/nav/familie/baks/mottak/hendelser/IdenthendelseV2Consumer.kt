@@ -45,18 +45,27 @@ class IdenthendelseV2Consumer(
             SECURE_LOGGER.info("Har mottatt ident-hendelse $consumerRecord")
 
             val aktør = consumerRecord.value()
+            val aktørIdPåHendelse = consumerRecord.key()
 
             if (aktør == null) {
                 log.warn("Tom aktør fra identhendelse")
-                SECURE_LOGGER.warn("Tom aktør fra identhendelse med nøkkel ${consumerRecord.key()}")
+                SECURE_LOGGER.warn("Tom aktør fra identhendelse med nøkkel $aktørIdPåHendelse")
             }
 
-            aktør?.identifikatorer?.singleOrNull { ident ->
-                ident.type == Type.FOLKEREGISTERIDENT && ident.gjeldende
-            }?.also { folkeregisterident ->
-                SECURE_LOGGER.info("Sender ident-hendelse til ba-sak for ident $folkeregisterident")
+            val aktivAktørid = aktør?.identifikatorer?.singleOrNull { ident ->
+                ident.type == Type.AKTORID && ident.gjeldende
+            }?.idnummer.toString()
 
-                sakClient.sendIdenthendelseTilSak(PersonIdent(ident = folkeregisterident.idnummer.toString()))
+            if (aktørIdPåHendelse.contains(aktivAktørid)) { // I tilfeller som ved merge av hendelser vil man få både identhendelse på gammel og ny aktørid, så for å unngå duplikater så sender man bare på aktiv ident
+                aktør?.identifikatorer?.singleOrNull { ident ->
+                    ident.type == Type.FOLKEREGISTERIDENT && ident.gjeldende
+                }?.also { folkeregisterident ->
+                    SECURE_LOGGER.info("Sender ident-hendelse til ba-sak for ident $folkeregisterident")
+
+                    sakClient.sendIdenthendelseTilSak(PersonIdent(ident = folkeregisterident.idnummer.toString()))
+                }
+            } else {
+                SECURE_LOGGER.info("Ignorerer å sende ident-hendelse til ba-sak for aktør $aktørIdPåHendelse ikke lenger gyldig aktør")
             }
         } catch (e: RuntimeException) {
             identhendelseFeiletCounter.increment()
