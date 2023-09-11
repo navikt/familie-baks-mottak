@@ -45,7 +45,7 @@ class IdenthendelseV2Consumer(
             SECURE_LOGGER.info("Har mottatt ident-hendelse $consumerRecord")
 
             val aktør = consumerRecord.value()
-            val aktørIdPåHendelse = consumerRecord.key().trim()
+            val aktørIdPåHendelse = consumerRecord.key()
 
             if (aktør == null) {
                 log.warn("Tom aktør fra identhendelse")
@@ -56,7 +56,7 @@ class IdenthendelseV2Consumer(
                 ident.type == Type.AKTORID && ident.gjeldende
             }?.idnummer.toString()
 
-            SECURE_LOGGER.info("aktivAktørid=$aktivAktørid aktørIdPåHendelse=$aktørIdPåHendelse ${aktørIdPåHendelse == aktivAktørid}")
+            SECURE_LOGGER.info("aktivAktørid=$aktivAktørid aktørIdPåHendelse=$aktørIdPåHendelse ${aktørIdPåHendelse.contains(aktivAktørid)}")
 
 //            if (aktørIdPåHendelse == aktivAktørid) { // I tilfeller som ved merge av hendelser vil man få både identhendelse på gammel og ny aktørid, så for å unngå duplikater så sender man bare på aktiv ident
             aktør?.identifikatorer?.singleOrNull { ident ->
