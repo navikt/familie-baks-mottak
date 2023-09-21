@@ -25,7 +25,7 @@
         <confluent.version>6.2.11</confluent.version>
         <prosessering.version>2.20230807154047_d770f01</prosessering.version>
         <felles.version>2.20230905101454_06fa3d7</felles.version>
-        <kontrakter.version>3.0_20230817140529_df3e9ab</kontrakter.version>
+        <kontrakter.version>3.0_20230918090258_bf0dfa7</kontrakter.version>
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
         <spring.cloud.version>4.0.4</spring.cloud.version>
         <token-validation-spring.version>3.1.0</token-validation-spring.version>
@@ -203,6 +203,13 @@
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
         </dependency>
+        <dependency> <!-- Overstyrer versjon default i spring pga sikkerhetshull https://security.snyk.io/package/maven/org.yaml:snakeyaml -->
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>2.2</version>
+        </dependency>
+
+
         <!-- https://github.com/spring-projects/spring-boot/issues/33044#issuecomment-1379812611 -->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
@@ -310,7 +317,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>3.9.1.2184</version>
+                    <version>3.10.0.2594</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
