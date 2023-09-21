@@ -2,10 +2,12 @@ package no.nav.familie.baks.mottak.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.familie.log.filter.LogFilter
+import no.nav.familie.prosessering.config.ProsesseringInfoProvider
 import no.nav.security.token.support.client.core.http.OAuth2HttpClient
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.spring.oauth2.DefaultOAuth2HttpClient
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
+import no.nav.security.token.support.spring.SpringTokenValidationContextHolder
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import org.springframework.boot.SpringBootConfiguration
 import org.springframework.boot.autoconfigure.domain.EntityScan
@@ -77,5 +79,25 @@ class ApplicationConfig {
                 .setConnectTimeout(Duration.of(2, ChronoUnit.SECONDS))
                 .setReadTimeout(Duration.of(4, ChronoUnit.SECONDS)),
         )
+    }
+
+    @Bean
+    fun prosesseringInfoProvider() = object : ProsesseringInfoProvider {
+        override fun hentBrukernavn(): String = try {
+            SpringTokenValidationContextHolder().tokenValidationContext.getClaims("azuread").getStringClaim("preferred_username")
+        } catch (e: Exception) {
+            "VL"
+        }
+
+        override fun harTilgang(): Boolean = grupper().contains("928636f4-fd0d-4149-978e-a6fb68bb19de")
+
+        private fun grupper(): List<String> {
+            return try {
+                SpringTokenValidationContextHolder().tokenValidationContext.getClaims("azuread")
+                    ?.get("groups") as List<String>? ?: emptyList()
+            } catch (e: Exception) {
+                emptyList()
+            }
+        }
     }
 }
