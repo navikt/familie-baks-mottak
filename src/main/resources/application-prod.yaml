@@ -70,6 +70,8 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
+prosessering.rolle: "87190cf3-b278-457d-8ab7-1a5c55a9edd7"
+
 FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1440
 FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER: 180
 

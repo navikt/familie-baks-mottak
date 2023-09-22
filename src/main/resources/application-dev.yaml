@@ -67,6 +67,9 @@ funksjonsbrytere:
 logging:
   config: "classpath:logback-test.xml"
 retry.backoff.delay: 5
+
+prosessering.rolle: "928636f4-fd0d-4149-978e-a6fb68bb19de"
+
 FAMILIE_BAKS_DOKGEN_API_URL: http://localhost:5914
 FAMILIE_BA_SAK_API_URL: http://localhost:8089/api
 FAMILIE_INTEGRASJONER_API_URL: http://localhost:8085/api
@@ -80,3 +83,4 @@ NORG2_API_URL: #mockes ut i test
 PDL_URL: dummy
 CREDENTIAL_USERNAME: not-a-real-srvuser
 CREDENTIAL_PASSWORD: not-a-real-pw
+
