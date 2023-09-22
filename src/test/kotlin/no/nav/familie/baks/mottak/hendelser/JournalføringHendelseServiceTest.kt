@@ -8,7 +8,6 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.justRun
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.familie.baks.mottak.config.FeatureToggleService
 import no.nav.familie.baks.mottak.domene.HendelseConsumer
 import no.nav.familie.baks.mottak.domene.Hendelseslogg
 import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
@@ -64,9 +63,6 @@ class JournalføringHendelseServiceTest {
 
     @MockK(relaxed = true)
     lateinit var mockTaskService: TaskService
-
-    @MockK(relaxed = true)
-    lateinit var mockFeatureToggleService: FeatureToggleService
 
     @MockK(relaxed = true)
     lateinit var mockHendelsesloggRepository: HendelsesloggRepository
@@ -162,8 +158,6 @@ class JournalføringHendelseServiceTest {
             sak = null,
         )
 
-        every { mockFeatureToggleService.isEnabled(any()) } returns true
-        every { mockFeatureToggleService.isEnabled(any(), true) } returns true
         every { mockTaskService.save(any()) } returns Task("dummy", "payload")
     }
 
