@@ -131,22 +131,6 @@ class ClientMocks {
 
     @Bean
     @Primary
-    fun mockFeatureToggleService(): FeatureToggleService {
-        val mockFeatureToggleClient = mockk<FeatureToggleService>(relaxed = true)
-
-        every {
-            mockFeatureToggleClient.isEnabled(any())
-        } returns true
-
-        every {
-            mockFeatureToggleClient.isEnabled(any(), any())
-        } returns true
-
-        return mockFeatureToggleClient
-    }
-
-    @Bean
-    @Primary
     @Profile("mock-dokgen")
     fun mockPdfClient(): PdfClient {
         val mockPdfClient = mockk<PdfClient>()

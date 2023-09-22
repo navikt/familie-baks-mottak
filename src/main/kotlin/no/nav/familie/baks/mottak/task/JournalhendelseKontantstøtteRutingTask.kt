@@ -2,8 +2,6 @@ package no.nav.familie.baks.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.baks.mottak.config.FeatureToggleConfig
-import no.nav.familie.baks.mottak.config.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.Identgruppe
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdKontantstøtteClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
@@ -16,6 +14,7 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import java.time.YearMonth
 
@@ -28,14 +27,15 @@ class JournalhendelseKontantstøtteRutingTask(
     private val pdlClient: PdlClient,
     private val infotrygdKontantstøtteClient: InfotrygdKontantstøtteClient,
     private val taskService: TaskService,
-    private val featureToggleService: FeatureToggleService,
+    private val environment: Environment,
 ) : AsyncTaskStep {
 
     val log: Logger = LoggerFactory.getLogger(JournalhendelseKontantstøtteRutingTask::class.java)
     val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
 
     override fun doTask(task: Task) {
-        if (featureToggleService.isEnabled(FeatureToggleConfig.OPPRETTE_JOURNALFØRINGSOPPGAVE_KONTANTSTØTTE, false)) {
+        val erProd = environment.activeProfiles.any { it == "prod" }
+        if (!erProd) {
             val brukersIdent = task.metadata["personIdent"] as String?
 
             val harLøpendeSakIInfotrygd = brukersIdent?.run { søkEtterSakIInfotrygd(this) } ?: false

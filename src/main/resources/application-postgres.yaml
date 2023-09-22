@@ -46,11 +46,7 @@ credential:
   password: "not-a-real-password"
 funksjonsbrytere:
   kafka.enabled: false
-  enabled: false
-  unleash:
-    uri: http://dummy/api/
-    cluster: localhost
-    applicationName: familie-ba-sak
+
 logging:
   config: "classpath:logback-test.xml"
 spring:
