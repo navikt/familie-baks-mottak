@@ -21,7 +21,7 @@
         <java.version>17</java.version>
         <jvmTarget>17</jvmTarget>
         <kotlin.version>1.9.10</kotlin.version>
-        <mockk.version>1.13.7</mockk.version>
+        <mockk.version>1.13.8</mockk.version>
         <confluent.version>6.2.11</confluent.version>
         <prosessering.version>2.20230807154047_d770f01</prosessering.version>
         <felles.version>2.20230905101454_06fa3d7</felles.version>
