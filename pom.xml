@@ -31,7 +31,7 @@
         <token-validation-spring.version>3.1.0</token-validation-spring.version>
         <spring.cloud.version>4.0.3</spring.cloud.version>
         <token-validation-spring.version>3.1.0</token-validation-spring.version>
-        <avro.version>1.11.2</avro.version>
+        <avro.version>1.11.3</avro.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
