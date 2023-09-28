@@ -151,7 +151,6 @@ class VurderLivshendelseTask(
         }
 
         return erEtterTidligsteInfotrygdVedtak
-            .also { if (!it) hentOgLoggRelevantInfoOmÅrsakenKanVæreInnflytting(personIdent, dato) }
     }
 
     private fun hentTidligsteVedtaksdatoFraInfotrygd(personIdent: String): LocalDate? {
@@ -163,11 +162,6 @@ class VurderLivshendelseTask(
         return tidligsteInfotrygdVedtak?.iverksattFom
             ?.let { YearMonth.parse("${999999 - it.toInt()}", DateTimeFormatter.ofPattern("yyyyMM")) }
             ?.atDay(1)
-    }
-
-    private fun hentOgLoggRelevantInfoOmÅrsakenKanVæreInnflytting(personIdent: String, dato: LocalDate) {
-        val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-innflytting", tema)
-        secureLog.info("Ignorerer sivilstandhendelse med gammel dato ($dato). Se om årsak kan være innflytting: $pdlPersonData")
     }
 
     private fun finnNyesteSivilstandEndring(pdlPersonData: PdlPersonData): Sivilstand? {
