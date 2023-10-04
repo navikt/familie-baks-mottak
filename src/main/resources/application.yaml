@@ -37,13 +37,6 @@ logging:
 
 retry.backoff.delay: 5000
 
-funksjonsbrytere:
-  enabled: true
-  unleash:
-    uri: https://unleash.nais.io/api/
-    cluster: ${NAIS_CLUSTER_NAME}
-    applicationName: ${NAIS_APP_NAME}
-
 prosessering:
   queue:
     capacity: 10
