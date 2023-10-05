@@ -269,11 +269,6 @@
             <id>github</id>
             <url>https://maven.pkg.github.com/navikt/familie-felles</url>
         </repository>
-        <repository>
-            <id>token-support</id>
-            <name>Github navikt Maven Packages</name>
-            <url>https://maven.pkg.github.com/navikt/token-support</url>
-        </repository>
     </repositories>
 
     <profiles>
