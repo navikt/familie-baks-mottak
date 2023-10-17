@@ -21,7 +21,6 @@ import org.springframework.test.context.ActiveProfiles
 @AutoConfigureWireMock(port = 28085)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class HentEnhetClientTest {
-
     @Autowired
     lateinit var client: HentEnhetClient
 

@@ -33,7 +33,6 @@ import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SkanHendelseTaskLøypeTest {
-
     private val mockJournalpostClient: JournalpostClient = mockk()
     private val mockOppgaveClient: OppgaveClient = mockk()
     private val mockSakClient: SakClient = mockk()
@@ -41,17 +40,19 @@ class SkanHendelseTaskLøypeTest {
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
 
-    private val rutingSteg = JournalhendelseRutingTask(
-        mockPdlClient,
-        mockSakClient,
-        mockInfotrygdBarnetrygdClient,
-        mockTaskService,
-    )
+    private val rutingSteg =
+        JournalhendelseRutingTask(
+            mockPdlClient,
+            mockSakClient,
+            mockInfotrygdBarnetrygdClient,
+            mockTaskService,
+        )
 
-    private val journalføringSteg = OpprettJournalføringOppgaveTask(
-        mockJournalpostClient,
-        mockOppgaveClient,
-    )
+    private val journalføringSteg =
+        OpprettJournalføringOppgaveTask(
+            mockJournalpostClient,
+            mockOppgaveClient,
+        )
 
     @BeforeEach
     internal fun setUp() {
@@ -59,18 +60,19 @@ class SkanHendelseTaskLøypeTest {
         // Inngående papirsøknad, Mottatt
         every {
             mockJournalpostClient.hentJournalpost(any())
-        } returns Journalpost(
-            journalpostId = JournalføringHendelseServiceTest.JOURNALPOST_PAPIRSØKNAD,
-            journalposttype = Journalposttype.I,
-            journalstatus = Journalstatus.MOTTATT,
-            bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-            tema = "BAR",
-            kanal = MOTTAK_KANAL,
-            behandlingstema = null,
-            dokumenter = null,
-            journalforendeEnhet = null,
-            sak = null,
-        )
+        } returns
+            Journalpost(
+                journalpostId = JournalføringHendelseServiceTest.JOURNALPOST_PAPIRSØKNAD,
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+                tema = "BAR",
+                kanal = MOTTAK_KANAL,
+                behandlingstema = null,
+                dokumenter = null,
+                journalforendeEnhet = null,
+                sak = null,
+            )
 
         every {
             mockOppgaveClient.finnOppgaver(any(), any())
@@ -206,17 +208,17 @@ class SkanHendelseTaskLøypeTest {
             },
         )
 
-        val nesteTask = slot<Task>().let { nyTask ->
-            verify(exactly = 1) {
-                mockTaskService.save(capture(nyTask))
+        val nesteTask =
+            slot<Task>().let { nyTask ->
+                verify(exactly = 1) {
+                    mockTaskService.save(capture(nyTask))
+                }
+                nyTask.captured
             }
-            nyTask.captured
-        }
         return nesteTask
     }
 
     companion object {
-
         private val MOTTAK_KANAL = "SKAN_NETS"
     }
 }

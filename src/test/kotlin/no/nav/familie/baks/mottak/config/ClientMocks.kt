@@ -26,7 +26,6 @@ import org.springframework.web.client.HttpClientErrorException
 
 @Component
 class ClientMocks {
-
     @Bean
     @Primary
     fun mockOppgaveClient(): OppgaveClient {
@@ -75,49 +74,53 @@ class ClientMocks {
 
         every {
             mockJournalpostClient.hentJournalpost("123")
-        } returns Journalpost(
-            journalpostId = "123",
-            journalposttype = Journalposttype.I,
-            journalstatus = Journalstatus.MOTTATT,
-            bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-            tema = "BAR",
-            kanal = "SKAN_NETS",
-            behandlingstema = null,
-            dokumenter = null,
-            journalforendeEnhet = null,
-            sak = null,
-        )
+        } returns
+            Journalpost(
+                journalpostId = "123",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+                tema = "BAR",
+                kanal = "SKAN_NETS",
+                behandlingstema = null,
+                dokumenter = null,
+                journalforendeEnhet = null,
+                sak = null,
+            )
 
         every {
             mockJournalpostClient.hentJournalpost("321")
-        } returns Journalpost(
-            journalpostId = "321",
-            journalposttype = Journalposttype.I,
-            journalstatus = Journalstatus.MOTTATT,
-            bruker = Bruker("12345678901", BrukerIdType.FNR),
-            tema = "BAR",
-            kanal = "SKAN_NETS",
-        )
+        } returns
+            Journalpost(
+                journalpostId = "321",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker = Bruker("12345678901", BrukerIdType.FNR),
+                tema = "BAR",
+                kanal = "SKAN_NETS",
+            )
 
-        every { mockJournalpostClient.hentJournalpost("456") } returns Journalpost(
-            journalpostId = "1456",
-            journalposttype = Journalposttype.I,
-            journalstatus = Journalstatus.MOTTATT,
-            bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-            tema = "KON",
-            kanal = "NO_NAV",
-            behandlingstema = null,
-            dokumenter = listOf(
-                DokumentInfo(
-                    tittel = "Søknad om kontantstøtte til småbarnsforeldre",
-                    brevkode = "34-00.08",
-                    dokumentstatus = null,
-                    dokumentvarianter = emptyList(),
-                ),
-            ),
-            journalforendeEnhet = null,
-            sak = null,
-        )
+        every { mockJournalpostClient.hentJournalpost("456") } returns
+            Journalpost(
+                journalpostId = "1456",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+                tema = "KON",
+                kanal = "NO_NAV",
+                behandlingstema = null,
+                dokumenter =
+                    listOf(
+                        DokumentInfo(
+                            tittel = "Søknad om kontantstøtte til småbarnsforeldre",
+                            brevkode = "34-00.08",
+                            dokumentstatus = null,
+                            dokumentvarianter = emptyList(),
+                        ),
+                    ),
+                journalforendeEnhet = null,
+                sak = null,
+            )
 
         return mockJournalpostClient
     }

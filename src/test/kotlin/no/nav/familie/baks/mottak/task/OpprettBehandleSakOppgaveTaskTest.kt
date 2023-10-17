@@ -26,7 +26,6 @@ import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OpprettBehandleSakOppgaveTaskTest {
-
     private val mockJournalpostClient: JournalpostClient = mockk()
     private val mockOppgaveClient: OppgaveClient = mockk()
     private val mockTaskService: TaskService = mockk(relaxed = true)
@@ -113,23 +112,25 @@ class OpprettBehandleSakOppgaveTaskTest {
         assertThat(task.metadata["oppgaveId"]).isEqualTo("321")
     }
 
-    private fun lagTestJournalpost(status: Journalstatus) = Journalpost(
-        journalpostId = JournalføringHendelseServiceTest.JOURNALPOST_PAPIRSØKNAD,
-        journalposttype = Journalposttype.I,
-        journalstatus = status,
-        bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-        tema = "BAR",
-        kanal = "NAV_NO",
-        behandlingstema = null,
-        dokumenter = listOf(
-            DokumentInfo(
-                "Tittel",
-                "",
-                Dokumentstatus.FERDIGSTILT,
-                emptyList(),
-            ),
-        ),
-        journalforendeEnhet = null,
-        sak = null,
-    )
+    private fun lagTestJournalpost(status: Journalstatus) =
+        Journalpost(
+            journalpostId = JournalføringHendelseServiceTest.JOURNALPOST_PAPIRSØKNAD,
+            journalposttype = Journalposttype.I,
+            journalstatus = status,
+            bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+            tema = "BAR",
+            kanal = "NAV_NO",
+            behandlingstema = null,
+            dokumenter =
+                listOf(
+                    DokumentInfo(
+                        "Tittel",
+                        "",
+                        Dokumentstatus.FERDIGSTILT,
+                        emptyList(),
+                    ),
+                ),
+            journalforendeEnhet = null,
+            sak = null,
+        )
 }

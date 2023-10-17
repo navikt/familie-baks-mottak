@@ -24,7 +24,6 @@ import kotlin.random.nextUInt
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LeesahServiceTest {
-
     lateinit var mockHendelsesloggRepository: HendelsesloggRepository
     lateinit var mockTaskService: TaskService
     lateinit var mockenv: Environment
@@ -45,15 +44,16 @@ class LeesahServiceTest {
     @Test
     fun `Skal opprette VurderLivshendelseTask for dødsfallhendelse`() {
         val hendelseId = UUID.randomUUID().toString()
-        val pdlHendelse = PdlHendelse(
-            offset = Random.nextUInt().toLong(),
-            gjeldendeAktørId = "1234567890123",
-            hendelseId = hendelseId,
-            personIdenter = listOf("12345678901", "1234567890123"),
-            endringstype = LeesahService.OPPRETTET,
-            opplysningstype = LeesahService.OPPLYSNINGSTYPE_DØDSFALL,
-            dødsdato = LocalDate.now(),
-        )
+        val pdlHendelse =
+            PdlHendelse(
+                offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = "1234567890123",
+                hendelseId = hendelseId,
+                personIdenter = listOf("12345678901", "1234567890123"),
+                endringstype = LeesahService.OPPRETTET,
+                opplysningstype = LeesahService.OPPLYSNINGSTYPE_DØDSFALL,
+                dødsdato = LocalDate.now(),
+            )
 
         service.prosesserNyHendelse(pdlHendelse)
 
@@ -73,15 +73,16 @@ class LeesahServiceTest {
     @Test
     fun `Skal opprette VurderLivshendelseTask for utflyttingshendelse`() {
         val hendelseId = UUID.randomUUID().toString()
-        val pdlHendelse = PdlHendelse(
-            offset = Random.nextUInt().toLong(),
-            gjeldendeAktørId = "1234567890123",
-            hendelseId = hendelseId,
-            personIdenter = listOf("12345678901", "1234567890123"),
-            endringstype = LeesahService.OPPRETTET,
-            opplysningstype = LeesahService.OPPLYSNINGSTYPE_UTFLYTTING,
-            utflyttingsdato = LocalDate.now(),
-        )
+        val pdlHendelse =
+            PdlHendelse(
+                offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = "1234567890123",
+                hendelseId = hendelseId,
+                personIdenter = listOf("12345678901", "1234567890123"),
+                endringstype = LeesahService.OPPRETTET,
+                opplysningstype = LeesahService.OPPLYSNINGSTYPE_UTFLYTTING,
+                utflyttingsdato = LocalDate.now(),
+            )
 
         service.prosesserNyHendelse(pdlHendelse)
 
@@ -101,16 +102,17 @@ class LeesahServiceTest {
     @Test
     fun `Skal opprette VurderLivshendelseTask for sivilstandhendelse GIFT`() {
         val hendelseId = UUID.randomUUID().toString()
-        val pdlHendelse = PdlHendelse(
-            offset = Random.nextUInt().toLong(),
-            gjeldendeAktørId = "1234567890123",
-            hendelseId = hendelseId,
-            personIdenter = listOf("12345678901", "1234567890123"),
-            endringstype = LeesahService.OPPRETTET,
-            opplysningstype = LeesahService.OPPLYSNINGSTYPE_SIVILSTAND,
-            sivilstand = "GIFT",
-            sivilstandDato = LocalDate.of(2022, 2, 22),
-        )
+        val pdlHendelse =
+            PdlHendelse(
+                offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = "1234567890123",
+                hendelseId = hendelseId,
+                personIdenter = listOf("12345678901", "1234567890123"),
+                endringstype = LeesahService.OPPRETTET,
+                opplysningstype = LeesahService.OPPLYSNINGSTYPE_SIVILSTAND,
+                sivilstand = "GIFT",
+                sivilstandDato = LocalDate.of(2022, 2, 22),
+            )
 
         service.prosesserNyHendelse(pdlHendelse)
         service.prosesserNyHendelse(pdlHendelse.copy(sivilstand = "UOPPGITT"))
@@ -132,16 +134,17 @@ class LeesahServiceTest {
     @Test
     fun `Skal opprette MottaFødselshendelseTask med fnr på payload`() {
         val hendelseId = UUID.randomUUID().toString()
-        val pdlHendelse = PdlHendelse(
-            offset = Random.nextUInt().toLong(),
-            gjeldendeAktørId = "1234567890123",
-            hendelseId = hendelseId,
-            personIdenter = listOf("12345678901", "1234567890123"),
-            endringstype = LeesahService.OPPRETTET,
-            opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
-            fødselsdato = LocalDate.now(),
-            fødeland = "NOR",
-        )
+        val pdlHendelse =
+            PdlHendelse(
+                offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = "1234567890123",
+                hendelseId = hendelseId,
+                personIdenter = listOf("12345678901", "1234567890123"),
+                endringstype = LeesahService.OPPRETTET,
+                opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
+                fødselsdato = LocalDate.now(),
+                fødeland = "NOR",
+            )
 
         service.prosesserNyHendelse(pdlHendelse)
 
@@ -162,16 +165,17 @@ class LeesahServiceTest {
     @Test
     fun `Skal ignorere fødselshendelser utenfor norge`() {
         val hendelseId = UUID.randomUUID().toString()
-        val pdlHendelse = PdlHendelse(
-            offset = Random.nextUInt().toLong(),
-            gjeldendeAktørId = "1234567890123",
-            hendelseId = hendelseId,
-            personIdenter = listOf("12345678901", "1234567890123"),
-            endringstype = LeesahService.OPPRETTET,
-            opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
-            fødselsdato = LocalDate.now(),
-            fødeland = "POL",
-        )
+        val pdlHendelse =
+            PdlHendelse(
+                offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = "1234567890123",
+                hendelseId = hendelseId,
+                personIdenter = listOf("12345678901", "1234567890123"),
+                endringstype = LeesahService.OPPRETTET,
+                opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
+                fødselsdato = LocalDate.now(),
+                fødeland = "POL",
+            )
 
         service.prosesserNyHendelse(pdlHendelse)
 
@@ -189,17 +193,18 @@ class LeesahServiceTest {
     @Test
     fun `Skal opprette MottaAnnullerFødselTask når endringstype er ANNULLERT`() {
         val hendelseId = UUID.randomUUID().toString()
-        val pdlHendelse = PdlHendelse(
-            offset = Random.nextUInt().toLong(),
-            gjeldendeAktørId = "1234567890123",
-            hendelseId = hendelseId,
-            personIdenter = listOf("12345678901", "1234567890123"),
-            endringstype = LeesahService.ANNULLERT,
-            opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
-            fødselsdato = LocalDate.now(),
-            fødeland = "NOR",
-            tidligereHendelseId = "unknown",
-        )
+        val pdlHendelse =
+            PdlHendelse(
+                offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = "1234567890123",
+                hendelseId = hendelseId,
+                personIdenter = listOf("12345678901", "1234567890123"),
+                endringstype = LeesahService.ANNULLERT,
+                opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
+                fødselsdato = LocalDate.now(),
+                fødeland = "NOR",
+                tidligereHendelseId = "unknown",
+            )
 
         service.prosesserNyHendelse(pdlHendelse)
 

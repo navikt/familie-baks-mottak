@@ -17,10 +17,9 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
+import java.util.Properties
 
-@Service
-class KontantstøtteSøknadService(
+@Service class KontantstøtteSøknadService(
     private val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
     private val kontantstøtteVedleggRepository: KontantstøtteVedleggRepository,
     private val taskService: TaskService,
@@ -29,21 +28,22 @@ class KontantstøtteSøknadService(
     @Transactional
     @Throws(FødselsnummerErNullException::class)
     fun mottaKontantstøtteSøknad(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad): DBKontantstøtteSøknad {
-        val (dbKontantstøtteSøknad, dokumentasjon) = when (versjonertKontantstøtteSøknad) {
-            is KontantstøtteSøknadV3 -> {
-                Pair(
-                    versjonertKontantstøtteSøknad.kontantstøtteSøknad.tilDBKontantstøtteSøknad(),
-                    versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon,
-                )
-            }
+        val (dbKontantstøtteSøknad, dokumentasjon) =
+            when (versjonertKontantstøtteSøknad) {
+                is KontantstøtteSøknadV3 -> {
+                    Pair(
+                        versjonertKontantstøtteSøknad.kontantstøtteSøknad.tilDBKontantstøtteSøknad(),
+                        versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon,
+                    )
+                }
 
-            is KontantstøtteSøknadV4 -> {
-                Pair(
-                    versjonertKontantstøtteSøknad.kontantstøtteSøknad.tilDBKontantstøtteSøknad(),
-                    versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon,
-                )
+                is KontantstøtteSøknadV4 -> {
+                    Pair(
+                        versjonertKontantstøtteSøknad.kontantstøtteSøknad.tilDBKontantstøtteSøknad(),
+                        versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon,
+                    )
+                }
             }
-        }
 
         lagreDBKontantstøtteSøknad(dbKontantstøtteSøknad)
 

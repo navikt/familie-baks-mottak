@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional
     matchIfMissing = true,
 )
 class JournalføringHendelseAivenConsumer(val journalhendelseService: JournalhendelseService) {
-
     val journalføringshendelseAivenConsumerFeilCounter: Counter = Metrics.counter("joark.hendelse.journalføring.feil")
 
     @KafkaListener(
@@ -31,7 +30,10 @@ class JournalføringHendelseAivenConsumer(val journalhendelseService: Journalhen
         idIsGroup = false,
     )
     @Transactional
-    fun listen(consumerRecord: ConsumerRecord<Long, JournalfoeringHendelseRecord>, ack: Acknowledgment) {
+    fun listen(
+        consumerRecord: ConsumerRecord<Long, JournalfoeringHendelseRecord>,
+        ack: Acknowledgment,
+    ) {
         try {
             journalhendelseService.prosesserNyHendelse(consumerRecord, ack)
         } catch (e: Exception) {

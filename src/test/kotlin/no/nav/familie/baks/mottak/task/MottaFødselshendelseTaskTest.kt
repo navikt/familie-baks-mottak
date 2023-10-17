@@ -51,7 +51,6 @@ import java.util.UUID
 @AutoConfigureWireMock(port = 28085)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MottaFødselshendelseTaskTest {
-
     @Autowired
     lateinit var taskService: TaskService
 
@@ -71,17 +70,19 @@ class MottaFødselshendelseTaskTest {
 
         mockResponseForPdlQuery(
             pdlRequestBody = gyldigRequest("hentperson-med-relasjoner.graphql", fnrBarn),
-            mockResponse = PdlHentPersonResponse(
-                data = PdlPerson(lagTestPdlPerson()),
-                errors = emptyList(),
-                extensions = null,
-            ),
+            mockResponse =
+                PdlHentPersonResponse(
+                    data = PdlPerson(lagTestPdlPerson()),
+                    errors = emptyList(),
+                    extensions = null,
+                ),
         )
 
         mottaFødselshendelseTask.doTask(Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn))
 
-        val taskerMedCallId = taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
-            .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
+        val taskerMedCallId =
+            taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
+                .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).hasSize(1).extracting("type").containsOnly(SendTilSakTask.TASK_STEP_TYPE)
         assertThat(objectMapper.readValue(taskerMedCallId.first().payload, NyBehandling::class.java))
@@ -96,26 +97,30 @@ class MottaFødselshendelseTaskTest {
 
         mockResponseForPdlQuery(
             pdlRequestBody = gyldigRequest("hentperson-med-relasjoner.graphql", fnrBarn),
-            mockResponse = PdlHentPersonResponse(
-                data = PdlPerson(
-                    lagTestPdlPerson().copy(
-                        bostedsadresse = emptyList(),
-                        adressebeskyttelse = listOf(
-                            Adressebeskyttelse(
-                                Adressebeskyttelsesgradering.STRENGT_FORTROLIG,
+            mockResponse =
+                PdlHentPersonResponse(
+                    data =
+                        PdlPerson(
+                            lagTestPdlPerson().copy(
+                                bostedsadresse = emptyList(),
+                                adressebeskyttelse =
+                                    listOf(
+                                        Adressebeskyttelse(
+                                            Adressebeskyttelsesgradering.STRENGT_FORTROLIG,
+                                        ),
+                                    ),
                             ),
                         ),
-                    ),
+                    errors = emptyList(),
+                    extensions = null,
                 ),
-                errors = emptyList(),
-                extensions = null,
-            ),
         )
 
         mottaFødselshendelseTask.doTask(Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
 
-        val taskerMedCallId = taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
-            .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
+        val taskerMedCallId =
+            taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
+                .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).hasSize(1).extracting("type").containsOnly(SendTilSakTask.TASK_STEP_TYPE)
         assertThat(objectMapper.readValue(taskerMedCallId.first().payload, NyBehandling::class.java))
@@ -131,8 +136,9 @@ class MottaFødselshendelseTaskTest {
 
         mottaFødselshendelseTask.doTask(task)
 
-        val taskerMedCallId = taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
-            .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
+        val taskerMedCallId =
+            taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
+                .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).isEmpty()
         assertThat(mottaFødselshendelseTask.barnHarDnrCounter.count()).isGreaterThan(barnHarDnrCountFørTest)
@@ -146,28 +152,32 @@ class MottaFødselshendelseTaskTest {
 
         mockResponseForPdlQuery(
             pdlRequestBody = gyldigRequest("hentperson-med-relasjoner.graphql", fnrBarn),
-            mockResponse = PdlHentPersonResponse(
-                data = PdlPerson(
-                    lagTestPdlPerson().copy(
-                        forelderBarnRelasjon = listOf(
-                            PdlForeldreBarnRelasjon(
-                                "40107678901",
-                                FORELDERBARNRELASJONROLLE.MOR,
+            mockResponse =
+                PdlHentPersonResponse(
+                    data =
+                        PdlPerson(
+                            lagTestPdlPerson().copy(
+                                forelderBarnRelasjon =
+                                    listOf(
+                                        PdlForeldreBarnRelasjon(
+                                            "40107678901",
+                                            FORELDERBARNRELASJONROLLE.MOR,
+                                        ),
+                                    ),
                             ),
                         ),
-                    ),
+                    errors = emptyList(),
+                    extensions = null,
                 ),
-                errors = emptyList(),
-                extensions = null,
-            ),
         )
 
         val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn)
 
         mottaFødselshendelseTask.doTask(task)
 
-        val taskerMedCallId = taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
-            .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
+        val taskerMedCallId =
+            taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
+                .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).isEmpty()
         assertThat(mottaFødselshendelseTask.forsørgerHarDnrCounter.count()).isGreaterThan(forsørgerHarDnrCountFørTest)
@@ -180,29 +190,32 @@ class MottaFødselshendelseTaskTest {
 
         mockResponseForPdlQuery(
             pdlRequestBody = gyldigRequest("hentperson-med-relasjoner.graphql", fnrBarn),
-            mockResponse = PdlHentPersonResponse(
-                data = PdlPerson(
-                    lagTestPdlPerson().copy(
-                        forelderBarnRelasjon =
-                        listOf(
-                            PdlForeldreBarnRelasjon(
-                                "20107678901",
-                                FORELDERBARNRELASJONROLLE.FAR,
+            mockResponse =
+                PdlHentPersonResponse(
+                    data =
+                        PdlPerson(
+                            lagTestPdlPerson().copy(
+                                forelderBarnRelasjon =
+                                    listOf(
+                                        PdlForeldreBarnRelasjon(
+                                            "20107678901",
+                                            FORELDERBARNRELASJONROLLE.FAR,
+                                        ),
+                                    ),
                             ),
                         ),
-                    ),
+                    errors = emptyList(),
+                    extensions = null,
                 ),
-                errors = emptyList(),
-                extensions = null,
-            ),
         )
 
         val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn)
 
         mottaFødselshendelseTask.doTask(task)
 
-        val taskerMedCallId = taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
-            .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
+        val taskerMedCallId =
+            taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
+                .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).isEmpty()
     }
@@ -215,19 +228,21 @@ class MottaFødselshendelseTaskTest {
 
         mockResponseForPdlQuery(
             pdlRequestBody = gyldigRequest("hentperson-med-relasjoner.graphql", fnrBarn),
-            mockResponse = PdlHentPersonResponse(
-                data = PdlPerson(lagTestPdlPerson().copy(bostedsadresse = emptyList())),
-                errors = emptyList(),
-                extensions = null,
-            ),
+            mockResponse =
+                PdlHentPersonResponse(
+                    data = PdlPerson(lagTestPdlPerson().copy(bostedsadresse = emptyList())),
+                    errors = emptyList(),
+                    extensions = null,
+                ),
         )
 
         val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn)
 
         mottaFødselshendelseTask.doTask(task)
 
-        val taskerMedCallId = taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
-            .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
+        val taskerMedCallId =
+            taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
+                .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).isEmpty()
         assertThat(mottaFødselshendelseTask.barnetManglerBostedsadresse.count()).isGreaterThan(barnetManglerBostedsadresseCountFørTest)
@@ -239,20 +254,23 @@ class MottaFødselshendelseTaskTest {
 
         mockResponseForPdlQuery(
             pdlRequestBody = gyldigRequest("hentperson-med-relasjoner.graphql", "02091901252"),
-            mockResponse = PdlHentPersonResponse(
-                data = PdlPerson(
-                    lagTestPdlPerson().copy(
-                        forelderBarnRelasjon = listOf(
-                            PdlForeldreBarnRelasjon(
-                                "40107678901",
-                                FORELDERBARNRELASJONROLLE.MOR,
+            mockResponse =
+                PdlHentPersonResponse(
+                    data =
+                        PdlPerson(
+                            lagTestPdlPerson().copy(
+                                forelderBarnRelasjon =
+                                    listOf(
+                                        PdlForeldreBarnRelasjon(
+                                            "40107678901",
+                                            FORELDERBARNRELASJONROLLE.MOR,
+                                        ),
+                                    ),
                             ),
                         ),
-                    ),
+                    errors = listOf(PdlError("Feilmelding", null)),
+                    extensions = null,
                 ),
-                errors = listOf(PdlError("Feilmelding", null)),
-                extensions = null,
-            ),
         )
 
         val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = "02091901252")
@@ -263,19 +281,22 @@ class MottaFødselshendelseTaskTest {
 
     private fun lagTestPdlPerson(): PdlPersonData {
         return PdlPersonData(
-            forelderBarnRelasjon = listOf(
-                PdlForeldreBarnRelasjon(
-                    "20107678901",
-                    FORELDERBARNRELASJONROLLE.MOR,
+            forelderBarnRelasjon =
+                listOf(
+                    PdlForeldreBarnRelasjon(
+                        "20107678901",
+                        FORELDERBARNRELASJONROLLE.MOR,
+                    ),
                 ),
-            ),
             bostedsadresse = listOf(Bostedsadresse(matrikkeladresse = Matrikkeladresse(1, "1", null, "0576", "3000"))),
         )
     }
 
     companion object {
-
-        private fun mockResponseForPdlQuery(pdlRequestBody: String, mockResponse: PdlHentPersonResponse) {
+        private fun mockResponseForPdlQuery(
+            pdlRequestBody: String,
+            mockResponse: PdlHentPersonResponse,
+        ) {
             stubFor(
                 post(urlEqualTo("/api/graphql"))
                     .withRequestBody(WireMock.equalToJson(pdlRequestBody))
@@ -287,7 +308,10 @@ class MottaFødselshendelseTaskTest {
             )
         }
 
-        private fun gyldigRequest(queryFilnavn: String, ident: String): String {
+        private fun gyldigRequest(
+            queryFilnavn: String,
+            ident: String,
+        ): String {
             return "{\"variables\":{\"ident\":\"$ident\"},\"query\":\"${readfile(queryFilnavn).graphqlCompatible()}\"}"
         }
 

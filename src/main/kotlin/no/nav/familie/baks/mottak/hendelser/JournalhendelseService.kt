@@ -32,7 +32,6 @@ class JournalhendelseService(
     val taskService: TaskService,
     val hendelsesloggRepository: HendelsesloggRepository,
 ) {
-
     val barnetrygdKanalCounter = mutableMapOf<String, Counter>()
     val kontantstøtteKanalCounter = mutableMapOf<String, Counter>()
     val skannetOrdinærBarnetrygdSøknadCounter: Counter =
@@ -181,10 +180,11 @@ class JournalhendelseService(
         GYLDIGE_JOURNALPOST_TEMAER.contains(journalpost.tema) && journalpost.journalposttype == Journalposttype.I
 
     private fun opprettJournalhendelseRutingTask(journalpost: Journalpost) {
-        val taskType = when (journalpost.tema) {
-            Tema.BAR.name -> JournalhendelseRutingTask.TASK_STEP_TYPE
-            else -> JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE
-        }
+        val taskType =
+            when (journalpost.tema) {
+                Tema.BAR.name -> JournalhendelseRutingTask.TASK_STEP_TYPE
+                else -> JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE
+            }
         Task(
             type = taskType,
             payload = journalpost.kanal!!,
@@ -207,7 +207,6 @@ class JournalhendelseService(
     }
 
     companion object {
-
         private val GYLDIGE_HENDELSE_TYPER = arrayOf("JournalpostMottatt", "TemaEndret")
         private val GYLDIGE_JOURNALPOST_TEMAER = listOf(Tema.BAR.name, Tema.KON.name)
         private val CONSUMER_JOURNAL = HendelseConsumer.JOURNAL_AIVEN

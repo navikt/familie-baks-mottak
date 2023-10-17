@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service
 @Service
 @TaskStepBeskrivelse(taskStepType = SendTilSakTask.TASK_STEP_TYPE, beskrivelse = "Send til sak")
 class SendTilSakTask(private val sakClient: SakClient) : AsyncTaskStep {
-
     val logger: Logger = LoggerFactory.getLogger(SendTilSakTask::class.java)
 
     override fun doTask(task: Task) {

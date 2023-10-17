@@ -45,7 +45,6 @@ import org.springframework.kafka.support.Acknowledgment
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class JournalføringHendelseServiceTest {
-
     @MockK
     lateinit var mockJournalpostClient: JournalpostClient
 
@@ -81,82 +80,87 @@ class JournalføringHendelseServiceTest {
         // Inngående papirsøknad, Mottatt
         every {
             mockJournalpostClient.hentJournalpost(JOURNALPOST_PAPIRSØKNAD)
-        } returns Journalpost(
-            journalpostId = JOURNALPOST_PAPIRSØKNAD,
-            journalposttype = Journalposttype.I,
-            journalstatus = Journalstatus.MOTTATT,
-            bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-            tema = "BAR",
-            kanal = "SKAN_NETS",
-            behandlingstema = null,
-            dokumenter = null,
-            journalforendeEnhet = null,
-            sak = null,
-        )
+        } returns
+            Journalpost(
+                journalpostId = JOURNALPOST_PAPIRSØKNAD,
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+                tema = "BAR",
+                kanal = "SKAN_NETS",
+                behandlingstema = null,
+                dokumenter = null,
+                journalforendeEnhet = null,
+                sak = null,
+            )
 
         // Inngående digital, Mottatt
         every {
             mockJournalpostClient.hentJournalpost(JOURNALPOST_DIGITALSØKNAD)
-        } returns Journalpost(
-            journalpostId = JOURNALPOST_DIGITALSØKNAD,
-            journalposttype = Journalposttype.I,
-            journalstatus = Journalstatus.MOTTATT,
-            bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-            tema = "BAR",
-            kanal = "NAV_NO",
-            behandlingstema = null,
-            dokumenter = null,
-            journalforendeEnhet = null,
-            sak = null,
-        )
+        } returns
+            Journalpost(
+                journalpostId = JOURNALPOST_DIGITALSØKNAD,
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+                tema = "BAR",
+                kanal = "NAV_NO",
+                behandlingstema = null,
+                dokumenter = null,
+                journalforendeEnhet = null,
+                sak = null,
+            )
 
         // Utgående digital, Mottatt
         every {
             mockJournalpostClient.hentJournalpost(JOURNALPOST_UTGÅENDE_DOKUMENT)
-        } returns Journalpost(
-            journalpostId = JOURNALPOST_UTGÅENDE_DOKUMENT,
-            journalposttype = Journalposttype.U,
-            journalstatus = Journalstatus.MOTTATT,
-            bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-            tema = "BAR",
-            kanal = "SKAN_NETS",
-            behandlingstema = null,
-            dokumenter = null,
-            journalforendeEnhet = null,
-            sak = null,
-        )
+        } returns
+            Journalpost(
+                journalpostId = JOURNALPOST_UTGÅENDE_DOKUMENT,
+                journalposttype = Journalposttype.U,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+                tema = "BAR",
+                kanal = "SKAN_NETS",
+                behandlingstema = null,
+                dokumenter = null,
+                journalforendeEnhet = null,
+                sak = null,
+            )
 
         // Ikke barnetrygd
         every {
             mockJournalpostClient.hentJournalpost(JOURNALPOST_IKKE_BARNETRYGD)
-        } returns Journalpost(
-            journalpostId = JOURNALPOST_IKKE_BARNETRYGD,
-            journalposttype = Journalposttype.U,
-            journalstatus = Journalstatus.MOTTATT,
-            bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-            tema = "FOR",
-            kanal = "NAV_NO",
-            behandlingstema = null,
-            dokumenter = null,
-            journalforendeEnhet = null,
-            sak = null,
-        )
+        } returns
+            Journalpost(
+                journalpostId = JOURNALPOST_IKKE_BARNETRYGD,
+                journalposttype = Journalposttype.U,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+                tema = "FOR",
+                kanal = "NAV_NO",
+                behandlingstema = null,
+                dokumenter = null,
+                journalforendeEnhet = null,
+                sak = null,
+            )
 
         // ferdigstilt journalpost
         every {
             mockJournalpostClient.hentJournalpost(JOURNALPOST_FERDIGSTILT)
-        } returns Journalpost(
-            journalpostId = JOURNALPOST_FERDIGSTILT,
-            journalposttype = Journalposttype.U,
-            journalstatus = Journalstatus.FERDIGSTILT,
-            bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-            tema = "BAR",
-            kanal = "NAV_NO",
-            behandlingstema = null,
-            dokumenter = null,
-            journalforendeEnhet = null,
-            sak = null,
-        )
+        } returns
+            Journalpost(
+                journalpostId = JOURNALPOST_FERDIGSTILT,
+                journalposttype = Journalposttype.U,
+                journalstatus = Journalstatus.FERDIGSTILT,
+                bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+                tema = "BAR",
+                kanal = "NAV_NO",
+                behandlingstema = null,
+                dokumenter = null,
+                journalforendeEnhet = null,
+                sak = null,
+            )
 
         every { mockTaskService.save(any()) } returns Task("dummy", "payload")
     }
@@ -250,10 +254,11 @@ class JournalføringHendelseServiceTest {
             infotrygdBarnetrygdClient.hentSaker(any(), any())
         } returns InfotrygdSøkResponse(emptyList(), emptyList())
 
-        val task = OpprettJournalføringOppgaveTask(
-            mockJournalpostClient,
-            mockOppgaveClient,
-        )
+        val task =
+            OpprettJournalføringOppgaveTask(
+                mockJournalpostClient,
+                mockOppgaveClient,
+            )
 
         task.doTask(
             Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "oppgavebeskrivelse").apply {
@@ -275,10 +280,11 @@ class JournalføringHendelseServiceTest {
             mockOppgaveClient.finnOppgaver(JOURNALPOST_PAPIRSØKNAD, Oppgavetype.Fordeling)
         } returns listOf(Oppgave(123))
 
-        val task = OpprettJournalføringOppgaveTask(
-            mockJournalpostClient,
-            mockOppgaveClient,
-        )
+        val task =
+            OpprettJournalføringOppgaveTask(
+                mockJournalpostClient,
+                mockOppgaveClient,
+            )
         task.doTask(
             Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = JOURNALPOST_UTGÅENDE_DOKUMENT).apply {
                 this.metadata["journalpostId"] = JOURNALPOST_UTGÅENDE_DOKUMENT
@@ -297,10 +303,11 @@ class JournalføringHendelseServiceTest {
 
     @Test
     fun `Kaster exception dersom journalstatus annet enn MOTTATT`() {
-        val task = OpprettJournalføringOppgaveTask(
-            mockJournalpostClient,
-            mockOppgaveClient,
-        )
+        val task =
+            OpprettJournalføringOppgaveTask(
+                mockJournalpostClient,
+                mockOppgaveClient,
+            )
 
         Assertions.assertThrows(IllegalStateException::class.java) {
             task.doTask(
@@ -313,13 +320,14 @@ class JournalføringHendelseServiceTest {
 
     @Test
     fun `Skal ignorere hendelse fordi den eksisterer i hendelseslogg`() {
-        val consumerRecord = ConsumerRecord(
-            "topic",
-            1,
-            OFFSET,
-            42L,
-            opprettRecord(JOURNALPOST_PAPIRSØKNAD),
-        )
+        val consumerRecord =
+            ConsumerRecord(
+                "topic",
+                1,
+                OFFSET,
+                42L,
+                opprettRecord(JOURNALPOST_PAPIRSØKNAD),
+            )
         every {
             mockHendelsesloggRepository.existsByHendelseIdAndConsumer("hendelseId", HendelseConsumer.JOURNAL_AIVEN)
         } returns true
@@ -335,13 +343,14 @@ class JournalføringHendelseServiceTest {
 
     @Test
     fun `Mottak av gyldig hendelse skal delegeres til service`() {
-        val consumerRecord = ConsumerRecord(
-            "topic",
-            1,
-            OFFSET,
-            42L,
-            opprettRecord(JOURNALPOST_PAPIRSØKNAD),
-        )
+        val consumerRecord =
+            ConsumerRecord(
+                "topic",
+                1,
+                OFFSET,
+                42L,
+                opprettRecord(JOURNALPOST_PAPIRSØKNAD),
+            )
 
         service.prosesserNyHendelse(consumerRecord, ack)
 
@@ -364,13 +373,14 @@ class JournalføringHendelseServiceTest {
     fun `Ikke gyldige hendelsetyper skal ignoreres`() {
         val ugyldigHendelsetypeRecord =
             opprettRecord(journalpostId = JOURNALPOST_PAPIRSØKNAD, hendelseType = "UgyldigType", temaNytt = "BAR")
-        val consumerRecord = ConsumerRecord(
-            "topic",
-            1,
-            OFFSET,
-            42L,
-            ugyldigHendelsetypeRecord,
-        )
+        val consumerRecord =
+            ConsumerRecord(
+                "topic",
+                1,
+                OFFSET,
+                42L,
+                ugyldigHendelsetypeRecord,
+            )
 
         service.prosesserNyHendelse(consumerRecord, ack)
 
@@ -384,13 +394,14 @@ class JournalføringHendelseServiceTest {
     fun `Hendelser hvor journalpost ikke har tema for Barnetrygd skal ignoreres`() {
         val ukjentTemaRecord = opprettRecord(journalpostId = JOURNALPOST_PAPIRSØKNAD, temaNytt = "UKJ")
 
-        val consumerRecord = ConsumerRecord(
-            "topic",
-            1,
-            OFFSET,
-            42L,
-            ukjentTemaRecord,
-        )
+        val consumerRecord =
+            ConsumerRecord(
+                "topic",
+                1,
+                OFFSET,
+                42L,
+                ukjentTemaRecord,
+            )
 
         service.prosesserNyHendelse(consumerRecord, ack)
 

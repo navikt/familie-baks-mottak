@@ -10,7 +10,8 @@ import org.springframework.context.annotation.Import
 class DevLauncher
 
 fun main(args: Array<String>) {
-    val app = SpringApplicationBuilder(DevLauncher::class.java)
-        .profiles("dev")
+    val app =
+        SpringApplicationBuilder(DevLauncher::class.java)
+            .profiles("dev")
     app.run(*args)
 }

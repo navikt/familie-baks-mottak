@@ -17,7 +17,6 @@ import java.time.LocalDateTime
 @Component
 @Profile("!prod")
 class FjernGamleFeiledeTasksIPreprod(val taskService: TaskService) {
-
     @Scheduled(cron = "0 0 10 * * *")
     @Transactional
     fun fjernGamleFeiledeTasksIPreprod() {
@@ -41,7 +40,6 @@ class FjernGamleFeiledeTasksIPreprod(val taskService: TaskService) {
     }
 
     companion object {
-
         val LOG = LoggerFactory.getLogger(FjernGamleFeiledeTasksIPreprod::class.java)
     }
 }

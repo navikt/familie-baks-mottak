@@ -15,20 +15,24 @@ import no.nav.familie.kontrakter.felles.objectMapper as getObjectMapper
 
 @Service
 class SøknadSpråkvelgerService {
-
-    fun konverterBarnetrygdSøknadTilMapForSpråk(versjonertSøknad: VersjonertSøknad, språk: String): Map<String, Any> {
+    fun konverterBarnetrygdSøknadTilMapForSpråk(
+        versjonertSøknad: VersjonertSøknad,
+        språk: String,
+    ): Map<String, Any> {
         val objectMapperForSpråk = hentObjectMapperForSpråk(språk)
 
-        val barnetrygdSøknadMapForSpråk = objectMapperForSpråk.convertValue<MutableMap<String, Any>>(
+        val barnetrygdSøknadMapForSpråk =
+            objectMapperForSpråk.convertValue<MutableMap<String, Any>>(
+                when (versjonertSøknad) {
+                    is SøknadV7 -> versjonertSøknad.søknad
+                    is SøknadV8 -> versjonertSøknad.søknad
+                },
+            )
+        barnetrygdSøknadMapForSpråk["teksterUtenomSpørsmål"] =
             when (versjonertSøknad) {
-                is SøknadV7 -> versjonertSøknad.søknad
-                is SøknadV8 -> versjonertSøknad.søknad
-            },
-        )
-        barnetrygdSøknadMapForSpråk["teksterUtenomSpørsmål"] = when (versjonertSøknad) {
-            is SøknadV7 -> versjonertSøknad.søknad.teksterUtenomSpørsmål
-            is SøknadV8 -> versjonertSøknad.søknad.teksterUtenomSpørsmål
-        }.mapValues { it.value[språk] }
+                is SøknadV7 -> versjonertSøknad.søknad.teksterUtenomSpørsmål
+                is SøknadV8 -> versjonertSøknad.søknad.teksterUtenomSpørsmål
+            }.mapValues { it.value[språk] }
 
         return barnetrygdSøknadMapForSpråk
     }
@@ -39,12 +43,13 @@ class SøknadSpråkvelgerService {
     ): Map<String, Any> {
         val objectMapperForSpråk = hentObjectMapperForSpråk(språk)
 
-        val kontantstøtteSøknadMapForSpråk = objectMapperForSpråk.convertValue<MutableMap<String, Any>>(
-            when (versjonertSøknad) {
-                is KontantstøtteSøknadV3 -> versjonertSøknad.kontantstøtteSøknad
-                is KontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad
-            },
-        )
+        val kontantstøtteSøknadMapForSpråk =
+            objectMapperForSpråk.convertValue<MutableMap<String, Any>>(
+                when (versjonertSøknad) {
+                    is KontantstøtteSøknadV3 -> versjonertSøknad.kontantstøtteSøknad
+                    is KontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad
+                },
+            )
         return kontantstøtteSøknadMapForSpråk
     }
 

@@ -20,14 +20,16 @@ class EnsligForsørgerHendelseService(
     val pdlClient: PdlClient,
     val hendelsesloggRepository: HendelsesloggRepository,
 ) {
-
     val ensligForsørgerVedtakhendelseOvergangstønadCounter: Counter =
         Metrics.counter("ef.hendelse.vedtak", "type", "overgangstønad")
     val ensligForsørgerVedtakhendelseAnnetCounter: Counter = Metrics.counter("ef.hendelse.vedtak", "type", "annet")
     val ensligForsørgerInfotrygdVedtakhendelseOvergangstønadCounter: Counter =
         Metrics.counter("ef.hendelse.infotrygd.vedtak", "type", "overgangstønad")
 
-    fun prosesserEfVedtakHendelse(offset: Long, ensligForsørgerVedtakhendelse: EnsligForsørgerVedtakhendelse) {
+    fun prosesserEfVedtakHendelse(
+        offset: Long,
+        ensligForsørgerVedtakhendelse: EnsligForsørgerVedtakhendelse,
+    ) {
         when (ensligForsørgerVedtakhendelse.stønadType) {
             StønadType.OVERGANGSSTØNAD -> {
                 if (!hendelsesloggRepository.existsByHendelseIdAndConsumer(
@@ -61,7 +63,10 @@ class EnsligForsørgerHendelseService(
         }
     }
 
-    fun prosesserEfInfotrygdHendelse(offset: Long, hendelse: InfotrygdHendelse) {
+    fun prosesserEfInfotrygdHendelse(
+        offset: Long,
+        hendelse: InfotrygdHendelse,
+    ) {
         if (hendelse.typeYtelse.trim() != "EF") {
             logger.info("Ignorerer infotrygdhendelse for hendelseId=${hendelse.hendelseId} fordi ytelsen ikke er EF")
             return
@@ -96,7 +101,6 @@ class EnsligForsørgerHendelseService(
     }
 
     companion object {
-
         private val logger: Logger = LoggerFactory.getLogger(EnsligForsørgerHendelseService::class.java)
         private val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
     }

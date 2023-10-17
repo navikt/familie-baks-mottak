@@ -29,7 +29,6 @@ class JournalhendelseKontantstøtteRutingTask(
     private val taskService: TaskService,
     private val environment: Environment,
 ) : AsyncTaskStep {
-
     val log: Logger = LoggerFactory.getLogger(JournalhendelseKontantstøtteRutingTask::class.java)
     val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
 
@@ -40,17 +39,18 @@ class JournalhendelseKontantstøtteRutingTask(
 
             val harLøpendeSakIInfotrygd = brukersIdent?.run { søkEtterSakIInfotrygd(this) } ?: false
 
-            val sakssystemMarkering = when {
-                harLøpendeSakIInfotrygd -> {
-                    incrementSakssystemMarkering("Infotrygd")
-                    "Et eller flere av barna har løpende sak i Infotrygd"
-                }
+            val sakssystemMarkering =
+                when {
+                    harLøpendeSakIInfotrygd -> {
+                        incrementSakssystemMarkering("Infotrygd")
+                        "Et eller flere av barna har løpende sak i Infotrygd"
+                    }
 
-                else -> {
-                    incrementSakssystemMarkering("Ingen")
-                    ""
+                    else -> {
+                        incrementSakssystemMarkering("Ingen")
+                        ""
+                    }
                 }
-            }
 
             Task(
                 type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
@@ -69,13 +69,15 @@ class JournalhendelseKontantstøtteRutingTask(
     }
 
     private fun søkEtterSakIInfotrygd(brukersIdent: String): Boolean {
-        val barnasIdenter = pdlClient.hentPersonMedRelasjoner(brukersIdent, Tema.KON).forelderBarnRelasjoner
-            .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
-            .map { it.relatertPersonsIdent }
-            .filterNotNull()
-        val alleBarnasIdenter = barnasIdenter.flatMap { pdlClient.hentIdenter(it, Tema.KON) }
-            .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
-            .map { it.ident }
+        val barnasIdenter =
+            pdlClient.hentPersonMedRelasjoner(brukersIdent, Tema.KON).forelderBarnRelasjoner
+                .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
+                .map { it.relatertPersonsIdent }
+                .filterNotNull()
+        val alleBarnasIdenter =
+            barnasIdenter.flatMap { pdlClient.hentIdenter(it, Tema.KON) }
+                .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
+                .map { it.ident }
 
         return if (infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(alleBarnasIdenter)) {
             infotrygdKontantstøtteClient.hentPerioderMedKontantstøtteIInfotrygd(alleBarnasIdenter).data.harPågåendeSak()

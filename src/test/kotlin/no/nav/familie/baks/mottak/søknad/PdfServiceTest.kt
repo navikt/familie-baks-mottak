@@ -19,7 +19,6 @@ import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadKontraktV8
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class PdfServiceTest {
-
     private val mockPdfClient: PdfClient = mockk<PdfClient>()
     private val søknadSpråkvelgerService: SøknadSpråkvelgerService = SøknadSpråkvelgerService()
 
@@ -34,8 +33,9 @@ internal class PdfServiceTest {
         mapper.registerKotlinModule()
         mapper.registerModule(JavaTimeModule())
 
-        val jsonString: String = File("./src/test/kotlin/no/nav/familie/baks/mottak/søknad/testdata/testdata1.json")
-            .readText(Charsets.UTF_8)
+        val jsonString: String =
+            File("./src/test/kotlin/no/nav/familie/baks/mottak/søknad/testdata/testdata1.json")
+                .readText(Charsets.UTF_8)
         val søknad: SøknadKontraktV8 = mapper.readValue(jsonString)
         val dbSøknad: DBSøknad = søknad.tilDBSøknad()
         pdfService.lagBarnetrygdPdf(SøknadV8(søknad = søknad), dbSøknad, språk = "nb")

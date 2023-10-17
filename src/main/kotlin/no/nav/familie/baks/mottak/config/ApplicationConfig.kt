@@ -40,7 +40,6 @@ import java.time.temporal.ChronoUnit
 @EnableOAuth2Client(cacheEnabled = true)
 @EnableRetry
 class ApplicationConfig {
-
     @Bean
     fun servletWebServerFactory(): ServletWebServerFactory {
         return JettyServletWebServerFactory()
@@ -86,11 +85,12 @@ class ApplicationConfig {
     fun prosesseringInfoProvider(
         @Value("\${prosessering.rolle}") prosesseringRolle: String,
     ) = object : ProsesseringInfoProvider {
-        override fun hentBrukernavn(): String = try {
-            SpringTokenValidationContextHolder().tokenValidationContext.getClaims("azuread").getStringClaim("preferred_username")
-        } catch (e: Exception) {
-            "VL"
-        }
+        override fun hentBrukernavn(): String =
+            try {
+                SpringTokenValidationContextHolder().tokenValidationContext.getClaims("azuread").getStringClaim("preferred_username")
+            } catch (e: Exception) {
+                "VL"
+            }
 
         override fun harTilgang(): Boolean = grupper().contains(prosesseringRolle)
 

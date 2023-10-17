@@ -27,11 +27,15 @@ class KontantstøtteSøknadController(
     private val kontantstøtteSøknadMetrikkService: KontantstøtteSøknadMetrikkService,
 ) {
     @PostMapping(value = ["/soknad/v3"], consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun taImotSøknad(@RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV3): ResponseEntity<Ressurs<Kvittering>> =
+    fun taImotSøknad(
+        @RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV3,
+    ): ResponseEntity<Ressurs<Kvittering>> =
         mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = KontantstøtteSøknadV3(kontantstøtteSøknad = søknad))
 
     @PostMapping(value = ["/soknad/v4"], consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun taImotSøknad(@RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV4): ResponseEntity<Ressurs<Kvittering>> =
+    fun taImotSøknad(
+        @RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV4,
+    ): ResponseEntity<Ressurs<Kvittering>> =
         mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = KontantstøtteSøknadV4(kontantstøtteSøknad = søknad))
 
     fun mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad): ResponseEntity<Ressurs<Kvittering>> {

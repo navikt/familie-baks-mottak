@@ -20,27 +20,30 @@ import org.slf4j.MDC
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MottaAnnullerFødselTaskTest {
-
     @Test
     fun `Skal endre status av Task med riktig type`() {
         val taskService = mockk<TaskService>()
         val restTaskService = mockk<RestTaskService>()
 
         MDC.put(MDCConstants.MDC_CALL_ID, "ooo")
-        val journalførSøknadTask = Task(type = JournalførSøknadTask.JOURNALFØR_SØKNAD, payload = "").copy(
-            id = 0,
-        )
-        val sendTilSakTask = Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "").copy(
-            id = 1,
-        )
-        val mottaFødselshendelseTask = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = "").copy(
-            id = 2,
-        )
-        every { taskService.finnTasksMedStatus(any(), any(), any()) } returns listOf(
-            journalførSøknadTask,
-            sendTilSakTask,
-            mottaFødselshendelseTask,
-        )
+        val journalførSøknadTask =
+            Task(type = JournalførSøknadTask.JOURNALFØR_SØKNAD, payload = "").copy(
+                id = 0,
+            )
+        val sendTilSakTask =
+            Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "").copy(
+                id = 1,
+            )
+        val mottaFødselshendelseTask =
+            Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = "").copy(
+                id = 2,
+            )
+        every { taskService.finnTasksMedStatus(any(), any(), any()) } returns
+            listOf(
+                journalførSøknadTask,
+                sendTilSakTask,
+                mottaFødselshendelseTask,
+            )
         every { taskService.findById(eq(0)) } returns journalførSøknadTask
         every { taskService.findById(eq(1)) } returns sendTilSakTask
         every { taskService.findById(eq(2)) } returns mottaFødselshendelseTask
@@ -65,18 +68,21 @@ class MottaAnnullerFødselTaskTest {
         val restTaskService = mockk<RestTaskService>()
 
         MDC.put(MDCConstants.MDC_CALL_ID, "xxx")
-        val task0 = Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "").copy(
-            id = 0,
-        )
+        val task0 =
+            Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "").copy(
+                id = 0,
+            )
         MDC.put(MDCConstants.MDC_CALL_ID, "ooo")
-        val task1 = Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "").copy(
-            id = 1,
-        )
+        val task1 =
+            Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "").copy(
+                id = 1,
+            )
 
-        every { taskService.finnTasksMedStatus(any(), any(), any()) } returns listOf(
-            task0,
-            task1,
-        )
+        every { taskService.finnTasksMedStatus(any(), any(), any()) } returns
+            listOf(
+                task0,
+                task1,
+            )
         every { taskService.findById(eq(0)) } returns task0
         every { taskService.findById(eq(1)) } returns task1
 

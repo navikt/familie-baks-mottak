@@ -29,7 +29,6 @@ data class DBSøknad(
     @Column(name = "journalpost_id")
     val journalpostId: String? = null,
 ) {
-
     private fun hentSøknadV7(): SøknadV7 {
         return objectMapper.readValue(søknadJson)
     }
@@ -99,7 +98,10 @@ fun SøknadV8.tilDBSøknad(): DBSøknad {
     }
 }
 
-fun Søknadsvedlegg.tilDBVedlegg(søknad: DBSøknad, data: ByteArray): DBVedlegg {
+fun Søknadsvedlegg.tilDBVedlegg(
+    søknad: DBSøknad,
+    data: ByteArray,
+): DBVedlegg {
     return DBVedlegg(
         dokumentId = this.dokumentId,
         søknadId = søknad.id,

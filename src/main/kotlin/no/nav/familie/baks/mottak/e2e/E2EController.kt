@@ -37,79 +37,92 @@ class E2EController(
     private val taskService: TaskService,
     private val databaseCleanupService: DatabaseCleanupService,
 ) {
-
     val logger: Logger = LoggerFactory.getLogger(E2EController::class.java)
 
     @PostMapping(path = ["/pdl/foedsel"], consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun pdlHendelseFødsel(@RequestBody personIdenter: List<String>): String {
+    fun pdlHendelseFødsel(
+        @RequestBody personIdenter: List<String>,
+    ): String {
         logger.info("Oppretter fødselshendelse e2e")
         val hendelseId = UUID.randomUUID().toString()
-        val pdlHendelse = PdlHendelse(
-            offset = Random.nextUInt().toLong(),
-            gjeldendeAktørId = personIdenter.first { it.length == 13 },
-            hendelseId = hendelseId,
-            personIdenter = personIdenter,
-            endringstype = LeesahService.OPPRETTET,
-            opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
-            fødselsdato = LocalDate.now(),
-        )
+        val pdlHendelse =
+            PdlHendelse(
+                offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = personIdenter.first { it.length == 13 },
+                hendelseId = hendelseId,
+                personIdenter = personIdenter,
+                endringstype = LeesahService.OPPRETTET,
+                opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
+                fødselsdato = LocalDate.now(),
+            )
 
         leesahService.prosesserNyHendelse(pdlHendelse)
         return hendelseId
     }
 
     @PostMapping(path = ["/pdl/doedsfall"], consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun pdlHendelseDødsfall(@RequestBody personIdenter: List<String>): String {
+    fun pdlHendelseDødsfall(
+        @RequestBody personIdenter: List<String>,
+    ): String {
         logger.info("Oppretter dødshendelse e2e")
         val hendelseId = UUID.randomUUID().toString()
-        val pdlHendelse = PdlHendelse(
-            offset = Random.nextUInt().toLong(),
-            gjeldendeAktørId = personIdenter.first { it.length == 13 },
-            hendelseId = hendelseId,
-            personIdenter = personIdenter,
-            endringstype = LeesahService.OPPRETTET,
-            opplysningstype = LeesahService.OPPLYSNINGSTYPE_DØDSFALL,
-            dødsdato = LocalDate.now(),
-        )
+        val pdlHendelse =
+            PdlHendelse(
+                offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = personIdenter.first { it.length == 13 },
+                hendelseId = hendelseId,
+                personIdenter = personIdenter,
+                endringstype = LeesahService.OPPRETTET,
+                opplysningstype = LeesahService.OPPLYSNINGSTYPE_DØDSFALL,
+                dødsdato = LocalDate.now(),
+            )
 
         leesahService.prosesserNyHendelse(pdlHendelse)
         return hendelseId
     }
 
     @PostMapping(path = ["/pdl/utflytting"], consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun pdlHendelseUtflytting(@RequestBody personIdenter: List<String>): String {
+    fun pdlHendelseUtflytting(
+        @RequestBody personIdenter: List<String>,
+    ): String {
         logger.info("Oppretter utflyttingshendlse e2e")
         val hendelseId = UUID.randomUUID().toString()
-        val pdlHendelse = PdlHendelse(
-            offset = Random.nextUInt().toLong(),
-            gjeldendeAktørId = personIdenter.first { it.length == 13 },
-            hendelseId = hendelseId,
-            personIdenter = personIdenter,
-            endringstype = LeesahService.OPPRETTET,
-            opplysningstype = LeesahService.OPPLYSNINGSTYPE_UTFLYTTING,
-            utflyttingsdato = LocalDate.now(),
-        )
+        val pdlHendelse =
+            PdlHendelse(
+                offset = Random.nextUInt().toLong(),
+                gjeldendeAktørId = personIdenter.first { it.length == 13 },
+                hendelseId = hendelseId,
+                personIdenter = personIdenter,
+                endringstype = LeesahService.OPPRETTET,
+                opplysningstype = LeesahService.OPPLYSNINGSTYPE_UTFLYTTING,
+                utflyttingsdato = LocalDate.now(),
+            )
 
         leesahService.prosesserNyHendelse(pdlHendelse)
         return hendelseId
     }
 
     @PostMapping(path = ["/journal"])
-    fun opprettJournalHendelse(@RequestBody journalpost: Journalpost): String {
+    fun opprettJournalHendelse(
+        @RequestBody journalpost: Journalpost,
+    ): String {
         logger.info("Oppretter journalhendelse e2e")
         val hendelseid = UUID.randomUUID().toString()
-        var journalHendelse = JournalfoeringHendelseRecord(
-            hendelseid,
-            1,
-            "MidlertidigJournalført",
-            journalpost.journalpostId,
-            null, // Må settes på selve journalposten
-            "BAR",
-            "BAR",
-            null, // Må settes på selve journalposten
-            "e2e-$hendelseid",
-            null,
-        ) // Kan settes på selve journalposten
+        var journalHendelse =
+            JournalfoeringHendelseRecord(
+                hendelseid,
+                1,
+                "MidlertidigJournalført",
+                journalpost.journalpostId,
+                // Må settes på selve journalposten
+                null,
+                "BAR",
+                "BAR",
+                // Må settes på selve journalposten
+                null,
+                "e2e-$hendelseid",
+                null,
+            )
 
         val cr = ConsumerRecord("topic", 1, 1, 1L, journalHendelse)
         val acknowledgment = E2EAcknowledgment()

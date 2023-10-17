@@ -24,7 +24,6 @@ class MottaAnnullerFødselTask(
     private val taskService: TaskService,
     private val restTaskService: RestTaskService,
 ) : AsyncTaskStep {
-
     val log: Logger = LoggerFactory.getLogger(MottaAnnullerFødselTask::class.java)
 
     override fun doTask(task: Task) {
@@ -53,7 +52,6 @@ class MottaAnnullerFødselTask(
     }
 
     companion object {
-
         const val TASK_STEP_TYPE = "mottaAnnullerFødsel"
         const val AVVIKSÅRSAK = "Annuller fødselshendelse"
     }

@@ -20,9 +20,7 @@ class HentEnhetClient(
     @param:Value("\${NORG2_API_URL}") private val norg2Uri: URI,
     @Qualifier("restTemplateUnsecured") restOperations: RestOperations,
 ) :
-
     AbstractRestClient(restOperations, "norg2") {
-
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
     @Cacheable("enhet", cacheManager = "dailyCacheManager")
     fun hentEnhet(enhetId: String): Enhet {

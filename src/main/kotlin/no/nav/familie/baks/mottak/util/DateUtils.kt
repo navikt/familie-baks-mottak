@@ -43,7 +43,10 @@ fun fristFerdigstillelse(daysToAdd: Long = 0): LocalDate {
 /**
  * Skipper helger hvis ikke e2e.
  */
-fun nesteGyldigeTriggertidFødselshendelser(minutesToAdd: Long = 0, environment: Environment): LocalDateTime {
+fun nesteGyldigeTriggertidFødselshendelser(
+    minutesToAdd: Long = 0,
+    environment: Environment,
+): LocalDateTime {
     var date = LocalDateTime.now().plusMinutes(minutesToAdd)
 
     if (environment.activeProfiles.contains("e2e")) {

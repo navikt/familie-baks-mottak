@@ -7,12 +7,13 @@ import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
 
 data class KontantstøtteSøknaddokumentasjon(val søknaddokumentasjon: Søknaddokumentasjon) :
     ISøknaddokumentasjon {
-    override val opplastedeVedlegg: List<Søknadsvedlegg> = søknaddokumentasjon.opplastedeVedlegg.map {
-        Søknadsvedlegg(
-            it.dokumentId,
-            dokumentasjonsbehovTilTittel(it.tittel),
-        )
-    }
+    override val opplastedeVedlegg: List<Søknadsvedlegg> =
+        søknaddokumentasjon.opplastedeVedlegg.map {
+            Søknadsvedlegg(
+                it.dokumentId,
+                dokumentasjonsbehovTilTittel(it.tittel),
+            )
+        }
 
     fun dokumentasjonsbehovTilTittel(dokumentasjonsbehov: Dokumentasjonsbehov): String {
         return when (dokumentasjonsbehov) {

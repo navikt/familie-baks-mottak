@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional
 
 @Repository
 interface KontantstøtteSøknadRepository : JpaRepository<DBKontantstøtteSøknad, String> {
-
     @Query(value = "SELECT s FROM kontantstotte_soknad s WHERE s.id = :soknadId")
     fun hentSøknad(soknadId: Long): DBKontantstøtteSøknad?
 }

@@ -28,12 +28,12 @@ class OppdaterOgFerdigstillJournalpostTask(
     private val taskService: TaskService,
     private val pdlClient: PdlClient,
 ) : AsyncTaskStep {
-
     val log: Logger = LoggerFactory.getLogger(OppdaterOgFerdigstillJournalpostTask::class.java)
 
     override fun doTask(task: Task) {
-        val journalpost = journalpostClient.hentJournalpost(task.payload)
-            .takeUnless { it.bruker == null } ?: error("Journalpost ${task.payload} mangler bruker")
+        val journalpost =
+            journalpostClient.hentJournalpost(task.payload)
+                .takeUnless { it.bruker == null } ?: error("Journalpost ${task.payload} mangler bruker")
 
         when (journalpost.journalstatus) {
             Journalstatus.MOTTATT -> {
@@ -60,24 +60,30 @@ class OppdaterOgFerdigstillJournalpostTask(
                     },
                 )
             }
-            Journalstatus.JOURNALFOERT -> log.info(
-                "Skipper oppdatering og ferdigstilling av " +
-                    "journalpost ${journalpost.journalpostId} som alt er ferdig journalført",
-            )
+            Journalstatus.JOURNALFOERT ->
+                log.info(
+                    "Skipper oppdatering og ferdigstilling av " +
+                        "journalpost ${journalpost.journalpostId} som alt er ferdig journalført",
+                )
             else -> error("Uventet journalstatus ${journalpost.journalstatus} for journalpost ${journalpost.journalpostId}")
         }
 
-        val nyTask = Task(
-            type = OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE,
-            payload = task.payload,
-            properties = task.metadata.apply {
-                this["fagsystem"] = "BA"
-            },
-        )
+        val nyTask =
+            Task(
+                type = OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE,
+                payload = task.payload,
+                properties =
+                    task.metadata.apply {
+                        this["fagsystem"] = "BA"
+                    },
+            )
         taskService.save(nyTask)
     }
 
-    private fun tilPersonIdent(bruker: Bruker, tema: String?): String {
+    private fun tilPersonIdent(
+        bruker: Bruker,
+        tema: String?,
+    ): String {
         return when (bruker.type) {
             BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema?.let { Tema.valueOf(tema) } ?: Tema.BAR)
             else -> bruker.id

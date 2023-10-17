@@ -35,19 +35,52 @@ data class Adresseinfo(
 )
 
 enum class PersonstatusType {
-    ABNR, ADNR, BOSA, DØD, DØDD, FOSV, FØDR, UFUL, UREG, UTAN, UTPE, UTVA
+    ABNR,
+    ADNR,
+    BOSA,
+    DØD,
+    DØDD,
+    FOSV,
+    FØDR,
+    UFUL,
+    UREG,
+    UTAN,
+    UTPE,
+    UTVA,
 }
 
 enum class SivilstandType {
-    GIFT, UGIF, ENKE, SKIL, SKPA, SAMB, GJPA, GLAD, NULL, REPA, SEPA, SEPR
+    GIFT,
+    UGIF,
+    ENKE,
+    SKIL,
+    SKPA,
+    SAMB,
+    GJPA,
+    GLAD,
+    NULL,
+    REPA,
+    SEPA,
+    SEPR,
 }
 
 enum class AdresseType {
-    BOSTEDSADRESSE, POSTADRESSE, POSTADRESSE_UTLAND, MIDLERTIDIG_POSTADRESSE_NORGE, MIDLERTIDIG_POSTADRESSE_UTLAND, UKJENT_ADRESSE
+    BOSTEDSADRESSE,
+    POSTADRESSE,
+    POSTADRESSE_UTLAND,
+    MIDLERTIDIG_POSTADRESSE_NORGE,
+    MIDLERTIDIG_POSTADRESSE_UTLAND,
+    UKJENT_ADRESSE,
 }
 
 enum class RelasjonsRolleType {
-    EKTE, BARN, FARA, MORA, REPA, SAMB, MMOR
+    EKTE,
+    BARN,
+    FARA,
+    MORA,
+    REPA,
+    SAMB,
+    MMOR,
 }
 
 data class Landkode(var kode: String?) {

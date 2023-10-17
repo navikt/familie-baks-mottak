@@ -19,7 +19,6 @@ import org.springframework.kafka.support.Acknowledgment
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class EnsligForsørgerInfotrygdHendelseConsumerTest {
-
     lateinit var mockHendelsesloggRepository: HendelsesloggRepository
     lateinit var mockSakClient: SakClient
     lateinit var mockPdlClient: PdlClient
@@ -90,9 +89,10 @@ class EnsligForsørgerInfotrygdHendelseConsumerTest {
     fun `Skal ikke ACKe melding ved feil`() {
         val ack: Acknowledgment = mockk(relaxed = true)
         val consumerRecord = ConsumerRecord("topic", 1, 1, "42", """{"json": "Ugyldig"}""")
-        val e = Assertions.assertThrows(RuntimeException::class.java) {
-            consumer.listen(consumerRecord, ack)
-        }
+        val e =
+            Assertions.assertThrows(RuntimeException::class.java) {
+                consumer.listen(consumerRecord, ack)
+            }
         assertThat(e.message).isEqualTo("Feil i prosessering av aapen-ef-overgangstonad-v1")
 
         verify(exactly = 0) { ack.acknowledge() }

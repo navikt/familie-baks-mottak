@@ -53,7 +53,6 @@ class VurderLivshendelseTask(
     private val sakClient: SakClient,
     private val infotrygdClient: InfotrygdBarnetrygdClient,
 ) : AsyncTaskStep {
-
     private val tema = Tema.BAR
 
     val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -111,10 +110,11 @@ class VurderLivshendelseTask(
             }
             SIVILSTAND -> {
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-sivilstand", tema)
-                val sivilstand = finnNyesteSivilstandEndring(pdlPersonData) ?: run {
-                    secureLog.info("Ignorerer sivilstandhendelse for $personIdent uten dato: $pdlPersonData")
-                    return
-                }
+                val sivilstand =
+                    finnNyesteSivilstandEndring(pdlPersonData) ?: run {
+                        secureLog.info("Ignorerer sivilstandhendelse for $personIdent uten dato: $pdlPersonData")
+                        return
+                    }
                 if (sivilstand.type != GIFT) {
                     secureLog.info("Endringen til sivilstand GIFT for $personIdent er korrigert/annulert: $pdlPersonData")
                     return
@@ -135,30 +135,38 @@ class VurderLivshendelseTask(
         }
     }
 
-    private fun sjekkOmDatoErEtterEldsteVedtaksdato(dato: LocalDate, aktivFaksak: RestFagsak, personIdent: String): Boolean {
-        val tidligsteVedtakIBaSak = aktivFaksak.behandlinger
-            .filter { it.resultat == RESULTAT_INNVILGET && it.steg == STEG_TYPE_BEHANDLING_AVSLUTTET }
-            .minByOrNull { it.opprettetTidspunkt } ?: return false
+    private fun sjekkOmDatoErEtterEldsteVedtaksdato(
+        dato: LocalDate,
+        aktivFaksak: RestFagsak,
+        personIdent: String,
+    ): Boolean {
+        val tidligsteVedtakIBaSak =
+            aktivFaksak.behandlinger
+                .filter { it.resultat == RESULTAT_INNVILGET && it.steg == STEG_TYPE_BEHANDLING_AVSLUTTET }
+                .minByOrNull { it.opprettetTidspunkt } ?: return false
 
         if (dato.isAfter(tidligsteVedtakIBaSak.opprettetTidspunkt.toLocalDate())) {
             return true
         }
 
-        val erEtterTidligsteInfotrygdVedtak = if (tidligsteVedtakIBaSak.type == BEHANDLING_TYPE_MIGRERING) {
-            hentTidligsteVedtaksdatoFraInfotrygd(personIdent)?.isBefore(dato) ?: false
-        } else {
-            false
-        }
+        val erEtterTidligsteInfotrygdVedtak =
+            if (tidligsteVedtakIBaSak.type == BEHANDLING_TYPE_MIGRERING) {
+                hentTidligsteVedtaksdatoFraInfotrygd(personIdent)?.isBefore(dato) ?: false
+            } else {
+                false
+            }
 
         return erEtterTidligsteInfotrygdVedtak
     }
 
     private fun hentTidligsteVedtaksdatoFraInfotrygd(personIdent: String): LocalDate? {
-        val personIdenter = pdlClient.hentIdenter(personIdent, tema)
-            .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
-            .map { it.ident }
-        val tidligsteInfotrygdVedtak = infotrygdClient.hentVedtak(personIdenter).bruker
-            .maxByOrNull { it.iverksattFom ?: "000000" } // maxBy... siden datoen er på "seq"-format
+        val personIdenter =
+            pdlClient.hentIdenter(personIdent, tema)
+                .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
+                .map { it.ident }
+        val tidligsteInfotrygdVedtak =
+            infotrygdClient.hentVedtak(personIdenter).bruker
+                .maxByOrNull { it.iverksattFom ?: "000000" } // maxBy... siden datoen er på "seq"-format
         return tidligsteInfotrygdVedtak?.iverksattFom
             ?.let { YearMonth.parse("${999999 - it.toInt()}", DateTimeFormatter.ofPattern("yyyyMM")) }
             ?.atDay(1)
@@ -194,11 +202,12 @@ class VurderLivshendelseTask(
         val åpenOppgave = søkEtterÅpenOppgavePåAktør(aktørIdForOppgave, hendelseType)
 
         if (åpenOppgave == null) {
-            val beskrivelse = leggTilNyPersonIBeskrivelse(
-                beskrivelse = "${hendelseType.beskrivelse}:",
-                personIdent = personIdent,
-                personErBruker = pdlClient.hentAktørId(personIdent, tema) == aktørIdForOppgave,
-            )
+            val beskrivelse =
+                leggTilNyPersonIBeskrivelse(
+                    beskrivelse = "${hendelseType.beskrivelse}:",
+                    personIdent = personIdent,
+                    personErBruker = pdlClient.hentAktørId(personIdent, tema) == aktørIdForOppgave,
+                )
             val restFagsak = hentRestFagsak(fagsakIdForOppgave)
             val restBehandling = hentSisteBehandlingSomErIverksatt(restFagsak) ?: hentAktivBehandling(restFagsak)
             val behandlingstema = tilBehandlingstema(restBehandling)
@@ -212,12 +221,14 @@ class VurderLivshendelseTask(
         } else {
             log.info("Fant åpen oppgave på aktørId=$aktørIdForOppgave oppgaveId=${åpenOppgave.id}")
             secureLog.info("Fant åpen oppgave: $åpenOppgave")
-            val beskrivelse = leggTilNyPersonIBeskrivelse(
-                beskrivelse = åpenOppgave.beskrivelse!!,
-                personIdent = personIdent,
-                personErBruker = åpenOppgave.identer?.map { it.ident }
-                    ?.contains(personIdent),
-            )
+            val beskrivelse =
+                leggTilNyPersonIBeskrivelse(
+                    beskrivelse = åpenOppgave.beskrivelse!!,
+                    personIdent = personIdent,
+                    personErBruker =
+                        åpenOppgave.identer?.map { it.ident }
+                            ?.contains(personIdent),
+                )
 
             oppdaterOppgaveMedNyBeskrivelse(åpenOppgave, beskrivelse)
             task.metadata["oppgaveId"] = åpenOppgave.id.toString()
@@ -226,7 +237,11 @@ class VurderLivshendelseTask(
         }
     }
 
-    private fun hentInitiellBeskrivelseForSivilstandOppgave(personErBruker: Boolean, formatertDato: String, personIdent: String): String =
+    private fun hentInitiellBeskrivelseForSivilstandOppgave(
+        personErBruker: Boolean,
+        formatertDato: String,
+        personIdent: String,
+    ): String =
         "${SIVILSTAND.beskrivelse}: ${if (personErBruker) "bruker" else "barn $personIdent"} er registrert som gift fra $formatertDato"
 
     private fun opprettEllerOppdaterEndringISivilstandOppgave(
@@ -236,23 +251,26 @@ class VurderLivshendelseTask(
         personIdent: String,
         task: Task,
     ) {
-        val formatertDato = endringsdato.format(
-            DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no")),
-        ) ?: "ukjent dato"
+        val formatertDato =
+            endringsdato.format(
+                DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no")),
+            ) ?: "ukjent dato"
 
-        val initiellBeskrivelse = hentInitiellBeskrivelseForSivilstandOppgave(
-            personErBruker = pdlClient.hentAktørId(personIdent, tema) == aktørIdForOppgave,
-            formatertDato = formatertDato,
-            personIdent = personIdent,
-        )
-
-        val oppgave = søkEtterÅpenOppgavePåAktør(aktørIdForOppgave, SIVILSTAND)
-            ?: opprettOppgavePåAktør(
-                aktørId = aktørIdForOppgave,
-                fagsakId = fagsakIdForOppgave,
-                beskrivelse = initiellBeskrivelse,
-                behandlingstema = Behandlingstema.UtvidetBarnetrygd,
+        val initiellBeskrivelse =
+            hentInitiellBeskrivelseForSivilstandOppgave(
+                personErBruker = pdlClient.hentAktørId(personIdent, tema) == aktørIdForOppgave,
+                formatertDato = formatertDato,
+                personIdent = personIdent,
             )
+
+        val oppgave =
+            søkEtterÅpenOppgavePåAktør(aktørIdForOppgave, SIVILSTAND)
+                ?: opprettOppgavePåAktør(
+                    aktørId = aktørIdForOppgave,
+                    fagsakId = fagsakIdForOppgave,
+                    beskrivelse = initiellBeskrivelse,
+                    behandlingstema = Behandlingstema.UtvidetBarnetrygd,
+                )
 
         when (oppgave) {
             is OppgaveResponse -> {
@@ -273,7 +291,11 @@ class VurderLivshendelseTask(
         }
     }
 
-    private fun leggTilNyPersonIBeskrivelse(beskrivelse: String, personIdent: String, personErBruker: Boolean?): String {
+    private fun leggTilNyPersonIBeskrivelse(
+        beskrivelse: String,
+        personIdent: String,
+        personErBruker: Boolean?,
+    ): String {
         return when (personErBruker) {
             true -> if (!beskrivelse.contains("bruker")) leggTilBrukerIBeskrivelse(beskrivelse) else beskrivelse
             else -> if (!beskrivelse.contains(personIdent)) leggTilBarnIBeskrivelse(beskrivelse, personIdent) else beskrivelse
@@ -285,7 +307,10 @@ class VurderLivshendelseTask(
         return "$livshendelseType: bruker" + if (barn.isNotEmpty()) " og $barn" else ""
     }
 
-    private fun leggTilBarnIBeskrivelse(beskrivelse: String, personIdent: String): String {
+    private fun leggTilBarnIBeskrivelse(
+        beskrivelse: String,
+        personIdent: String,
+    ): String {
         if (!beskrivelse.contains("barn")) {
             val (livshendelseType, bruker) = beskrivelse.split(":")
             return "$livshendelseType:" + (if (bruker.isNotEmpty()) "$bruker og" else "") + " barn $personIdent"
@@ -308,7 +333,7 @@ class VurderLivshendelseTask(
         return vurderLivshendelseOppgaver.firstOrNull {
             it.beskrivelse?.startsWith(type.beskrivelse) == true && (
                 it.status != StatusEnum.FERDIGSTILT || it.status != StatusEnum.FEILREGISTRERT
-                )
+            )
         }
     }
 
@@ -376,7 +401,6 @@ class VurderLivshendelseTask(
     data class Bruker(val ident: String, val fagsakId: Long)
 
     companion object {
-
         const val TASK_STEP_TYPE = "vurderLivshendelseTask"
 
         const val STEG_TYPE_BEHANDLING_AVSLUTTET = "BEHANDLING_AVSLUTTET"

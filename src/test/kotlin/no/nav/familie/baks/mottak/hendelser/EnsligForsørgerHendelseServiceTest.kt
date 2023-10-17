@@ -16,7 +16,6 @@ import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class EnsligForsørgerHendelseServiceTest {
-
     lateinit var mockHendelsesloggRepository: HendelsesloggRepository
     lateinit var mockSakClient: SakClient
     lateinit var mockPdlClient: PdlClient

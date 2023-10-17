@@ -25,7 +25,6 @@ class JournalførKontantstøtteSøknadTask(
     private val journalføringService: JournalføringService,
     private val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
 ) : AsyncTaskStep {
-
     override fun doTask(task: Task) {
         try {
             val id = task.payload
@@ -36,27 +35,30 @@ class JournalførKontantstøtteSøknadTask(
             val versjonertSøknad = dbKontantstøtteSøknad.hentVersjonertKontantstøtteSøknad()
 
             logger.info("Generer pdf og journalfør søknad")
-            val bokmålPdf = pdfService.lagKontantstøttePdf(
-                versjonertSøknad = versjonertSøknad,
-                dbKontantstøtteSøknad = dbKontantstøtteSøknad,
-                språk = "nb",
-            )
-            logger.info("Generert pdf med størrelse ${bokmålPdf.size}")
-
-            val orginalspråk = when (versjonertSøknad) {
-                is KontantstøtteSøknadV3 -> versjonertSøknad.kontantstøtteSøknad.originalSpråk
-                is KontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.originalSpråk
-            }
-
-            val orginalspråkPdf: ByteArray = if (orginalspråk != "nb") {
+            val bokmålPdf =
                 pdfService.lagKontantstøttePdf(
                     versjonertSøknad = versjonertSøknad,
                     dbKontantstøtteSøknad = dbKontantstøtteSøknad,
-                    språk = orginalspråk,
+                    språk = "nb",
                 )
-            } else {
-                ByteArray(0)
-            }
+            logger.info("Generert pdf med størrelse ${bokmålPdf.size}")
+
+            val orginalspråk =
+                when (versjonertSøknad) {
+                    is KontantstøtteSøknadV3 -> versjonertSøknad.kontantstøtteSøknad.originalSpråk
+                    is KontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.originalSpråk
+                }
+
+            val orginalspråkPdf: ByteArray =
+                if (orginalspråk != "nb") {
+                    pdfService.lagKontantstøttePdf(
+                        versjonertSøknad = versjonertSøknad,
+                        dbKontantstøtteSøknad = dbKontantstøtteSøknad,
+                        språk = orginalspråk,
+                    )
+                } else {
+                    ByteArray(0)
+                }
             journalføringService.journalførKontantstøtteSøknad(dbKontantstøtteSøknad, bokmålPdf, orginalspråkPdf)
         } catch (e: RessursException) {
             when (e.cause) {

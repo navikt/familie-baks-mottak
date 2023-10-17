@@ -26,13 +26,16 @@ class BarnetrygdSøknadController(
     private val barnetrygdSøknadService: BarnetrygdSøknadService,
     private val barnetrygdSøknadMetrikkService: BarnetrygdSøknadMetrikkService,
 ) {
-
     @PostMapping(value = ["/soknad/v7"], consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun taImotSøknad(@RequestPart("søknad") søknad: SøknadKontraktV7): ResponseEntity<Ressurs<Kvittering>> =
+    fun taImotSøknad(
+        @RequestPart("søknad") søknad: SøknadKontraktV7,
+    ): ResponseEntity<Ressurs<Kvittering>> =
         mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad = SøknadV7(søknad = søknad))
 
     @PostMapping(value = ["/soknad/v8"], consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun taImotSøknad(@RequestPart("søknad") søknad: SøknadKontraktV8): ResponseEntity<Ressurs<Kvittering>> =
+    fun taImotSøknad(
+        @RequestPart("søknad") søknad: SøknadKontraktV8,
+    ): ResponseEntity<Ressurs<Kvittering>> =
         mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad = SøknadV8(søknad = søknad))
 
     fun mottaVersjonertSøknadOgSendMetrikker(versjonertSøknad: VersjonertSøknad): ResponseEntity<Ressurs<Kvittering>> {

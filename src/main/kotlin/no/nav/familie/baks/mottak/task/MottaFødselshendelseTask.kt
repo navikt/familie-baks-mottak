@@ -35,7 +35,6 @@ class MottaFødselshendelseTask(
     private val pdlClient: PdlClient,
     @Value("\${FØDSELSHENDELSE_REKJØRINGSINTERVALL_MINUTTER}") private val rekjøringsintervall: Long,
 ) : AsyncTaskStep {
-
     val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
     val barnHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.barn.har.dnr.eller.fdatnr")
     val forsørgerHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.forsorger.har.dnr.eller.fdatnr")
@@ -69,16 +68,17 @@ class MottaFødselshendelseTask(
                 }
 
                 task.metadata["morsIdent"] = morsIdent.id
-                val nesteTask = Task(
-                    SendTilSakTask.TASK_STEP_TYPE,
-                    jacksonObjectMapper().writeValueAsString(
-                        NyBehandling(
-                            morsIdent = morsIdent.id,
-                            barnasIdenter = arrayOf(barnetsId),
+                val nesteTask =
+                    Task(
+                        SendTilSakTask.TASK_STEP_TYPE,
+                        jacksonObjectMapper().writeValueAsString(
+                            NyBehandling(
+                                morsIdent = morsIdent.id,
+                                barnasIdenter = arrayOf(barnetsId),
+                            ),
                         ),
-                    ),
-                    task.metadata,
-                )
+                        task.metadata,
+                    )
 
                 taskService.save(nesteTask)
             } else {
@@ -107,7 +107,6 @@ class MottaFødselshendelseTask(
     }
 
     companion object {
-
         const val TASK_STEP_TYPE = "mottaFødselshendelse"
     }
 }

@@ -16,18 +16,22 @@ class JournalføringService(
     private val barnetrygdSøknadService: BarnetrygdSøknadService,
     private val kontantstøtteSøknadService: KontantstøtteSøknadService,
 ) {
-
-    fun journalførBarnetrygdSøknad(dbSøknad: DBSøknad, pdf: ByteArray, pdfOriginalSpråk: ByteArray = ByteArray(0)) {
+    fun journalførBarnetrygdSøknad(
+        dbSøknad: DBSøknad,
+        pdf: ByteArray,
+        pdfOriginalSpråk: ByteArray = ByteArray(0),
+    ) {
         if (dbSøknad.journalpostId == null) {
             val vedlegg = barnetrygdSøknadService.hentLagredeVedlegg(dbSøknad)
 
-            val arkiverDokumentRequest = ArkiverDokumentRequestMapper.toDto(
-                dbSøknad = dbSøknad,
-                versjonertSøknad = dbSøknad.hentVersjonertSøknad(),
-                pdf = pdf,
-                vedleggMap = vedlegg,
-                pdfOriginalSpråk = pdfOriginalSpråk,
-            )
+            val arkiverDokumentRequest =
+                ArkiverDokumentRequestMapper.toDto(
+                    dbSøknad = dbSøknad,
+                    versjonertSøknad = dbSøknad.hentVersjonertSøknad(),
+                    pdf = pdf,
+                    vedleggMap = vedlegg,
+                    pdfOriginalSpråk = pdfOriginalSpråk,
+                )
             val journalpostId: String = arkiverSøknad(arkiverDokumentRequest)
             val dbSøknadMedJournalpostId = dbSøknad.copy(journalpostId = journalpostId)
             barnetrygdSøknadService.lagreDBSøknad(dbSøknadMedJournalpostId)
@@ -48,13 +52,14 @@ class JournalføringService(
         if (dbKontantstøtteSøknad.journalpostId == null) {
             val vedlegg = kontantstøtteSøknadService.hentLagredeDBKontantstøtteVedlegg(dbKontantstøtteSøknad)
 
-            val arkiverDokumentRequest = ArkiverDokumentRequestMapper.toDto(
-                dbKontantstøtteSøknad = dbKontantstøtteSøknad,
-                versjonertSøknad = dbKontantstøtteSøknad.hentVersjonertKontantstøtteSøknad(),
-                pdf = pdf,
-                vedleggMap = vedlegg,
-                pdfOriginalSpråk = pdfOriginalSpråk,
-            )
+            val arkiverDokumentRequest =
+                ArkiverDokumentRequestMapper.toDto(
+                    dbKontantstøtteSøknad = dbKontantstøtteSøknad,
+                    versjonertSøknad = dbKontantstøtteSøknad.hentVersjonertKontantstøtteSøknad(),
+                    pdf = pdf,
+                    vedleggMap = vedlegg,
+                    pdfOriginalSpråk = pdfOriginalSpråk,
+                )
             val journalpostId: String = arkiverSøknad(arkiverDokumentRequest)
             val dbSøknadMedJournalpostId = dbKontantstøtteSøknad.copy(journalpostId = journalpostId)
             kontantstøtteSøknadService.lagreDBKontantstøtteSøknad(dbSøknadMedJournalpostId)

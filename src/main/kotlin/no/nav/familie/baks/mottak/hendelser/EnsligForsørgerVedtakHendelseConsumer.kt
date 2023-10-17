@@ -29,7 +29,6 @@ import java.util.UUID
     matchIfMissing = true,
 )
 class EnsligForsørgerVedtakHendelseConsumer(val vedtakOmOvergangsstønadService: EnsligForsørgerHendelseService) {
-
     val ensligForsørgerVedtakhendelseFeilCounter: Counter = Metrics.counter("ef.hendelse.vedtak.feil")
 
     @KafkaListener(
@@ -40,7 +39,10 @@ class EnsligForsørgerVedtakHendelseConsumer(val vedtakOmOvergangsstønadService
         idIsGroup = false,
     )
     @Transactional
-    fun listen(consumerRecord: ConsumerRecord<String, String>, ack: Acknowledgment) {
+    fun listen(
+        consumerRecord: ConsumerRecord<String, String>,
+        ack: Acknowledgment,
+    ) {
         try {
             MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
             logger.info("$TOPIC_EF_VEDTAK melding mottatt. Offset: ${consumerRecord.offset()}")
@@ -60,7 +62,6 @@ class EnsligForsørgerVedtakHendelseConsumer(val vedtakOmOvergangsstønadService
     }
 
     companion object {
-
         private const val TOPIC_EF_VEDTAK = "aapen-ensligforsorger-iverksatt-vedtak"
 
         private val logger: Logger = LoggerFactory.getLogger(EnsligForsørgerVedtakHendelseConsumer::class.java)

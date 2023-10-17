@@ -16,7 +16,6 @@ class OpprettBehandleSakOppgaveTask(
     private val journalpostClient: JournalpostClient,
     private val oppgaveClient: OppgaveClient,
 ) : AsyncTaskStep {
-
     val log: Logger = LoggerFactory.getLogger(OpprettBehandleSakOppgaveTask::class.java)
 
     override fun doTask(task: Task) {
@@ -42,7 +41,6 @@ class OpprettBehandleSakOppgaveTask(
     }
 
     companion object {
-
         const val TASK_STEP_TYPE = "opprettBehandleSakoppgave"
     }
 }

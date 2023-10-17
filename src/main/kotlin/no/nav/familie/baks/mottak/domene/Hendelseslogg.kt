@@ -19,26 +19,20 @@ import java.util.Properties
 data class Hendelseslogg(
     @Column(name = "kafka_offset")
     val offset: Long,
-
     @Column(name = "hendelse_id")
     val hendelseId: String,
-
     @Enumerated(EnumType.STRING)
     @Column(name = "consumer")
     val consumer: HendelseConsumer,
-
     @Convert(converter = PropertiesToStringConverter::class)
     @Column(name = "metadata")
     val metadata: Properties = Properties(),
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hendelseslogg_seq")
     @SequenceGenerator(name = "hendelseslogg_seq")
     val id: Long? = null,
-
     @Column(name = "opprettet_tid", nullable = false, updatable = false)
     val opprettetTidspunkt: LocalDateTime = LocalDateTime.now(),
-
     @Column(name = "ident", nullable = true)
     val ident: String? = null,
 )

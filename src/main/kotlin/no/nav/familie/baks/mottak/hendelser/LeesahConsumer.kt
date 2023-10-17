@@ -25,7 +25,6 @@ import java.time.LocalDate
     matchIfMissing = true,
 )
 class LeesahConsumer(val leesahService: LeesahService) {
-
     val leesahFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesha.feilet")
 
     @KafkaListener(
@@ -37,22 +36,26 @@ class LeesahConsumer(val leesahService: LeesahService) {
         autoStartup = "true",
     )
     @Transactional
-    fun listen(cr: ConsumerRecord<String, Personhendelse>, ack: Acknowledgment) {
-        val pdlHendelse = PdlHendelse(
-            cr.value().hentHendelseId(),
-            cr.key().substring(6),
-            cr.offset(),
-            cr.value().hentOpplysningstype(),
-            cr.value().hentEndringstype(),
-            cr.value().hentPersonidenter(),
-            cr.value().hentDødsdato(),
-            cr.value().hentFødselsdato(),
-            cr.value().hentFødeland(),
-            cr.value().hentUtflyttingsdato(),
-            cr.value().hentTidligereHendelseId(),
-            cr.value().hentSivilstandType(),
-            cr.value().hentSivilstandDato(),
-        )
+    fun listen(
+        cr: ConsumerRecord<String, Personhendelse>,
+        ack: Acknowledgment,
+    ) {
+        val pdlHendelse =
+            PdlHendelse(
+                cr.value().hentHendelseId(),
+                cr.key().substring(6),
+                cr.offset(),
+                cr.value().hentOpplysningstype(),
+                cr.value().hentEndringstype(),
+                cr.value().hentPersonidenter(),
+                cr.value().hentDødsdato(),
+                cr.value().hentFødselsdato(),
+                cr.value().hentFødeland(),
+                cr.value().hentUtflyttingsdato(),
+                cr.value().hentTidligereHendelseId(),
+                cr.value().hentSivilstandType(),
+                cr.value().hentSivilstandDato(),
+            )
 
         try {
             MDC.put(MDCConstants.MDC_CALL_ID, pdlHendelse.hendelseId)
@@ -133,7 +136,6 @@ class LeesahConsumer(val leesahService: LeesahService) {
     }
 
     companion object {
-
         val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
         val log: Logger = LoggerFactory.getLogger(LeesahConsumer::class.java)
     }

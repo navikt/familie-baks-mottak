@@ -27,7 +27,6 @@ import java.util.UUID
 class IdenthendelseV2Consumer(
     private val sakClient: SakClient,
 ) {
-
     val identhendelseFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.ident.feilet")
 
     @KafkaListener(
@@ -38,7 +37,10 @@ class IdenthendelseV2Consumer(
         containerFactory = "kafkaAivenHendelseListenerAvroLatestContainerFactory",
     )
     @Transactional
-    fun listen(consumerRecord: ConsumerRecord<String, Aktor?>, ack: Acknowledgment) {
+    fun listen(
+        consumerRecord: ConsumerRecord<String, Aktor?>,
+        ack: Acknowledgment,
+    ) {
         try {
             Thread.sleep(60000) // Sender man med en gang, så får man Person ikke funnet fra PDL når ba-sak gjør filtrering. Venter derfor 1 minutt
             MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
@@ -52,9 +54,10 @@ class IdenthendelseV2Consumer(
                 SECURE_LOGGER.warn("Tom aktør fra identhendelse med nøkkel $aktørIdPåHendelse")
             }
 
-            val aktivAktørid = aktør?.identifikatorer?.singleOrNull { ident ->
-                ident.type == Type.AKTORID && ident.gjeldende
-            }?.idnummer.toString()
+            val aktivAktørid =
+                aktør?.identifikatorer?.singleOrNull { ident ->
+                    ident.type == Type.AKTORID && ident.gjeldende
+                }?.idnummer.toString()
 
             if (aktørIdPåHendelse.contains(aktivAktørid)) { // I tilfeller som ved merge av hendelser vil man få både identhendelse på gammel og ny aktørid, så for å unngå duplikater så sender man bare på aktiv ident
                 aktør?.identifikatorer?.singleOrNull { ident ->
@@ -80,7 +83,6 @@ class IdenthendelseV2Consumer(
     }
 
     companion object {
-
         val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
         val log: Logger = LoggerFactory.getLogger(IdenthendelseV2Consumer::class.java)
     }

@@ -24,7 +24,6 @@ class OpprettJournalføringOppgaveTask(
     private val journalpostClient: JournalpostClient,
     private val oppgaveClient: OppgaveClient,
 ) : AsyncTaskStep {
-
     val log: Logger = LoggerFactory.getLogger(OpprettJournalføringOppgaveTask::class.java)
     val barnetrygdOppgaverOpprettetCounter: Counter = Metrics.counter("barnetrygd.ruting.oppgave.opprettet")
     val barnetrygdOppgaverOppdatertCounter: Counter = Metrics.counter("barnetrygd.ruting.oppgave.oppdatert")
@@ -53,10 +52,11 @@ class OpprettJournalføringOppgaveTask(
                         null
                     }
                 if (oppgaveTypeForEksisterendeOppgave == null) {
-                    val nyOppgave = oppgaveClient.opprettJournalføringsoppgave(
-                        journalpost = journalpost,
-                        beskrivelse = task.payload.takeIf { it.isNotEmpty() },
-                    )
+                    val nyOppgave =
+                        oppgaveClient.opprettJournalføringsoppgave(
+                            journalpost = journalpost,
+                            beskrivelse = task.payload.takeIf { it.isNotEmpty() },
+                        )
                     task.metadata["oppgaveId"] = "${nyOppgave.oppgaveId}"
                     log.info("Oppretter ny journalførings-oppgave med id ${nyOppgave.oppgaveId} for journalpost ${journalpost.journalpostId}")
                     incrementOppgaverOpprettet(tema)
@@ -77,9 +77,10 @@ class OpprettJournalføringOppgaveTask(
             }
 
             else -> {
-                val error = IllegalStateException(
-                    "Journalpost ${journalpost.journalpostId} har endret status fra MOTTATT til ${journalpost.journalstatus.name}",
-                )
+                val error =
+                    IllegalStateException(
+                        "Journalpost ${journalpost.journalpostId} har endret status fra MOTTATT til ${journalpost.journalstatus.name}",
+                    )
                 log.info("OpprettJournalføringOppgaveTask feilet.", error)
                 throw error
             }
@@ -116,7 +117,6 @@ class OpprettJournalføringOppgaveTask(
     }
 
     companion object {
-
         const val TASK_STEP_TYPE = "opprettJournalføringsoppgave"
     }
 }

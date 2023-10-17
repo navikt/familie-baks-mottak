@@ -6,13 +6,13 @@ import no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
 
 data class BarnetrygdSøknaddokumentasjon(val søknaddokumentasjon: Søknaddokumentasjon) : ISøknaddokumentasjon {
-
-    override val opplastedeVedlegg: List<Søknadsvedlegg> = søknaddokumentasjon.opplastedeVedlegg.map {
-        Søknadsvedlegg(
-            it.dokumentId,
-            dokumentasjonsbehovTilTittel(it.tittel),
-        )
-    }
+    override val opplastedeVedlegg: List<Søknadsvedlegg> =
+        søknaddokumentasjon.opplastedeVedlegg.map {
+            Søknadsvedlegg(
+                it.dokumentId,
+                dokumentasjonsbehovTilTittel(it.tittel),
+            )
+        }
 
     private fun dokumentasjonsbehovTilTittel(dokumentasjonsbehov: Dokumentasjonsbehov): String {
         return when (dokumentasjonsbehov) {

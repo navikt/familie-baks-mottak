@@ -31,7 +31,6 @@ class JournalføringTest(
     @Autowired
     val kontantstøtteSøknadService: KontantstøtteSøknadService,
 ) {
-
     val søknad = SøknadTestData.søknadV8()
     val dbSøknad = søknad.tilDBSøknad()
     val kontantstøtteSøknad = KontantstøtteSøknadTestData.kontantstøtteSøknad()
@@ -40,13 +39,14 @@ class JournalføringTest(
 
     @Test
     fun `arkiverSøknad returnerer riktig journalpostId for barnetrygdsøknad`() {
-        val arkiverDokumentRequest = ArkiverDokumentRequestMapper.toDto(
-            dbSøknad = dbSøknad,
-            versjonertSøknad = dbSøknad.hentVersjonertSøknad(),
-            pdf = testPDF,
-            vedleggMap = emptyMap(),
-            pdfOriginalSpråk = ByteArray(0),
-        )
+        val arkiverDokumentRequest =
+            ArkiverDokumentRequestMapper.toDto(
+                dbSøknad = dbSøknad,
+                versjonertSøknad = dbSøknad.hentVersjonertSøknad(),
+                pdf = testPDF,
+                vedleggMap = emptyMap(),
+                pdfOriginalSpråk = ByteArray(0),
+            )
         val journalPostId = journalføringService.arkiverSøknad(arkiverDokumentRequest)
 
         assertEquals("123", journalPostId)
@@ -54,13 +54,14 @@ class JournalføringTest(
 
     @Test
     fun `arkiverSøknad returnerer riktig journalpostId for kontantstøttesøknad`() {
-        val arkiverDokumentRequest = ArkiverDokumentRequestMapper.toDto(
-            dbKontantstøtteSøknad = dbKontantstøtteSøknad,
-            versjonertSøknad = dbKontantstøtteSøknad.hentVersjonertKontantstøtteSøknad(),
-            pdf = testPDF,
-            vedleggMap = emptyMap(),
-            pdfOriginalSpråk = ByteArray(0),
-        )
+        val arkiverDokumentRequest =
+            ArkiverDokumentRequestMapper.toDto(
+                dbKontantstøtteSøknad = dbKontantstøtteSøknad,
+                versjonertSøknad = dbKontantstøtteSøknad.hentVersjonertKontantstøtteSøknad(),
+                pdf = testPDF,
+                vedleggMap = emptyMap(),
+                pdfOriginalSpråk = ByteArray(0),
+            )
         val journalPostId = journalføringService.arkiverSøknad(arkiverDokumentRequest)
 
         assertEquals("123", journalPostId)

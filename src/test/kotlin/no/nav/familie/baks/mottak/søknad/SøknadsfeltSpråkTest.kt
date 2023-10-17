@@ -32,18 +32,22 @@ class SøknadsfeltSpråkTest(
     fun `Kan velge språk for søknadsfelter`() {
         val søknad: Søknad = mockk()
         every { søknad.originalSpråk } returns "nb"
-        every { søknad.spørsmål } returns mapOf(
-            "testSpørsmål" to Søknadsfelt(
-                label = mapOf(
-                    "nb" to "TestSpørsmål",
-                    "en" to "TestQuestion",
-                ),
-                verdi = mapOf(
-                    "nb" to "TestSvar",
-                    "en" to "TestAnswer",
-                ),
-            ),
-        )
+        every { søknad.spørsmål } returns
+            mapOf(
+                "testSpørsmål" to
+                    Søknadsfelt(
+                        label =
+                            mapOf(
+                                "nb" to "TestSpørsmål",
+                                "en" to "TestQuestion",
+                            ),
+                        verdi =
+                            mapOf(
+                                "nb" to "TestSvar",
+                                "en" to "TestAnswer",
+                            ),
+                    ),
+            )
         every { søknad.teksterUtenomSpørsmål } returns mapOf()
 
         var barnetrygdSøknadMap = søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(SøknadV8(søknad = søknad), "en")
@@ -59,18 +63,22 @@ class SøknadsfeltSpråkTest(
     fun `Påvirker ikke global objectmapping`() {
         val søknad: Søknad = mockk()
         every { søknad.originalSpråk } returns "nb"
-        every { søknad.spørsmål } returns mapOf(
-            "testSpørsmål" to Søknadsfelt(
-                label = mapOf(
-                    "nb" to "TestSpørsmål",
-                    "en" to "TestQuestion",
-                ),
-                verdi = mapOf(
-                    "nb" to "TestSvar",
-                    "en" to "TestAnswer",
-                ),
-            ),
-        )
+        every { søknad.spørsmål } returns
+            mapOf(
+                "testSpørsmål" to
+                    Søknadsfelt(
+                        label =
+                            mapOf(
+                                "nb" to "TestSpørsmål",
+                                "en" to "TestQuestion",
+                            ),
+                        verdi =
+                            mapOf(
+                                "nb" to "TestSvar",
+                                "en" to "TestAnswer",
+                            ),
+                    ),
+            )
 
         val asJson = objectMapper.writeValueAsString(søknad)
         assertNotEquals(-1, asJson.indexOf("TestSpørsmål"))
@@ -83,36 +91,46 @@ class SøknadsfeltSpråkTest(
     fun `Håndterer nested SøknadsFelter korrekt`() {
         val søknad: Søknad = mockk()
         every { søknad.originalSpråk } returns "nb"
-        every { søknad.spørsmål } returns mapOf(
-            "testSpørsmål" to Søknadsfelt(
-                label = mapOf(
-                    "nb" to "TestSpørsmål",
-                    "en" to "TestQuestion",
-                ),
-                verdi = mapOf(
-                    "nb" to Søknadsfelt(
-                        label = mapOf(
-                            "nb" to "TestNøstetLabel",
-                            "en" to "TestNestedLabel",
-                        ),
-                        verdi = mapOf(
-                            "nb" to "TestNøstetVerdi",
-                            "en" to "TestNestedValue",
-                        ),
+        every { søknad.spørsmål } returns
+            mapOf(
+                "testSpørsmål" to
+                    Søknadsfelt(
+                        label =
+                            mapOf(
+                                "nb" to "TestSpørsmål",
+                                "en" to "TestQuestion",
+                            ),
+                        verdi =
+                            mapOf(
+                                "nb" to
+                                    Søknadsfelt(
+                                        label =
+                                            mapOf(
+                                                "nb" to "TestNøstetLabel",
+                                                "en" to "TestNestedLabel",
+                                            ),
+                                        verdi =
+                                            mapOf(
+                                                "nb" to "TestNøstetVerdi",
+                                                "en" to "TestNestedValue",
+                                            ),
+                                    ),
+                                "en" to
+                                    Søknadsfelt(
+                                        label =
+                                            mapOf(
+                                                "nb" to "TestNøstetLabel",
+                                                "en" to "TestNestedLabel",
+                                            ),
+                                        verdi =
+                                            mapOf(
+                                                "nb" to "TestNøstetVerdi",
+                                                "en" to "TestNestedValue",
+                                            ),
+                                    ),
+                            ),
                     ),
-                    "en" to Søknadsfelt(
-                        label = mapOf(
-                            "nb" to "TestNøstetLabel",
-                            "en" to "TestNestedLabel",
-                        ),
-                        verdi = mapOf(
-                            "nb" to "TestNøstetVerdi",
-                            "en" to "TestNestedValue",
-                        ),
-                    ),
-                ),
-            ),
-        )
+            )
         every { søknad.teksterUtenomSpørsmål } returns mapOf()
 
         val barnetrygdSøknadMap = søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(SøknadV8(søknad = søknad), "nb")
@@ -124,12 +142,14 @@ class SøknadsfeltSpråkTest(
     fun `Håndterer språkvalg for ekstratekster`() {
         val søknad: Søknad = mockk()
         every { søknad.originalSpråk } returns "nb"
-        every { søknad.teksterUtenomSpørsmål } returns mapOf(
-            "test.tekst" to mapOf(
-                "nb" to "TestTekst",
-                "en" to "TestText",
-            ),
-        )
+        every { søknad.teksterUtenomSpørsmål } returns
+            mapOf(
+                "test.tekst" to
+                    mapOf(
+                        "nb" to "TestTekst",
+                        "en" to "TestText",
+                    ),
+            )
 
         val barnetrygdSøknadMap = søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(SøknadV8(søknad = søknad), "nb")
         val barnetrygdSøknadJsonNode = objectMapper.valueToTree<JsonNode>(barnetrygdSøknadMap)

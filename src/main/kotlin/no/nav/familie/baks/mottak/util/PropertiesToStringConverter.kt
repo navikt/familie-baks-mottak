@@ -13,7 +13,6 @@ import java.util.Properties
  */
 @Converter
 class PropertiesToStringConverter : AttributeConverter<Properties, String> {
-
     override fun convertToDatabaseColumn(props: Properties?): String? {
         if (props == null || props.isEmpty) {
             return null

@@ -22,7 +22,6 @@ class DatabaseCleanupService(
     private val entityManager: EntityManager,
     private val environment: Environment,
 ) : InitializingBean {
-
     private val logger = LoggerFactory.getLogger(this::class.java)
     private lateinit var tableNames: List<String>
 
@@ -32,14 +31,15 @@ class DatabaseCleanupService(
      */
     override fun afterPropertiesSet() {
         val metaModel: Metamodel = entityManager.metamodel
-        tableNames = metaModel.managedTypes
-            .filter {
-                it.javaType.kotlin.findAnnotation<Table>() != null
-            }
-            .map {
-                val tableAnnotation: Table? = it.javaType.kotlin.findAnnotation()
-                tableAnnotation?.name ?: throw IllegalStateException("should never get here")
-            }
+        tableNames =
+            metaModel.managedTypes
+                .filter {
+                    it.javaType.kotlin.findAnnotation<Table>() != null
+                }
+                .map {
+                    val tableAnnotation: Table? = it.javaType.kotlin.findAnnotation()
+                    tableAnnotation?.name ?: throw IllegalStateException("should never get here")
+                }
     }
 
     /**

@@ -51,7 +51,6 @@ import java.time.LocalDateTime
 @AutoConfigureWireMock(port = 28085)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OppgaveClientTest {
-
     @Autowired
     @Qualifier("oppgaveClient")
     lateinit var oppgaveClient: OppgaveClient
@@ -266,25 +265,25 @@ class OppgaveClientTest {
     }
 
     companion object {
-
-        private val journalPost = Journalpost(
-            "1234567",
-            Journalposttype.I,
-            Journalstatus.MOTTATT,
-            Tema.BAR.name,
-            "behandlingstemaFraJournalpost",
-            null,
-            Bruker("1234567891011", BrukerIdType.AKTOERID),
-            "9999",
-            "kanal",
-            listOf(
-                DokumentInfo(
-                    "Tittel",
-                    "NAV- 99.00.07",
-                    null,
-                    null,
+        private val journalPost =
+            Journalpost(
+                "1234567",
+                Journalposttype.I,
+                Journalstatus.MOTTATT,
+                Tema.BAR.name,
+                "behandlingstemaFraJournalpost",
+                null,
+                Bruker("1234567891011", BrukerIdType.AKTOERID),
+                "9999",
+                "kanal",
+                listOf(
+                    DokumentInfo(
+                        "Tittel",
+                        "NAV- 99.00.07",
+                        null,
+                        null,
+                    ),
                 ),
-            ),
-        )
+            )
     }
 }

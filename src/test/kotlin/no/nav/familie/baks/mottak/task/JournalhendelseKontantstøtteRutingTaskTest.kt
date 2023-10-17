@@ -23,51 +23,46 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.core.env.Environment
 import java.time.YearMonth
-import java.util.*
+import java.util.Properties
 import kotlin.test.assertEquals
 
 @ExtendWith(MockKExtension::class)
 class JournalhendelseKontantstøtteRutingTaskTest {
+    @MockK private lateinit var pdlClient: PdlClient
 
-    @MockK
-    private lateinit var pdlClient: PdlClient
+    @MockK private lateinit var infotrygdKontantstøtteClient: InfotrygdKontantstøtteClient
 
-    @MockK
-    private lateinit var infotrygdKontantstøtteClient: InfotrygdKontantstøtteClient
+    @MockK private lateinit var taskService: TaskService
 
-    @MockK
-    private lateinit var taskService: TaskService
+    @MockK private lateinit var environment: Environment
 
-    @MockK
-    private lateinit var environment: Environment
-
-    @InjectMockKs
-    private lateinit var journalhendelseKontantstøtteRutingTask: JournalhendelseKontantstøtteRutingTask
+    @InjectMockKs private lateinit var journalhendelseKontantstøtteRutingTask: JournalhendelseKontantstøtteRutingTask
 
     val søkerFnr = "12345678910"
     val barn1Fnr = "11223344556"
     val barn2Fnr = "11223344557"
 
-    @Test
-    fun `doTask - skal opprette OpprettJournalføringOppgaveTask med informasjon om at det finnes løpende sak i Infotrygd når et eller flere av barna har løpende sak i Infotrygd`() {
+    @Test fun `doTask - skal opprette OpprettJournalføringOppgaveTask med informasjon om at det finnes løpende sak i Infotrygd når et eller flere av barna har løpende sak i Infotrygd`() {
         val taskSlot = slot<Task>()
         setupPDLMocks()
         every { environment.getActiveProfiles() } returns arrayOf("dev")
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
-        every { infotrygdKontantstøtteClient.hentPerioderMedKontantstøtteIInfotrygd(any()) } returns InnsynResponse(
-            data = listOf(
-                StonadDto(
-                    fnr = Foedselsnummer(søkerFnr),
-                    YearMonth.now().minusMonths(5),
-                    YearMonth.now().plusMonths(1),
-                    belop = 1000,
+        every { infotrygdKontantstøtteClient.hentPerioderMedKontantstøtteIInfotrygd(any()) } returns
+            InnsynResponse(
+                data =
                     listOf(
-                        BarnDto(Foedselsnummer(barn1Fnr)),
-                        BarnDto(Foedselsnummer(barn2Fnr)),
+                        StonadDto(
+                            fnr = Foedselsnummer(søkerFnr),
+                            YearMonth.now().minusMonths(5),
+                            YearMonth.now().plusMonths(1),
+                            belop = 1000,
+                            listOf(
+                                BarnDto(Foedselsnummer(barn1Fnr)),
+                                BarnDto(Foedselsnummer(barn2Fnr)),
+                            ),
+                        ),
                     ),
-                ),
-            ),
-        )
+            )
         every { taskService.save(capture(taskSlot)) } returns mockk()
 
         journalhendelseKontantstøtteRutingTask.doTask(
@@ -81,26 +76,27 @@ class JournalhendelseKontantstøtteRutingTaskTest {
         assertEquals("Et eller flere av barna har løpende sak i Infotrygd", taskSlot.captured.payload)
     }
 
-    @Test
-    fun `doTask - skal opprette OpprettJournalføringOppgaveTask med tom sakssystem-markering når et eller flere av barna har sak i Infotrygd men ingen løpende`() {
+    @Test fun `doTask - skal opprette OpprettJournalføringOppgaveTask med tom sakssystem-markering når et eller flere av barna har sak i Infotrygd men ingen løpende`() {
         val taskSlot = slot<Task>()
         setupPDLMocks()
         every { environment.getActiveProfiles() } returns arrayOf("dev")
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
-        every { infotrygdKontantstøtteClient.hentPerioderMedKontantstøtteIInfotrygd(any()) } returns InnsynResponse(
-            data = listOf(
-                StonadDto(
-                    fnr = Foedselsnummer(søkerFnr),
-                    YearMonth.now().minusMonths(8),
-                    YearMonth.now().minusMonths(1),
-                    belop = 1000,
+        every { infotrygdKontantstøtteClient.hentPerioderMedKontantstøtteIInfotrygd(any()) } returns
+            InnsynResponse(
+                data =
                     listOf(
-                        BarnDto(Foedselsnummer(barn1Fnr)),
-                        BarnDto(Foedselsnummer(barn2Fnr)),
+                        StonadDto(
+                            fnr = Foedselsnummer(søkerFnr),
+                            YearMonth.now().minusMonths(8),
+                            YearMonth.now().minusMonths(1),
+                            belop = 1000,
+                            listOf(
+                                BarnDto(Foedselsnummer(barn1Fnr)),
+                                BarnDto(Foedselsnummer(barn2Fnr)),
+                            ),
+                        ),
                     ),
-                ),
-            ),
-        )
+            )
         every { taskService.save(capture(taskSlot)) } returns mockk()
 
         journalhendelseKontantstøtteRutingTask.doTask(
@@ -114,8 +110,7 @@ class JournalhendelseKontantstøtteRutingTaskTest {
         assertEquals("", taskSlot.captured.payload)
     }
 
-    @Test
-    fun `doTask - skal opprette OpprettJournalføringOppgaveTask med tom sakssystem-markering når ingen av barna har sak i Infotrygd`() {
+    @Test fun `doTask - skal opprette OpprettJournalføringOppgaveTask med tom sakssystem-markering når ingen av barna har sak i Infotrygd`() {
         val taskSlot = slot<Task>()
         setupPDLMocks()
         every { environment.getActiveProfiles() } returns arrayOf("dev")
@@ -135,26 +130,30 @@ class JournalhendelseKontantstøtteRutingTaskTest {
     }
 
     private fun setupPDLMocks() {
-        every { pdlClient.hentPersonMedRelasjoner(any(), any()) } returns Person(
-            navn = "Ola Norman",
-            forelderBarnRelasjoner = setOf(
-                ForelderBarnRelasjon(barn1Fnr, FORELDERBARNRELASJONROLLE.BARN),
-                ForelderBarnRelasjon(barn2Fnr, FORELDERBARNRELASJONROLLE.BARN),
-            ),
-        )
-        every { pdlClient.hentIdenter(barn1Fnr, any()) } returns listOf(
-            IdentInformasjon(
-                ident = barn1Fnr,
-                gruppe = IdentGruppe.FOLKEREGISTERIDENT.name,
-                historisk = false,
-            ),
-        )
-        every { pdlClient.hentIdenter(barn2Fnr, any()) } returns listOf(
-            IdentInformasjon(
-                ident = barn2Fnr,
-                gruppe = IdentGruppe.FOLKEREGISTERIDENT.name,
-                historisk = false,
-            ),
-        )
+        every { pdlClient.hentPersonMedRelasjoner(any(), any()) } returns
+            Person(
+                navn = "Ola Norman",
+                forelderBarnRelasjoner =
+                    setOf(
+                        ForelderBarnRelasjon(barn1Fnr, FORELDERBARNRELASJONROLLE.BARN),
+                        ForelderBarnRelasjon(barn2Fnr, FORELDERBARNRELASJONROLLE.BARN),
+                    ),
+            )
+        every { pdlClient.hentIdenter(barn1Fnr, any()) } returns
+            listOf(
+                IdentInformasjon(
+                    ident = barn1Fnr,
+                    gruppe = IdentGruppe.FOLKEREGISTERIDENT.name,
+                    historisk = false,
+                ),
+            )
+        every { pdlClient.hentIdenter(barn2Fnr, any()) } returns
+            listOf(
+                IdentInformasjon(
+                    ident = barn2Fnr,
+                    gruppe = IdentGruppe.FOLKEREGISTERIDENT.name,
+                    historisk = false,
+                ),
+            )
     }
 }

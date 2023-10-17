@@ -17,7 +17,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(MockKExtension::class)
 class SøknadSpråkvelgerServiceTest {
-
     private val søknadSpråkvelgerService: SøknadSpråkvelgerService = SøknadSpråkvelgerService()
 
     @Test
@@ -25,29 +24,35 @@ class SøknadSpråkvelgerServiceTest {
         val kontantstøtteSøknad: KontantstøtteSøknad = mockk()
         val barn: Barn = mockk()
         val dokumentasjon: Søknaddokumentasjon = mockk()
-        val tekstPåSpråk = mapOf(
-            "nb" to "Norge",
-            "nn" to "Noreg",
-            "en" to "Norway",
-        )
-        val teksterTilPdf = mapOf(
-            "testApiNavn" to TekstPåSpråkMap(
-                tekstPåSpråk,
-            ),
-        )
+        val tekstPåSpråk =
+            mapOf(
+                "nb" to "Norge",
+                "nn" to "Noreg",
+                "en" to "Norway",
+            )
+        val teksterTilPdf =
+            mapOf(
+                "testApiNavn" to
+                    TekstPåSpråkMap(
+                        tekstPåSpråk,
+                    ),
+            )
         every { barn.teksterTilPdf } returns teksterTilPdf
-        every { kontantstøtteSøknad.barn } returns listOf(
-            barn,
-        )
+        every { kontantstøtteSøknad.barn } returns
+            listOf(
+                barn,
+            )
         every { kontantstøtteSøknad.teksterTilPdf } returns teksterTilPdf
-        every { kontantstøtteSøknad.erBarnAdoptert } returns Søknadsfelt(
-            label = tekstPåSpråk,
-            verdi = tekstPåSpråk,
-        )
+        every { kontantstøtteSøknad.erBarnAdoptert } returns
+            Søknadsfelt(
+                label = tekstPåSpråk,
+                verdi = tekstPåSpråk,
+            )
         every { dokumentasjon.dokumentasjonSpråkTittel } returns TekstPåSpråkMap(tekstPåSpråk)
-        every { kontantstøtteSøknad.dokumentasjon } returns listOf(
-            dokumentasjon,
-        )
+        every { kontantstøtteSøknad.dokumentasjon } returns
+            listOf(
+                dokumentasjon,
+            )
 
         val versjonertKontantstøtteSøknad = KontantstøtteSøknadV4(kontantstøtteSøknad = kontantstøtteSøknad)
 

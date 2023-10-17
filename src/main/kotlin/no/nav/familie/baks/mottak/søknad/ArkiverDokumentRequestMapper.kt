@@ -20,7 +20,6 @@ import no.nav.familie.kontrakter.felles.dokarkiv.v2.Dokument
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.Filtype
 
 object ArkiverDokumentRequestMapper {
-
     private val KONTANTSTØTTE_ID_POSTFIX = "NAV_34-00.08"
     private val BARNETRYGD_ID_ORDINÆR_POSTFIX = "NAV_33-00.07"
     private val BARNETRYGD_ID_UTVIDET_POSTFIX = "NAV_33-00.09"
@@ -32,23 +31,27 @@ object ArkiverDokumentRequestMapper {
         vedleggMap: Map<String, DBVedlegg>,
         pdfOriginalSpråk: ByteArray,
     ): ArkiverDokumentRequest {
-        val (søknadstype, dokumentasjon) = when (versjonertSøknad) {
-            is SøknadV7 -> Pair(
-                versjonertSøknad.søknad.søknadstype,
-                versjonertSøknad.søknad.dokumentasjon.map { BarnetrygdSøknaddokumentasjon(it) },
-            )
+        val (søknadstype, dokumentasjon) =
+            when (versjonertSøknad) {
+                is SøknadV7 ->
+                    Pair(
+                        versjonertSøknad.søknad.søknadstype,
+                        versjonertSøknad.søknad.dokumentasjon.map { BarnetrygdSøknaddokumentasjon(it) },
+                    )
 
-            is SøknadV8 -> Pair(
-                versjonertSøknad.søknad.søknadstype,
-                versjonertSøknad.søknad.dokumentasjon.map { BarnetrygdSøknaddokumentasjon(it) },
-            )
-        }
+                is SøknadV8 ->
+                    Pair(
+                        versjonertSøknad.søknad.søknadstype,
+                        versjonertSøknad.søknad.dokumentasjon.map { BarnetrygdSøknaddokumentasjon(it) },
+                    )
+            }
 
-        val dokumenttype = when (søknadstype) {
-            Søknadstype.ORDINÆR -> Dokumenttype.BARNETRYGD_ORDINÆR
-            Søknadstype.UTVIDET -> Dokumenttype.BARNETRYGD_UTVIDET
-            Søknadstype.IKKE_SATT -> Dokumenttype.BARNETRYGD_ORDINÆR
-        }
+        val dokumenttype =
+            when (søknadstype) {
+                Søknadstype.ORDINÆR -> Dokumenttype.BARNETRYGD_ORDINÆR
+                Søknadstype.UTVIDET -> Dokumenttype.BARNETRYGD_UTVIDET
+                Søknadstype.IKKE_SATT -> Dokumenttype.BARNETRYGD_ORDINÆR
+            }
 
         val søknadsdokumentJson =
             Dokument(
@@ -63,11 +66,12 @@ object ArkiverDokumentRequestMapper {
                 dokument = pdf,
                 filtype = Filtype.PDFA,
                 filnavn = null,
-                tittel = when (dokumenttype) {
-                    Dokumenttype.BARNETRYGD_UTVIDET -> "Søknad om utvidet barnetrygd"
-                    Dokumenttype.BARNETRYGD_ORDINÆR -> "Søknad om ordinær barnetrygd"
-                    else -> "Søknad om ordinær barnetrygd"
-                },
+                tittel =
+                    when (dokumenttype) {
+                        Dokumenttype.BARNETRYGD_UTVIDET -> "Søknad om utvidet barnetrygd"
+                        Dokumenttype.BARNETRYGD_ORDINÆR -> "Søknad om ordinær barnetrygd"
+                        else -> "Søknad om ordinær barnetrygd"
+                    },
                 dokumenttype = dokumenttype,
             )
 
@@ -75,12 +79,13 @@ object ArkiverDokumentRequestMapper {
             fnr = dbSøknad.fnr,
             forsøkFerdigstill = false,
             hoveddokumentvarianter = listOf(søknadsdokumentPdf, søknadsdokumentJson),
-            vedleggsdokumenter = hentVedleggListeTilArkivering(
-                dokumentasjon,
-                vedleggMap,
-                pdfOriginalSpråk,
-                Dokumenttype.BARNETRYGD_VEDLEGG,
-            ),
+            vedleggsdokumenter =
+                hentVedleggListeTilArkivering(
+                    dokumentasjon,
+                    vedleggMap,
+                    pdfOriginalSpråk,
+                    Dokumenttype.BARNETRYGD_VEDLEGG,
+                ),
             eksternReferanseId = genererEksternReferanseId(dbSøknad.id, dokumenttype),
         )
     }
@@ -94,13 +99,14 @@ object ArkiverDokumentRequestMapper {
     ): ArkiverDokumentRequest {
         val dokumenttype = Dokumenttype.KONTANTSTØTTE_SØKNAD
 
-        val dokumentasjon = when (versjonertSøknad) {
-            is KontantstøtteSøknadV3 ->
-                versjonertSøknad.kontantstøtteSøknad.dokumentasjon.map { KontantstøtteSøknaddokumentasjon(it) }
+        val dokumentasjon =
+            when (versjonertSøknad) {
+                is KontantstøtteSøknadV3 ->
+                    versjonertSøknad.kontantstøtteSøknad.dokumentasjon.map { KontantstøtteSøknaddokumentasjon(it) }
 
-            is KontantstøtteSøknadV4 ->
-                versjonertSøknad.kontantstøtteSøknad.dokumentasjon.map { KontantstøtteSøknaddokumentasjon(it) }
-        }
+                is KontantstøtteSøknadV4 ->
+                    versjonertSøknad.kontantstøtteSøknad.dokumentasjon.map { KontantstøtteSøknaddokumentasjon(it) }
+            }
 
         val søknadsdokumentJson =
             Dokument(
@@ -123,12 +129,13 @@ object ArkiverDokumentRequestMapper {
             fnr = dbKontantstøtteSøknad.fnr,
             forsøkFerdigstill = false,
             hoveddokumentvarianter = listOf(søknadsdokumentPdf, søknadsdokumentJson),
-            vedleggsdokumenter = hentVedleggListeTilArkivering(
-                dokumentasjon,
-                vedleggMap,
-                pdfOriginalSpråk,
-                Dokumenttype.KONTANTSTØTTE_VEDLEGG,
-            ),
+            vedleggsdokumenter =
+                hentVedleggListeTilArkivering(
+                    dokumentasjon,
+                    vedleggMap,
+                    pdfOriginalSpråk,
+                    Dokumenttype.KONTANTSTØTTE_VEDLEGG,
+                ),
             eksternReferanseId = genererEksternReferanseId(dbKontantstøtteSøknad.id, dokumenttype),
         )
     }
@@ -170,15 +177,19 @@ object ArkiverDokumentRequestMapper {
         return vedlegg
     }
 
-    private fun genererEksternReferanseId(id: Long, dokumenttype: Dokumenttype) =
+    private fun genererEksternReferanseId(
+        id: Long,
+        dokumenttype: Dokumenttype,
+    ) =
         "${id}_${postfixForDokumenttype(dokumenttype)}"
 
-    private fun postfixForDokumenttype(dokumenttype: Dokumenttype) = when (dokumenttype) {
-        Dokumenttype.BARNETRYGD_ORDINÆR -> BARNETRYGD_ID_ORDINÆR_POSTFIX
-        Dokumenttype.BARNETRYGD_UTVIDET -> BARNETRYGD_ID_UTVIDET_POSTFIX
-        Dokumenttype.KONTANTSTØTTE_SØKNAD -> KONTANTSTØTTE_ID_POSTFIX
-        else -> throw RuntimeException("Støtter ikke journalføring for dokumenttype: $dokumenttype")
-    }
+    private fun postfixForDokumenttype(dokumenttype: Dokumenttype) =
+        when (dokumenttype) {
+            Dokumenttype.BARNETRYGD_ORDINÆR -> BARNETRYGD_ID_ORDINÆR_POSTFIX
+            Dokumenttype.BARNETRYGD_UTVIDET -> BARNETRYGD_ID_UTVIDET_POSTFIX
+            Dokumenttype.KONTANTSTØTTE_SØKNAD -> KONTANTSTØTTE_ID_POSTFIX
+            else -> throw RuntimeException("Støtter ikke journalføring for dokumenttype: $dokumenttype")
+        }
 }
 
 interface ISøknaddokumentasjon {

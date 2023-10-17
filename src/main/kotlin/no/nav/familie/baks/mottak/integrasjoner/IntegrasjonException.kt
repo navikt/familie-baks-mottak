@@ -13,7 +13,6 @@ class IntegrasjonException(
     uri: URI? = null,
     ident: String? = null,
 ) : RuntimeException(responseFra(uri, throwable) ?: msg, throwable) {
-
     init {
         val detaljertMelding = responseFra(uri, throwable)
         secureLogger.info(
@@ -29,7 +28,10 @@ class IntegrasjonException(
         private val logger = LoggerFactory.getLogger(IntegrasjonException::class.java)
         private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
-        fun responseFra(uri: URI?, e: Throwable?): String? {
+        fun responseFra(
+            uri: URI?,
+            e: Throwable?,
+        ): String? {
             return when (e) {
                 is RestClientResponseException,
                 -> "Error mot $uri status=${e.getRawStatusCode()} body=${e.responseBodyAsString}" else
