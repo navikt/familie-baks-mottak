@@ -21,7 +21,6 @@ import java.io.IOException
 @AutoConfigureWireMock(port = 28085)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SakClientTest {
-
     @Autowired
     lateinit var sakClient: SakClient
 

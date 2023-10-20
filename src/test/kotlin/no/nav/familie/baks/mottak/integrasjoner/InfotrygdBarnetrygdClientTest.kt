@@ -22,7 +22,6 @@ import java.nio.file.Files
 @AutoConfigureWireMock(port = 28085)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class InfotrygdBarnetrygdClientTest {
-
     @Autowired
     lateinit var infotrygdClient: InfotrygdBarnetrygdClient
 

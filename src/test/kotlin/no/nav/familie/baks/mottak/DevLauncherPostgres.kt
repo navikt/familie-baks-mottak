@@ -10,7 +10,8 @@ import org.springframework.context.annotation.Import
 class DevLauncherPostgres
 
 fun main(args: Array<String>) {
-    val app = SpringApplicationBuilder(DevLauncherPostgres::class.java)
-        .profiles("postgres", "mock-dokarkiv", "mock-dokgen")
+    val app =
+        SpringApplicationBuilder(DevLauncherPostgres::class.java)
+            .profiles("postgres", "mock-dokarkiv", "mock-dokgen")
     app.run(*args)
 }

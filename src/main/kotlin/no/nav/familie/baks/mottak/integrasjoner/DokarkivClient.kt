@@ -20,15 +20,18 @@ class DokarkivClient(
     @Qualifier("clientCredentials") restOperations: RestOperations,
 ) :
     AbstractRestClient(restOperations, "integrasjon") {
-
-    fun oppdaterJournalpostSak(jp: Journalpost, fagsakId: String) {
+    fun oppdaterJournalpostSak(
+        jp: Journalpost,
+        fagsakId: String,
+    ) {
         logger.info("Oppdaterer journalpost ${jp.journalpostId} med fagsaktilknytning $fagsakId ")
         val uri = URI.create("$integrasjonUri/arkiv/v2/${jp.journalpostId}")
-        val request = TilknyttFagsakRequest(
-            bruker = Bruker(idType = IdType.valueOf(jp.bruker!!.type.name), id = jp.bruker.id),
-            tema = "BAR",
-            sak = Sak(fagsakId, "BA"),
-        )
+        val request =
+            TilknyttFagsakRequest(
+                bruker = Bruker(idType = IdType.valueOf(jp.bruker!!.type.name), id = jp.bruker.id),
+                tema = "BAR",
+                sak = Sak(fagsakId, "BA"),
+            )
 
         when (val response = utførRequest(uri, request)) {
             is Throwable -> throw IntegrasjonException(
@@ -56,7 +59,10 @@ class DokarkivClient(
         }
     }
 
-    private fun utførRequest(uri: URI, request: Any = ""): Any {
+    private fun utførRequest(
+        uri: URI,
+        request: Any = "",
+    ): Any {
         return Result.runCatching {
             putForEntity<Ressurs<Any>>(uri, request)
         }.fold(
@@ -92,6 +98,8 @@ class DokarkivClient(
     )
 
     enum class IdType {
-        FNR, ORGNR, AKTOERID
+        FNR,
+        ORGNR,
+        AKTOERID,
     }
 }

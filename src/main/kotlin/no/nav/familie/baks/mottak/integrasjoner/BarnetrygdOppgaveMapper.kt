@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service
 @Service
 class BarnetrygdOppgaveMapper(hentEnhetClient: HentEnhetClient, pdlClient: PdlClient) :
     AbstractOppgaveMapper(hentEnhetClient, pdlClient) {
-
     override val tema: Tema = Tema.BAR
 
     // Behandlingstema og behandlingstype settes basert på regelsettet som er dokumentert nederst her: https://confluence.adeo.no/display/TFA/Mottak+av+dokumenter

@@ -41,7 +41,6 @@ class JournalhendelseRutingTask(
     private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,
     private val taskService: TaskService,
 ) : AsyncTaskStep {
-
     private val tema = Tema.BAR
 
     val log: Logger = LoggerFactory.getLogger(JournalhendelseRutingTask::class.java)
@@ -52,24 +51,25 @@ class JournalhendelseRutingTask(
 
         val (baSak, infotrygdSak) = brukersIdent?.run { søkEtterSakIBaSakOgInfotrygd(this) } ?: Pair(null, null)
 
-        val sakssystemMarkering = when {
-            baSak.finnes() && infotrygdSak.finnes() -> {
-                incrementSakssystemMarkering("Begge")
-                "Bruker har sak i både Infotrygd og BA-sak"
+        val sakssystemMarkering =
+            when {
+                baSak.finnes() && infotrygdSak.finnes() -> {
+                    incrementSakssystemMarkering("Begge")
+                    "Bruker har sak i både Infotrygd og BA-sak"
+                }
+                baSak.finnes() -> {
+                    incrementSakssystemMarkering("BA_SAK")
+                    "${baSak!!.part} har sak i BA-sak"
+                }
+                infotrygdSak.finnes() -> {
+                    incrementSakssystemMarkering("Infotrygd")
+                    "${infotrygdSak!!.part} har sak i Infotrygd"
+                }
+                else -> {
+                    incrementSakssystemMarkering("Ingen")
+                    ""
+                } // trenger ingen form for markering. Kan løses av begge systemer
             }
-            baSak.finnes() -> {
-                incrementSakssystemMarkering("BA_SAK")
-                "${baSak!!.part} har sak i BA-sak"
-            }
-            infotrygdSak.finnes() -> {
-                incrementSakssystemMarkering("Infotrygd")
-                "${infotrygdSak!!.part} har sak i Infotrygd"
-            }
-            else -> {
-                incrementSakssystemMarkering("Ingen")
-                ""
-            } // trenger ingen form for markering. Kan løses av begge systemer
-        }
 
         Task(
             type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
@@ -86,40 +86,57 @@ class JournalhendelseRutingTask(
     }
 
     private fun søkEtterSakIBaSakOgInfotrygd(brukersIdent: String): Pair<Sakspart?, Sakspart?> {
-        val brukersIdenter = try {
-            pdlClient.hentIdenter(brukersIdent, tema).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }.map { it.ident }
-        } catch (e: IntegrasjonException) {
-            return Pair(null, null)
-        }
-        val barnasIdenter = pdlClient.hentPersonMedRelasjoner(brukersIdent, tema).forelderBarnRelasjoner
-            .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
-            .map { it.relatertPersonsIdent }
-            .filterNotNull()
-        val alleBarnasIdenter = barnasIdenter.flatMap { pdlClient.hentIdenter(it, tema) }
-            .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
-            .map { it.ident }
+        val brukersIdenter =
+            try {
+                pdlClient.hentIdenter(brukersIdent, tema).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }.map { it.ident }
+            } catch (e: IntegrasjonException) {
+                return Pair(null, null)
+            }
+        val barnasIdenter =
+            pdlClient.hentPersonMedRelasjoner(brukersIdent, tema).forelderBarnRelasjoner
+                .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
+                .map { it.relatertPersonsIdent }
+                .filterNotNull()
+        val alleBarnasIdenter =
+            barnasIdenter.flatMap { pdlClient.hentIdenter(it, tema) }
+                .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
+                .map { it.ident }
 
         return Pair(
             first = sakClient.hentRestFagsakDeltagerListe(brukersIdent, barnasIdenter).sakspart(sakClient),
-            second = infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, alleBarnasIdenter).sakspart
-                ?: infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).sakspart,
+            second =
+                infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, alleBarnasIdenter).sakspart
+                    ?: infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).sakspart,
         )
     }
 
     fun Sakspart?.finnes(): Boolean = this != null
 
     companion object {
-
         const val TASK_STEP_TYPE = "journalhendelseRuting"
     }
 }
 
 val InfotrygdSøkResponse<StønadDto>.sakspart: Sakspart?
-    get() = if (bruker.isNotEmpty()) Sakspart.SØKER else if (barn.isNotEmpty()) Sakspart.ANNEN else null
+    get() =
+        if (bruker.isNotEmpty()) {
+            Sakspart.SØKER
+        } else if (barn.isNotEmpty()) {
+            Sakspart.ANNEN
+        } else {
+            null
+        }
 
 val InfotrygdSøkResponse<SakDto>.sakspart: Sakspart?
     @JvmName("sakspart")
-    get() = if (bruker.harSak()) Sakspart.SØKER else if (barn.harSak()) Sakspart.ANNEN else null
+    get() =
+        if (bruker.harSak()) {
+            Sakspart.SØKER
+        } else if (barn.harSak()) {
+            Sakspart.ANNEN
+        } else {
+            null
+        }
 
 private fun List<SakDto>.harSak(): Boolean {
     val (sakerMedVedtak, sakerUtenVedtak) = this.partition { it.stønad != null }
@@ -139,11 +156,12 @@ enum class Sakspart(val part: String) {
     ANNEN("Søsken"),
 }
 
-private fun List<RestFagsakDeltager>.sakspart(sakClient: SakClient): Sakspart? = when {
-    any { it.rolle == FORELDER && it.harPågåendeSak(sakClient) } -> Sakspart.SØKER
-    any { it.rolle == BARN && it.harPågåendeSak(sakClient) } -> Sakspart.ANNEN
-    else -> null
-}
+private fun List<RestFagsakDeltager>.sakspart(sakClient: SakClient): Sakspart? =
+    when {
+        any { it.rolle == FORELDER && it.harPågåendeSak(sakClient) } -> Sakspart.SØKER
+        any { it.rolle == BARN && it.harPågåendeSak(sakClient) } -> Sakspart.ANNEN
+        else -> null
+    }
 
 private fun RestFagsakDeltager.harPågåendeSak(sakClient: SakClient): Boolean {
     return when (fagsakStatus) {
@@ -153,8 +171,9 @@ private fun RestFagsakDeltager.harPågåendeSak(sakClient: SakClient): Boolean {
 }
 
 private fun sisteBehandlingHenlagtEllerTekniskOpphør(fagsak: RestFagsak): Boolean {
-    val sisteBehandling = fagsak.behandlinger
-        .sortedBy { it.opprettetTidspunkt }
-        .findLast { it.steg == "BEHANDLING_AVSLUTTET" } ?: return false
+    val sisteBehandling =
+        fagsak.behandlinger
+            .sortedBy { it.opprettetTidspunkt }
+            .findLast { it.steg == "BEHANDLING_AVSLUTTET" } ?: return false
     return sisteBehandling.type == "TEKNISK_OPPHØR" || sisteBehandling.resultat.startsWith("HENLAGT")
 }

@@ -10,7 +10,7 @@ import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.kontrakter.felles.oppgave.OpprettOppgaveRequest
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.Locale
 
 abstract class AbstractOppgaveMapper(
     private val hentEnhetClient: HentEnhetClient,
@@ -41,7 +41,10 @@ abstract class AbstractOppgaveMapper(
 
     abstract fun hentBehandlingstype(journalpost: Journalpost): String?
 
-    private fun tilOppgaveIdent(journalpost: Journalpost, oppgavetype: Oppgavetype): OppgaveIdentV2? {
+    private fun tilOppgaveIdent(
+        journalpost: Journalpost,
+        oppgavetype: Oppgavetype,
+    ): OppgaveIdentV2? {
         if (journalpost.bruker == null) {
             when (oppgavetype) {
                 Oppgavetype.BehandleSak -> error("Journalpost ${journalpost.journalpostId} mangler bruker")
@@ -59,15 +62,14 @@ abstract class AbstractOppgaveMapper(
                         ident = it,
                         gruppe = IdentGruppe.AKTOERID,
                     )
+                } ?: if (oppgavetype == Oppgavetype.BehandleSak) {
+                    throw IntegrasjonException(
+                        msg = "Fant ikke aktørId på person i PDL",
+                        ident = journalpost.bruker.id,
+                    )
+                } else {
+                    null
                 }
-                    ?: if (oppgavetype == Oppgavetype.BehandleSak) {
-                        throw IntegrasjonException(
-                            msg = "Fant ikke aktørId på person i PDL",
-                            ident = journalpost.bruker.id,
-                        )
-                    } else {
-                        null
-                    }
             }
 
             BrukerIdType.ORGNR -> {
@@ -83,12 +85,16 @@ abstract class AbstractOppgaveMapper(
         }
     }
 
-    private fun tilBeskrivelse(journalpost: Journalpost, beskrivelse: String?): String {
-        val bindestrek = if (!beskrivelse.isNullOrEmpty() && !journalpost.hentHovedDokumentTittel().isNullOrEmpty()) {
-            "-"
-        } else {
-            ""
-        }
+    private fun tilBeskrivelse(
+        journalpost: Journalpost,
+        beskrivelse: String?,
+    ): String {
+        val bindestrek =
+            if (!beskrivelse.isNullOrEmpty() && !journalpost.hentHovedDokumentTittel().isNullOrEmpty()) {
+                "-"
+            } else {
+                ""
+            }
 
         return "${journalpost.hentHovedDokumentTittel().orEmpty()} $bindestrek ${beskrivelse.orEmpty()}".trim()
     }
@@ -107,17 +113,18 @@ abstract class AbstractOppgaveMapper(
         }
     }
 
-    private fun hentAktørIdFraPdl(brukerId: String, tema: Tema): String? {
+    private fun hentAktørIdFraPdl(
+        brukerId: String,
+        tema: Tema,
+    ): String? {
         return try {
-            pdlClient.hentIdenter(brukerId, tema).filter { it.gruppe == Identgruppe.AKTORID.name && !it.historisk }
-                .lastOrNull()?.ident
+            pdlClient.hentIdenter(brukerId, tema).filter { it.gruppe == Identgruppe.AKTORID.name && !it.historisk }.lastOrNull()?.ident
         } catch (e: IntegrasjonException) {
             null
         }
     }
 
-    fun erEØS(journalpost: Journalpost) =
-        journalpost.bruker?.type == BrukerIdType.FNR && erDnummer(journalpost.bruker.id)
+    fun erEØS(journalpost: Journalpost) = journalpost.bruker?.type == BrukerIdType.FNR && erDnummer(journalpost.bruker.id)
 
     private fun validerJournalpost(journalpost: Journalpost) {
         if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
@@ -140,13 +147,10 @@ interface IOppgaveMapper {
     fun støtterTema(tema: Tema) = this.tema == tema
 }
 
-@Service
-class OppgaveMapperService(val oppgaveMappers: Collection<IOppgaveMapper>) {
+@Service class OppgaveMapperService(val oppgaveMappers: Collection<IOppgaveMapper>) {
     fun tilOpprettOppgaveRequest(
         oppgavetype: Oppgavetype,
         journalpost: Journalpost,
         beskrivelse: String? = null,
-    ): OpprettOppgaveRequest =
-        oppgaveMappers.first { it.støtterTema(Tema.valueOf(journalpost.tema!!)) }
-            .tilOpprettOppgaveRequest(oppgavetype, journalpost, beskrivelse)
+    ): OpprettOppgaveRequest = oppgaveMappers.first { it.støtterTema(Tema.valueOf(journalpost.tema!!)) }.tilOpprettOppgaveRequest(oppgavetype, journalpost, beskrivelse)
 }

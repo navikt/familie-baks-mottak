@@ -17,8 +17,8 @@ data class PdlHendelse(
     val sivilstand: String? = null,
     val sivilstandDato: LocalDate? = null,
 ) {
-
     // TODO: Skal gjøres tydeligere og mer robust.
     fun hentPersonident() = personIdenter.first { it.length == 11 }
+
     fun hentPersonidenter() = personIdenter.filter { it.length == 11 }
 }

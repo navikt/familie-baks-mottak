@@ -33,7 +33,6 @@ import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NavnoHendelseTaskLøypeTest {
-
     private val mockJournalpostClient: JournalpostClient = mockk()
     private val mockSakClient: SakClient = mockk()
     private val mockOppgaveClient: OppgaveClient = mockk(relaxed = true)
@@ -41,17 +40,19 @@ class NavnoHendelseTaskLøypeTest {
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
 
-    private val rutingSteg = JournalhendelseRutingTask(
-        mockPdlClient,
-        mockSakClient,
-        mockInfotrygdBarnetrygdClient,
-        mockTaskService,
-    )
+    private val rutingSteg =
+        JournalhendelseRutingTask(
+            mockPdlClient,
+            mockSakClient,
+            mockInfotrygdBarnetrygdClient,
+            mockTaskService,
+        )
 
-    private val journalføringSteg = OpprettJournalføringOppgaveTask(
-        mockJournalpostClient,
-        mockOppgaveClient,
-    )
+    private val journalføringSteg =
+        OpprettJournalføringOppgaveTask(
+            mockJournalpostClient,
+            mockOppgaveClient,
+        )
 
     @BeforeEach
     internal fun setUp() {
@@ -59,18 +60,19 @@ class NavnoHendelseTaskLøypeTest {
         // Inngående digital, Mottatt
         every {
             mockJournalpostClient.hentJournalpost(any())
-        } returns Journalpost(
-            journalpostId = JOURNALPOST_ID,
-            journalposttype = Journalposttype.I,
-            journalstatus = Journalstatus.MOTTATT,
-            bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
-            tema = "BAR",
-            kanal = MOTTAK_KANAL,
-            behandlingstema = null,
-            dokumenter = null,
-            journalforendeEnhet = null,
-            sak = null,
-        )
+        } returns
+            Journalpost(
+                journalpostId = JOURNALPOST_ID,
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+                tema = "BAR",
+                kanal = MOTTAK_KANAL,
+                behandlingstema = null,
+                dokumenter = null,
+                journalforendeEnhet = null,
+                sak = null,
+            )
 
         every {
             mockTaskService.save(any<Task>())
@@ -176,16 +178,17 @@ class NavnoHendelseTaskLøypeTest {
 
         every {
             mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
-        } returns InfotrygdSøkResponse(
-            listOf(
-                SakDto(
-                    status = StatusKode.FB.name,
-                    vedtaksdato = LocalDate.now(),
-                    stønad = StønadDto(opphørsgrunn = MIGRERT.kode),
+        } returns
+            InfotrygdSøkResponse(
+                listOf(
+                    SakDto(
+                        status = StatusKode.FB.name,
+                        vedtaksdato = LocalDate.now(),
+                        stønad = StønadDto(opphørsgrunn = MIGRERT.kode),
+                    ),
                 ),
-            ),
-            emptyList(),
-        )
+                emptyList(),
+            )
 
         kjørRutingTaskOgReturnerNesteTask().run { journalføringSteg.doTask(this) }
 
@@ -208,12 +211,13 @@ class NavnoHendelseTaskLøypeTest {
             },
         )
 
-        val nesteTask = slot<Task>().let { nyTask ->
-            verify(atMost = 1) {
-                mockTaskService.save(capture(nyTask))
+        val nesteTask =
+            slot<Task>().let { nyTask ->
+                verify(atMost = 1) {
+                    mockTaskService.save(capture(nyTask))
+                }
+                nyTask.captured
             }
-            nyTask.captured
-        }
         return nesteTask
     }
 

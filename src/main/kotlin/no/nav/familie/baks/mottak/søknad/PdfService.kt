@@ -22,31 +22,37 @@ class PdfService(
     private val pdfClient: PdfClient,
     private val søknadSpråkvelgerService: SøknadSpråkvelgerService,
 ) {
-
-    fun lagBarnetrygdPdf(versjonertSøknad: VersjonertSøknad, dbSøknad: DBSøknad, språk: String = "nb"): ByteArray {
+    fun lagBarnetrygdPdf(
+        versjonertSøknad: VersjonertSøknad,
+        dbSøknad: DBSøknad,
+        språk: String = "nb",
+    ): ByteArray {
         val barnetrygdSøknadMapForSpråk =
             søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(versjonertSøknad, språk)
 
-        val (søknadstype, navn) = when (versjonertSøknad) {
-            is SøknadV7 -> {
-                Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.søker.navn)
-            }
+        val (søknadstype, navn) =
+            when (versjonertSøknad) {
+                is SøknadV7 -> {
+                    Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.søker.navn)
+                }
 
-            is SøknadV8 -> {
-                Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.søker.navn)
+                is SøknadV8 -> {
+                    Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.søker.navn)
+                }
             }
-        }
 
         val path: String = søknadstypeTilPath(søknadstype)
-        val ekstraFelterMap = hentEkstraFelter(
-            navn = navn.verdi.getValue("nb"),
-            opprettetTid = dbSøknad.opprettetTid,
-            fnr = dbSøknad.fnr,
-            label = when (søknadstype) {
-                Søknadstype.UTVIDET -> "Søknad om utvidet barnetrygd"
-                else -> "Søknad om ordinær barnetrygd"
-            },
-        )
+        val ekstraFelterMap =
+            hentEkstraFelter(
+                navn = navn.verdi.getValue("nb"),
+                opprettetTid = dbSøknad.opprettetTid,
+                fnr = dbSøknad.fnr,
+                label =
+                    when (søknadstype) {
+                        Søknadstype.UTVIDET -> "Søknad om utvidet barnetrygd"
+                        else -> "Søknad om ordinær barnetrygd"
+                    },
+            )
         return pdfClient.lagPdf(barnetrygdSøknadMapForSpråk + ekstraFelterMap, path)
     }
 
@@ -58,17 +64,19 @@ class PdfService(
         val kontantstøtteSøknadMapForSpråk =
             søknadSpråkvelgerService.konverterKontantstøtteSøknadTilMapForSpråk(versjonertSøknad, språk)
 
-        val navn = when (versjonertSøknad) {
-            is KontantstøtteSøknadV3 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
-            is KontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
-        }
+        val navn =
+            when (versjonertSøknad) {
+                is KontantstøtteSøknadV3 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
+                is KontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
+            }
 
-        val ekstraFelterMap = hentEkstraFelter(
-            navn = navn.verdi.getValue("nb"),
-            opprettetTid = dbKontantstøtteSøknad.opprettetTid,
-            fnr = dbKontantstøtteSøknad.fnr,
-            label = "Søknad om kontantstøtte",
-        )
+        val ekstraFelterMap =
+            hentEkstraFelter(
+                navn = navn.verdi.getValue("nb"),
+                opprettetTid = dbKontantstøtteSøknad.opprettetTid,
+                fnr = dbKontantstøtteSøknad.fnr,
+                label = "Søknad om kontantstøtte",
+            )
         return pdfClient.lagPdf(kontantstøtteSøknadMapForSpråk + ekstraFelterMap, "kontantstotte-soknad")
     }
 
@@ -86,9 +94,10 @@ class PdfService(
         label: String,
     ): Map<String, String> {
         return mapOf(
-            "dokumentDato" to opprettetTid.format(
-                DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no")),
-            ),
+            "dokumentDato" to
+                opprettetTid.format(
+                    DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no")),
+                ),
             "navn" to navn,
             "fodselsnummer" to fnr,
             "label" to label,

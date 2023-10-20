@@ -49,7 +49,6 @@ import java.time.YearMonth
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VurderLivshendelseTaskTest {
-
     private val mockOppgaveClient: OppgaveClient = mockk()
     private val mockSakClient: SakClient = mockk()
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
@@ -98,32 +97,35 @@ class VurderLivshendelseTaskTest {
                 any(),
                 any(),
             )
-        } returns PdlPersonData(
-            forelderBarnRelasjon = listOf(
-                PdlForeldreBarnRelasjon(
-                    minRolleForPerson = FORELDERBARNRELASJONROLLE.BARN,
-                    relatertPersonsIdent = PERSONIDENT_MOR,
-                    relatertPersonsRolle = FORELDERBARNRELASJONROLLE.MOR,
-                ),
-                PdlForeldreBarnRelasjon(
-                    minRolleForPerson = FORELDERBARNRELASJONROLLE.BARN,
-                    relatertPersonsIdent = PERSONIDENT_FAR,
-                    relatertPersonsRolle = FORELDERBARNRELASJONROLLE.FAR,
-                ),
-            ),
-            dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now())),
-            fødsel = listOf(Fødsel(LocalDate.of(1980, 8, 3))),
-        )
+        } returns
+            PdlPersonData(
+                forelderBarnRelasjon =
+                    listOf(
+                        PdlForeldreBarnRelasjon(
+                            minRolleForPerson = FORELDERBARNRELASJONROLLE.BARN,
+                            relatertPersonsIdent = PERSONIDENT_MOR,
+                            relatertPersonsRolle = FORELDERBARNRELASJONROLLE.MOR,
+                        ),
+                        PdlForeldreBarnRelasjon(
+                            minRolleForPerson = FORELDERBARNRELASJONROLLE.BARN,
+                            relatertPersonsIdent = PERSONIDENT_FAR,
+                            relatertPersonsRolle = FORELDERBARNRELASJONROLLE.FAR,
+                        ),
+                    ),
+                dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now())),
+                fødsel = listOf(Fødsel(LocalDate.of(1980, 8, 3))),
+            )
 
         vurderLivshendelseTask.doTask(
             Task(
                 type = VurderLivshendelseTask.TASK_STEP_TYPE,
-                payload = objectMapper.writeValueAsString(
-                    VurderLivshendelseTaskDTO(
-                        PERSONIDENT_BARN,
-                        livshendelseType,
+                payload =
+                    objectMapper.writeValueAsString(
+                        VurderLivshendelseTaskDTO(
+                            PERSONIDENT_BARN,
+                            livshendelseType,
+                        ),
                     ),
-                ),
             ),
         )
 
@@ -144,9 +146,10 @@ class VurderLivshendelseTaskTest {
                     listOf(RestFagsakIdOgTilknyttetAktørId(PERSONIDENT_MOR + "00", SAKS_ID))
             }
             else -> {
-                every { mockSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(any()) } returns listOf(
-                    RestFagsakIdOgTilknyttetAktørId(PERSONIDENT_MOR + "00", SAKS_ID),
-                )
+                every { mockSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(any()) } returns
+                    listOf(
+                        RestFagsakIdOgTilknyttetAktørId(PERSONIDENT_MOR + "00", SAKS_ID),
+                    )
             }
         }
 
@@ -156,34 +159,38 @@ class VurderLivshendelseTaskTest {
                 any(),
                 any(),
             )
-        } returns PdlPersonData(
-            forelderBarnRelasjon = listOf(
-                PdlForeldreBarnRelasjon(
-                    minRolleForPerson = FORELDERBARNRELASJONROLLE.MOR,
-                    relatertPersonsIdent = PERSONIDENT_BARN,
-                    relatertPersonsRolle = FORELDERBARNRELASJONROLLE.BARN,
-                ),
-            ),
-            dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now())),
-            sivilstand = listOf(
-                Sivilstand(
-                    type = GIFT,
-                    gyldigFraOgMed = LocalDate.now(),
-                ),
-            ),
-        )
+        } returns
+            PdlPersonData(
+                forelderBarnRelasjon =
+                    listOf(
+                        PdlForeldreBarnRelasjon(
+                            minRolleForPerson = FORELDERBARNRELASJONROLLE.MOR,
+                            relatertPersonsIdent = PERSONIDENT_BARN,
+                            relatertPersonsRolle = FORELDERBARNRELASJONROLLE.BARN,
+                        ),
+                    ),
+                dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now())),
+                sivilstand =
+                    listOf(
+                        Sivilstand(
+                            type = GIFT,
+                            gyldigFraOgMed = LocalDate.now(),
+                        ),
+                    ),
+            )
 
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
 
         vurderLivshendelseTask.doTask(
             Task(
                 type = VurderLivshendelseTask.TASK_STEP_TYPE,
-                payload = objectMapper.writeValueAsString(
-                    VurderLivshendelseTaskDTO(
-                        PERSONIDENT_MOR,
-                        livshendelseType,
+                payload =
+                    objectMapper.writeValueAsString(
+                        VurderLivshendelseTaskDTO(
+                            PERSONIDENT_MOR,
+                            livshendelseType,
+                        ),
                     ),
-                ),
             ),
         )
 
@@ -210,9 +217,10 @@ class VurderLivshendelseTaskTest {
         names = ["UTFLYTTING", "DØDSFALL"],
     )
     fun `Livshendelser på barnet som har sak i ba-sak`(livshendelseType: VurderLivshendelseType) {
-        every { mockSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(any()) } returns listOf(
-            RestFagsakIdOgTilknyttetAktørId(PERSONIDENT_MOR + "00", SAKS_ID),
-        )
+        every { mockSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(any()) } returns
+            listOf(
+                RestFagsakIdOgTilknyttetAktørId(PERSONIDENT_MOR + "00", SAKS_ID),
+            )
 
         every {
             mockPdlClient.hentPerson(
@@ -220,34 +228,38 @@ class VurderLivshendelseTaskTest {
                 any(),
                 any(),
             )
-        } returns PdlPersonData(
-            forelderBarnRelasjon = listOf(
-                PdlForeldreBarnRelasjon(
-                    minRolleForPerson = FORELDERBARNRELASJONROLLE.MOR,
-                    relatertPersonsIdent = PERSONIDENT_BARN,
-                    relatertPersonsRolle = FORELDERBARNRELASJONROLLE.BARN,
-                ),
-            ),
-            dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now())),
-            sivilstand = listOf(
-                Sivilstand(
-                    type = GIFT,
-                    gyldigFraOgMed = LocalDate.now(),
-                ),
-            ),
-        )
+        } returns
+            PdlPersonData(
+                forelderBarnRelasjon =
+                    listOf(
+                        PdlForeldreBarnRelasjon(
+                            minRolleForPerson = FORELDERBARNRELASJONROLLE.MOR,
+                            relatertPersonsIdent = PERSONIDENT_BARN,
+                            relatertPersonsRolle = FORELDERBARNRELASJONROLLE.BARN,
+                        ),
+                    ),
+                dødsfall = listOf(Dødsfall(dødsdato = LocalDate.now())),
+                sivilstand =
+                    listOf(
+                        Sivilstand(
+                            type = GIFT,
+                            gyldigFraOgMed = LocalDate.now(),
+                        ),
+                    ),
+            )
 
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
 
         vurderLivshendelseTask.doTask(
             Task(
                 type = VurderLivshendelseTask.TASK_STEP_TYPE,
-                payload = objectMapper.writeValueAsString(
-                    VurderLivshendelseTaskDTO(
-                        PERSONIDENT_BARN,
-                        livshendelseType,
+                payload =
+                    objectMapper.writeValueAsString(
+                        VurderLivshendelseTaskDTO(
+                            PERSONIDENT_BARN,
+                            livshendelseType,
+                        ),
                     ),
-                ),
             ),
         )
 
@@ -275,31 +287,34 @@ class VurderLivshendelseTaskTest {
                 any(),
                 any(),
             )
-        } returns PdlPersonData(
-            sivilstand = listOf(
-                Sivilstand(type = GIFT),
-                Sivilstand(
-                    type = GIFT,
-                    gyldigFraOgMed = LocalDate.now().minusYears(10),
-                ),
-                Sivilstand(
-                    type = GIFT,
-                    bekreftelsesdato = LocalDate.now(),
-                ),
-            ),
-        )
+        } returns
+            PdlPersonData(
+                sivilstand =
+                    listOf(
+                        Sivilstand(type = GIFT),
+                        Sivilstand(
+                            type = GIFT,
+                            gyldigFraOgMed = LocalDate.now().minusYears(10),
+                        ),
+                        Sivilstand(
+                            type = GIFT,
+                            bekreftelsesdato = LocalDate.now(),
+                        ),
+                    ),
+            )
 
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
 
         vurderLivshendelseTask.doTask(
             Task(
                 type = VurderLivshendelseTask.TASK_STEP_TYPE,
-                payload = objectMapper.writeValueAsString(
-                    VurderLivshendelseTaskDTO(
-                        PERSONIDENT_MOR,
-                        SIVILSTAND,
+                payload =
+                    objectMapper.writeValueAsString(
+                        VurderLivshendelseTaskDTO(
+                            PERSONIDENT_MOR,
+                            SIVILSTAND,
+                        ),
                     ),
-                ),
             ),
         )
 
@@ -334,12 +349,13 @@ class VurderLivshendelseTaskTest {
             vurderLivshendelseTask.doTask(
                 Task(
                     type = VurderLivshendelseTask.TASK_STEP_TYPE,
-                    payload = objectMapper.writeValueAsString(
-                        VurderLivshendelseTaskDTO(
-                            PERSONIDENT_MOR,
-                            SIVILSTAND,
+                    payload =
+                        objectMapper.writeValueAsString(
+                            VurderLivshendelseTaskDTO(
+                                PERSONIDENT_MOR,
+                                SIVILSTAND,
+                            ),
                         ),
-                    ),
                 ),
             )
         }
@@ -355,32 +371,36 @@ class VurderLivshendelseTaskTest {
 
     @Test
     fun `Skal sett riktig beskrivelsestekster når oppdater dødsfall oppgave`() {
-        every { mockSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(any()) } returns listOf(
-            RestFagsakIdOgTilknyttetAktørId(PERSONIDENT_MOR + "00", SAKS_ID),
-        )
+        every { mockSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(any()) } returns
+            listOf(
+                RestFagsakIdOgTilknyttetAktørId(PERSONIDENT_MOR + "00", SAKS_ID),
+            )
 
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
         val oppgavebeskrivelseSlot = slot<String>()
-        every { mockOppgaveClient.oppdaterOppgaveBeskrivelse(any(), capture(oppgavebeskrivelseSlot)) } returns OppgaveResponse(
-            oppgaveId = 1,
-        )
+        every { mockOppgaveClient.oppdaterOppgaveBeskrivelse(any(), capture(oppgavebeskrivelseSlot)) } returns
+            OppgaveResponse(
+                oppgaveId = 1,
+            )
 
         setupPdlMockForDødsfallshendelse(true, false, false)
         vurderLivshendelseTask.doTask(
             Task(
                 type = VurderLivshendelseTask.TASK_STEP_TYPE,
-                payload = objectMapper.writeValueAsString(
-                    VurderLivshendelseTaskDTO(
-                        PERSONIDENT_MOR,
-                        DØDSFALL,
+                payload =
+                    objectMapper.writeValueAsString(
+                        VurderLivshendelseTaskDTO(
+                            PERSONIDENT_MOR,
+                            DØDSFALL,
+                        ),
                     ),
-                ),
             ),
         )
 
-        every { mockOppgaveClient.finnOppgaverPåAktørId(any(), any()) } returns listOf(
-            Oppgave(beskrivelse = DØDSFALL.beskrivelse + ": bruker"),
-        )
+        every { mockOppgaveClient.finnOppgaverPåAktørId(any(), any()) } returns
+            listOf(
+                Oppgave(beskrivelse = DØDSFALL.beskrivelse + ": bruker"),
+            )
 
         every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN)) } returns
             listOf(
@@ -392,20 +412,22 @@ class VurderLivshendelseTaskTest {
         vurderLivshendelseTask.doTask(
             Task(
                 type = VurderLivshendelseTask.TASK_STEP_TYPE,
-                payload = objectMapper.writeValueAsString(
-                    VurderLivshendelseTaskDTO(
-                        PERSONIDENT_BARN,
-                        DØDSFALL,
+                payload =
+                    objectMapper.writeValueAsString(
+                        VurderLivshendelseTaskDTO(
+                            PERSONIDENT_BARN,
+                            DØDSFALL,
+                        ),
                     ),
-                ),
             ),
         )
 
         assertThat(oppgavebeskrivelseSlot.captured).isEqualTo(DØDSFALL.beskrivelse + ": bruker og barn $PERSONIDENT_BARN")
 
-        every { mockOppgaveClient.finnOppgaverPåAktørId(any(), any()) } returns listOf(
-            Oppgave(beskrivelse = DØDSFALL.beskrivelse + ": bruker og barn $PERSONIDENT_BARN"),
-        )
+        every { mockOppgaveClient.finnOppgaverPåAktørId(any(), any()) } returns
+            listOf(
+                Oppgave(beskrivelse = DØDSFALL.beskrivelse + ": bruker og barn $PERSONIDENT_BARN"),
+            )
 
         every { mockSakClient.hentRestFagsakDeltagerListe(PERSONIDENT_MOR, listOf(PERSONIDENT_BARN2)) } returns
             listOf(
@@ -417,42 +439,48 @@ class VurderLivshendelseTaskTest {
         vurderLivshendelseTask.doTask(
             Task(
                 type = VurderLivshendelseTask.TASK_STEP_TYPE,
-                payload = objectMapper.writeValueAsString(
-                    VurderLivshendelseTaskDTO(
-                        PERSONIDENT_BARN2,
-                        DØDSFALL,
+                payload =
+                    objectMapper.writeValueAsString(
+                        VurderLivshendelseTaskDTO(
+                            PERSONIDENT_BARN2,
+                            DØDSFALL,
+                        ),
                     ),
-                ),
             ),
         )
 
         assertThat(oppgavebeskrivelseSlot.captured).isEqualTo(DØDSFALL.beskrivelse + ": bruker og 2 barn $PERSONIDENT_BARN $PERSONIDENT_BARN2")
     }
 
-    private fun setupPdlMockForDødsfallshendelse(morDød: Boolean, barn1Død: Boolean, barn2Død: Boolean) {
+    private fun setupPdlMockForDødsfallshendelse(
+        morDød: Boolean,
+        barn1Død: Boolean,
+        barn2Død: Boolean,
+    ) {
         every {
             mockPdlClient.hentPerson(
                 PERSONIDENT_MOR,
                 any(),
                 any(),
             )
-        } returns PdlPersonData(
-            forelderBarnRelasjon = listOf(
-                PdlForeldreBarnRelasjon(
-                    minRolleForPerson = FORELDERBARNRELASJONROLLE.MOR,
-                    relatertPersonsIdent = PERSONIDENT_BARN,
-                    relatertPersonsRolle = FORELDERBARNRELASJONROLLE.BARN,
-                ),
-                PdlForeldreBarnRelasjon(
-                    minRolleForPerson = FORELDERBARNRELASJONROLLE.MOR,
-                    relatertPersonsIdent = PERSONIDENT_BARN2,
-                    relatertPersonsRolle = FORELDERBARNRELASJONROLLE.BARN,
-                ),
-
-            ),
-            dødsfall = if (morDød) listOf(Dødsfall(dødsdato = LocalDate.now())) else emptyList(),
-            fødsel = listOf(Fødsel(LocalDate.now().minusYears(22))),
-        )
+        } returns
+            PdlPersonData(
+                forelderBarnRelasjon =
+                    listOf(
+                        PdlForeldreBarnRelasjon(
+                            minRolleForPerson = FORELDERBARNRELASJONROLLE.MOR,
+                            relatertPersonsIdent = PERSONIDENT_BARN,
+                            relatertPersonsRolle = FORELDERBARNRELASJONROLLE.BARN,
+                        ),
+                        PdlForeldreBarnRelasjon(
+                            minRolleForPerson = FORELDERBARNRELASJONROLLE.MOR,
+                            relatertPersonsIdent = PERSONIDENT_BARN2,
+                            relatertPersonsRolle = FORELDERBARNRELASJONROLLE.BARN,
+                        ),
+                    ),
+                dødsfall = if (morDød) listOf(Dødsfall(dødsdato = LocalDate.now())) else emptyList(),
+                fødsel = listOf(Fødsel(LocalDate.now().minusYears(22))),
+            )
 
         every {
             mockPdlClient.hentPerson(
@@ -460,17 +488,19 @@ class VurderLivshendelseTaskTest {
                 any(),
                 any(),
             )
-        } returns PdlPersonData(
-            forelderBarnRelasjon = listOf(
-                PdlForeldreBarnRelasjon(
-                    minRolleForPerson = FORELDERBARNRELASJONROLLE.BARN,
-                    relatertPersonsIdent = PERSONIDENT_MOR,
-                    relatertPersonsRolle = FORELDERBARNRELASJONROLLE.MOR,
-                ),
-            ),
-            dødsfall = if (barn1Død) listOf(Dødsfall(dødsdato = LocalDate.now())) else emptyList(),
-            fødsel = listOf(Fødsel(LocalDate.now().minusYears(3))),
-        )
+        } returns
+            PdlPersonData(
+                forelderBarnRelasjon =
+                    listOf(
+                        PdlForeldreBarnRelasjon(
+                            minRolleForPerson = FORELDERBARNRELASJONROLLE.BARN,
+                            relatertPersonsIdent = PERSONIDENT_MOR,
+                            relatertPersonsRolle = FORELDERBARNRELASJONROLLE.MOR,
+                        ),
+                    ),
+                dødsfall = if (barn1Død) listOf(Dødsfall(dødsdato = LocalDate.now())) else emptyList(),
+                fødsel = listOf(Fødsel(LocalDate.now().minusYears(3))),
+            )
 
         every {
             mockPdlClient.hentPerson(
@@ -478,46 +508,50 @@ class VurderLivshendelseTaskTest {
                 any(),
                 any(),
             )
-        } returns PdlPersonData(
-            forelderBarnRelasjon = listOf(
-                PdlForeldreBarnRelasjon(
-                    minRolleForPerson = FORELDERBARNRELASJONROLLE.BARN,
-                    relatertPersonsIdent = PERSONIDENT_MOR,
-                    relatertPersonsRolle = FORELDERBARNRELASJONROLLE.MOR,
-                ),
-            ),
-            dødsfall = if (barn2Død) listOf(Dødsfall(dødsdato = LocalDate.now())) else emptyList(),
-            fødsel = listOf(Fødsel(LocalDate.now().minusYears(3))),
-        )
+        } returns
+            PdlPersonData(
+                forelderBarnRelasjon =
+                    listOf(
+                        PdlForeldreBarnRelasjon(
+                            minRolleForPerson = FORELDERBARNRELASJONROLLE.BARN,
+                            relatertPersonsIdent = PERSONIDENT_MOR,
+                            relatertPersonsRolle = FORELDERBARNRELASJONROLLE.MOR,
+                        ),
+                    ),
+                dødsfall = if (barn2Død) listOf(Dødsfall(dødsdato = LocalDate.now())) else emptyList(),
+                fødsel = listOf(Fødsel(LocalDate.now().minusYears(3))),
+            )
     }
 
-    private fun lagAktivUtvidet() = RestFagsak(
-        SAKS_ID,
-        listOf(
-            RestUtvidetBehandling(
-                true,
-                RestArbeidsfordelingPåBehandling(ENHET_ID),
-                321,
-                BehandlingKategori.NASJONAL,
-                LocalDateTime.now(),
-                "INNVILGET",
-                "BEHANDLING_AVSLUTTET",
-                "MIGRERING_FRA_INFOTRYGD",
-                BehandlingUnderkategori.UTVIDET,
+    private fun lagAktivUtvidet() =
+        RestFagsak(
+            SAKS_ID,
+            listOf(
+                RestUtvidetBehandling(
+                    true,
+                    RestArbeidsfordelingPåBehandling(ENHET_ID),
+                    321,
+                    BehandlingKategori.NASJONAL,
+                    LocalDateTime.now(),
+                    "INNVILGET",
+                    "BEHANDLING_AVSLUTTET",
+                    "MIGRERING_FRA_INFOTRYGD",
+                    BehandlingUnderkategori.UTVIDET,
+                ),
             ),
-        ),
-    )
+        )
 
-    private fun lagInfotrygdResponse() = InfotrygdSøkResponse(
-        bruker = listOf(
-            Stønad(iverksattFom = YearMonth.now().minusYears(2).tilSeqFormat),
-            Stønad(iverksattFom = YearMonth.now().minusYears(5).tilSeqFormat),
-        ),
-        barn = listOf(),
-    )
+    private fun lagInfotrygdResponse() =
+        InfotrygdSøkResponse(
+            bruker =
+                listOf(
+                    Stønad(iverksattFom = YearMonth.now().minusYears(2).tilSeqFormat),
+                    Stønad(iverksattFom = YearMonth.now().minusYears(5).tilSeqFormat),
+                ),
+            barn = listOf(),
+        )
 
     companion object {
-
         private val PERSONIDENT_BARN = "12345654321"
         private val PERSONIDENT_BARN2 = "12345654322"
         private val PERSONIDENT_MOR = "12345678901"

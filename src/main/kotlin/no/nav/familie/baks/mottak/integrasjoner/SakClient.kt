@@ -20,139 +20,140 @@ import java.time.LocalDateTime
 private val logger = LoggerFactory.getLogger(SakClient::class.java)
 
 @Component
-class SakClient @Autowired constructor(
-    @param:Value("\${FAMILIE_BA_SAK_API_URL}") private val sakServiceUri: String,
-    @Qualifier("clientCredentials") restOperations: RestOperations,
-) : AbstractRestClient(restOperations, "integrasjon") {
+class SakClient
+    @Autowired
+    constructor(
+        @param:Value("\${FAMILIE_BA_SAK_API_URL}") private val sakServiceUri: String,
+        @Qualifier("clientCredentials") restOperations: RestOperations,
+    ) : AbstractRestClient(restOperations, "integrasjon") {
+        @Retryable(
+            value = [RuntimeException::class],
+            maxAttempts = 3,
+            backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
+        )
+        fun sendTilSak(nyBehandling: NyBehandling) {
+            val uri = URI.create("$sakServiceUri/behandlinger")
+            logger.info("Sender søknad til {}", uri)
+            try {
+                val response = putForEntity<Ressurs<String>>(uri, nyBehandling)
+                logger.info("Søknad sendt til sak. Status=${response.status}")
+            } catch (e: RestClientResponseException) {
+                logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
+                throw IllegalStateException(
+                    "Innsending til sak feilet. Status: " + e.rawStatusCode +
+                        ", body: " + e.responseBodyAsString,
+                    e,
+                )
+            } catch (e: RestClientException) {
+                throw IllegalStateException("Innsending til sak feilet.", e)
+            }
+        }
 
-    @Retryable(
-        value = [RuntimeException::class],
-        maxAttempts = 3,
-        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
-    )
-    fun sendTilSak(nyBehandling: NyBehandling) {
-        val uri = URI.create("$sakServiceUri/behandlinger")
-        logger.info("Sender søknad til {}", uri)
-        try {
-            val response = putForEntity<Ressurs<String>>(uri, nyBehandling)
-            logger.info("Søknad sendt til sak. Status=${response.status}")
-        } catch (e: RestClientResponseException) {
-            logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
-            throw IllegalStateException(
-                "Innsending til sak feilet. Status: " + e.rawStatusCode +
-                    ", body: " + e.responseBodyAsString,
-                e,
+        @Retryable(
+            value = [RuntimeException::class],
+            maxAttempts = 3,
+            backoff = Backoff(delayExpression = "60000"),
+        )
+        fun sendIdenthendelseTilSak(personIdent: PersonIdent) {
+            val uri = URI.create("$sakServiceUri/ident")
+            try {
+                val response = postForEntity<Ressurs<String>>(uri, personIdent)
+                secureLogger.info("Identhendelse sendt til sak for $personIdent. Status=${response.status}")
+            } catch (e: RestClientResponseException) {
+                logger.info("Innsending av identhendelse til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
+                secureLogger.info("Innsending av identhendelse til sak feilet for $personIdent. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
+                throw IllegalStateException(
+                    "Innsending av identhendelse til sak feilet. Status: " + e.rawStatusCode +
+                        ", body: " + e.responseBodyAsString,
+                    e,
+                )
+            } catch (e: RestClientException) {
+                secureLogger.warn("Innsending av identhendelse til sak feilet for $personIdent", e)
+                throw IllegalStateException("Innsending av identhendelse til sak feilet.", e)
+            }
+        }
+
+        fun hentSaksnummer(personIdent: String): String {
+            val uri = URI.create("$sakServiceUri/fagsaker")
+            return runCatching {
+                postForEntity<Ressurs<RestFagsak>>(uri, mapOf("personIdent" to personIdent))
+            }.fold(
+                onSuccess = { it.data?.id?.toString() ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
+                onFailure = { throw IntegrasjonException("Feil ved henting av saksnummer fra ba-sak.", it, uri, personIdent) },
             )
-        } catch (e: RestClientException) {
-            throw IllegalStateException("Innsending til sak feilet.", e)
         }
-    }
 
-    @Retryable(
-        value = [RuntimeException::class],
-        maxAttempts = 3,
-        backoff = Backoff(delayExpression = "60000"),
-    )
-    fun sendIdenthendelseTilSak(personIdent: PersonIdent) {
-        val uri = URI.create("$sakServiceUri/ident")
-        try {
-            val response = postForEntity<Ressurs<String>>(uri, personIdent)
-            secureLogger.info("Identhendelse sendt til sak for $personIdent. Status=${response.status}")
-        } catch (e: RestClientResponseException) {
-            logger.info("Innsending av identhendelse til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
-            secureLogger.info("Innsending av identhendelse til sak feilet for $personIdent. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
-            throw IllegalStateException(
-                "Innsending av identhendelse til sak feilet. Status: " + e.rawStatusCode +
-                    ", body: " + e.responseBodyAsString,
-                e,
+        fun hentRestFagsakDeltagerListe(
+            personIdent: String,
+            barnasIdenter: List<String> = emptyList(),
+        ): List<RestFagsakDeltager> {
+            val uri = URI.create("$sakServiceUri/fagsaker/sok/fagsakdeltagere")
+            return runCatching {
+                postForEntity<Ressurs<List<RestFagsakDeltager>>>(uri, RestSøkParam(personIdent, barnasIdenter))
+            }.fold(
+                onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
+                onFailure = { throw IntegrasjonException("Feil ved henting av fagsakdeltagere fra ba-sak.", it, uri, personIdent) },
             )
-        } catch (e: RestClientException) {
-            secureLogger.warn("Innsending av identhendelse til sak feilet for $personIdent", e)
-            throw IllegalStateException("Innsending av identhendelse til sak feilet.", e)
+        }
+
+        fun hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(
+            personIdent: String,
+        ): List<RestFagsakIdOgTilknyttetAktørId> {
+            val uri = URI.create("$sakServiceUri/fagsaker/sok/fagsaker-hvor-person-er-deltaker")
+            return runCatching {
+                postForEntity<Ressurs<List<RestFagsakIdOgTilknyttetAktørId>>>(uri, RestPersonIdent(personIdent))
+            }.fold(
+                onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
+                onFailure = { throw IntegrasjonException("Feil ved henting av fagsakId og aktørId fra ba-sak.", it, uri, personIdent) },
+            )
+        }
+
+        fun hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(
+            personIdent: String,
+        ): List<RestFagsakIdOgTilknyttetAktørId> {
+            val uri = URI.create("$sakServiceUri/fagsaker/sok/fagsaker-hvor-person-mottar-lopende-ytelse")
+            return runCatching {
+                postForEntity<Ressurs<List<RestFagsakIdOgTilknyttetAktørId>>>(uri, RestPersonIdent(personIdent))
+            }.fold(
+                onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
+                onFailure = { throw IntegrasjonException("Feil ved henting av fagsakId og aktørId fra ba-sak.", it, uri, personIdent) },
+            )
+        }
+
+        fun hentMinimalRestFagsak(fagsakId: Long): RestMinimalFagsak {
+            val uri = URI.create("$sakServiceUri/fagsaker/minimal/$fagsakId")
+            return runCatching {
+                getForEntity<Ressurs<RestMinimalFagsak>>(uri)
+            }.fold(
+                onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
+                onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ba-sak.", it, uri) },
+            )
+        }
+
+        fun hentRestFagsak(fagsakId: Long): RestFagsak {
+            val uri = URI.create("$sakServiceUri/fagsaker/$fagsakId")
+            return runCatching {
+                getForEntity<Ressurs<RestFagsak>>(uri)
+            }.fold(
+                onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
+                onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ba-sak.", it, uri) },
+            )
+        }
+
+        fun sendVedtakOmOvergangsstønadHendelseTilSak(personIdent: String) {
+            val uri = URI.create("$sakServiceUri/overgangsstonad")
+            logger.info("sender ident fra vedtak om overgangsstønad til {}", uri)
+            try {
+                val response = postForEntity<Ressurs<String>>(uri, PersonIdent(ident = personIdent))
+                logger.info("Ident fra vedtak om overgangsstønad sendt til sak. Status=${response.status}")
+            } catch (e: RestClientResponseException) {
+                logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
+                throw IllegalStateException("Innsending til sak feilet. Status: ${e.rawStatusCode}, body: ${e.responseBodyAsString}", e)
+            } catch (e: RestClientException) {
+                throw IllegalStateException("Innsending til sak feilet.", e)
+            }
         }
     }
-
-    fun hentSaksnummer(personIdent: String): String {
-        val uri = URI.create("$sakServiceUri/fagsaker")
-        return runCatching {
-            postForEntity<Ressurs<RestFagsak>>(uri, mapOf("personIdent" to personIdent))
-        }.fold(
-            onSuccess = { it.data?.id?.toString() ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
-            onFailure = { throw IntegrasjonException("Feil ved henting av saksnummer fra ba-sak.", it, uri, personIdent) },
-        )
-    }
-
-    fun hentRestFagsakDeltagerListe(
-        personIdent: String,
-        barnasIdenter: List<String> = emptyList(),
-    ): List<RestFagsakDeltager> {
-        val uri = URI.create("$sakServiceUri/fagsaker/sok/fagsakdeltagere")
-        return runCatching {
-            postForEntity<Ressurs<List<RestFagsakDeltager>>>(uri, RestSøkParam(personIdent, barnasIdenter))
-        }.fold(
-            onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
-            onFailure = { throw IntegrasjonException("Feil ved henting av fagsakdeltagere fra ba-sak.", it, uri, personIdent) },
-        )
-    }
-
-    fun hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(
-        personIdent: String,
-    ): List<RestFagsakIdOgTilknyttetAktørId> {
-        val uri = URI.create("$sakServiceUri/fagsaker/sok/fagsaker-hvor-person-er-deltaker")
-        return runCatching {
-            postForEntity<Ressurs<List<RestFagsakIdOgTilknyttetAktørId>>>(uri, RestPersonIdent(personIdent))
-        }.fold(
-            onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
-            onFailure = { throw IntegrasjonException("Feil ved henting av fagsakId og aktørId fra ba-sak.", it, uri, personIdent) },
-        )
-    }
-
-    fun hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(
-        personIdent: String,
-    ): List<RestFagsakIdOgTilknyttetAktørId> {
-        val uri = URI.create("$sakServiceUri/fagsaker/sok/fagsaker-hvor-person-mottar-lopende-ytelse")
-        return runCatching {
-            postForEntity<Ressurs<List<RestFagsakIdOgTilknyttetAktørId>>>(uri, RestPersonIdent(personIdent))
-        }.fold(
-            onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
-            onFailure = { throw IntegrasjonException("Feil ved henting av fagsakId og aktørId fra ba-sak.", it, uri, personIdent) },
-        )
-    }
-
-    fun hentMinimalRestFagsak(fagsakId: Long): RestMinimalFagsak {
-        val uri = URI.create("$sakServiceUri/fagsaker/minimal/$fagsakId")
-        return runCatching {
-            getForEntity<Ressurs<RestMinimalFagsak>>(uri)
-        }.fold(
-            onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
-            onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ba-sak.", it, uri) },
-        )
-    }
-
-    fun hentRestFagsak(fagsakId: Long): RestFagsak {
-        val uri = URI.create("$sakServiceUri/fagsaker/$fagsakId")
-        return runCatching {
-            getForEntity<Ressurs<RestFagsak>>(uri)
-        }.fold(
-            onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
-            onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ba-sak.", it, uri) },
-        )
-    }
-
-    fun sendVedtakOmOvergangsstønadHendelseTilSak(personIdent: String) {
-        val uri = URI.create("$sakServiceUri/overgangsstonad")
-        logger.info("sender ident fra vedtak om overgangsstønad til {}", uri)
-        try {
-            val response = postForEntity<Ressurs<String>>(uri, PersonIdent(ident = personIdent))
-            logger.info("Ident fra vedtak om overgangsstønad sendt til sak. Status=${response.status}")
-        } catch (e: RestClientResponseException) {
-            logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
-            throw IllegalStateException("Innsending til sak feilet. Status: ${e.rawStatusCode}, body: ${e.responseBodyAsString}", e)
-        } catch (e: RestClientException) {
-            throw IllegalStateException("Innsending til sak feilet.", e)
-        }
-    }
-}
 
 data class RestPersonIdent(
     val personIdent: String,
@@ -220,7 +221,6 @@ data class RestFagsakDeltager(
     val rolle: FagsakDeltagerRolle,
     val fagsakId: Long,
     val fagsakStatus: FagsakStatus,
-
 )
 
 data class RestAnnullerFødsel(val barnasIdenter: List<String>, val tidligereHendelseId: String)

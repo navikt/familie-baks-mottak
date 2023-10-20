@@ -34,7 +34,6 @@ data class DBKontantstøtteSøknad(
     @Column(name = "journalpost_id")
     val journalpostId: String? = null,
 ) {
-
     private fun hentSøknadV3(): KontantstøtteSøknadV3 {
         return objectMapper.readValue(søknadJson)
     }
@@ -94,7 +93,10 @@ fun KontantstøtteSøknadV4.tilDBKontantstøtteSøknad(): DBKontantstøtteSøkna
     }
 }
 
-fun Søknadsvedlegg.tilDBKontantstøtteVedlegg(søknad: DBKontantstøtteSøknad, data: ByteArray): DBKontantstotteVedlegg {
+fun Søknadsvedlegg.tilDBKontantstøtteVedlegg(
+    søknad: DBKontantstøtteSøknad,
+    data: ByteArray,
+): DBKontantstotteVedlegg {
     return DBKontantstotteVedlegg(
         dokumentId = this.dokumentId,
         søknadId = søknad.id,

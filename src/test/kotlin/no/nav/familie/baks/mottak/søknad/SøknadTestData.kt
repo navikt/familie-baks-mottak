@@ -12,12 +12,14 @@ import no.nav.familie.kontrakter.ba.søknad.v8.Barn as BarnV8
 import no.nav.familie.kontrakter.ba.søknad.v8.Søker as SøkerV8
 import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadV8
 
-fun <T> søknadsfelt(label: String, verdi: T): SøknadsfeltV4<T> {
+fun <T> søknadsfelt(
+    label: String,
+    verdi: T,
+): SøknadsfeltV4<T> {
     return SøknadsfeltV4(label = mapOf("nb" to label), verdi = mapOf("nb" to verdi))
 }
 
 object SøknadTestData {
-
     private fun søkerV8(): SøkerV8 {
         return SøkerV8(
             harEøsSteg = true,
@@ -25,17 +27,18 @@ object SøknadTestData {
             ident = søknadsfelt("fødselsnummer", "1234578901"),
             statsborgerskap = søknadsfelt("statsborgerskap", listOf("NOR")),
             adressebeskyttelse = false,
-            adresse = søknadsfelt(
-                "adresse",
-                SøknadAdresse(
-                    adressenavn = null,
-                    postnummer = null,
-                    husbokstav = null,
-                    bruksenhetsnummer = null,
-                    husnummer = null,
-                    poststed = null,
+            adresse =
+                søknadsfelt(
+                    "adresse",
+                    SøknadAdresse(
+                        adressenavn = null,
+                        postnummer = null,
+                        husbokstav = null,
+                        bruksenhetsnummer = null,
+                        husnummer = null,
+                        poststed = null,
+                    ),
                 ),
-            ),
             sivilstand = søknadsfelt("sivilstand", SIVILSTANDTYPE.GIFT),
             spørsmål = mapOf(),
             nåværendeSamboer = null,
@@ -79,28 +82,31 @@ object SøknadTestData {
         )
     }
 
-    fun søknadV8(): SøknadV8 = SøknadV8(
-        antallEøsSteg = 3,
-        kontraktVersjon = 8,
-        søknadstype = Søknadstype.ORDINÆR,
-        søker = søkerV8(),
-        barn = barnV8(),
-        spørsmål = mapOf(),
-        dokumentasjon = listOf(
-            Søknaddokumentasjon(
-                dokumentasjonsbehov = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON,
-                harSendtInn = false,
-                opplastedeVedlegg = listOf(
-                    Søknadsvedlegg(
-                        dokumentId = "en-slags-uuid",
-                        navn = "IMG 1337.png",
-                        tittel = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON,
+    fun søknadV8(): SøknadV8 =
+        SøknadV8(
+            antallEøsSteg = 3,
+            kontraktVersjon = 8,
+            søknadstype = Søknadstype.ORDINÆR,
+            søker = søkerV8(),
+            barn = barnV8(),
+            spørsmål = mapOf(),
+            dokumentasjon =
+                listOf(
+                    Søknaddokumentasjon(
+                        dokumentasjonsbehov = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON,
+                        harSendtInn = false,
+                        opplastedeVedlegg =
+                            listOf(
+                                Søknadsvedlegg(
+                                    dokumentId = "en-slags-uuid",
+                                    navn = "IMG 1337.png",
+                                    tittel = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON,
+                                ),
+                            ),
+                        dokumentasjonSpråkTittel = mapOf("nb" to "Bekreftelse fra barnevernet"),
                     ),
                 ),
-                dokumentasjonSpråkTittel = mapOf("nb" to "Bekreftelse fra barnevernet"),
-            ),
-        ),
-        originalSpråk = "nb",
-        teksterUtenomSpørsmål = mapOf(),
-    )
+            originalSpråk = "nb",
+            teksterUtenomSpørsmål = mapOf(),
+        )
 }

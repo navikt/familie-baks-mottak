@@ -23,7 +23,6 @@ import java.time.Duration
     matchIfMissing = true,
 )
 class KafkaAivenConfig(val environment: Environment) {
-
     @Bean
     fun kafkaAivenHendelseListenerContainerFactory(kafkaRestartingErrorHandler: KafkaRestartingErrorHandler): ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
@@ -61,15 +60,16 @@ class KafkaAivenConfig(val environment: Environment) {
 
     private fun consumerConfigs(): Map<String, Any> {
         val kafkaBrokers = System.getenv("KAFKA_BROKERS") ?: "http://localhost:9092"
-        val consumerConfigs = mutableMapOf(
-            ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaBrokers,
-            ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
-            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
-            ConsumerConfig.CLIENT_ID_CONFIG to "consumer-familie-baks-mottak-1",
-            ConsumerConfig.MAX_POLL_RECORDS_CONFIG to "50",
-            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "latest",
-            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
-        )
+        val consumerConfigs =
+            mutableMapOf(
+                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaBrokers,
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
+                ConsumerConfig.CLIENT_ID_CONFIG to "consumer-familie-baks-mottak-1",
+                ConsumerConfig.MAX_POLL_RECORDS_CONFIG to "50",
+                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "latest",
+                ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
+            )
         if (environment.activeProfiles.none { it.contains("dev") || it.contains("postgres") }) {
             return consumerConfigs + securityConfig()
         }
@@ -81,19 +81,20 @@ class KafkaAivenConfig(val environment: Environment) {
         val schemaRegisty = System.getenv("KAFKA_SCHEMA_REGISTRY") ?: "http://localhost:9093"
         val schemaRegistryUser = System.getenv("KAFKA_SCHEMA_REGISTRY_USER") ?: "mangler i pod"
         val schemaRegistryPassword = System.getenv("KAFKA_SCHEMA_REGISTRY_PASSWORD") ?: "mangler i pod"
-        val consumerConfigs = mutableMapOf(
-            ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaBrokers,
-            "schema.registry.url" to schemaRegisty,
-            "basic.auth.credentials.source" to "USER_INFO",
-            "basic.auth.user.info" to "$schemaRegistryUser:$schemaRegistryPassword",
-            "specific.avro.reader" to true,
-            ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
-            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java,
-            ConsumerConfig.CLIENT_ID_CONFIG to "consumer-familie-baks-mottak-2",
-            ConsumerConfig.MAX_POLL_RECORDS_CONFIG to "1",
-            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "latest",
-            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to "false",
-        )
+        val consumerConfigs =
+            mutableMapOf(
+                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaBrokers,
+                "schema.registry.url" to schemaRegisty,
+                "basic.auth.credentials.source" to "USER_INFO",
+                "basic.auth.user.info" to "$schemaRegistryUser:$schemaRegistryPassword",
+                "specific.avro.reader" to true,
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java,
+                ConsumerConfig.CLIENT_ID_CONFIG to "consumer-familie-baks-mottak-2",
+                ConsumerConfig.MAX_POLL_RECORDS_CONFIG to "1",
+                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "latest",
+                ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to "false",
+            )
         if (environment.activeProfiles.none { it.contains("dev") || it.contains("postgres") }) {
             return consumerConfigs + securityConfig()
         }
@@ -105,19 +106,20 @@ class KafkaAivenConfig(val environment: Environment) {
         val schemaRegisty = System.getenv("KAFKA_SCHEMA_REGISTRY") ?: "http://localhost:9093"
         val schemaRegistryUser = System.getenv("KAFKA_SCHEMA_REGISTRY_USER") ?: "mangler i pod"
         val schemaRegistryPassword = System.getenv("KAFKA_SCHEMA_REGISTRY_PASSWORD") ?: "mangler i pod"
-        val consumerConfigs = mutableMapOf(
-            ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaBrokers,
-            "schema.registry.url" to schemaRegisty,
-            "basic.auth.credentials.source" to "USER_INFO",
-            "basic.auth.user.info" to "$schemaRegistryUser:$schemaRegistryPassword",
-            "specific.avro.reader" to true,
-            ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
-            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java,
-            ConsumerConfig.CLIENT_ID_CONFIG to "consumer-familie-baks-mottak-2",
-            ConsumerConfig.MAX_POLL_RECORDS_CONFIG to "50",
-            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
-            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
-        )
+        val consumerConfigs =
+            mutableMapOf(
+                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaBrokers,
+                "schema.registry.url" to schemaRegisty,
+                "basic.auth.credentials.source" to "USER_INFO",
+                "basic.auth.user.info" to "$schemaRegistryUser:$schemaRegistryPassword",
+                "specific.avro.reader" to true,
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java,
+                ConsumerConfig.CLIENT_ID_CONFIG to "consumer-familie-baks-mottak-2",
+                ConsumerConfig.MAX_POLL_RECORDS_CONFIG to "50",
+                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
+                ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
+            )
         if (environment.activeProfiles.none { it.contains("dev") || it.contains("postgres") }) {
             return consumerConfigs + securityConfig()
         }
@@ -130,7 +132,8 @@ class KafkaAivenConfig(val environment: Environment) {
         val kafkaKeystorePath = System.getenv("KAFKA_KEYSTORE_PATH")
         return mapOf(
             CommonClientConfigs.SECURITY_PROTOCOL_CONFIG to "SSL",
-            SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG to "", // Disable server host name verification
+            // Disable server host name verification
+            SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG to "",
             SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG to "JKS",
             SslConfigs.SSL_KEYSTORE_TYPE_CONFIG to "PKCS12",
             SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG to kafkaTruststorePath,

@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class BarnetrygdSøknadMetrikkService {
-
     // Metrics for ordinær barnetrygd
     private val søknadMottattOk = Metrics.counter("barnetrygd.soknad.mottatt.ok")
     private val søknadMottattFeil = Metrics.counter("barnetrygd.soknad.mottatt.feil")
@@ -38,15 +37,17 @@ class BarnetrygdSøknadMetrikkService {
     private val utvidetSøknadEøs = Metrics.counter("barnetrygd.utvidet.soknad.eos")
 
     fun sendMottakMetrikker(versjonertSøknad: VersjonertSøknad) {
-        val (søknadstype, dokumentasjon) = when (versjonertSøknad) {
-            is SøknadV7 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
-            is SøknadV8 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
-        }
+        val (søknadstype, dokumentasjon) =
+            when (versjonertSøknad) {
+                is SøknadV7 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
+                is SøknadV8 -> Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.dokumentasjon)
+            }
 
-        val harEøsSteg = when (versjonertSøknad) {
-            is SøknadV7 -> versjonertSøknad.søknad.antallEøsSteg > 0
-            is SøknadV8 -> versjonertSøknad.søknad.antallEøsSteg > 0
-        }
+        val harEøsSteg =
+            when (versjonertSøknad) {
+                is SøknadV7 -> versjonertSøknad.søknad.antallEøsSteg > 0
+                is SøknadV8 -> versjonertSøknad.søknad.antallEøsSteg > 0
+            }
 
         val erUtvidet = søknadstype == Søknadstype.UTVIDET
         sendSøknadMetrikker(harEøsSteg, erUtvidet)
@@ -55,14 +56,18 @@ class BarnetrygdSøknadMetrikkService {
     }
 
     fun sendMottakFeiletMetrikker(versjonertSøknad: VersjonertSøknad) {
-        val søknadstype = when (versjonertSøknad) {
-            is SøknadV7 -> versjonertSøknad.søknad.søknadstype
-            is SøknadV8 -> versjonertSøknad.søknad.søknadstype
-        }
+        val søknadstype =
+            when (versjonertSøknad) {
+                is SøknadV7 -> versjonertSøknad.søknad.søknadstype
+                is SøknadV8 -> versjonertSøknad.søknad.søknadstype
+            }
         if (søknadstype == Søknadstype.UTVIDET) søknadUtvidetMottattFeil.increment() else søknadMottattFeil.increment()
     }
 
-    private fun sendSøknadMetrikker(harEøsSteg: Boolean, erUtvidet: Boolean) {
+    private fun sendSøknadMetrikker(
+        harEøsSteg: Boolean,
+        erUtvidet: Boolean,
+    ) {
         if (erUtvidet) {
             søknadUtvidetMottattOk.increment()
             if (harEøsSteg) {
@@ -76,7 +81,10 @@ class BarnetrygdSøknadMetrikkService {
         }
     }
 
-    private fun sendDokumentasjonMetrikker(erUtvidet: Boolean, dokumentasjon: List<Søknaddokumentasjon>) {
+    private fun sendDokumentasjonMetrikker(
+        erUtvidet: Boolean,
+        dokumentasjon: List<Søknaddokumentasjon>,
+    ) {
         if (dokumentasjon.isNotEmpty()) {
             // Filtrerer ut Dokumentasjonsbehov.ANNEN_DOKUMENTASJON
             val dokumentasjonsbehovUtenAnnenDokumentasjon =
@@ -103,7 +111,10 @@ class BarnetrygdSøknadMetrikkService {
         }
     }
 
-    private fun sendDokumentasjonsbehovMetrikker(erUtvidet: Boolean, dokumentasjonsbehov: List<Søknaddokumentasjon>) {
+    private fun sendDokumentasjonsbehovMetrikker(
+        erUtvidet: Boolean,
+        dokumentasjonsbehov: List<Søknaddokumentasjon>,
+    ) {
         if (erUtvidet) {
             utvidetSøknadHarDokumentasjonsbehov.increment()
             utvidetAntallDokumentasjonsbehov.increment(dokumentasjonsbehov.size.toDouble())
@@ -113,7 +124,10 @@ class BarnetrygdSøknadMetrikkService {
         }
     }
 
-    private fun sendVedleggMetrikker(erUtvidet: Boolean, vedlegg: List<Søknadsvedlegg>) {
+    private fun sendVedleggMetrikker(
+        erUtvidet: Boolean,
+        vedlegg: List<Søknadsvedlegg>,
+    ) {
         if (erUtvidet) {
             utvidetSøknadHarVedlegg.increment()
             utvidetAntallVedlegg.increment(vedlegg.size.toDouble())

@@ -8,7 +8,6 @@ import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
 
 class BarnetrygdSøknadObjectMapperModule(språk: String) : SimpleModule() {
-
     init {
         addSerializer(Søknadsfelt::class.java, SøknadsfeltSerializer(språk))
         addSerializer(Søknaddokumentasjon::class.java, SøknaddokumentasjonSerializer(språk))
@@ -16,7 +15,11 @@ class BarnetrygdSøknadObjectMapperModule(språk: String) : SimpleModule() {
 }
 
 class SøknaddokumentasjonSerializer(private val språk: String) : JsonSerializer<Søknaddokumentasjon>() {
-    override fun serialize(dokumentasjon: Søknaddokumentasjon, jsonGenerator: JsonGenerator, serializerProvider: SerializerProvider) {
+    override fun serialize(
+        dokumentasjon: Søknaddokumentasjon,
+        jsonGenerator: JsonGenerator,
+        serializerProvider: SerializerProvider,
+    ) {
         return jsonGenerator.writeObject(
             mapOf(
                 "dokumentasjonsbehov" to dokumentasjon.dokumentasjonsbehov,
@@ -29,7 +32,11 @@ class SøknaddokumentasjonSerializer(private val språk: String) : JsonSerialize
 }
 
 class SøknadsfeltSerializer(private val språk: String) : JsonSerializer<Søknadsfelt<*>>() {
-    override fun serialize(søknadsFelt: Søknadsfelt<*>, jsonGenerator: JsonGenerator, serializerProvider: SerializerProvider) {
+    override fun serialize(
+        søknadsFelt: Søknadsfelt<*>,
+        jsonGenerator: JsonGenerator,
+        serializerProvider: SerializerProvider,
+    ) {
         return jsonGenerator.writeObject(
             mapOf(
                 "label" to søknadsFelt.label[språk],

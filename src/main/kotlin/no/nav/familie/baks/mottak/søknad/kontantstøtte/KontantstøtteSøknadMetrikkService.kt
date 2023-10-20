@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class KontantstøtteSøknadMetrikkService {
-
     // Metrics for kontantstotte
     val søknadMottattOk = Metrics.counter("kontantstotte.soknad.mottatt.ok")
     val søknadMottattFeil = Metrics.counter("kontantstotte.soknad.mottatt.feil")
@@ -24,15 +23,17 @@ class KontantstøtteSøknadMetrikkService {
     val søknadEøs = Metrics.counter("kontantstotte.soknad.eos")
 
     fun sendMottakMetrikker(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad) {
-        val dokumentasjon = when (versjonertKontantstøtteSøknad) {
-            is KontantstøtteSøknadV3 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon
-            is KontantstøtteSøknadV4 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon
-        }
+        val dokumentasjon =
+            when (versjonertKontantstøtteSøknad) {
+                is KontantstøtteSøknadV3 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon
+                is KontantstøtteSøknadV4 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon
+            }
 
-        val harEøsSteg = when (versjonertKontantstøtteSøknad) {
-            is KontantstøtteSøknadV3 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.antallEøsSteg > 0
-            is KontantstøtteSøknadV4 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.antallEøsSteg > 0
-        }
+        val harEøsSteg =
+            when (versjonertKontantstøtteSøknad) {
+                is KontantstøtteSøknadV3 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.antallEøsSteg > 0
+                is KontantstøtteSøknadV4 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.antallEøsSteg > 0
+            }
 
         sendSøknadMetrikker(harEøsSteg)
 

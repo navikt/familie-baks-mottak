@@ -57,7 +57,6 @@ class EnsligForsørgerInfotrygdHendelseConsumer(
     val vedtakOmOvergangsstønadService: EnsligForsørgerHendelseService,
     val environment: Environment,
 ) {
-
     val ensligForsørgerInfotrygdHendelseConsumerFeilCounter: Counter = Metrics.counter("ef.hendelse.infotrygdvedtak.feil")
 
     @KafkaListener(
@@ -68,7 +67,10 @@ class EnsligForsørgerInfotrygdHendelseConsumer(
         idIsGroup = false,
     )
     @Transactional
-    fun listen(consumerRecord: ConsumerRecord<String, String>, ack: Acknowledgment) {
+    fun listen(
+        consumerRecord: ConsumerRecord<String, String>,
+        ack: Acknowledgment,
+    ) {
         try {
             logger.info("$TOPIC_INFOTRYGD_VEDTAK melding mottatt. Offset: ${consumerRecord.offset()}")
             secureLogger.info("$TOPIC_INFOTRYGD_VEDTAK melding mottatt. Offset: ${consumerRecord.offset()} Key: ${consumerRecord.key()} Value: ${consumerRecord.value()}")
@@ -93,7 +95,6 @@ class EnsligForsørgerInfotrygdHendelseConsumer(
     }
 
     companion object {
-
         private const val TOPIC_INFOTRYGD_VEDTAK = "aapen-ef-overgangstonad-v1"
 
         private val logger: Logger = LoggerFactory.getLogger(EnsligForsørgerInfotrygdHendelseConsumer::class.java)

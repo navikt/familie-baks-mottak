@@ -8,7 +8,6 @@ import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsfelt
 import no.nav.familie.kontrakter.ks.søknad.v1.TekstPåSpråkMap
 
 class KontantstøtteObjectMapperModule(språk: String) : SimpleModule() {
-
     init {
         addSerializer(Søknadsfelt::class.java, SøknadsfeltSerializer(språk))
         addSerializer(TekstPåSpråkMap::class.java, TekstPåSpråkMapSerializer(språk))

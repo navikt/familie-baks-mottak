@@ -24,7 +24,6 @@ import java.nio.charset.StandardCharsets
     StsBearerTokenClientInterceptor::class,
 )
 class RestTemplateConfig {
-
     @Bean
     fun restTemplate(): RestTemplate {
         return RestTemplate(listOf(StringHttpMessageConverter(StandardCharsets.UTF_8), ByteArrayHttpMessageConverter()))

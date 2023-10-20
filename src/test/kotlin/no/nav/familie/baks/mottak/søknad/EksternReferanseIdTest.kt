@@ -28,7 +28,6 @@ class EksternReferanseIdTest(
     @Autowired
     val journalførSøknadTask: JournalførSøknadTask,
 ) {
-
     val søknad = SøknadTestData.søknadV8()
     val dbSøknad = søknad.tilDBSøknad()
 

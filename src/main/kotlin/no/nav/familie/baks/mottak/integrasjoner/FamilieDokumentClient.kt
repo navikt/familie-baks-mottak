@@ -18,7 +18,6 @@ class FamilieDokumentClient(
     @param:Value("\${FAMILIE_DOKUMENT_API_URL}") private val dokumentUri: URI,
     @Qualifier("clientCredentials") restOperations: RestOperations,
 ) : AbstractRestClient(restOperations, "integrasjon") {
-
     @Retryable(
         value = [RuntimeException::class],
         backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),

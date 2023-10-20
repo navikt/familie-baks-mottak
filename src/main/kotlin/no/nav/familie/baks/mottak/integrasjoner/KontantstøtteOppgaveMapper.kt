@@ -9,7 +9,6 @@ class KontantstøtteOppgaveMapper(
     hentEnhetClient: HentEnhetClient,
     pdlClient: PdlClient,
 ) : AbstractOppgaveMapper(hentEnhetClient, pdlClient) {
-
     override val tema: Tema = Tema.KON
 
     override fun hentBehandlingstema(journalpost: Journalpost): String? {

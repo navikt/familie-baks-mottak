@@ -28,12 +28,14 @@ class PdlClient(
     @Value("\${PDL_URL}") pdlBaseUrl: URI,
     @Qualifier("clientCredentials") val restTemplate: RestOperations,
 ) : AbstractRestClient(restTemplate, "pdl.personinfo") {
-
     private val pdlUri = UriUtil.uri(pdlBaseUrl, PATH_GRAPHQL)
 
     @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
     @Cacheable("hentIdenter", cacheManager = "hourlyCacheManager")
-    fun hentIdenter(personIdent: String, tema: Tema): List<IdentInformasjon> {
+    fun hentIdenter(
+        personIdent: String,
+        tema: Tema,
+    ): List<IdentInformasjon> {
         val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery("hentIdenter"))
         val response = postForEntity<PdlHentIdenterResponse>(pdlUri, pdlPersonRequest, httpHeaders(tema))
 
@@ -50,23 +52,33 @@ class PdlClient(
         return response.data.pdlIdenter?.identer.orEmpty()
     }
 
-    fun hentPersonident(aktørId: String, tema: Tema): String {
+    fun hentPersonident(
+        aktørId: String,
+        tema: Tema,
+    ): String {
         return hentIdenter(aktørId, tema).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name && !it.historisk }.last().ident
     }
 
-    fun hentAktørId(personIdent: String, tema: Tema): String {
+    fun hentAktørId(
+        personIdent: String,
+        tema: Tema,
+    ): String {
         return hentIdenter(personIdent, tema).filter { it.gruppe == Identgruppe.AKTORID.name && !it.historisk }.last().ident
     }
 
-    fun hentPersonMedRelasjoner(personIdent: String, tema: Tema): Person {
+    fun hentPersonMedRelasjoner(
+        personIdent: String,
+        tema: Tema,
+    ): Person {
         val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery("hentperson-med-relasjoner"))
 
         try {
-            val response = postForEntity<PdlHentPersonResponse>(
-                pdlUri,
-                pdlPersonRequest,
-                httpHeaders(tema),
-            )
+            val response =
+                postForEntity<PdlHentPersonResponse>(
+                    pdlUri,
+                    pdlPersonRequest,
+                    httpHeaders(tema),
+                )
             if (response.harFeil()) {
                 throw IntegrasjonException(
                     msg = "Feil ved oppslag på person: ${response.errorMessages()}",
@@ -117,25 +129,30 @@ class PdlClient(
         }
     }
 
-    fun hentPerson(personIdent: String, graphqlfil: String, tema: Tema): PdlPersonData {
+    fun hentPerson(
+        personIdent: String,
+        graphqlfil: String,
+        tema: Tema,
+    ): PdlPersonData {
         val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery(graphqlfil))
 
-        val response = try {
-            postForEntity<PdlHentPersonResponse>(
-                pdlUri,
-                pdlPersonRequest,
-                httpHeaders(tema),
-            )
-        } catch (e: Exception) {
-            when (e) {
-                is IntegrasjonException -> throw e
-                else -> throw IntegrasjonException(
-                    msg = "Feil ved oppslag på hentPerson mot PDL. Gav feil: ${e.message}",
-                    uri = pdlUri,
-                    ident = personIdent,
+        val response =
+            try {
+                postForEntity<PdlHentPersonResponse>(
+                    pdlUri,
+                    pdlPersonRequest,
+                    httpHeaders(tema),
                 )
+            } catch (e: Exception) {
+                when (e) {
+                    is IntegrasjonException -> throw e
+                    else -> throw IntegrasjonException(
+                        msg = "Feil ved oppslag på hentPerson mot PDL. Gav feil: ${e.message}",
+                        uri = pdlUri,
+                        ident = personIdent,
+                    )
+                }
             }
-        }
 
         if (response.harFeil()) {
             throw IntegrasjonException(
@@ -174,19 +191,19 @@ class PdlClient(
     }
 
     companion object {
-
         private const val PATH_GRAPHQL = "graphql"
         private const val TEMA = "BAR"
     }
 }
 
 interface PdlBaseResponse {
-
     val errors: List<PdlError>?
     val extensions: PdlExtensions?
 
     fun harFeil() = errors != null && errors!!.isNotEmpty()
+
     fun harAdvarsel() = !extensions?.warnings.isNullOrEmpty()
+
     fun errorMessages() = errors?.joinToString { it -> it.message } ?: ""
 }
 

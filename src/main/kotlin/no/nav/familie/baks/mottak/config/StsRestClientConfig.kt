@@ -11,7 +11,6 @@ import java.net.URI
 
 @Configuration
 class StsRestClientConfig {
-
     @Bean
     @Autowired
     @Profile("!mock-sts")

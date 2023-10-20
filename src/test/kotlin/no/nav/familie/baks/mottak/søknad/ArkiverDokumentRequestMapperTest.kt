@@ -23,52 +23,56 @@ import kotlin.test.assertEquals
 
 @ExtendWith(MockKExtension::class)
 class ArkiverDokumentRequestMapperTest {
-
     @Test
     fun `toDto - skal opprette ArkiverDokumentRequest basert på KontantstøtteSøknad`() {
         val kontantstøtteSøknad: KontantstøtteSøknad = mockk()
-        val dokumentasjon = Søknaddokumentasjon(
-            Dokumentasjonsbehov.BEKREFTELESE_PÅ_BARNEHAGEPLASS,
-            true,
+        val dokumentasjon =
+            Søknaddokumentasjon(
+                Dokumentasjonsbehov.BEKREFTELESE_PÅ_BARNEHAGEPLASS,
+                true,
+                listOf(
+                    no.nav.familie.kontrakter.ks.søknad.v1.Søknadsvedlegg(
+                        "123",
+                        "navn",
+                        Dokumentasjonsbehov.BEKREFTELESE_PÅ_BARNEHAGEPLASS,
+                    ),
+                ),
+                TekstPåSpråkMap(
+                    mapOf(
+                        "nb" to "Norge",
+                        "nn" to "Noreg",
+                        "en" to "Norway",
+                    ),
+                ),
+            )
+        every { kontantstøtteSøknad.dokumentasjon } returns
             listOf(
-                no.nav.familie.kontrakter.ks.søknad.v1.Søknadsvedlegg(
-                    "123",
-                    "navn",
-                    Dokumentasjonsbehov.BEKREFTELESE_PÅ_BARNEHAGEPLASS,
-                ),
-            ),
-            TekstPåSpråkMap(
-                mapOf(
-                    "nb" to "Norge",
-                    "nn" to "Noreg",
-                    "en" to "Norway",
-                ),
-            ),
-        )
-        every { kontantstøtteSøknad.dokumentasjon } returns listOf(
-            dokumentasjon,
-        )
+                dokumentasjon,
+            )
         val dbKontantstøtteSøknad = DBKontantstøtteSøknad(søknadJson = "{}", fnr = "12345678910")
-        val vedleggMap = mapOf(
-            "123" to DBKontantstotteVedlegg(dokumentId = "123", søknadId = 0, data = ByteArray(0)),
-        )
-        val arkiverDokumentRequest = ArkiverDokumentRequestMapper.toDto(
-            dbKontantstøtteSøknad,
-            KontantstøtteSøknadV4(kontantstøtteSøknad = kontantstøtteSøknad),
-            ByteArray(0),
-            vedleggMap,
-            ByteArray(0),
-        )
+        val vedleggMap =
+            mapOf(
+                "123" to DBKontantstotteVedlegg(dokumentId = "123", søknadId = 0, data = ByteArray(0)),
+            )
+        val arkiverDokumentRequest =
+            ArkiverDokumentRequestMapper.toDto(
+                dbKontantstøtteSøknad,
+                KontantstøtteSøknadV4(kontantstøtteSøknad = kontantstøtteSøknad),
+                ByteArray(0),
+                vedleggMap,
+                ByteArray(0),
+            )
         assertEquals("12345678910", arkiverDokumentRequest.fnr)
         assertEquals(false, arkiverDokumentRequest.forsøkFerdigstill)
         assertEquals(2, arkiverDokumentRequest.hoveddokumentvarianter.size)
         assertEquals(
             true,
             arkiverDokumentRequest.hoveddokumentvarianter.all {
-                it.filtype in listOf(
-                    Filtype.PDFA,
-                    Filtype.JSON,
-                ) && it.dokumenttype == Dokumenttype.KONTANTSTØTTE_SØKNAD
+                it.filtype in
+                    listOf(
+                        Filtype.PDFA,
+                        Filtype.JSON,
+                    ) && it.dokumenttype == Dokumenttype.KONTANTSTØTTE_SØKNAD
             },
         )
         assertEquals(1, arkiverDokumentRequest.vedleggsdokumenter.size)
@@ -104,32 +108,36 @@ class ArkiverDokumentRequestMapperTest {
                     ),
                 ),
             )
-        every { søknad.dokumentasjon } returns listOf(
-            dokumentasjon,
-        )
+        every { søknad.dokumentasjon } returns
+            listOf(
+                dokumentasjon,
+            )
         every { søknad.søknadstype } returns Søknadstype.ORDINÆR
 
         val dbSøknad = DBSøknad(søknadJson = "{}", fnr = "12345678910")
-        val vedleggMap = mapOf(
-            "123" to DBVedlegg(dokumentId = "123", søknadId = 0, data = ByteArray(0)),
-        )
-        val arkiverDokumentRequest = ArkiverDokumentRequestMapper.toDto(
-            dbSøknad,
-            SøknadV8(søknad),
-            ByteArray(0),
-            vedleggMap,
-            ByteArray(0),
-        )
+        val vedleggMap =
+            mapOf(
+                "123" to DBVedlegg(dokumentId = "123", søknadId = 0, data = ByteArray(0)),
+            )
+        val arkiverDokumentRequest =
+            ArkiverDokumentRequestMapper.toDto(
+                dbSøknad,
+                SøknadV8(søknad),
+                ByteArray(0),
+                vedleggMap,
+                ByteArray(0),
+            )
         assertEquals("12345678910", arkiverDokumentRequest.fnr)
         assertEquals(false, arkiverDokumentRequest.forsøkFerdigstill)
         assertEquals(2, arkiverDokumentRequest.hoveddokumentvarianter.size)
         assertEquals(
             true,
             arkiverDokumentRequest.hoveddokumentvarianter.all {
-                it.filtype in listOf(
-                    Filtype.PDFA,
-                    Filtype.JSON,
-                ) && it.dokumenttype == Dokumenttype.BARNETRYGD_ORDINÆR
+                it.filtype in
+                    listOf(
+                        Filtype.PDFA,
+                        Filtype.JSON,
+                    ) && it.dokumenttype == Dokumenttype.BARNETRYGD_ORDINÆR
             },
         )
         assertEquals(1, arkiverDokumentRequest.vedleggsdokumenter.size)

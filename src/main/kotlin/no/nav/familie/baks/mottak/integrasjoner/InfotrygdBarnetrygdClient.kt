@@ -20,15 +20,20 @@ class InfotrygdBarnetrygdClient(
     private val environment: Environment,
 ) :
     AbstractRestClient(restOperations, "familie-ba-infotrygd") {
-
-    fun hentLøpendeUtbetalinger(søkersIdenter: List<String>, barnasIdenter: List<String>): InfotrygdSøkResponse<StønadDto> {
+    fun hentLøpendeUtbetalinger(
+        søkersIdenter: List<String>,
+        barnasIdenter: List<String>,
+    ): InfotrygdSøkResponse<StønadDto> {
         return infotrygdResponseFra(
             request = { postForEntity(uri("stonad"), InfotrygdSøkRequest(søkersIdenter, barnasIdenter)) },
             onFailure = { ex -> IntegrasjonException("Feil ved søk etter stønad i infotrygd.", ex, uri("stonad")) },
         )
     }
 
-    fun hentSaker(søkersIdenter: List<String>, barnasIdenter: List<String>): InfotrygdSøkResponse<SakDto> {
+    fun hentSaker(
+        søkersIdenter: List<String>,
+        barnasIdenter: List<String>,
+    ): InfotrygdSøkResponse<SakDto> {
         return infotrygdResponseFra(
             request = { postForEntity(uri("saker"), InfotrygdSøkRequest(søkersIdenter, barnasIdenter)) },
             onFailure = { ex -> IntegrasjonException("Feil ved uthenting av saker fra infotrygd.", ex, uri("saker")) },

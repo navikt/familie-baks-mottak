@@ -29,7 +29,6 @@ import org.springframework.test.context.ActiveProfiles
 @AutoConfigureWireMock(port = 28085)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DokarkivClientTest {
-
     @Autowired
     lateinit var dokarkivClient: DokarkivClient
 
@@ -120,11 +119,12 @@ class DokarkivClientTest {
 
     companion object {
         private val response = objectMapper.writeValueAsString(Ressurs.success(mapOf("journalpostId" to "12345678"), "test"))
-        private val jp = Journalpost(
-            journalpostId = "12345678",
-            journalposttype = Journalposttype.I,
-            journalstatus = Journalstatus.MOTTATT,
-            bruker = Bruker("12345678910", BrukerIdType.FNR),
-        )
+        private val jp =
+            Journalpost(
+                journalpostId = "12345678",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker = Bruker("12345678910", BrukerIdType.FNR),
+            )
     }
 }

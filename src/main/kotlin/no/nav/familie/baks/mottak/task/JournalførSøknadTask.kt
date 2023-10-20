@@ -23,7 +23,6 @@ class JournalførSøknadTask(
     private val journalføringService: JournalføringService,
     private val søknadRepository: SøknadRepository,
 ) : AsyncTaskStep {
-
     override fun doTask(task: Task) {
         try {
             val id = task.payload
@@ -33,23 +32,26 @@ class JournalførSøknadTask(
             val versjonertSøknad: VersjonertSøknad = dbSøknad.hentVersjonertSøknad()
 
             log.info("Generer pdf og journalfør søknad")
-            val bokmålPdf = pdfService.lagBarnetrygdPdf(
-                versjonertSøknad = versjonertSøknad,
-                dbSøknad = dbSøknad,
-                språk = "nb",
-            )
+            val bokmålPdf =
+                pdfService.lagBarnetrygdPdf(
+                    versjonertSøknad = versjonertSøknad,
+                    dbSøknad = dbSøknad,
+                    språk = "nb",
+                )
             log.info("Generert pdf med størrelse ${bokmålPdf.size}")
 
-            val orginalspråk = when (versjonertSøknad) {
-                is SøknadV7 -> versjonertSøknad.søknad.originalSpråk
-                is SøknadV8 -> versjonertSøknad.søknad.originalSpråk
-            }
+            val orginalspråk =
+                when (versjonertSøknad) {
+                    is SøknadV7 -> versjonertSøknad.søknad.originalSpråk
+                    is SøknadV8 -> versjonertSøknad.søknad.originalSpråk
+                }
 
-            val orginalspråkPdf: ByteArray = if (orginalspråk != "nb") {
-                pdfService.lagBarnetrygdPdf(versjonertSøknad, dbSøknad, orginalspråk)
-            } else {
-                ByteArray(0)
-            }
+            val orginalspråkPdf: ByteArray =
+                if (orginalspråk != "nb") {
+                    pdfService.lagBarnetrygdPdf(versjonertSøknad, dbSøknad, orginalspråk)
+                } else {
+                    ByteArray(0)
+                }
             journalføringService.journalførBarnetrygdSøknad(dbSøknad, bokmålPdf, orginalspråkPdf)
         } catch (e: RessursException) {
             when (e.cause) {
@@ -72,7 +74,6 @@ class JournalførSøknadTask(
     }
 
     companion object {
-
         const val JOURNALFØR_SØKNAD = "journalførSøknad"
         val log: Logger = LoggerFactory.getLogger(this::class.java)
         val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")

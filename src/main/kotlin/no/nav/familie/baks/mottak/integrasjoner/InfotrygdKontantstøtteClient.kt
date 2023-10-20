@@ -60,11 +60,12 @@ class InfotrygdKontantstøtteClient(
         request: () -> T,
         onFailure: (Throwable) -> RuntimeException,
         e2eResponse: T,
-    ): T = if (environment.activeProfiles.contains("e2e")) {
-        e2eResponse
-    } else {
-        runCatching(request).getOrElse { throw onFailure(it) }
-    }
+    ): T =
+        if (environment.activeProfiles.contains("e2e")) {
+            e2eResponse
+        } else {
+            runCatching(request).getOrElse { throw onFailure(it) }
+        }
 
     private fun uri(endepunkt: String) = URI.create(encodePath("$clientUri/$endepunkt", "UTF-8"))
 }
@@ -89,4 +90,6 @@ data class BarnDto(
     val fnr: Foedselsnummer,
 )
 
-data class Foedselsnummer(@get:JsonValue val asString: String)
+data class Foedselsnummer(
+    @get:JsonValue val asString: String,
+)

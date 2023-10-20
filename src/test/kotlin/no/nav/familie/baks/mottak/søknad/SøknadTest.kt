@@ -27,7 +27,6 @@ import kotlin.test.assertEquals
 class SøknadTest(
     @Autowired val barnetrygdSøknadService: BarnetrygdSøknadService,
 ) {
-
     val søknadV8 = SøknadTestData.søknadV8()
 
     @Test
@@ -44,13 +43,14 @@ class SøknadTest(
     @Test
     fun `Få riktig versjon v8 ved mapping fra DBSøknad`() {
         val dbSøknadFraMapper = søknadV8.tilDBSøknad()
-        val versjon: Int? = when (val versjonertSøknad = dbSøknadFraMapper.hentVersjonertSøknad()) {
-            is SøknadV7 -> versjonertSøknad.søknad.kontraktVersjon
-            is SøknadV8 -> versjonertSøknad.søknad.kontraktVersjon
-            else -> {
-                null
+        val versjon: Int? =
+            when (val versjonertSøknad = dbSøknadFraMapper.hentVersjonertSøknad()) {
+                is SøknadV7 -> versjonertSøknad.søknad.kontraktVersjon
+                is SøknadV8 -> versjonertSøknad.søknad.kontraktVersjon
+                else -> {
+                    null
+                }
             }
-        }
         assertEquals(søknadV8.kontraktVersjon, versjon)
 
         val dbSøknadFraDB = barnetrygdSøknadService.lagreDBSøknad(dbSøknadFraMapper)
@@ -62,11 +62,12 @@ class SøknadTest(
     @Test
     fun `Version detection ved henting av søknad fra database`() {
         val lagraV8SøknadData = objectMapper.writeValueAsString(SøknadTestData.søknadV8())
-        val v8dbSøknad = DBSøknad(
-            id = 2L,
-            søknadJson = lagraV8SøknadData,
-            fnr = "1234123412",
-        )
+        val v8dbSøknad =
+            DBSøknad(
+                id = 2L,
+                søknadJson = lagraV8SøknadData,
+                fnr = "1234123412",
+            )
         assertThat(v8dbSøknad.hentVersjonertSøknad() is SøknadV8).isTrue
     }
 }

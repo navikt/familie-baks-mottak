@@ -24,7 +24,6 @@ import java.time.LocalDate
 @AutoConfigureWireMock(port = 28085)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PdlClientTest {
-
     @Autowired
     lateinit var pdlClient: PdlClient
 
@@ -100,10 +99,12 @@ class PdlClientTest {
     }
 
     companion object {
-
         val testIdent = "12345678901"
 
-        private fun mockResponseForPdlQuery(pdlRequestBody: String, mockResponse: String) {
+        private fun mockResponseForPdlQuery(
+            pdlRequestBody: String,
+            mockResponse: String,
+        ) {
             stubFor(
                 post(urlEqualTo("/api/graphql"))
                     .withRequestBody(equalToJson(pdlRequestBody))
@@ -115,7 +116,10 @@ class PdlClientTest {
             )
         }
 
-        private fun gyldigRequest(queryFilnavn: String, ident: String): String {
+        private fun gyldigRequest(
+            queryFilnavn: String,
+            ident: String,
+        ): String {
             return "{\"variables\":{\"ident\":\"$ident\"},\"query\":\"${readfile(queryFilnavn).graphqlCompatible()}\"}"
         }
 

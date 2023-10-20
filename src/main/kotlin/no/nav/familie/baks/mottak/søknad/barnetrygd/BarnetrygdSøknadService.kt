@@ -26,19 +26,19 @@ class BarnetrygdSøknadService(
     private val taskService: TaskService,
     private val vedleggClient: FamilieDokumentClient,
 ) {
-
     @Transactional
     @Throws(FødselsnummerErNullException::class)
     fun motta(versjonertSøknad: VersjonertSøknad): DBSøknad {
-        val (dbSøknad, dokumentasjon) = when (versjonertSøknad) {
-            is SøknadV7 -> {
-                Pair(versjonertSøknad.søknad.tilDBSøknad(), versjonertSøknad.søknad.dokumentasjon)
-            }
+        val (dbSøknad, dokumentasjon) =
+            when (versjonertSøknad) {
+                is SøknadV7 -> {
+                    Pair(versjonertSøknad.søknad.tilDBSøknad(), versjonertSøknad.søknad.dokumentasjon)
+                }
 
-            is SøknadV8 -> {
-                Pair(versjonertSøknad.søknad.tilDBSøknad(), versjonertSøknad.søknad.dokumentasjon)
+                is SøknadV8 -> {
+                    Pair(versjonertSøknad.søknad.tilDBSøknad(), versjonertSøknad.søknad.dokumentasjon)
+                }
             }
-        }
 
         lagreDBSøknad(dbSøknad)
 
@@ -77,7 +77,10 @@ class BarnetrygdSøknadService(
         vedleggRepository.slettAlleVedlegg(søknad.id)
     }
 
-    private fun hentOgLagreSøknadvedlegg(dbSøknad: DBSøknad, søknaddokumentasjonsliste: List<Søknaddokumentasjon>) {
+    private fun hentOgLagreSøknadvedlegg(
+        dbSøknad: DBSøknad,
+        søknaddokumentasjonsliste: List<Søknaddokumentasjon>,
+    ) {
         søknaddokumentasjonsliste.forEach { søknaddokumentasjon ->
             søknaddokumentasjon.opplastedeVedlegg.forEach { vedlegg ->
                 val vedleggDokument = vedleggClient.hentVedlegg(dokumentId = vedlegg.dokumentId)

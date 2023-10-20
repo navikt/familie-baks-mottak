@@ -7,9 +7,11 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface HendelsesloggRepository : JpaRepository<Hendelseslogg, Long> {
-
     @Lock(LockModeType.PESSIMISTIC_FORCE_INCREMENT)
     fun save(hendelseslogg: Hendelseslogg): Hendelseslogg
 
-    fun existsByHendelseIdAndConsumer(hendelseId: String, consumer: HendelseConsumer): Boolean
+    fun existsByHendelseIdAndConsumer(
+        hendelseId: String,
+        consumer: HendelseConsumer,
+    ): Boolean
 }

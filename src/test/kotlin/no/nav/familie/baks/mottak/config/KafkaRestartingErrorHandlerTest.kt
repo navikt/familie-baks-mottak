@@ -15,7 +15,6 @@ import org.springframework.kafka.listener.MessageListenerContainer
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class KafkaRestartingErrorHandlerTest {
-
     @MockK(relaxed = true)
     lateinit var container: MessageListenerContainer
 
