@@ -31,10 +31,12 @@ import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND.GIFT
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.prosessering.error.RekjørSenereException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -73,7 +75,10 @@ class VurderLivshendelseTask(
                 secureLog.info("dødsfallshendelse person følselsdato = ${pdlPersonData.fødsel.firstOrNull()}")
                 if (pdlPersonData.dødsfall.firstOrNull()?.dødsdato == null) {
                     secureLog.info("Har mottatt dødsfallshendelse uten dødsdato $pdlPersonData")
-                    error("Har mottatt dødsfallshendelse uten dødsdato")
+                    throw RekjørSenereException(
+                        årsak = "Har mottatt dødsfallshendelse uten dødsdato",
+                        triggerTid = LocalDateTime.now().plusDays(1),
+                    )
                 }
 
                 val berørteBrukereIBaSak = finnBrukereBerørtAvDødsfallEllerUtflyttingHendelseForIdent(personIdent)
