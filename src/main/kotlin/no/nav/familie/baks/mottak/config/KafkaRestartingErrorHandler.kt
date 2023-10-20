@@ -48,7 +48,7 @@ class KafkaRestartingErrorHandler : CommonContainerStoppingErrorHandler() {
                     "Feil ved konsumering av melding fra ${this.topic()}. id ${this.key()}, " +
                         "offset: ${this.offset()}, partition: ${this.partition()}",
                 )
-                se.warn("${this.topic()} - Problemer med prosessering av $records", e)
+                secureLogger.warn("${this.topic()} - Problemer med prosessering av $records", e)
                 scheduleRestart(
                     e,
                     container,
