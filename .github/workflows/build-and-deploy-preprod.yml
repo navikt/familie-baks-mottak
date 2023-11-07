@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 21
           distribution: 'temurin'
           cache: 'maven'
       - name: Kjør ktlint
@@ -39,7 +39,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 21
           distribution: 'temurin'
           cache: 'maven'
 
