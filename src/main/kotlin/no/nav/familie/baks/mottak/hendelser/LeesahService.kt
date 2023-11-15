@@ -13,6 +13,9 @@ import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseTask
 import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseTaskDTO
 import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseType
 import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseType.SIVILSTAND
+import no.nav.familie.baks.mottak.task.VurderKontantstøtteLivshendelseTask
+import no.nav.familie.baks.mottak.task.VurderKontantstøtteLivshendelseTaskDTO
+import no.nav.familie.baks.mottak.task.VurderKontantstøtteLivshendelseType
 import no.nav.familie.baks.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND.GIFT
@@ -77,8 +80,10 @@ class LeesahService(
                     dødsfallIgnorertCounter.increment()
                 } else {
                     opprettVurderBarnetrygdLivshendelseTaskForHendelse(VurderBarnetrygdLivshendelseType.DØDSFALL, pdlHendelse)
+                    opprettVurderKontantstøtteLivshendelseTaskForHendelse(VurderKontantstøtteLivshendelseType.DØDSFALL, pdlHendelse)
                 }
             }
+
             else -> {
                 logHendelse(pdlHendelse)
                 logHendelse(pdlHendelse, "Ikke av type OPPRETTET. Dødsdato: ${pdlHendelse.dødsdato}")
@@ -130,6 +135,7 @@ class LeesahService(
                     fødselIgnorertCounter.increment()
                 }
             }
+
             ANNULLERT -> {
                 fødselAnnullertCounter.increment()
                 if (pdlHendelse.tidligereHendelseId != null) {
@@ -155,6 +161,7 @@ class LeesahService(
                     log.warn("Mottatt annuller fødsel uten tidligereHendelseId, hendelseId ${pdlHendelse.hendelseId}")
                 }
             }
+
             else -> {
                 logHendelse(pdlHendelse)
             }
@@ -174,7 +181,9 @@ class LeesahService(
                 utflyttingOpprettetCounter.increment()
 
                 opprettVurderBarnetrygdLivshendelseTaskForHendelse(VurderBarnetrygdLivshendelseType.UTFLYTTING, pdlHendelse)
+                opprettVurderKontantstøtteLivshendelseTaskForHendelse(VurderKontantstøtteLivshendelseType.UTFLYTTING, pdlHendelse)
             }
+
             else -> {
                 logHendelse(pdlHendelse, "Ikke av type OPPRETTET.")
                 when (pdlHendelse.endringstype) {
@@ -199,6 +208,7 @@ class LeesahService(
 
                 opprettTaskHvisSivilstandErGift(pdlHendelse)
             }
+
             else -> {
                 logHendelse(pdlHendelse, "Ikke av type OPPRETTET.")
                 when (pdlHendelse.endringstype) {
@@ -263,6 +273,26 @@ class LeesahService(
         Task(
             type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
             payload = objectMapper.writeValueAsString(VurderBarnetrygdLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type)),
+            properties =
+                Properties().apply {
+                    this["ident"] = pdlHendelse.hentPersonident()
+                    this["callId"] = pdlHendelse.hendelseId
+                    this["type"] = type.name
+                },
+        ).medTriggerTid(LocalDateTime.now().run { if (environment.activeProfiles.contains("prod")) this.plusHours(1) else this })
+            .also {
+                taskService.save(it)
+            }
+    }
+
+    private fun opprettVurderKontantstøtteLivshendelseTaskForHendelse(
+        type: VurderKontantstøtteLivshendelseType,
+        pdlHendelse: PdlHendelse,
+    ) {
+        log.info("opprett VurderKontantstøtteLivshendelseTask for pdlHendelse (id= ${pdlHendelse.hendelseId})")
+        Task(
+            type = VurderKontantstøtteLivshendelseTask.TASK_STEP_TYPE,
+            payload = objectMapper.writeValueAsString(VurderKontantstøtteLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type)),
             properties =
                 Properties().apply {
                     this["ident"] = pdlHendelse.hentPersonident()

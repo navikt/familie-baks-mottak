@@ -45,7 +45,7 @@ import java.util.Locale
 @Service
 @TaskStepBeskrivelse(
     taskStepType = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
-    beskrivelse = "Vurder livshendelse",
+    beskrivelse = "Vurder barnetrygd livshendelse",
     maxAntallFeil = 3,
     triggerTidVedFeilISekunder = 3600,
 )

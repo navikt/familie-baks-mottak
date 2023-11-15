@@ -20,6 +20,15 @@ no.nav.security.jwt:
           client-id: ${CLIENT_ID}
           client-secret: ${CLIENT_SECRET}
           client-auth-method: client_secret_basic
+      ks-sak-clientcredentials:
+        resource-url: ${FAMILIE_KS_SAK_API_URL}
+        token-endpoint-url: https://login.microsoftonline.com/navq.onmicrosoft.com/oauth2/v2.0/token
+        grant-type: client_credentials
+        scope: ${KS_SAK_SCOPE}
+        authentication:
+          client-id: ${AZURE_APP_CLIENT_ID}
+          client-secret: ${AZURE_APP_CLIENT_SECRET}
+          client-auth-method: client_secret_basic
       integrasjoner-clientcredentials:
         resource-url: ${FAMILIE_INTEGRASJONER_API_URL}
         token-endpoint-url: https://login.microsoftonline.com/navq.onmicrosoft.com/oauth2/v2.0/token
@@ -68,6 +77,7 @@ prosessering.rolle: "928636f4-fd0d-4149-978e-a6fb68bb19de"
 
 FAMILIE_BAKS_DOKGEN_API_URL: http://localhost:5914
 FAMILIE_BA_SAK_API_URL: http://localhost:8089/api
+FAMILIE_KS_SAK_API_URL: http://localhost:8083/api
 FAMILIE_INTEGRASJONER_API_URL: http://localhost:8085/api
 FAMILIE_BA_INFOTRYGD_API_URL: http://localhost:8093
 FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1
