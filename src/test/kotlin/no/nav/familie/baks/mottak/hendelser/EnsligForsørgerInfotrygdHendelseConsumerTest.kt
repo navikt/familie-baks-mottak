@@ -5,8 +5,8 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
+import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
-import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.objectMapper
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -20,7 +20,7 @@ import org.springframework.kafka.support.Acknowledgment
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class EnsligForsørgerInfotrygdHendelseConsumerTest {
     lateinit var mockHendelsesloggRepository: HendelsesloggRepository
-    lateinit var mockSakClient: SakClient
+    lateinit var mockBaSakClient: BaSakClient
     lateinit var mockPdlClient: PdlClient
     lateinit var service: EnsligForsørgerHendelseService
 
@@ -51,9 +51,9 @@ class EnsligForsørgerInfotrygdHendelseConsumerTest {
     @BeforeEach
     internal fun setUp() {
         mockHendelsesloggRepository = mockk(relaxed = true)
-        mockSakClient = mockk(relaxed = true)
+        mockBaSakClient = mockk(relaxed = true)
         mockPdlClient = mockk(relaxed = true)
-        service = EnsligForsørgerHendelseService(mockSakClient, mockPdlClient, mockHendelsesloggRepository)
+        service = EnsligForsørgerHendelseService(mockBaSakClient, mockPdlClient, mockHendelsesloggRepository)
         consumer = EnsligForsørgerInfotrygdHendelseConsumer(service, mockk(relaxed = true))
         clearAllMocks()
 
@@ -80,7 +80,7 @@ class EnsligForsørgerInfotrygdHendelseConsumerTest {
         val consumerRecord = ConsumerRecord("topic", 1, 1, "42", json)
         consumer.listen(consumerRecord, ack)
         verify(exactly = 1) {
-            mockSakClient.sendVedtakOmOvergangsstønadHendelseTilSak("12345678910")
+            mockBaSakClient.sendVedtakOmOvergangsstønadHendelseTilBaSak("12345678910")
         }
         verify(exactly = 1) { ack.acknowledge() }
     }

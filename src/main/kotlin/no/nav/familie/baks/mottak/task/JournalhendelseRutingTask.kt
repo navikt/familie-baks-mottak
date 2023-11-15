@@ -2,6 +2,7 @@ package no.nav.familie.baks.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
+import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.BARN
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus.AVSLUTTET
@@ -14,7 +15,6 @@ import no.nav.familie.baks.mottak.integrasjoner.Opphørsgrunn
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsak
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
-import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.baks.mottak.integrasjoner.StatusKode
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.kontrakter.felles.Tema
@@ -37,7 +37,7 @@ import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 )
 class JournalhendelseRutingTask(
     private val pdlClient: PdlClient,
-    private val sakClient: SakClient,
+    private val baSakClient: BaSakClient,
     private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,
     private val taskService: TaskService,
 ) : AsyncTaskStep {
@@ -103,7 +103,7 @@ class JournalhendelseRutingTask(
                 .map { it.ident }
 
         return Pair(
-            first = sakClient.hentRestFagsakDeltagerListe(brukersIdent, barnasIdenter).sakspart(sakClient),
+            first = baSakClient.hentRestFagsakDeltagerListe(brukersIdent, barnasIdenter).sakspart(baSakClient),
             second =
                 infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, alleBarnasIdenter).sakspart
                     ?: infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).sakspart,
@@ -156,17 +156,17 @@ enum class Sakspart(val part: String) {
     ANNEN("Søsken"),
 }
 
-private fun List<RestFagsakDeltager>.sakspart(sakClient: SakClient): Sakspart? =
+private fun List<RestFagsakDeltager>.sakspart(baSakClient: BaSakClient): Sakspart? =
     when {
-        any { it.rolle == FORELDER && it.harPågåendeSak(sakClient) } -> Sakspart.SØKER
-        any { it.rolle == BARN && it.harPågåendeSak(sakClient) } -> Sakspart.ANNEN
+        any { it.rolle == FORELDER && it.harPågåendeSak(baSakClient) } -> Sakspart.SØKER
+        any { it.rolle == BARN && it.harPågåendeSak(baSakClient) } -> Sakspart.ANNEN
         else -> null
     }
 
-private fun RestFagsakDeltager.harPågåendeSak(sakClient: SakClient): Boolean {
+private fun RestFagsakDeltager.harPågåendeSak(baSakClient: BaSakClient): Boolean {
     return when (fagsakStatus) {
         OPPRETTET, LØPENDE -> true
-        AVSLUTTET -> !sisteBehandlingHenlagtEllerTekniskOpphør(sakClient.hentRestFagsak(fagsakId))
+        AVSLUTTET -> !sisteBehandlingHenlagtEllerTekniskOpphør(baSakClient.hentRestFagsak(fagsakId))
     }
 }
 

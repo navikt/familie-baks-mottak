@@ -30,8 +30,8 @@ class MottaAnnullerFødselTaskTest {
             Task(type = JournalførSøknadTask.JOURNALFØR_SØKNAD, payload = "").copy(
                 id = 0,
             )
-        val sendTilSakTask =
-            Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "").copy(
+        val sendTilBaSakTask =
+            Task(type = SendTilBaSakTask.TASK_STEP_TYPE, payload = "").copy(
                 id = 1,
             )
         val mottaFødselshendelseTask =
@@ -41,11 +41,11 @@ class MottaAnnullerFødselTaskTest {
         every { taskService.finnTasksMedStatus(any(), any(), any()) } returns
             listOf(
                 journalførSøknadTask,
-                sendTilSakTask,
+                sendTilBaSakTask,
                 mottaFødselshendelseTask,
             )
         every { taskService.findById(eq(0)) } returns journalførSøknadTask
-        every { taskService.findById(eq(1)) } returns sendTilSakTask
+        every { taskService.findById(eq(1)) } returns sendTilBaSakTask
         every { taskService.findById(eq(2)) } returns mottaFødselshendelseTask
 
         val taskSlot = mutableListOf<Task>()
@@ -69,12 +69,12 @@ class MottaAnnullerFødselTaskTest {
 
         MDC.put(MDCConstants.MDC_CALL_ID, "xxx")
         val task0 =
-            Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "").copy(
+            Task(type = SendTilBaSakTask.TASK_STEP_TYPE, payload = "").copy(
                 id = 0,
             )
         MDC.put(MDCConstants.MDC_CALL_ID, "ooo")
         val task1 =
-            Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "").copy(
+            Task(type = SendTilBaSakTask.TASK_STEP_TYPE, payload = "").copy(
                 id = 1,
             )
 

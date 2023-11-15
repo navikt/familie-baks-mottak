@@ -84,7 +84,7 @@ class MottaFødselshendelseTaskTest {
             taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
-        assertThat(taskerMedCallId).hasSize(1).extracting("type").containsOnly(SendTilSakTask.TASK_STEP_TYPE)
+        assertThat(taskerMedCallId).hasSize(1).extracting("type").containsOnly(SendTilBaSakTask.TASK_STEP_TYPE)
         assertThat(objectMapper.readValue(taskerMedCallId.first().payload, NyBehandling::class.java))
             .hasFieldOrPropertyWithValue("morsIdent", "20107678901")
             .hasFieldOrPropertyWithValue("barnasIdenter", arrayOf(fnrBarn))
@@ -122,7 +122,7 @@ class MottaFødselshendelseTaskTest {
             taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
-        assertThat(taskerMedCallId).hasSize(1).extracting("type").containsOnly(SendTilSakTask.TASK_STEP_TYPE)
+        assertThat(taskerMedCallId).hasSize(1).extracting("type").containsOnly(SendTilBaSakTask.TASK_STEP_TYPE)
         assertThat(objectMapper.readValue(taskerMedCallId.first().payload, NyBehandling::class.java))
             .hasFieldOrPropertyWithValue("morsIdent", "20107678901")
             .hasFieldOrPropertyWithValue("barnasIdenter", arrayOf(fnrBarn))

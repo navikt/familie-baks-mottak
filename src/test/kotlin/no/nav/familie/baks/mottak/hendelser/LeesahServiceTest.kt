@@ -9,7 +9,7 @@ import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
 import no.nav.familie.baks.mottak.domene.hendelser.PdlHendelse
 import no.nav.familie.baks.mottak.task.MottaAnnullerFødselTask
 import no.nav.familie.baks.mottak.task.MottaFødselshendelseTask
-import no.nav.familie.baks.mottak.task.VurderLivshendelseTask
+import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseTask
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.assertj.core.api.Assertions.assertThat
@@ -63,7 +63,7 @@ class LeesahServiceTest {
         }
         assertThat(taskSlot.captured).isNotNull
         assertThat(taskSlot.captured.payload).contains("\"personIdent\":\"12345678901\",\"type\":\"DØDSFALL\"")
-        assertThat(taskSlot.captured.type).isEqualTo(VurderLivshendelseTask.TASK_STEP_TYPE)
+        assertThat(taskSlot.captured.type).isEqualTo(VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE)
 
         verify(exactly = 1) {
             mockHendelsesloggRepository.save(any())
@@ -92,7 +92,7 @@ class LeesahServiceTest {
         }
         assertThat(taskSlot.captured).isNotNull
         assertThat(taskSlot.captured.payload).contains("\"personIdent\":\"12345678901\",\"type\":\"UTFLYTTING\"")
-        assertThat(taskSlot.captured.type).isEqualTo(VurderLivshendelseTask.TASK_STEP_TYPE)
+        assertThat(taskSlot.captured.type).isEqualTo(VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE)
 
         verify(exactly = 1) {
             mockHendelsesloggRepository.save(any())
@@ -124,7 +124,7 @@ class LeesahServiceTest {
         assertThat(taskSlot.captured).isNotNull
         assertThat(taskSlot.captured.payload)
             .isEqualTo("{\"personIdent\":\"12345678901\",\"type\":\"SIVILSTAND\"}")
-        assertThat(taskSlot.captured.type).isEqualTo(VurderLivshendelseTask.TASK_STEP_TYPE)
+        assertThat(taskSlot.captured.type).isEqualTo(VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE)
 
         verify(exactly = 2) {
             mockHendelsesloggRepository.save(any())

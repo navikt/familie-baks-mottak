@@ -5,6 +5,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingUnderkategori
 import no.nav.familie.baks.mottak.integrasjoner.Dødsfall
@@ -23,7 +24,6 @@ import no.nav.familie.baks.mottak.integrasjoner.RestFagsak
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakIdOgTilknyttetAktørId
 import no.nav.familie.baks.mottak.integrasjoner.RestUtvidetBehandling
-import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.baks.mottak.integrasjoner.Sivilstand
 import no.nav.familie.baks.mottak.task.VurderLivshendelseType.DØDSFALL
 import no.nav.familie.baks.mottak.task.VurderLivshendelseType.SIVILSTAND
@@ -48,14 +48,14 @@ import java.time.Year
 import java.time.YearMonth
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class VurderLivshendelseTaskTest {
+class VurderBarnetrygdLivshendelseTaskTest {
     private val mockOppgaveClient: OppgaveClient = mockk()
-    private val mockSakClient: SakClient = mockk()
+    private val mockSakClient: BaSakClient = mockk()
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdClient: InfotrygdBarnetrygdClient = mockk()
 
-    private val vurderLivshendelseTask =
-        VurderLivshendelseTask(mockOppgaveClient, mockPdlClient, mockSakClient, mockInfotrygdClient)
+    private val vurderBarnetrygdLivshendelseTask =
+        VurderBarnetrygdLivshendelseTask(mockOppgaveClient, mockPdlClient, mockSakClient, mockInfotrygdClient)
 
     @BeforeEach
     internal fun setUp() {
@@ -116,9 +116,9 @@ class VurderLivshendelseTaskTest {
                 fødsel = listOf(Fødsel(LocalDate.of(1980, 8, 3))),
             )
 
-        vurderLivshendelseTask.doTask(
+        vurderBarnetrygdLivshendelseTask.doTask(
             Task(
-                type = VurderLivshendelseTask.TASK_STEP_TYPE,
+                type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
                 payload =
                     objectMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
@@ -181,9 +181,9 @@ class VurderLivshendelseTaskTest {
 
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
 
-        vurderLivshendelseTask.doTask(
+        vurderBarnetrygdLivshendelseTask.doTask(
             Task(
-                type = VurderLivshendelseTask.TASK_STEP_TYPE,
+                type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
                 payload =
                     objectMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
@@ -250,9 +250,9 @@ class VurderLivshendelseTaskTest {
 
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
 
-        vurderLivshendelseTask.doTask(
+        vurderBarnetrygdLivshendelseTask.doTask(
             Task(
-                type = VurderLivshendelseTask.TASK_STEP_TYPE,
+                type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
                 payload =
                     objectMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
@@ -305,9 +305,9 @@ class VurderLivshendelseTaskTest {
 
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
 
-        vurderLivshendelseTask.doTask(
+        vurderBarnetrygdLivshendelseTask.doTask(
             Task(
-                type = VurderLivshendelseTask.TASK_STEP_TYPE,
+                type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
                 payload =
                     objectMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
@@ -346,9 +346,9 @@ class VurderLivshendelseTaskTest {
         every { mockSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
 
         listOf(1, 2, 3, 4).forEach {
-            vurderLivshendelseTask.doTask(
+            vurderBarnetrygdLivshendelseTask.doTask(
                 Task(
-                    type = VurderLivshendelseTask.TASK_STEP_TYPE,
+                    type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
                     payload =
                         objectMapper.writeValueAsString(
                             VurderLivshendelseTaskDTO(
@@ -384,9 +384,9 @@ class VurderLivshendelseTaskTest {
             )
 
         setupPdlMockForDødsfallshendelse(true, false, false)
-        vurderLivshendelseTask.doTask(
+        vurderBarnetrygdLivshendelseTask.doTask(
             Task(
-                type = VurderLivshendelseTask.TASK_STEP_TYPE,
+                type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
                 payload =
                     objectMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
@@ -409,9 +409,9 @@ class VurderLivshendelseTaskTest {
             )
 
         setupPdlMockForDødsfallshendelse(true, true, false)
-        vurderLivshendelseTask.doTask(
+        vurderBarnetrygdLivshendelseTask.doTask(
             Task(
-                type = VurderLivshendelseTask.TASK_STEP_TYPE,
+                type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
                 payload =
                     objectMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
@@ -436,9 +436,9 @@ class VurderLivshendelseTaskTest {
             )
 
         setupPdlMockForDødsfallshendelse(true, true, true)
-        vurderLivshendelseTask.doTask(
+        vurderBarnetrygdLivshendelseTask.doTask(
             Task(
-                type = VurderLivshendelseTask.TASK_STEP_TYPE,
+                type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
                 payload =
                     objectMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(

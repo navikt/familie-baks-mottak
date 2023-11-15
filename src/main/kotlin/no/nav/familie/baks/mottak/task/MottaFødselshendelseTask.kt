@@ -70,7 +70,7 @@ class MottaFødselshendelseTask(
                 task.metadata["morsIdent"] = morsIdent.id
                 val nesteTask =
                     Task(
-                        SendTilSakTask.TASK_STEP_TYPE,
+                        SendTilBaSakTask.TASK_STEP_TYPE,
                         jacksonObjectMapper().writeValueAsString(
                             NyBehandling(
                                 morsIdent = morsIdent.id,

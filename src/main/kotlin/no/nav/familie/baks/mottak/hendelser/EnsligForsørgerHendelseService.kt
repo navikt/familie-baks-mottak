@@ -5,8 +5,8 @@ import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.domene.HendelseConsumer
 import no.nav.familie.baks.mottak.domene.Hendelseslogg
 import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
+import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
-import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.ef.EnsligForsørgerVedtakhendelse
 import no.nav.familie.kontrakter.felles.ef.StønadType
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class EnsligForsørgerHendelseService(
-    val sakClient: SakClient,
+    val baSakClient: BaSakClient,
     val pdlClient: PdlClient,
     val hendelsesloggRepository: HendelsesloggRepository,
 ) {
@@ -39,7 +39,7 @@ class EnsligForsørgerHendelseService(
                 ) {
                     secureLogger.info("Mottatt vedtak om overgangsstønad hendelse: $ensligForsørgerVedtakhendelse")
 
-                    sakClient.sendVedtakOmOvergangsstønadHendelseTilSak(ensligForsørgerVedtakhendelse.personIdent)
+                    baSakClient.sendVedtakOmOvergangsstønadHendelseTilBaSak(ensligForsørgerVedtakhendelse.personIdent)
 
                     hendelsesloggRepository.save(
                         Hendelseslogg(
@@ -81,7 +81,7 @@ class EnsligForsørgerHendelseService(
 
             val personIdent = pdlClient.hentPersonident(hendelse.aktørId.toString(), Tema.BAR)
 
-            sakClient.sendVedtakOmOvergangsstønadHendelseTilSak(personIdent)
+            baSakClient.sendVedtakOmOvergangsstønadHendelseTilBaSak(personIdent)
 
             hendelsesloggRepository.save(
                 Hendelseslogg(

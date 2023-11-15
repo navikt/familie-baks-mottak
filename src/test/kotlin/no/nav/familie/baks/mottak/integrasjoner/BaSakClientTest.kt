@@ -20,9 +20,9 @@ import java.io.IOException
 @ActiveProfiles("dev", "mock-oauth")
 @AutoConfigureWireMock(port = 28085)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SakClientTest {
+class BaSakClientTest {
     @Autowired
-    lateinit var sakClient: SakClient
+    lateinit var baSakClient: BaSakClient
 
     @Test
     @Tag("integration")
@@ -37,7 +37,7 @@ class SakClientTest {
                 ),
         )
 
-        val response = sakClient.hentSaksnummer(personIdent)
+        val response = baSakClient.hentSaksnummer(personIdent)
         Assertions.assertThat(response).isEqualTo(fagsakId.toString())
     }
 

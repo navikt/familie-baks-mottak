@@ -2,6 +2,7 @@ package no.nav.familie.baks.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
+import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingUnderkategori
 import no.nav.familie.baks.mottak.integrasjoner.Identgruppe
@@ -14,7 +15,6 @@ import no.nav.familie.baks.mottak.integrasjoner.PdlPersonData
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsak
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakIdOgTilknyttetAktørId
 import no.nav.familie.baks.mottak.integrasjoner.RestUtvidetBehandling
-import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.baks.mottak.integrasjoner.Sivilstand
 import no.nav.familie.baks.mottak.task.VurderLivshendelseType.DØDSFALL
 import no.nav.familie.baks.mottak.task.VurderLivshendelseType.SIVILSTAND
@@ -44,15 +44,15 @@ import java.util.Locale
 
 @Service
 @TaskStepBeskrivelse(
-    taskStepType = VurderLivshendelseTask.TASK_STEP_TYPE,
+    taskStepType = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
     beskrivelse = "Vurder livshendelse",
     maxAntallFeil = 3,
     triggerTidVedFeilISekunder = 3600,
 )
-class VurderLivshendelseTask(
+class VurderBarnetrygdLivshendelseTask(
     private val oppgaveClient: OppgaveClient,
     private val pdlClient: PdlClient,
-    private val sakClient: SakClient,
+    private val baSakClient: BaSakClient,
     private val infotrygdClient: InfotrygdBarnetrygdClient,
 ) : AsyncTaskStep {
     private val tema = Tema.BAR
@@ -184,7 +184,7 @@ class VurderLivshendelseTask(
     private fun finnBrukereBerørtAvDødsfallEllerUtflyttingHendelseForIdent(
         personIdent: String,
     ): List<RestFagsakIdOgTilknyttetAktørId> {
-        val listeMedFagsakIdOgTilknyttetAktør = sakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(personIdent)
+        val listeMedFagsakIdOgTilknyttetAktør = baSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(personIdent)
         secureLog.info("Aktører og fagsaker berørt av hendelse for personIdent=$personIdent: ${listeMedFagsakIdOgTilknyttetAktør.map { "(aktørId=${it.aktørId}, fagsakId=${it.fagsakId}),"}}")
         return listeMedFagsakIdOgTilknyttetAktør
     }
@@ -192,7 +192,7 @@ class VurderLivshendelseTask(
     private fun finnBrukereBerørtAvSivilstandHendelseForIdent(
         personIdent: String,
     ): List<RestFagsakIdOgTilknyttetAktørId> {
-        val listeMedFagsakIdOgTilknyttetAktørId = sakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(personIdent)
+        val listeMedFagsakIdOgTilknyttetAktørId = baSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(personIdent)
         secureLog.info("Aktører og fagsaker berørt av hendelse for personIdent=$personIdent: ${listeMedFagsakIdOgTilknyttetAktørId.map { "(aktørId=${it.aktørId}, fagsakId=${it.fagsakId})," }}")
         return listeMedFagsakIdOgTilknyttetAktørId
     }
@@ -371,7 +371,7 @@ class VurderLivshendelseTask(
     }
 
     private fun hentRestFagsak(fagsakId: Long): RestFagsak {
-        return sakClient.hentRestFagsak(fagsakId).also {
+        return baSakClient.hentRestFagsak(fagsakId).also {
             secureLog.info("Hentet rest fagsak: $it")
         }
     }
@@ -406,7 +406,7 @@ class VurderLivshendelseTask(
     data class Bruker(val ident: String, val fagsakId: Long)
 
     companion object {
-        const val TASK_STEP_TYPE = "vurderLivshendelseTask"
+        const val TASK_STEP_TYPE = "vurderBarnetrygdLivshendelseTask"
 
         const val STEG_TYPE_BEHANDLING_AVSLUTTET = "BEHANDLING_AVSLUTTET"
         const val RESULTAT_INNVILGET = "INNVILGET"
