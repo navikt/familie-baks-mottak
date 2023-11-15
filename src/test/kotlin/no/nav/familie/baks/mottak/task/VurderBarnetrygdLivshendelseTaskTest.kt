@@ -25,11 +25,12 @@ import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakIdOgTilknyttetAktørId
 import no.nav.familie.baks.mottak.integrasjoner.RestUtvidetBehandling
 import no.nav.familie.baks.mottak.integrasjoner.Sivilstand
-import no.nav.familie.baks.mottak.task.VurderLivshendelseType.DØDSFALL
-import no.nav.familie.baks.mottak.task.VurderLivshendelseType.SIVILSTAND
+import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseType.DØDSFALL
+import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseType.SIVILSTAND
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.kontrakter.ba.infotrygd.Stønad
 import no.nav.familie.kontrakter.felles.Behandlingstema
+import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
@@ -77,7 +78,7 @@ class VurderBarnetrygdLivshendelseTaskTest {
             mockPdlClient.hentAktørId(PERSONIDENT_BARN, any())
         } returns PERSONIDENT_BARN + "00"
 
-        every { mockOppgaveClient.finnOppgaverPåAktørId(any(), any()) } returns emptyList()
+        every { mockOppgaveClient.finnOppgaverPåAktørId(any(), any(), Tema.BAR) } returns emptyList()
 
         every { mockOppgaveClient.opprettVurderLivshendelseOppgave(any()) } returns OppgaveResponse(42)
 
@@ -86,10 +87,10 @@ class VurderBarnetrygdLivshendelseTaskTest {
 
     @ParameterizedTest
     @EnumSource(
-        value = VurderLivshendelseType::class,
+        value = VurderBarnetrygdLivshendelseType::class,
         names = ["UTFLYTTING", "DØDSFALL", "SIVILSTAND"],
     )
-    fun `Ignorer livshendelser på person som ikke er berørt av hendelse`(livshendelseType: VurderLivshendelseType) {
+    fun `Ignorer livshendelser på person som ikke er berørt av hendelse`(livshendelseType: VurderBarnetrygdLivshendelseType) {
         every { mockSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(any()) } returns emptyList()
         every {
             mockPdlClient.hentPerson(
@@ -121,7 +122,7 @@ class VurderBarnetrygdLivshendelseTaskTest {
                 type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
                 payload =
                     objectMapper.writeValueAsString(
-                        VurderLivshendelseTaskDTO(
+                        VurderBarnetrygdLivshendelseTaskDTO(
                             PERSONIDENT_BARN,
                             livshendelseType,
                         ),
@@ -136,10 +137,10 @@ class VurderBarnetrygdLivshendelseTaskTest {
 
     @ParameterizedTest
     @EnumSource(
-        value = VurderLivshendelseType::class,
+        value = VurderBarnetrygdLivshendelseType::class,
         names = ["UTFLYTTING", "DØDSFALL", "SIVILSTAND"],
     )
-    fun `Livshendelser på person som har sak i ba-sak`(livshendelseType: VurderLivshendelseType) {
+    fun `Livshendelser på person som har sak i ba-sak`(livshendelseType: VurderBarnetrygdLivshendelseType) {
         when (livshendelseType) {
             SIVILSTAND -> {
                 every { mockSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(PERSONIDENT_MOR) } returns
@@ -186,7 +187,7 @@ class VurderBarnetrygdLivshendelseTaskTest {
                 type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
                 payload =
                     objectMapper.writeValueAsString(
-                        VurderLivshendelseTaskDTO(
+                        VurderBarnetrygdLivshendelseTaskDTO(
                             PERSONIDENT_MOR,
                             livshendelseType,
                         ),
@@ -213,10 +214,10 @@ class VurderBarnetrygdLivshendelseTaskTest {
 
     @ParameterizedTest
     @EnumSource(
-        value = VurderLivshendelseType::class,
+        value = VurderBarnetrygdLivshendelseType::class,
         names = ["UTFLYTTING", "DØDSFALL"],
     )
-    fun `Livshendelser på barnet som har sak i ba-sak`(livshendelseType: VurderLivshendelseType) {
+    fun `Livshendelser på barnet som har sak i ba-sak`(livshendelseType: VurderBarnetrygdLivshendelseType) {
         every { mockSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(any()) } returns
             listOf(
                 RestFagsakIdOgTilknyttetAktørId(PERSONIDENT_MOR + "00", SAKS_ID),
@@ -255,7 +256,7 @@ class VurderBarnetrygdLivshendelseTaskTest {
                 type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
                 payload =
                     objectMapper.writeValueAsString(
-                        VurderLivshendelseTaskDTO(
+                        VurderBarnetrygdLivshendelseTaskDTO(
                             PERSONIDENT_BARN,
                             livshendelseType,
                         ),
@@ -310,7 +311,7 @@ class VurderBarnetrygdLivshendelseTaskTest {
                 type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
                 payload =
                     objectMapper.writeValueAsString(
-                        VurderLivshendelseTaskDTO(
+                        VurderBarnetrygdLivshendelseTaskDTO(
                             PERSONIDENT_MOR,
                             SIVILSTAND,
                         ),
@@ -351,7 +352,7 @@ class VurderBarnetrygdLivshendelseTaskTest {
                     type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
                     payload =
                         objectMapper.writeValueAsString(
-                            VurderLivshendelseTaskDTO(
+                            VurderBarnetrygdLivshendelseTaskDTO(
                                 PERSONIDENT_MOR,
                                 SIVILSTAND,
                             ),
@@ -389,7 +390,7 @@ class VurderBarnetrygdLivshendelseTaskTest {
                 type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
                 payload =
                     objectMapper.writeValueAsString(
-                        VurderLivshendelseTaskDTO(
+                        VurderBarnetrygdLivshendelseTaskDTO(
                             PERSONIDENT_MOR,
                             DØDSFALL,
                         ),
@@ -397,7 +398,7 @@ class VurderBarnetrygdLivshendelseTaskTest {
             ),
         )
 
-        every { mockOppgaveClient.finnOppgaverPåAktørId(any(), any()) } returns
+        every { mockOppgaveClient.finnOppgaverPåAktørId(any(), any(), Tema.BAR) } returns
             listOf(
                 Oppgave(beskrivelse = DØDSFALL.beskrivelse + ": bruker"),
             )
@@ -414,7 +415,7 @@ class VurderBarnetrygdLivshendelseTaskTest {
                 type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
                 payload =
                     objectMapper.writeValueAsString(
-                        VurderLivshendelseTaskDTO(
+                        VurderBarnetrygdLivshendelseTaskDTO(
                             PERSONIDENT_BARN,
                             DØDSFALL,
                         ),
@@ -424,7 +425,7 @@ class VurderBarnetrygdLivshendelseTaskTest {
 
         assertThat(oppgavebeskrivelseSlot.captured).isEqualTo(DØDSFALL.beskrivelse + ": bruker og barn $PERSONIDENT_BARN")
 
-        every { mockOppgaveClient.finnOppgaverPåAktørId(any(), any()) } returns
+        every { mockOppgaveClient.finnOppgaverPåAktørId(any(), any(), Tema.BAR) } returns
             listOf(
                 Oppgave(beskrivelse = DØDSFALL.beskrivelse + ": bruker og barn $PERSONIDENT_BARN"),
             )
@@ -441,7 +442,7 @@ class VurderBarnetrygdLivshendelseTaskTest {
                 type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
                 payload =
                     objectMapper.writeValueAsString(
-                        VurderLivshendelseTaskDTO(
+                        VurderBarnetrygdLivshendelseTaskDTO(
                             PERSONIDENT_BARN2,
                             DØDSFALL,
                         ),

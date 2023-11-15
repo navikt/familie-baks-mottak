@@ -16,9 +16,9 @@ import no.nav.familie.baks.mottak.integrasjoner.RestFagsak
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakIdOgTilknyttetAktørId
 import no.nav.familie.baks.mottak.integrasjoner.RestUtvidetBehandling
 import no.nav.familie.baks.mottak.integrasjoner.Sivilstand
-import no.nav.familie.baks.mottak.task.VurderLivshendelseType.DØDSFALL
-import no.nav.familie.baks.mottak.task.VurderLivshendelseType.SIVILSTAND
-import no.nav.familie.baks.mottak.task.VurderLivshendelseType.UTFLYTTING
+import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseType.DØDSFALL
+import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseType.SIVILSTAND
+import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseType.UTFLYTTING
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.objectMapper
@@ -64,7 +64,7 @@ class VurderBarnetrygdLivshendelseTask(
     val oppgaveOpprettetSivilstandCounter: Counter = Metrics.counter("barnetrygd.sivilstand.oppgave.opprettet")
 
     override fun doTask(task: Task) {
-        val payload = objectMapper.readValue(task.payload, VurderLivshendelseTaskDTO::class.java)
+        val payload = objectMapper.readValue(task.payload, VurderBarnetrygdLivshendelseTaskDTO::class.java)
         val personIdent = payload.personIdent
 
         when (payload.type) {
@@ -198,7 +198,7 @@ class VurderBarnetrygdLivshendelseTask(
     }
 
     private fun opprettEllerOppdaterVurderLivshendelseOppgave(
-        hendelseType: VurderLivshendelseType,
+        hendelseType: VurderBarnetrygdLivshendelseType,
         aktørIdForOppgave: String,
         fagsakIdForOppgave: Long,
         personIdent: String,
@@ -331,9 +331,9 @@ class VurderBarnetrygdLivshendelseTask(
 
     private fun søkEtterÅpenOppgavePåAktør(
         aktørId: String,
-        type: VurderLivshendelseType,
+        type: VurderBarnetrygdLivshendelseType,
     ): Oppgave? {
-        val vurderLivshendelseOppgaver = oppgaveClient.finnOppgaverPåAktørId(aktørId, Oppgavetype.VurderLivshendelse)
+        val vurderLivshendelseOppgaver = oppgaveClient.finnOppgaverPåAktørId(aktørId, Oppgavetype.VurderLivshendelse, Tema.BAR)
         secureLog.info("Fant følgende oppgaver: $vurderLivshendelseOppgaver")
         return vurderLivshendelseOppgaver.firstOrNull {
             it.beskrivelse?.startsWith(type.beskrivelse) == true && (
@@ -414,9 +414,9 @@ class VurderBarnetrygdLivshendelseTask(
     }
 }
 
-data class VurderLivshendelseTaskDTO(val personIdent: String, val type: VurderLivshendelseType)
+data class VurderBarnetrygdLivshendelseTaskDTO(val personIdent: String, val type: VurderBarnetrygdLivshendelseType)
 
-enum class VurderLivshendelseType(val beskrivelse: String) {
+enum class VurderBarnetrygdLivshendelseType(val beskrivelse: String) {
     DØDSFALL("Dødsfall"),
     SIVILSTAND("Endring i sivilstand"),
     ADDRESSE("Addresse"),

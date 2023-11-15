@@ -10,9 +10,9 @@ import no.nav.familie.baks.mottak.integrasjoner.RestAnnullerFødsel
 import no.nav.familie.baks.mottak.task.MottaAnnullerFødselTask
 import no.nav.familie.baks.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseTask
-import no.nav.familie.baks.mottak.task.VurderLivshendelseTaskDTO
-import no.nav.familie.baks.mottak.task.VurderLivshendelseType
-import no.nav.familie.baks.mottak.task.VurderLivshendelseType.SIVILSTAND
+import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseTaskDTO
+import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseType
+import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseType.SIVILSTAND
 import no.nav.familie.baks.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND.GIFT
@@ -76,7 +76,7 @@ class LeesahService(
                     log.error("Mangler dødsdato. Ignorerer hendelse ${pdlHendelse.hendelseId}")
                     dødsfallIgnorertCounter.increment()
                 } else {
-                    opprettVurderBarnetrygdLivshendelseTaskForHendelse(VurderLivshendelseType.DØDSFALL, pdlHendelse)
+                    opprettVurderBarnetrygdLivshendelseTaskForHendelse(VurderBarnetrygdLivshendelseType.DØDSFALL, pdlHendelse)
                 }
             }
             else -> {
@@ -173,7 +173,7 @@ class LeesahService(
                 logHendelse(pdlHendelse, "utflyttingsdato: ${pdlHendelse.utflyttingsdato}")
                 utflyttingOpprettetCounter.increment()
 
-                opprettVurderBarnetrygdLivshendelseTaskForHendelse(VurderLivshendelseType.UTFLYTTING, pdlHendelse)
+                opprettVurderBarnetrygdLivshendelseTaskForHendelse(VurderBarnetrygdLivshendelseType.UTFLYTTING, pdlHendelse)
             }
             else -> {
                 logHendelse(pdlHendelse, "Ikke av type OPPRETTET.")
@@ -256,13 +256,13 @@ class LeesahService(
     }
 
     private fun opprettVurderBarnetrygdLivshendelseTaskForHendelse(
-        type: VurderLivshendelseType,
+        type: VurderBarnetrygdLivshendelseType,
         pdlHendelse: PdlHendelse,
     ) {
-        log.info("opprett VurderLivshendelseTask for pdlHendelse (id= ${pdlHendelse.hendelseId})")
+        log.info("opprett VurderBarnetrygdLivshendelseTask for pdlHendelse (id= ${pdlHendelse.hendelseId})")
         Task(
             type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
-            payload = objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type)),
+            payload = objectMapper.writeValueAsString(VurderBarnetrygdLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type)),
             properties =
                 Properties().apply {
                     this["ident"] = pdlHendelse.hentPersonident()
