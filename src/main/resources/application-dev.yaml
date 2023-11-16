@@ -78,6 +78,7 @@ prosessering.rolle: "928636f4-fd0d-4149-978e-a6fb68bb19de"
 FAMILIE_BAKS_DOKGEN_API_URL: http://localhost:5914
 FAMILIE_BA_SAK_API_URL: http://localhost:8089/api
 FAMILIE_KS_SAK_API_URL: http://localhost:8083/api
+KS_SAK_SCOPE: api://dev-gcp.teamfamilie.familie-ks-sak/.default
 FAMILIE_INTEGRASJONER_API_URL: http://localhost:8085/api
 FAMILIE_BA_INFOTRYGD_API_URL: http://localhost:8093
 FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER: 1
