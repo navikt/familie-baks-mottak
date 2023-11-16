@@ -54,6 +54,8 @@ spec:
       rules:
         - application: familie-ba-sak
           cluster: prod-gcp
+        - application: familie-ks-sak
+          cluster: prod-gcp
         - application: familie-dokument
           cluster: prod-gcp
         - application: familie-baks-dokgen
