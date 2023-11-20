@@ -17,10 +17,10 @@ import org.springframework.web.client.RestOperations
 import java.net.URI
 import java.time.LocalDateTime
 
-private val logger = LoggerFactory.getLogger(SakClient::class.java)
+private val logger = LoggerFactory.getLogger(BaSakClient::class.java)
 
 @Component
-class SakClient
+class BaSakClient
     @Autowired
     constructor(
         @param:Value("\${FAMILIE_BA_SAK_API_URL}") private val sakServiceUri: String,
@@ -54,7 +54,7 @@ class SakClient
             maxAttempts = 3,
             backoff = Backoff(delayExpression = "60000"),
         )
-        fun sendIdenthendelseTilSak(personIdent: PersonIdent) {
+        fun sendIdenthendelseTilBaSak(personIdent: PersonIdent) {
             val uri = URI.create("$sakServiceUri/ident")
             try {
                 val response = postForEntity<Ressurs<String>>(uri, personIdent)
@@ -140,7 +140,7 @@ class SakClient
             )
         }
 
-        fun sendVedtakOmOvergangsstønadHendelseTilSak(personIdent: String) {
+        fun sendVedtakOmOvergangsstønadHendelseTilBaSak(personIdent: String) {
             val uri = URI.create("$sakServiceUri/overgangsstonad")
             logger.info("sender ident fra vedtak om overgangsstønad til {}", uri)
             try {

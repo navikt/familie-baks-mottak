@@ -83,7 +83,7 @@ class OppgaveClient
                     ident = OppgaveIdentV2(dto.aktørId, IdentGruppe.AKTOERID),
                     saksId = dto.saksId,
                     journalpostId = null,
-                    tema = Tema.BAR,
+                    tema = dto.tema,
                     oppgavetype = Oppgavetype.VurderLivshendelse,
                     fristFerdigstillelse = fristFerdigstillelse(),
                     beskrivelse = dto.beskrivelse,
@@ -169,13 +169,14 @@ class OppgaveClient
         fun finnOppgaverPåAktørId(
             aktørId: String,
             oppgavetype: Oppgavetype,
+            tema: Tema,
         ): List<Oppgave> {
-            logger.info("Søker etter aktive oppgaver for aktørId $aktørId")
+            logger.info("Søker etter aktive oppgaver med tema $tema for aktørId $aktørId")
             val uri = URI.create("$integrasjonUri/oppgave/v4")
             val request =
                 FinnOppgaveRequest(
                     aktørId = aktørId,
-                    tema = Tema.BAR,
+                    tema = tema,
                     oppgavetype = oppgavetype,
                 )
 
@@ -241,4 +242,5 @@ data class OppgaveVurderLivshendelseDto(
     val behandlingstema: String,
     val enhetsId: String? = null,
     val behandlesAvApplikasjon: String? = null,
+    val tema: Tema,
 )

@@ -9,7 +9,8 @@ import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
 import no.nav.familie.baks.mottak.domene.hendelser.PdlHendelse
 import no.nav.familie.baks.mottak.task.MottaAnnullerFødselTask
 import no.nav.familie.baks.mottak.task.MottaFødselshendelseTask
-import no.nav.familie.baks.mottak.task.VurderLivshendelseTask
+import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseTask
+import no.nav.familie.baks.mottak.task.VurderKontantstøtteLivshendelseTask
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.assertj.core.api.Assertions.assertThat
@@ -42,7 +43,7 @@ class LeesahServiceTest {
     }
 
     @Test
-    fun `Skal opprette VurderLivshendelseTask for dødsfallhendelse`() {
+    fun `Skal opprette VurderBarnetrygdLivshendelseTask og VurderKontantstøtteLivshendelseTask for dødsfallhendelse`() {
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse =
             PdlHendelse(
@@ -57,13 +58,17 @@ class LeesahServiceTest {
 
         service.prosesserNyHendelse(pdlHendelse)
 
-        val taskSlot = slot<Task>()
+        val taskList = mutableListOf<Task>()
         verify {
-            mockTaskService.save(capture(taskSlot))
+            mockTaskService.save(capture(taskList))
         }
-        assertThat(taskSlot.captured).isNotNull
-        assertThat(taskSlot.captured.payload).contains("\"personIdent\":\"12345678901\",\"type\":\"DØDSFALL\"")
-        assertThat(taskSlot.captured.type).isEqualTo(VurderLivshendelseTask.TASK_STEP_TYPE)
+        assertThat(taskList[0]).isNotNull
+        assertThat(taskList[0].payload).contains("\"personIdent\":\"12345678901\",\"type\":\"DØDSFALL\"")
+        assertThat(taskList[0].type).isEqualTo(VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE)
+
+        assertThat(taskList[1]).isNotNull
+        assertThat(taskList[1].payload).contains("\"personIdent\":\"12345678901\",\"type\":\"DØDSFALL\"")
+        assertThat(taskList[1].type).isEqualTo(VurderKontantstøtteLivshendelseTask.TASK_STEP_TYPE)
 
         verify(exactly = 1) {
             mockHendelsesloggRepository.save(any())
@@ -71,7 +76,7 @@ class LeesahServiceTest {
     }
 
     @Test
-    fun `Skal opprette VurderLivshendelseTask for utflyttingshendelse`() {
+    fun `Skal opprette VurderBarnetrygdLivshendelseTask og VurderKontantstøtteLivshendelseTask for utflyttingshendelse`() {
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse =
             PdlHendelse(
@@ -86,13 +91,18 @@ class LeesahServiceTest {
 
         service.prosesserNyHendelse(pdlHendelse)
 
-        val taskSlot = slot<Task>()
+        val taskList = mutableListOf<Task>()
+
         verify {
-            mockTaskService.save(capture(taskSlot))
+            mockTaskService.save(capture(taskList))
         }
-        assertThat(taskSlot.captured).isNotNull
-        assertThat(taskSlot.captured.payload).contains("\"personIdent\":\"12345678901\",\"type\":\"UTFLYTTING\"")
-        assertThat(taskSlot.captured.type).isEqualTo(VurderLivshendelseTask.TASK_STEP_TYPE)
+        assertThat(taskList[0]).isNotNull
+        assertThat(taskList[0].payload).contains("\"personIdent\":\"12345678901\",\"type\":\"UTFLYTTING\"")
+        assertThat(taskList[0].type).isEqualTo(VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE)
+
+        assertThat(taskList[1]).isNotNull
+        assertThat(taskList[1].payload).contains("\"personIdent\":\"12345678901\",\"type\":\"UTFLYTTING\"")
+        assertThat(taskList[1].type).isEqualTo(VurderKontantstøtteLivshendelseTask.TASK_STEP_TYPE)
 
         verify(exactly = 1) {
             mockHendelsesloggRepository.save(any())
@@ -100,7 +110,7 @@ class LeesahServiceTest {
     }
 
     @Test
-    fun `Skal opprette VurderLivshendelseTask for sivilstandhendelse GIFT`() {
+    fun `Skal opprette VurderBarnetrygdLivshendelseTask for sivilstandhendelse GIFT`() {
         val hendelseId = UUID.randomUUID().toString()
         val pdlHendelse =
             PdlHendelse(
@@ -124,7 +134,7 @@ class LeesahServiceTest {
         assertThat(taskSlot.captured).isNotNull
         assertThat(taskSlot.captured.payload)
             .isEqualTo("{\"personIdent\":\"12345678901\",\"type\":\"SIVILSTAND\"}")
-        assertThat(taskSlot.captured.type).isEqualTo(VurderLivshendelseTask.TASK_STEP_TYPE)
+        assertThat(taskSlot.captured.type).isEqualTo(VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE)
 
         verify(exactly = 2) {
             mockHendelsesloggRepository.save(any())

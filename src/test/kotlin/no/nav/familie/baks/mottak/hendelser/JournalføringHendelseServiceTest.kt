@@ -11,6 +11,7 @@ import io.mockk.verify
 import no.nav.familie.baks.mottak.domene.HendelseConsumer
 import no.nav.familie.baks.mottak.domene.Hendelseslogg
 import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
+import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
@@ -23,10 +24,9 @@ import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
-import no.nav.familie.baks.mottak.integrasjoner.SakClient
 import no.nav.familie.baks.mottak.task.JournalhendelseRutingTask
 import no.nav.familie.baks.mottak.task.OpprettJournalføringOppgaveTask
-import no.nav.familie.baks.mottak.task.SendTilSakTask
+import no.nav.familie.baks.mottak.task.SendTilBaSakTask
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
@@ -52,7 +52,7 @@ class JournalføringHendelseServiceTest {
     lateinit var mockOppgaveClient: OppgaveClient
 
     @MockK
-    lateinit var sakClient: SakClient
+    lateinit var baSakClient: BaSakClient
 
     @MockK
     lateinit var infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient
@@ -243,7 +243,7 @@ class JournalføringHendelseServiceTest {
         } returns "12345678910"
 
         every {
-            sakClient.hentRestFagsakDeltagerListe(any(), emptyList())
+            baSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
         } returns listOf(RestFagsakDeltager("12345678910", FORELDER, 1L, LØPENDE))
 
         every {
@@ -261,7 +261,7 @@ class JournalføringHendelseServiceTest {
             )
 
         task.doTask(
-            Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = "oppgavebeskrivelse").apply {
+            Task(type = SendTilBaSakTask.TASK_STEP_TYPE, payload = "oppgavebeskrivelse").apply {
                 this.metadata["journalpostId"] = JOURNALPOST_UTGÅENDE_DOKUMENT
             },
         )
@@ -286,12 +286,12 @@ class JournalføringHendelseServiceTest {
                 mockOppgaveClient,
             )
         task.doTask(
-            Task(type = SendTilSakTask.TASK_STEP_TYPE, payload = JOURNALPOST_UTGÅENDE_DOKUMENT).apply {
+            Task(type = SendTilBaSakTask.TASK_STEP_TYPE, payload = JOURNALPOST_UTGÅENDE_DOKUMENT).apply {
                 this.metadata["journalpostId"] = JOURNALPOST_UTGÅENDE_DOKUMENT
             },
         )
         task.doTask(
-            Task(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_PAPIRSØKNAD).apply {
+            Task(SendTilBaSakTask.TASK_STEP_TYPE, JOURNALPOST_PAPIRSØKNAD).apply {
                 this.metadata["journalpostId"] = JOURNALPOST_PAPIRSØKNAD
             },
         )
@@ -311,7 +311,7 @@ class JournalføringHendelseServiceTest {
 
         Assertions.assertThrows(IllegalStateException::class.java) {
             task.doTask(
-                Task(SendTilSakTask.TASK_STEP_TYPE, JOURNALPOST_FERDIGSTILT).apply {
+                Task(SendTilBaSakTask.TASK_STEP_TYPE, JOURNALPOST_FERDIGSTILT).apply {
                     this.metadata["journalpostId"] = JOURNALPOST_FERDIGSTILT
                 },
             )

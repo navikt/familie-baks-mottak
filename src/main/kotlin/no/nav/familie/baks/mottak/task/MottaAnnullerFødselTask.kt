@@ -38,7 +38,7 @@ class MottaAnnullerFødselTask(
             )
                 .filter {
                     it.callId == tidligereHendelseId &&
-                        (it.type == MottaFødselshendelseTask.TASK_STEP_TYPE || it.type == SendTilSakTask.TASK_STEP_TYPE)
+                        (it.type == MottaFødselshendelseTask.TASK_STEP_TYPE || it.type == SendTilBaSakTask.TASK_STEP_TYPE)
                 }
 
         tasker.forEach {
