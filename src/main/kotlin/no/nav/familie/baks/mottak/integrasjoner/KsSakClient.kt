@@ -29,19 +29,6 @@ class KsSakClient
             )
         }
 
-        fun hentRestFagsakDeltagerListe(
-            personIdent: String,
-            barnasIdenter: List<String> = emptyList(),
-        ): List<RestFagsakDeltager> {
-            val uri = URI.create("$ksSakServiceUri/fagsaker/sok/fagsakdeltagere")
-            return runCatching {
-                postForEntity<Ressurs<List<RestFagsakDeltager>>>(uri, RestSøkParam(personIdent, barnasIdenter))
-            }.fold(
-                onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
-                onFailure = { throw IntegrasjonException("Feil ved henting av fagsakdeltagere fra ks-sak.", it, uri, personIdent) },
-            )
-        }
-
         fun hentFagsakerHvorPersonErSøkerEllerMottarKontantstøtte(
             personIdent: String,
         ): List<RestFagsakIdOgTilknyttetAktørId> {
