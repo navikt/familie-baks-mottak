@@ -83,7 +83,7 @@ class OppgaveClient
                     ident = OppgaveIdentV2(dto.aktørId, IdentGruppe.AKTOERID),
                     saksId = dto.saksId,
                     journalpostId = null,
-                    tema = Tema.BAR,
+                    tema = dto.tema,
                     oppgavetype = Oppgavetype.VurderLivshendelse,
                     fristFerdigstillelse = fristFerdigstillelse(),
                     beskrivelse = dto.beskrivelse,
@@ -242,4 +242,5 @@ data class OppgaveVurderLivshendelseDto(
     val behandlingstema: String,
     val enhetsId: String? = null,
     val behandlesAvApplikasjon: String? = null,
+    val tema: Tema,
 )

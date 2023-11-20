@@ -10,12 +10,10 @@ import no.nav.familie.baks.mottak.integrasjoner.RestAnnullerFødsel
 import no.nav.familie.baks.mottak.task.MottaAnnullerFødselTask
 import no.nav.familie.baks.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseTask
-import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseTaskDTO
-import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseType
-import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseType.SIVILSTAND
 import no.nav.familie.baks.mottak.task.VurderKontantstøtteLivshendelseTask
-import no.nav.familie.baks.mottak.task.VurderKontantstøtteLivshendelseTaskDTO
-import no.nav.familie.baks.mottak.task.VurderKontantstøtteLivshendelseType
+import no.nav.familie.baks.mottak.task.VurderLivshendelseTaskDTO
+import no.nav.familie.baks.mottak.task.VurderLivshendelseType
+import no.nav.familie.baks.mottak.task.VurderLivshendelseType.SIVILSTAND
 import no.nav.familie.baks.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND.GIFT
@@ -79,8 +77,8 @@ class LeesahService(
                     log.error("Mangler dødsdato. Ignorerer hendelse ${pdlHendelse.hendelseId}")
                     dødsfallIgnorertCounter.increment()
                 } else {
-                    opprettVurderBarnetrygdLivshendelseTaskForHendelse(VurderBarnetrygdLivshendelseType.DØDSFALL, pdlHendelse)
-                    opprettVurderKontantstøtteLivshendelseTaskForHendelse(VurderKontantstøtteLivshendelseType.DØDSFALL, pdlHendelse)
+                    opprettVurderBarnetrygdLivshendelseTaskForHendelse(VurderLivshendelseType.DØDSFALL, pdlHendelse)
+                    opprettVurderKontantstøtteLivshendelseTaskForHendelse(VurderLivshendelseType.DØDSFALL, pdlHendelse)
                 }
             }
 
@@ -180,8 +178,8 @@ class LeesahService(
                 logHendelse(pdlHendelse, "utflyttingsdato: ${pdlHendelse.utflyttingsdato}")
                 utflyttingOpprettetCounter.increment()
 
-                opprettVurderBarnetrygdLivshendelseTaskForHendelse(VurderBarnetrygdLivshendelseType.UTFLYTTING, pdlHendelse)
-                opprettVurderKontantstøtteLivshendelseTaskForHendelse(VurderKontantstøtteLivshendelseType.UTFLYTTING, pdlHendelse)
+                opprettVurderBarnetrygdLivshendelseTaskForHendelse(VurderLivshendelseType.UTFLYTTING, pdlHendelse)
+                opprettVurderKontantstøtteLivshendelseTaskForHendelse(VurderLivshendelseType.UTFLYTTING, pdlHendelse)
             }
 
             else -> {
@@ -266,13 +264,13 @@ class LeesahService(
     }
 
     private fun opprettVurderBarnetrygdLivshendelseTaskForHendelse(
-        type: VurderBarnetrygdLivshendelseType,
+        type: VurderLivshendelseType,
         pdlHendelse: PdlHendelse,
     ) {
         log.info("opprett VurderBarnetrygdLivshendelseTask for pdlHendelse (id= ${pdlHendelse.hendelseId})")
         Task(
             type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
-            payload = objectMapper.writeValueAsString(VurderBarnetrygdLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type)),
+            payload = objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type)),
             properties =
                 Properties().apply {
                     this["ident"] = pdlHendelse.hentPersonident()
@@ -286,13 +284,13 @@ class LeesahService(
     }
 
     private fun opprettVurderKontantstøtteLivshendelseTaskForHendelse(
-        type: VurderKontantstøtteLivshendelseType,
+        type: VurderLivshendelseType,
         pdlHendelse: PdlHendelse,
     ) {
         log.info("opprett VurderKontantstøtteLivshendelseTask for pdlHendelse (id= ${pdlHendelse.hendelseId})")
         Task(
             type = VurderKontantstøtteLivshendelseTask.TASK_STEP_TYPE,
-            payload = objectMapper.writeValueAsString(VurderKontantstøtteLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type)),
+            payload = objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type)),
             properties =
                 Properties().apply {
                     this["ident"] = pdlHendelse.hentPersonident()
