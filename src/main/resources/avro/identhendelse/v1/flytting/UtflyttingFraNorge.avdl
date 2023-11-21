@@ -1,5 +1,5 @@
-@namespace("no.nav.person.pdl.leesah.utflytting")
-protocol UtflyttingV1 {
+@namespace("no.nav.person.identhendelse.v1.flytting")
+protocol UtflyttingFraNorgeV1 {
 
   record UtflyttingFraNorge {
     union { null, string } tilflyttingsland = null;

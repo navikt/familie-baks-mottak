@@ -1,0 +1,7 @@
+@namespace("no.nav.person.identhendelse.v1.rettslighandleevne")
+protocol RettsligHandleevneV1 {
+
+	record RettsligHandleevne {
+		string rettsligHandleevneomfang;
+	}
+}
