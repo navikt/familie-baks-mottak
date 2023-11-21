@@ -33,6 +33,7 @@ class KafkaRestartingErrorHandler : CommonContainerStoppingErrorHandler() {
         consumer: Consumer<*, *>,
         container: MessageListenerContainer,
     ) {
+        secureLogger.info("Treffer KafkaRestartingErrorHandler $records")
         Thread.sleep(1000)
 
         if (records.isNullOrEmpty()) {
