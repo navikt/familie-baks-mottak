@@ -6,7 +6,7 @@ on:
 jobs:
   deploy-to-prod:
     name: Bygg app/image, push til github, deploy til dev-gcp
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-4-cores
     permissions:
       contents: "read"
       id-token: "write"
