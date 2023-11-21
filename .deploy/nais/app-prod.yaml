@@ -65,6 +65,8 @@ spec:
         - host: pdl-api.prod-fss-pub.nais.io
         - host: norg2.prod-fss-pub.nais.io
         - host: familie-integrasjoner.prod-fss-pub.nais.io
+        - host: familie-ba-infotrygd.prod-fss-pub.nais.io
+        - host: familie-ks-infotrygd.prod-fss-pub.nais.io
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: prod
