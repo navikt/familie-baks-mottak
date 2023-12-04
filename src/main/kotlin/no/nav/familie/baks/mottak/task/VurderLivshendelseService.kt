@@ -68,13 +68,6 @@ class VurderLivshendelseService(
                 secureLog.info("Har mottatt dødsfallshendelse for person $personIdent")
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-dødsfall", tema)
                 secureLog.info("dødsfallshendelse person fødselsdato = ${pdlPersonData.fødsel.firstOrNull()}")
-                if (pdlPersonData.dødsfall.firstOrNull()?.dødsdato == null) {
-                    secureLog.info("Har mottatt dødsfallshendelse uten dødsdato $pdlPersonData")
-                    throw RekjørSenereException(
-                        årsak = "Har mottatt dødsfallshendelse uten dødsdato",
-                        triggerTid = LocalDateTime.now().plusDays(1),
-                    )
-                }
 
                 val berørteBrukere = finnBrukereBerørtAvDødsfallEllerUtflyttingHendelseForIdent(personIdent, tema)
                 secureLog.info(
@@ -82,6 +75,14 @@ class VurderLivshendelseService(
                         berørteBrukere.fold("") { aktørIder, it -> aktørIder + " " + it.aktørId }
                     } tema = $tema ",
                 )
+
+                if (berørteBrukere.isNotEmpty() && pdlPersonData.dødsfall.firstOrNull()?.dødsdato == null) {
+                    secureLog.info("Har mottatt dødsfallshendelse uten dødsdato $pdlPersonData")
+                    throw RekjørSenereException(
+                        årsak = "Har mottatt dødsfallshendelse uten dødsdato",
+                        triggerTid = LocalDateTime.now().plusDays(1),
+                    )
+                }
 
                 berørteBrukere.forEach {
                     if (opprettEllerOppdaterVurderLivshendelseOppgave(
