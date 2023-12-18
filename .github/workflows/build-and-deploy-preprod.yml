@@ -76,9 +76,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Deploy til dev-gcp team namespace
         if: (github.triggering_actor != 'dependabot[bot]' || github.event_name != 'merge_group')
-        uses: nais/deploy/actions/deploy@v1
+        uses: nais/deploy/actions/deploy@v2
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: .deploy/nais/app-preprod.yaml
-          IMAGE: ${{ needs.build-dev.outputs.image }}
+          VAR: image=${{ needs.build-dev.outputs.image }}
