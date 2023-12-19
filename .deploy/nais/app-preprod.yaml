@@ -9,7 +9,6 @@ metadata:
 spec:
   envFrom:
     - secret: familie-baks-mottak
-  image: {{ image }}
   port: 8090
   leaderElection: true
   liveness:
