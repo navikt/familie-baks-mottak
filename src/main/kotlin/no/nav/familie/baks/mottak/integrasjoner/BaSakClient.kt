@@ -172,6 +172,8 @@ data class RestMinimalFagsak(
 class RestVisningBehandling(
     val behandlingId: Long,
     val opprettetTidspunkt: LocalDateTime,
+    val kategori: BehandlingKategori,
+    val underkategori: BehandlingUnderkategori?,
     val aktiv: Boolean,
     val årsak: String? = null,
     val type: String,
