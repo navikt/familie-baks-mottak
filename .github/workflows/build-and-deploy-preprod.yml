@@ -75,7 +75,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Deploy til dev-gcp team namespace
-        if: (github.triggering_actor != 'dependabot[bot]' || github.event_name != 'merge_group')
+        if: (github.triggering_actor != 'dependabot[bot]' && github.event_name != 'merge_group')
         uses: nais/deploy/actions/deploy@v2
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
