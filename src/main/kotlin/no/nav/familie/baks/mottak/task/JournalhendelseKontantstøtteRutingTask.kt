@@ -14,7 +14,6 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import java.time.YearMonth
 
@@ -27,37 +26,33 @@ class JournalhendelseKontantstøtteRutingTask(
     private val pdlClient: PdlClient,
     private val infotrygdKontantstøtteClient: InfotrygdKontantstøtteClient,
     private val taskService: TaskService,
-    private val environment: Environment,
 ) : AsyncTaskStep {
     val log: Logger = LoggerFactory.getLogger(JournalhendelseKontantstøtteRutingTask::class.java)
     val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
 
     override fun doTask(task: Task) {
-        val erProd = environment.activeProfiles.any { it == "prod" }
-        if (!erProd) {
-            val brukersIdent = task.metadata["personIdent"] as String?
+        val brukersIdent = task.metadata["personIdent"] as String?
 
-            val harLøpendeSakIInfotrygd = brukersIdent?.run { søkEtterSakIInfotrygd(this) } ?: false
+        val harLøpendeSakIInfotrygd = brukersIdent?.run { søkEtterSakIInfotrygd(this) } ?: false
 
-            val sakssystemMarkering =
-                when {
-                    harLøpendeSakIInfotrygd -> {
-                        incrementSakssystemMarkering("Infotrygd")
-                        "Et eller flere av barna har løpende sak i Infotrygd"
-                    }
-
-                    else -> {
-                        incrementSakssystemMarkering("Ingen")
-                        ""
-                    }
+        val sakssystemMarkering =
+            when {
+                harLøpendeSakIInfotrygd -> {
+                    incrementSakssystemMarkering("Infotrygd")
+                    "Et eller flere av barna har løpende sak i Infotrygd"
                 }
 
-            Task(
-                type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
-                payload = sakssystemMarkering,
-                properties = task.metadata,
-            ).apply { taskService.save(this) }
-        }
+                else -> {
+                    incrementSakssystemMarkering("Ingen")
+                    ""
+                }
+            }
+
+        Task(
+            type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
+            payload = sakssystemMarkering,
+            properties = task.metadata,
+        ).apply { taskService.save(this) }
     }
 
     private fun incrementSakssystemMarkering(saksystem: String) {
