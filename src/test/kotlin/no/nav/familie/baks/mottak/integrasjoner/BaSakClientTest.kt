@@ -2,11 +2,12 @@ package no.nav.familie.baks.mottak.integrasjoner
 
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
+import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import no.nav.familie.baks.mottak.DevLauncher
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -15,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.test.context.ActiveProfiles
 import java.io.IOException
+import java.time.LocalDate
 
 @SpringBootTest(classes = [DevLauncher::class], properties = ["FAMILIE_BA_SAK_API_URL=http://localhost:28085/api"])
 @ActiveProfiles("dev", "mock-oauth")
@@ -38,7 +40,34 @@ class BaSakClientTest {
         )
 
         val response = baSakClient.hentSaksnummer(personIdent)
-        Assertions.assertThat(response).isEqualTo(fagsakId.toString())
+        assertThat(response).isEqualTo(fagsakId.toString())
+    }
+
+    @Test
+    @Tag("integration")
+    fun `skal hente minimal fagsak og mappe til RestMinimalFagsak`() {
+        stubFor(
+            get(urlEqualTo("/api/fagsaker/minimal/1"))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(gyldigResponseMinimalSak()),
+                ),
+        )
+
+        val response = baSakClient.hentMinimalRestFagsak(fagsakId)
+        assertThat(response.id).isEqualTo(fagsakId)
+        assertThat(response.behandlinger).hasSize(1)
+        assertThat(response.behandlinger.first().aktiv).isTrue()
+        assertThat(response.behandlinger.first().behandlingId).isEqualTo(1000)
+        assertThat(response.behandlinger.first().kategori).isEqualTo(BehandlingKategori.NASJONAL)
+        assertThat(response.behandlinger.first().underkategori).isEqualTo(BehandlingUnderkategori.ORDINÆR)
+        assertThat(response.behandlinger.first().opprettetTidspunkt).isEqualTo(LocalDate.of(2023, 4, 2).atStartOfDay())
+        assertThat(response.behandlinger.first().status).isEqualTo("AVSLUTTET")
+        assertThat(response.behandlinger.first().type).isEqualTo("FØRSTEGANGSBEHANDLING")
+        assertThat(response.behandlinger.first().vedtaksdato).isEqualTo(LocalDate.of(2023, 4, 3).atStartOfDay())
+        assertThat(response.behandlinger.first().årsak).isEqualTo("SØKNAD")
+        assertThat(response.behandlinger.first().resultat).isEqualTo("INNVILGET")
     }
 
     @Throws(IOException::class)
@@ -55,6 +84,42 @@ class BaSakClientTest {
             "    \"melding\": \"Innhenting av data var vellykket\",\n" +
             "    \"stacktrace\": null\n" +
             "}"
+    }
+
+    @Throws(IOException::class)
+    private fun gyldigResponseMinimalSak(): String {
+        return """
+            {
+              "data": {
+                "opprettetTidspunkt": "2023-04-01T00:00:00.00",
+                "id": $fagsakId,
+                "søkerFødselsnummer": "42104200000",
+                "status": "LØPENDE",
+                "underBehandling": false,
+                "løpendeKategori": "NASJONAL",
+                "behandlinger": [
+                  {
+                    "behandlingId": 1000,
+                    "opprettetTidspunkt": "2023-04-02T00:00:00.00",
+                    "kategori": "NASJONAL",
+                    "underkategori": "ORDINÆR",
+                    "aktiv": true,
+                    "årsak": "SØKNAD",
+                    "type": "FØRSTEGANGSBEHANDLING",
+                    "status": "AVSLUTTET",
+                    "resultat": "INNVILGET",
+                    "vedtaksdato": "2023-04-03T00:00:00.00"
+                  }
+                ],
+                "tilbakekrevingsbehandlinger": [],
+                "gjeldendeUtbetalingsperioder": []
+              },
+              "status": "SUKSESS",
+              "melding": "Innhenting av data var vellykket",
+              "frontendFeilmelding": null,
+              "stacktrace": null
+            }                                   
+            """.trimIndent()
     }
 
     companion object {

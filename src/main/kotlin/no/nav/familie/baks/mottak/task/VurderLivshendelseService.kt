@@ -12,9 +12,9 @@ import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveVurderLivshendelseDto
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlPersonData
-import no.nav.familie.baks.mottak.integrasjoner.RestFagsak
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakIdOgTilknyttetAktørId
-import no.nav.familie.baks.mottak.integrasjoner.RestUtvidetBehandling
+import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
+import no.nav.familie.baks.mottak.integrasjoner.RestVisningBehandling
 import no.nav.familie.baks.mottak.integrasjoner.Sivilstand
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
@@ -68,13 +68,6 @@ class VurderLivshendelseService(
                 secureLog.info("Har mottatt dødsfallshendelse for person $personIdent")
                 val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-dødsfall", tema)
                 secureLog.info("dødsfallshendelse person fødselsdato = ${pdlPersonData.fødsel.firstOrNull()}")
-                if (pdlPersonData.dødsfall.firstOrNull()?.dødsdato == null) {
-                    secureLog.info("Har mottatt dødsfallshendelse uten dødsdato $pdlPersonData")
-                    throw RekjørSenereException(
-                        årsak = "Har mottatt dødsfallshendelse uten dødsdato",
-                        triggerTid = LocalDateTime.now().plusDays(1),
-                    )
-                }
 
                 val berørteBrukere = finnBrukereBerørtAvDødsfallEllerUtflyttingHendelseForIdent(personIdent, tema)
                 secureLog.info(
@@ -82,6 +75,14 @@ class VurderLivshendelseService(
                         berørteBrukere.fold("") { aktørIder, it -> aktørIder + " " + it.aktørId }
                     } tema = $tema ",
                 )
+
+                if (berørteBrukere.isNotEmpty() && pdlPersonData.dødsfall.firstOrNull()?.dødsdato == null) {
+                    secureLog.info("Har mottatt dødsfallshendelse uten dødsdato $pdlPersonData")
+                    throw RekjørSenereException(
+                        årsak = "Har mottatt dødsfallshendelse uten dødsdato",
+                        triggerTid = LocalDateTime.now().plusDays(1),
+                    )
+                }
 
                 berørteBrukere.forEach {
                     if (opprettEllerOppdaterVurderLivshendelseOppgave(
@@ -229,7 +230,7 @@ class VurderLivshendelseService(
 
     private fun hentBehandlingstema(
         tema: Tema,
-        restBehandling: RestUtvidetBehandling,
+        restBehandling: RestVisningBehandling,
     ) = when (tema) {
         Tema.BAR -> tilBarnetrygdBehandlingstema(restBehandling)
         Tema.KON -> tilKontanstøtteBehandlingstema(restBehandling)
@@ -286,23 +287,23 @@ class VurderLivshendelseService(
     private fun hentRestFagsak(
         fagsakId: Long,
         tema: Tema,
-    ): RestFagsak {
+    ): RestMinimalFagsak {
         return when (tema) {
-            Tema.BAR -> baSakClient.hentRestFagsak(fagsakId)
-            Tema.KON -> ksSakClient.hentRestFagsak(fagsakId)
+            Tema.BAR -> baSakClient.hentMinimalRestFagsak(fagsakId)
+            Tema.KON -> ksSakClient.hentMinimalRestFagsak(fagsakId)
             Tema.ENF, Tema.OPP -> throw RuntimeException("Tema $tema er ikke støttet")
         }.also {
             secureLog.info("Hentet rest fagsak: $it, tema: $tema")
         }
     }
 
-    private fun hentSisteBehandlingSomErIverksatt(restFagsak: RestFagsak): RestUtvidetBehandling? {
+    private fun hentSisteBehandlingSomErIverksatt(restFagsak: RestMinimalFagsak): RestVisningBehandling? {
         return restFagsak.behandlinger
-            .filter { it.steg == STEG_TYPE_BEHANDLING_AVSLUTTET }
+            .filter { it.status == STATUS_AVSLUTTET }
             .maxByOrNull { it.opprettetTidspunkt }
     }
 
-    private fun hentAktivBehandling(restFagsak: RestFagsak): RestUtvidetBehandling {
+    private fun hentAktivBehandling(restFagsak: RestMinimalFagsak): RestVisningBehandling {
         return restFagsak.behandlinger.firstOrNull { it.aktiv }
             ?: error("Fagsak ${restFagsak.id} mangler aktiv behandling. Får ikke opprettet VurderLivshendelseOppgave")
     }
@@ -352,32 +353,32 @@ class VurderLivshendelseService(
         return listeMedFagsakIdOgTilknyttetAktør
     }
 
-    private fun tilBarnetrygdBehandlingstema(restUtvidetBehandling: RestUtvidetBehandling?): Behandlingstema {
+    private fun tilBarnetrygdBehandlingstema(restBehandling: RestVisningBehandling?): Behandlingstema {
         return when {
-            restUtvidetBehandling == null -> Behandlingstema.Barnetrygd
-            restUtvidetBehandling.kategori == BehandlingKategori.EØS -> Behandlingstema.BarnetrygdEØS
-            restUtvidetBehandling.kategori == BehandlingKategori.NASJONAL && restUtvidetBehandling.underkategori == BehandlingUnderkategori.ORDINÆR -> Behandlingstema.OrdinærBarnetrygd
-            restUtvidetBehandling.kategori == BehandlingKategori.NASJONAL && restUtvidetBehandling.underkategori == BehandlingUnderkategori.UTVIDET -> Behandlingstema.UtvidetBarnetrygd
+            restBehandling == null -> Behandlingstema.Barnetrygd
+            restBehandling.kategori == BehandlingKategori.EØS -> Behandlingstema.BarnetrygdEØS
+            restBehandling.kategori == BehandlingKategori.NASJONAL && restBehandling.underkategori == BehandlingUnderkategori.ORDINÆR -> Behandlingstema.OrdinærBarnetrygd
+            restBehandling.kategori == BehandlingKategori.NASJONAL && restBehandling.underkategori == BehandlingUnderkategori.UTVIDET -> Behandlingstema.UtvidetBarnetrygd
             else -> Behandlingstema.Barnetrygd
         }
     }
 
-    private fun tilKontanstøtteBehandlingstema(restUtvidetBehandling: RestUtvidetBehandling?): Behandlingstema =
+    private fun tilKontanstøtteBehandlingstema(restBehandling: RestVisningBehandling?): Behandlingstema =
         when {
-            restUtvidetBehandling == null -> Behandlingstema.Kontantstøtte
-            restUtvidetBehandling.kategori == BehandlingKategori.EØS -> Behandlingstema.KontantstøtteEØS
+            restBehandling == null -> Behandlingstema.Kontantstøtte
+            restBehandling.kategori == BehandlingKategori.EØS -> Behandlingstema.KontantstøtteEØS
             else -> Behandlingstema.Kontantstøtte
         }
 
     private fun sjekkOmDatoErEtterEldsteVedtaksdato(
         dato: LocalDate,
-        aktivFaksak: RestFagsak,
+        aktivFaksak: RestMinimalFagsak,
         personIdent: String,
         tema: Tema,
     ): Boolean {
         val tidligsteVedtakIBaSak =
             aktivFaksak.behandlinger
-                .filter { it.resultat == RESULTAT_INNVILGET && it.steg == STEG_TYPE_BEHANDLING_AVSLUTTET }
+                .filter { it.resultat == RESULTAT_INNVILGET && it.status == STATUS_AVSLUTTET }
                 .minByOrNull { it.opprettetTidspunkt } ?: return false
 
         if (dato.isAfter(tidligsteVedtakIBaSak.opprettetTidspunkt.toLocalDate())) {
@@ -468,7 +469,7 @@ class VurderLivshendelseService(
         "${VurderLivshendelseType.SIVILSTAND.beskrivelse}: ${if (personErBruker) "bruker" else "barn $personIdent"} er registrert som gift fra $formatertDato"
 
     companion object {
-        const val STEG_TYPE_BEHANDLING_AVSLUTTET = "BEHANDLING_AVSLUTTET"
+        const val STATUS_AVSLUTTET = "AVSLUTTET"
         const val RESULTAT_INNVILGET = "INNVILGET"
         const val BEHANDLING_TYPE_MIGRERING = "MIGRERING_FRA_INFOTRYGD"
     }

@@ -41,10 +41,10 @@ class KsSakClient
             )
         }
 
-        fun hentRestFagsak(fagsakId: Long): RestFagsak {
-            val uri = URI.create("$ksSakServiceUri/fagsaker/$fagsakId")
+        fun hentMinimalRestFagsak(fagsakId: Long): RestMinimalFagsak {
+            val uri = URI.create("$ksSakServiceUri/fagsaker/minimal/$fagsakId")
             return runCatching {
-                getForEntity<Ressurs<RestFagsak>>(uri)
+                getForEntity<Ressurs<RestMinimalFagsak>>(uri)
             }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ks-sak.", it, uri) },

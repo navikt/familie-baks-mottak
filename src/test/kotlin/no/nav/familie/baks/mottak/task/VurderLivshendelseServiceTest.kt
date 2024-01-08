@@ -19,12 +19,12 @@ import no.nav.familie.baks.mottak.integrasjoner.OppgaveVurderLivshendelseDto
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlForeldreBarnRelasjon
 import no.nav.familie.baks.mottak.integrasjoner.PdlPersonData
-import no.nav.familie.baks.mottak.integrasjoner.RestArbeidsfordelingPåBehandling
-import no.nav.familie.baks.mottak.integrasjoner.RestFagsak
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakIdOgTilknyttetAktørId
-import no.nav.familie.baks.mottak.integrasjoner.RestUtvidetBehandling
+import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
+import no.nav.familie.baks.mottak.integrasjoner.RestVisningBehandling
 import no.nav.familie.baks.mottak.integrasjoner.Sivilstand
+import no.nav.familie.baks.mottak.task.VurderLivshendelseService.Companion.BEHANDLING_TYPE_MIGRERING
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.kontrakter.ba.infotrygd.Stønad
 import no.nav.familie.kontrakter.felles.Behandlingstema
@@ -183,7 +183,7 @@ class VurderLivshendelseServiceTest {
                     ),
             )
 
-        every { mockBaSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
+        every { mockBaSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagMinimalRestFagsakForBA()
 
         val livshendelseTask =
             Task(
@@ -254,7 +254,7 @@ class VurderLivshendelseServiceTest {
                     ),
             )
 
-        every { mockKsSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
+        every { mockKsSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagMinimalRestFagsakForKS()
 
         val livshendelseTask =
             Task(
@@ -321,7 +321,7 @@ class VurderLivshendelseServiceTest {
                     ),
             )
 
-        every { mockBaSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
+        every { mockBaSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagMinimalRestFagsakForBA()
 
         val livshendelseTask =
             Task(
@@ -389,7 +389,7 @@ class VurderLivshendelseServiceTest {
                     ),
             )
 
-        every { mockKsSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
+        every { mockKsSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagMinimalRestFagsakForBA()
 
         val livshendelseTask =
             Task(
@@ -446,7 +446,7 @@ class VurderLivshendelseServiceTest {
                     ),
             )
 
-        every { mockBaSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
+        every { mockBaSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagMinimalRestFagsakForBA()
 
         val livshendelseTask =
             Task(
@@ -487,7 +487,7 @@ class VurderLivshendelseServiceTest {
             sivilstandMedDagensDato.data andThen
             sivilstandEldreEnnBasakVedtakMenNyereEnnInfotrygdVedtak.data
 
-        every { mockBaSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
+        every { mockBaSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagMinimalRestFagsakForBA()
 
         listOf(1, 2, 3, 4).forEach {
             val livshendelseTask =
@@ -521,7 +521,7 @@ class VurderLivshendelseServiceTest {
                 RestFagsakIdOgTilknyttetAktørId(PERSONIDENT_MOR + "00", SAKS_ID),
             )
 
-        every { mockBaSakClient.hentRestFagsak(SAKS_ID) } returns lagAktivUtvidet()
+        every { mockBaSakClient.hentMinimalRestFagsak(SAKS_ID) } returns lagMinimalRestFagsakForBA()
         val oppgavebeskrivelseSlot = slot<String>()
         every { mockOppgaveClient.oppdaterOppgaveBeskrivelse(any(), capture(oppgavebeskrivelseSlot)) } returns
             OppgaveResponse(
@@ -673,22 +673,34 @@ class VurderLivshendelseServiceTest {
             )
     }
 
-    private fun lagAktivUtvidet() =
-        RestFagsak(
-            SAKS_ID,
-            listOf(
-                RestUtvidetBehandling(
-                    true,
-                    RestArbeidsfordelingPåBehandling(ENHET_ID),
-                    321,
-                    BehandlingKategori.NASJONAL,
-                    LocalDateTime.now(),
-                    "INNVILGET",
-                    "BEHANDLING_AVSLUTTET",
-                    "MIGRERING_FRA_INFOTRYGD",
-                    BehandlingUnderkategori.UTVIDET,
+    private fun lagMinimalRestFagsakForBA() =
+        RestMinimalFagsak(
+            id = SAKS_ID,
+            behandlinger =
+                listOf(
+                    lagRestVisningBehandling(underkategori = BehandlingUnderkategori.UTVIDET),
                 ),
-            ),
+        )
+
+    private fun lagMinimalRestFagsakForKS() =
+        RestMinimalFagsak(
+            id = SAKS_ID,
+            behandlinger =
+                listOf(
+                    lagRestVisningBehandling(underkategori = null),
+                ),
+        )
+
+    private fun lagRestVisningBehandling(underkategori: BehandlingUnderkategori?) =
+        RestVisningBehandling(
+            aktiv = true,
+            behandlingId = 321,
+            kategori = BehandlingKategori.NASJONAL,
+            opprettetTidspunkt = LocalDateTime.now(),
+            resultat = "INNVILGET",
+            status = "AVSLUTTET",
+            type = BEHANDLING_TYPE_MIGRERING,
+            underkategori = underkategori,
         )
 
     private fun lagInfotrygdResponse() =

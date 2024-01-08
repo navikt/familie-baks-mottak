@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.5</version>
+        <version>3.2.1</version>
     </parent>
 
     <properties>
@@ -20,17 +20,16 @@
         <changelist>-SNAPSHOT</changelist>
         <java.version>21</java.version>
         <jvmTarget>21</jvmTarget>
-        <kotlin.version>1.9.20</kotlin.version>
+        <kotlin.version>1.9.22</kotlin.version>
         <mockk.version>1.13.8</mockk.version>
         <confluent.version>7.5.1</confluent.version>
-        <prosessering.version>2.20231026103714_2f17845</prosessering.version>
-        <felles.version>2.20231023162434_fa320ce</felles.version>
-        <kontrakter.version>3.0_20231109091547_fd2cae7</kontrakter.version>
+        <prosessering.version>2.20231212093500_bfa0e7c</prosessering.version>
+
+        <felles.version>2.20231201131108_ea25dd3</felles.version>
+        <kontrakter.version>3.0_20231215081141_948d3f9</kontrakter.version>
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
-        <spring.cloud.version>4.0.4</spring.cloud.version>
-        <token-validation-spring.version>3.1.0</token-validation-spring.version>
-        <spring.cloud.version>4.0.3</spring.cloud.version>
-        <token-validation-spring.version>3.1.0</token-validation-spring.version>
+        <spring.cloud.version>4.1.0</spring.cloud.version>
+        <token-validation-spring.version>3.2.0</token-validation-spring.version>
         <avro.version>1.11.3</avro.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
@@ -134,6 +133,11 @@
         </dependency>
         <dependency>
             <groupId>no.nav.security</groupId>
+            <artifactId>token-client-core</artifactId>
+            <version>${token-validation-spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.security</groupId>
             <artifactId>token-client-spring</artifactId>
             <version>${token-validation-spring.version}</version>
         </dependency>
@@ -182,7 +186,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.6.0</version>
+            <version>42.7.1</version>
         </dependency>
         <dependency>
             <groupId>com.papertrailapp</groupId>
@@ -237,7 +241,7 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
-            <version>1.19.1</version>
+            <version>1.19.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -421,7 +425,7 @@
                     <dependency>
                         <groupId>com.pinterest.ktlint</groupId>
                         <artifactId>ktlint-cli</artifactId>
-                        <version>1.0.1</version>
+                        <version>1.1.0</version>
                     </dependency>
                     <!-- additional 3rd party ruleset(s) can be specified here -->
                 </dependencies>
