@@ -21,7 +21,6 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.core.env.Environment
 import java.time.YearMonth
 import java.util.Properties
 import kotlin.test.assertEquals
@@ -34,8 +33,6 @@ class JournalhendelseKontantstøtteRutingTaskTest {
 
     @MockK private lateinit var taskService: TaskService
 
-    @MockK private lateinit var environment: Environment
-
     @InjectMockKs private lateinit var journalhendelseKontantstøtteRutingTask: JournalhendelseKontantstøtteRutingTask
 
     val søkerFnr = "12345678910"
@@ -45,7 +42,6 @@ class JournalhendelseKontantstøtteRutingTaskTest {
     @Test fun `doTask - skal opprette OpprettJournalføringOppgaveTask med informasjon om at det finnes løpende sak i Infotrygd når et eller flere av barna har løpende sak i Infotrygd`() {
         val taskSlot = slot<Task>()
         setupPDLMocks()
-        every { environment.getActiveProfiles() } returns arrayOf("dev")
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
         every { infotrygdKontantstøtteClient.hentPerioderMedKontantstøtteIInfotrygd(any()) } returns
             InnsynResponse(
@@ -79,7 +75,6 @@ class JournalhendelseKontantstøtteRutingTaskTest {
     @Test fun `doTask - skal opprette OpprettJournalføringOppgaveTask med tom sakssystem-markering når et eller flere av barna har sak i Infotrygd men ingen løpende`() {
         val taskSlot = slot<Task>()
         setupPDLMocks()
-        every { environment.getActiveProfiles() } returns arrayOf("dev")
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
         every { infotrygdKontantstøtteClient.hentPerioderMedKontantstøtteIInfotrygd(any()) } returns
             InnsynResponse(
@@ -113,7 +108,6 @@ class JournalhendelseKontantstøtteRutingTaskTest {
     @Test fun `doTask - skal opprette OpprettJournalføringOppgaveTask med tom sakssystem-markering når ingen av barna har sak i Infotrygd`() {
         val taskSlot = slot<Task>()
         setupPDLMocks()
-        every { environment.getActiveProfiles() } returns arrayOf("dev")
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns false
 
         every { taskService.save(capture(taskSlot)) } returns mockk()
