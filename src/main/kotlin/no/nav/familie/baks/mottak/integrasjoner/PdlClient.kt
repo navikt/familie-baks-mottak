@@ -40,6 +40,7 @@ class PdlClient(
         val response = postForEntity<PdlHentIdenterResponse>(pdlUri, pdlPersonRequest, httpHeaders(tema))
 
         if (response.harFeil()) {
+            secureLogger.info("Response mot PDL harFeil for ident=$personIdent response=$response")
             if (response.errors?.any { it.extensions?.notFound() == true } == true) {
                 throw PdlNotFoundException(
                     msg = "Fant ikke identer på person: ${response.errorMessages()}",
