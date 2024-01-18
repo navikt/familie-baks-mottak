@@ -63,6 +63,12 @@ class VurderLivshendelseService(
         val personIdent = payload.personIdent
         val type = payload.type
 
+        if (pdlClient.hentIdenter(personIdent = personIdent, tema).isEmpty()) {
+            log.warn("Hendelse ignoreres siden ident ikke eksisterer")
+            secureLog.warn("Hendelse ignoreres siden ident ikke eksisterer for $personIdent")
+            return
+        }
+
         when (type) {
             VurderLivshendelseType.DØDSFALL -> {
                 secureLog.info("Har mottatt dødsfallshendelse for person $personIdent")
