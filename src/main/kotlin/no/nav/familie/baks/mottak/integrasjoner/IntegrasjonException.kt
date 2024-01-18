@@ -7,7 +7,7 @@ import org.springframework.web.client.RestClientResponseException
 import java.net.URI
 
 @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
-class IntegrasjonException(
+open class IntegrasjonException(
     msg: String,
     throwable: Throwable? = null,
     uri: URI? = null,
@@ -40,3 +40,9 @@ class IntegrasjonException(
         }
     }
 }
+
+class PdlNotFoundException(
+    msg: String,
+    uri: URI,
+    ident: String,
+) : IntegrasjonException(msg = msg, uri = uri, ident = ident)

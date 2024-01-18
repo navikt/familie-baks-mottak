@@ -40,6 +40,14 @@ class PdlClient(
         val response = postForEntity<PdlHentIdenterResponse>(pdlUri, pdlPersonRequest, httpHeaders(tema))
 
         if (response.harFeil()) {
+            if (response.errors?.any { it.extensions?.notFound() == true } == true) {
+                throw PdlNotFoundException(
+                    msg = "Fant ikke identer på person: ${response.errorMessages()}",
+                    uri = pdlUri,
+                    ident = personIdent,
+                )
+            }
+
             throw IntegrasjonException(
                 msg = "Fant ikke identer på person: ${response.errorMessages()}",
                 uri = pdlUri,
