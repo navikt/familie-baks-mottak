@@ -12,6 +12,7 @@ import no.nav.familie.baks.mottak.integrasjoner.Dødsfall
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus
 import no.nav.familie.baks.mottak.integrasjoner.Fødsel
+import no.nav.familie.baks.mottak.integrasjoner.IdentInformasjon
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
@@ -30,6 +31,7 @@ import no.nav.familie.kontrakter.ba.infotrygd.Stønad
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
@@ -83,6 +85,11 @@ class VurderLivshendelseServiceTest {
         every { mockOppgaveClient.opprettVurderLivshendelseOppgave(any()) } returns OppgaveResponse(42)
 
         every { mockInfotrygdClient.hentVedtak(any()) } returns lagInfotrygdResponse()
+
+        every { mockPdlClient.hentIdenter(PERSONIDENT_MOR, any()) } returns listOf(IdentInformasjon(PERSONIDENT_MOR, false, IdentGruppe.FOLKEREGISTERIDENT.name))
+        every { mockPdlClient.hentIdenter(PERSONIDENT_FAR, any()) } returns listOf(IdentInformasjon(PERSONIDENT_FAR, false, IdentGruppe.FOLKEREGISTERIDENT.name))
+        every { mockPdlClient.hentIdenter(PERSONIDENT_BARN, any()) } returns listOf(IdentInformasjon(PERSONIDENT_BARN, false, IdentGruppe.FOLKEREGISTERIDENT.name))
+        every { mockPdlClient.hentIdenter(PERSONIDENT_BARN2, any()) } returns listOf(IdentInformasjon(PERSONIDENT_BARN2, false, IdentGruppe.FOLKEREGISTERIDENT.name))
     }
 
     @ParameterizedTest
@@ -602,6 +609,29 @@ class VurderLivshendelseServiceTest {
         Assertions.assertThat(oppgavebeskrivelseSlot.captured).isEqualTo(VurderLivshendelseType.DØDSFALL.beskrivelse + ": bruker og 2 barn $PERSONIDENT_BARN $PERSONIDENT_BARN2")
     }
 
+    @Test
+    fun `Skal ignorere hendelse hvis ident ikke finnes i PDL`() {
+        val livshendelseTask =
+            Task(
+                type = VurderKontantstøtteLivshendelseTask.TASK_STEP_TYPE,
+                payload =
+                    objectMapper.writeValueAsString(
+                        VurderLivshendelseTaskDTO(
+                            UKJENT_PERSONIDENT,
+                            VurderLivshendelseType.SIVILSTAND,
+                        ),
+                    ),
+            )
+
+        vurderLivshendelseService.vurderLivshendelseOppgave(livshendelseTask, Tema.BAR)
+
+        val oppgaveSlot = mutableListOf<OppgaveVurderLivshendelseDto>()
+        verify(exactly = 0) {
+            mockOppgaveClient.opprettVurderLivshendelseOppgave(any())
+            mockBaSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(any())
+        }
+    }
+
     private fun setupPdlMockForDødsfallshendelse(
         morDød: Boolean,
         barn1Død: Boolean,
@@ -718,8 +748,8 @@ class VurderLivshendelseServiceTest {
         private val PERSONIDENT_BARN2 = "12345654322"
         private val PERSONIDENT_MOR = "12345678901"
         private val PERSONIDENT_FAR = "12345678888"
+        private val UKJENT_PERSONIDENT = "12345666666"
         private val SAKS_ID = 123L
-        private val ENHET_ID = "3049"
     }
 
     private val Sivilstand.data: PdlPersonData
