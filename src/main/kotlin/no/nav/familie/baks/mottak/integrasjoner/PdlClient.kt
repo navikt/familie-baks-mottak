@@ -38,6 +38,7 @@ class PdlClient(
     ): List<IdentInformasjon> {
         val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery("hentIdenter"))
         val response = postForEntity<PdlHentIdenterResponse>(pdlUri, pdlPersonRequest, httpHeaders(tema))
+        secureLogger.info("hent identer $response")
 
         if (response.harFeil()) {
             if (response.errors?.any { it.extensions?.notFound() == true } == true) {
