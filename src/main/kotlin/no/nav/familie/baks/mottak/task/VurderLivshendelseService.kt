@@ -11,6 +11,7 @@ import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveVurderLivshendelseDto
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlNotFoundException
 import no.nav.familie.baks.mottak.integrasjoner.PdlPersonData
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakIdOgTilknyttetAktørId
 import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
@@ -63,7 +64,9 @@ class VurderLivshendelseService(
         val personIdent = payload.personIdent
         val type = payload.type
 
-        if (pdlClient.hentIdenter(personIdent = personIdent, tema).isEmpty()) {
+        try {
+            pdlClient.hentIdenter(personIdent = personIdent, tema)
+        } catch (e: PdlNotFoundException) {
             log.warn("Hendelse ignoreres siden ident ikke eksisterer")
             secureLog.warn("Hendelse ignoreres siden ident ikke eksisterer for $personIdent")
             return

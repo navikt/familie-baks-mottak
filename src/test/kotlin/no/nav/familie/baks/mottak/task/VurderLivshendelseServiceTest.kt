@@ -19,6 +19,7 @@ import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveVurderLivshendelseDto
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlForeldreBarnRelasjon
+import no.nav.familie.baks.mottak.integrasjoner.PdlNotFoundException
 import no.nav.familie.baks.mottak.integrasjoner.PdlPersonData
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakIdOgTilknyttetAktørId
@@ -43,6 +44,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import java.net.URI
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
@@ -611,6 +613,7 @@ class VurderLivshendelseServiceTest {
 
     @Test
     fun `Skal ignorere hendelse hvis ident ikke finnes i PDL`() {
+        every { mockPdlClient.hentIdenter(UKJENT_PERSONIDENT, any()) } throws PdlNotFoundException("fant ikke ident", URI.create("mocked"), UKJENT_PERSONIDENT)
         val livshendelseTask =
             Task(
                 type = VurderKontantstøtteLivshendelseTask.TASK_STEP_TYPE,
@@ -625,7 +628,6 @@ class VurderLivshendelseServiceTest {
 
         vurderLivshendelseService.vurderLivshendelseOppgave(livshendelseTask, Tema.BAR)
 
-        val oppgaveSlot = mutableListOf<OppgaveVurderLivshendelseDto>()
         verify(exactly = 0) {
             mockOppgaveClient.opprettVurderLivshendelseOppgave(any())
             mockBaSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(any())
