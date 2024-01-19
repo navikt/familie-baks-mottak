@@ -634,6 +634,29 @@ class VurderLivshendelseServiceTest {
         }
     }
 
+    @Test
+    fun `Skal ignorere hendelse hvis ident er NPID`() {
+        every { mockPdlClient.hentIdenter("123", any()) } returns listOf(IdentInformasjon("123", false, "NPID"))
+        val livshendelseTask =
+            Task(
+                type = VurderKontantstøtteLivshendelseTask.TASK_STEP_TYPE,
+                payload =
+                    objectMapper.writeValueAsString(
+                        VurderLivshendelseTaskDTO(
+                            UKJENT_PERSONIDENT,
+                            VurderLivshendelseType.SIVILSTAND,
+                        ),
+                    ),
+            )
+
+        vurderLivshendelseService.vurderLivshendelseOppgave(livshendelseTask, Tema.BAR)
+
+        verify(exactly = 0) {
+            mockOppgaveClient.opprettVurderLivshendelseOppgave(any())
+            mockBaSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(any())
+        }
+    }
+
     private fun setupPdlMockForDødsfallshendelse(
         morDød: Boolean,
         barn1Død: Boolean,

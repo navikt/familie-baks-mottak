@@ -65,7 +65,12 @@ class VurderLivshendelseService(
         val type = payload.type
 
         try {
-            pdlClient.hentIdenter(personIdent = personIdent, tema)
+            val identer = pdlClient.hentIdenter(personIdent = personIdent, tema)
+            if (identer.firstOrNull { it.ident == personIdent }?.gruppe != Identgruppe.FOLKEREGISTERIDENT.name) {
+                log.warn("Hendelse ignoreres siden ident ikke er av gruppe FOLKEREGISTERIDENT")
+                secureLog.warn("Hendelse ignoreres siden ident ikke er av gruppe FOLKEREGISTERIDENT $identer")
+                return
+            }
         } catch (e: PdlNotFoundException) {
             log.warn("Hendelse ignoreres siden ident ikke eksisterer")
             secureLog.warn("Hendelse ignoreres siden ident ikke eksisterer for $personIdent")
