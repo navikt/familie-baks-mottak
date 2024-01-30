@@ -59,7 +59,6 @@ class InfotrygdKontantstøtteClient(
         onFailure: (Throwable) -> RuntimeException,
     ): T = runCatching(request).getOrElse { throw onFailure(it) }
 
-
     private fun uri(endepunkt: String) = URI.create(encodePath("$clientUri/$endepunkt", "UTF-8"))
 }
 
