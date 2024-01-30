@@ -25,7 +25,7 @@ class InfotrygdKontantstøtteClient(
         return infotrygdResponseFra(
             request = {
                 operations.postForObject(
-                    uri("harLøpendeKontantstotteIInfotrygd"),
+                    uri("harLopendeKontantstotteIInfotrygd"),
                     InnsynRequest(barnasIdenter),
                 )
             },
@@ -33,39 +33,31 @@ class InfotrygdKontantstøtteClient(
                 IntegrasjonException(
                     "Feil ved søk etter stønad i infotrygd.",
                     ex,
-                    uri("harLøpendeKontantstotteIInfotrygd"),
+                    uri("harLopendeKontantstotteIInfotrygd"),
                 )
             },
-            e2eResponse = false,
         )
     }
 
-    fun hentPerioderMedKontantstøtteIInfotrygd(
+    fun hentPerioderMedKontantstotteIInfotrygdByBarn(
         barnasIdenter: List<String>,
     ): InnsynResponse {
         return infotrygdResponseFra(
-            request = postForEntity(uri("hentPerioderMedKontantstøtteIInfotrygd"), InnsynRequest(barnasIdenter)),
+            request = postForEntity(uri("hentPerioderMedKontantstotteIInfotrygdByBarn"), InnsynRequest(barnasIdenter)),
             onFailure = { ex ->
                 IntegrasjonException(
                     "Feil ved uthenting av saker fra infotrygd.",
                     ex,
-                    uri("hentPerioderMedKontantstøtteIInfotrygd"),
+                    uri("hentPerioderMedKontantstotteIInfotrygdByBarn"),
                 )
             },
-            e2eResponse = InnsynResponse(emptyList()),
         )
     }
 
     private fun <T> infotrygdResponseFra(
         request: () -> T,
         onFailure: (Throwable) -> RuntimeException,
-        e2eResponse: T,
-    ): T =
-        if (environment.activeProfiles.contains("e2e")) {
-            e2eResponse
-        } else {
-            runCatching(request).getOrElse { throw onFailure(it) }
-        }
+    ): T = runCatching(request).getOrElse { throw onFailure(it) }
 
     private fun uri(endepunkt: String) = URI.create(encodePath("$clientUri/$endepunkt", "UTF-8"))
 }
