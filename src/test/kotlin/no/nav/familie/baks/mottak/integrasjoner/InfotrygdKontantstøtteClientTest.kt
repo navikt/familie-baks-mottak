@@ -49,7 +49,7 @@ class InfotrygdKontantstøtteClientTest {
 
     private fun gyldigStønadResponse(): String {
         return Files.readString(
-            ClassPathResource("testdata/hentInfotrygdstønad-response.json").file.toPath(),
+            ClassPathResource("testdata/hentInfotrygdKontantstøtteStønad-response.json").file.toPath(),
             StandardCharsets.UTF_8,
         )
     }

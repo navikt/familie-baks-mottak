@@ -2,6 +2,7 @@ package no.nav.familie.baks.mottak.integrasjoner
 
 import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.familie.http.client.AbstractRestClient
+import no.nav.familie.kontrakter.felles.objectMapper
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.env.Environment
@@ -42,16 +43,8 @@ class InfotrygdKontantstøtteClient(
     fun hentPerioderMedKontantstotteIInfotrygdByBarn(
         barnasIdenter: List<String>,
     ): InnsynResponse {
-        return infotrygdResponseFra(
-            request = postForEntity(uri("hentPerioderMedKontantstotteIInfotrygdByBarn"), InnsynRequest(barnasIdenter)),
-            onFailure = { ex ->
-                IntegrasjonException(
-                    "Feil ved uthenting av saker fra infotrygd.",
-                    ex,
-                    uri("hentPerioderMedKontantstotteIInfotrygdByBarn"),
-                )
-            },
-        )
+        val response: String = postForEntity(uri("hentPerioderMedKontantstotteIInfotrygdByBarn"), InnsynRequest(barnasIdenter))
+        return objectMapper.readValue(response, InnsynResponse::class.java)
     }
 
     private fun <T> infotrygdResponseFra(
@@ -70,15 +63,15 @@ data class InnsynResponse(
 )
 
 data class StonadDto(
-    val fnr: Foedselsnummer,
-    val fom: YearMonth?,
-    val tom: YearMonth?,
+    val fnr: String,
+    val fom: String?,
+    val tom: String?,
     val belop: Int?,
     val barn: List<BarnDto>,
 )
 
 data class BarnDto(
-    val fnr: Foedselsnummer,
+    val fnr: String,
 )
 
 data class Foedselsnummer(

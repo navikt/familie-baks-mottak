@@ -91,8 +91,8 @@ private fun List<StonadDto>.harPågåendeSak(): Boolean = any { it.erPågåendeS
 private fun StonadDto.erPågåendeSak(): Boolean {
     return when {
         tom == null -> true
-        tom.isBefore(YearMonth.now()) -> false
-        tom.isAfter(YearMonth.now()) -> true
+//        tom.isBefore(YearMonth.now()) -> false
+//        tom.isAfter(YearMonth.now()) -> true
         else -> true
     }
 }

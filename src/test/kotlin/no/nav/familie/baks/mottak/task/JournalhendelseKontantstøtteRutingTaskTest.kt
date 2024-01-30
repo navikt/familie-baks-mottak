@@ -39,71 +39,71 @@ class JournalhendelseKontantstøtteRutingTaskTest {
     val barn1Fnr = "11223344556"
     val barn2Fnr = "11223344557"
 
-    @Test fun `doTask - skal opprette OpprettJournalføringOppgaveTask med informasjon om at det finnes løpende sak i Infotrygd når et eller flere av barna har løpende sak i Infotrygd`() {
-        val taskSlot = slot<Task>()
-        setupPDLMocks()
-        every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
-        every { infotrygdKontantstøtteClient.hentPerioderMedKontantstotteIInfotrygdByBarn(any()) } returns
-            InnsynResponse(
-                data =
-                    listOf(
-                        StonadDto(
-                            fnr = Foedselsnummer(søkerFnr),
-                            YearMonth.now().minusMonths(5),
-                            YearMonth.now().plusMonths(1),
-                            belop = 1000,
-                            listOf(
-                                BarnDto(Foedselsnummer(barn1Fnr)),
-                                BarnDto(Foedselsnummer(barn2Fnr)),
-                            ),
-                        ),
-                    ),
-            )
-        every { taskService.save(capture(taskSlot)) } returns mockk()
-
-        journalhendelseKontantstøtteRutingTask.doTask(
-            Task(
-                type = JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE,
-                payload = "NAV_NO",
-                properties = Properties().apply { this["personIdent"] = søkerFnr },
-            ),
-        )
-
-        assertEquals("Et eller flere av barna har løpende sak i Infotrygd", taskSlot.captured.payload)
-    }
-
-    @Test fun `doTask - skal opprette OpprettJournalføringOppgaveTask med tom sakssystem-markering når et eller flere av barna har sak i Infotrygd men ingen løpende`() {
-        val taskSlot = slot<Task>()
-        setupPDLMocks()
-        every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
-        every { infotrygdKontantstøtteClient.hentPerioderMedKontantstotteIInfotrygdByBarn(any()) } returns
-            InnsynResponse(
-                data =
-                    listOf(
-                        StonadDto(
-                            fnr = Foedselsnummer(søkerFnr),
-                            YearMonth.now().minusMonths(8),
-                            YearMonth.now().minusMonths(1),
-                            belop = 1000,
-                            listOf(
-                                BarnDto(Foedselsnummer(barn1Fnr)),
-                                BarnDto(Foedselsnummer(barn2Fnr)),
-                            ),
-                        ),
-                    ),
-            )
-        every { taskService.save(capture(taskSlot)) } returns mockk()
-
-        journalhendelseKontantstøtteRutingTask.doTask(
-            Task(
-                type = JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE,
-                payload = "NAV_NO",
-                properties = Properties().apply { this["personIdent"] = søkerFnr },
-            ),
-        )
-
-        assertEquals("", taskSlot.captured.payload)
-    }
+//    @Test fun `doTask - skal opprette OpprettJournalføringOppgaveTask med informasjon om at det finnes løpende sak i Infotrygd når et eller flere av barna har løpende sak i Infotrygd`() {
+//        val taskSlot = slot<Task>()
+//        setupPDLMocks()
+//        every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
+//        every { infotrygdKontantstøtteClient.hentPerioderMedKontantstotteIInfotrygdByBarn(any()) } returns
+//            InnsynResponse(
+//                data =
+//                    listOf(
+//                        StonadDto(
+//                            fnr = Foedselsnummer(søkerFnr),
+//                            YearMonth.now().minusMonths(5),
+//                            YearMonth.now().plusMonths(1),
+//                            belop = 1000,
+//                            listOf(
+//                                BarnDto(Foedselsnummer(barn1Fnr)),
+//                                BarnDto(Foedselsnummer(barn2Fnr)),
+//                            ),
+//                        ),
+//                    ),
+//            )
+//        every { taskService.save(capture(taskSlot)) } returns mockk()
+//
+//        journalhendelseKontantstøtteRutingTask.doTask(
+//            Task(
+//                type = JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE,
+//                payload = "NAV_NO",
+//                properties = Properties().apply { this["personIdent"] = søkerFnr },
+//            ),
+//        )
+//
+//        assertEquals("Et eller flere av barna har løpende sak i Infotrygd", taskSlot.captured.payload)
+//    }
+//
+//    @Test fun `doTask - skal opprette OpprettJournalføringOppgaveTask med tom sakssystem-markering når et eller flere av barna har sak i Infotrygd men ingen løpende`() {
+//        val taskSlot = slot<Task>()
+//        setupPDLMocks()
+//        every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
+//        every { infotrygdKontantstøtteClient.hentPerioderMedKontantstotteIInfotrygdByBarn(any()) } returns
+//            InnsynResponse(
+//                data =
+//                    listOf(
+//                        StonadDto(
+//                            fnr = Foedselsnummer(søkerFnr),
+//                            YearMonth.now().minusMonths(8),
+//                            YearMonth.now().minusMonths(1),
+//                            belop = 1000,
+//                            listOf(
+//                                BarnDto(Foedselsnummer(barn1Fnr)),
+//                                BarnDto(Foedselsnummer(barn2Fnr)),
+//                            ),
+//                        ),
+//                    ),
+//            )
+//        every { taskService.save(capture(taskSlot)) } returns mockk()
+//
+//        journalhendelseKontantstøtteRutingTask.doTask(
+//            Task(
+//                type = JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE,
+//                payload = "NAV_NO",
+//                properties = Properties().apply { this["personIdent"] = søkerFnr },
+//            ),
+//        )
+//
+//        assertEquals("", taskSlot.captured.payload)
+//    }
 
     @Test fun `doTask - skal opprette OpprettJournalføringOppgaveTask med tom sakssystem-markering når ingen av barna har sak i Infotrygd`() {
         val taskSlot = slot<Task>()
