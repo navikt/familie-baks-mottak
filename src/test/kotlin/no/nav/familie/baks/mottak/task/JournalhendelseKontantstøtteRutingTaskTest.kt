@@ -43,7 +43,7 @@ class JournalhendelseKontantstøtteRutingTaskTest {
         val taskSlot = slot<Task>()
         setupPDLMocks()
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
-        every { infotrygdKontantstøtteClient.hentPerioderMedKontantstøtteIInfotrygd(any()) } returns
+        every { infotrygdKontantstøtteClient.hentPerioderMedKontantstotteIInfotrygdByBarn(any()) } returns
             InnsynResponse(
                 data =
                     listOf(
@@ -76,7 +76,7 @@ class JournalhendelseKontantstøtteRutingTaskTest {
         val taskSlot = slot<Task>()
         setupPDLMocks()
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
-        every { infotrygdKontantstøtteClient.hentPerioderMedKontantstøtteIInfotrygd(any()) } returns
+        every { infotrygdKontantstøtteClient.hentPerioderMedKontantstotteIInfotrygdByBarn(any()) } returns
             InnsynResponse(
                 data =
                     listOf(
