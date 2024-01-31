@@ -1,13 +1,13 @@
 {
   "data": [
     {
-      "fnr": "20086600000",
+      "fnr": "søkerFnr",
       "fom": "2023-04",
-      "tom": null,
+      "tom": "2023-07",
       "belop": 7500,
       "barn": [
         {
-          "fnr": "31038600000"
+          "fnr": "barnFnr"
         }
       ]
     }
