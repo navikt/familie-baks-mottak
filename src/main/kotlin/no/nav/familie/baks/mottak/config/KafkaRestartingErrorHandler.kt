@@ -29,14 +29,14 @@ class KafkaRestartingErrorHandler : CommonContainerStoppingErrorHandler() {
 
     override fun handleRemaining(
         e: Exception,
-        records: List<ConsumerRecord<*, *>>?,
+        records: List<ConsumerRecord<*, *>>,
         consumer: Consumer<*, *>,
         container: MessageListenerContainer,
     ) {
         secureLogger.info("Treffer KafkaRestartingErrorHandler $records")
         Thread.sleep(1000)
 
-        if (records.isNullOrEmpty()) {
+        if (records.isEmpty()) {
             logger.warn("Feil ved konsumering av melding. Ingen records. ${consumer.subscription()}", e)
             scheduleRestart(
                 e,
