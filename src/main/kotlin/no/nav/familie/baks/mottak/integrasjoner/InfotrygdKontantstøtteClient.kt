@@ -5,14 +5,14 @@ import no.nav.familie.http.client.AbstractRestClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.env.Environment
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 import org.springframework.web.client.RestOperations
 import org.springframework.web.client.postForObject
 import org.springframework.web.util.UriUtils.encodePath
 import java.net.URI
 import java.time.YearMonth
 
-@Service
+@Component
 class InfotrygdKontantstøtteClient(
     @Qualifier("clientCredentials") restOperations: RestOperations,
     @Value("\${FAMILIE_KS_INFOTRYGD_API_URL}/api") private val clientUri: URI,
@@ -42,16 +42,15 @@ class InfotrygdKontantstøtteClient(
     fun hentPerioderMedKontantstotteIInfotrygdByBarn(
         barnasIdenter: List<String>,
     ): InnsynResponse {
-        return infotrygdResponseFra(
-            request = postForEntity(uri("hentPerioderMedKontantstotteIInfotrygdByBarn"), InnsynRequest(barnasIdenter)),
-            onFailure = { ex ->
-                IntegrasjonException(
-                    "Feil ved uthenting av saker fra infotrygd.",
-                    ex,
-                    uri("hentPerioderMedKontantstotteIInfotrygdByBarn"),
-                )
-            },
-        )
+        runCatching {
+            return postForEntity(uri("hentPerioderMedKontantstotteIInfotrygdByBarn"), InnsynRequest(barnasIdenter))
+        }.getOrElse { ex ->
+            throw IntegrasjonException(
+                "Feil ved uthenting av saker fra infotrygd.",
+                ex,
+                uri("hentPerioderMedKontantstotteIInfotrygdByBarn"),
+            )
+        }
     }
 
     private fun <T> infotrygdResponseFra(
