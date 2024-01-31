@@ -15,6 +15,7 @@ import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.time.YearMonth
 
 @Service
 @TaskStepBeskrivelse(
@@ -90,8 +91,8 @@ private fun List<StonadDto>.harPågåendeSak(): Boolean = any { it.erPågåendeS
 private fun StonadDto.erPågåendeSak(): Boolean {
     return when {
         tom == null -> true
-//        tom.isBefore(YearMonth.now()) -> false
-//        tom.isAfter(YearMonth.now()) -> true
+        tom.isBefore(YearMonth.now()) -> false
+        tom.isAfter(YearMonth.now()) -> true
         else -> true
     }
 }
