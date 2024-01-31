@@ -60,7 +60,7 @@ class InfotrygdKontantstøtteClientTest {
     @Tag("integration")
     fun `harKontantstøtteIInfotrygd skal true hvis en liste med barn har kontantstøtte`() {
         stubFor(
-            post(urlEqualTo("/api/harKontantstøtteIInfotrygd"))
+            post(urlEqualTo("/api/harLopendeKontantstotteIInfotrygd"))
                 .withRequestBody(
                     equalToJson(
                         "{\n" +
