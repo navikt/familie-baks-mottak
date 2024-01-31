@@ -96,7 +96,7 @@ class PdfService(
         return mapOf(
             "dokumentDato" to
                 opprettetTid.format(
-                    DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no")),
+                    DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale.of("no")),
                 ),
             "navn" to navn,
             "fodselsnummer" to fnr,
