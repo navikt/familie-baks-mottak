@@ -45,13 +45,10 @@ class LeesahService(
     val fødselIgnorertUnder18årCounter: Counter = Metrics.counter("fodsel.ignorert.under18")
     val fødselIgnorertFødelandCounter: Counter = Metrics.counter("hendelse.ignorert.fodeland.nor")
     val sivilstandOpprettetCounter: Counter = Metrics.counter("sivilstand.opprettet")
-    val sivilstandAnnullertCounter: Counter = Metrics.counter("sivilstand.annullert")
-    val sivilstandKorrigertCounter: Counter = Metrics.counter("sivilstand.korrigert")
     val sivilstandIgnorertCounter: Counter = Metrics.counter("sivilstand.ignorert")
     val utflyttingOpprettetCounter: Counter = Metrics.counter("utflytting.opprettet")
     val utflyttingAnnullertCounter: Counter = Metrics.counter("utflytting.annullert")
     val utflyttingKorrigertCounter: Counter = Metrics.counter("utflytting.korrigert")
-    val utflyttingIgnorertCounter: Counter = Metrics.counter("utflytting.ignorert")
     val leesahDuplikatCounter: Counter = Metrics.counter("hendelse.leesah.duplikat")
 
     fun prosesserNyHendelse(pdlHendelse: PdlHendelse) {
