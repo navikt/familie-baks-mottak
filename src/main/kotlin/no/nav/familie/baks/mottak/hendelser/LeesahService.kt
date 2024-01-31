@@ -123,7 +123,7 @@ class LeesahService(
                                         this["callId"] = pdlHendelse.hendelseId
                                     },
                             ).medTriggerTid(
-                                nesteGyldigeTriggertidFødselshendelser(triggerTidForTps, environment),
+                                nesteGyldigeTriggertidFødselshendelser(triggerTidForTps),
                             )
                         taskService.save(task)
                     }
