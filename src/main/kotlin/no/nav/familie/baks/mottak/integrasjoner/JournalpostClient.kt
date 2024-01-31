@@ -35,9 +35,9 @@ class JournalpostClient
                 val response = getForEntity<Ressurs<Journalpost>>(uri)
                 response.getDataOrThrow()
             } catch (e: RestClientResponseException) {
-                logger.warn("Henting av journalpost feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
+                logger.warn("Henting av journalpost feilet. Responskode: {}, body: {}", e.statusCode, e.responseBodyAsString)
                 throw IllegalStateException(
-                    "Henting av journalpost med id $journalpostId feilet. Status: " + e.rawStatusCode +
+                    "Henting av journalpost med id $journalpostId feilet. Status: " + e.statusCode +
                         ", body: " + e.responseBodyAsString,
                     e,
                 )
