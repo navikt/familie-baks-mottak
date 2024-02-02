@@ -1,6 +1,8 @@
 # familie-baks-mottak
 Mottaksapplikasjon for barnetrygd. Lytter på ulike hendelser (fødsler, dødsfall mm) og mottar søknader. 
 
+
+fdskjfdslkjfl
 ## Lokal kjøring
 Appen bygges med maven og kan kjøres fra DevLauncher-klassen. Sett `-Dspring.profiles.active=dev` under Edit Configurations -> VM Options. Lokalt må man kjøre serveren sammen med [navkafka-docker-compose][1].
 Topicene vi lytter på må da opprettes via deres api med følgende data:
