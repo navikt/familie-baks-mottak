@@ -64,6 +64,6 @@ class DateUtilsTest {
 
         every { LocalDateTime.now() } returns input
 
-        assertThat(nesteGyldigeTriggertidFødselshendelser(1440, mockk(relaxed = true))).isEqualTo(expected)
+        assertThat(nesteGyldigeTriggertidFødselshendelser(1440)).isEqualTo(expected)
     }
 }

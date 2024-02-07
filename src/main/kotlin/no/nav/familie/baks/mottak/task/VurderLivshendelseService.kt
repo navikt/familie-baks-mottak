@@ -419,7 +419,7 @@ class VurderLivshendelseService(
     ) {
         val formatertDato =
             endringsdato.format(
-                DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale("no")),
+                DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale.of("no")),
             ) ?: "ukjent dato"
 
         val initiellBeskrivelse =

@@ -33,7 +33,7 @@ object Feltformaterer {
         }
     }
 
-    private fun displayName(verdi: Month) = verdi.getDisplayName(TextStyle.FULL, Locale("no"))
+    private fun displayName(verdi: Month) = verdi.getDisplayName(TextStyle.FULL, Locale.of("no"))
 
     private fun feltMap(
         label: String,

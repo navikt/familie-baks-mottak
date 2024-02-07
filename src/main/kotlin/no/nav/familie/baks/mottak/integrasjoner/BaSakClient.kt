@@ -38,9 +38,9 @@ class BaSakClient
                 val response = putForEntity<Ressurs<String>>(uri, nyBehandling)
                 logger.info("Søknad sendt til sak. Status=${response.status}")
             } catch (e: RestClientResponseException) {
-                logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
+                logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.statusCode, e.responseBodyAsString)
                 throw IllegalStateException(
-                    "Innsending til sak feilet. Status: " + e.rawStatusCode +
+                    "Innsending til sak feilet. Status: " + e.statusCode +
                         ", body: " + e.responseBodyAsString,
                     e,
                 )
@@ -60,10 +60,10 @@ class BaSakClient
                 val response = postForEntity<Ressurs<String>>(uri, personIdent)
                 secureLogger.info("Identhendelse sendt til sak for $personIdent. Status=${response.status}")
             } catch (e: RestClientResponseException) {
-                logger.info("Innsending av identhendelse til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
-                secureLogger.info("Innsending av identhendelse til sak feilet for $personIdent. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
+                logger.info("Innsending av identhendelse til sak feilet. Responskode: {}, body: {}", e.statusCode, e.responseBodyAsString)
+                secureLogger.info("Innsending av identhendelse til sak feilet for $personIdent. Responskode: {}, body: {}", e.statusCode, e.responseBodyAsString)
                 throw IllegalStateException(
-                    "Innsending av identhendelse til sak feilet. Status: " + e.rawStatusCode +
+                    "Innsending av identhendelse til sak feilet. Status: " + e.statusCode +
                         ", body: " + e.responseBodyAsString,
                     e,
                 )
@@ -147,8 +147,8 @@ class BaSakClient
                 val response = postForEntity<Ressurs<String>>(uri, PersonIdent(ident = personIdent))
                 logger.info("Ident fra vedtak om overgangsstønad sendt til sak. Status=${response.status}")
             } catch (e: RestClientResponseException) {
-                logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
-                throw IllegalStateException("Innsending til sak feilet. Status: ${e.rawStatusCode}, body: ${e.responseBodyAsString}", e)
+                logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.statusCode, e.responseBodyAsString)
+                throw IllegalStateException("Innsending til sak feilet. Status: ${e.statusCode}, body: ${e.responseBodyAsString}", e)
             } catch (e: RestClientException) {
                 throw IllegalStateException("Innsending til sak feilet.", e)
             }

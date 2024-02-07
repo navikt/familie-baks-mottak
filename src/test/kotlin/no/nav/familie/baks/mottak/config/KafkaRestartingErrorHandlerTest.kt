@@ -45,12 +45,4 @@ class KafkaRestartingErrorHandlerTest {
             .hasCauseExactlyInstanceOf(RuntimeException::class.java)
             .hasStackTraceContaining("Feil i test")
     }
-
-    @Test
-    fun `skal stoppe container hvis man mottar feil hvor liste med records er null`() {
-        val consumerRecord = ConsumerRecord("topic", 1, 1, 1, "record")
-        assertThatThrownBy { errorHandler.handleRemaining(RuntimeException("Feil i test"), null, consumer, container) }
-            .hasCauseExactlyInstanceOf(RuntimeException::class.java)
-            .hasStackTraceContaining("Feil i test")
-    }
 }

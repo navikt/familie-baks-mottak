@@ -30,7 +30,7 @@ class HentEnhetClient(
             getForEntity(uri)
         } catch (e: RestClientException) {
             val responseBodyAsString = if (e is RestClientResponseException) e.responseBodyAsString else ""
-            val statusCode = if (e is RestClientResponseException) e.rawStatusCode.toString() else ""
+            val statusCode = if (e is RestClientResponseException) e.statusCode.toString() else ""
             logger.error("Henting av enhet med id $enhetId feilet. $statusCode $responseBodyAsString")
             error("Henting av enhet med id $enhetId feilet. $statusCode $responseBodyAsString")
         }

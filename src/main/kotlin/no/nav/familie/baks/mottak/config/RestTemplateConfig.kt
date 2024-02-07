@@ -20,7 +20,7 @@ import org.springframework.web.client.RestOperations
     RestTemplateSts::class,
 )
 class RestTemplateConfig {
-    @Profile("!dev || !e2e || !postgres")
+    @Profile("!dev || !postgres")
     @Bean("clientCredentials")
     fun restTemplateClientCredentials(
         consumerIdClientInterceptor: ConsumerIdClientInterceptor,

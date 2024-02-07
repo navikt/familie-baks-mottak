@@ -51,11 +51,7 @@ class InfotrygdBarnetrygdClient(
         request: () -> InfotrygdSøkResponse<T>,
         onFailure: (Throwable) -> RuntimeException,
     ): InfotrygdSøkResponse<T> {
-        return if (environment.activeProfiles.contains("e2e")) {
-            InfotrygdSøkResponse(emptyList(), emptyList())
-        } else {
-            runCatching(request).getOrElse { throw onFailure(it) }
-        }
+        return runCatching(request).getOrElse { throw onFailure(it) }
     }
 
     private fun uri(endepunkt: String) = URI.create("$clientUri/$endepunkt")

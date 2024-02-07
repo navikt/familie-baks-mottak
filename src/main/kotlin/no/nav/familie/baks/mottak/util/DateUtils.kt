@@ -1,6 +1,5 @@
 package no.nav.familie.baks.mottak.util
 
-import org.springframework.core.env.Environment
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -40,18 +39,10 @@ fun fristFerdigstillelse(daysToAdd: Long = 0): LocalDate {
     return date.toLocalDate()
 }
 
-/**
- * Skipper helger hvis ikke e2e.
- */
 fun nesteGyldigeTriggertidFødselshendelser(
     minutesToAdd: Long = 0,
-    environment: Environment,
 ): LocalDateTime {
     var date = LocalDateTime.now().plusMinutes(minutesToAdd)
-
-    if (environment.activeProfiles.contains("e2e")) {
-        return date
-    }
 
     when {
         date.dayOfWeek == DayOfWeek.SATURDAY -> date = date.plusDays(2)

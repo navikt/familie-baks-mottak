@@ -36,7 +36,7 @@ import java.time.temporal.ChronoUnit
 @EntityScan("no.nav.familie.prosessering", "no.nav.familie")
 @ConfigurationPropertiesScan("no.nav.familie")
 @EnableScheduling
-@EnableJwtTokenValidation(ignore = ["org.springframework", "no.nav.familie.baks.mottak.e2e"])
+@EnableJwtTokenValidation(ignore = ["org.springframework"])
 @EnableOAuth2Client(cacheEnabled = true)
 @EnableRetry
 class ApplicationConfig {
