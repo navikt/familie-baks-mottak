@@ -23,7 +23,6 @@ import org.springframework.context.annotation.Primary
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.retry.annotation.EnableRetry
 import org.springframework.scheduling.annotation.EnableScheduling
-import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestTemplate
 import java.time.Duration
 import java.time.temporal.ChronoUnit
@@ -76,11 +75,9 @@ class ApplicationConfig {
     @Primary
     fun oAuth2HttpClient(): OAuth2HttpClient {
         return DefaultOAuth2HttpClient(
-            RestClient.create(
-                RestTemplateBuilder()
-                    .setConnectTimeout(Duration.of(2, ChronoUnit.SECONDS))
-                    .setReadTimeout(Duration.of(4, ChronoUnit.SECONDS)).build(),
-            ),
+            RestTemplateBuilder()
+                .setConnectTimeout(Duration.of(2, ChronoUnit.SECONDS))
+                .setReadTimeout(Duration.of(4, ChronoUnit.SECONDS)),
         )
     }
 
@@ -90,7 +87,7 @@ class ApplicationConfig {
     ) = object : ProsesseringInfoProvider {
         override fun hentBrukernavn(): String =
             try {
-                SpringTokenValidationContextHolder().getTokenValidationContext().getClaims("azuread").getStringClaim("preferred_username")
+                SpringTokenValidationContextHolder().tokenValidationContext.getClaims("azuread").getStringClaim("preferred_username")
             } catch (e: Exception) {
                 "VL"
             }
@@ -99,8 +96,8 @@ class ApplicationConfig {
 
         private fun grupper(): List<String> {
             return try {
-                SpringTokenValidationContextHolder().getTokenValidationContext().getClaims("azuread")
-                    .get("groups") as List<String>? ?: emptyList()
+                SpringTokenValidationContextHolder().tokenValidationContext.getClaims("azuread")
+                    ?.get("groups") as List<String>? ?: emptyList()
             } catch (e: Exception) {
                 emptyList()
             }
