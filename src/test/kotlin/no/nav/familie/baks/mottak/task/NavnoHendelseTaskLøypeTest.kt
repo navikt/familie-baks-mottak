@@ -10,6 +10,7 @@ import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus.LØPENDE
+import no.nav.familie.baks.mottak.integrasjoner.IdentInformasjon
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
@@ -93,6 +94,10 @@ class NavnoHendelseTaskLøypeTest {
         every {
             mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
         } returns InfotrygdSøkResponse(emptyList(), emptyList())
+
+        every {
+            mockPdlClient.hentIdenter(any(), any())
+        } returns listOf(IdentInformasjon("12345678910", historisk = false, gruppe = "FOLKEREGISTERIDENT"))
     }
 
     @Test
