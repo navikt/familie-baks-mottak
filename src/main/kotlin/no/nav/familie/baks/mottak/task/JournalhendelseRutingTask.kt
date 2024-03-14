@@ -86,12 +86,15 @@ class JournalhendelseRutingTask(
     }
 
     private fun søkEtterSakIBaSakOgInfotrygd(brukersIdent: String): Pair<Sakspart?, Sakspart?> {
-        val brukersIdenter =
+        val (brukersHistoriskeFnr, brukersFnr) =
             try {
-                pdlClient.hentIdenter(brukersIdent, tema).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }.map { it.ident }
+                pdlClient.hentIdenter(brukersIdent, tema)
+                    .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
+                    .partition { it.historisk }
             } catch (e: IntegrasjonException) {
                 return Pair(null, null)
             }
+        val brukersIdenter = brukersFnr.plus(brukersHistoriskeFnr).map { it.ident }
         val barnasIdenter =
             pdlClient.hentPersonMedRelasjoner(brukersIdent, tema).forelderBarnRelasjoner
                 .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
@@ -103,7 +106,7 @@ class JournalhendelseRutingTask(
                 .map { it.ident }
 
         return Pair(
-            first = baSakClient.hentRestFagsakDeltagerListe(brukersIdent, barnasIdenter).sakspart(baSakClient),
+            first = baSakClient.hentRestFagsakDeltagerListe(brukersFnr.last().ident, barnasIdenter).sakspart(baSakClient),
             second =
                 infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, alleBarnasIdenter).sakspart
                     ?: infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).sakspart,
