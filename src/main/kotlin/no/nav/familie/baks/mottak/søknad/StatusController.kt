@@ -17,99 +17,72 @@ import java.time.LocalDateTime
 class StatusController(val barnetrygdSøknadRepository: SøknadRepository, val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository) {
     val logger: Logger = LoggerFactory.getLogger(javaClass)
 
-    @GetMapping()
+    @GetMapping(value = ["/barnetrygd"])
     @Unprotected
-    fun status(): StatusDto {
+    fun statusBarnetrygd(): StatusDto {
         val sistBarnetrygdSøknad = barnetrygdSøknadRepository.finnSisteLagredeSøknad()
-        val sistKontantstøtteSøknad = kontantstøtteSøknadRepository.finnSisteLagredeSøknad()
         val tidSidenSisteBarnetrygdSøknad = Duration.between(LocalDateTime.now(), sistBarnetrygdSøknad.opprettetTid)
+        loggHvisLiteAktivitet(tidSidenSisteBarnetrygdSøknad, Søknadstype.BARNETRYGD)
+        return lagStatusDto(tidSidenSisteBarnetrygdSøknad, Søknadstype.BARNETRYGD)
+    }
+
+    @GetMapping(value = ["/kontantstotte"])
+    @Unprotected
+    fun statusKontantstøtte(): StatusDto {
+        val sistKontantstøtteSøknad = kontantstøtteSøknadRepository.finnSisteLagredeSøknad()
         val tidSidenSisteKontantstøtteSøknad = Duration.between(LocalDateTime.now(), sistKontantstøtteSøknad.opprettetTid)
-        loggHvisLiteAktivitet(tidSidenSisteBarnetrygdSøknad, tidSidenSisteKontantstøtteSøknad)
-        return lagStatusDto(tidSidenSisteBarnetrygdSøknad, tidSidenSisteKontantstøtteSøknad)
+        loggHvisLiteAktivitet(tidSidenSisteKontantstøtteSøknad, Søknadstype.KONTANTSTØTTE)
+        return lagStatusDto(tidSidenSisteKontantstøtteSøknad, Søknadstype.KONTANTSTØTTE)
     }
 
     private fun loggHvisLiteAktivitet(
-        tidSidenSisteBASøknad: Duration,
-        tidSidenSisteKSSøknad: Duration,
+        tidSidenSisteSøknad: Duration,
+        søknadstype: Søknadstype
     ) {
         if (erDagtid() && !erHelg()) {
             when {
-                tidSidenSisteBASøknad.toHours() > 3 -> logger.error("Status baks-mottak: Det er ${tidSidenSisteBASøknad.toHours()} timer siden vi sist mottok en barnetrygdsøknad")
-                tidSidenSisteBASøknad.toMinutes() > 20 -> logger.warn("Status baks-mottak: Det er ${tidSidenSisteBASøknad.toMinutes()} minutter siden vi sist mottok en barnetrygdsøknad")
-            }
-            when {
-                tidSidenSisteKSSøknad.toHours() > 3 -> logger.error("Status baks-mottak: Det er ${tidSidenSisteKSSøknad.toHours()} timer siden vi sist mottok en kontantstøttesøknad")
-                tidSidenSisteKSSøknad.toMinutes() > 20 -> logger.warn("Status baks-mottak: Det er ${tidSidenSisteKSSøknad.toMinutes()} minutter siden vi sist mottok en kontantstøttesøknad")
+                tidSidenSisteSøknad.toHours() > 3 -> logger.error("Status baks-mottak: Det er ${tidSidenSisteSøknad.toHours()} timer siden vi sist mottok en søknad om ${søknadstype.name.lowercase()}")
+                tidSidenSisteSøknad.toMinutes() > 20 -> logger.warn("Status baks-mottak: Det er ${tidSidenSisteSøknad.toMinutes()} minutter siden vi sist mottok en søknad om ${søknadstype.name.lowercase()}")
             }
         }
     }
 
     private fun lagStatusDto(
-        tidSidenSisteBASøknad: Duration,
-        tidSidenSisteKSSøknad: Duration,
+        tidSidenSisteSøknad: Duration,
+        søknadstype: Søknadstype
     ) =
         when {
-            erTidspunktMedForventetAktivitet() -> lagDagStatus(tidSidenSisteBASøknad, tidSidenSisteKSSøknad)
-            else -> lagNattStatus(tidSidenSisteBASøknad, tidSidenSisteKSSøknad)
+            erTidspunktMedForventetAktivitet() -> lagDagStatus(tidSidenSisteSøknad, søknadstype)
+            else -> lagNattStatus(tidSidenSisteSøknad, søknadstype)
         }
 
     private fun lagDagStatus(
-        tidSidenSisteBASøknad: Duration,
-        tidSidenSisteKSSøknad: Duration,
+        tidSidenSisteSøknad: Duration,
+        søknadstype: Søknadstype
     ) =
         when {
-            tidSidenSisteBASøknad.toHours() > 12 && tidSidenSisteKSSøknad.toHours() > 12 ->
+            tidSidenSisteSøknad.toHours() > 12 ->
                 StatusDto(
                     status = Plattformstatus.DOWN,
-                    description = "Det er over 12 timer siden sist vi mottok en søknad om barnetrygd eller kontantstøtte",
-                )
-            tidSidenSisteBASøknad.toHours() > 12 ->
-                StatusDto(
-                    status = Plattformstatus.DOWN,
-                    description = "Det er over 12 timer siden sist vi mottok en søknad om barnetrygd",
-                )
-            tidSidenSisteKSSøknad.toHours() > 12 ->
-                StatusDto(
-                    status = Plattformstatus.DOWN,
-                    description = "Det er over 12 timer siden sist vi mottok en søknad om kontantstøtte",
+                    description = "Det er over 12 timer siden sist vi mottok en søknad om ${søknadstype.name.lowercase()}",
                 )
             else -> StatusDto(status = Plattformstatus.OK, description = "Alt er OK", logLink = null)
         }
 
     private fun lagNattStatus(
-        tidSidenSisteBASøknad: Duration,
-        tidSidenSisteKSSøknad: Duration,
+        tidSidenSisteSøknad: Duration,
+        søknadstype: Søknadstype
     ) =
         when {
-            tidSidenSisteBASøknad.toHours() > 24 && tidSidenSisteKSSøknad.toHours() > 24 ->
+            tidSidenSisteSøknad.toHours() > 24 ->
                 StatusDto(
                     status = Plattformstatus.DOWN,
-                    description = "Det er over 24 timer siden sist vi mottok en søknad om barnetrygd eller kontantstøtte",
+                    description = "Det er over 24 timer siden sist vi mottok en søknad om ${søknadstype.name.lowercase()}",
                 )
-            tidSidenSisteBASøknad.toHours() > 24 ->
-                StatusDto(
-                    status = Plattformstatus.DOWN,
-                    description = "Det er over 24 timer siden sist vi mottok en søknad om barnetrygd",
-                )
-            tidSidenSisteKSSøknad.toHours() > 24 ->
-                StatusDto(
-                    status = Plattformstatus.DOWN,
-                    description = "Det er over 24 timer siden sist vi mottok en søknad om kontantstøtte",
-                )
-            tidSidenSisteBASøknad.toHours() > 12 && tidSidenSisteKSSøknad.toHours() > 12 ->
+            tidSidenSisteSøknad.toHours() > 12 ->
                 StatusDto(
                     status = Plattformstatus.ISSUE,
-                    description = "Det er over 12 timer siden sist vi mottok en søknad om barnetrygd eller kontantstøtte",
-                )
-            tidSidenSisteBASøknad.toHours() > 12 ->
-                StatusDto(
-                    status = Plattformstatus.ISSUE,
-                    description = "Det er over 12 timer siden sist vi mottok en søknad om barnetrygd",
-                )
-            tidSidenSisteKSSøknad.toHours() > 12 ->
-                StatusDto(
-                    status = Plattformstatus.ISSUE,
-                    description = "Det er over 12 timer siden sist vi mottok en søknad om kontantstøtte",
+                    description = "Det er over 12 timer siden sist vi mottok en søknad om ${søknadstype.name.lowercase()}",
                 )
             else -> StatusDto(status = Plattformstatus.OK, description = "Alt er OK", logLink = null)
         }
@@ -129,4 +102,9 @@ enum class Plattformstatus {
     OK,
     ISSUE,
     DOWN,
+}
+
+enum class Søknadstype {
+    KONTANTSTØTTE,
+    BARNETRYGD,
 }
