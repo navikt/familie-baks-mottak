@@ -50,6 +50,8 @@ spec:
         - application: familie-prosessering
           namespace: teamfamilie
           cluster: prod-gcp
+        - application: statuspoll
+          namespace: navdig
     outbound:
       rules:
         - application: familie-ba-sak
