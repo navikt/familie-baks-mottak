@@ -37,7 +37,7 @@ class StatusController(val barnetrygdSøknadRepository: SøknadRepository, val k
 
     private fun loggHvisLiteAktivitet(
         tidSidenSisteSøknad: Duration,
-        søknadstype: Søknadstype
+        søknadstype: Søknadstype,
     ) {
         if (erDagtid() && !erHelg()) {
             when {
@@ -49,7 +49,7 @@ class StatusController(val barnetrygdSøknadRepository: SøknadRepository, val k
 
     private fun lagStatusDto(
         tidSidenSisteSøknad: Duration,
-        søknadstype: Søknadstype
+        søknadstype: Søknadstype,
     ) =
         when {
             erTidspunktMedForventetAktivitet() -> lagDagStatus(tidSidenSisteSøknad, søknadstype)
@@ -58,7 +58,7 @@ class StatusController(val barnetrygdSøknadRepository: SøknadRepository, val k
 
     private fun lagDagStatus(
         tidSidenSisteSøknad: Duration,
-        søknadstype: Søknadstype
+        søknadstype: Søknadstype,
     ) =
         when {
             tidSidenSisteSøknad.toHours() > 12 ->
@@ -71,7 +71,7 @@ class StatusController(val barnetrygdSøknadRepository: SøknadRepository, val k
 
     private fun lagNattStatus(
         tidSidenSisteSøknad: Duration,
-        søknadstype: Søknadstype
+        søknadstype: Søknadstype,
     ) =
         when {
             tidSidenSisteSøknad.toHours() > 24 ->
