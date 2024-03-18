@@ -13,7 +13,7 @@ interface KontantstøtteSøknadRepository : JpaRepository<DBKontantstøtteSøkna
     fun hentSøknad(soknadId: Long): DBKontantstøtteSøknad?
 
     @Query(
-        "SELECT s FROM Soknad s ORDER BY s.opprettetTid DESC LIMIT 1",
+        "SELECT s FROM kontantstotte_soknad s ORDER BY s.opprettetTid DESC LIMIT 1",
     )
     fun finnSisteLagredeSøknad(): DBSøknad
 }
