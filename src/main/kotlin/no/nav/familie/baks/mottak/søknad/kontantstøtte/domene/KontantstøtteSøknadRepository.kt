@@ -1,6 +1,5 @@
 package no.nav.familie.baks.mottak.søknad.kontantstøtte.domene
 
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
@@ -15,7 +14,7 @@ interface KontantstøtteSøknadRepository : JpaRepository<DBKontantstøtteSøkna
     @Query(
         "SELECT s FROM kontantstotte_soknad s ORDER BY s.opprettetTid DESC LIMIT 1",
     )
-    fun finnSisteLagredeSøknad(): DBSøknad
+    fun finnSisteLagredeSøknad(): DBKontantstøtteSøknad
 }
 
 @Repository
