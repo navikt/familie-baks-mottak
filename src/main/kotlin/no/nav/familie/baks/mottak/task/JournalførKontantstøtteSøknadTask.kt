@@ -34,7 +34,7 @@ class JournalførKontantstøtteSøknadTask(
                     ?: error("Kunne ikke finne søknad ($id) i database")
             val versjonertSøknad = dbKontantstøtteSøknad.hentVersjonertKontantstøtteSøknad()
 
-            logger.info("Generer pdf og journalfør søknad")
+            logger.info("Generer pdf og journalfør søknad om kontantstøtte")
             val bokmålPdf =
                 pdfService.lagKontantstøttePdf(
                     versjonertSøknad = versjonertSøknad,

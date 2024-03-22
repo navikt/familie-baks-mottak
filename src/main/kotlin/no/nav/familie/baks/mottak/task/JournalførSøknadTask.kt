@@ -31,7 +31,12 @@ class JournalførSøknadTask(
                 søknadRepository.hentDBSøknad(id.toLong()) ?: error("Kunne ikke finne søknad ($id) i database")
             val versjonertSøknad: VersjonertSøknad = dbSøknad.hentVersjonertSøknad()
 
-            log.info("Generer pdf og journalfør søknad")
+            val søknadstype =
+                when (versjonertSøknad) {
+                    is SøknadV7 -> versjonertSøknad.søknad.søknadstype
+                    is SøknadV8 -> versjonertSøknad.søknad.søknadstype
+                }
+            log.info("Generer pdf og journalfør søknad om ${søknadstype.name.lowercase()} barnetrygd")
             val bokmålPdf =
                 pdfService.lagBarnetrygdPdf(
                     versjonertSøknad = versjonertSøknad,
