@@ -1,12 +1,17 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
 import no.nav.familie.http.client.AbstractRestClient
+import no.nav.familie.kontrakter.felles.PersonIdent
 import no.nav.familie.kontrakter.felles.Ressurs
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.retry.annotation.Backoff
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
+import org.springframework.web.client.RestClientException
+import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.RestOperations
 import java.net.URI
 
@@ -50,4 +55,28 @@ class KsSakClient
                 onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ks-sak.", it, uri) },
             )
         }
+
+    @Retryable(
+        value = [RuntimeException::class],
+        maxAttempts = 3,
+        backoff = Backoff(delayExpression = "60000"),
+    )
+    fun sendIdenthendelseTilKsSak(personIdent: PersonIdent) {
+        val uri = URI.create("$ksSakServiceUri/ident")
+        try {
+            val response = postForEntity<Ressurs<String>>(uri, personIdent)
+            secureLogger.info("Identhendelse sendt til ks-sak for $personIdent. Status=${response.status}")
+        } catch (e: RestClientResponseException) {
+            logger.info("Innsending av identhendelse til ks-sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
+            secureLogger.info("Innsending av identhendelse til ks-sak feilet for $personIdent. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
+            throw IllegalStateException(
+                "Innsending av identhendelse til ks-sak feilet. Status: " + e.rawStatusCode +
+                        ", body: " + e.responseBodyAsString,
+                e,
+            )
+        } catch (e: RestClientException) {
+            secureLogger.warn("Innsending av identhendelse til ks-sak feilet for $personIdent", e)
+            throw IllegalStateException("Innsending av identhendelse til ks-sak feilet.", e)
+        }
+    }
     }

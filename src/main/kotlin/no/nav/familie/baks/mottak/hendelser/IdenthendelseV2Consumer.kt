@@ -3,6 +3,7 @@ package no.nav.familie.baks.mottak.hendelser
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
+import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.kontrakter.felles.PersonIdent
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.person.pdl.aktor.v2.Aktor
@@ -26,6 +27,7 @@ import java.util.UUID
 )
 class IdenthendelseV2Consumer(
     private val baSakClient: BaSakClient,
+    private val ksSakClient: KsSakClient,
 ) {
     val identhendelseFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.ident.feilet")
 
@@ -64,11 +66,13 @@ class IdenthendelseV2Consumer(
                     ident.type == Type.FOLKEREGISTERIDENT && ident.gjeldende
                 }?.also { folkeregisterident ->
                     SECURE_LOGGER.info("Sender ident-hendelse til ba-sak for ident $folkeregisterident")
-
                     baSakClient.sendIdenthendelseTilBaSak(PersonIdent(ident = folkeregisterident.idnummer.toString()))
+
+                    SECURE_LOGGER.info("Sender ident-hendelse til ks-sak for ident $folkeregisterident")
+                    ksSakClient.sendIdenthendelseTilKsSak(PersonIdent(ident = folkeregisterident.idnummer.toString()))
                 }
             } else {
-                SECURE_LOGGER.info("Ignorerer å sende ident-hendelse til ba-sak for aktør $aktørIdPåHendelse ikke lenger gyldig aktør")
+                SECURE_LOGGER.info("Ignorerer å sende ident-hendelse til ba-sak og ks-sak for aktør $aktørIdPåHendelse ikke lenger gyldig aktør")
             }
         } catch (e: RuntimeException) {
             identhendelseFeiletCounter.increment()

@@ -23,7 +23,7 @@ private val logger = LoggerFactory.getLogger(BaSakClient::class.java)
 class BaSakClient
     @Autowired
     constructor(
-        @param:Value("\${FAMILIE_BA_SAK_API_URL}") private val sakServiceUri: String,
+        @param:Value("\${FAMILIE_BA_SAK_API_URL}") private val baSakServiceUri: String,
         @Qualifier("clientCredentials") restOperations: RestOperations,
     ) : AbstractRestClient(restOperations, "integrasjon") {
         @Retryable(
@@ -32,7 +32,7 @@ class BaSakClient
             backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
         )
         fun sendTilSak(nyBehandling: NyBehandling) {
-            val uri = URI.create("$sakServiceUri/behandlinger")
+            val uri = URI.create("$baSakServiceUri/behandlinger")
             logger.info("Sender søknad til {}", uri)
             try {
                 val response = putForEntity<Ressurs<String>>(uri, nyBehandling)
@@ -55,26 +55,33 @@ class BaSakClient
             backoff = Backoff(delayExpression = "60000"),
         )
         fun sendIdenthendelseTilBaSak(personIdent: PersonIdent) {
-            val uri = URI.create("$sakServiceUri/ident")
+            val uri = URI.create("$baSakServiceUri/ident")
             try {
                 val response = postForEntity<Ressurs<String>>(uri, personIdent)
-                secureLogger.info("Identhendelse sendt til sak for $personIdent. Status=${response.status}")
+                secureLogger.info("Identhendelse sendt til ba-sak for $personIdent. Status=${response.status}")
             } catch (e: RestClientResponseException) {
+<<<<<<< Updated upstream
                 logger.info("Innsending av identhendelse til sak feilet. Responskode: {}, body: {}", e.statusCode, e.responseBodyAsString)
                 secureLogger.info("Innsending av identhendelse til sak feilet for $personIdent. Responskode: {}, body: {}", e.statusCode, e.responseBodyAsString)
                 throw IllegalStateException(
                     "Innsending av identhendelse til sak feilet. Status: " + e.statusCode +
+=======
+                logger.info("Innsending av identhendelse til ba-sak feilet. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
+                secureLogger.info("Innsending av identhendelse til ba-sak feilet for $personIdent. Responskode: {}, body: {}", e.rawStatusCode, e.responseBodyAsString)
+                throw IllegalStateException(
+                    "Innsending av identhendelse til ba-sak feilet. Status: " + e.rawStatusCode +
+>>>>>>> Stashed changes
                         ", body: " + e.responseBodyAsString,
                     e,
                 )
             } catch (e: RestClientException) {
-                secureLogger.warn("Innsending av identhendelse til sak feilet for $personIdent", e)
-                throw IllegalStateException("Innsending av identhendelse til sak feilet.", e)
+                secureLogger.warn("Innsending av identhendelse til ba-sak feilet for $personIdent", e)
+                throw IllegalStateException("Innsending av identhendelse til ba-sak feilet.", e)
             }
         }
 
         fun hentSaksnummer(personIdent: String): String {
-            val uri = URI.create("$sakServiceUri/fagsaker")
+            val uri = URI.create("$baSakServiceUri/fagsaker")
             return runCatching {
                 postForEntity<Ressurs<RestFagsak>>(uri, mapOf("personIdent" to personIdent))
             }.fold(
@@ -87,7 +94,7 @@ class BaSakClient
             personIdent: String,
             barnasIdenter: List<String> = emptyList(),
         ): List<RestFagsakDeltager> {
-            val uri = URI.create("$sakServiceUri/fagsaker/sok/fagsakdeltagere")
+            val uri = URI.create("$baSakServiceUri/fagsaker/sok/fagsakdeltagere")
             return runCatching {
                 postForEntity<Ressurs<List<RestFagsakDeltager>>>(uri, RestSøkParam(personIdent, barnasIdenter))
             }.fold(
@@ -99,7 +106,7 @@ class BaSakClient
         fun hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(
             personIdent: String,
         ): List<RestFagsakIdOgTilknyttetAktørId> {
-            val uri = URI.create("$sakServiceUri/fagsaker/sok/fagsaker-hvor-person-er-deltaker")
+            val uri = URI.create("$baSakServiceUri/fagsaker/sok/fagsaker-hvor-person-er-deltaker")
             return runCatching {
                 postForEntity<Ressurs<List<RestFagsakIdOgTilknyttetAktørId>>>(uri, RestPersonIdent(personIdent))
             }.fold(
@@ -111,7 +118,7 @@ class BaSakClient
         fun hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(
             personIdent: String,
         ): List<RestFagsakIdOgTilknyttetAktørId> {
-            val uri = URI.create("$sakServiceUri/fagsaker/sok/fagsaker-hvor-person-mottar-lopende-ytelse")
+            val uri = URI.create("$baSakServiceUri/fagsaker/sok/fagsaker-hvor-person-mottar-lopende-ytelse")
             return runCatching {
                 postForEntity<Ressurs<List<RestFagsakIdOgTilknyttetAktørId>>>(uri, RestPersonIdent(personIdent))
             }.fold(
@@ -121,7 +128,7 @@ class BaSakClient
         }
 
         fun hentMinimalRestFagsak(fagsakId: Long): RestMinimalFagsak {
-            val uri = URI.create("$sakServiceUri/fagsaker/minimal/$fagsakId")
+            val uri = URI.create("$baSakServiceUri/fagsaker/minimal/$fagsakId")
             return runCatching {
                 getForEntity<Ressurs<RestMinimalFagsak>>(uri)
             }.fold(
@@ -131,7 +138,7 @@ class BaSakClient
         }
 
         fun hentRestFagsak(fagsakId: Long): RestFagsak {
-            val uri = URI.create("$sakServiceUri/fagsaker/$fagsakId")
+            val uri = URI.create("$baSakServiceUri/fagsaker/$fagsakId")
             return runCatching {
                 getForEntity<Ressurs<RestFagsak>>(uri)
             }.fold(
@@ -141,7 +148,7 @@ class BaSakClient
         }
 
         fun sendVedtakOmOvergangsstønadHendelseTilBaSak(personIdent: String) {
-            val uri = URI.create("$sakServiceUri/overgangsstonad")
+            val uri = URI.create("$baSakServiceUri/overgangsstonad")
             logger.info("sender ident fra vedtak om overgangsstønad til {}", uri)
             try {
                 val response = postForEntity<Ressurs<String>>(uri, PersonIdent(ident = personIdent))
