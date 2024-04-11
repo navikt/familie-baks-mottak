@@ -10,6 +10,11 @@ import org.springframework.transaction.annotation.Transactional
 interface SøknadRepository : JpaRepository<DBSøknad, String> {
     @Query(value = "SELECT s FROM Soknad s WHERE s.id = :soknadId")
     fun hentDBSøknad(soknadId: Long): DBSøknad?
+
+    @Query(
+        "SELECT s FROM Soknad s ORDER BY s.opprettetTid DESC LIMIT 1",
+    )
+    fun finnSisteLagredeSøknad(): DBSøknad
 }
 
 @Repository

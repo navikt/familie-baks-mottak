@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.2</version>
+        <version>3.2.4</version>
     </parent>
 
     <properties>
@@ -20,16 +20,16 @@
         <changelist>-SNAPSHOT</changelist>
         <java.version>21</java.version>
         <jvmTarget>21</jvmTarget>
-        <kotlin.version>1.9.22</kotlin.version>
-        <mockk.version>1.13.9</mockk.version>
+        <kotlin.version>1.9.23</kotlin.version>
+        <mockk.version>1.13.10</mockk.version>
         <confluent.version>7.6.0</confluent.version>
         <prosessering.version>2.20240214140223_83c31de</prosessering.version>
 
-        <felles.version>2.20240123084817_35f03aa</felles.version>
-        <kontrakter.version>3.0_20240215101759_cea211f</kontrakter.version>
+        <felles.version>3.20240322152837_a01cd9d</felles.version>
+        <kontrakter.version>3.0_20240326084609_597be6d</kontrakter.version>
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
-        <spring.cloud.version>4.1.1</spring.cloud.version>
-        <token-validation-spring.version>3.2.0</token-validation-spring.version>
+        <spring.cloud.version>4.1.2</spring.cloud.version>
+        <token-validation-spring.version>4.1.4</token-validation-spring.version>
         <avro.version>1.11.3</avro.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
@@ -142,6 +142,11 @@
             <version>${token-validation-spring.version}</version>
         </dependency>
         <dependency>
+            <groupId>no.nav.security</groupId>
+            <artifactId>token-validation-core</artifactId>
+            <version>${token-validation-spring.version}</version>
+        </dependency>
+        <dependency>
             <groupId>no.nav.familie.kontrakter</groupId>
             <artifactId>barnetrygd</artifactId>
             <version>${kontrakter.version}</version>
@@ -186,7 +191,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.1</version>
+            <version>42.7.3</version>
         </dependency>
         <dependency>
             <groupId>com.papertrailapp</groupId>
@@ -241,7 +246,7 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
-            <version>1.19.5</version>
+            <version>1.19.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -253,7 +258,7 @@
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility-kotlin</artifactId>
-            <version>4.2.0</version>
+            <version>4.2.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -285,7 +290,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>3.10.0.2594</version>
+                    <version>3.11.0.3922</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -425,7 +430,7 @@
                     <dependency>
                         <groupId>com.pinterest.ktlint</groupId>
                         <artifactId>ktlint-cli</artifactId>
-                        <version>1.1.1</version>
+                        <version>1.2.1</version>
                     </dependency>
                     <!-- additional 3rd party ruleset(s) can be specified here -->
                 </dependencies>
