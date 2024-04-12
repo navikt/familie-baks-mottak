@@ -33,7 +33,7 @@ spec:
       memory: 4Gi
     requests:
       memory: 2Gi
-      cpu: 200m
+      cpu: 50m
   ingresses:
     - https://familie-baks-mottak.intern.nav.no
   secureLogs:
