@@ -19,9 +19,6 @@ interface KontantstøtteSøknadRepository : JpaRepository<DBKontantstøtteSøkna
 
 @Repository
 interface KontantstøtteVedleggRepository : JpaRepository<DBKontantstotteVedlegg, String> {
-    @Query(value = "SELECT v FROM kontantstotte_soknad_vedlegg v WHERE v.dokumentId = :dokumentId")
-    fun hentVedlegg(dokumentId: String): DBKontantstotteVedlegg?
-
     @Query(value = "SELECT v FROM kontantstotte_soknad_vedlegg v WHERE v.søknadId = :soknadId")
     fun hentAlleVedlegg(soknadId: Long): List<DBKontantstotteVedlegg>
 

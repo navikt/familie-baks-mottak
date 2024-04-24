@@ -23,6 +23,7 @@ class FamilieDokumentClient(
         backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
     )
     fun hentVedlegg(dokumentId: String): ByteArray {
+        logger.info("Henter vedlegg med dokumentid $dokumentId")
         val uri = URI.create("$dokumentUri/api/mapper/ANYTHING/$dokumentId")
         val response = getForEntity<Ressurs<ByteArray>>(uri)
         return response.data!!

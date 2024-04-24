@@ -16,7 +16,6 @@ import org.springframework.web.client.RestOperations
 import java.net.URI
 
 private val logger = LoggerFactory.getLogger(JournalpostClient::class.java)
-private const val OAUTH2_CLIENT_CONFIG_KEY = "integrasjoner-clientcredentials"
 
 @Component
 class JournalpostClient

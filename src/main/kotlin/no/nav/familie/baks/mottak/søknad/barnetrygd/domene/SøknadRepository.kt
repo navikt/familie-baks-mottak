@@ -19,9 +19,6 @@ interface SøknadRepository : JpaRepository<DBSøknad, String> {
 
 @Repository
 interface SøknadVedleggRepository : JpaRepository<DBVedlegg, String> {
-    @Query(value = "SELECT v FROM SoknadVedlegg v WHERE v.dokumentId = :dokumentId")
-    fun hentVedlegg(dokumentId: String): DBVedlegg?
-
     @Query(value = "SELECT v FROM SoknadVedlegg v WHERE v.søknadId = :soknadId")
     fun hentAlleVedlegg(soknadId: Long): List<DBVedlegg>
 
