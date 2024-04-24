@@ -49,30 +49,6 @@ class BaSakClient
             }
         }
 
-        @Retryable(
-            value = [RuntimeException::class],
-            maxAttempts = 3,
-            backoff = Backoff(delayExpression = "60000"),
-        )
-        fun sendIdenthendelseTilBaSak(personIdent: PersonIdent) {
-            val uri = URI.create("$sakServiceUri/ident")
-            try {
-                val response = postForEntity<Ressurs<String>>(uri, personIdent)
-                secureLogger.info("Identhendelse sendt til sak for $personIdent. Status=${response.status}")
-            } catch (e: RestClientResponseException) {
-                logger.info("Innsending av identhendelse til sak feilet. Responskode: {}, body: {}", e.statusCode, e.responseBodyAsString)
-                secureLogger.info("Innsending av identhendelse til sak feilet for $personIdent. Responskode: {}, body: {}", e.statusCode, e.responseBodyAsString)
-                throw IllegalStateException(
-                    "Innsending av identhendelse til sak feilet. Status: " + e.statusCode +
-                        ", body: " + e.responseBodyAsString,
-                    e,
-                )
-            } catch (e: RestClientException) {
-                secureLogger.warn("Innsending av identhendelse til sak feilet for $personIdent", e)
-                throw IllegalStateException("Innsending av identhendelse til sak feilet.", e)
-            }
-        }
-
         fun hentSaksnummer(personIdent: String): String {
             val uri = URI.create("$sakServiceUri/fagsaker")
             return runCatching {
