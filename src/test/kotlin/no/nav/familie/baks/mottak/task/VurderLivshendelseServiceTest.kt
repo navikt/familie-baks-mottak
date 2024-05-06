@@ -537,7 +537,7 @@ class VurderLivshendelseServiceTest {
                 oppgaveId = 1,
             )
 
-        setupPdlMockForDødsfallshendelse(true, false, false)
+        setupPdlMockForDødsfallshendelse(morDød = true, barn1Død = false, barn2Død = false)
 
         val livshendelseTask =
             Task(
@@ -564,7 +564,7 @@ class VurderLivshendelseServiceTest {
                 RestFagsakDeltager(PERSONIDENT_BARN, FagsakDeltagerRolle.BARN, SAKS_ID, FagsakStatus.LØPENDE),
             )
 
-        setupPdlMockForDødsfallshendelse(true, true, false)
+        setupPdlMockForDødsfallshendelse(morDød = true, barn1Død = true, barn2Død = false)
 
         val livshendelseTask2 =
             Task(

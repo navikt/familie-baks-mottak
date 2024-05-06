@@ -5,7 +5,6 @@ import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkRequest
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestOperations
 import java.net.URI
@@ -17,7 +16,6 @@ class InfotrygdBarnetrygdClient(
     @Value("\${FAMILIE_BA_INFOTRYGD_API_URL}/infotrygd/barnetrygd")
     private val clientUri: URI,
     @Qualifier("clientCredentials") restOperations: RestOperations,
-    private val environment: Environment,
 ) :
     AbstractRestClient(restOperations, "familie-ba-infotrygd") {
     fun hentLøpendeUtbetalinger(

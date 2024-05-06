@@ -97,9 +97,7 @@ class JournalhendelseRutingTask(
         val brukersIdenter = brukersFnr.plus(brukersHistoriskeFnr).map { it.ident }
         val barnasIdenter =
             pdlClient.hentPersonMedRelasjoner(brukersIdent, tema).forelderBarnRelasjoner
-                .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
-                .map { it.relatertPersonsIdent }
-                .filterNotNull()
+                .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }.mapNotNull { it.relatertPersonsIdent }
         val alleBarnasIdenter =
             barnasIdenter.flatMap { pdlClient.hentIdenter(it, tema) }
                 .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }

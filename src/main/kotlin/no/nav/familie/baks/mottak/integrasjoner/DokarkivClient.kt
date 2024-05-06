@@ -55,7 +55,7 @@ class DokarkivClient(
         val uri = URI.create("$integrasjonUri/arkiv/v2/$journalpostId/ferdigstill?journalfoerendeEnhet=9999")
 
         when (val response = utførRequest(uri)) {
-            is Throwable -> throw IntegrasjonException("Ferdigstilling av journalpost $journalpostId feilet", response, uri, null)
+            is Throwable -> throw IntegrasjonException("Ferdigstilling av journalpost $journalpostId feilet", response, uri)
         }
     }
 
