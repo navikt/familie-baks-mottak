@@ -35,7 +35,7 @@ class OppdaterOgFerdigstillJournalpostTask(
                 .takeUnless { it.bruker == null } ?: error("Journalpost ${task.payload} mangler bruker")
 
         val fagsakId = task.metadata["fagsakId"] as String
-        val tema = task.metadata["tema"] as Tema
+        val tema = Tema.valueOf(task.metadata["tema"] as String)
         val brukersIdent = task.metadata["personIdent"] as String
 
         when (journalpost.journalstatus) {
