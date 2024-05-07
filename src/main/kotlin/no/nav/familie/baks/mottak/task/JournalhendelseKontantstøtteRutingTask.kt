@@ -83,6 +83,11 @@ class JournalhendelseKontantstøtteRutingTask(
                     },
             ).apply { taskService.save(this) }
         } else {
+            log.info("Journalpost: $journalpost")
+            log.info("Er kontantstøtte søknad: $erKontantstøtteSøknad")
+            log.info("Har løpende sak i infotrygd: $harLøpendeSakIInfotrygd")
+            log.info("Har løpende sak i kontantstøtte: $harLøpendeSakIKsSak")
+
             val sakssystemMarkering =
                 when {
                     harLøpendeSakIInfotrygd -> {
