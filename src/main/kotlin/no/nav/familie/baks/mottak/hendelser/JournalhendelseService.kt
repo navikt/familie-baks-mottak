@@ -11,7 +11,7 @@ import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.Journalposttype
 import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
 import no.nav.familie.baks.mottak.task.JournalhendelseKontantstøtteRutingTask
-import no.nav.familie.baks.mottak.task.JournalhendelseRutingTask
+import no.nav.familie.baks.mottak.task.JournalhendelseBarnetrygdRutingTask
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.log.IdUtils
 import no.nav.familie.log.mdc.MDCConstants
@@ -182,8 +182,9 @@ class JournalhendelseService(
     private fun opprettJournalhendelseRutingTask(journalpost: Journalpost) {
         val taskType =
             when (journalpost.tema) {
-                Tema.BAR.name -> JournalhendelseRutingTask.TASK_STEP_TYPE
-                else -> JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE
+                Tema.BAR.name -> JournalhendelseBarnetrygdRutingTask.TASK_STEP_TYPE
+                Tema.KON.name -> JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE
+                else -> throw IllegalStateException("Ukjent tema ${journalpost.tema}")
             }
         Task(
             type = taskType,

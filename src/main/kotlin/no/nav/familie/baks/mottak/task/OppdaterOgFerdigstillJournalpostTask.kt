@@ -1,12 +1,8 @@
 package no.nav.familie.baks.mottak.task
 
-import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
-import no.nav.familie.baks.mottak.integrasjoner.Bruker
-import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.DokarkivClient
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -24,9 +20,7 @@ import org.springframework.stereotype.Service
 class OppdaterOgFerdigstillJournalpostTask(
     private val journalpostClient: JournalpostClient,
     private val dokarkivClient: DokarkivClient,
-    private val baSakClient: BaSakClient,
     private val taskService: TaskService,
-    private val pdlClient: PdlClient,
 ) : AsyncTaskStep {
     val log: Logger = LoggerFactory.getLogger(OppdaterOgFerdigstillJournalpostTask::class.java)
 
@@ -35,11 +29,13 @@ class OppdaterOgFerdigstillJournalpostTask(
             journalpostClient.hentJournalpost(task.payload)
                 .takeUnless { it.bruker == null } ?: error("Journalpost ${task.payload} mangler bruker")
 
+        val fagsakId = task.metadata["fagsakId"] as String
+        val tema = task.metadata["tema"] as Tema
+
         when (journalpost.journalstatus) {
             Journalstatus.MOTTATT -> {
-                val fagsakId = baSakClient.hentSaksnummer(tilPersonIdent(journalpost.bruker!!, journalpost.tema))
                 runCatching { // forsøk å journalføre automatisk
-                    dokarkivClient.oppdaterJournalpostSak(journalpost, fagsakId)
+                    dokarkivClient.oppdaterJournalpostSak(journalpost, fagsakId, tema)
                     dokarkivClient.ferdigstillJournalpost(journalpost.journalpostId)
                 }.fold(
                     onSuccess = {
@@ -68,26 +64,18 @@ class OppdaterOgFerdigstillJournalpostTask(
             else -> error("Uventet journalstatus ${journalpost.journalstatus} for journalpost ${journalpost.journalpostId}")
         }
 
+
+
         val nyTask =
             Task(
                 type = OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE,
                 payload = task.payload,
                 properties =
                     task.metadata.apply {
-                        this["fagsystem"] = "BA"
+                        this["fagsystem"] = tema
                     },
             )
         taskService.save(nyTask)
-    }
-
-    private fun tilPersonIdent(
-        bruker: Bruker,
-        tema: String?,
-    ): String {
-        return when (bruker.type) {
-            BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema?.let { Tema.valueOf(tema) } ?: Tema.BAR)
-            else -> bruker.id
-        }
     }
 
     companion object {

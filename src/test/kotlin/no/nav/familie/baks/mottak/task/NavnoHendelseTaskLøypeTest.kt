@@ -42,7 +42,7 @@ class NavnoHendelseTaskLøypeTest {
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
 
     private val rutingSteg =
-        JournalhendelseRutingTask(
+        JournalhendelseBarnetrygdRutingTask(
             mockPdlClient,
             mockSakClient,
             mockInfotrygdBarnetrygdClient,
@@ -208,7 +208,7 @@ class NavnoHendelseTaskLøypeTest {
     private fun kjørRutingTaskOgReturnerNesteTask(): Task {
         rutingSteg.doTask(
             Task(
-                type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+                type = JournalhendelseBarnetrygdRutingTask.TASK_STEP_TYPE,
                 payload = MOTTAK_KANAL,
             ).apply {
                 this.metadata["personIdent"] = "12345678901"

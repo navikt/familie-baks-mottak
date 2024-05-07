@@ -42,7 +42,7 @@ class SkanHendelseTaskLøypeTest {
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
 
     private val rutingSteg =
-        JournalhendelseRutingTask(
+        JournalhendelseBarnetrygdRutingTask(
             mockPdlClient,
             mockSakClient,
             mockInfotrygdBarnetrygdClient,
@@ -203,7 +203,7 @@ class SkanHendelseTaskLøypeTest {
     private fun kjørRutingTaskOgReturnerNesteTask(brukerId: String? = "12345678901"): Task {
         rutingSteg.doTask(
             Task(
-                type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+                type = JournalhendelseBarnetrygdRutingTask.TASK_STEP_TYPE,
                 payload = MOTTAK_KANAL,
             ).apply {
                 if (brukerId != null) {

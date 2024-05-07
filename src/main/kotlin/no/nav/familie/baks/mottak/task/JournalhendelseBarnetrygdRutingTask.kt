@@ -32,10 +32,10 @@ import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 
 @Service
 @TaskStepBeskrivelse(
-    taskStepType = JournalhendelseRutingTask.TASK_STEP_TYPE,
+    taskStepType = JournalhendelseBarnetrygdRutingTask.TASK_STEP_TYPE,
     beskrivelse = "Håndterer ruting og markering av sakssystem",
 )
-class JournalhendelseRutingTask(
+class JournalhendelseBarnetrygdRutingTask(
     private val pdlClient: PdlClient,
     private val baSakClient: BaSakClient,
     private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,
@@ -43,7 +43,7 @@ class JournalhendelseRutingTask(
 ) : AsyncTaskStep {
     private val tema = Tema.BAR
 
-    val log: Logger = LoggerFactory.getLogger(JournalhendelseRutingTask::class.java)
+    val log: Logger = LoggerFactory.getLogger(JournalhendelseBarnetrygdRutingTask::class.java)
     val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
 
     override fun doTask(task: Task) {
@@ -104,7 +104,7 @@ class JournalhendelseRutingTask(
                 .map { it.ident }
 
         return Pair(
-            first = baSakClient.hentRestFagsakDeltagerListe(brukersFnr.last().ident, barnasIdenter).sakspart(baSakClient),
+            first = baSakClient.hentRestFagsakDeltagerListe(brukersFnr.last().ident, barnasIdenter).harForelderEllerBarnPågåendeSak(baSakClient),
             second =
                 infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, alleBarnasIdenter).sakspart
                     ?: infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).sakspart,
@@ -114,7 +114,7 @@ class JournalhendelseRutingTask(
     fun Sakspart?.finnes(): Boolean = this != null
 
     companion object {
-        const val TASK_STEP_TYPE = "journalhendelseRuting"
+        const val TASK_STEP_TYPE = "journalhendelseBarnetrygdRuting"
     }
 }
 
@@ -157,7 +157,7 @@ enum class Sakspart(val part: String) {
     ANNEN("Søsken"),
 }
 
-private fun List<RestFagsakDeltager>.sakspart(baSakClient: BaSakClient): Sakspart? =
+private fun List<RestFagsakDeltager>.harForelderEllerBarnPågåendeSak(baSakClient: BaSakClient): Sakspart? =
     when {
         any { it.rolle == FORELDER && it.harPågåendeSak(baSakClient) } -> Sakspart.SØKER
         any { it.rolle == BARN && it.harPågåendeSak(baSakClient) } -> Sakspart.ANNEN
