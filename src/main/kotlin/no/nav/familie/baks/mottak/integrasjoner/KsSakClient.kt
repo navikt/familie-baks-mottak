@@ -76,7 +76,7 @@ class KsSakClient
             personIdent: String,
             barnasIdenter: List<String> = emptyList(),
         ): List<RestFagsakDeltager> {
-            val uri = URI.create("$ksSakServiceUri/fagsaker/sok")
+            val uri = URI.create("$ksSakServiceUri/fagsaker/sok/fagsakdeltagere")
             return runCatching {
                 postForEntity<Ressurs<List<RestFagsakDeltager>>>(uri, RestSøkParam(personIdent, barnasIdenter))
             }.fold(
