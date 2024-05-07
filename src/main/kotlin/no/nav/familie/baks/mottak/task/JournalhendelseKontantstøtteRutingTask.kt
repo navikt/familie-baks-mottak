@@ -79,6 +79,7 @@ class JournalhendelseKontantstøtteRutingTask(
                     Properties().apply {
                         this["fagsakId"] = fagsakId
                         this["tema"] = Tema.KON
+                        this["personIdent"] = brukersIdent
                     },
             ).apply { taskService.save(this) }
         } else {

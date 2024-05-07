@@ -1,12 +1,10 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
-import no.nav.familie.kontrakter.felles.tilbakekreving.Behandlingsårsakstype
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class RestKsSakBehandlingRequest(
     val kategori: String,
     val søkersIdent: String,
-    val behandlingÅrsak: Behandlingsårsakstype,
-    val saksbehandlerIdent: String,
-    val søknadMottattDato: LocalDate,
+    val behandlingÅrsak: String,
+    val søknadMottattDato: LocalDateTime,
 )

@@ -15,7 +15,7 @@ class KontantstøtteOppgaveMapper(
         return null
     }
 
-    override fun hentBehandlingstype(journalpost: Journalpost): String? {
+    override fun hentBehandlingstype(journalpost: Journalpost): String {
         return when {
             erEØS(journalpost) -> Behandlingstype.EØS.value
             else -> Behandlingstype.NASJONAL.value

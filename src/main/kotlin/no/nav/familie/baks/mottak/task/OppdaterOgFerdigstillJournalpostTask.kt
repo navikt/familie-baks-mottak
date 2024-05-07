@@ -3,6 +3,8 @@ package no.nav.familie.baks.mottak.task
 import no.nav.familie.baks.mottak.integrasjoner.DokarkivClient
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
+import no.nav.familie.baks.mottak.integrasjoner.KontantstøtteOppgaveMapper
+import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -11,6 +13,7 @@ import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 @TaskStepBeskrivelse(
@@ -21,6 +24,8 @@ class OppdaterOgFerdigstillJournalpostTask(
     private val journalpostClient: JournalpostClient,
     private val dokarkivClient: DokarkivClient,
     private val taskService: TaskService,
+    private val ksSakClient: KsSakClient,
+    private val kontantstøtteOppgaveMapper: KontantstøtteOppgaveMapper,
 ) : AsyncTaskStep {
     val log: Logger = LoggerFactory.getLogger(OppdaterOgFerdigstillJournalpostTask::class.java)
 
@@ -31,12 +36,31 @@ class OppdaterOgFerdigstillJournalpostTask(
 
         val fagsakId = task.metadata["fagsakId"] as String
         val tema = task.metadata["tema"] as Tema
+        val brukersIdent = task.metadata["personIdent"] as String
+
 
         when (journalpost.journalstatus) {
             Journalstatus.MOTTATT -> {
                 runCatching { // forsøk å journalføre automatisk
                     dokarkivClient.oppdaterJournalpostSak(journalpost, fagsakId, tema)
                     dokarkivClient.ferdigstillJournalpost(journalpost.journalpostId)
+
+                    when (tema) {
+                        Tema.KON -> {
+                            val kategori = kontantstøtteOppgaveMapper.hentBehandlingstype(journalpost)
+
+
+                            ksSakClient.opprettBehandlingIKsSak(
+                                kategori = kategori,
+                                behandlingÅrsak = "SØKNAD",
+                                søkersIdent = brukersIdent,
+                                søknadMottattDato = journalpost.datoMottatt ?: LocalDateTime.now(),
+
+
+                            )
+                        }
+                        else -> throw IllegalStateException("$tema ikke støttet")
+                    }
                 }.fold(
                     onSuccess = {
                         task.metadata["fagsakId"] = fagsakId
@@ -63,17 +87,6 @@ class OppdaterOgFerdigstillJournalpostTask(
                 )
             else -> error("Uventet journalstatus ${journalpost.journalstatus} for journalpost ${journalpost.journalpostId}")
         }
-
-        val nyTask =
-            Task(
-                type = OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE,
-                payload = task.payload,
-                properties =
-                    task.metadata.apply {
-                        this["fagsystem"] = tema
-                    },
-            )
-        taskService.save(nyTask)
     }
 
     companion object {

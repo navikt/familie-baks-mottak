@@ -2,7 +2,6 @@ package no.nav.familie.baks.mottak.integrasjoner
 
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
-import no.nav.familie.kontrakter.felles.tilbakekreving.Behandlingsårsakstype
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -10,6 +9,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestOperations
 import java.net.URI
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Component
 class KsSakClient
@@ -53,9 +53,8 @@ class KsSakClient
         fun opprettBehandlingIKsSak(
             kategori: String,
             søkersIdent: String,
-            behandlingÅrsak: Behandlingsårsakstype,
-            saksbehandlerIdent: String,
-            søknadMottattDato: LocalDate,
+            behandlingÅrsak: String,
+            søknadMottattDato: LocalDateTime,
         ) {
             val uri = URI.create("$ksSakServiceUri/behandlinger")
             kotlin.runCatching {
@@ -65,7 +64,6 @@ class KsSakClient
                         kategori,
                         søkersIdent,
                         behandlingÅrsak,
-                        saksbehandlerIdent,
                         søknadMottattDato,
                     ),
                 )
@@ -79,7 +77,7 @@ class KsSakClient
             personIdent: String,
             barnasIdenter: List<String> = emptyList(),
         ): List<RestFagsakDeltager> {
-            val uri = URI.create("$ksSakServiceUri/fagsaker/sok/")
+            val uri = URI.create("$ksSakServiceUri/fagsaker/sok")
             return runCatching {
                 postForEntity<Ressurs<List<RestFagsakDeltager>>>(uri, RestSøkParam(personIdent, barnasIdenter))
             }.fold(

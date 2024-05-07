@@ -14,6 +14,7 @@ import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.RestOperations
 import java.net.URI
+import java.time.LocalDateTime
 
 private val logger = LoggerFactory.getLogger(JournalpostClient::class.java)
 
@@ -57,6 +58,7 @@ data class Journalpost(
     val journalforendeEnhet: String? = null,
     val kanal: String? = null,
     val dokumenter: List<DokumentInfo>? = null,
+    val datoMottatt: LocalDateTime? = null,
 ) {
     fun hentHovedDokumentTittel(): String? {
         if (dokumenter.isNullOrEmpty()) error("Journalpost $journalpostId mangler dokumenter")
