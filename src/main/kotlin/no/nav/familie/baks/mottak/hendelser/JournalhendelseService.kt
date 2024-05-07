@@ -10,8 +10,8 @@ import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.Journalposttype
 import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
-import no.nav.familie.baks.mottak.task.JournalhendelseKontantstøtteRutingTask
 import no.nav.familie.baks.mottak.task.JournalhendelseBarnetrygdRutingTask
+import no.nav.familie.baks.mottak.task.JournalhendelseKontantstøtteRutingTask
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.log.IdUtils
 import no.nav.familie.log.mdc.MDCConstants

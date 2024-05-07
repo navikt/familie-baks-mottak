@@ -64,8 +64,6 @@ class OppdaterOgFerdigstillJournalpostTask(
             else -> error("Uventet journalstatus ${journalpost.journalstatus} for journalpost ${journalpost.journalpostId}")
         }
 
-
-
         val nyTask =
             Task(
                 type = OpprettBehandleSakOppgaveTask.TASK_STEP_TYPE,

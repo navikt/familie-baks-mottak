@@ -9,6 +9,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import no.nav.familie.baks.mottak.DevLauncher
 import no.nav.familie.http.client.RessursException
 import no.nav.familie.kontrakter.felles.Ressurs
+import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentResponse
 import no.nav.familie.kontrakter.felles.dokarkiv.Dokumenttype
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.ArkiverDokumentRequest
@@ -45,7 +46,7 @@ class DokarkivClientTest {
                 ),
         )
 
-        dokarkivClient.oppdaterJournalpostSak(jp, "11111111")
+        dokarkivClient.oppdaterJournalpostSak(jp, "11111111", Tema.BAR)
     }
 
     @Test

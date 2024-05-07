@@ -25,16 +25,17 @@ class DokarkivClient(
     fun oppdaterJournalpostSak(
         jp: Journalpost,
         fagsakId: String,
-        tema: Tema
+        tema: Tema,
     ) {
         logger.info("Oppdaterer journalpost ${jp.journalpostId} med fagsaktilknytning $fagsakId ")
         val uri = URI.create("$integrasjonUri/arkiv/v2/${jp.journalpostId}")
 
-        val sak = when(tema) {
-            Tema.BAR -> Sak(fagsakId, Fagsystem.BA.name)
-            Tema.KON -> Sak(fagsakId, Fagsystem.KONT.name)
-            else -> throw IllegalArgumentException("Ukjent tema $tema")
-        }
+        val sak =
+            when (tema) {
+                Tema.BAR -> Sak(fagsakId, Fagsystem.BA.name)
+                Tema.KON -> Sak(fagsakId, Fagsystem.KONT.name)
+                else -> throw IllegalArgumentException("Ukjent tema $tema")
+            }
 
         val request =
             TilknyttFagsakRequest(

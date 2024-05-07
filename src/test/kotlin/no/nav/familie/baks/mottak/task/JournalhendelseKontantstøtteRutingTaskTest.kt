@@ -12,6 +12,11 @@ import no.nav.familie.baks.mottak.integrasjoner.Foedselsnummer
 import no.nav.familie.baks.mottak.integrasjoner.IdentInformasjon
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdKontantstøtteClient
 import no.nav.familie.baks.mottak.integrasjoner.InnsynResponse
+import no.nav.familie.baks.mottak.integrasjoner.Journalpost
+import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
+import no.nav.familie.baks.mottak.integrasjoner.Journalposttype
+import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
+import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.StonadDto
 import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
@@ -27,22 +32,34 @@ import kotlin.test.assertEquals
 
 @ExtendWith(MockKExtension::class)
 class JournalhendelseKontantstøtteRutingTaskTest {
-    @MockK private lateinit var pdlClient: PdlClient
+    @MockK
+    private lateinit var pdlClient: PdlClient
 
-    @MockK private lateinit var infotrygdKontantstøtteClient: InfotrygdKontantstøtteClient
+    @MockK
+    private lateinit var infotrygdKontantstøtteClient: InfotrygdKontantstøtteClient
 
-    @MockK private lateinit var taskService: TaskService
+    @MockK
+    private lateinit var taskService: TaskService
 
-    @InjectMockKs private lateinit var journalhendelseKontantstøtteRutingTask: JournalhendelseKontantstøtteRutingTask
+    @MockK
+    private lateinit var ksSakClient: KsSakClient
+
+    @MockK
+    private lateinit var journalpostClient: JournalpostClient
+
+    @InjectMockKs
+    private lateinit var journalhendelseKontantstøtteRutingTask: JournalhendelseKontantstøtteRutingTask
 
     val søkerFnr = "12345678910"
     val barn1Fnr = "11223344556"
     val barn2Fnr = "11223344557"
 
-    @Test fun `doTask - skal opprette OpprettJournalføringOppgaveTask med informasjon om at det finnes løpende sak i Infotrygd når et eller flere av barna har løpende sak i Infotrygd`() {
+    @Test
+    fun `doTask - skal opprette OpprettJournalføringOppgaveTask med informasjon om at det finnes løpende sak i Infotrygd når et eller flere av barna har løpende sak i Infotrygd`() {
         val taskSlot = slot<Task>()
         setupPDLMocks()
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
+        every { journalpostClient.hentJournalpost("1") } returns Journalpost(journalpostId = "1", journalposttype = Journalposttype.I, journalstatus = Journalstatus.JOURNALFOERT)
         every { infotrygdKontantstøtteClient.hentPerioderMedKontantstotteIInfotrygdByBarn(any()) } returns
             InnsynResponse(
                 data =
@@ -65,17 +82,24 @@ class JournalhendelseKontantstøtteRutingTaskTest {
             Task(
                 type = JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE,
                 payload = "NAV_NO",
-                properties = Properties().apply { this["personIdent"] = søkerFnr },
+                properties =
+                    Properties().apply {
+                        this["personIdent"] = søkerFnr
+                        this["journalpostId"] = "1"
+                    },
             ),
         )
 
         assertEquals("Et eller flere av barna har løpende sak i Infotrygd", taskSlot.captured.payload)
     }
 
-    @Test fun `doTask - skal opprette OpprettJournalføringOppgaveTask med tom sakssystem-markering når et eller flere av barna har sak i Infotrygd men ingen løpende`() {
+    @Test
+    fun `doTask - skal opprette OpprettJournalføringOppgaveTask med tom sakssystem-markering når et eller flere av barna har sak i Infotrygd men ingen løpende`() {
         val taskSlot = slot<Task>()
         setupPDLMocks()
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
+        every { journalpostClient.hentJournalpost("1") } returns Journalpost(journalpostId = "1", journalposttype = Journalposttype.I, journalstatus = Journalstatus.JOURNALFOERT)
+
         every { infotrygdKontantstøtteClient.hentPerioderMedKontantstotteIInfotrygdByBarn(any()) } returns
             InnsynResponse(
                 data =
@@ -98,25 +122,36 @@ class JournalhendelseKontantstøtteRutingTaskTest {
             Task(
                 type = JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE,
                 payload = "NAV_NO",
-                properties = Properties().apply { this["personIdent"] = søkerFnr },
+                properties =
+                    Properties().apply {
+                        this["personIdent"] = søkerFnr
+                        this["journalpostId"] = "1"
+                    },
             ),
         )
 
         assertEquals("", taskSlot.captured.payload)
     }
 
-    @Test fun `doTask - skal opprette OpprettJournalføringOppgaveTask med tom sakssystem-markering når ingen av barna har sak i Infotrygd`() {
+    @Test
+    fun `doTask - skal opprette OpprettJournalføringOppgaveTask med tom sakssystem-markering når ingen av barna har sak i Infotrygd`() {
         val taskSlot = slot<Task>()
         setupPDLMocks()
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns false
 
         every { taskService.save(capture(taskSlot)) } returns mockk()
 
+        every { journalpostClient.hentJournalpost("1") } returns Journalpost(journalpostId = "1", journalposttype = Journalposttype.I, journalstatus = Journalstatus.JOURNALFOERT)
+
         journalhendelseKontantstøtteRutingTask.doTask(
             Task(
                 type = JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE,
                 payload = "NAV_NO",
-                properties = Properties().apply { this["personIdent"] = søkerFnr },
+                properties =
+                    Properties().apply {
+                        this["personIdent"] = søkerFnr
+                        this["journalpostId"] = "1"
+                    },
             ),
         )
 
@@ -132,6 +167,14 @@ class JournalhendelseKontantstøtteRutingTaskTest {
                         ForelderBarnRelasjon(barn1Fnr, FORELDERBARNRELASJONROLLE.BARN),
                         ForelderBarnRelasjon(barn2Fnr, FORELDERBARNRELASJONROLLE.BARN),
                     ),
+            )
+        every { pdlClient.hentIdenter(søkerFnr, any()) } returns
+            listOf(
+                IdentInformasjon(
+                    ident = søkerFnr,
+                    gruppe = IdentGruppe.FOLKEREGISTERIDENT.name,
+                    historisk = false,
+                ),
             )
         every { pdlClient.hentIdenter(barn1Fnr, any()) } returns
             listOf(

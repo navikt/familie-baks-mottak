@@ -24,7 +24,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.YearMonth
-import java.util.*
+import java.util.Properties
 
 @Service
 @TaskStepBeskrivelse(
@@ -59,22 +59,27 @@ class JournalhendelseKontantstøtteRutingTask(
 
         val harLøpendeSakIInfotrygd = søkEtterSakIInfotrygd(alleBarnasIdenter)
 
-        val brukersFnr = pdlClient.hentIdenter(brukersIdent, tema)
-            .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
-        val harLøpendeSakIKsSak = harLøpendeSakIKsSak(brukersFnr, barnasIdenter)
+        val brukersFnr =
+            pdlClient.hentIdenter(brukersIdent, tema)
+                .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
+
+        val harLøpendeSakIKsSak by lazy {
+            harLøpendeSakIKsSak(brukersFnr, barnasIdenter)
+        }
 
         val erKontantstøtteSøknad = journalpost.dokumenter?.find { it.brevkode == "NAV 34-00.08" } != null
 
-        if (erKontantstøtteSøknad && !harLøpendeSakIInfotrygd && harLøpendeSakIKsSak) {
+        if (erKontantstøtteSøknad && !harLøpendeSakIInfotrygd && !harLøpendeSakIKsSak) {
             val fagsakId = ksSakClient.hentSaksnummer(tilPersonIdent(journalpost.bruker!!, journalpost.tema))
 
             Task(
                 type = OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE,
                 payload = journalpost.journalpostId,
-                properties = Properties().apply {
-                    this["fagsakId"] = fagsakId
-                    this["tema"] = Tema.KON
-                },
+                properties =
+                    Properties().apply {
+                        this["fagsakId"] = fagsakId
+                        this["tema"] = Tema.KON
+                    },
             ).apply { taskService.save(this) }
         } else {
             val sakssystemMarkering =
@@ -98,17 +103,19 @@ class JournalhendelseKontantstøtteRutingTask(
         }
     }
 
-    private fun harLøpendeSakIKsSak(brukersFnr: List<IdentInformasjon>, barnasIdenter: List<String>): Boolean {
-
-        val harLøpendeSakIKsSak = ksSakClient
-            .hentRestFagsakDeltagerListe(brukersFnr.last().ident, barnasIdenter)
-            .harForelderEllerBarnPågåendeSak()
+    private fun harLøpendeSakIKsSak(
+        brukersFnr: List<IdentInformasjon>,
+        barnasIdenter: List<String>,
+    ): Boolean {
+        val harLøpendeSakIKsSak =
+            ksSakClient
+                .hentRestFagsakDeltagerListe(brukersFnr.last().ident, barnasIdenter)
+                .harForelderEllerBarnPågåendeSak()
         return harLøpendeSakIKsSak
     }
 
     private fun List<RestFagsakDeltager>.harForelderEllerBarnPågåendeSak(): Boolean =
-        any { it.rolle == FagsakDeltagerRolle.FORELDER || it.rolle == FagsakDeltagerRolle.BARN && it.harPågåendeSak() }
-
+        this.any { it.rolle == FagsakDeltagerRolle.FORELDER || it.rolle == FagsakDeltagerRolle.BARN && it.harPågåendeSak() }
 
     private fun RestFagsakDeltager.harPågåendeSak(): Boolean {
         return when (fagsakStatus) {
