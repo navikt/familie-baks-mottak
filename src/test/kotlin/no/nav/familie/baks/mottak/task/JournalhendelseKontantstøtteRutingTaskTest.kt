@@ -192,5 +192,7 @@ class JournalhendelseKontantstøtteRutingTaskTest {
                     historisk = false,
                 ),
             )
+
+        every { ksSakClient.hentRestFagsakDeltagerListe(any(), any()) } returns emptyList()
     }
 }
