@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestOperations
 import java.net.URI
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Component

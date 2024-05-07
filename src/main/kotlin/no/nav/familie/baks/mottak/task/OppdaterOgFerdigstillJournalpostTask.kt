@@ -38,7 +38,6 @@ class OppdaterOgFerdigstillJournalpostTask(
         val tema = task.metadata["tema"] as Tema
         val brukersIdent = task.metadata["personIdent"] as String
 
-
         when (journalpost.journalstatus) {
             Journalstatus.MOTTATT -> {
                 runCatching { // forsøk å journalføre automatisk
@@ -49,14 +48,11 @@ class OppdaterOgFerdigstillJournalpostTask(
                         Tema.KON -> {
                             val kategori = kontantstøtteOppgaveMapper.hentBehandlingstype(journalpost)
 
-
                             ksSakClient.opprettBehandlingIKsSak(
                                 kategori = kategori,
                                 behandlingÅrsak = "SØKNAD",
                                 søkersIdent = brukersIdent,
                                 søknadMottattDato = journalpost.datoMottatt ?: LocalDateTime.now(),
-
-
                             )
                         }
                         else -> throw IllegalStateException("$tema ikke støttet")
