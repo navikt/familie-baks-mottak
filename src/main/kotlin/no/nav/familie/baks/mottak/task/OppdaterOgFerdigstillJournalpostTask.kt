@@ -46,7 +46,7 @@ class OppdaterOgFerdigstillJournalpostTask(
 
                     when (tema) {
                         Tema.KON -> {
-                            val kategori = kontantstøtteOppgaveMapper.hentBehandlingstype(journalpost)
+                            val kategori = kontantstøtteOppgaveMapper.hentBehandlingstypeVerdi(journalpost)
 
                             ksSakClient.opprettBehandlingIKsSak(
                                 kategori = kategori,

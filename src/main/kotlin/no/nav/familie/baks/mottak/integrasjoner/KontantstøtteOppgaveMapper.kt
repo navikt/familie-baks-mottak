@@ -15,10 +15,12 @@ class KontantstøtteOppgaveMapper(
         return null
     }
 
-    override fun hentBehandlingstype(journalpost: Journalpost): String {
+    override fun hentBehandlingstypeVerdi(journalpost: Journalpost) = hentBehandlingstype(journalpost).value
+
+    override fun hentBehandlingstype(journalpost: Journalpost): Behandlingstype {
         return when {
-            erEØS(journalpost) -> Behandlingstype.EØS.value
-            else -> Behandlingstype.NASJONAL.value
+            erEØS(journalpost) -> Behandlingstype.EØS
+            else -> Behandlingstype.NASJONAL
         }
     }
 }
