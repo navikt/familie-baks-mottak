@@ -68,7 +68,7 @@ class JournalhendelseKontantstøtteRutingTask(
                 payload = journalpost.journalpostId,
                 properties =
                     Properties().apply {
-                        this["fagsakId"] = fagsakId
+                        this["fagsakId"] = fagsakId.toString()
                         this["tema"] = Tema.KON.name
                         this["personIdent"] = brukersIdent
                     },
