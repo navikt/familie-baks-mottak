@@ -40,7 +40,7 @@ class KsSakClientTest {
         )
 
         val response = ksSakClient.hentSaksnummer(personIdent)
-        assertThat(response).isEqualTo(fagsakId.toString())
+        assertThat(response).isEqualTo(fagsakId)
     }
 
     @Test
