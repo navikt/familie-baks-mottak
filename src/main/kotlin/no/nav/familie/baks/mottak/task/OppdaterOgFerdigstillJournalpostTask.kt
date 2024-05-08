@@ -52,7 +52,6 @@ class OppdaterOgFerdigstillJournalpostTask(
                             val kategori = kontantstøtteOppgaveMapper.hentBehandlingstypeVerdi(journalpost)
                             val fagsak = ksSakClient.hentMinimalRestFagsak(fagsakId.toLong())
 
-
                             val type = utledBehandlingstype(fagsak)
 
                             ksSakClient.opprettBehandlingIKsSak(
@@ -94,16 +93,18 @@ class OppdaterOgFerdigstillJournalpostTask(
     }
 
     private fun utledBehandlingstype(fagsak: RestMinimalFagsak): String {
-        val erFagsakLøpendeOgAktiveBehandlingerAvsluttet = fagsak.behandlinger.any { behandling ->
-            val kanOppretteBehandling = behandling.status == Behandlingsstatus.AVSLUTTET.name && behandling.aktiv
-            fagsak.status != FagsakStatus.LØPENDE && kanOppretteBehandling
-        }
+        val erFagsakLøpendeOgAktiveBehandlingerAvsluttet =
+            fagsak.behandlinger.any { behandling ->
+                val kanOppretteBehandling = behandling.status == Behandlingsstatus.AVSLUTTET.name && behandling.aktiv
+                fagsak.status != FagsakStatus.LØPENDE && kanOppretteBehandling
+            }
 
-        val type = if (erFagsakLøpendeOgAktiveBehandlingerAvsluttet || fagsak.behandlinger.isEmpty()) {
-            "FØRSTEGANGSBEHANDLING"
-        } else {
-            "REVURDERING"
-        }
+        val type =
+            if (erFagsakLøpendeOgAktiveBehandlingerAvsluttet || fagsak.behandlinger.isEmpty()) {
+                "FØRSTEGANGSBEHANDLING"
+            } else {
+                "REVURDERING"
+            }
         return type
     }
 

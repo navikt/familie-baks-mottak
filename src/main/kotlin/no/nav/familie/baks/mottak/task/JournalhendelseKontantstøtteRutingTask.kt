@@ -4,15 +4,11 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
-import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle
-import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus
-import no.nav.familie.baks.mottak.integrasjoner.IdentInformasjon
 import no.nav.familie.baks.mottak.integrasjoner.Identgruppe
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdKontantstøtteClient
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
-import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.integrasjoner.StonadDto
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
@@ -67,16 +63,15 @@ class JournalhendelseKontantstøtteRutingTask(
         val erKontantstøtteSøknad = journalpost.dokumenter?.find { it.brevkode == "NAV 34-00.08" } != null
 
         if (erKontantstøtteSøknad && !harLøpendeSakIInfotrygd && !harLøpendeSakIKsSak) {
-
             Task(
                 type = OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE,
                 payload = journalpost.journalpostId,
                 properties =
-                Properties().apply {
-                    this["fagsakId"] = fagsakId
-                    this["tema"] = Tema.KON.name
-                    this["personIdent"] = brukersIdent
-                },
+                    Properties().apply {
+                        this["fagsakId"] = fagsakId
+                        this["tema"] = Tema.KON.name
+                        this["personIdent"] = brukersIdent
+                    },
             ).apply { taskService.save(this) }
         } else {
             log.info("Journalpost: $journalpost")
@@ -106,12 +101,13 @@ class JournalhendelseKontantstøtteRutingTask(
     }
 
     private fun harLøpendeSakIKsSak(
-        fagsakId: Long
+        fagsakId: Long,
     ): Boolean {
         val minimalFagsak = ksSakClient.hentMinimalRestFagsak(fagsakId)
 
         return minimalFagsak.behandlinger.any { it.status != "AVSLUTTET" }
     }
+
     private fun incrementSakssystemMarkering(saksystem: String) {
         if (!sakssystemMarkeringCounter.containsKey(saksystem)) {
             sakssystemMarkeringCounter[saksystem] =
