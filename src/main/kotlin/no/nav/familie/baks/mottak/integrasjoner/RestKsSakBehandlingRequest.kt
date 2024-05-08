@@ -7,4 +7,5 @@ data class RestKsSakBehandlingRequest(
     val søkersIdent: String,
     val behandlingÅrsak: String,
     val søknadMottattDato: LocalDateTime,
+    val type: String,
 )

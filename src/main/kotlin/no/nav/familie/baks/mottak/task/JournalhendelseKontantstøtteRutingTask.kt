@@ -59,28 +59,24 @@ class JournalhendelseKontantstøtteRutingTask(
 
         val harLøpendeSakIInfotrygd = søkEtterSakIInfotrygd(alleBarnasIdenter)
 
-        val brukersFnr =
-            pdlClient.hentIdenter(brukersIdent, tema)
-                .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
-
+        val fagsakId by lazy { ksSakClient.hentSaksnummer(tilPersonIdent(journalpost.bruker!!, journalpost.tema)) }
         val harLøpendeSakIKsSak by lazy {
-            harLøpendeSakIKsSak(brukersFnr, barnasIdenter)
+            harLøpendeSakIKsSak(fagsakId)
         }
 
         val erKontantstøtteSøknad = journalpost.dokumenter?.find { it.brevkode == "NAV 34-00.08" } != null
 
         if (erKontantstøtteSøknad && !harLøpendeSakIInfotrygd && !harLøpendeSakIKsSak) {
-            val fagsakId = ksSakClient.hentSaksnummer(tilPersonIdent(journalpost.bruker!!, journalpost.tema))
 
             Task(
                 type = OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE,
                 payload = journalpost.journalpostId,
                 properties =
-                    Properties().apply {
-                        this["fagsakId"] = fagsakId
-                        this["tema"] = Tema.KON.name
-                        this["personIdent"] = brukersIdent
-                    },
+                Properties().apply {
+                    this["fagsakId"] = fagsakId
+                    this["tema"] = Tema.KON.name
+                    this["personIdent"] = brukersIdent
+                },
             ).apply { taskService.save(this) }
         } else {
             log.info("Journalpost: $journalpost")
@@ -110,26 +106,12 @@ class JournalhendelseKontantstøtteRutingTask(
     }
 
     private fun harLøpendeSakIKsSak(
-        brukersFnr: List<IdentInformasjon>,
-        barnasIdenter: List<String>,
+        fagsakId: Long
     ): Boolean {
-        val harLøpendeSakIKsSak =
-            ksSakClient
-                .hentRestFagsakDeltagerListe(brukersFnr.last().ident, barnasIdenter)
-                .harForelderEllerBarnPågåendeSak()
-        return harLøpendeSakIKsSak
+        val minimalFagsak = ksSakClient.hentMinimalRestFagsak(fagsakId)
+
+        return minimalFagsak.behandlinger.any { it.status != "AVSLUTTET" }
     }
-
-    private fun List<RestFagsakDeltager>.harForelderEllerBarnPågåendeSak(): Boolean =
-        this.any { it.rolle == FagsakDeltagerRolle.FORELDER || it.rolle == FagsakDeltagerRolle.BARN && it.harPågåendeSak() }
-
-    private fun RestFagsakDeltager.harPågåendeSak(): Boolean {
-        return when (fagsakStatus) {
-            FagsakStatus.OPPRETTET, FagsakStatus.LØPENDE -> true
-            FagsakStatus.AVSLUTTET -> false
-        }
-    }
-
     private fun incrementSakssystemMarkering(saksystem: String) {
         if (!sakssystemMarkeringCounter.containsKey(saksystem)) {
             sakssystemMarkeringCounter[saksystem] =

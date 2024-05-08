@@ -1,11 +1,14 @@
 package no.nav.familie.baks.mottak.task
 
 import no.nav.familie.baks.mottak.integrasjoner.DokarkivClient
+import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
 import no.nav.familie.baks.mottak.integrasjoner.KontantstøtteOppgaveMapper
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
+import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
 import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.tilbakekreving.Behandlingsstatus
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -47,12 +50,17 @@ class OppdaterOgFerdigstillJournalpostTask(
                     when (tema) {
                         Tema.KON -> {
                             val kategori = kontantstøtteOppgaveMapper.hentBehandlingstypeVerdi(journalpost)
+                            val fagsak = ksSakClient.hentMinimalRestFagsak(fagsakId.toLong())
+
+
+                            val type = utledBehandlingstype(fagsak)
 
                             ksSakClient.opprettBehandlingIKsSak(
                                 kategori = kategori,
                                 behandlingÅrsak = "SØKNAD",
                                 søkersIdent = brukersIdent,
                                 søknadMottattDato = journalpost.datoMottatt ?: LocalDateTime.now(),
+                                type = type,
                             )
                         }
                         else -> throw IllegalStateException("$tema ikke støttet")
@@ -83,6 +91,20 @@ class OppdaterOgFerdigstillJournalpostTask(
                 )
             else -> error("Uventet journalstatus ${journalpost.journalstatus} for journalpost ${journalpost.journalpostId}")
         }
+    }
+
+    private fun utledBehandlingstype(fagsak: RestMinimalFagsak): String {
+        val erFagsakLøpendeOgAktiveBehandlingerAvsluttet = fagsak.behandlinger.any { behandling ->
+            val kanOppretteBehandling = behandling.status == Behandlingsstatus.AVSLUTTET.name && behandling.aktiv
+            fagsak.status != FagsakStatus.LØPENDE && kanOppretteBehandling
+        }
+
+        val type = if (erFagsakLøpendeOgAktiveBehandlingerAvsluttet || fagsak.behandlinger.isEmpty()) {
+            "FØRSTEGANGSBEHANDLING"
+        } else {
+            "REVURDERING"
+        }
+        return type
     }
 
     companion object {

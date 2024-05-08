@@ -17,12 +17,12 @@ class KsSakClient
         @param:Value("\${FAMILIE_KS_SAK_API_URL}") private val ksSakServiceUri: String,
         @Qualifier("clientCredentials") restOperations: RestOperations,
     ) : AbstractRestClient(restOperations, "integrasjon") {
-        fun hentSaksnummer(personIdent: String): String {
+        fun hentSaksnummer(personIdent: String): Long {
             val uri = URI.create("$ksSakServiceUri/fagsaker")
             return runCatching {
                 postForEntity<Ressurs<RestFagsak>>(uri, mapOf("personIdent" to personIdent))
             }.fold(
-                onSuccess = { it.data?.id?.toString() ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
+                onSuccess = { it.data?.id ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av saksnummer fra ks-sak.", it, uri, personIdent) },
             )
         }
@@ -54,6 +54,7 @@ class KsSakClient
             søkersIdent: String,
             behandlingÅrsak: String,
             søknadMottattDato: LocalDateTime,
+            type: String,
         ) {
             val uri = URI.create("$ksSakServiceUri/behandlinger")
             kotlin.runCatching {
@@ -64,6 +65,7 @@ class KsSakClient
                         søkersIdent,
                         behandlingÅrsak,
                         søknadMottattDato,
+                        type,
                     ),
                 )
             }

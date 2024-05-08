@@ -143,6 +143,7 @@ data class RestFagsakIdOgTilknyttetAktørId(
 data class RestMinimalFagsak(
     val id: Long,
     val behandlinger: List<RestVisningBehandling>,
+    val status: FagsakStatus
 )
 
 class RestVisningBehandling(
