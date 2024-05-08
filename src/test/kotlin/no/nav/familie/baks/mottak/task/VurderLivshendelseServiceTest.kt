@@ -735,6 +735,7 @@ class VurderLivshendelseServiceTest {
                 listOf(
                     lagRestVisningBehandling(underkategori = BehandlingUnderkategori.UTVIDET),
                 ),
+            status = FagsakStatus.OPPRETTET,
         )
 
     private fun lagMinimalRestFagsakForKS() =
@@ -744,6 +745,7 @@ class VurderLivshendelseServiceTest {
                 listOf(
                     lagRestVisningBehandling(underkategori = null),
                 ),
+            status = FagsakStatus.OPPRETTET,
         )
 
     private fun lagRestVisningBehandling(underkategori: BehandlingUnderkategori?) =
