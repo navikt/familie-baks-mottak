@@ -19,6 +19,7 @@ import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.StonadDto
+import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.kontrakter.felles.personopplysning.ForelderBarnRelasjon
@@ -86,6 +87,8 @@ class JournalhendelseKontantstøtteRutingTaskTest {
                     Properties().apply {
                         this["personIdent"] = søkerFnr
                         this["journalpostId"] = "1"
+                        this["fagsakId"] = "123"
+                        this["tema"] = Tema.KON.name
                     },
             ),
         )
@@ -126,6 +129,8 @@ class JournalhendelseKontantstøtteRutingTaskTest {
                     Properties().apply {
                         this["personIdent"] = søkerFnr
                         this["journalpostId"] = "1"
+                        this["fagsakId"] = "123"
+                        this["tema"] = Tema.KON.name
                     },
             ),
         )
@@ -151,6 +156,8 @@ class JournalhendelseKontantstøtteRutingTaskTest {
                     Properties().apply {
                         this["personIdent"] = søkerFnr
                         this["journalpostId"] = "1"
+                        this["fagsakId"] = "123"
+                        this["tema"] = Tema.KON.name
                     },
             ),
         )
