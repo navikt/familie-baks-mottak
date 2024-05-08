@@ -8,6 +8,9 @@ import io.mockk.mockk
 import io.mockk.slot
 import no.nav.familie.baks.mottak.domene.personopplysning.Person
 import no.nav.familie.baks.mottak.integrasjoner.BarnDto
+import no.nav.familie.baks.mottak.integrasjoner.Bruker
+import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
+import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus
 import no.nav.familie.baks.mottak.integrasjoner.Foedselsnummer
 import no.nav.familie.baks.mottak.integrasjoner.IdentInformasjon
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdKontantstøtteClient
@@ -18,6 +21,7 @@ import no.nav.familie.baks.mottak.integrasjoner.Journalposttype
 import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
 import no.nav.familie.baks.mottak.integrasjoner.StonadDto
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
@@ -60,7 +64,14 @@ class JournalhendelseKontantstøtteRutingTaskTest {
         val taskSlot = slot<Task>()
         setupPDLMocks()
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
-        every { journalpostClient.hentJournalpost("1") } returns Journalpost(journalpostId = "1", journalposttype = Journalposttype.I, journalstatus = Journalstatus.JOURNALFOERT)
+        every { journalpostClient.hentJournalpost("1") } returns
+            Journalpost(
+                journalpostId = "1",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.JOURNALFOERT,
+                bruker = Bruker("testId", type = BrukerIdType.AKTOERID),
+            )
+
         every { infotrygdKontantstøtteClient.hentPerioderMedKontantstotteIInfotrygdByBarn(any()) } returns
             InnsynResponse(
                 data =
@@ -101,7 +112,13 @@ class JournalhendelseKontantstøtteRutingTaskTest {
         val taskSlot = slot<Task>()
         setupPDLMocks()
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
-        every { journalpostClient.hentJournalpost("1") } returns Journalpost(journalpostId = "1", journalposttype = Journalposttype.I, journalstatus = Journalstatus.JOURNALFOERT)
+        every { journalpostClient.hentJournalpost("1") } returns
+            Journalpost(
+                journalpostId = "1",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.JOURNALFOERT,
+                bruker = Bruker("testId", type = BrukerIdType.AKTOERID),
+            )
 
         every { infotrygdKontantstøtteClient.hentPerioderMedKontantstotteIInfotrygdByBarn(any()) } returns
             InnsynResponse(
@@ -146,8 +163,13 @@ class JournalhendelseKontantstøtteRutingTaskTest {
 
         every { taskService.save(capture(taskSlot)) } returns mockk()
 
-        every { journalpostClient.hentJournalpost("1") } returns Journalpost(journalpostId = "1", journalposttype = Journalposttype.I, journalstatus = Journalstatus.JOURNALFOERT)
-
+        every { journalpostClient.hentJournalpost("1") } returns
+            Journalpost(
+                journalpostId = "1",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.JOURNALFOERT,
+                bruker = Bruker("testId", type = BrukerIdType.AKTOERID),
+            )
         journalhendelseKontantstøtteRutingTask.doTask(
             Task(
                 type = JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE,
@@ -200,6 +222,10 @@ class JournalhendelseKontantstøtteRutingTaskTest {
                 ),
             )
 
-        every { ksSakClient.hentRestFagsakDeltagerListe(any(), any()) } returns emptyList()
+        every { pdlClient.hentPersonident(any(), any()) } returns "TEST"
+
+        every { ksSakClient.hentSaksnummer("TEST") } returns 1L
+
+        every { ksSakClient.hentMinimalRestFagsak(1L) } returns RestMinimalFagsak(id = 0, emptyList(), FagsakStatus.OPPRETTET)
     }
 }
