@@ -49,7 +49,7 @@ class OppdaterOgFerdigstillJournalpostTask(
 
                     when (tema) {
                         Tema.KON -> {
-                            val kategori = kontantstøtteOppgaveMapper.hentBehandlingstypeVerdi(journalpost)
+                            val kategori = kontantstøtteOppgaveMapper.hentBehandlingstype(journalpost).name
                             val fagsak = ksSakClient.hentMinimalRestFagsak(fagsakId.toLong())
 
                             val type = utledBehandlingstype(fagsak)
