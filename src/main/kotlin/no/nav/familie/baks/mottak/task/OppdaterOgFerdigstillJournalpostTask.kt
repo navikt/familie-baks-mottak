@@ -77,7 +77,6 @@ class OppdaterOgFerdigstillJournalpostTask(
                         Task(
                             OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
                             journalpost.journalpostId,
-
                             // Husk å legge til journalpostid hvis det feiler
                             task.metadata,
                         ).also { taskService.save(it) }
