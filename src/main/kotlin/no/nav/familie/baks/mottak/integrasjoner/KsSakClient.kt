@@ -58,7 +58,7 @@ class KsSakClient
         ) {
             val uri = URI.create("$ksSakServiceUri/behandlinger")
             kotlin.runCatching {
-                postForEntity<Ressurs<String>>(
+                postForEntity<Ressurs<Any>>(
                     uri,
                     RestKsSakBehandlingRequest(
                         kategori,
