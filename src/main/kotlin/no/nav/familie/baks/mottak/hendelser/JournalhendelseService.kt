@@ -184,7 +184,7 @@ class JournalhendelseService(
             when (journalpost.tema) {
                 Tema.BAR.name -> JournalhendelseBarnetrygdRutingTask.TASK_STEP_TYPE
                 Tema.KON.name -> JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE
-                else -> throw IllegalStateException("Ukjent tema ${journalpost.tema}")
+                else -> throw IllegalStateException("Tema ${journalpost.tema} støtter ikke opprettelse av journalhendelse ruting task")
             }
         Task(
             type = taskType,

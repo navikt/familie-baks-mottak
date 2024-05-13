@@ -20,7 +20,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.YearMonth
-import java.util.Properties
 
 @Service
 @TaskStepBeskrivelse(
@@ -36,68 +35,81 @@ class JournalhendelseKontantstøtteRutingTask(
 ) : AsyncTaskStep {
     val log: Logger = LoggerFactory.getLogger(JournalhendelseKontantstøtteRutingTask::class.java)
     val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
-    private val tema = Tema.KON
+    val tema = Tema.KON
 
     override fun doTask(task: Task) {
         val brukersIdent = task.metadata["personIdent"] as String
 
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
 
-        val barnasIdenter =
-            pdlClient.hentPersonMedRelasjoner(brukersIdent, Tema.KON).forelderBarnRelasjoner
-                .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
-                .map { it.relatertPersonsIdent }
-                .filterNotNull()
-        val alleBarnasIdenter =
-            barnasIdenter.flatMap { pdlClient.hentIdenter(it, Tema.KON) }
-                .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
-                .map { it.ident }
+        val barnasIdenterFraPdl = hentBarnasIdenterFraPdl(brukersIdent, tema)
 
-        val harLøpendeSakIInfotrygd = søkEtterSakIInfotrygd(alleBarnasIdenter)
+        val fagsakId by lazy { ksSakClient.hentFagsaknummerPåPersonident(tilPersonIdent(journalpost.bruker!!, tema)) }
 
-        val fagsakId by lazy { ksSakClient.hentSaksnummer(tilPersonIdent(journalpost.bruker!!, journalpost.tema)) }
         val harLøpendeSakIKsSak by lazy {
             harLøpendeSakIKsSak(fagsakId)
         }
 
+        val harLøpendeSakIInfotrygd = søkEtterSakIInfotrygd(barnasIdenterFraPdl)
+
+        val sakssystemMarkering = hentSakssystemMarkering(harLøpendeSakIInfotrygd)
+
         val erKontantstøtteSøknad = journalpost.dokumenter?.find { it.brevkode == "NAV 34-00.08" } != null
 
-        if (erKontantstøtteSøknad && !harLøpendeSakIInfotrygd && !harLøpendeSakIKsSak) {
+        val skalAutomatiskJournalføreJournalpost = erKontantstøtteSøknad && !harLøpendeSakIInfotrygd && !harLøpendeSakIKsSak
+
+        if (skalAutomatiskJournalføreJournalpost) {
+            log.info("Oppretter OppdaterOgFerdigstillJournalpostTask for journalpost med id ${journalpost.journalpostId}")
+
             Task(
                 type = OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE,
                 payload = journalpost.journalpostId,
                 properties =
-                    Properties().apply {
-                        this["fagsakId"] = fagsakId.toString()
+                    task.metadata.apply {
+                        this["fagsakId"] = "$fagsakId"
                         this["tema"] = Tema.KON.name
                         this["personIdent"] = brukersIdent
+                        this["sakssystemMarkering"] = sakssystemMarkering
                     },
             ).apply { taskService.save(this) }
         } else {
-            log.info("Journalpost: $journalpost")
-            log.info("Er kontantstøtte søknad: $erKontantstøtteSøknad")
-            log.info("Har løpende sak i infotrygd: $harLøpendeSakIInfotrygd")
-            log.info("Har løpende sak i kontantstøtte: $harLøpendeSakIKsSak")
-
-            val sakssystemMarkering =
-                when {
-                    harLøpendeSakIInfotrygd -> {
-                        incrementSakssystemMarkering("Infotrygd")
-                        "Et eller flere av barna har løpende sak i Infotrygd"
-                    }
-
-                    else -> {
-                        incrementSakssystemMarkering("Ingen")
-                        ""
-                    }
-                }
-
             Task(
                 type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
                 payload = sakssystemMarkering,
                 properties = task.metadata,
             ).apply { taskService.save(this) }
         }
+    }
+
+    private fun hentSakssystemMarkering(harLøpendeSakIInfotrygd: Boolean): String {
+        val sakssystemMarkering =
+            when {
+                harLøpendeSakIInfotrygd -> {
+                    incrementSakssystemMarkering("Infotrygd")
+                    "Et eller flere av barna har løpende sak i Infotrygd"
+                }
+
+                else -> {
+                    incrementSakssystemMarkering("Ingen")
+                    ""
+                }
+            }
+        return sakssystemMarkering
+    }
+
+    private fun hentBarnasIdenterFraPdl(
+        brukersIdent: String,
+        tema: Tema,
+    ): List<String> {
+        val barnasIdenter =
+            pdlClient.hentPersonMedRelasjoner(brukersIdent, tema).forelderBarnRelasjoner
+                .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
+                .map { it.relatertPersonsIdent }
+                .filterNotNull()
+
+        return barnasIdenter.flatMap { pdlClient.hentIdenter(it, Tema.KON) }
+            .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
+            .map { it.ident }
     }
 
     private fun harLøpendeSakIKsSak(
@@ -126,10 +138,10 @@ class JournalhendelseKontantstøtteRutingTask(
 
     private fun tilPersonIdent(
         bruker: Bruker,
-        tema: String?,
+        tema: Tema,
     ): String {
         return when (bruker.type) {
-            BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema?.let { Tema.valueOf(tema) } ?: Tema.BAR)
+            BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema)
             else -> bruker.id
         }
     }

@@ -224,7 +224,7 @@ class JournalhendelseKontantstøtteRutingTaskTest {
 
         every { pdlClient.hentPersonident(any(), any()) } returns "TEST"
 
-        every { ksSakClient.hentSaksnummer("TEST") } returns 1L
+        every { ksSakClient.hentFagsaknummerPåPersonident("TEST") } returns 1L
 
         every { ksSakClient.hentMinimalRestFagsak(1L) } returns RestMinimalFagsak(id = 0, emptyList(), FagsakStatus.OPPRETTET)
     }

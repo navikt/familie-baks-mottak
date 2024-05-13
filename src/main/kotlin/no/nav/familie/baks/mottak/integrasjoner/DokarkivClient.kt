@@ -34,7 +34,7 @@ class DokarkivClient(
             when (tema) {
                 Tema.BAR -> Sak(fagsakId, Fagsystem.BA.name)
                 Tema.KON -> Sak(fagsakId, Fagsystem.KONT.name)
-                else -> throw IllegalArgumentException("Ukjent tema $tema")
+                else -> throw IllegalArgumentException("Tema $tema støtter ikke oppdatering av journalpost sak")
             }
 
         val request =

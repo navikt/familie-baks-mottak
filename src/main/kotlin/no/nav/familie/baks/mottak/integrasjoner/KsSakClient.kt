@@ -17,12 +17,12 @@ class KsSakClient
         @param:Value("\${FAMILIE_KS_SAK_API_URL}") private val ksSakServiceUri: String,
         @Qualifier("clientCredentials") restOperations: RestOperations,
     ) : AbstractRestClient(restOperations, "integrasjon") {
-        fun hentSaksnummer(personIdent: String): Long {
+        fun hentFagsaknummerPåPersonident(personIdent: String): Long {
             val uri = URI.create("$ksSakServiceUri/fagsaker")
             return runCatching {
                 postForEntity<Ressurs<RestFagsak>>(uri, mapOf("personIdent" to personIdent))
             }.fold(
-                onSuccess = { it.data?.id ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
+                onSuccess = { it.data?.id ?: throw IntegrasjonException(it.melding, uri = uri, ident = personIdent) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av saksnummer fra ks-sak.", it, uri, personIdent) },
             )
         }
@@ -44,7 +44,7 @@ class KsSakClient
             return runCatching {
                 getForEntity<Ressurs<RestMinimalFagsak>>(uri)
             }.fold(
-                onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
+                onSuccess = { it.data ?: throw IntegrasjonException(it.melding, uri = uri) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ks-sak.", it, uri) },
             )
         }
@@ -60,7 +60,7 @@ class KsSakClient
             kotlin.runCatching {
                 postForEntity<Ressurs<Any>>(
                     uri,
-                    RestKsSakBehandlingRequest(
+                    OpprettKontantstøtteBehandlingRequest(
                         kategori,
                         søkersIdent,
                         behandlingÅrsak,
@@ -72,18 +72,5 @@ class KsSakClient
                 .onFailure {
                     throw IntegrasjonException("Feil ved opprettelse av behandling i ks-sak.", it, uri)
                 }
-        }
-
-        fun hentRestFagsakDeltagerListe(
-            personIdent: String,
-            barnasIdenter: List<String> = emptyList(),
-        ): List<RestFagsakDeltager> {
-            val uri = URI.create("$ksSakServiceUri/fagsaker/sok/fagsakdeltagere")
-            return runCatching {
-                postForEntity<Ressurs<List<RestFagsakDeltager>>>(uri, RestSøkParam(personIdent, barnasIdenter))
-            }.fold(
-                onSuccess = { it.data ?: throw IntegrasjonException(it.melding, uri = uri, ident = personIdent) },
-                onFailure = { throw IntegrasjonException("Feil ved henting av fagsakdeltagere fra ba-sak.", it, uri, personIdent) },
-            )
         }
     }
