@@ -15,7 +15,7 @@ import java.util.Locale
 
 abstract class AbstractOppgaveMapper(
     private val hentEnhetClient: HentEnhetClient,
-    private val pdlClient: PdlClient,
+    val pdlClient: PdlClient,
 ) : IOppgaveMapper {
     override fun tilOpprettOppgaveRequest(
         oppgavetype: Oppgavetype,
@@ -127,7 +127,7 @@ abstract class AbstractOppgaveMapper(
         }
     }
 
-    fun erEØS(journalpost: Journalpost) = journalpost.bruker?.type == BrukerIdType.FNR && erDnummer(journalpost.bruker.id)
+    open fun erEØS(journalpost: Journalpost) = journalpost.bruker?.type == BrukerIdType.FNR && erDnummer(journalpost.bruker.id)
 
     private fun validerJournalpost(journalpost: Journalpost) {
         if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
