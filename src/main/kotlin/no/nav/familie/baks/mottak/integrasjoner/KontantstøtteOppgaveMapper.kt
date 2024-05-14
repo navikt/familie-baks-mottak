@@ -21,7 +21,7 @@ class KontantstøtteOppgaveMapper(
     ): Boolean {
         return when (journalpost.bruker?.type) {
             BrukerIdType.FNR -> erDnummer(journalpost.bruker.id)
-            BrukerIdType.AKTOERID -> erDnummer(pdlClient.hentPersonident(journalpost.bruker.id, tema))
+            BrukerIdType.AKTOERID -> erDnummer(pdlClient.hentPersonident(journalpost.bruker.id, tema).takeIf { it.isNotEmpty() } ?: return false)
             else -> false
         }
     }
