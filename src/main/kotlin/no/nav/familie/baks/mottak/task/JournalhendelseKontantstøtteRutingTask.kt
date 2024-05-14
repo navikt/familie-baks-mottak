@@ -49,7 +49,7 @@ class JournalhendelseKontantstøtteRutingTask(
 
         val harÅpenBehandlingIFagsak by lazy { ksSakClient.hentMinimalRestFagsak(fagsakId).finnesÅpenBehandlingIFagsak() }
         val harLøpendeSakIInfotrygd = søkEtterSakIInfotrygd(barnasIdenterFraPdl)
-        val erKontantstøtteSøknad = journalpost.dokumenter?.find { it.brevkode == "NAV 34-00.08" } != null
+        val erKontantstøtteSøknad = journalpost.dokumenter?.any { it.brevkode == KONTANTSTØTTE_SØKNAD_BREV_KODE } ?: false
 
         val sakssystemMarkering = hentSakssystemMarkering(harLøpendeSakIInfotrygd)
 
@@ -136,6 +136,7 @@ class JournalhendelseKontantstøtteRutingTask(
 
     companion object {
         const val TASK_STEP_TYPE = "journalhendelseKontantstøtteRuting"
+        const val KONTANTSTØTTE_SØKNAD_BREV_KODE = "NAV 34-00.08"
     }
 }
 
