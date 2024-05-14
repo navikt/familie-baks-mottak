@@ -9,6 +9,7 @@ metadata:
 spec:
   envFrom:
     - secret: familie-baks-mottak
+    - secret: familie-baks-mottak-unleash-api-token
   image: {{ image }}
   port: 8090
   leaderElection: true
@@ -71,6 +72,7 @@ spec:
         - host: norg2.dev-fss-pub.nais.io
         - host: familie-ba-infotrygd.dev-fss-pub.nais.io
         - host: familie-ks-infotrygd.dev-fss-pub.nais.io
+        - host: teamfamilie-unleash-api.nav.cloud.nais.io
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: preprod
