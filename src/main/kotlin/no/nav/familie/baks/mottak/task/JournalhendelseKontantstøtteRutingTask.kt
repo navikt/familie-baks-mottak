@@ -47,7 +47,7 @@ class JournalhendelseKontantstøtteRutingTask(
 
         val fagsakId by lazy { ksSakClient.hentFagsaknummerPåPersonident(tilPersonIdent(journalpost.bruker!!, tema)) }
 
-        val harÅpenBehandlingIFagsak by lazy { harÅpenBehandlingIFagsak(fagsakId) }
+        val harÅpenBehandlingIFagsak by lazy { ksSakClient.hentMinimalRestFagsak(fagsakId).finnesÅpenBehandlingIFagsak() }
         val harLøpendeSakIInfotrygd = søkEtterSakIInfotrygd(barnasIdenterFraPdl)
         val erKontantstøtteSøknad = journalpost.dokumenter?.find { it.brevkode == "NAV 34-00.08" } != null
 
@@ -108,14 +108,6 @@ class JournalhendelseKontantstøtteRutingTask(
             .map { it.ident }
     }
 
-    private fun harÅpenBehandlingIFagsak(
-        fagsakId: Long,
-    ): Boolean {
-        val minimalFagsak = ksSakClient.hentMinimalRestFagsak(fagsakId)
-
-        return minimalFagsak.finnesÅpenBehandlingIFagsak()
-    }
-
     private fun incrementSakssystemMarkering(saksystem: String) {
         if (!sakssystemMarkeringCounter.containsKey(saksystem)) {
             sakssystemMarkeringCounter[saksystem] =
@@ -126,7 +118,7 @@ class JournalhendelseKontantstøtteRutingTask(
 
     private fun søkEtterSakIInfotrygd(alleBarnasIdenter: List<String>): Boolean {
         return if (infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(alleBarnasIdenter)) {
-            infotrygdKontantstøtteClient.hentPerioderMedKontantstotteIInfotrygdByBarn(alleBarnasIdenter).data.harPågåendeSak()
+            infotrygdKontantstøtteClient.hentPerioderMedKontantstotteIInfotrygdByBarn(alleBarnasIdenter).data.harPågåendeSakIInfotrygd()
         } else {
             false
         }
@@ -147,7 +139,7 @@ class JournalhendelseKontantstøtteRutingTask(
     }
 }
 
-private fun List<StonadDto>.harPågåendeSak(): Boolean = any { it.erPågåendeSak() }
+private fun List<StonadDto>.harPågåendeSakIInfotrygd(): Boolean = any { it.erPågåendeSak() }
 
 private fun StonadDto.erPågåendeSak(): Boolean {
     return when {
