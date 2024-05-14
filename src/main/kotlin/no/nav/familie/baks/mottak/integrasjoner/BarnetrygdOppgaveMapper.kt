@@ -13,7 +13,7 @@ class BarnetrygdOppgaveMapper(hentEnhetClient: HentEnhetClient, pdlClient: PdlCl
     // Behandlingstema og behandlingstype settes basert på regelsettet som er dokumentert nederst her: https://confluence.adeo.no/display/TFA/Mottak+av+dokumenter
     override fun hentBehandlingstema(journalpost: Journalpost): String? {
         return when {
-            erEØS(journalpost) -> Behandlingstema.BarnetrygdEØS.value
+            erEØS(journalpost, Tema.BAR) -> Behandlingstema.BarnetrygdEØS.value
             hoveddokumentErÅrligDifferanseutbetalingAvBarnetrygd(journalpost) -> null
             else -> Behandlingstema.OrdinærBarnetrygd.value
         }

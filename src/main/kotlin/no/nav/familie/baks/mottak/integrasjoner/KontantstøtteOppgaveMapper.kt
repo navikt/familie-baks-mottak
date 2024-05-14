@@ -19,7 +19,7 @@ class KontantstøtteOppgaveMapper(
 
     override fun hentBehandlingstype(journalpost: Journalpost): Behandlingstype {
         return when {
-            erEØS(journalpost) -> Behandlingstype.EØS
+            erEØS(journalpost, Tema.KON) -> Behandlingstype.EØS
             else -> Behandlingstype.NASJONAL
         }
     }

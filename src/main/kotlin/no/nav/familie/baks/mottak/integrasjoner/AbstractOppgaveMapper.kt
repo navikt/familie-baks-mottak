@@ -127,7 +127,16 @@ abstract class AbstractOppgaveMapper(
         }
     }
 
-    fun erEØS(journalpost: Journalpost) = journalpost.bruker?.type == BrukerIdType.FNR && erDnummer(journalpost.bruker.id)
+    fun erEØS(
+        journalpost: Journalpost,
+        tema: Tema,
+    ): Boolean {
+        return when (journalpost.bruker?.type) {
+            BrukerIdType.FNR -> erDnummer(journalpost.bruker.id)
+            BrukerIdType.AKTOERID -> erDnummer(pdlClient.hentPersonident(journalpost.bruker.id, tema))
+            else -> false
+        }
+    }
 
     private fun validerJournalpost(journalpost: Journalpost) {
         if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
@@ -150,7 +159,8 @@ interface IOppgaveMapper {
     fun støtterTema(tema: Tema) = this.tema == tema
 }
 
-@Service class OppgaveMapperService(val oppgaveMappers: Collection<IOppgaveMapper>) {
+@Service
+class OppgaveMapperService(val oppgaveMappers: Collection<IOppgaveMapper>) {
     fun tilOpprettOppgaveRequest(
         oppgavetype: Oppgavetype,
         journalpost: Journalpost,
