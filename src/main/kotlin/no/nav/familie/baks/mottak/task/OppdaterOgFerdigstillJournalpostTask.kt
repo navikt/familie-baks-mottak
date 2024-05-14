@@ -30,7 +30,7 @@ class OppdaterOgFerdigstillJournalpostTask(
                 .takeUnless { it.bruker == null } ?: error("Journalpost ${task.payload} mangler bruker")
 
         val fagsakId = task.metadata["fagsakId"] as String
-        val tema = Tema.valueOf(task.metadata["tema"] as String)
+        val tema = Tema.valueOf(journalpost.tema!!)
 
         when (journalpost.journalstatus) {
             Journalstatus.MOTTATT -> {
@@ -40,11 +40,11 @@ class OppdaterOgFerdigstillJournalpostTask(
                 }.fold(
                     onSuccess = {
                         log.info("Har oppdatert og automatisk ferdigstilt journalpost ${journalpost.journalpostId}")
-
+                        log.info("Oppretter OpprettSøknadBehandlingISakTask for fagsak $fagsakId m/ tema $tema")
                         Task(
-                            OpprettBehandlingISakTask.TASK_STEP_TYPE,
-                            journalpost.journalpostId,
-                            task.metadata,
+                            type = OpprettSøknadBehandlingISakTask.TASK_STEP_TYPE,
+                            payload = journalpost.journalpostId,
+                            properties = task.metadata,
                         ).also(taskService::save)
                     },
                     onFailure = {
@@ -53,10 +53,9 @@ class OppdaterOgFerdigstillJournalpostTask(
                                 "${journalpost.journalpostId}.",
                         )
                         Task(
-                            OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
-                            task.metadata["sakssystemMarkering"] as String,
-                            // Husk å legge til journalpostid hvis det feiler
-                            task.metadata,
+                            type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
+                            payload = task.metadata["sakssystemMarkering"] as String,
+                            properties = task.metadata,
                         ).also(taskService::save)
 
                         return@doTask

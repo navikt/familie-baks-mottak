@@ -54,13 +54,13 @@ class KsSakClient
             søkersIdent: String,
             behandlingÅrsak: String,
             søknadMottattDato: LocalDateTime,
-            type: String,
+            type: BehandlingType,
         ) {
             val uri = URI.create("$ksSakServiceUri/behandlinger")
             kotlin.runCatching {
                 postForEntity<Ressurs<Any>>(
                     uri,
-                    OpprettKontantstøtteBehandlingRequest(
+                    RestOpprettBehandlingRequest(
                         kategori,
                         søkersIdent,
                         behandlingÅrsak,

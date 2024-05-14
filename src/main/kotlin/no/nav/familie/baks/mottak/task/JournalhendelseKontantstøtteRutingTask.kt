@@ -10,6 +10,7 @@ import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.StonadDto
+import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingIFagsak
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.prosessering.AsyncTaskStep
@@ -46,17 +47,13 @@ class JournalhendelseKontantstøtteRutingTask(
 
         val fagsakId by lazy { ksSakClient.hentFagsaknummerPåPersonident(tilPersonIdent(journalpost.bruker!!, tema)) }
 
-        val harLøpendeSakIKsSak by lazy {
-            harLøpendeSakIKsSak(fagsakId)
-        }
-
+        val harÅpenBehandlingIFagsak by lazy { harÅpenBehandlingIFagsak(fagsakId) }
         val harLøpendeSakIInfotrygd = søkEtterSakIInfotrygd(barnasIdenterFraPdl)
+        val erKontantstøtteSøknad = journalpost.dokumenter?.find { it.brevkode == "NAV 34-00.08" } != null
 
         val sakssystemMarkering = hentSakssystemMarkering(harLøpendeSakIInfotrygd)
 
-        val erKontantstøtteSøknad = journalpost.dokumenter?.find { it.brevkode == "NAV 34-00.08" } != null
-
-        val skalAutomatiskJournalføreJournalpost = erKontantstøtteSøknad && !harLøpendeSakIInfotrygd && !harLøpendeSakIKsSak
+        val skalAutomatiskJournalføreJournalpost = erKontantstøtteSøknad && !harLøpendeSakIInfotrygd && !harÅpenBehandlingIFagsak
 
         if (skalAutomatiskJournalføreJournalpost) {
             log.info("Oppretter OppdaterOgFerdigstillJournalpostTask for journalpost med id ${journalpost.journalpostId}")
@@ -67,7 +64,6 @@ class JournalhendelseKontantstøtteRutingTask(
                 properties =
                     task.metadata.apply {
                         this["fagsakId"] = "$fagsakId"
-                        this["tema"] = Tema.KON.name
                         this["personIdent"] = brukersIdent
                         this["sakssystemMarkering"] = sakssystemMarkering
                     },
@@ -112,12 +108,12 @@ class JournalhendelseKontantstøtteRutingTask(
             .map { it.ident }
     }
 
-    private fun harLøpendeSakIKsSak(
+    private fun harÅpenBehandlingIFagsak(
         fagsakId: Long,
     ): Boolean {
         val minimalFagsak = ksSakClient.hentMinimalRestFagsak(fagsakId)
 
-        return minimalFagsak.behandlinger.any { it.status != "AVSLUTTET" }
+        return minimalFagsak.finnesÅpenBehandlingIFagsak()
     }
 
     private fun incrementSakssystemMarkering(saksystem: String) {
