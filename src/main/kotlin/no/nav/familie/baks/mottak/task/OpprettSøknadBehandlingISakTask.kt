@@ -51,7 +51,7 @@ class OpprettSøknadBehandlingISakTask(
 
                     log.info("Oppretter ny $kategori $type behandling i ks-sak")
 
-                    ksSakClient.opprettBehandlingIKsSak(
+                    ksSakClient.opprettBehandling(
                         kategori = kategori,
                         behandlingÅrsak = "SØKNAD",
                         søkersIdent = brukersIdent,

@@ -43,12 +43,10 @@ class JournalhendelseKontantstøtteRutingTask(
 
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
 
-        val barnasIdenterFraPdl = hentBarnasIdenterFraPdl(brukersIdent, tema)
-
         val fagsakId by lazy { ksSakClient.hentFagsaknummerPåPersonident(tilPersonIdent(journalpost.bruker!!, tema)) }
 
         val harÅpenBehandlingIFagsak by lazy { ksSakClient.hentMinimalRestFagsak(fagsakId).finnesÅpenBehandlingIFagsak() }
-        val harLøpendeSakIInfotrygd = søkEtterSakIInfotrygd(barnasIdenterFraPdl)
+        val harLøpendeSakIInfotrygd = harLøpendeSakIInfotrygd(brukersIdent)
         val erKontantstøtteSøknad = journalpost.dokumenter?.any { it.brevkode == KONTANTSTØTTE_SØKNAD_BREV_KODE } ?: false
 
         val sakssystemMarkering = hentSakssystemMarkering(harLøpendeSakIInfotrygd)
@@ -116,9 +114,11 @@ class JournalhendelseKontantstøtteRutingTask(
         sakssystemMarkeringCounter[saksystem]!!.increment()
     }
 
-    private fun søkEtterSakIInfotrygd(alleBarnasIdenter: List<String>): Boolean {
-        return if (infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(alleBarnasIdenter)) {
-            infotrygdKontantstøtteClient.hentPerioderMedKontantstotteIInfotrygdByBarn(alleBarnasIdenter).data.harPågåendeSakIInfotrygd()
+    private fun harLøpendeSakIInfotrygd(brukersIdent: String): Boolean {
+        val barnasIdenterFraPdl = hentBarnasIdenterFraPdl(brukersIdent, tema)
+
+        return if (infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(barnasIdenterFraPdl)) {
+            infotrygdKontantstøtteClient.hentPerioderMedKontantstotteIInfotrygdByBarn(barnasIdenterFraPdl).data.harPågåendeSakIInfotrygd()
         } else {
             false
         }

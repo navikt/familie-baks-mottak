@@ -49,7 +49,7 @@ class KsSakClient
             )
         }
 
-        fun opprettBehandlingIKsSak(
+        fun opprettBehandling(
             kategori: String,
             søkersIdent: String,
             behandlingÅrsak: String,

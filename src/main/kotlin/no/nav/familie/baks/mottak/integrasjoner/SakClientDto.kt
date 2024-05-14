@@ -91,7 +91,7 @@ enum class FagsakDeltagerRolle {
 
 enum class FagsakStatus {
     OPPRETTET,
-    LØPENDE, // Har minst én behandling gjeldende for fremtidig utbetaling
+    LØPENDE,
     AVSLUTTET,
 }
 
