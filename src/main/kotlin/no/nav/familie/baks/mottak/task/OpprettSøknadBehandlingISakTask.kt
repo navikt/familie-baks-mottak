@@ -39,7 +39,7 @@ class OpprettSøknadBehandlingISakTask(
             Tema.KON -> {
                 val kategori = kontantstøtteOppgaveMapper.hentBehandlingstype(journalpost).name
                 val fagsak = ksSakClient.hentMinimalRestFagsak(fagsakId.toLong())
-                log.info("")
+                log.info("kategori = $kategori")
 
                 val finnesÅpenBehandlingPåFagsak = fagsak.finnesÅpenBehandlingIFagsak()
 
