@@ -53,22 +53,6 @@ class OppgaveClient
             return responseFraOpprettOppgave(uri, request)
         }
 
-        fun opprettBehandleSakOppgave(
-            journalpost: Journalpost,
-            beskrivelse: String? = null,
-        ): OppgaveResponse {
-            logger.info("Oppretter \"Behandle sak\"-oppgave for digital søknad")
-            val uri = URI.create("$integrasjonUri/oppgave/opprett")
-            val request =
-                oppgaveMapperService.tilOpprettOppgaveRequest(
-                    Oppgavetype.BehandleSak,
-                    journalpost,
-                    beskrivelse,
-                )
-
-            return responseFraOpprettOppgave(uri, request)
-        }
-
         @Retryable(
             value = [RuntimeException::class],
             maxAttempts = 3,

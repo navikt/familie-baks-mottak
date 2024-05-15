@@ -12,7 +12,7 @@ import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.StonadDto
-import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingIFagsak
+import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.prosessering.AsyncTaskStep
@@ -48,10 +48,14 @@ class JournalhendelseKontantstøtteRutingTask(
 
         val fagsakId by lazy { ksSakClient.hentFagsaknummerPåPersonident(tilPersonIdent(journalpost.bruker!!, tema)) }
 
-        val harÅpenBehandlingIFagsak by lazy { ksSakClient.hentMinimalRestFagsak(fagsakId).finnesÅpenBehandlingIFagsak() }
+        val harÅpenBehandlingIFagsak by lazy { ksSakClient.hentMinimalRestFagsak(fagsakId).finnesÅpenBehandlingPåFagsak() }
         val harLøpendeSakIInfotrygd = harLøpendeSakIInfotrygd(brukersIdent)
         val erKontantstøtteSøknad = journalpost.dokumenter?.any { it.brevkode == KONTANTSTØTTE_SØKNAD_BREV_KODE } ?: false
-        val featureToggleForAutomatiskJournalføringSkruddPå = unleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER)
+        val featureToggleForAutomatiskJournalføringSkruddPå =
+            unleashService.isEnabled(
+                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER,
+                defaultValue = false,
+            )
 
         val sakssystemMarkering = hentSakssystemMarkering(harLøpendeSakIInfotrygd)
 
@@ -104,8 +108,7 @@ class JournalhendelseKontantstøtteRutingTask(
         val barnasIdenter =
             pdlClient.hentPersonMedRelasjoner(brukersIdent, tema).forelderBarnRelasjoner
                 .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
-                .map { it.relatertPersonsIdent }
-                .filterNotNull()
+                .mapNotNull { it.relatertPersonsIdent }
 
         return barnasIdenter.flatMap { pdlClient.hentIdenter(it, Tema.KON) }
             .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
@@ -124,7 +127,7 @@ class JournalhendelseKontantstøtteRutingTask(
         val barnasIdenterFraPdl = hentBarnasIdenterFraPdl(brukersIdent, tema)
 
         return if (infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(barnasIdenterFraPdl)) {
-            infotrygdKontantstøtteClient.hentPerioderMedKontantstotteIInfotrygdByBarn(barnasIdenterFraPdl).data.harPågåendeSakIInfotrygd()
+            infotrygdKontantstøtteClient.hentPerioderMedKontantstotteIInfotrygdByBarn(barnasIdenterFraPdl).data.harPågåendeSak()
         } else {
             false
         }
@@ -146,7 +149,7 @@ class JournalhendelseKontantstøtteRutingTask(
     }
 }
 
-private fun List<StonadDto>.harPågåendeSakIInfotrygd(): Boolean = any { it.erPågåendeSak() }
+private fun List<StonadDto>.harPågåendeSak(): Boolean = any { it.erPågåendeSak() }
 
 private fun StonadDto.erPågåendeSak(): Boolean {
     return when {

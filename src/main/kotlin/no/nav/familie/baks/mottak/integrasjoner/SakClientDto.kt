@@ -112,4 +112,4 @@ enum class BehandlingStatus {
     AVSLUTTET,
 }
 
-fun RestMinimalFagsak.finnesÅpenBehandlingIFagsak() = behandlinger.any { it.aktiv && it.status != BehandlingStatus.AVSLUTTET }
+fun RestMinimalFagsak.finnesÅpenBehandlingPåFagsak() = behandlinger.any { it.aktiv && it.status != BehandlingStatus.AVSLUTTET }

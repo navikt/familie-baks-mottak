@@ -7,7 +7,7 @@ import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.KontantstøtteOppgaveMapper
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
-import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingIFagsak
+import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -35,12 +35,12 @@ class OpprettSøknadBehandlingISakTask(
         val brukersIdent = task.metadata["personIdent"] as String
         val tema = Tema.valueOf(journalpost.tema!!)
 
-        when (tema) {
+        when (val tema = Tema.valueOf(journalpost.tema!!)) {
             Tema.KON -> {
                 val kategori = kontantstøtteOppgaveMapper.hentBehandlingstype(journalpost).name
                 val fagsak = ksSakClient.hentMinimalRestFagsak(fagsakId.toLong())
 
-                val finnesÅpenBehandlingPåFagsak = fagsak.finnesÅpenBehandlingIFagsak()
+                val finnesÅpenBehandlingPåFagsak = fagsak.finnesÅpenBehandlingPåFagsak()
 
                 if (finnesÅpenBehandlingPåFagsak) {
                     log.info("Finnes allerede åpen behandling på fagsak $fagsakId m/ tema $tema. Hopper over opprettelsen av ny behandling")

@@ -159,12 +159,12 @@ enum class Sakspart(val part: String) {
 
 private fun List<RestFagsakDeltager>.harForelderEllerBarnPågåendeSak(baSakClient: BaSakClient): Sakspart? =
     when {
-        any { it.rolle == FORELDER && it.harPågåendeSakIInfotrygd(baSakClient) } -> Sakspart.SØKER
-        any { it.rolle == BARN && it.harPågåendeSakIInfotrygd(baSakClient) } -> Sakspart.ANNEN
+        any { it.rolle == FORELDER && it.harPågåendeSak(baSakClient) } -> Sakspart.SØKER
+        any { it.rolle == BARN && it.harPågåendeSak(baSakClient) } -> Sakspart.ANNEN
         else -> null
     }
 
-private fun RestFagsakDeltager.harPågåendeSakIInfotrygd(baSakClient: BaSakClient): Boolean {
+private fun RestFagsakDeltager.harPågåendeSak(baSakClient: BaSakClient): Boolean {
     return when (fagsakStatus) {
         OPPRETTET, LØPENDE -> true
         AVSLUTTET -> !sisteBehandlingHenlagtEllerTekniskOpphør(baSakClient.hentRestFagsak(fagsakId))
