@@ -33,6 +33,7 @@ import java.time.temporal.ChronoUnit
     "no.nav.familie.prosessering",
     "no.nav.familie.sikkerhet",
     "no.nav.familie.baks.mottak",
+    "no.nav.familie.unleash",
 )
 @EntityScan("no.nav.familie.prosessering", "no.nav.familie")
 @ConfigurationPropertiesScan("no.nav.familie")
