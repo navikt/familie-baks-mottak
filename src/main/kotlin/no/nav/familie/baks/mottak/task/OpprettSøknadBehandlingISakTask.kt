@@ -35,7 +35,7 @@ class OpprettSøknadBehandlingISakTask(
         val brukersIdent = task.metadata["personIdent"] as String
         val tema = Tema.valueOf(journalpost.tema!!)
 
-        when (val tema = Tema.valueOf(journalpost.tema!!)) {
+        when (tema) {
             Tema.KON -> {
                 val kategori = kontantstøtteOppgaveMapper.hentBehandlingstype(journalpost).name
                 val fagsak = ksSakClient.hentMinimalRestFagsak(fagsakId.toLong())

@@ -70,7 +70,7 @@ class JournalhendelseKontantstøtteRutingTaskTest {
         setupPDLMocks()
         setupKsSakClientMocks()
 
-        every { unleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER) } returns false
+        every { unleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER, false) } returns false
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
         every { journalpostClient.hentJournalpost("1") } returns
             Journalpost(
@@ -121,7 +121,7 @@ class JournalhendelseKontantstøtteRutingTaskTest {
         setupPDLMocks()
         setupKsSakClientMocks()
 
-        every { unleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER) } returns false
+        every { unleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER, false) } returns false
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
         every { journalpostClient.hentJournalpost("1") } returns
             Journalpost(
@@ -172,7 +172,7 @@ class JournalhendelseKontantstøtteRutingTaskTest {
         setupPDLMocks()
         setupKsSakClientMocks()
 
-        every { unleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER) } returns false
+        every { unleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER, false) } returns false
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns false
 
         every { taskService.save(capture(taskSlot)) } returns mockk()

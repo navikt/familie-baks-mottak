@@ -55,18 +55,23 @@ class OppdaterOgFerdigstillJournalpostTask(
                         Task(
                             type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
                             payload = task.metadata["sakssystemMarkering"] as String,
-                            properties = task.metadata,
+                            properties =
+                                task.metadata.apply {
+                                    this["tema"] = tema
+                                },
                         ).also(taskService::save)
 
                         return@doTask
                     },
                 )
             }
+
             Journalstatus.JOURNALFOERT ->
                 log.info(
                     "Skipper oppdatering og ferdigstilling av " +
                         "journalpost ${journalpost.journalpostId} som alt er ferdig journalført",
                 )
+
             else -> error("Uventet journalstatus ${journalpost.journalstatus} for journalpost ${journalpost.journalpostId}")
         }
     }
