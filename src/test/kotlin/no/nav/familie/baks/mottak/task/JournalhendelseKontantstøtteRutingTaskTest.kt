@@ -6,6 +6,8 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.slot
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
+import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.domene.personopplysning.Person
 import no.nav.familie.baks.mottak.integrasjoner.BarnDto
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
@@ -52,6 +54,9 @@ class JournalhendelseKontantstøtteRutingTaskTest {
     @MockK
     private lateinit var journalpostClient: JournalpostClient
 
+    @MockK
+    private lateinit var unleashService: UnleashNextMedContextService
+
     @InjectMockKs
     private lateinit var journalhendelseKontantstøtteRutingTask: JournalhendelseKontantstøtteRutingTask
 
@@ -63,6 +68,9 @@ class JournalhendelseKontantstøtteRutingTaskTest {
     fun `doTask - skal opprette OpprettJournalføringOppgaveTask med informasjon om at det finnes løpende sak i Infotrygd når et eller flere av barna har løpende sak i Infotrygd`() {
         val taskSlot = slot<Task>()
         setupPDLMocks()
+        setupKsSakClientMocks()
+
+        every { unleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER) } returns false
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
         every { journalpostClient.hentJournalpost("1") } returns
             Journalpost(
@@ -111,6 +119,9 @@ class JournalhendelseKontantstøtteRutingTaskTest {
     fun `doTask - skal opprette OpprettJournalføringOppgaveTask med tom sakssystem-markering når et eller flere av barna har sak i Infotrygd men ingen løpende`() {
         val taskSlot = slot<Task>()
         setupPDLMocks()
+        setupKsSakClientMocks()
+
+        every { unleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER) } returns false
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
         every { journalpostClient.hentJournalpost("1") } returns
             Journalpost(
@@ -159,6 +170,9 @@ class JournalhendelseKontantstøtteRutingTaskTest {
     fun `doTask - skal opprette OpprettJournalføringOppgaveTask med tom sakssystem-markering når ingen av barna har sak i Infotrygd`() {
         val taskSlot = slot<Task>()
         setupPDLMocks()
+        setupKsSakClientMocks()
+
+        every { unleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER) } returns false
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns false
 
         every { taskService.save(capture(taskSlot)) } returns mockk()
@@ -223,7 +237,9 @@ class JournalhendelseKontantstøtteRutingTaskTest {
             )
 
         every { pdlClient.hentPersonident(any(), any()) } returns "TEST"
+    }
 
+    private fun setupKsSakClientMocks() {
         every { ksSakClient.hentFagsaknummerPåPersonident("TEST") } returns 1L
 
         every { ksSakClient.hentMinimalRestFagsak(1L) } returns RestMinimalFagsak(id = 0, emptyList(), FagsakStatus.OPPRETTET)

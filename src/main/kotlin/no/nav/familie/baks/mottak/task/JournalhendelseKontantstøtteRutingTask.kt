@@ -2,6 +2,8 @@ package no.nav.familie.baks.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
+import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.Identgruppe
@@ -33,6 +35,7 @@ class JournalhendelseKontantstøtteRutingTask(
     private val taskService: TaskService,
     private val journalpostClient: JournalpostClient,
     private val ksSakClient: KsSakClient,
+    private val unleashService: UnleashNextMedContextService,
 ) : AsyncTaskStep {
     val log: Logger = LoggerFactory.getLogger(JournalhendelseKontantstøtteRutingTask::class.java)
     val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
@@ -48,10 +51,13 @@ class JournalhendelseKontantstøtteRutingTask(
         val harÅpenBehandlingIFagsak by lazy { ksSakClient.hentMinimalRestFagsak(fagsakId).finnesÅpenBehandlingIFagsak() }
         val harLøpendeSakIInfotrygd = harLøpendeSakIInfotrygd(brukersIdent)
         val erKontantstøtteSøknad = journalpost.dokumenter?.any { it.brevkode == KONTANTSTØTTE_SØKNAD_BREV_KODE } ?: false
+        val featureToggleForAutomatiskJournalføringSkruddPå = unleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER)
 
         val sakssystemMarkering = hentSakssystemMarkering(harLøpendeSakIInfotrygd)
 
-        val skalAutomatiskJournalføreJournalpost = erKontantstøtteSøknad && !harLøpendeSakIInfotrygd && !harÅpenBehandlingIFagsak
+        val skalAutomatiskJournalføreJournalpost =
+            featureToggleForAutomatiskJournalføringSkruddPå &&
+                erKontantstøtteSøknad && !harLøpendeSakIInfotrygd && !harÅpenBehandlingIFagsak
 
         if (skalAutomatiskJournalføreJournalpost) {
             log.info("Oppretter OppdaterOgFerdigstillJournalpostTask for journalpost med id ${journalpost.journalpostId}")
