@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class UnleashNextMedContextService(
-    private val unleashService: UnleashService,
+    private val unleashNext: UnleashService,
 ) {
-    fun isEnabled(toggleId: String): Boolean = unleashService.isEnabled(toggleId)
+    fun isEnabled(toggleId: String): Boolean = unleashNext.isEnabled(toggleId)
 }
