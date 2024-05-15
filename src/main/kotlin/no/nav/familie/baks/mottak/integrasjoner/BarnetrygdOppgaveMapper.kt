@@ -19,12 +19,14 @@ class BarnetrygdOppgaveMapper(hentEnhetClient: HentEnhetClient, pdlClient: PdlCl
         }
     }
 
-    override fun hentBehandlingstype(journalpost: Journalpost): String? {
+    override fun hentBehandlingstype(journalpost: Journalpost): Behandlingstype? {
         return when {
-            hoveddokumentErÅrligDifferanseutbetalingAvBarnetrygd(journalpost) -> Behandlingstype.Utland.value
+            hoveddokumentErÅrligDifferanseutbetalingAvBarnetrygd(journalpost) -> Behandlingstype.Utland
             else -> null
         }
     }
+
+    override fun hentBehandlingstypeVerdi(journalpost: Journalpost): String? = hentBehandlingstype(journalpost)?.value
 
     private fun hoveddokumentErÅrligDifferanseutbetalingAvBarnetrygd(journalpost: Journalpost) =
         // Brevkode "NAV 33-00.15" representerer dokumentet "Norsk sokkel - Årlig differanseutbetaling av barnetrygd"

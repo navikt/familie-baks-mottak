@@ -24,7 +24,7 @@ import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
-import no.nav.familie.baks.mottak.task.JournalhendelseRutingTask
+import no.nav.familie.baks.mottak.task.JournalhendelseBarnetrygdRutingTask
 import no.nav.familie.baks.mottak.task.OpprettJournalføringOppgaveTask
 import no.nav.familie.baks.mottak.task.SendTilBaSakTask
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
@@ -180,7 +180,7 @@ class JournalføringHendelseServiceTest {
         assertThat(taskSlot.captured).isNotNull
         assertThat(taskSlot.captured.payload).isEqualTo("SKAN_NETS")
         assertThat(taskSlot.captured.metadata.getProperty("callId")).isEqualTo("papir")
-        assertThat(taskSlot.captured.type).isEqualTo(JournalhendelseRutingTask.TASK_STEP_TYPE)
+        assertThat(taskSlot.captured.type).isEqualTo(JournalhendelseBarnetrygdRutingTask.TASK_STEP_TYPE)
     }
 
     @Test
@@ -198,7 +198,7 @@ class JournalføringHendelseServiceTest {
         assertThat(taskSlot.captured).isNotNull
         assertThat(taskSlot.captured.payload).isEqualTo("NAV_NO")
         assertThat(taskSlot.captured.metadata.getProperty("callId")).isEqualTo("digital")
-        assertThat(taskSlot.captured.type).isEqualTo(JournalhendelseRutingTask.TASK_STEP_TYPE)
+        assertThat(taskSlot.captured.type).isEqualTo(JournalhendelseBarnetrygdRutingTask.TASK_STEP_TYPE)
     }
 
     @Test

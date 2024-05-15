@@ -7,6 +7,8 @@ import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
+import no.nav.familie.baks.mottak.integrasjoner.BehandlingStatus
+import no.nav.familie.baks.mottak.integrasjoner.BehandlingType
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingUnderkategori
 import no.nav.familie.baks.mottak.integrasjoner.Dødsfall
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle
@@ -26,7 +28,6 @@ import no.nav.familie.baks.mottak.integrasjoner.RestFagsakIdOgTilknyttetAktørId
 import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
 import no.nav.familie.baks.mottak.integrasjoner.RestVisningBehandling
 import no.nav.familie.baks.mottak.integrasjoner.Sivilstand
-import no.nav.familie.baks.mottak.task.VurderLivshendelseService.Companion.BEHANDLING_TYPE_MIGRERING
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.kontrakter.ba.infotrygd.Stønad
 import no.nav.familie.kontrakter.felles.Behandlingstema
@@ -735,6 +736,7 @@ class VurderLivshendelseServiceTest {
                 listOf(
                     lagRestVisningBehandling(underkategori = BehandlingUnderkategori.UTVIDET),
                 ),
+            status = FagsakStatus.OPPRETTET,
         )
 
     private fun lagMinimalRestFagsakForKS() =
@@ -744,6 +746,7 @@ class VurderLivshendelseServiceTest {
                 listOf(
                     lagRestVisningBehandling(underkategori = null),
                 ),
+            status = FagsakStatus.OPPRETTET,
         )
 
     private fun lagRestVisningBehandling(underkategori: BehandlingUnderkategori?) =
@@ -753,8 +756,8 @@ class VurderLivshendelseServiceTest {
             kategori = BehandlingKategori.NASJONAL,
             opprettetTidspunkt = LocalDateTime.now(),
             resultat = "INNVILGET",
-            status = "AVSLUTTET",
-            type = BEHANDLING_TYPE_MIGRERING,
+            status = BehandlingStatus.AVSLUTTET,
+            type = BehandlingType.MIGRERING_FRA_INFOTRYGD,
             underkategori = underkategori,
         )
 

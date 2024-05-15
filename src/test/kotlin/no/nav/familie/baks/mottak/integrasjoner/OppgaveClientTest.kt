@@ -115,46 +115,6 @@ class OppgaveClientTest {
 
     @Test
     @Tag("integration")
-    fun `Opprett behandleSak-oppgave skal returnere oppgave id`() {
-        MDC.put("callId", "opprettJournalføringsoppgave")
-        stubFor(
-            post(urlEqualTo("/api/oppgave/opprett"))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(success(OppgaveResponse(oppgaveId = 1234))),
-                        ),
-                ),
-        )
-        mockkStatic(LocalDateTime::class)
-        every { LocalDateTime.now() } returns LocalDateTime.of(2020, 4, 1, 0, 0)
-
-        val opprettOppgaveResponse =
-            oppgaveClient.opprettBehandleSakOppgave(journalPost)
-
-        assertThat(opprettOppgaveResponse.oppgaveId).isEqualTo(1234)
-        verify(
-            anyRequestedFor(anyUrl())
-                .withHeader(NavHttpHeaders.NAV_CALL_ID.asString(), equalTo("opprettJournalføringsoppgave"))
-                .withHeader(NavHttpHeaders.NAV_CONSUMER_ID.asString(), equalTo("familie-baks-mottak"))
-                .withRequestBody(
-                    equalToJson(
-                        forventetOpprettOppgaveRequestJson(
-                            journalpostId = "1234567",
-                            oppgavetype = "BehandleSak",
-                            behandlingstema = Behandlingstema.OrdinærBarnetrygd.value,
-                            beskrivelse = "Tittel",
-                        ),
-                        true,
-                        true,
-                    ),
-                ),
-        )
-    }
-
-    @Test
-    @Tag("integration")
     fun `Opprett oppgave skal kaste feil hvis response er ugyldig`() {
         stubFor(
             post(urlEqualTo("/api/oppgave/opprett"))
@@ -167,12 +127,6 @@ class OppgaveClientTest {
 
         assertThatThrownBy {
             oppgaveClient.opprettJournalføringsoppgave(journalPost)
-        }.isInstanceOf(IntegrasjonException::class.java)
-            .hasCauseInstanceOf(RessursException::class.java)
-            .hasMessageContaining("feilet ved opprettelse av oppgave")
-
-        assertThatThrownBy {
-            oppgaveClient.opprettBehandleSakOppgave(journalPost)
         }.isInstanceOf(IntegrasjonException::class.java)
             .hasCauseInstanceOf(RessursException::class.java)
             .hasMessageContaining("feilet ved opprettelse av oppgave")

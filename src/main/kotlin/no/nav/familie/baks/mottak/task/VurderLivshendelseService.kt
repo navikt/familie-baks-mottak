@@ -4,6 +4,8 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
+import no.nav.familie.baks.mottak.integrasjoner.BehandlingStatus
+import no.nav.familie.baks.mottak.integrasjoner.BehandlingType
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingUnderkategori
 import no.nav.familie.baks.mottak.integrasjoner.Identgruppe
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
@@ -313,7 +315,7 @@ class VurderLivshendelseService(
 
     private fun hentSisteBehandlingSomErIverksatt(restFagsak: RestMinimalFagsak): RestVisningBehandling? {
         return restFagsak.behandlinger
-            .filter { it.status == STATUS_AVSLUTTET }
+            .filter { it.status == BehandlingStatus.AVSLUTTET }
             .maxByOrNull { it.opprettetTidspunkt }
     }
 
@@ -392,7 +394,7 @@ class VurderLivshendelseService(
     ): Boolean {
         val tidligsteVedtakIBaSak =
             aktivFaksak.behandlinger
-                .filter { it.resultat == RESULTAT_INNVILGET && it.status == STATUS_AVSLUTTET }
+                .filter { it.resultat == RESULTAT_INNVILGET && it.status == BehandlingStatus.AVSLUTTET }
                 .minByOrNull { it.opprettetTidspunkt } ?: return false
 
         if (dato.isAfter(tidligsteVedtakIBaSak.opprettetTidspunkt.toLocalDate())) {
@@ -400,7 +402,7 @@ class VurderLivshendelseService(
         }
 
         val erEtterTidligsteInfotrygdVedtak =
-            if (tidligsteVedtakIBaSak.type == BEHANDLING_TYPE_MIGRERING) {
+            if (tidligsteVedtakIBaSak.type == BehandlingType.MIGRERING_FRA_INFOTRYGD) {
                 hentTidligsteVedtaksdatoFraInfotrygd(personIdent, tema)?.isBefore(dato) ?: false
             } else {
                 false
@@ -483,9 +485,7 @@ class VurderLivshendelseService(
         "${VurderLivshendelseType.SIVILSTAND.beskrivelse}: ${if (personErBruker) "bruker" else "barn $personIdent"} er registrert som gift fra $formatertDato"
 
     companion object {
-        const val STATUS_AVSLUTTET = "AVSLUTTET"
         const val RESULTAT_INNVILGET = "INNVILGET"
-        const val BEHANDLING_TYPE_MIGRERING = "MIGRERING_FRA_INFOTRYGD"
     }
 }
 

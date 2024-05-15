@@ -15,7 +15,6 @@ import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.RestOperations
 import java.net.URI
-import java.time.LocalDateTime
 
 private val logger = LoggerFactory.getLogger(BaSakClient::class.java)
 
@@ -130,87 +129,3 @@ class BaSakClient
             }
         }
     }
-
-data class RestPersonIdent(
-    val personIdent: String,
-)
-
-data class RestFagsakIdOgTilknyttetAktørId(
-    val aktørId: String,
-    val fagsakId: Long,
-)
-
-data class RestMinimalFagsak(
-    val id: Long,
-    val behandlinger: List<RestVisningBehandling>,
-)
-
-class RestVisningBehandling(
-    val behandlingId: Long,
-    val opprettetTidspunkt: LocalDateTime,
-    val kategori: BehandlingKategori,
-    val underkategori: BehandlingUnderkategori?,
-    val aktiv: Boolean,
-    val årsak: String? = null,
-    val type: String,
-    val status: String,
-    val resultat: String? = null,
-    val vedtaksdato: LocalDateTime? = null,
-)
-
-data class RestFagsak(
-    val id: Long,
-    val behandlinger: List<RestUtvidetBehandling>,
-)
-
-data class RestUtvidetBehandling(
-    val aktiv: Boolean,
-    val arbeidsfordelingPåBehandling: RestArbeidsfordelingPåBehandling,
-    val behandlingId: Long,
-    val kategori: BehandlingKategori,
-    val opprettetTidspunkt: LocalDateTime,
-    val resultat: String,
-    val steg: String,
-    val type: String,
-    val underkategori: BehandlingUnderkategori,
-)
-
-data class RestArbeidsfordelingPåBehandling(
-    val behandlendeEnhetId: String,
-)
-
-enum class BehandlingKategori {
-    EØS,
-    NASJONAL,
-}
-
-enum class BehandlingUnderkategori {
-    UTVIDET,
-    ORDINÆR,
-}
-
-data class RestSøkParam(
-    val personIdent: String,
-    val barnasIdenter: List<String> = emptyList(),
-)
-
-data class RestFagsakDeltager(
-    val ident: String,
-    val rolle: FagsakDeltagerRolle,
-    val fagsakId: Long,
-    val fagsakStatus: FagsakStatus,
-)
-
-data class RestAnnullerFødsel(val barnasIdenter: List<String>, val tidligereHendelseId: String)
-
-enum class FagsakDeltagerRolle {
-    BARN,
-    FORELDER,
-    UKJENT,
-}
-
-enum class FagsakStatus {
-    OPPRETTET,
-    LØPENDE, // Har minst én behandling gjeldende for fremtidig utbetaling
-    AVSLUTTET,
-}

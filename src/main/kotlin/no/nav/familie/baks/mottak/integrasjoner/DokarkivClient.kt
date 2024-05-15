@@ -1,7 +1,9 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
 import no.nav.familie.http.client.AbstractRestClient
+import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.Ressurs
+import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentResponse
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.ArkiverDokumentRequest
 import no.nav.familie.kontrakter.felles.getDataOrThrow
@@ -23,14 +25,23 @@ class DokarkivClient(
     fun oppdaterJournalpostSak(
         jp: Journalpost,
         fagsakId: String,
+        tema: Tema,
     ) {
         logger.info("Oppdaterer journalpost ${jp.journalpostId} med fagsaktilknytning $fagsakId ")
         val uri = URI.create("$integrasjonUri/arkiv/v2/${jp.journalpostId}")
+
+        val sak =
+            when (tema) {
+                Tema.BAR -> Sak(fagsakId, Fagsystem.BA.name)
+                Tema.KON -> Sak(fagsakId, Fagsystem.KONT.name)
+                else -> throw IllegalArgumentException("Tema $tema støtter ikke oppdatering av journalpost sak")
+            }
+
         val request =
             TilknyttFagsakRequest(
                 bruker = Bruker(idType = IdType.valueOf(jp.bruker!!.type.name), id = jp.bruker.id),
-                tema = "BAR",
-                sak = Sak(fagsakId, "BA"),
+                tema = tema.name,
+                sak = sak,
             )
 
         when (val response = utførRequest(uri, request)) {
