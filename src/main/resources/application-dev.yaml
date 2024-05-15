@@ -88,6 +88,7 @@ NORG2_API_URL: #mockes ut i test
 PDL_URL: dummy
 CREDENTIAL_USERNAME: not-a-real-srvuser
 CREDENTIAL_PASSWORD: not-a-real-pw
+NAIS_APP_NAME: familie-baks-mottak
 
 # Kreves for at unleash mock skal fungere:
 UNLEASH_SERVER_API_URL: http://dummy/api/
