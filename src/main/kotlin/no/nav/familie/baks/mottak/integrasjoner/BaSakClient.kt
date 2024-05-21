@@ -137,6 +137,7 @@ class BaSakClient
             behandlingÅrsak: String,
             søknadMottattDato: LocalDateTime,
             behandlingType: BehandlingType,
+            fagsakId: Long,
         ) {
             val uri = URI.create("$sakServiceUri/behandlinger")
             kotlin.runCatching {
@@ -149,6 +150,7 @@ class BaSakClient
                         behandlingÅrsak = behandlingÅrsak,
                         søknadMottattDato = søknadMottattDato,
                         behandlingType = behandlingType,
+                        fagsakId = fagsakId,
                     ),
                 )
             }

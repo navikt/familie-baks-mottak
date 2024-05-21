@@ -83,6 +83,7 @@ class OpprettSøknadBehandlingISakTask(
                         søkersIdent = brukersIdent,
                         søknadMottattDato = journalpost.datoMottatt ?: LocalDateTime.now(),
                         behandlingType = behandlingType,
+                        fagsakId = fagsakId.toLong(),
                     )
                 }
             }

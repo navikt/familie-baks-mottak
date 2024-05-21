@@ -17,6 +17,7 @@ data class RestOpprettBehandlingBarnetrygdRequest(
     val behandlingÅrsak: String,
     val søknadMottattDato: LocalDateTime,
     val behandlingType: BehandlingType,
+    val fagsakId: Long,
 )
 
 data class RestPersonIdent(
