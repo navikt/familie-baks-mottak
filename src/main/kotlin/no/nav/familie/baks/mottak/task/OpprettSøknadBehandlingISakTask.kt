@@ -1,5 +1,7 @@
 package no.nav.familie.baks.mottak.task
 
+import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
+import no.nav.familie.baks.mottak.integrasjoner.BarnetrygdOppgaveMapper
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingStatus
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingType
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus
@@ -25,7 +27,9 @@ import java.time.LocalDateTime
 class OpprettSøknadBehandlingISakTask(
     private val journalpostClient: JournalpostClient,
     private val kontantstøtteOppgaveMapper: KontantstøtteOppgaveMapper,
+    private val barnetrygdOppgaveMapper: BarnetrygdOppgaveMapper,
     private val ksSakClient: KsSakClient,
+    private val baSakClient: BaSakClient,
 ) : AsyncTaskStep {
     val log: Logger = LoggerFactory.getLogger(OpprettSøknadBehandlingISakTask::class.java)
 
@@ -37,24 +41,48 @@ class OpprettSøknadBehandlingISakTask(
 
         when (tema) {
             Tema.KON -> {
-                val kategori = kontantstøtteOppgaveMapper.hentBehandlingstype(journalpost).name
                 val fagsak = ksSakClient.hentMinimalRestFagsak(fagsakId.toLong())
-
                 val finnesÅpenBehandlingPåFagsak = fagsak.finnesÅpenBehandlingPåFagsak()
 
                 if (finnesÅpenBehandlingPåFagsak) {
                     log.info("Finnes allerede åpen behandling på fagsak $fagsakId m/ tema $tema. Hopper over opprettelsen av ny behandling")
                 } else {
-                    val type = utledBehandlingstype(fagsak)
+                    val behandlingType = utledBehandlingstype(fagsak)
+                    val kategori = kontantstøtteOppgaveMapper.hentBehandlingstype(journalpost).name
 
-                    log.info("Oppretter ny $kategori $type behandling i ks-sak")
+                    log.info("Oppretter ny $kategori $behandlingType behandling i ks-sak")
 
                     ksSakClient.opprettBehandling(
                         kategori = kategori,
                         behandlingÅrsak = "SØKNAD",
                         søkersIdent = brukersIdent,
                         søknadMottattDato = journalpost.datoMottatt ?: LocalDateTime.now(),
-                        type = type,
+                        behandlingType = behandlingType,
+                    )
+                }
+            }
+
+            Tema.BAR -> {
+                val fagsak = baSakClient.hentMinimalRestFagsak(fagsakId.toLong())
+
+                val finnesÅpenBehandlingPåFagsak = fagsak.finnesÅpenBehandlingPåFagsak()
+
+                if (finnesÅpenBehandlingPåFagsak) {
+                    log.info("Finnes allerede åpen behandling på fagsak $fagsakId m/ tema $tema. Hopper over opprettelsen av ny behandling")
+                } else {
+                    val behandlingType = utledBehandlingstype(fagsak)
+                    val kategori = barnetrygdOppgaveMapper.utledBehandlingKategori(journalpost)
+                    val underkategori = barnetrygdOppgaveMapper.utledBehandlingUnderkategori(journalpost)
+
+                    log.info("Oppretter ny $kategori $behandlingType behandling i ba-sak")
+
+                    baSakClient.opprettBehandling(
+                        kategori = kategori,
+                        underkategori = underkategori,
+                        behandlingÅrsak = "SØKNAD",
+                        søkersIdent = brukersIdent,
+                        søknadMottattDato = journalpost.datoMottatt ?: LocalDateTime.now(),
+                        behandlingType = behandlingType,
                     )
                 }
             }

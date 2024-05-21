@@ -10,6 +10,9 @@ import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.Journalposttype
 import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
+import no.nav.familie.baks.mottak.integrasjoner.erBarnetrygdOrdinærSøknad
+import no.nav.familie.baks.mottak.integrasjoner.erBarnetrygdUtvidetSøknad
+import no.nav.familie.baks.mottak.integrasjoner.erKontantstøtteSøknad
 import no.nav.familie.baks.mottak.task.JournalhendelseBarnetrygdRutingTask
 import no.nav.familie.baks.mottak.task.JournalhendelseKontantstøtteRutingTask
 import no.nav.familie.kontrakter.felles.Tema
@@ -145,9 +148,9 @@ class JournalhendelseService(
 
     private fun behandleSkanningHendelser(journalpost: Journalpost) {
         logger.info("Ny Journalhendelse med [journalpostId=${journalpost.journalpostId}, status=${journalpost.journalstatus}, tema=${journalpost.tema}, kanal=${journalpost.kanal}]")
-        val erOrdinærBarnetrygdSøknad = journalpost.dokumenter?.find { it.brevkode == "NAV 33-00.07" } != null
-        val erUtvidetBarnetrygdSøknad = journalpost.dokumenter?.find { it.brevkode == "NAV 33-00.09" } != null
-        val erKontantstøtteSøknad = journalpost.dokumenter?.find { it.brevkode == "NAV 34-00.08" } != null
+        val erOrdinærBarnetrygdSøknad = journalpost.erBarnetrygdOrdinærSøknad()
+        val erUtvidetBarnetrygdSøknad = journalpost.erBarnetrygdUtvidetSøknad()
+        val erKontantstøtteSøknad = journalpost.erKontantstøtteSøknad()
 
         opprettJournalhendelseRutingTask(journalpost)
 

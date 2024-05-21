@@ -2,7 +2,16 @@ package no.nav.familie.baks.mottak.integrasjoner
 
 import java.time.LocalDateTime
 
-data class RestOpprettBehandlingRequest(
+data class RestOpprettBehandlingKontantstøtteRequest(
+    val kategori: String,
+    val søkersIdent: String,
+    val behandlingÅrsak: String,
+    val søknadMottattDato: LocalDateTime,
+    val behandlingType: BehandlingType,
+)
+
+data class RestOpprettBehandlingBarnetrygdRequest(
+    val underkategori: String,
     val kategori: String,
     val søkersIdent: String,
     val behandlingÅrsak: String,
