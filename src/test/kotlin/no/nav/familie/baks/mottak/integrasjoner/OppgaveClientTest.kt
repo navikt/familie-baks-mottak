@@ -66,6 +66,14 @@ class OppgaveClientTest {
                         .withBody(objectMapper.writeValueAsString(Enhet("9999", "enhetNavn", true, "Aktiv"))),
                 ),
         )
+        stubFor(
+            post(urlEqualTo("/api/graphql"))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(readfile("mockIdentInformasjonResponse.json")),
+                ),
+        )
     }
 
     @AfterEach
@@ -117,10 +125,6 @@ class OppgaveClientTest {
     @Test
     @Tag("integration")
     fun `Opprett oppgave skal kaste feil hvis response er ugyldig`() {
-        mockResponseForPdlQuery(
-            mockResponse = readfile("mockIdentInformasjonResponse.json"),
-        )
-
         stubFor(
             post(urlEqualTo("/api/oppgave/opprett"))
                 .willReturn(
@@ -244,19 +248,6 @@ class OppgaveClientTest {
                     ),
                 ),
             )
-
-        private fun mockResponseForPdlQuery(
-            mockResponse: String,
-        ) {
-            stubFor(
-                post(urlEqualTo("/api/graphql"))
-                    .willReturn(
-                        aResponse()
-                            .withHeader("Content-Type", "application/json")
-                            .withBody(mockResponse),
-                    ),
-            )
-        }
 
         private fun readfile(filnavn: String): String {
             return this::class.java.getResource("/pdl/$filnavn").readText()
