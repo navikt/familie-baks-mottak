@@ -155,7 +155,7 @@ class BaSakClient
                 )
             }
                 .onFailure {
-                    throw IntegrasjonException("Feil ved opprettelse av behandling i ks-sak.", it, uri)
+                    throw IntegrasjonException("Feil ved opprettelse av behandling i ba-sak.", it, uri)
                 }
         }
     }
