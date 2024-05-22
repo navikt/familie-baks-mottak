@@ -12,6 +12,7 @@ import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.StonadDto
+import no.nav.familie.baks.mottak.integrasjoner.erKontantstøtteSøknad
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
@@ -50,7 +51,7 @@ class JournalhendelseKontantstøtteRutingTask(
 
         val harÅpenBehandlingIFagsak by lazy { ksSakClient.hentMinimalRestFagsak(fagsakId).finnesÅpenBehandlingPåFagsak() }
         val harLøpendeSakIInfotrygd = harLøpendeSakIInfotrygd(brukersIdent)
-        val erKontantstøtteSøknad = journalpost.dokumenter?.any { it.brevkode == KONTANTSTØTTE_SØKNAD_BREV_KODE } ?: false
+        val erKontantstøtteSøknad = journalpost.erKontantstøtteSøknad()
         val featureToggleForAutomatiskJournalføringSkruddPå =
             unleashService.isEnabled(
                 toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER,
@@ -145,7 +146,6 @@ class JournalhendelseKontantstøtteRutingTask(
 
     companion object {
         const val TASK_STEP_TYPE = "journalhendelseKontantstøtteRuting"
-        const val KONTANTSTØTTE_SØKNAD_BREV_KODE = "NAV 34-00.08"
     }
 }
 

@@ -39,7 +39,7 @@ class BaSakClientTest {
                 ),
         )
 
-        val response = baSakClient.hentSaksnummer(personIdent)
+        val response = baSakClient.hentFagsaknummerPåPersonident(personIdent)
         assertThat(response).isEqualTo(fagsakId.toString())
     }
 

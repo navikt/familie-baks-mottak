@@ -5,6 +5,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.hendelser.JournalføringHendelseServiceTest
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
@@ -40,6 +41,7 @@ class SkanHendelseTaskLøypeTest {
     private val mockTaskService: TaskService = mockk(relaxed = true)
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
+    private val mockUnleashNextMedContextService: UnleashNextMedContextService = mockk()
 
     private val rutingSteg =
         JournalhendelseBarnetrygdRutingTask(
@@ -47,6 +49,8 @@ class SkanHendelseTaskLøypeTest {
             mockSakClient,
             mockInfotrygdBarnetrygdClient,
             mockTaskService,
+            mockUnleashNextMedContextService,
+            mockJournalpostClient,
         )
 
     private val journalføringSteg =
@@ -102,6 +106,10 @@ class SkanHendelseTaskLøypeTest {
         every {
             mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
         } returns InfotrygdSøkResponse(emptyList(), emptyList())
+
+        every {
+            mockUnleashNextMedContextService.isEnabled(any(), any())
+        } returns false
     }
 
     @Test
