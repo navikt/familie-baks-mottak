@@ -15,6 +15,7 @@ import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.RestOperations
 import java.net.URI
+import java.time.LocalDateTime
 
 private val logger = LoggerFactory.getLogger(BaSakClient::class.java)
 
@@ -48,7 +49,7 @@ class BaSakClient
             }
         }
 
-        fun hentSaksnummer(personIdent: String): String {
+        fun hentFagsaknummerPåPersonident(personIdent: String): String {
             val uri = URI.create("$sakServiceUri/fagsaker")
             return runCatching {
                 postForEntity<Ressurs<RestFagsak>>(uri, mapOf("personIdent" to personIdent))
@@ -127,5 +128,34 @@ class BaSakClient
             } catch (e: RestClientException) {
                 throw IllegalStateException("Innsending til sak feilet.", e)
             }
+        }
+
+        fun opprettBehandling(
+            kategori: BehandlingKategori,
+            underkategori: BehandlingUnderkategori,
+            søkersIdent: String,
+            behandlingÅrsak: String,
+            søknadMottattDato: LocalDateTime,
+            behandlingType: BehandlingType,
+            fagsakId: Long,
+        ) {
+            val uri = URI.create("$sakServiceUri/behandlinger")
+            kotlin.runCatching {
+                postForEntity<Ressurs<Any>>(
+                    uri,
+                    RestOpprettBehandlingBarnetrygdRequest(
+                        kategori = kategori.name,
+                        underkategori = underkategori.name,
+                        søkersIdent = søkersIdent,
+                        behandlingÅrsak = behandlingÅrsak,
+                        søknadMottattDato = søknadMottattDato,
+                        behandlingType = behandlingType,
+                        fagsakId = fagsakId,
+                    ),
+                )
+            }
+                .onFailure {
+                    throw IntegrasjonException("Feil ved opprettelse av behandling i ba-sak.", it, uri)
+                }
         }
     }

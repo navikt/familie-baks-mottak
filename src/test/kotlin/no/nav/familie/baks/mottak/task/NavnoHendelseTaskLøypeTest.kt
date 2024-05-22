@@ -5,6 +5,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
@@ -40,6 +41,7 @@ class NavnoHendelseTaskLøypeTest {
     private val mockTaskService: TaskService = mockk(relaxed = true)
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
+    private val mockUnleashNextMedContextService: UnleashNextMedContextService = mockk()
 
     private val rutingSteg =
         JournalhendelseBarnetrygdRutingTask(
@@ -47,6 +49,8 @@ class NavnoHendelseTaskLøypeTest {
             mockSakClient,
             mockInfotrygdBarnetrygdClient,
             mockTaskService,
+            mockUnleashNextMedContextService,
+            mockJournalpostClient,
         )
 
     private val journalføringSteg =
@@ -98,6 +102,9 @@ class NavnoHendelseTaskLøypeTest {
         every {
             mockPdlClient.hentIdenter(any(), any())
         } returns listOf(IdentInformasjon("12345678910", historisk = false, gruppe = "FOLKEREGISTERIDENT"))
+        every {
+            mockUnleashNextMedContextService.isEnabled(any(), any())
+        } returns false
     }
 
     @Test
@@ -106,7 +113,7 @@ class NavnoHendelseTaskLøypeTest {
             mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
         } returns listOf(RestFagsakDeltager("12345678901", FORELDER, FAGSAK_ID.toLong(), LØPENDE))
 
-        every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
+        every { mockSakClient.hentFagsaknummerPåPersonident(any()) } returns FAGSAK_ID
 
         kjørRutingTaskOgReturnerNesteTask().run {
             Assertions.assertThat(this.type).isEqualTo(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE)
@@ -146,7 +153,7 @@ class NavnoHendelseTaskLøypeTest {
             mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
         } returns listOf(RestFagsakDeltager("12345678901", FORELDER, FAGSAK_ID.toLong(), LØPENDE))
 
-        every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
+        every { mockSakClient.hentFagsaknummerPåPersonident(any()) } returns FAGSAK_ID
 
         every {
             mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
@@ -179,7 +186,7 @@ class NavnoHendelseTaskLøypeTest {
             mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
         } returns listOf(RestFagsakDeltager("12345678901", FORELDER, FAGSAK_ID.toLong(), LØPENDE))
 
-        every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
+        every { mockSakClient.hentFagsaknummerPåPersonident(any()) } returns FAGSAK_ID
 
         every {
             mockInfotrygdBarnetrygdClient.hentSaker(any(), any())

@@ -27,6 +27,7 @@ import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.log.NavHttpHeaders
+import org.apache.commons.lang3.StringUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
@@ -45,7 +46,7 @@ import java.time.LocalDateTime
 
 @SpringBootTest(
     classes = [DevLauncher::class],
-    properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api", "NORG2_API_URL=http://localhost:28085/norg2"],
+    properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api", "NORG2_API_URL=http://localhost:28085/norg2", "PDL_URL=http://localhost:28085/api"],
 )
 @ActiveProfiles("dev", "mock-oauth")
 @AutoConfigureWireMock(port = 28085)
@@ -63,6 +64,14 @@ class OppgaveClientTest {
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(objectMapper.writeValueAsString(Enhet("9999", "enhetNavn", true, "Aktiv"))),
+                ),
+        )
+        stubFor(
+            post(urlEqualTo("/api/graphql"))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(readfile("mockIdentInformasjonResponse.json")),
                 ),
         )
     }
@@ -239,5 +248,13 @@ class OppgaveClientTest {
                     ),
                 ),
             )
+
+        private fun readfile(filnavn: String): String {
+            return this::class.java.getResource("/pdl/$filnavn").readText()
+        }
+
+        private fun String.graphqlCompatible(): String {
+            return StringUtils.normalizeSpace(this.replace("\n", ""))
+        }
     }
 }
