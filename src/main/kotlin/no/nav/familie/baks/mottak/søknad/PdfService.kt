@@ -1,6 +1,7 @@
 package no.nav.familie.baks.mottak.søknad
 
-import no.nav.familie.baks.mottak.integrasjoner.PdfClient
+import no.nav.familie.baks.dokgen.DokGen
+import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClient
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
@@ -11,6 +12,8 @@ import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteS�
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -19,8 +22,9 @@ import java.util.Locale
 
 @Service
 class PdfService(
-    private val pdfClient: PdfClient,
+    private val familieDokumentClient: FamilieDokumentClient,
     private val søknadSpråkvelgerService: SøknadSpråkvelgerService,
+    private val dokgen: DokGen
 ) {
     fun lagBarnetrygdPdf(
         versjonertSøknad: VersjonertSøknad,
@@ -53,7 +57,10 @@ class PdfService(
                         else -> "Søknad om ordinær barnetrygd"
                     },
             )
-        return pdfClient.lagPdf(barnetrygdSøknadMapForSpråk + ekstraFelterMap, path)
+
+        return familieDokumentClient.lagPdf(
+            html = dokgen.lagHtmlTilPdf(path, barnetrygdSøknadMapForSpråk + ekstraFelterMap)
+        )
     }
 
     fun lagKontantstøttePdf(
@@ -77,7 +84,9 @@ class PdfService(
                 fnr = dbKontantstøtteSøknad.fnr,
                 label = "Søknad om kontantstøtte",
             )
-        return pdfClient.lagPdf(kontantstøtteSøknadMapForSpråk + ekstraFelterMap, "kontantstotte-soknad")
+        return familieDokumentClient.lagPdf(
+            html = dokgen.lagHtmlTilPdf("kontantstotte-soknad", kontantstøtteSøknadMapForSpråk + ekstraFelterMap)
+        )
     }
 
     private fun søknadstypeTilPath(søknadstype: Søknadstype): String {
@@ -101,10 +110,17 @@ class PdfService(
             "navn" to navn,
             "fodselsnummer" to fnr,
             "label" to label,
+            "maalform" to "NB"
         )
     }
 
     companion object {
         val logger = LoggerFactory.getLogger(this::class.java)
     }
+}
+
+@Configuration
+class DokgenConfig {
+    @Bean
+    fun dokgen() = DokGen()
 }

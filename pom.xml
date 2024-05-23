@@ -156,7 +156,11 @@
             <artifactId>kontantstotte</artifactId>
             <version>${kontrakter.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>no.nav.familie</groupId>
+            <artifactId>baks-dokgen</artifactId>
+            <version>1.0_20240522152254_faa6932</version>
+        </dependency>
         <!-- Kafka -->
         <dependency>
             <groupId>org.apache.avro</groupId>
