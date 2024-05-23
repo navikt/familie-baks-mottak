@@ -24,7 +24,7 @@ import java.util.Locale
 class PdfService(
     private val familieDokumentClient: FamilieDokumentClient,
     private val søknadSpråkvelgerService: SøknadSpråkvelgerService,
-    private val dokgen: DokGen
+    private val dokgen: DokGen,
 ) {
     fun lagBarnetrygdPdf(
         versjonertSøknad: VersjonertSøknad,
@@ -59,7 +59,7 @@ class PdfService(
             )
 
         return familieDokumentClient.lagPdf(
-            html = dokgen.lagHtmlTilPdf(path, barnetrygdSøknadMapForSpråk + ekstraFelterMap)
+            html = dokgen.lagHtmlTilPdf(path, barnetrygdSøknadMapForSpråk + ekstraFelterMap),
         )
     }
 
@@ -85,7 +85,7 @@ class PdfService(
                 label = "Søknad om kontantstøtte",
             )
         return familieDokumentClient.lagPdf(
-            html = dokgen.lagHtmlTilPdf("kontantstotte-soknad", kontantstøtteSøknadMapForSpråk + ekstraFelterMap)
+            html = dokgen.lagHtmlTilPdf("kontantstotte-soknad", kontantstøtteSøknadMapForSpråk + ekstraFelterMap),
         )
     }
 
@@ -110,7 +110,7 @@ class PdfService(
             "navn" to navn,
             "fodselsnummer" to fnr,
             "label" to label,
-            "maalform" to "NB"
+            "maalform" to "NB",
         )
     }
 

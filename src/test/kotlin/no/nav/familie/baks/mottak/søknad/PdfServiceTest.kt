@@ -7,6 +7,8 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import no.nav.familie.baks.dokgen.DokGen
+import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClient
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
@@ -15,8 +17,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.io.File
 import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadKontraktV8
-import no.nav.familie.baks.dokgen.DokGen
-import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClient
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class PdfServiceTest {

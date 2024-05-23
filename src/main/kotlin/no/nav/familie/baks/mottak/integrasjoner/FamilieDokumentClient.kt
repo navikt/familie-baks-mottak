@@ -36,10 +36,11 @@ class FamilieDokumentClient(
         return postForEntity(
             uri = sendInnUri,
             payload = html.encodeToByteArray(),
-            httpHeaders = HttpHeaders().apply {
-                contentType = MediaType.TEXT_HTML
-                accept = listOf(MediaType.APPLICATION_PDF)
-            },
+            httpHeaders =
+                HttpHeaders().apply {
+                    contentType = MediaType.TEXT_HTML
+                    accept = listOf(MediaType.APPLICATION_PDF)
+                },
         )
     }
 }
