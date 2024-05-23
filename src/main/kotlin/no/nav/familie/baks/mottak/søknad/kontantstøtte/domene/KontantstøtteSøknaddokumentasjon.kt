@@ -15,7 +15,7 @@ data class KontantstøtteSøknaddokumentasjon(val søknaddokumentasjon: Søknadd
             )
         }
 
-    fun dokumentasjonsbehovTilTittel(dokumentasjonsbehov: Dokumentasjonsbehov): String {
+    private fun dokumentasjonsbehovTilTittel(dokumentasjonsbehov: Dokumentasjonsbehov): String {
         return when (dokumentasjonsbehov) {
             Dokumentasjonsbehov.AVTALE_DELT_BOSTED -> "Avtale om delt bosted"
             Dokumentasjonsbehov.VEDTAK_OPPHOLDSTILLATELSE -> "Vedtak om oppholdstillatelse"

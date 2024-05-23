@@ -91,3 +91,13 @@ STS_URL: "dummy"
 PDL_URL: "dummy"
 CREDENTIAL_USERNAME: not-a-real-srvuser
 CREDENTIAL_PASSWORD: not-a-real-pw
+
+NAIS_APP_NAME: familie-baks-mottak
+
+# Kreves for at unleash mock skal fungere:
+UNLEASH_SERVER_API_URL: http://dummy/api/
+UNLEASH_SERVER_API_TOKEN: dummy-token
+
+# Disabler unleash her for å unngå feilmeldinger tilknyttet oppkobling når vi uansett mocker alle unleash-kall i testene.
+unleash:
+  enabled: false

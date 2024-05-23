@@ -97,7 +97,7 @@ class BarnetrygdSøknadMetrikkService {
                 )
             }
             // Inkluderer Dokumentasjonsbehov.ANNEN_DOKUMENTASJON for søknadHarVedlegg og antallVedlegg
-            val alleVedlegg: List<Søknadsvedlegg> = dokumentasjon.map { it.opplastedeVedlegg }.flatten()
+            val alleVedlegg: List<Søknadsvedlegg> = dokumentasjon.map(Søknaddokumentasjon::opplastedeVedlegg).flatten()
             if (alleVedlegg.isNotEmpty()) {
                 sendVedleggMetrikker(erUtvidet = erUtvidet, vedlegg = alleVedlegg)
             }

@@ -5,6 +5,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.hendelser.JournalføringHendelseServiceTest
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
@@ -12,6 +13,7 @@ import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.BARN
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus.LØPENDE
+import no.nav.familie.baks.mottak.integrasjoner.IdentInformasjon
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
@@ -39,13 +41,16 @@ class SkanHendelseTaskLøypeTest {
     private val mockTaskService: TaskService = mockk(relaxed = true)
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
+    private val mockUnleashNextMedContextService: UnleashNextMedContextService = mockk()
 
     private val rutingSteg =
-        JournalhendelseRutingTask(
+        JournalhendelseBarnetrygdRutingTask(
             mockPdlClient,
             mockSakClient,
             mockInfotrygdBarnetrygdClient,
             mockTaskService,
+            mockUnleashNextMedContextService,
+            mockJournalpostClient,
         )
 
     private val journalføringSteg =
@@ -87,6 +92,10 @@ class SkanHendelseTaskLøypeTest {
         } returns "12345678910"
 
         every {
+            mockPdlClient.hentIdenter(any(), any())
+        } returns listOf(IdentInformasjon("12345678910", historisk = false, gruppe = "FOLKEREGISTERIDENT"))
+
+        every {
             mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
         } returns emptyList()
 
@@ -97,6 +106,10 @@ class SkanHendelseTaskLøypeTest {
         every {
             mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
         } returns InfotrygdSøkResponse(emptyList(), emptyList())
+
+        every {
+            mockUnleashNextMedContextService.isEnabled(any(), any())
+        } returns false
     }
 
     @Test
@@ -198,7 +211,7 @@ class SkanHendelseTaskLøypeTest {
     private fun kjørRutingTaskOgReturnerNesteTask(brukerId: String? = "12345678901"): Task {
         rutingSteg.doTask(
             Task(
-                type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+                type = JournalhendelseBarnetrygdRutingTask.TASK_STEP_TYPE,
                 payload = MOTTAK_KANAL,
             ).apply {
                 if (brukerId != null) {

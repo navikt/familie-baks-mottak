@@ -2,7 +2,11 @@ package no.nav.familie.baks.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
+import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
+import no.nav.familie.baks.mottak.integrasjoner.Bruker
+import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.BARN
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus.AVSLUTTET
@@ -11,11 +15,14 @@ import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus.OPPRETTET
 import no.nav.familie.baks.mottak.integrasjoner.Identgruppe
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.IntegrasjonException
+import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.Opphørsgrunn
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsak
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.integrasjoner.StatusKode
+import no.nav.familie.baks.mottak.integrasjoner.erBarnetrygdSøknad
+import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
@@ -32,50 +39,97 @@ import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 
 @Service
 @TaskStepBeskrivelse(
-    taskStepType = JournalhendelseRutingTask.TASK_STEP_TYPE,
+    taskStepType = JournalhendelseBarnetrygdRutingTask.TASK_STEP_TYPE,
     beskrivelse = "Håndterer ruting og markering av sakssystem",
 )
-class JournalhendelseRutingTask(
+class JournalhendelseBarnetrygdRutingTask(
     private val pdlClient: PdlClient,
     private val baSakClient: BaSakClient,
     private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,
     private val taskService: TaskService,
+    private val unleashService: UnleashNextMedContextService,
+    private val journalpostClient: JournalpostClient,
 ) : AsyncTaskStep {
     private val tema = Tema.BAR
 
-    val log: Logger = LoggerFactory.getLogger(JournalhendelseRutingTask::class.java)
+    val log: Logger = LoggerFactory.getLogger(JournalhendelseBarnetrygdRutingTask::class.java)
     val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
 
     override fun doTask(task: Task) {
         val brukersIdent = task.metadata["personIdent"] as String?
+        val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
+        val erBarnetrygdSøknad = journalpost.erBarnetrygdSøknad()
 
         val (baSak, infotrygdSak) = brukersIdent?.run { søkEtterSakIBaSakOgInfotrygd(this) } ?: Pair(null, null)
 
+        val brukerHarFagsakIBaSak = baSak.finnes()
+        val brukerHarSakIInfotrygd = infotrygdSak.finnes()
+        val featureToggleForAutomatiskJournalføringSkruddPå =
+            unleashService.isEnabled(
+                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_BARNETRYGD_SØKNADER,
+                defaultValue = false,
+            )
+
+        val fagsakId by lazy { baSakClient.hentFagsaknummerPåPersonident(tilPersonIdent(journalpost.bruker!!, tema)) }
+        val harÅpenBehandlingIFagsak by lazy { baSakClient.hentMinimalRestFagsak(fagsakId.toLong()).finnesÅpenBehandlingPåFagsak() }
+
+        val sakssystemMarkering = hentSakssystemMarkering(brukerHarFagsakIBaSak, brukerHarSakIInfotrygd, baSak, infotrygdSak)
+
+        val skalAutomatiskJournalføreJournalpost =
+            featureToggleForAutomatiskJournalføringSkruddPå &&
+                erBarnetrygdSøknad && !brukerHarSakIInfotrygd && !harÅpenBehandlingIFagsak
+
+        if (skalAutomatiskJournalføreJournalpost) {
+            log.info("Oppretter OppdaterOgFerdigstillJournalpostTask for journalpost med id ${journalpost.journalpostId}")
+
+            Task(
+                type = OppdaterOgFerdigstillJournalpostTask.TASK_STEP_TYPE,
+                payload = journalpost.journalpostId,
+                properties =
+                    task.metadata.apply {
+                        this["fagsakId"] = "$fagsakId"
+                        this["personIdent"] = brukersIdent
+                        this["sakssystemMarkering"] = sakssystemMarkering
+                    },
+            ).apply { taskService.save(this) }
+        } else {
+            Task(
+                type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
+                payload = sakssystemMarkering,
+                properties = task.metadata,
+            ).apply { taskService.save(this) }
+        }
+    }
+
+    private fun hentSakssystemMarkering(
+        brukerHarFagsakIBaSak: Boolean,
+        brukerHarSakIInfotrygd: Boolean,
+        baSak: Sakspart?,
+        infotrygdSak: Sakspart?,
+    ): String {
         val sakssystemMarkering =
             when {
-                baSak.finnes() && infotrygdSak.finnes() -> {
+                brukerHarFagsakIBaSak && brukerHarSakIInfotrygd -> {
                     incrementSakssystemMarkering("Begge")
                     "Bruker har sak i både Infotrygd og BA-sak"
                 }
-                baSak.finnes() -> {
+
+                brukerHarFagsakIBaSak -> {
                     incrementSakssystemMarkering("BA_SAK")
                     "${baSak!!.part} har sak i BA-sak"
                 }
-                infotrygdSak.finnes() -> {
+
+                brukerHarSakIInfotrygd -> {
                     incrementSakssystemMarkering("Infotrygd")
                     "${infotrygdSak!!.part} har sak i Infotrygd"
                 }
+
                 else -> {
                     incrementSakssystemMarkering("Ingen")
                     ""
                 } // trenger ingen form for markering. Kan løses av begge systemer
             }
-
-        Task(
-            type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
-            payload = sakssystemMarkering,
-            properties = task.metadata,
-        ).apply { taskService.save(this) }
+        return sakssystemMarkering
     }
 
     private fun incrementSakssystemMarkering(saksystem: String) {
@@ -86,24 +140,25 @@ class JournalhendelseRutingTask(
     }
 
     private fun søkEtterSakIBaSakOgInfotrygd(brukersIdent: String): Pair<Sakspart?, Sakspart?> {
-        val brukersIdenter =
+        val (brukersHistoriskeFnr, brukersFnr) =
             try {
-                pdlClient.hentIdenter(brukersIdent, tema).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }.map { it.ident }
+                pdlClient.hentIdenter(brukersIdent, tema)
+                    .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
+                    .partition { it.historisk }
             } catch (e: IntegrasjonException) {
                 return Pair(null, null)
             }
+        val brukersIdenter = brukersFnr.plus(brukersHistoriskeFnr).map { it.ident }
         val barnasIdenter =
             pdlClient.hentPersonMedRelasjoner(brukersIdent, tema).forelderBarnRelasjoner
-                .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
-                .map { it.relatertPersonsIdent }
-                .filterNotNull()
+                .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }.mapNotNull { it.relatertPersonsIdent }
         val alleBarnasIdenter =
             barnasIdenter.flatMap { pdlClient.hentIdenter(it, tema) }
                 .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
                 .map { it.ident }
 
         return Pair(
-            first = baSakClient.hentRestFagsakDeltagerListe(brukersIdent, barnasIdenter).sakspart(baSakClient),
+            first = baSakClient.hentRestFagsakDeltagerListe(brukersFnr.last().ident, barnasIdenter).harForelderEllerBarnPågåendeSak(baSakClient),
             second =
                 infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, alleBarnasIdenter).sakspart
                     ?: infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).sakspart,
@@ -112,8 +167,18 @@ class JournalhendelseRutingTask(
 
     fun Sakspart?.finnes(): Boolean = this != null
 
+    private fun tilPersonIdent(
+        bruker: Bruker,
+        tema: Tema,
+    ): String {
+        return when (bruker.type) {
+            BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema)
+            else -> bruker.id
+        }
+    }
+
     companion object {
-        const val TASK_STEP_TYPE = "journalhendelseRuting"
+        const val TASK_STEP_TYPE = "journalhendelseBarnetrygdRuting"
     }
 }
 
@@ -156,7 +221,7 @@ enum class Sakspart(val part: String) {
     ANNEN("Søsken"),
 }
 
-private fun List<RestFagsakDeltager>.sakspart(baSakClient: BaSakClient): Sakspart? =
+private fun List<RestFagsakDeltager>.harForelderEllerBarnPågåendeSak(baSakClient: BaSakClient): Sakspart? =
     when {
         any { it.rolle == FORELDER && it.harPågåendeSak(baSakClient) } -> Sakspart.SØKER
         any { it.rolle == BARN && it.harPågåendeSak(baSakClient) } -> Sakspart.ANNEN

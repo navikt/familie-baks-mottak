@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.familie.http.client.AbstractRestClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestOperations
 import org.springframework.web.client.postForObject
@@ -16,7 +15,6 @@ import java.time.YearMonth
 class InfotrygdKontantstøtteClient(
     @Qualifier("clientCredentials") restOperations: RestOperations,
     @Value("\${FAMILIE_KS_INFOTRYGD_API_URL}/api") private val clientUri: URI,
-    private val environment: Environment,
 ) :
     AbstractRestClient(restOperations, "familie-ks-infotrygd") {
     fun harKontantstøtteIInfotrygd(

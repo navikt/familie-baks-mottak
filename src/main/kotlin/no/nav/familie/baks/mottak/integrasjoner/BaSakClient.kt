@@ -49,31 +49,7 @@ class BaSakClient
             }
         }
 
-        @Retryable(
-            value = [RuntimeException::class],
-            maxAttempts = 3,
-            backoff = Backoff(delayExpression = "60000"),
-        )
-        fun sendIdenthendelseTilBaSak(personIdent: PersonIdent) {
-            val uri = URI.create("$sakServiceUri/ident")
-            try {
-                val response = postForEntity<Ressurs<String>>(uri, personIdent)
-                secureLogger.info("Identhendelse sendt til sak for $personIdent. Status=${response.status}")
-            } catch (e: RestClientResponseException) {
-                logger.info("Innsending av identhendelse til sak feilet. Responskode: {}, body: {}", e.statusCode, e.responseBodyAsString)
-                secureLogger.info("Innsending av identhendelse til sak feilet for $personIdent. Responskode: {}, body: {}", e.statusCode, e.responseBodyAsString)
-                throw IllegalStateException(
-                    "Innsending av identhendelse til sak feilet. Status: " + e.statusCode +
-                        ", body: " + e.responseBodyAsString,
-                    e,
-                )
-            } catch (e: RestClientException) {
-                secureLogger.warn("Innsending av identhendelse til sak feilet for $personIdent", e)
-                throw IllegalStateException("Innsending av identhendelse til sak feilet.", e)
-            }
-        }
-
-        fun hentSaksnummer(personIdent: String): String {
+        fun hentFagsaknummerPåPersonident(personIdent: String): String {
             val uri = URI.create("$sakServiceUri/fagsaker")
             return runCatching {
                 postForEntity<Ressurs<RestFagsak>>(uri, mapOf("personIdent" to personIdent))
@@ -153,88 +129,33 @@ class BaSakClient
                 throw IllegalStateException("Innsending til sak feilet.", e)
             }
         }
+
+        fun opprettBehandling(
+            kategori: BehandlingKategori,
+            underkategori: BehandlingUnderkategori,
+            søkersIdent: String,
+            behandlingÅrsak: String,
+            søknadMottattDato: LocalDateTime,
+            behandlingType: BehandlingType,
+            fagsakId: Long,
+        ) {
+            val uri = URI.create("$sakServiceUri/behandlinger")
+            kotlin.runCatching {
+                postForEntity<Ressurs<Any>>(
+                    uri,
+                    RestOpprettBehandlingBarnetrygdRequest(
+                        kategori = kategori.name,
+                        underkategori = underkategori.name,
+                        søkersIdent = søkersIdent,
+                        behandlingÅrsak = behandlingÅrsak,
+                        søknadMottattDato = søknadMottattDato,
+                        behandlingType = behandlingType,
+                        fagsakId = fagsakId,
+                    ),
+                )
+            }
+                .onFailure {
+                    throw IntegrasjonException("Feil ved opprettelse av behandling i ba-sak.", it, uri)
+                }
+        }
     }
-
-data class RestPersonIdent(
-    val personIdent: String,
-)
-
-data class RestFagsakIdOgTilknyttetAktørId(
-    val aktørId: String,
-    val fagsakId: Long,
-)
-
-data class RestMinimalFagsak(
-    val id: Long,
-    val behandlinger: List<RestVisningBehandling>,
-)
-
-class RestVisningBehandling(
-    val behandlingId: Long,
-    val opprettetTidspunkt: LocalDateTime,
-    val kategori: BehandlingKategori,
-    val underkategori: BehandlingUnderkategori?,
-    val aktiv: Boolean,
-    val årsak: String? = null,
-    val type: String,
-    val status: String,
-    val resultat: String? = null,
-    val vedtaksdato: LocalDateTime? = null,
-)
-
-data class RestFagsak(
-    val id: Long,
-    val behandlinger: List<RestUtvidetBehandling>,
-)
-
-data class RestUtvidetBehandling(
-    val aktiv: Boolean,
-    val arbeidsfordelingPåBehandling: RestArbeidsfordelingPåBehandling,
-    val behandlingId: Long,
-    val kategori: BehandlingKategori,
-    val opprettetTidspunkt: LocalDateTime,
-    val resultat: String,
-    val steg: String,
-    val type: String,
-    val underkategori: BehandlingUnderkategori,
-)
-
-data class RestArbeidsfordelingPåBehandling(
-    val behandlendeEnhetId: String,
-)
-
-enum class BehandlingKategori {
-    EØS,
-    NASJONAL,
-}
-
-enum class BehandlingUnderkategori {
-    UTVIDET,
-    ORDINÆR,
-}
-
-data class RestSøkParam(
-    val personIdent: String,
-    val barnasIdenter: List<String> = emptyList(),
-)
-
-data class RestFagsakDeltager(
-    val ident: String,
-    val rolle: FagsakDeltagerRolle,
-    val fagsakId: Long,
-    val fagsakStatus: FagsakStatus,
-)
-
-data class RestAnnullerFødsel(val barnasIdenter: List<String>, val tidligereHendelseId: String)
-
-enum class FagsakDeltagerRolle {
-    BARN,
-    FORELDER,
-    UKJENT,
-}
-
-enum class FagsakStatus {
-    OPPRETTET,
-    LØPENDE, // Har minst én behandling gjeldende for fremtidig utbetaling
-    AVSLUTTET,
-}

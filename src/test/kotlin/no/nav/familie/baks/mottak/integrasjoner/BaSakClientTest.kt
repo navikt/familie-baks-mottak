@@ -39,7 +39,7 @@ class BaSakClientTest {
                 ),
         )
 
-        val response = baSakClient.hentSaksnummer(personIdent)
+        val response = baSakClient.hentFagsaknummerPåPersonident(personIdent)
         assertThat(response).isEqualTo(fagsakId.toString())
     }
 
@@ -63,8 +63,8 @@ class BaSakClientTest {
         assertThat(response.behandlinger.first().kategori).isEqualTo(BehandlingKategori.NASJONAL)
         assertThat(response.behandlinger.first().underkategori).isEqualTo(BehandlingUnderkategori.ORDINÆR)
         assertThat(response.behandlinger.first().opprettetTidspunkt).isEqualTo(LocalDate.of(2023, 4, 2).atStartOfDay())
-        assertThat(response.behandlinger.first().status).isEqualTo("AVSLUTTET")
-        assertThat(response.behandlinger.first().type).isEqualTo("FØRSTEGANGSBEHANDLING")
+        assertThat(response.behandlinger.first().status).isEqualTo(BehandlingStatus.AVSLUTTET)
+        assertThat(response.behandlinger.first().type).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
         assertThat(response.behandlinger.first().vedtaksdato).isEqualTo(LocalDate.of(2023, 4, 3).atStartOfDay())
         assertThat(response.behandlinger.first().årsak).isEqualTo("SØKNAD")
         assertThat(response.behandlinger.first().resultat).isEqualTo("INNVILGET")

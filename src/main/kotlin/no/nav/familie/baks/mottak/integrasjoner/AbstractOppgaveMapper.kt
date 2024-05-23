@@ -3,7 +3,9 @@ package no.nav.familie.baks.mottak.integrasjoner
 import no.nav.familie.baks.mottak.util.erDnummer
 import no.nav.familie.baks.mottak.util.erOrgnr
 import no.nav.familie.baks.mottak.util.fristFerdigstillelse
+import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveIdentV2
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
@@ -14,7 +16,7 @@ import java.util.Locale
 
 abstract class AbstractOppgaveMapper(
     private val hentEnhetClient: HentEnhetClient,
-    private val pdlClient: PdlClient,
+    val pdlClient: PdlClient,
 ) : IOppgaveMapper {
     override fun tilOpprettOppgaveRequest(
         oppgavetype: Oppgavetype,
@@ -32,14 +34,18 @@ abstract class AbstractOppgaveMapper(
             fristFerdigstillelse = fristFerdigstillelse(),
             beskrivelse = tilBeskrivelse(journalpost, beskrivelse),
             enhetsnummer = utledEnhetsnummer(journalpost),
-            behandlingstema = hentBehandlingstema(journalpost),
-            behandlingstype = hentBehandlingstype(journalpost),
+            behandlingstema = hentBehandlingstemaVerdi(journalpost),
+            behandlingstype = hentBehandlingstypeVerdi(journalpost),
         )
     }
 
-    abstract fun hentBehandlingstema(journalpost: Journalpost): String?
+    abstract fun hentBehandlingstema(journalpost: Journalpost): Behandlingstema?
 
-    abstract fun hentBehandlingstype(journalpost: Journalpost): String?
+    abstract fun hentBehandlingstemaVerdi(journalpost: Journalpost): String?
+
+    abstract fun hentBehandlingstypeVerdi(journalpost: Journalpost): String?
+
+    abstract fun hentBehandlingstype(journalpost: Journalpost): Behandlingstype?
 
     private fun tilOppgaveIdent(
         journalpost: Journalpost,
@@ -124,7 +130,15 @@ abstract class AbstractOppgaveMapper(
         }
     }
 
-    fun erEØS(journalpost: Journalpost) = journalpost.bruker?.type == BrukerIdType.FNR && erDnummer(journalpost.bruker.id)
+    fun erEØS(
+        journalpost: Journalpost,
+    ): Boolean {
+        return when (journalpost.bruker?.type) {
+            BrukerIdType.FNR -> erDnummer(journalpost.bruker.id)
+            BrukerIdType.AKTOERID -> erDnummer(pdlClient.hentPersonident(journalpost.bruker.id, tema).takeIf { it.isNotEmpty() } ?: return false)
+            else -> false
+        }
+    }
 
     private fun validerJournalpost(journalpost: Journalpost) {
         if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")

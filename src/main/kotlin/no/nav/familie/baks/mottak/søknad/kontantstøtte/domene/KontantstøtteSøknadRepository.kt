@@ -10,13 +10,15 @@ import org.springframework.transaction.annotation.Transactional
 interface KontantstøtteSøknadRepository : JpaRepository<DBKontantstøtteSøknad, String> {
     @Query(value = "SELECT s FROM kontantstotte_soknad s WHERE s.id = :soknadId")
     fun hentSøknad(soknadId: Long): DBKontantstøtteSøknad?
+
+    @Query(
+        "SELECT s FROM kontantstotte_soknad s ORDER BY s.opprettetTid DESC LIMIT 1",
+    )
+    fun finnSisteLagredeSøknad(): DBKontantstøtteSøknad
 }
 
 @Repository
 interface KontantstøtteVedleggRepository : JpaRepository<DBKontantstotteVedlegg, String> {
-    @Query(value = "SELECT v FROM kontantstotte_soknad_vedlegg v WHERE v.dokumentId = :dokumentId")
-    fun hentVedlegg(dokumentId: String): DBKontantstotteVedlegg?
-
     @Query(value = "SELECT v FROM kontantstotte_soknad_vedlegg v WHERE v.søknadId = :soknadId")
     fun hentAlleVedlegg(soknadId: Long): List<DBKontantstotteVedlegg>
 

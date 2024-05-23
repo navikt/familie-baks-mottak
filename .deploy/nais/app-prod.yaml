@@ -9,6 +9,7 @@ metadata:
 spec:
   envFrom:
     - secret: familie-baks-mottak
+    - secret: familie-baks-mottak-unleash-api-token
   image: {{ image }}
   port: 8090
   leaderElection: true
@@ -33,7 +34,9 @@ spec:
       memory: 4Gi
     requests:
       memory: 2Gi
-      cpu: 200m
+      cpu: 50m
+  ingresses:
+    - https://familie-baks-mottak.intern.nav.no
   secureLogs:
     enabled: true
   tokenx:
@@ -50,6 +53,8 @@ spec:
         - application: familie-prosessering
           namespace: teamfamilie
           cluster: prod-gcp
+        - application: statuspoll
+          namespace: navdig
     outbound:
       rules:
         - application: familie-ba-sak
@@ -67,6 +72,7 @@ spec:
         - host: familie-integrasjoner.prod-fss-pub.nais.io
         - host: familie-ba-infotrygd.prod-fss-pub.nais.io
         - host: familie-ks-infotrygd.prod-fss-pub.nais.io
+        - host: teamfamilie-unleash-api.nav.cloud.nais.io
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: prod
@@ -92,3 +98,8 @@ spec:
 
   kafka:
     pool: nav-prod
+
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java

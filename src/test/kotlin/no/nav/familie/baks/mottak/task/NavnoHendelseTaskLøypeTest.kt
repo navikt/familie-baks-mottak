@@ -5,11 +5,13 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus.LØPENDE
+import no.nav.familie.baks.mottak.integrasjoner.IdentInformasjon
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
@@ -39,13 +41,16 @@ class NavnoHendelseTaskLøypeTest {
     private val mockTaskService: TaskService = mockk(relaxed = true)
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
+    private val mockUnleashNextMedContextService: UnleashNextMedContextService = mockk()
 
     private val rutingSteg =
-        JournalhendelseRutingTask(
+        JournalhendelseBarnetrygdRutingTask(
             mockPdlClient,
             mockSakClient,
             mockInfotrygdBarnetrygdClient,
             mockTaskService,
+            mockUnleashNextMedContextService,
+            mockJournalpostClient,
         )
 
     private val journalføringSteg =
@@ -93,6 +98,13 @@ class NavnoHendelseTaskLøypeTest {
         every {
             mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
         } returns InfotrygdSøkResponse(emptyList(), emptyList())
+
+        every {
+            mockPdlClient.hentIdenter(any(), any())
+        } returns listOf(IdentInformasjon("12345678910", historisk = false, gruppe = "FOLKEREGISTERIDENT"))
+        every {
+            mockUnleashNextMedContextService.isEnabled(any(), any())
+        } returns false
     }
 
     @Test
@@ -101,7 +113,7 @@ class NavnoHendelseTaskLøypeTest {
             mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
         } returns listOf(RestFagsakDeltager("12345678901", FORELDER, FAGSAK_ID.toLong(), LØPENDE))
 
-        every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
+        every { mockSakClient.hentFagsaknummerPåPersonident(any()) } returns FAGSAK_ID
 
         kjørRutingTaskOgReturnerNesteTask().run {
             Assertions.assertThat(this.type).isEqualTo(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE)
@@ -141,7 +153,7 @@ class NavnoHendelseTaskLøypeTest {
             mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
         } returns listOf(RestFagsakDeltager("12345678901", FORELDER, FAGSAK_ID.toLong(), LØPENDE))
 
-        every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
+        every { mockSakClient.hentFagsaknummerPåPersonident(any()) } returns FAGSAK_ID
 
         every {
             mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
@@ -174,7 +186,7 @@ class NavnoHendelseTaskLøypeTest {
             mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
         } returns listOf(RestFagsakDeltager("12345678901", FORELDER, FAGSAK_ID.toLong(), LØPENDE))
 
-        every { mockSakClient.hentSaksnummer(any()) } returns FAGSAK_ID
+        every { mockSakClient.hentFagsaknummerPåPersonident(any()) } returns FAGSAK_ID
 
         every {
             mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
@@ -203,7 +215,7 @@ class NavnoHendelseTaskLøypeTest {
     private fun kjørRutingTaskOgReturnerNesteTask(): Task {
         rutingSteg.doTask(
             Task(
-                type = JournalhendelseRutingTask.TASK_STEP_TYPE,
+                type = JournalhendelseBarnetrygdRutingTask.TASK_STEP_TYPE,
                 payload = MOTTAK_KANAL,
             ).apply {
                 this.metadata["personIdent"] = "12345678901"
