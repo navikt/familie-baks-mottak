@@ -54,10 +54,13 @@ class JournalhendelseBarnetrygdRutingTask(
 
     val log: Logger = LoggerFactory.getLogger(JournalhendelseBarnetrygdRutingTask::class.java)
     val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
+    val enheterSomIkkeSkalHaAutomatiskJournalføring = listOf("4863")
 
     override fun doTask(task: Task) {
         val brukersIdent = task.metadata["personIdent"] as String?
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
+        val journalførendeEnhet = journalpost.journalforendeEnhet
+
         val erBarnetrygdSøknad = journalpost.erBarnetrygdSøknad()
 
         val (baSak, infotrygdSak) = brukersIdent?.run { søkEtterSakIBaSakOgInfotrygd(this) } ?: Pair(null, null)
@@ -77,7 +80,10 @@ class JournalhendelseBarnetrygdRutingTask(
 
         val skalAutomatiskJournalføreJournalpost =
             featureToggleForAutomatiskJournalføringSkruddPå &&
-                erBarnetrygdSøknad && !brukerHarSakIInfotrygd && !harÅpenBehandlingIFagsak
+                erBarnetrygdSøknad &&
+                !brukerHarSakIInfotrygd &&
+                !harÅpenBehandlingIFagsak &&
+                journalførendeEnhet !in enheterSomIkkeSkalHaAutomatiskJournalføring
 
         if (skalAutomatiskJournalføreJournalpost) {
             log.info("Oppretter OppdaterOgFerdigstillJournalpostTask for journalpost med id ${journalpost.journalpostId}")
