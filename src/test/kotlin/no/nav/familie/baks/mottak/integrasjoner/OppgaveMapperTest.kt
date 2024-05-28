@@ -3,6 +3,8 @@ package no.nav.familie.baks.mottak.integrasjoner
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.baks.mottak.DevLauncher
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
@@ -25,13 +27,16 @@ class OppgaveMapperTest(
     private val journalpostClient: JournalpostClient,
     @Autowired
     private val mockPdlClient: PdlClient,
+    @Autowired
+    private val barnetrygdSøknadRepository: SøknadRepository,
+    @Autowired
+    private val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
 ) {
     private val mockHentEnhetClient: HentEnhetClient = mockk(relaxed = true)
 
-    private val barnetrygdOppgaveMapper: IOppgaveMapper = BarnetrygdOppgaveMapper(mockHentEnhetClient, mockPdlClient)
+    private val barnetrygdOppgaveMapper: IOppgaveMapper = BarnetrygdOppgaveMapper(mockHentEnhetClient, mockPdlClient, barnetrygdSøknadRepository)
 
-    private val kontantstøtteOppgaveMapper: IOppgaveMapper =
-        KontantstøtteOppgaveMapper(mockHentEnhetClient, mockPdlClient)
+    private val kontantstøtteOppgaveMapper: IOppgaveMapper = KontantstøtteOppgaveMapper(mockHentEnhetClient, mockPdlClient, kontantstøtteSøknadRepository)
 
     @Test
     fun `skal kaste exception dersom dokumentlisten er tom`() {

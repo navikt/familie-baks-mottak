@@ -16,7 +16,7 @@ import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadV8
 
 @Entity(name = "Soknad")
 @Table(name = "Soknad")
-data class DBSøknad(
+data class DBBarnetrygdSøknad(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "soknad_seq_generator")
     @SequenceGenerator(name = "soknad_seq_generator", sequenceName = "soknad_seq", allocationSize = 50)
@@ -76,9 +76,9 @@ interface Vedlegg {
     val data: ByteArray
 }
 
-fun SøknadV7.tilDBSøknad(): DBSøknad {
+fun SøknadV7.tilDBSøknad(): DBBarnetrygdSøknad {
     try {
-        return DBSøknad(
+        return DBBarnetrygdSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
             fnr = this.søker.ident.verdi.getValue("nb"),
         )
@@ -87,9 +87,9 @@ fun SøknadV7.tilDBSøknad(): DBSøknad {
     }
 }
 
-fun SøknadV8.tilDBSøknad(): DBSøknad {
+fun SøknadV8.tilDBSøknad(): DBBarnetrygdSøknad {
     try {
-        return DBSøknad(
+        return DBBarnetrygdSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
             fnr = this.søker.ident.verdi.getValue("nb"),
         )
@@ -99,7 +99,7 @@ fun SøknadV8.tilDBSøknad(): DBSøknad {
 }
 
 fun Søknadsvedlegg.tilDBVedlegg(
-    søknad: DBSøknad,
+    søknad: DBBarnetrygdSøknad,
     data: ByteArray,
 ): DBVedlegg {
     return DBVedlegg(
@@ -107,6 +107,15 @@ fun Søknadsvedlegg.tilDBVedlegg(
         søknadId = søknad.id,
         data = data,
     )
+}
+
+fun DBBarnetrygdSøknad.harEøsSteg(): Boolean {
+    val versjonertSøknad = this.hentVersjonertSøknad()
+
+    return when (versjonertSøknad) {
+        is no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7 -> versjonertSøknad.søknad.søker.harEøsSteg
+        is no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8 -> versjonertSøknad.søknad.søker.harEøsSteg
+    }
 }
 
 class FødselsnummerErNullException : Exception()

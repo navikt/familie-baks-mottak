@@ -48,7 +48,7 @@ class OpprettSøknadBehandlingISakTask(
                     log.info("Finnes allerede åpen behandling på fagsak $fagsakId m/ tema $tema. Hopper over opprettelsen av ny behandling")
                 } else {
                     val behandlingType = utledBehandlingstype(fagsak)
-                    val kategori = kontantstøtteOppgaveMapper.hentBehandlingstype(journalpost).name
+                    val kategori = kontantstøtteOppgaveMapper.utledBehandlingKategoriFraSøknad(journalpost).name
 
                     log.info("Oppretter ny $kategori $behandlingType behandling i ks-sak")
 
@@ -71,8 +71,8 @@ class OpprettSøknadBehandlingISakTask(
                     log.info("Finnes allerede åpen behandling på fagsak $fagsakId m/ tema $tema. Hopper over opprettelsen av ny behandling")
                 } else {
                     val behandlingType = utledBehandlingstype(fagsak)
-                    val kategori = barnetrygdOppgaveMapper.utledBehandlingKategori(journalpost)
-                    val underkategori = barnetrygdOppgaveMapper.utledBehandlingUnderkategori(journalpost)
+                    val kategori = barnetrygdOppgaveMapper.utledBehandlingKategoriFraSøknad(journalpost)
+                    val underkategori = barnetrygdOppgaveMapper.utledBehandlingUnderkategoriFraSøknad(journalpost)
 
                     log.info("Oppretter ny $kategori $behandlingType behandling i ba-sak")
 

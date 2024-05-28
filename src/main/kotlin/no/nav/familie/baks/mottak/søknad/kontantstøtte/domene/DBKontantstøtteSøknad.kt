@@ -60,6 +60,15 @@ data class DBKontantstøtteSøknad(
     }
 }
 
+fun DBKontantstøtteSøknad.harEøsSteg(): Boolean {
+    val versjonertSøknad = this.hentVersjonertKontantstøtteSøknad()
+
+    return when (versjonertSøknad) {
+        is no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV3 -> versjonertSøknad.kontantstøtteSøknad.søker.harEøsSteg
+        is no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.søker.harEøsSteg
+    }
+}
+
 @Entity(name = "kontantstotte_soknad_vedlegg")
 @Table(name = "kontantstotte_soknad_vedlegg")
 data class DBKontantstotteVedlegg(

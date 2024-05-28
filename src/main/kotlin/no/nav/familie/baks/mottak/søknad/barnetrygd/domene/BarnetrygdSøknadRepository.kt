@@ -7,14 +7,16 @@ import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 
 @Repository
-interface SøknadRepository : JpaRepository<DBSøknad, String> {
+interface SøknadRepository : JpaRepository<DBBarnetrygdSøknad, String> {
     @Query(value = "SELECT s FROM Soknad s WHERE s.id = :soknadId")
-    fun hentDBSøknad(soknadId: Long): DBSøknad?
+    fun hentDBSøknad(soknadId: Long): DBBarnetrygdSøknad?
 
     @Query(
         "SELECT s FROM Soknad s ORDER BY s.opprettetTid DESC LIMIT 1",
     )
-    fun finnSisteLagredeSøknad(): DBSøknad
+    fun finnSisteLagredeSøknad(): DBBarnetrygdSøknad
+
+    fun getByJournalpostId(journalpostId: String): DBBarnetrygdSøknad
 }
 
 @Repository

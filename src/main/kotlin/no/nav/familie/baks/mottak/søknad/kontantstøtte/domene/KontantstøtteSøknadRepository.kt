@@ -15,6 +15,8 @@ interface KontantstøtteSøknadRepository : JpaRepository<DBKontantstøtteSøkna
         "SELECT s FROM kontantstotte_soknad s ORDER BY s.opprettetTid DESC LIMIT 1",
     )
     fun finnSisteLagredeSøknad(): DBKontantstøtteSøknad
+
+    fun getByJournalpostId(journalpostId: String): DBKontantstøtteSøknad
 }
 
 @Repository

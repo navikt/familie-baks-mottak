@@ -55,7 +55,7 @@ data class RestFagsak(
 
 data class RestUtvidetBehandling(
     val aktiv: Boolean,
-    val arbeidsfordelingPåBehandling: RestArbeidsfordelingPåBehandling,
+    val arbeidsfordelingPåBehandling: RestArbeidsfordelingPåBehandling?,
     val behandlingId: Long,
     val kategori: BehandlingKategori,
     val opprettetTidspunkt: LocalDateTime,
