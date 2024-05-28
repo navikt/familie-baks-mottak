@@ -1,7 +1,7 @@
 package no.nav.familie.baks.mottak.søknad
 
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknaddokumentasjon
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBVedlegg
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
@@ -25,7 +25,7 @@ object ArkiverDokumentRequestMapper {
     private val BARNETRYGD_ID_UTVIDET_POSTFIX = "NAV_33-00.09"
 
     fun toDto(
-        dbSøknad: DBSøknad,
+        dbBarnetrygdSøknad: DBBarnetrygdSøknad,
         versjonertSøknad: VersjonertSøknad,
         pdf: ByteArray,
         vedleggMap: Map<String, DBVedlegg>,
@@ -55,7 +55,7 @@ object ArkiverDokumentRequestMapper {
 
         val søknadsdokumentJson =
             Dokument(
-                dokument = dbSøknad.søknadJson.toByteArray(),
+                dokument = dbBarnetrygdSøknad.søknadJson.toByteArray(),
                 filtype = Filtype.JSON,
                 filnavn = null,
                 tittel = "SØKNAD_${dokumenttype}_JSON",
@@ -76,7 +76,7 @@ object ArkiverDokumentRequestMapper {
             )
 
         return ArkiverDokumentRequest(
-            fnr = dbSøknad.fnr,
+            fnr = dbBarnetrygdSøknad.fnr,
             forsøkFerdigstill = false,
             hoveddokumentvarianter = listOf(søknadsdokumentPdf, søknadsdokumentJson),
             vedleggsdokumenter =
@@ -86,7 +86,7 @@ object ArkiverDokumentRequestMapper {
                     pdfOriginalSpråk,
                     Dokumenttype.BARNETRYGD_VEDLEGG,
                 ),
-            eksternReferanseId = genererEksternReferanseId(dbSøknad.id, dokumenttype),
+            eksternReferanseId = genererEksternReferanseId(dbBarnetrygdSøknad.id, dokumenttype),
         )
     }
 

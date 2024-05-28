@@ -2,7 +2,7 @@ package no.nav.familie.baks.mottak.søknad
 
 import no.nav.familie.baks.mottak.integrasjoner.DokarkivClient
 import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadService
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadService
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.ArkiverDokumentRequest
@@ -17,30 +17,30 @@ class JournalføringService(
     private val kontantstøtteSøknadService: KontantstøtteSøknadService,
 ) {
     fun journalførBarnetrygdSøknad(
-        dbSøknad: DBSøknad,
+        dbBarnetrygdSøknad: DBBarnetrygdSøknad,
         pdf: ByteArray,
         pdfOriginalSpråk: ByteArray = ByteArray(0),
     ) {
-        if (dbSøknad.journalpostId == null) {
-            val vedlegg = barnetrygdSøknadService.hentLagredeVedlegg(dbSøknad)
+        if (dbBarnetrygdSøknad.journalpostId == null) {
+            val vedlegg = barnetrygdSøknadService.hentLagredeVedlegg(dbBarnetrygdSøknad)
 
             val arkiverDokumentRequest =
                 ArkiverDokumentRequestMapper.toDto(
-                    dbSøknad = dbSøknad,
-                    versjonertSøknad = dbSøknad.hentVersjonertSøknad(),
+                    dbBarnetrygdSøknad = dbBarnetrygdSøknad,
+                    versjonertSøknad = dbBarnetrygdSøknad.hentVersjonertSøknad(),
                     pdf = pdf,
                     vedleggMap = vedlegg,
                     pdfOriginalSpråk = pdfOriginalSpråk,
                 )
             val journalpostId: String = arkiverSøknad(arkiverDokumentRequest)
-            val dbSøknadMedJournalpostId = dbSøknad.copy(journalpostId = journalpostId)
+            val dbSøknadMedJournalpostId = dbBarnetrygdSøknad.copy(journalpostId = journalpostId)
             barnetrygdSøknadService.lagreDBSøknad(dbSøknadMedJournalpostId)
             log.info("Søknaden er journalført og lagret til database")
 
-            barnetrygdSøknadService.slettLagredeVedlegg(dbSøknad)
+            barnetrygdSøknadService.slettLagredeVedlegg(dbBarnetrygdSøknad)
             log.info("Vedlegg for søknad slettet fra database etter journalføring")
         } else {
-            log.warn("Søknaden har allerede blitt journalført med journalpostId: ${dbSøknad.journalpostId}")
+            log.warn("Søknaden har allerede blitt journalført med journalpostId: ${dbBarnetrygdSøknad.journalpostId}")
         }
     }
 

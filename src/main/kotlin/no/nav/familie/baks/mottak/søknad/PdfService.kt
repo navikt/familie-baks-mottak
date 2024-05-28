@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.søknad
 
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
@@ -8,7 +8,7 @@ import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontan
 interface PdfService {
     fun lagBarnetrygdPdf(
         versjonertSøknad: VersjonertSøknad,
-        dbSøknad: DBSøknad,
+        dbBarnetrygdSøknad: DBBarnetrygdSøknad,
         språk: String = "nb",
     ): ByteArray
 

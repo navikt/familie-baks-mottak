@@ -1,7 +1,7 @@
 package no.nav.familie.baks.mottak.søknad
 
 import no.nav.familie.baks.mottak.integrasjoner.PdfClient
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
@@ -22,7 +22,7 @@ class GammelPdfService(
 ) : PdfService {
     override fun lagBarnetrygdPdf(
         versjonertSøknad: VersjonertSøknad,
-        dbSøknad: DBSøknad,
+        dbBarnetrygdSøknad: DBBarnetrygdSøknad,
         språk: String,
     ): ByteArray {
         val barnetrygdSøknadMapForSpråk =
@@ -43,8 +43,8 @@ class GammelPdfService(
         val ekstraFelterMap =
             hentEkstraFelter(
                 navn = navn.verdi.getValue("nb"),
-                opprettetTid = dbSøknad.opprettetTid,
-                fnr = dbSøknad.fnr,
+                opprettetTid = dbBarnetrygdSøknad.opprettetTid,
+                fnr = dbBarnetrygdSøknad.fnr,
                 label =
                     when (søknadstype) {
                         Søknadstype.UTVIDET -> "Søknad om utvidet barnetrygd"

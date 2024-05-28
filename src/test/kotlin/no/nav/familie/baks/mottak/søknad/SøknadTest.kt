@@ -2,7 +2,7 @@ package no.nav.familie.baks.mottak.søknad
 
 import no.nav.familie.baks.mottak.DevLauncherPostgres
 import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadService
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
@@ -62,12 +62,12 @@ class SøknadTest(
     @Test
     fun `Version detection ved henting av søknad fra database`() {
         val lagraV8SøknadData = objectMapper.writeValueAsString(SøknadTestData.søknadV8())
-        val v8dbSøknad =
-            DBSøknad(
+        val v8DbBarnetrygdSøknad =
+            DBBarnetrygdSøknad(
                 id = 2L,
                 søknadJson = lagraV8SøknadData,
                 fnr = "1234123412",
             )
-        assertThat(v8dbSøknad.hentVersjonertSøknad() is SøknadV8).isTrue
+        assertThat(v8DbBarnetrygdSøknad.hentVersjonertSøknad() is SøknadV8).isTrue
     }
 }

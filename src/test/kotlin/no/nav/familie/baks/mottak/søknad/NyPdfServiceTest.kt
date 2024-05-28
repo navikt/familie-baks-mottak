@@ -9,7 +9,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import no.nav.familie.baks.dokgen.DokGen
 import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClient
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
 import org.assertj.core.api.Assertions.assertThat
@@ -39,7 +39,7 @@ internal class NyPdfServiceTest {
             File("./src/test/kotlin/no/nav/familie/baks/mottak/søknad/testdata/testdata1.json")
                 .readText(Charsets.UTF_8)
         val søknad: SøknadKontraktV8 = mapper.readValue(jsonString)
-        val dbSøknad: DBSøknad = søknad.tilDBSøknad()
+        val dbSøknad: DBBarnetrygdSøknad = søknad.tilDBSøknad()
         pdfService.lagBarnetrygdPdf(SøknadV8(søknad = søknad), dbSøknad, språk = "nb")
 
         // Kommenter inn dette for å logge generert input til console

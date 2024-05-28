@@ -8,7 +8,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import no.nav.familie.baks.mottak.integrasjoner.PdfClient
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
 import org.assertj.core.api.Assertions.assertThat
@@ -37,8 +37,8 @@ internal class GammelPdfServiceTest {
             File("./src/test/kotlin/no/nav/familie/baks/mottak/søknad/testdata/testdata1.json")
                 .readText(Charsets.UTF_8)
         val søknad: SøknadKontraktV8 = mapper.readValue(jsonString)
-        val dbSøknad: DBSøknad = søknad.tilDBSøknad()
-        pdfService.lagBarnetrygdPdf(SøknadV8(søknad = søknad), dbSøknad, språk = "nb")
+        val dbBarnetrygdSøknad: DBBarnetrygdSøknad = søknad.tilDBSøknad()
+        pdfService.lagBarnetrygdPdf(SøknadV8(søknad = søknad), dbBarnetrygdSøknad, språk = "nb")
 
         // Kommenter inn dette for å logge generert json til console
         // val jsonToDokgen: String = mapper.writeValueAsString(jsonSlot)

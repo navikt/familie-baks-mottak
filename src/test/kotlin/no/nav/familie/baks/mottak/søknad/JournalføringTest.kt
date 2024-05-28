@@ -41,7 +41,7 @@ class JournalføringTest(
     fun `arkiverSøknad returnerer riktig journalpostId for barnetrygdsøknad`() {
         val arkiverDokumentRequest =
             ArkiverDokumentRequestMapper.toDto(
-                dbSøknad = dbSøknad,
+                dbBarnetrygdSøknad = dbSøknad,
                 versjonertSøknad = dbSøknad.hentVersjonertSøknad(),
                 pdf = testPDF,
                 vedleggMap = emptyMap(),
