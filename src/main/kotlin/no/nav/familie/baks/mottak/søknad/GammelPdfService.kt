@@ -107,7 +107,6 @@ class GammelPdfService(
             "navn" to navn,
             "fodselsnummer" to fnr,
             "label" to label,
-            "maalform" to "NB",
         )
     }
 
