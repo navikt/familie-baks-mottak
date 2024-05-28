@@ -39,6 +39,7 @@ class JournalhendelseKontantstøtteRutingTask(
     private val unleashService: UnleashNextMedContextService,
 ) : AsyncTaskStep {
     val log: Logger = LoggerFactory.getLogger(JournalhendelseKontantstøtteRutingTask::class.java)
+    val enheterSomIkkeSkalHaAutomatiskJournalføring = listOf("4863")
     val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
     val tema = Tema.KON
 
@@ -46,6 +47,7 @@ class JournalhendelseKontantstøtteRutingTask(
         val brukersIdent = task.metadata["personIdent"] as String
 
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
+        val journalførendeEnhet = journalpost.journalforendeEnhet
 
         val fagsakId by lazy { ksSakClient.hentFagsaknummerPåPersonident(tilPersonIdent(journalpost.bruker!!, tema)) }
 
@@ -62,7 +64,10 @@ class JournalhendelseKontantstøtteRutingTask(
 
         val skalAutomatiskJournalføreJournalpost =
             featureToggleForAutomatiskJournalføringSkruddPå &&
-                erKontantstøtteSøknad && !harLøpendeSakIInfotrygd && !harÅpenBehandlingIFagsak
+                erKontantstøtteSøknad &&
+                !harLøpendeSakIInfotrygd &&
+                !harÅpenBehandlingIFagsak &&
+                journalførendeEnhet !in enheterSomIkkeSkalHaAutomatiskJournalføring
 
         if (skalAutomatiskJournalføreJournalpost) {
             log.info("Oppretter OppdaterOgFerdigstillJournalpostTask for journalpost med id ${journalpost.journalpostId}")
