@@ -2,7 +2,7 @@ package no.nav.familie.baks.mottak.task
 
 import no.nav.familie.baks.mottak.søknad.JournalføringService
 import no.nav.familie.baks.mottak.søknad.PdfService
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
@@ -27,9 +27,9 @@ class JournalførSøknadTask(
         try {
             val id = task.payload
             log.info("Prøver å hente søknadspdf for $id")
-            val dbSøknad: DBSøknad =
+            val dbBarnetrygdSøknad: DBBarnetrygdSøknad =
                 søknadRepository.hentDBSøknad(id.toLong()) ?: error("Kunne ikke finne søknad ($id) i database")
-            val versjonertSøknad: VersjonertSøknad = dbSøknad.hentVersjonertSøknad()
+            val versjonertSøknad: VersjonertSøknad = dbBarnetrygdSøknad.hentVersjonertSøknad()
 
             val søknadstype =
                 when (versjonertSøknad) {
@@ -40,7 +40,7 @@ class JournalførSøknadTask(
             val bokmålPdf =
                 pdfService.lagBarnetrygdPdf(
                     versjonertSøknad = versjonertSøknad,
-                    dbSøknad = dbSøknad,
+                    dbBarnetrygdSøknad = dbBarnetrygdSøknad,
                     språk = "nb",
                 )
             log.info("Generert pdf med størrelse ${bokmålPdf.size}")
@@ -53,11 +53,11 @@ class JournalførSøknadTask(
 
             val orginalspråkPdf: ByteArray =
                 if (orginalspråk != "nb") {
-                    pdfService.lagBarnetrygdPdf(versjonertSøknad, dbSøknad, orginalspråk)
+                    pdfService.lagBarnetrygdPdf(versjonertSøknad, dbBarnetrygdSøknad, orginalspråk)
                 } else {
                     ByteArray(0)
                 }
-            journalføringService.journalførBarnetrygdSøknad(dbSøknad, bokmålPdf, orginalspråkPdf)
+            journalføringService.journalførBarnetrygdSøknad(dbBarnetrygdSøknad, bokmålPdf, orginalspråkPdf)
         } catch (e: RessursException) {
             when (e.cause) {
                 is HttpClientErrorException.Conflict -> {

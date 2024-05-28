@@ -1,12 +1,14 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.harEøsSteg
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import org.springframework.stereotype.Service
 
 @Service
-class BarnetrygdOppgaveMapper(hentEnhetClient: HentEnhetClient, pdlClient: PdlClient) :
+class BarnetrygdOppgaveMapper(hentEnhetClient: HentEnhetClient, pdlClient: PdlClient, val søknadRepository: SøknadRepository) :
     AbstractOppgaveMapper(hentEnhetClient, pdlClient) {
     override val tema: Tema = Tema.BAR
 
@@ -30,13 +32,17 @@ class BarnetrygdOppgaveMapper(hentEnhetClient: HentEnhetClient, pdlClient: PdlCl
 
     override fun hentBehandlingstypeVerdi(journalpost: Journalpost): String? = hentBehandlingstype(journalpost)?.value
 
-    fun utledBehandlingKategori(journalpost: Journalpost) =
-        when {
-            erEØS(journalpost) -> BehandlingKategori.EØS
+    fun utledBehandlingKategoriFraSøknad(journalpost: Journalpost): BehandlingKategori {
+        check(journalpost.erBarnetrygdSøknad()) { "Journalpost m/ id ${journalpost.journalpostId} er ikke en barnetrygd søknad" }
+        val søknad = søknadRepository.getByJournalpostId(journalpost.journalpostId)
+
+        return when {
+            søknad.harEøsSteg() -> BehandlingKategori.EØS
             else -> BehandlingKategori.NASJONAL
         }
+    }
 
-    fun utledBehandlingUnderkategori(journalpost: Journalpost) =
+    fun utledBehandlingUnderkategoriFraSøknad(journalpost: Journalpost) =
         when {
             journalpost.erBarnetrygdUtvidetSøknad() -> BehandlingUnderkategori.UTVIDET
             else -> BehandlingUnderkategori.ORDINÆR
