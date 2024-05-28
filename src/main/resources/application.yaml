@@ -52,6 +52,7 @@ management:
       export:
         enabled: true
 
+FAMILIE_BAKS_DOKGEN_API_URL: http://familie-baks-dokgen
 FAMILIE_INTEGRASJONER_API_URL: https://familie-integrasjoner.prod-fss-pub.nais.io/api
 FAMILIE_DOKUMENT_API_URL: http://familie-dokument
 FAMILIE_BA_INFOTRYGD_API_URL: http://familie-ba-infotrygd

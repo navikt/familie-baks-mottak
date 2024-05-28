@@ -7,8 +7,7 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
-import no.nav.familie.baks.dokgen.DokGen
-import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClient
+import no.nav.familie.baks.mottak.integrasjoner.PdfClient
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
@@ -19,17 +18,16 @@ import java.io.File
 import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadKontraktV8
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class PdfServiceTest {
-    private val mockFamilieDokumentClient: FamilieDokumentClient = mockk(relaxed = true)
-    private val mockDokgen: DokGen = mockk()
+internal class GammelPdfServiceTest {
+    private val mockPdfClient: PdfClient = mockk()
     private val søknadSpråkvelgerService: SøknadSpråkvelgerService = SøknadSpråkvelgerService()
 
-    private val pdfService = PdfService(mockFamilieDokumentClient, søknadSpråkvelgerService, mockDokgen)
+    private val pdfService = GammelPdfService(mockPdfClient, søknadSpråkvelgerService)
 
     @Test
     fun `mapper fra søknad kontrakt til dokgen input`() {
-        val input = slot<Map<String, Any>>()
-        every { mockDokgen.lagHtmlTilPdf(any(), capture(input)) } returns "<html/>"
+        val jsonSlot = slot<Map<String, Any>>()
+        every { mockPdfClient.lagPdf(capture(jsonSlot), any()) } returns ByteArray(0)
 
         val mapper = jacksonObjectMapper()
         mapper.registerKotlinModule()
@@ -42,9 +40,10 @@ internal class PdfServiceTest {
         val dbSøknad: DBSøknad = søknad.tilDBSøknad()
         pdfService.lagBarnetrygdPdf(SøknadV8(søknad = søknad), dbSøknad, språk = "nb")
 
-        // Kommenter inn dette for å logge generert input til console
-        // println(input.captured)
+        // Kommenter inn dette for å logge generert json til console
+        // val jsonToDokgen: String = mapper.writeValueAsString(jsonSlot)
+        // println(jsonToDokgen)
 
-        assertThat(input.captured["kontraktVersjon"]).isEqualTo(8)
+        assertThat(jsonSlot.captured["kontraktVersjon"]).isEqualTo(8)
     }
 }
