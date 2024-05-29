@@ -15,11 +15,11 @@ class FamilieDokumentPdfClientTest {
     @Test
     fun lagPdf() {
         // Arrange
-        val capturedHtml = slot<String>()
+        val outputHtml = slot<String>()
 
         val mockedByteArray = ByteArray(1)
 
-        every { familieDokumentClient.lagPdf(capture(capturedHtml)) } returns mockedByteArray
+        every { familieDokumentClient.lagPdf(capture(outputHtml)) } returns mockedByteArray
 
         val familieDokumentPdfClient =
             FamilieDokumentPdfClient(
@@ -45,7 +45,7 @@ class FamilieDokumentPdfClientTest {
 
         // Assert
         assertThat(pdfByteArray).isEqualTo(mockedByteArray)
-        assertThat(capturedHtml.captured.lines().joinToString(transform = String::trimEnd))
+        assertThat(outputHtml.captured.lines().joinToString(transform = String::trimEnd))
             .isEqualTo(forventetResultat.lines().joinToString(transform = String::trimEnd))
     }
 }
