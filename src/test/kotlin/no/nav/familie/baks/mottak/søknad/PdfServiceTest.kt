@@ -18,16 +18,16 @@ import java.io.File
 import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadKontraktV8
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class GammelPdfServiceTest {
+internal class PdfServiceTest {
     private val mockPdfClient: PdfClient = mockk()
     private val søknadSpråkvelgerService: SøknadSpråkvelgerService = SøknadSpråkvelgerService()
 
-    private val pdfService = GammelPdfService(mockPdfClient, søknadSpråkvelgerService)
+    private val pdfService = PdfService(mockPdfClient, søknadSpråkvelgerService)
 
     @Test
     fun `mapper fra søknad kontrakt til dokgen input`() {
         val jsonSlot = slot<Map<String, Any>>()
-        every { mockPdfClient.lagPdf(capture(jsonSlot), any()) } returns ByteArray(0)
+        every { mockPdfClient.lagPdf(any(), capture(jsonSlot)) } returns ByteArray(0)
 
         val mapper = jacksonObjectMapper()
         mapper.registerKotlinModule()
