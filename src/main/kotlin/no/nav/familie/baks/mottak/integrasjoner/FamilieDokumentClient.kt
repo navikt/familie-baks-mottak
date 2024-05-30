@@ -19,7 +19,10 @@ private val logger = LoggerFactory.getLogger(FamilieDokumentClient::class.java)
 class FamilieDokumentClient(
     @param:Value("\${FAMILIE_DOKUMENT_API_URL}") private val dokumentUri: URI,
     @Qualifier("clientCredentials") restOperations: RestOperations,
+    @Qualifier("restTemplateUnsecured") unsecuredRestOperations: RestOperations,
 ) : AbstractRestClient(restOperations, "integrasjon") {
+    private val unauthenticated = object : AbstractRestClient(unsecuredRestOperations, "familie.dokument.pdf") {}
+
     @Retryable(
         value = [RuntimeException::class],
         backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
@@ -33,7 +36,7 @@ class FamilieDokumentClient(
 
     fun lagPdf(html: String): ByteArray {
         val sendInnUri = URI.create("$dokumentUri/api/html-til-pdf")
-        return postForEntity(
+        return unauthenticated.postForEntity(
             uri = sendInnUri,
             payload = html.encodeToByteArray(),
             httpHeaders =
