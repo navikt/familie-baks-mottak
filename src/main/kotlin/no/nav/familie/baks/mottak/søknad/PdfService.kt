@@ -59,9 +59,9 @@ class PdfService(
             )
 
         return if (unleashService.isEnabled(FeatureToggleConfig.BRUK_NY_DOKGEN_LØSNING)) {
-            dokgenPdfClient.lagPdf(path, barnetrygdSøknadMapForSpråk + ekstraFelterMap)
-        } else {
             familieDokumentPdfClient.lagPdf(path, barnetrygdSøknadMapForSpråk + ekstraFelterMap)
+        } else {
+            dokgenPdfClient.lagPdf(path, barnetrygdSøknadMapForSpråk + ekstraFelterMap)
         }
     }
 
@@ -88,9 +88,9 @@ class PdfService(
             )
 
         return if (unleashService.isEnabled(FeatureToggleConfig.BRUK_NY_DOKGEN_LØSNING)) {
-            dokgenPdfClient.lagPdf("kontantstotte-soknad", kontantstøtteSøknadMapForSpråk + ekstraFelterMap)
-        } else {
             familieDokumentPdfClient.lagPdf("kontantstotte-soknad", kontantstøtteSøknadMapForSpråk + ekstraFelterMap)
+        } else {
+            dokgenPdfClient.lagPdf("kontantstotte-soknad", kontantstøtteSøknadMapForSpråk + ekstraFelterMap)
         }
     }
 
