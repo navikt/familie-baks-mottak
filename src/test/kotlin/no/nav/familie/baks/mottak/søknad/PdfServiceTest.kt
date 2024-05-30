@@ -11,6 +11,7 @@ import no.nav.familie.baks.mottak.integrasjoner.PdfClient
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
+import no.nav.familie.unleash.UnleashService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -19,15 +20,18 @@ import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadKontraktV8
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class PdfServiceTest {
-    private val mockPdfClient: PdfClient = mockk()
+    private val mockFamilieDokumentPdfClient: PdfClient = mockk()
+    private val mockDokgenPdfClient: PdfClient = mockk()
+    private val mockUnleashService: UnleashService = mockk(relaxed = true)
     private val søknadSpråkvelgerService: SøknadSpråkvelgerService = SøknadSpråkvelgerService()
 
-    private val pdfService = PdfService(mockPdfClient, søknadSpråkvelgerService)
+    private val pdfService = PdfService(familieDokumentPdfClient = mockFamilieDokumentPdfClient, dokgenPdfClient = mockDokgenPdfClient, søknadSpråkvelgerService = søknadSpråkvelgerService, unleashService = mockUnleashService)
 
     @Test
     fun `mapper fra søknad kontrakt til dokgen input`() {
         val jsonSlot = slot<Map<String, Any>>()
-        every { mockPdfClient.lagPdf(any(), capture(jsonSlot)) } returns ByteArray(0)
+        every { mockFamilieDokumentPdfClient.lagPdf(any(), capture(jsonSlot)) } returns ByteArray(0)
+        every { mockDokgenPdfClient.lagPdf(any(), capture(jsonSlot)) } returns ByteArray(0)
 
         val mapper = jacksonObjectMapper()
         mapper.registerKotlinModule()
