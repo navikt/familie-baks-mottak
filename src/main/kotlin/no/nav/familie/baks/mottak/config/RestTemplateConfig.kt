@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Profile
+import org.springframework.http.converter.ByteArrayHttpMessageConverter
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.web.client.RestOperations
 
@@ -32,7 +33,7 @@ class RestTemplateConfig {
                 bearerTokenClientInterceptor,
                 MdcValuesPropagatingClientInterceptor(),
             )
-            .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
+            .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper), ByteArrayHttpMessageConverter())
             .build()
     }
 
