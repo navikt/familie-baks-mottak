@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
-import no.nav.familie.baks.dokgen.DokGen
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -24,7 +23,6 @@ class FamilieDokumentPdfClientTest {
         val familieDokumentPdfClient =
             FamilieDokumentPdfClient(
                 familieDokumentClient,
-                DokGen(),
             )
 
         val inputData =
