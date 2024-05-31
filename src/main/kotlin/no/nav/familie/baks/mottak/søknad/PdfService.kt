@@ -1,5 +1,6 @@
 package no.nav.familie.baks.mottak.søknad
 
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.integrasjoner.PdfClient
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
@@ -10,6 +11,7 @@ import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteS�
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
+import no.nav.familie.unleash.UnleashService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -19,13 +21,15 @@ import java.util.Locale
 
 @Service
 class PdfService(
-    private val pdfClient: PdfClient,
+    private val familieDokumentPdfClient: PdfClient,
+    private val dokgenPdfClient: PdfClient,
     private val søknadSpråkvelgerService: SøknadSpråkvelgerService,
+    private val unleashService: UnleashService,
 ) {
     fun lagBarnetrygdPdf(
         versjonertSøknad: VersjonertSøknad,
         dbBarnetrygdSøknad: DBBarnetrygdSøknad,
-        språk: String = "nb",
+        språk: String,
     ): ByteArray {
         val barnetrygdSøknadMapForSpråk =
             søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(versjonertSøknad, språk)
@@ -53,13 +57,18 @@ class PdfService(
                         else -> "Søknad om ordinær barnetrygd"
                     },
             )
-        return pdfClient.lagPdf(barnetrygdSøknadMapForSpråk + ekstraFelterMap, path)
+
+        return if (unleashService.isEnabled(FeatureToggleConfig.BRUK_NY_DOKGEN_LØSNING)) {
+            familieDokumentPdfClient.lagPdf(path, barnetrygdSøknadMapForSpråk + ekstraFelterMap)
+        } else {
+            dokgenPdfClient.lagPdf(path, barnetrygdSøknadMapForSpråk + ekstraFelterMap)
+        }
     }
 
     fun lagKontantstøttePdf(
         versjonertSøknad: VersjonertKontantstøtteSøknad,
         dbKontantstøtteSøknad: DBKontantstøtteSøknad,
-        språk: String = "nb",
+        språk: String,
     ): ByteArray {
         val kontantstøtteSøknadMapForSpråk =
             søknadSpråkvelgerService.konverterKontantstøtteSøknadTilMapForSpråk(versjonertSøknad, språk)
@@ -77,7 +86,12 @@ class PdfService(
                 fnr = dbKontantstøtteSøknad.fnr,
                 label = "Søknad om kontantstøtte",
             )
-        return pdfClient.lagPdf(kontantstøtteSøknadMapForSpråk + ekstraFelterMap, "kontantstotte-soknad")
+
+        return if (unleashService.isEnabled(FeatureToggleConfig.BRUK_NY_DOKGEN_LØSNING)) {
+            familieDokumentPdfClient.lagPdf("kontantstotte-soknad", kontantstøtteSøknadMapForSpråk + ekstraFelterMap)
+        } else {
+            dokgenPdfClient.lagPdf("kontantstotte-soknad", kontantstøtteSøknadMapForSpråk + ekstraFelterMap)
+        }
     }
 
     private fun søknadstypeTilPath(søknadstype: Søknadstype): String {
@@ -101,6 +115,7 @@ class PdfService(
             "navn" to navn,
             "fodselsnummer" to fnr,
             "label" to label,
+            "maalform" to "NB",
         )
     }
 

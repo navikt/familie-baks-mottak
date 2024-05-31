@@ -1,0 +1,909 @@
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <style>/* WARNING: Uses CSS 2.1 */
+
+* {
+    font-family: "Source Sans Pro", sans-serif !important;
+}
+
+html {
+    height:100%;
+}
+
+body{
+    height: 100%;
+    margin: 0;
+    padding-left: 4%;
+    padding-right: 4%;
+    position: relative;
+}
+
+body::after {
+    content: '';
+    display: block;
+}
+
+#content {
+    margin: 0;
+}
+
+#header {
+    margin: 0;
+}
+
+#Logo {
+    height: 27mm;
+}
+
+#logo_container {
+    width: 30mm;
+    height: 18.9mm;
+    margin: auto;
+    float: right;
+    text-align: right;
+}
+#nav_logo {
+    width: 90%;
+    height: 90%;
+}
+
+#dato {
+    text-align: right;
+    font-family: "Times New Roman", sans-serif;
+    padding-bottom: 5mm;
+}
+
+#dato::before {
+    content: "Dato: ";
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 8pt;
+}
+
+#mottakeradresse {
+    font-family: Arial, sans-serif;
+    font-size: 12pt;
+    padding-bottom: 18mm;
+}
+
+#overskrift {
+    font-family: "Times New Roman", sans-serif;
+    font-size: 14pt;
+    font-weight: bold;
+}
+
+.personinfo {
+    font-family: "Times New Roman", sans-serif;
+    font-size: 10pt;
+    color: grey;
+}
+
+.personinfo_small{
+    font-size: 8pt;
+}
+
+.personinfo::before {
+    /*font-family: Arial, sans-serif;*/
+    font-size: 8pt;
+}
+
+#fodselsnummer::before {
+    content: "Fødselsnummer: ";
+}
+
+#hilsen #saksbehandler {
+    float: left;
+}
+
+#hilsen #beslutter {
+    float: right;
+}
+
+#footer {
+    position: fixed;
+    margin: 0;
+    bottom: -19mm;
+    right: 8mm;
+    width: 100%;
+    height: 25mm;
+    text-align: right;
+}
+
+#pagenumber:before {
+    content: counter(page);
+}
+
+#pagecount:before {
+    content: counter(pages);
+}
+
+
+.line_top {
+    border-top: 1px black solid;
+}
+
+.line_bottom {
+    border-bottom: 1px black solid;
+}
+
+.line_left {
+    border-left: 1px black solid;
+}
+
+.line_right {
+    border-right: 1px black solid;
+}
+
+.block {
+    width: 100%;
+    margin-top: 0;
+}
+
+.inline {
+    display: inline-block;
+}
+
+h1 {
+    font-size: 30px;
+    margin: 3mm 0 2mm 0;
+}
+
+h2 {
+    font-size: 26px;
+    margin: 3mm 0 1.5mm 0;
+}
+
+h3 {
+    font-size: 22px;
+    margin: 3mm 0 1.5mm 0;
+}
+
+h4 {
+    font-size: 20px;
+    margin: 3mm 0 1.5mm 0;
+}
+
+p {
+    font-size: 16px;
+    margin: 0.5mm 0 0 0;
+}
+
+li {
+    font-size: 16px;
+    margin-left: 2em;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+tr {
+    font-size: 10px;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.checkbox {
+    width: 3mm;
+    height: 3mm;
+    border: black 1px solid;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 10px;
+}
+
+.new_page {
+    page-break-before: always;
+}
+
+.checkbox_title_right {
+    margin-left: 5mm;
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+.titled_checkbox_block {
+    margin-left: 3mm;
+    margin-bottom: 5mm;
+}
+
+.titled_checkbox_inline {
+    display: inline;
+    margin-left: 3mm;
+}
+
+.signature_date_title {
+    font-size: 10px;
+}
+
+.centered_text_title {
+    text-align: center;
+    font-size: 12px;
+}
+table {
+    width: 100%;
+}
+
+.td01 {
+    width: 110px;
+    font-size: 12px;
+}
+
+.td02 {
+    width: 150px;
+}
+
+.bold {
+    font-weight: 700;
+}
+
+.new_page {
+    page-break-before: always;
+
+}
+td, th {
+    font-weight: bold;
+    /*border: 1px solid #cccccc;*/
+    text-align: left;
+    margin: 0;
+    padding: 6px 13px
+}
+
+.label-1 {
+    font-weight: bold;
+    text-indent: 0px;
+}
+
+.verdi-1 {
+    font-weight: bold;
+    font-family: "Source Sans Pro", sans-serif;
+    margin-bottom: 10px;
+}
+
+.label-2 {
+    font-weight: bold;
+    text-indent: 20px;
+}
+
+.verdi-2 {
+    text-indent: 20px;
+    margin-bottom: 10px;
+}
+
+.label-3 {
+    font-weight: bold;
+    text-indent: 40px;
+}
+
+.verdi-3 {
+    text-indent: 40px;
+    margin-bottom: 10px;
+}
+
+.label-4 {
+    font-weight: bold;
+    text-indent: 80px;
+}
+
+.verdi-4 {
+    text-indent: 80px;
+    margin-bottom: 10px;
+}
+
+ul {
+    margin-top: 0;
+}
+
+.soknad-section {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 14px;
+    page-break-inside: avoid;
+}
+
+.oppfølging {
+    margin-top: 0.5rem;
+    margin-left: 0.5rem;
+}
+
+.oppfølging ul, .oppfølging li {
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
+.soknad-section table {
+    border: 1px solid black;
+    border-collapse: collapse;
+    -fs-keep-with-inline: keep;
+}
+
+.soknad-section td {
+    padding: 6px 13px;
+    border: 1px solid black;
+    vertical-align: top;
+    font-weight: 600;
+    width: 50%;
+    page-break-inside: avoid;
+}
+
+.soknad-section h4 {
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.soknad-section h5 {
+    font-size: 1rem;
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+    margin-top: 0.2rem;
+}
+
+.extra-cell-content {
+    margin-top: 0.5rem;
+    margin-left: 0.5rem;
+}
+
+.soknad-seksjon {
+    width: 100%;
+    margin-bottom: 20px;
+    page-break-inside: avoid;
+}
+
+.soknad-seksjon-tittel {
+    color: #262626;
+    font-weight: 600;
+    font-size: 1.25rem;
+    margin-bottom: 1.33rem;
+}
+
+.soknad-seksjon-undertittel {
+    color: #262626;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    font-size: 1.125rem;
+}
+
+.soknad-sporsmal {
+    font-weight: 600;
+}
+
+.soknad-sporsmal-med-svar {
+    margin-bottom: 1.25rem;
+    color: #262626;
+}
+
+.soknad-seksjon-slutt-linje {
+    border: 1px solid #6A6A6A;
+    margin: 1.25rem 0;
+}
+
+.periode-tittel {
+    color: #262626;
+    font-weight: 600;
+}</style>
+ </head>
+ <body>
+  <div id="header"><!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+   <div id="Logo">
+    <div id="logo_container">
+     <svg id="nav_logo" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 704 443.10666" height="444" width="704" xml:space="preserve" version="1.1"><metadata id="metadata8">
+       <rdf:rdf>
+        <cc:work rdf:about="">
+         <dc:format>
+          image/svg+xml
+         </dc:format>
+         <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        </cc:work>
+       </rdf:rdf>
+      </metadata> <defs id="defs6">
+      </defs> <g transform="matrix(1.3333333,0,0,-1.3333333,0,443.10667)" id="g10">
+       <g transform="scale(0.1)" id="g12">
+        <path id="path14" style="fill:#cf181f;fill-opacity:1;fill-rule:nonzero;stroke:none" d="M 4126.87,1661.53 C 4126.87,743.93 3382.81,-0.0117188 2465,-0.0117188 1547.56,-0.0117188 803.555,743.93 803.555,1661.53 c 0,917.69 744.005,1661.73 1661.445,1661.73 917.81,0 1661.87,-744.04 1661.87,-1661.73">
+        </path>
+        <path id="path16" style="fill:#cf181f;fill-opacity:1;fill-rule:nonzero;stroke:none" d="M 0,935.949 339.617,1776.57 H 665.938 L 326.762,935.949 H 0">
+        </path>
+        <path id="path18" style="fill:#cf181f;fill-opacity:1;fill-rule:nonzero;stroke:none" d="m 4190.89,935.949 335.29,840.621 h 177.94 l -335.3,-840.621 h -177.93">
+        </path>
+        <path id="path20" style="fill:#cf181f;fill-opacity:1;fill-rule:nonzero;stroke:none" d="m 4850.25,935.949 335.24,840.621 H 5280 L 4944.7,935.949 h -94.45">
+        </path>
+        <path id="path22" style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" d="m 2614.38,1239.79 h -171.15 c -68.09,0 -123.51,55.18 -123.51,123.34 0,68.15 55.42,123.58 123.51,123.58 h 47.87 c 67.98,0 123.28,-55.43 123.28,-123.58 z m 1267.96,536.78 h -295.37 c 0,0 -20.31,0 -27.5,-18 l -163.49,-500.36 -163.32,500.36 c -7.22,18 -27.72,18 -27.72,18 H 2637 c -12.3,0 -22.62,-10.32 -22.62,-22.56 v -169.88 c 0,134.79 -143.42,192.44 -227.4,192.44 -188.15,0 -314.06,-123.93 -353.23,-312.24 -2.17,124.88 -12.54,169.64 -46.18,215.52 -15.5,22.45 -37.8,41.41 -62.15,57.01 -50.1,29.34 -95.08,39.71 -191.8,39.71 h -113.49 c 0,0 -20.53,0 -27.78,-18 v 0 l -103.3,-255.91 v 251.35 c 0,12.24 -10.19,22.56 -22.48,22.56 h -262.69 c 0,0 -20.29,0 -27.66,-18 l -107.39,-266.23 c 0,0 -10.74,-26.62 13.81,-26.62 h 100.95 V 958.559 c 0,-12.59 9.9,-22.61 22.56,-22.61 h 260.42 c 12.29,0 22.48,10.02 22.48,22.61 v 507.161 h 101.5 c 58.26,0 70.61,-1.57 93.28,-12.13 13.63,-5.16 25.92,-15.48 32.64,-27.61 13.74,-25.84 17.15,-56.87 17.15,-148.46 V 958.559 c 0,-12.59 10.15,-22.61 22.62,-22.61 h 249.62 c 0,0 28.21,0 39.33,27.891 l 55.34,136.77 c 73.53,-103.051 194.59,-164.661 345.04,-164.661 h 32.89 c 0,0 28.36,0 39.58,27.891 l 96.34,238.64 V 958.559 c 0,-12.59 10.32,-22.61 22.62,-22.61 h 254.76 c 0,0 28.13,0 39.4,27.891 0,0 101.98,253.02 102.3,254.96 h 0.17 v 0 c 3.91,20.99 -22.67,20.99 -22.67,20.99 h -90.92 v 434.14 l 286.07,-710.09 c 11.19,-27.891 39.33,-27.891 39.33,-27.891 h 301.04 c 0,0 28.34,0 39.48,27.891 l 317.19,785.49 c 11.03,27.24 -20.81,27.24 -20.81,27.24">
+        </path>
+       </g>
+      </g>
+     </svg>
+    </div>
+   </div>
+   <div>
+    <p id="dato">15.05.2024</p>
+    <p id="mottakeradresse"></p>
+   </div>
+   <div style="margin-bottom: 1em;">
+    <h2 id="overskrift">Søknad om ordinær barnetrygd</h2>
+    <div><span class="personinfo personinfo_small">Navn: </span> <span id="navn" class="personinfo">VOKSEN VOKSNESSEN</span>
+    </div>
+    <p id="fodselsnummer" class="personinfo">23058518298</p>
+   </div>
+  </div>
+  <div id="content">
+   <section class="soknad-section">
+    <h3>Søker</h3>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Navn</p>
+     <p>Voksen Voksnessen</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Jeg er klar over at jeg kan miste retten til barnetrygd dersom jeg gir feil opplysninger. Jeg er også klar over at jeg må betale tilbake dersom jeg får penger jeg ikke har rett til hvis jeg lar være å informere eller gir feil opplysninger.</p>
+     <p>Jeg bekrefter at jeg har lest og forstått.</p>
+    </div>
+   </section>
+   <section class="soknad-section">
+    <h3>1. Om deg</h3>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Ident</p>
+     <p>23058518298</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Statsborgerskap</p>
+     <p>Norge, Afghanistan</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Sivilstatus</p>
+     <p></p>
+     <p>Gift</p>
+     <p></p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Adresse</p>
+     <p>Solveien 2 A H0101<br>2304 HAMAR</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Bor du på denne adressen?</p>
+     <p>Nei</p>
+    </div>
+   </section>
+   <section class="soknad-section">
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Har du oppholdt deg sammenhengende i Norge de siste tolv månedene?</p>
+     <p>Nei</p>
+    </div>
+    <p class="periode-tittel">Utenlandsopphold 1</p>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hva beskriver perioden du oppholdt deg utenfor Norge best?</p>
+     <p>Jeg oppholder meg utenfor Norge nå</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hvilket land oppholder du deg i?</p>
+     <p>Amerikansk Samoa</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Når startet oppholdet?</p>
+     <p>01.06.2022</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Når avsluttes oppholdet?</p>
+     <p>Jeg vet ikke når oppholdet avsluttes</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Planlegger du å bo sammenhengende i Norge i mer enn tolv måneder?</p>
+     <p>Ja</p>
+    </div>
+   </section>
+   <section class="soknad-section">
+    <h3>2. Livssituasjonen din</h3>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Er du asylsøker?</p>
+     <p>Nei</p>
+    </div>
+    <p class="periode-tittel">Arbeidsperiode utenfor Norge 1</p>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Er arbeidsperioden avsluttet?</p>
+     <p>Ja</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hvilket land arbeidet du i?</p>
+     <p>Andorra</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Får eller har du fått pensjon fra utlandet?</p>
+     <p>Ja</p>
+    </div>
+    <p class="periode-tittel">Pensjonsperiode fra utlandet 1</p>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Får du pensjon nå?</p>
+     <p>Ja</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hvilket land får du pensjon fra?</p>
+     <p>Belgia</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Når har du fått pensjon fra?</p>
+     <p>01.06.2022</p>
+    </div>
+   </section>
+   <section class="soknad-section">
+    <h3>3. Hvilke barn søker du for?</h3>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Navn</p>
+     <p>Barn Barnessen III</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Alder</p>
+     <p>12 år</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Ident</p>
+     <p>12345678987</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Registrert bosted</p>
+     <p>Registrert på søkers adresse</p>
+    </div>
+   </section>
+   <section class="soknad-section">
+    <h3>4. Om barna dine</h3>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Er noen av barna fosterbarn?</p>
+     <p>Nei</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Er noen av barna i barnverninstitusjon eller i annen institusjon?</p>
+     <p>Ja</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hvem av barna er i institusjon?</p>
+     <p>Barn Barnessen III</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Er noen av barna adoptert fra utlandet?</p>
+     <p>Ja</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hvem av barna er adoptert fra utlandet?</p>
+     <p>Barn Barnessen III</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Er det søkt om asyl i Norge for noen av barna?</p>
+     <p>Ja</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hvem av barna er det søkt om asyl for?</p>
+     <p>Barn Barnessen III</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Har barna oppholdt seg sammenhengende i Norge de siste tolv månedene?</p>
+     <p>Nei</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hvem av barna har oppholdt seg utenfor Norge i løpet av de siste tolv månedene?</p>
+     <p>Barn Barnessen III</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Får, har du fått eller har du søkt om barnetrygd for noen av barna fra et annet EØS land?</p>
+     <p>Ja</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hvem av barna får du, har du fått eller har du søkt om barnetrygd for?</p>
+     <p>Barn Barnessen III</p>
+    </div>
+   </section>
+   <section class="soknad-section">
+    <h3>5. Om BARN BARNESSEN III</h3>
+    <p class="soknad-sporsmal">Du har opplyst at Barn Barnessen III er i institusjon</p>
+    <p class="soknad-sporsmal">Institusjonen er i utlandet</p>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Når startet institusjonsoppholdet?</p>
+     <p>03.06.2022</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Når avsluttes institusjonsoppholdet?</p>
+     <p>Jeg vet ikke når institusjonsoppholdet avsluttes</p>
+    </div>
+    <p class="soknad-sporsmal">Du har opplyst at Barn Barnessen III har oppholdt seg utenfor Norge i løpet av de siste tolv månedene</p>
+    <p class="periode-tittel">Utenlandsopphold 1</p>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hva beskriver perioden Barn Barnessen III oppholdt seg utenfor Norge best?</p>
+     <p>Barnet oppholder seg utenfor Norge nå</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hvilket land oppholder Barn Barnessen III seg i?</p>
+     <p>Amerikansk Samoa</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Når startet oppholdet?</p>
+     <p>01.06.2022</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Når avsluttes oppholdet?</p>
+     <p>Jeg vet ikke når oppholdet avsluttes</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Er det planlagt at Barn Barnessen III skal bo sammenhengende i Norge i mer enn tolv måneder?</p>
+     <p>Nei</p>
+    </div>
+    <p class="soknad-sporsmal">Du har opplyst at du får eller har søkt om barnetrygd for Barn Barnessen III fra et annet EØS land.</p>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Har du en pågående søknad om barnetrygd fra et annet EU/EØS land?</p>
+     <p>Ja</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hvilket land har du søkt om barnetrygd fra?</p>
+     <p>Belgia</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Får du eller har du fått barnetrygd fra et annet EU/EØS land?</p>
+     <p>Ja</p>
+    </div>
+    <p class="periode-tittel">Barnetrygdperiode 1</p>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Får du barnetrygd fra et EU/EØS land nå?</p>
+     <p>Ja</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hvilket land får du barnetrygd fra?</p>
+     <p>Danmark</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Når startet barnetrygden?</p>
+     <p>01.06.2022</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Beløp hver måned for Barn Barnessen III</p>
+     <p>22</p>
+    </div>
+    <h4>Barnets andre forelder</h4>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Navn</p>
+     <p>dsadsad</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Fødselsnummer eller d-nummer</p>
+     <p>Jeg kjenner ikke fødselsnummer eller d-nummer</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Fødselsdato</p>
+     <p>Jeg kjenner ikke fødselsdato</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Arbeider eller har den andre forelderen til Barn Barnessen III arbeidet utenfor Norge, på utenlandsk skip eller på utenlandsk kontinentalsokkel?</p>
+     <p>Ja</p>
+    </div>
+    <p class="periode-tittel">Arbeidsperiode utenfor Norge 1</p>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Er arbeidsperioden avsluttet?</p>
+     <p>Ja</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hvilket land arbeidet den andre forelderen i?</p>
+     <p>Antarktis</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Får eller har den andre forelderen til Barn Barnessen III fått pensjon fra utlandet?</p>
+     <p>Ja</p>
+    </div>
+    <p class="periode-tittel">Pensjonsperiode fra utlandet 1</p>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Får Barn Barnessen III sin andre forelder pensjon nå?</p>
+     <p>Ja</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hvilket land får den andre forelderen til Barn Barnessen III pensjon fra?</p>
+     <p>Amerikansk Samoa</p>
+    </div>
+    <h4>Bosted</h4>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Bor Barn Barnessen III fast sammen med deg?</p>
+     <p>Ja</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Har du og den andre forelderen skriftlig avtale om delt bosted for Barn Barnessen III?</p>
+     <p>Ja</p>
+    </div>
+   </section>
+   <section class="soknad-seksjon">
+    <h2 class="soknad-seksjon-tittel">6. Barnetrygd etter EØS-reglene - Om deg</h2>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hva er id-nummeret ditt i Belgia?</p>
+     <p>dsadsadsa</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hvor bor du i perioden du søker om barnetrygd?</p>
+     <p>dsadsadsa</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Arbeider eller har du arbeidet i Norge, på norsk kontinentalsokkel eller på skip med norsk flagg?</p>
+     <p>Ja</p>
+    </div>
+    <p class="periode-tittel">Arbeidsperiode i Norge 1</p>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Er arbeidsperioden avsluttet?</p>
+     <p>Ja</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Arbeidsgiver</p>
+     <p>dsadsada</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Når startet arbeidsperioden?</p>
+     <p>01.06.2022</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Når ble arbeidsperioden avsluttet?</p>
+     <p>02.06.2022</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Får du eller har du fått pensjon fra Norge?</p>
+     <p>Ja</p>
+    </div>
+    <p class="periode-tittel">Pensjonsperiode fra Norge 1</p>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Får du pensjon nå?</p>
+     <p>Ja</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Når har du fått pensjon fra?</p>
+     <p>01.06.2022</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Får du eller har du fått utbetalinger som erstatter arbeidsinntekt fra Norge og/eller andre EØS-land?</p>
+     <p>Ja</p>
+    </div>
+    <p class="periode-tittel">Utbetalingsperiode 1</p>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Får du utbetalinger nå?</p>
+     <p>Ja</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hvilket land får du utbetalinger fra?</p>
+     <p>Amerikansk Samoa</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Når startet utbetalingene?</p>
+     <p>01.06.2022</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Når stopper utbetalingene?</p>
+     <p>Jeg vet ikke når utbetalingene stopper</p>
+    </div>
+    <hr class="soknad-seksjon-slutt-linje">
+   </section>
+   <section class="soknad-seksjon">
+    <h2 class="soknad-seksjon-tittel">7. Barnetrygd etter EØS-reglene - Om BARN BARNESSEN III</h2>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hva er id-nummeret til Barn Barnessen III i Danmark?</p>
+     <p>Jeg kjenner ikke id-nummeret</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hva er id-nummeret til Barn Barnessen III i Belgia?</p>
+     <p>Jeg kjenner ikke id-nummeret</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hva er slektsforholdet ditt til Barn Barnessen III?</p>
+     <p>Onkel / Tante</p>
+    </div>
+    <h3 class="soknad-seksjon-undertittel">Barnets andre forelder</h3>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hvor bor Barn Barnessen III sin andre forelder i perioden det søkes om barnetrygd?</p>
+     <p>Jeg vet ikke hvor den andre forelderen bor</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Arbeider eller har den andre forelderen til Barn Barnessen III arbeidet i Norge, på norsk kontinentalsokkel eller på skip som fører norsk flagg?</p>
+     <p>Ja</p>
+    </div>
+    <p class="periode-tittel">Arbeidsperiode i Norge 1</p>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Er arbeidsperioden avsluttet?</p>
+     <p>Ja</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Arbeidsgiver</p>
+     <p>dsadsads</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Når startet arbeidsperioden?</p>
+     <p>01.06.2022</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Når ble arbeidsperioden avsluttet?</p>
+     <p>03.06.2022</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Får eller har Barn Barnessen III sin andre forelder fått pensjon fra Norge?</p>
+     <p>Ja</p>
+    </div>
+    <p class="periode-tittel">Pensjonsperiode fra Norge 1</p>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Får Barn Barnessen III sin andre forelder pensjon nå?</p>
+     <p>Ja</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Når har den andre forelderen til Barn Barnessen III fått pensjon fra?</p>
+     <p>03.06.2022</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Får eller har Barn Barnessen III sin andre forelder fått utbetalinger som erstatter arbeidsinntekt fra Norge og/eller andre EØS-land?</p>
+     <p>Ja</p>
+    </div>
+    <p class="periode-tittel">Utbetalingsperiode 1</p>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Får Barn Barnessen III sin andre forelder utbetalinger nå?</p>
+     <p>Ja</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hvilket land får Barn Barnessen III sin andre forelder utbetalinger fra?</p>
+     <p>Andorra</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Når startet utbetalingene?</p>
+     <p>01.06.2022</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Når stopper utbetalingene?</p>
+     <p>Jeg vet ikke når utbetalingene stopper</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Har Barn Barnessen III sin andre forelder en pågående søknad om barnetrygd fra et annet EU/EØS land?</p>
+     <p>Ja</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hvilket land har Barn Barnessen III sin andre forelder søkt om barnetrygd fra?</p>
+     <p>Estland</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Får eller har Barn Barnessen III sin andre forelder fått barnetrygd fra et annet EU/EØS land?</p>
+     <p>Ja</p>
+    </div>
+    <p class="periode-tittel">Barnetrygdperiode 1</p>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Får Barn Barnessen III sin andre forelder barnetrygd fra et EU/EØS land nå?</p>
+     <p>Ja</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Hvilket land får Barn Barnessen III sin andre forelder barnetrygd fra?</p>
+     <p>Estland</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Når startet barnetrygden?</p>
+     <p>02.06.2022</p>
+    </div>
+    <div class="soknad-sporsmal-med-svar">
+     <p class="soknad-sporsmal">Beløp hver måned for Barn Barnessen III</p>
+     <p>32</p>
+    </div>
+    <hr class="soknad-seksjon-slutt-linje">
+   </section>
+   <div class="soknad-section">
+    <h3>8. Liste over vedlegg</h3>
+    <div class="soknad-sporsmal-med-svar"><!-- Eneste måten jeg fant som lot meg putte en java Integer inn i en String på... -->
+     <p class="soknad-sporsmal">Vedlegg 1 av 4: Avtale om delt bosted</p>
+     <p></p>
+     <p>Lastet opp 0 vedlegg</p>
+     <p></p>
+    </div>
+    <div class="soknad-sporsmal-med-svar"><!-- Eneste måten jeg fant som lot meg putte en java Integer inn i en String på... -->
+     <p class="soknad-sporsmal">Vedlegg 2 av 4: Vedtak om oppholdstillatelse</p>
+     <p></p>
+     <p>Lastet opp 0 vedlegg</p>
+     <p></p>
+    </div>
+    <div class="soknad-sporsmal-med-svar"><!-- Eneste måten jeg fant som lot meg putte en java Integer inn i en String på... -->
+     <p class="soknad-sporsmal">Vedlegg 3 av 4: Bekreftelse på dato du overtok omsorgen ved adopsjon</p>
+     <p></p>
+     <p>Lastet opp 0 vedlegg</p>
+     <p></p>
+    </div>
+    <div class="soknad-sporsmal-med-svar"><!-- Eneste måten jeg fant som lot meg putte en java Integer inn i en String på... -->
+     <p class="soknad-sporsmal">Vedlegg 4 av 4: Annen dokumentasjon</p>
+     <p></p>
+     <p>Lastet opp 0 vedlegg</p>
+     <p></p>
+    </div>
+   </div>
+  </div>
+  <div id="footer">
+   Side <span id="pagenumber"></span> av <span id="pagecount"></span>
+  </div>
+ </body>
+</html>

@@ -1,0 +1,719 @@
+{
+  "kontraktVersjon": 8,
+  "antallEøsSteg": 2,
+  "søknadstype": "ORDINÆR",
+  "søker": {
+    "harEøsSteg": true,
+    "ident": {
+      "label": "Ident",
+      "verdi": "23058518298"
+    },
+    "navn": {
+      "label": "Navn",
+      "verdi": "Voksen Voksnessen"
+    },
+    "statsborgerskap": {
+      "label": "Statsborgerskap",
+      "verdi": [
+        "Norge",
+        "Afghanistan"
+      ]
+    },
+    "adresse": {
+      "label": "Adresse",
+      "verdi": {
+        "adressenavn": "Solveien",
+        "postnummer": "2304",
+        "husbokstav": "A",
+        "bruksenhetsnummer": "H0101",
+        "husnummer": "2",
+        "poststed": "HAMAR"
+      }
+    },
+    "adressebeskyttelse": false,
+    "sivilstand": {
+      "label": "Sivilstatus",
+      "verdi": "GIFT"
+    },
+    "spørsmål": {
+      "borPåRegistrertAdresse": {
+        "label": "Bor du på denne adressen?",
+        "verdi": "NEI"
+      },
+      "værtINorgeITolvMåneder": {
+        "label": "Har du oppholdt deg sammenhengende i Norge de siste tolv månedene?",
+        "verdi": "NEI"
+      },
+      "planleggerÅBoINorgeTolvMnd": {
+        "label": "Planlegger du å bo sammenhengende i Norge i mer enn tolv måneder?",
+        "verdi": "JA"
+      },
+      "erAsylsøker": {
+        "label": "Er du asylsøker?",
+        "verdi": "NEI"
+      },
+      "jobberPåBåt": {
+        "label": "Arbeider eller har du arbeidet utenfor Norge, på utenlandsk skip eller på utenlandsk kontinentalsokkel?",
+        "verdi": "JA"
+      },
+      "mottarUtenlandspensjon": {
+        "label": "Får eller har du fått pensjon fra utlandet?",
+        "verdi": "JA"
+      },
+      "arbeidINorge": {
+        "label": "Arbeider eller har du arbeidet i Norge, på norsk kontinentalsokkel eller på skip med norsk flagg?",
+        "verdi": "JA"
+      },
+      "pensjonNorge": {
+        "label": "Får du eller har du fått pensjon fra Norge?",
+        "verdi": "JA"
+      },
+      "andreUtbetalinger": {
+        "label": "Får du eller har du fått utbetalinger som erstatter arbeidsinntekt fra Norge og/eller andre EØS-land?",
+        "verdi": "JA"
+      },
+      "harSamboerNå": {
+        "label": "Har du en annen samboer enn din ektefelle nå?",
+        "verdi": "JA"
+      },
+      "adresseISøkeperiode": {
+        "label": "Hvor bor du i perioden du søker om barnetrygd?",
+        "verdi": "dsadsadsa"
+      }
+    },
+    "nåværendeSamboer": {
+      "label": "Samboer",
+      "verdi": {
+        "navn": {
+          "label": "Samboerens navn",
+          "verdi": "dsadsa"
+        },
+        "ident": {
+          "label": "Fødselsnummer eller d-nummer",
+          "verdi": "Jeg kjenner ikke fødselsnummer eller d-nummer"
+        },
+        "fødselsdato": {
+          "label": "Fødselsdato",
+          "verdi": "Jeg kjenner ikke fødselsdato"
+        },
+        "samboerFraDato": {
+          "label": "Når startet samboerforholdet?",
+          "verdi": "2022-06-02"
+        }
+      }
+    },
+    "tidligereSamboere": [],
+    "utenlandsperioder": [
+      {
+        "label": "Utenlandsopphold 1",
+        "verdi": {
+          "utenlandsoppholdÅrsak": {
+            "label": "Hva beskriver perioden du oppholdt deg utenfor Norge best?",
+            "verdi": "Jeg oppholder meg utenfor Norge nå"
+          },
+          "oppholdsland": {
+            "label": "Hvilket land oppholder du deg i?",
+            "verdi": "Amerikansk Samoa"
+          },
+          "oppholdslandTilDato": {
+            "label": "Når avsluttes oppholdet?",
+            "verdi": "Jeg vet ikke når oppholdet avsluttes"
+          },
+          "oppholdslandFraDato": {
+            "label": "Når startet oppholdet?",
+            "verdi": "2022-06-01"
+          }
+        }
+      }
+    ],
+    "andreUtbetalingsperioder": [
+      {
+        "label": "Utbetalingsperiode 1",
+        "verdi": {
+          "fårUtbetalingNå": {
+            "label": "Får du utbetalinger nå?",
+            "verdi": "JA"
+          },
+          "utbetalingLand": {
+            "label": "Hvilket land får du utbetalinger fra?",
+            "verdi": "Amerikansk Samoa"
+          },
+          "utbetalingFraDato": {
+            "label": "Når startet utbetalingene?",
+            "verdi": "2022-06-01"
+          },
+          "utbetalingTilDato": {
+            "label": "Når stopper utbetalingene?",
+            "verdi": "Jeg vet ikke når utbetalingene stopper"
+          }
+        }
+      }
+    ],
+    "arbeidsperioderUtland": [
+      {
+        "label": "Arbeidsperiode utenfor Norge 1",
+        "verdi": {
+          "arbeidsperiodeAvsluttet": {
+            "label": "Er arbeidsperioden avsluttet?",
+            "verdi": "JA"
+          },
+          "arbeidsperiodeland": {
+            "label": "Hvilket land arbeidet du i?",
+            "verdi": "Andorra"
+          },
+          "arbeidsgiver": null,
+          "fraDatoArbeidsperiode": null,
+          "tilDatoArbeidsperiode": null
+        }
+      }
+    ],
+    "arbeidsperioderNorge": [
+      {
+        "label": "Arbeidsperiode i Norge 1",
+        "verdi": {
+          "arbeidsperiodeAvsluttet": {
+            "label": "Er arbeidsperioden avsluttet?",
+            "verdi": "JA"
+          },
+          "arbeidsperiodeland": null,
+          "arbeidsgiver": {
+            "label": "Arbeidsgiver",
+            "verdi": "dsadsada"
+          },
+          "fraDatoArbeidsperiode": {
+            "label": "Når startet arbeidsperioden?",
+            "verdi": "2022-06-01"
+          },
+          "tilDatoArbeidsperiode": {
+            "label": "Når ble arbeidsperioden avsluttet?",
+            "verdi": "2022-06-02"
+          }
+        }
+      }
+    ],
+    "pensjonsperioderNorge": [
+      {
+        "label": "Pensjonsperiode fra Norge 1",
+        "verdi": {
+          "mottarPensjonNå": {
+            "label": "Får du pensjon nå?",
+            "verdi": "JA"
+          },
+          "pensjonsland": null,
+          "pensjonFra": {
+            "label": "Når har du fått pensjon fra?",
+            "verdi": "2022-06-01"
+          },
+          "pensjonTil": null
+        }
+      }
+    ],
+    "pensjonsperioderUtland": [
+      {
+        "label": "Pensjonsperiode fra utlandet 1",
+        "verdi": {
+          "mottarPensjonNå": {
+            "label": "Får du pensjon nå?",
+            "verdi": "JA"
+          },
+          "pensjonsland": {
+            "label": "Hvilket land får du pensjon fra?",
+            "verdi": "Belgia"
+          },
+          "pensjonFra": {
+            "label": "Når har du fått pensjon fra?",
+            "verdi": "2022-06-01"
+          },
+          "pensjonTil": null
+        }
+      }
+    ],
+    "idNummer": [
+      {
+        "label": "Hva er id-nummeret ditt i Belgia?",
+        "verdi": {
+          "idNummer": {
+            "label": "Hva er id-nummeret ditt i Belgia?",
+            "verdi": "dsadsadsa"
+          },
+          "land": {
+            "label": "Hva er id-nummeret ditt i Belgia?",
+            "verdi": "BEL"
+          }
+        }
+      }
+    ]
+  },
+  "barn": [
+    {
+      "harEøsSteg": true,
+      "ident": {
+        "label": "Ident",
+        "verdi": "12345678987"
+      },
+      "navn": {
+        "label": "Navn",
+        "verdi": "Barn Barnessen III"
+      },
+      "registrertBostedType": {
+        "label": "Registrert bosted",
+        "verdi": "REGISTRERT_SOKERS_ADRESSE"
+      },
+      "alder": {
+        "label": "Alder",
+        "verdi": "12 år"
+      },
+      "spørsmål": {
+        "erFosterbarn": {
+          "label": "Hvem av barna er fosterbarn?",
+          "verdi": "NEI"
+        },
+        "erAdoptertFraUtland": {
+          "label": "Hvem av barna er adoptert fra utlandet?",
+          "verdi": "JA"
+        },
+        "erAsylsøker": {
+          "label": "Hvem av barna er det søkt om asyl for?",
+          "verdi": "JA"
+        },
+        "barnetrygdFraAnnetEøsland": {
+          "label": "Hvem av barna får du, har du fått eller har du søkt om barnetrygd for?",
+          "verdi": "JA"
+        },
+        "andreForelderErDød": {
+          "label": "Hvem av barna er din tidligere ektefelle/samboer forelder til?",
+          "verdi": "NEI"
+        },
+        "oppholderSegIInstitusjon": {
+          "label": "Hvem av barna er i institusjon?",
+          "verdi": "JA"
+        },
+        "institusjonIUtland": {
+          "label": "Institusjonen er i utlandet",
+          "verdi": "JA"
+        },
+        "institusjonOppholdStartdato": {
+          "label": "Når startet institusjonsoppholdet?",
+          "verdi": "2022-06-03"
+        },
+        "boddMindreEnn12MndINorge": {
+          "label": "Hvem av barna har oppholdt seg utenfor Norge i løpet av de siste tolv månedene?",
+          "verdi": "JA"
+        },
+        "planleggerÅBoINorge12Mnd": {
+          "label": "Er det planlagt at Barn Barnessen III skal bo sammenhengende i Norge i mer enn tolv måneder?",
+          "verdi": "NEI"
+        },
+        "pågåendeSøknadFraAnnetEøsLand": {
+          "label": "Har du en pågående søknad om barnetrygd fra et annet EU/EØS land?",
+          "verdi": "JA"
+        },
+        "pågåendeSøknadHvilketLand": {
+          "label": "Hvilket land har du søkt om barnetrygd fra?",
+          "verdi": "Belgia"
+        },
+        "mottarEllerMottokEøsBarnetrygd": {
+          "label": "Får du eller har du fått barnetrygd fra et annet EU/EØS land?",
+          "verdi": "JA"
+        },
+        "borFastMedSøker": {
+          "label": "Bor Barn Barnessen III fast sammen med deg?",
+          "verdi": "JA"
+        },
+        "søkerForTidsrom": {
+          "label": "Søker du barnetrygd for et spesielt tidsrom for Barn Barnessen III?",
+          "verdi": "JA"
+        },
+        "søkerForTidsromStartdato": {
+          "label": "Fra og med",
+          "verdi": "2022-06-02"
+        },
+        "søkersSlektsforhold": {
+          "label": "Hva er slektsforholdet ditt til Barn Barnessen III?",
+          "verdi": "Onkel / Tante"
+        },
+        "søkerForTidsromSluttdato": {
+          "label": "Til og med",
+          "verdi": "Tidsrommet har ikke en til og med dato / Til og med dato er frem i tid."
+        },
+        "institusjonOppholdSluttdato": {
+          "label": "Når avsluttes institusjonsoppholdet?",
+          "verdi": "Jeg vet ikke når institusjonsoppholdet avsluttes"
+        },
+        "adresse": {
+          "label": "Hvor bor Barn Barnessen III i perioden det søkes om barnetrygd?",
+          "verdi": ""
+        }
+      },
+      "utenlandsperioder": [
+        {
+          "label": "Utenlandsopphold 1",
+          "verdi": {
+            "utenlandsoppholdÅrsak": {
+              "label": "Hva beskriver perioden Barn Barnessen III oppholdt seg utenfor Norge best?",
+              "verdi": "Barnet oppholder seg utenfor Norge nå"
+            },
+            "oppholdsland": {
+              "label": "Hvilket land oppholder Barn Barnessen III seg i?",
+              "verdi": "Amerikansk Samoa"
+            },
+            "oppholdslandTilDato": {
+              "label": "Når avsluttes oppholdet?",
+              "verdi": "Jeg vet ikke når oppholdet avsluttes"
+            },
+            "oppholdslandFraDato": {
+              "label": "Når startet oppholdet?",
+              "verdi": "2022-06-01"
+            }
+          }
+        }
+      ],
+      "andreForelder": {
+        "kanIkkeGiOpplysninger": {
+          "label": "Jeg kan ikke gi opplysninger om den andre forelderen",
+          "verdi": "NEI"
+        },
+        "navn": {
+          "label": "Navn",
+          "verdi": "dsadsad"
+        },
+        "fnr": {
+          "label": "Fødselsnummer eller d-nummer",
+          "verdi": "Jeg kjenner ikke fødselsnummer eller d-nummer"
+        },
+        "fødselsdato": {
+          "label": "Fødselsdato",
+          "verdi": "Jeg kjenner ikke fødselsdato"
+        },
+        "arbeidUtlandet": {
+          "label": "Arbeider eller har den andre forelderen til Barn Barnessen III arbeidet utenfor Norge, på utenlandsk skip eller på utenlandsk kontinentalsokkel?",
+          "verdi": "JA"
+        },
+        "pensjonUtland": {
+          "label": "Får eller har den andre forelderen til Barn Barnessen III fått pensjon fra utlandet?",
+          "verdi": "JA"
+        },
+        "skriftligAvtaleOmDeltBosted": {
+          "label": "Har du og den andre forelderen skriftlig avtale om delt bosted for Barn Barnessen III?",
+          "verdi": "JA"
+        },
+        "pensjonNorge": {
+          "label": "Får eller har Barn Barnessen III sin andre forelder fått pensjon fra Norge?",
+          "verdi": "JA"
+        },
+        "arbeidNorge": {
+          "label": "Arbeider eller har den andre forelderen til Barn Barnessen III arbeidet i Norge, på norsk kontinentalsokkel eller på skip som fører norsk flagg?",
+          "verdi": "JA"
+        },
+        "andreUtbetalinger": {
+          "label": "Får eller har Barn Barnessen III sin andre forelder fått utbetalinger som erstatter arbeidsinntekt fra Norge og/eller andre EØS-land?",
+          "verdi": "JA"
+        },
+        "idNummer": [],
+        "adresse": {
+          "label": "Hvor bor Barn Barnessen III sin andre forelder i perioden det søkes om barnetrygd?",
+          "verdi": "Jeg vet ikke hvor den andre forelderen bor"
+        },
+        "pågåendeSøknadFraAnnetEøsLand": {
+          "label": "Har Barn Barnessen III sin andre forelder en pågående søknad om barnetrygd fra et annet EU/EØS land?",
+          "verdi": "JA"
+        },
+        "pågåendeSøknadHvilketLand": {
+          "label": "Hvilket land har Barn Barnessen III sin andre forelder søkt om barnetrygd fra?",
+          "verdi": "Estland"
+        },
+        "barnetrygdFraEøs": {
+          "label": "Får eller har Barn Barnessen III sin andre forelder fått barnetrygd fra et annet EU/EØS land?",
+          "verdi": "JA"
+        },
+        "arbeidsperioderUtland": [
+          {
+            "label": "Arbeidsperiode utenfor Norge 1",
+            "verdi": {
+              "arbeidsperiodeAvsluttet": {
+                "label": "Er arbeidsperioden avsluttet?",
+                "verdi": "JA"
+              },
+              "arbeidsperiodeland": {
+                "label": "Hvilket land arbeidet den andre forelderen i?",
+                "verdi": "Antarktis"
+              },
+              "arbeidsgiver": null,
+              "fraDatoArbeidsperiode": null,
+              "tilDatoArbeidsperiode": null
+            }
+          }
+        ],
+        "pensjonsperioderUtland": [
+          {
+            "label": "Pensjonsperiode fra utlandet 1",
+            "verdi": {
+              "mottarPensjonNå": {
+                "label": "Får Barn Barnessen III sin andre forelder pensjon nå?",
+                "verdi": "JA"
+              },
+              "pensjonsland": {
+                "label": "Hvilket land får den andre forelderen til Barn Barnessen III pensjon fra?",
+                "verdi": "Amerikansk Samoa"
+              },
+              "pensjonFra": null,
+              "pensjonTil": null
+            }
+          }
+        ],
+        "arbeidsperioderNorge": [
+          {
+            "label": "Arbeidsperiode i Norge 1",
+            "verdi": {
+              "arbeidsperiodeAvsluttet": {
+                "label": "Er arbeidsperioden avsluttet?",
+                "verdi": "JA"
+              },
+              "arbeidsperiodeland": null,
+              "arbeidsgiver": {
+                "label": "Arbeidsgiver",
+                "verdi": "dsadsads"
+              },
+              "fraDatoArbeidsperiode": {
+                "label": "Når startet arbeidsperioden?",
+                "verdi": "2022-06-01"
+              },
+              "tilDatoArbeidsperiode": {
+                "label": "Når ble arbeidsperioden avsluttet?",
+                "verdi": "2022-06-03"
+              }
+            }
+          }
+        ],
+        "pensjonsperioderNorge": [
+          {
+            "label": "Pensjonsperiode fra Norge 1",
+            "verdi": {
+              "mottarPensjonNå": {
+                "label": "Får Barn Barnessen III sin andre forelder pensjon nå?",
+                "verdi": "JA"
+              },
+              "pensjonsland": null,
+              "pensjonFra": {
+                "label": "Når har den andre forelderen til Barn Barnessen III fått pensjon fra?",
+                "verdi": "2022-06-03"
+              },
+              "pensjonTil": null
+            }
+          }
+        ],
+        "andreUtbetalingsperioder": [
+          {
+            "label": "Utbetalingsperiode 1",
+            "verdi": {
+              "fårUtbetalingNå": {
+                "label": "Får Barn Barnessen III sin andre forelder utbetalinger nå?",
+                "verdi": "JA"
+              },
+              "utbetalingLand": {
+                "label": "Hvilket land får Barn Barnessen III sin andre forelder utbetalinger fra?",
+                "verdi": "Andorra"
+              },
+              "utbetalingFraDato": {
+                "label": "Når startet utbetalingene?",
+                "verdi": "2022-06-01"
+              },
+              "utbetalingTilDato": {
+                "label": "Når stopper utbetalingene?",
+                "verdi": "Jeg vet ikke når utbetalingene stopper"
+              }
+            }
+          }
+        ],
+        "eøsBarnetrygdsperioder": [
+          {
+            "label": "Barnetrygdperiode 1",
+            "verdi": {
+              "mottarEøsBarnetrygdNå": {
+                "label": "Får Barn Barnessen III sin andre forelder barnetrygd fra et EU/EØS land nå?",
+                "verdi": "JA"
+              },
+              "barnetrygdsland": {
+                "label": "Hvilket land får Barn Barnessen III sin andre forelder barnetrygd fra?",
+                "verdi": "Estland"
+              },
+              "fraDatoBarnetrygdperiode": {
+                "label": "Når startet barnetrygden?",
+                "verdi": "2022-06-02"
+              },
+              "tilDatoBarnetrygdperiode": null,
+              "månedligBeløp": {
+                "label": "Beløp hver måned for Barn Barnessen III",
+                "verdi": "32"
+              }
+            }
+          }
+        ],
+        "utvidet": {
+          "søkerHarBoddMedAndreForelder": null,
+          "søkerFlyttetFraAndreForelderDato": null
+        }
+      },
+      "omsorgsperson": null,
+      "eøsBarnetrygdsperioder": [
+        {
+          "label": "Barnetrygdperiode 1",
+          "verdi": {
+            "mottarEøsBarnetrygdNå": {
+              "label": "Får du barnetrygd fra et EU/EØS land nå?",
+              "verdi": "JA"
+            },
+            "barnetrygdsland": {
+              "label": "Hvilket land får du barnetrygd fra?",
+              "verdi": "Danmark"
+            },
+            "fraDatoBarnetrygdperiode": {
+              "label": "Når startet barnetrygden?",
+              "verdi": "2022-06-01"
+            },
+            "tilDatoBarnetrygdperiode": null,
+            "månedligBeløp": {
+              "label": "Beløp hver måned for Barn Barnessen III",
+              "verdi": "22"
+            }
+          }
+        }
+      ],
+      "idNummer": [
+        {
+          "label": "Hva er id-nummeret til Barn Barnessen III i Danmark?",
+          "verdi": {
+            "idNummer": {
+              "label": "Hva er id-nummeret til Barn Barnessen III i Danmark?",
+              "verdi": "Jeg kjenner ikke id-nummeret"
+            },
+            "land": {
+              "label": "Hva er id-nummeret til Barn Barnessen III i Danmark?",
+              "verdi": "DNK"
+            }
+          }
+        },
+        {
+          "label": "Hva er id-nummeret til Barn Barnessen III i Belgia?",
+          "verdi": {
+            "idNummer": {
+              "label": "Hva er id-nummeret til Barn Barnessen III i Belgia?",
+              "verdi": "Jeg kjenner ikke id-nummeret"
+            },
+            "land": {
+              "label": "Hva er id-nummeret til Barn Barnessen III i Belgia?",
+              "verdi": "BEL"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "spørsmål": {
+    "erNoenAvBarnaFosterbarn": {
+      "label": "Er noen av barna fosterbarn?",
+      "verdi": "NEI"
+    },
+    "søktAsylForBarn": {
+      "label": "Er det søkt om asyl i Norge for noen av barna?",
+      "verdi": "JA"
+    },
+    "oppholderBarnSegIInstitusjon": {
+      "label": "Er noen av barna i barnverninstitusjon eller i annen institusjon?",
+      "verdi": "JA"
+    },
+    "barnOppholdtSegTolvMndSammenhengendeINorge": {
+      "label": "Har barna oppholdt seg sammenhengende i Norge de siste tolv månedene?",
+      "verdi": "NEI"
+    },
+    "erBarnAdoptertFraUtland": {
+      "label": "Er noen av barna adoptert fra utlandet?",
+      "verdi": "JA"
+    },
+    "mottarBarnetrygdForBarnFraAnnetEøsland": {
+      "label": "Får, har du fått eller har du søkt om barnetrygd for noen av barna fra et annet EØS land?",
+      "verdi": "JA"
+    },
+    "erAvdødPartnerForelder": {
+      "label": "Du er folkeregistrert som enke/enkemann. Er din tidligere ektefelle forelder til noen av barna du søker barnetrygd for?",
+      "verdi": null
+    },
+    "lestOgForståttBekreftelse": {
+      "label": "Jeg er klar over at jeg kan miste retten til barnetrygd dersom jeg gir feil opplysninger. Jeg er også klar over at jeg må betale tilbake dersom jeg får penger jeg ikke har rett til hvis jeg lar være å informere eller gir feil opplysninger.",
+      "verdi": "Jeg bekrefter at jeg har lest og forstått."
+    }
+  },
+  "dokumentasjon": [
+    {
+      "dokumentasjonsbehov": "AVTALE_DELT_BOSTED",
+      "harSendtInn": false,
+      "opplastedeVedlegg": [],
+      "dokumentasjonSpråkTittel": "Avtale om delt bosted"
+    },
+    {
+      "dokumentasjonsbehov": "VEDTAK_OPPHOLDSTILLATELSE",
+      "harSendtInn": false,
+      "opplastedeVedlegg": [],
+      "dokumentasjonSpråkTittel": "Vedtak om oppholdstillatelse"
+    },
+    {
+      "dokumentasjonsbehov": "ADOPSJON_DATO",
+      "harSendtInn": false,
+      "opplastedeVedlegg": [],
+      "dokumentasjonSpråkTittel": "Bekreftelse på dato du overtok omsorgen ved adopsjon"
+    },
+    {
+      "dokumentasjonsbehov": "ANNEN_DOKUMENTASJON",
+      "harSendtInn": false,
+      "opplastedeVedlegg": [],
+      "dokumentasjonSpråkTittel": "Annen dokumentasjon"
+    }
+  ],
+  "teksterUtenomSpørsmål": {
+    "hvilkebarn.barn.bosted.adressesperre": "Barnet er registrert med adressesperre.",
+    "ombarnet.fosterbarn": "Du har opplyst at {navn} er fosterbarn",
+    "ombarnet.institusjon": "Du har opplyst at {navn} er i institusjon",
+    "ombarnet.opplystatbarnutlandopphold.info": "Du har opplyst at {navn} har oppholdt seg utenfor Norge i løpet av de siste tolv månedene",
+    "ombarnet.barnetrygd-eøs": "Du har opplyst at du får eller har søkt om barnetrygd for {navn} fra et annet EØS land.",
+    "omdeg.annensamboer.spm": "Har du hatt samboer tidligere i perioden du søker barnetrygd for?",
+    "omdeg.personopplysninger.adressesperre.alert": "Du er registrert med adressesperre",
+    "omdeg.personopplysninger.ikke-registrert.alert": "Du er ikke registrert med bostedsadresse i Norge",
+    "pdf.andreforelder.seksjonstittel": "Barnets andre forelder",
+    "pdf.hvilkebarn.seksjonstittel": "Hvilke barn søker du for?",
+    "pdf.hvilkebarn.registrert-på-adresse": "Registrert på søkers adresse",
+    "pdf.hvilkebarn.ikke-registrert-på-adresse": "Ikke registrert på søkers adresse",
+    "pdf.ombarnet.seksjonstittel": "Om {navn}",
+    "pdf.omdeg.seksjonstittel": "Om deg",
+    "pdf.bosted.seksjonstittel": "Bosted",
+    "pdf.ombarna.seksjonstittel": "Om barna dine",
+    "pdf.søker-for-tidsrom.seksjonstittel": "Søker du barnetrygd for et spesielt tidsrom for {navn}?",
+    "pdf.søker.seksjonstittel": "Søker",
+    "pdf.vedlegg.seksjonstittel": "Liste over vedlegg",
+    "pdf.vedlegg.lastet-opp-antall": "Lastet opp {antall} vedlegg",
+    "pdf.vedlegg.nummerering": "Vedlegg {x} av {total}",
+    "dokumentasjon.har-sendt-inn.spm": "Jeg har sendt inn denne dokumentasjonen til NAV tidligere",
+    "dinlivssituasjon.sidetittel": "Livssituasjonen din",
+    "pdf.dinlivssituasjon.tidligeresamboer.seksjonstittel": "Tidligere samboer {x}",
+    "eøs-om-deg.sidetittel": "Barnetrygd etter EØS-reglene - Om deg",
+    "eøs-om-barn.sidetittel": "Barnetrygd etter EØS-reglene - Om {barn}",
+    "felles.sivilstatus.kode.GIFT": "Gift",
+    "felles.sivilstatus.kode.ENKE_ELLER_ENKEMANN": "Enke/Enkemann",
+    "felles.sivilstatus.kode.SKILT": "Skilt",
+    "felles.sivilstatus.kode.SEPARERT": "Separert",
+    "felles.sivilstatus.kode.REGISTRERT_PARTNER": "Registrert partner",
+    "felles.sivilstatus.kode.SEPARERT_PARTNER": "Separert partner",
+    "felles.sivilstatus.kode.SKILT_PARTNER": "Skilt partner",
+    "felles.sivilstatus.kode.GJENLEVENDE_PARTNER": "Gjenlevende partner",
+    "felles.sivilstatus.kode.UGIFT": "Ugift",
+    "felles.sivilstatus.kode.UOPPGITT": "Ikke oppgitt",
+    "felles.svaralternativ.ja": "Ja",
+    "felles.svaralternativ.nei": "Nei",
+    "felles.svaralternativ.vetikke": "Jeg vet ikke"
+  },
+  "originalSpråk": "nb",
+  "dokumentDato": "15.05.2024",
+  "navn": "Voksen Voksnessen",
+  "fodselsnummer": "23058518298",
+  "label": "Søknad om ordinær barnetrygd",
+  "maalform": "NB"
+}
