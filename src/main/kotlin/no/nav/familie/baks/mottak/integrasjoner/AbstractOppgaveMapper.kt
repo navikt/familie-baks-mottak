@@ -130,7 +130,7 @@ abstract class AbstractOppgaveMapper(
         }
     }
 
-    fun erEØS(
+    fun erDnummerPåJournalpost(
         journalpost: Journalpost,
     ): Boolean {
         return when (journalpost.bruker?.type) {
