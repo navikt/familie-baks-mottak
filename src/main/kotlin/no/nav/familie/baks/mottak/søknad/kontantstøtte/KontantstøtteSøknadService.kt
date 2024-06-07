@@ -5,7 +5,6 @@ import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteV
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.FødselsnummerErNullException
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV3
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteVedleggRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
@@ -30,13 +29,6 @@ import java.util.Properties
     fun mottaKontantstøtteSøknad(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad): DBKontantstøtteSøknad {
         val (dbKontantstøtteSøknad, dokumentasjon) =
             when (versjonertKontantstøtteSøknad) {
-                is KontantstøtteSøknadV3 -> {
-                    Pair(
-                        versjonertKontantstøtteSøknad.kontantstøtteSøknad.tilDBKontantstøtteSøknad(),
-                        versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon,
-                    )
-                }
-
                 is KontantstøtteSøknadV4 -> {
                     Pair(
                         versjonertKontantstøtteSøknad.kontantstøtteSøknad.tilDBKontantstøtteSøknad(),

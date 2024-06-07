@@ -4,9 +4,8 @@ import no.nav.familie.baks.mottak.søknad.JournalføringService
 import no.nav.familie.baks.mottak.søknad.PdfService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertBarnetrygdSøknad
 import no.nav.familie.http.client.RessursException
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -29,31 +28,29 @@ class JournalførSøknadTask(
             log.info("Prøver å hente søknadspdf for $id")
             val dbBarnetrygdSøknad: DBBarnetrygdSøknad =
                 søknadRepository.hentDBSøknad(id.toLong()) ?: error("Kunne ikke finne søknad ($id) i database")
-            val versjonertSøknad: VersjonertSøknad = dbBarnetrygdSøknad.hentVersjonertSøknad()
+            val versjonertBarnetrygdSøknad: VersjonertBarnetrygdSøknad = dbBarnetrygdSøknad.hentVersjonertSøknad()
 
             val søknadstype =
-                when (versjonertSøknad) {
-                    is SøknadV7 -> versjonertSøknad.søknad.søknadstype
-                    is SøknadV8 -> versjonertSøknad.søknad.søknadstype
+                when (versjonertBarnetrygdSøknad) {
+                    is SøknadV8 -> versjonertBarnetrygdSøknad.søknad.søknadstype
                 }
             log.info("Generer pdf og journalfør søknad om ${søknadstype.name.lowercase()} barnetrygd")
             val bokmålPdf =
                 pdfService.lagBarnetrygdPdf(
-                    versjonertSøknad = versjonertSøknad,
+                    versjonertBarnetrygdSøknad = versjonertBarnetrygdSøknad,
                     dbBarnetrygdSøknad = dbBarnetrygdSøknad,
                     språk = "nb",
                 )
             log.info("Generert pdf med størrelse ${bokmålPdf.size}")
 
             val orginalspråk =
-                when (versjonertSøknad) {
-                    is SøknadV7 -> versjonertSøknad.søknad.originalSpråk
-                    is SøknadV8 -> versjonertSøknad.søknad.originalSpråk
+                when (versjonertBarnetrygdSøknad) {
+                    is SøknadV8 -> versjonertBarnetrygdSøknad.søknad.originalSpråk
                 }
 
             val orginalspråkPdf: ByteArray =
                 if (orginalspråk != "nb") {
-                    pdfService.lagBarnetrygdPdf(versjonertSøknad, dbBarnetrygdSøknad, orginalspråk)
+                    pdfService.lagBarnetrygdPdf(versjonertBarnetrygdSøknad, dbBarnetrygdSøknad, orginalspråk)
                 } else {
                     ByteArray(0)
                 }

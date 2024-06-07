@@ -27,7 +27,7 @@ class JournalføringService(
             val arkiverDokumentRequest =
                 ArkiverDokumentRequestMapper.toDto(
                     dbBarnetrygdSøknad = dbBarnetrygdSøknad,
-                    versjonertSøknad = dbBarnetrygdSøknad.hentVersjonertSøknad(),
+                    versjonertBarnetrygdSøknad = dbBarnetrygdSøknad.hentVersjonertSøknad(),
                     pdf = pdf,
                     vedleggMap = vedlegg,
                     pdfOriginalSpråk = pdfOriginalSpråk,

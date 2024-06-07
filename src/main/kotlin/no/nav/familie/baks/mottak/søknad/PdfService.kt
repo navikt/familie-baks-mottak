@@ -3,11 +3,9 @@ package no.nav.familie.baks.mottak.søknad
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.integrasjoner.PdfClient
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV3
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
@@ -27,21 +25,17 @@ class PdfService(
     private val unleashService: UnleashService,
 ) {
     fun lagBarnetrygdPdf(
-        versjonertSøknad: VersjonertSøknad,
+        versjonertBarnetrygdSøknad: VersjonertBarnetrygdSøknad,
         dbBarnetrygdSøknad: DBBarnetrygdSøknad,
         språk: String,
     ): ByteArray {
         val barnetrygdSøknadMapForSpråk =
-            søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(versjonertSøknad, språk)
+            søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(versjonertBarnetrygdSøknad, språk)
 
         val (søknadstype, navn) =
-            when (versjonertSøknad) {
-                is SøknadV7 -> {
-                    Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.søker.navn)
-                }
-
+            when (versjonertBarnetrygdSøknad) {
                 is SøknadV8 -> {
-                    Pair(versjonertSøknad.søknad.søknadstype, versjonertSøknad.søknad.søker.navn)
+                    Pair(versjonertBarnetrygdSøknad.søknad.søknadstype, versjonertBarnetrygdSøknad.søknad.søker.navn)
                 }
             }
 
@@ -75,7 +69,6 @@ class PdfService(
 
         val navn =
             when (versjonertSøknad) {
-                is KontantstøtteSøknadV3 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
                 is KontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
             }
 
