@@ -1,7 +1,6 @@
 package no.nav.familie.baks.mottak.søknad.kontantstøtte
 
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV3
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ks.søknad.v1.Dokumentasjonsbehov
@@ -25,13 +24,11 @@ class KontantstøtteSøknadMetrikkService {
     fun sendMottakMetrikker(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad) {
         val dokumentasjon =
             when (versjonertKontantstøtteSøknad) {
-                is KontantstøtteSøknadV3 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon
                 is KontantstøtteSøknadV4 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon
             }
 
         val harEøsSteg =
             when (versjonertKontantstøtteSøknad) {
-                is KontantstøtteSøknadV3 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.antallEøsSteg > 0
                 is KontantstøtteSøknadV4 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.antallEøsSteg > 0
             }
 

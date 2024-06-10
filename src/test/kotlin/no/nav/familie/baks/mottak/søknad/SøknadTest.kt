@@ -3,7 +3,6 @@ package no.nav.familie.baks.mottak.søknad
 import no.nav.familie.baks.mottak.DevLauncherPostgres
 import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
 import no.nav.familie.baks.mottak.util.DbContainerInitializer
@@ -45,7 +44,6 @@ class SøknadTest(
         val dbSøknadFraMapper = søknadV8.tilDBSøknad()
         val versjon: Int? =
             when (val versjonertSøknad = dbSøknadFraMapper.hentVersjonertSøknad()) {
-                is SøknadV7 -> versjonertSøknad.søknad.kontraktVersjon
                 is SøknadV8 -> versjonertSøknad.søknad.kontraktVersjon
                 else -> {
                     null

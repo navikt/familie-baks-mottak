@@ -11,7 +11,6 @@ import jakarta.persistence.Table
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg
 import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.LocalDateTime
-import no.nav.familie.kontrakter.ba.søknad.v7.Søknad as SøknadV7
 import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadV8
 
 @Entity(name = "Soknad")
@@ -29,10 +28,6 @@ data class DBBarnetrygdSøknad(
     @Column(name = "journalpost_id")
     val journalpostId: String? = null,
 ) {
-    private fun hentSøknadV7(): SøknadV7 {
-        return objectMapper.readValue(søknadJson)
-    }
-
     private fun hentSøknadV8(): SøknadV8 {
         return objectMapper.readValue(søknadJson)
     }
@@ -50,12 +45,12 @@ data class DBBarnetrygdSøknad(
         }
     }
 
-    fun hentVersjonertSøknad(): VersjonertSøknad {
+    fun hentVersjonertSøknad(): VersjonertBarnetrygdSøknad {
         val versjon = this.hentSøknadVersjon()
-        if (versjon == "v8") {
-            return SøknadV8(søknad = hentSøknadV8())
+        return when (versjon) {
+            "v8" -> SøknadV8(søknad = hentSøknadV8())
+            else -> error("Ikke støttet versjon $versjon av kontrakt for Barnetrygd")
         }
-        return SøknadV7(søknad = hentSøknadV7())
     }
 }
 
@@ -74,17 +69,6 @@ interface Vedlegg {
     val dokumentId: String
     val søknadId: Long
     val data: ByteArray
-}
-
-fun SøknadV7.tilDBSøknad(): DBBarnetrygdSøknad {
-    try {
-        return DBBarnetrygdSøknad(
-            søknadJson = objectMapper.writeValueAsString(this),
-            fnr = this.søker.ident.verdi.getValue("nb"),
-        )
-    } catch (e: KotlinNullPointerException) {
-        throw FødselsnummerErNullException()
-    }
 }
 
 fun SøknadV8.tilDBSøknad(): DBBarnetrygdSøknad {
@@ -113,7 +97,6 @@ fun DBBarnetrygdSøknad.harEøsSteg(): Boolean {
     val versjonertSøknad = this.hentVersjonertSøknad()
 
     return when (versjonertSøknad) {
-        is no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7 -> versjonertSøknad.søknad.søker.harEøsSteg
         is no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8 -> versjonertSøknad.søknad.søker.harEøsSteg
     }
 }
