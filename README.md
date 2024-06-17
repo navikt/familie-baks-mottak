@@ -47,7 +47,8 @@ Vi lytter på 4 typer hendelser fra Leesah-topicen til PDL
 ### Fødselhendelse
 ```mermaid
 sequenceDiagram
-Leesah->>LeesahService: Er fødselshendelse?
+Leesah->>LeesahService: Mottar ny hendelse
+LeesahService->>LeesahService: Er fødselshendelse?
 LeesahService-->>MottaFødselshendelseTask: Hvis barn er født i Norge og er under 6 måneder gammel
 note over MottaFødselshendelseTask: Venter til neste virkedag før task kjøres
 MottaFødselshendelseTask->>SendTilBaSakTask: Ikke D-nummer og adressegradering
@@ -61,12 +62,47 @@ Kontanstøtte lytter på Utflytting og Dødsfall
 
 ```mermaid
 sequenceDiagram
-Leesah->>LeesahService: Er hendelse av type dødsfall/sivilstand/utflytting?
-LeesahService-->>VurderLivshendelseTask: Oppretter task VurderLivshendelseTask for BA og KS
+Leesah->>LeesahService: Mottar ny hendelse
+LeesahService->>LeesahService: Er hendelse av type dødsfall/sivilstand/utflytting?
+LeesahService->>VurderLivshendelseTask: Oppretter task VurderLivshendelseTask for BA og KS
 note over VurderLivshendelseTask: Venter 1 time før task kjøres
 VurderLivshendelseTask->>familie-ba-sak: Finn berørte brukere
-familie-ba-sak->>VurderLivshendelseTask: Liste med berørte brukere
-VurderLivshendelseTask-->Oppgave: Opprett eller oppdater eksisterende VurderLivshendelse-oppgave i Oppgave
+familie-ba-sak-->>VurderLivshendelseTask: Liste med berørte brukere
+VurderLivshendelseTask->>Oppgave: Opprett eller oppdater eksisterende VurderLivshendelse-oppgave i Oppgave
 ```
+
+## Mottak av søknad
+```mermaid
+sequenceDiagram
+baks-soknad-api->>SøknadController: Mottak av søknad
+SøknadController->>familie-dokument: Hent alle vedlegg på søknad
+familie-dokument-->>SøknadController: Alle vedlegg
+SøknadController->>SøknadController: Lagre ned vedlegg og søknad i database
+SøknadController->>JournalførSøknadTask: Journalfør søknad
+JournalførSøknadTask-->>familie-dokument: Generer PDF av Søknad 
+familie-dokument->>JournalførSøknadTask: PDF av Søknad
+JournalførSøknadTask->>DokArkiv: Opprett Journalpost i arkiv av generert PDF og Vedlegg
+```
+
+## Ruting av journalposter
+
+
+```mermaid
+sequenceDiagram
+Kafka->>JournalhendelseService: Ny hendelse av type Journalføring av tema BAR/KON
+JournalhendelseService->>JournalhendelseRutingTask: Oppretter ruting task for riktig tema
+JournalhendelseRutingTask->>JournalhendelseRutingTask: Sjekk om journalpost kan automatisk journalføres
+note over JournalhendelseRutingTask: Søknader sendt inn på digital kanal kan automatisk journalføres
+alt Kan automatisk journalføres
+    JournalhendelseRutingTask->>familie-ba-sak: Opprett fagsak og behandling
+    JournalhendelseRutingTask->>OppdaterOgFerdigstillJournalpostTask: Oppretter task
+    OppdaterOgFerdigstillJournalpostTask->>dokarkiv: Ferdigstiller journalpost i arkiv
+else Kan ikke automatisk journalføres
+    JournalhendelseRutingTask->>OpprettJournalføringOppgaveTask: Opprett task for Journalføringsoppgave hvis man ikke kan automatisk journalføre
+    OpprettJournalføringOppgaveTask->>Oppgave: Oppretter JFR-oppgave
+end
+```
+- JournalhendelseRutingTask for BA --> JournalhendelseBarnetrygdRutingTask
+- JournalhendelseRutingTask for KS --> JournalhendelseKontantstøtteRutingTask
 
 [1]: https://github.com/navikt/navkafka-docker-compose
