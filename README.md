@@ -40,4 +40,33 @@ Appen blir produksjonssatt ved push til main
 ## Henvendelser
 For NAV-interne kan henvendelser rettes til #team-familie på slack. Ellers kan henvendelser rettes via et issue her på github-repoet.
 
+
+
+## Kort om bruk av Leesah-hendelser
+Vi lytter på 4 typer hendelser fra Leesah-topicen til PDL 
+### Fødselhendelse
+```mermaid
+sequenceDiagram
+Leesah->>LeesahService: Er fødselshendelse?
+LeesahService-->>MottaFødselshendelseTask: Hvis barn er født i Norge og er under 6 måneder gammel
+note over MottaFødselshendelseTask: Venter til neste virkedag før task kjøres
+MottaFødselshendelseTask->>SendTilBaSakTask: Ikke D-nummer og adressegradering
+SendTilBaSakTask->>Familie-ba-sak: Behandle fødselshendelse
+```
+
+### Sivilstand, Utflytting, Dødsfall
+Barnetrygd lytter på Sivilstand, Utflytting og Dødsfall
+
+Kontanstøtte lytter på Utflytting og Dødsfall
+
+```mermaid
+sequenceDiagram
+Leesah->>LeesahService: Er hendelse av type dødsfall/sivilstand/utflytting?
+LeesahService-->>VurderLivshendelseTask: Oppretter task VurderLivshendelseTask for BA og KS
+note over VurderLivshendelseTask: Venter 1 time før task kjøres
+VurderLivshendelseTask->>familie-ba-sak: Finn berørte brukere
+familie-ba-sak->>VurderLivshendelseTask: Liste med berørte brukere
+VurderLivshendelseTask-->Oppgave: Opprett eller oppdater eksisterende VurderLivshendelse-oppgave i Oppgave
+```
+
 [1]: https://github.com/navikt/navkafka-docker-compose
