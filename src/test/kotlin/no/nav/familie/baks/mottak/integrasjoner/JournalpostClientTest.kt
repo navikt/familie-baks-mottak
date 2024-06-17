@@ -41,10 +41,9 @@ class JournalpostClientTest {
     }
 
     @Throws(IOException::class)
-    private fun gyldigResponse(): String {
-        return Files.readString(
+    private fun gyldigResponse(): String =
+        Files.readString(
             ClassPathResource("testdata/hentJournalpost-response.json").file.toPath(),
             StandardCharsets.UTF_8,
         )
-    }
 }

@@ -87,20 +87,19 @@ class PdfService(
         }
     }
 
-    private fun søknadstypeTilPath(søknadstype: Søknadstype): String {
-        return when (søknadstype) {
+    private fun søknadstypeTilPath(søknadstype: Søknadstype): String =
+        when (søknadstype) {
             Søknadstype.UTVIDET -> "soknad-utvidet"
             else -> "soknad"
         }
-    }
 
     private fun hentEkstraFelter(
         opprettetTid: LocalDateTime,
         navn: String,
         fnr: String,
         label: String,
-    ): Map<String, String> {
-        return mapOf(
+    ): Map<String, String> =
+        mapOf(
             "dokumentDato" to
                 opprettetTid.format(
                     DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale.of("no")),
@@ -110,7 +109,6 @@ class PdfService(
             "label" to label,
             "maalform" to "NB",
         )
-    }
 
     companion object {
         val logger = LoggerFactory.getLogger(this::class.java)

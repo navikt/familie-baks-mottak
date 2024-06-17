@@ -28,7 +28,9 @@ import java.util.UUID
     havingValue = "true",
     matchIfMissing = true,
 )
-class EnsligForsørgerVedtakHendelseConsumer(val vedtakOmOvergangsstønadService: EnsligForsørgerHendelseService) {
+class EnsligForsørgerVedtakHendelseConsumer(
+    val vedtakOmOvergangsstønadService: EnsligForsørgerHendelseService,
+) {
     val ensligForsørgerVedtakhendelseFeilCounter: Counter = Metrics.counter("ef.hendelse.vedtak.feil")
 
     @KafkaListener(
@@ -47,7 +49,8 @@ class EnsligForsørgerVedtakHendelseConsumer(val vedtakOmOvergangsstønadService
             MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
             logger.info("$TOPIC_EF_VEDTAK melding mottatt. Offset: ${consumerRecord.offset()}")
             secureLogger.info("$TOPIC_EF_VEDTAK melding mottatt. Offset: ${consumerRecord.offset()} Key: ${consumerRecord.key()} Value: ${consumerRecord.value()}")
-            objectMapper.readValue(consumerRecord.value(), EnsligForsørgerVedtakhendelse::class.java)
+            objectMapper
+                .readValue(consumerRecord.value(), EnsligForsørgerVedtakhendelse::class.java)
                 .also {
                     vedtakOmOvergangsstønadService.prosesserEfVedtakHendelse(consumerRecord.offset(), it)
                 }

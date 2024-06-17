@@ -5,8 +5,9 @@ import no.nav.familie.baks.mottak.søknad.Søknadsvedlegg
 import no.nav.familie.kontrakter.ks.søknad.v1.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
 
-data class KontantstøtteSøknaddokumentasjon(val søknaddokumentasjon: Søknaddokumentasjon) :
-    ISøknaddokumentasjon {
+data class KontantstøtteSøknaddokumentasjon(
+    val søknaddokumentasjon: Søknaddokumentasjon,
+) : ISøknaddokumentasjon {
     override val opplastedeVedlegg: List<Søknadsvedlegg> =
         søknaddokumentasjon.opplastedeVedlegg.map {
             Søknadsvedlegg(
@@ -15,8 +16,8 @@ data class KontantstøtteSøknaddokumentasjon(val søknaddokumentasjon: Søknadd
             )
         }
 
-    private fun dokumentasjonsbehovTilTittel(dokumentasjonsbehov: Dokumentasjonsbehov): String {
-        return when (dokumentasjonsbehov) {
+    private fun dokumentasjonsbehovTilTittel(dokumentasjonsbehov: Dokumentasjonsbehov): String =
+        when (dokumentasjonsbehov) {
             Dokumentasjonsbehov.AVTALE_DELT_BOSTED -> "Avtale om delt bosted"
             Dokumentasjonsbehov.VEDTAK_OPPHOLDSTILLATELSE -> "Vedtak om oppholdstillatelse"
             Dokumentasjonsbehov.ADOPSJON_DATO -> "Adopsjonsdato"
@@ -24,5 +25,4 @@ data class KontantstøtteSøknaddokumentasjon(val søknaddokumentasjon: Søknadd
             Dokumentasjonsbehov.ANNEN_DOKUMENTASJON -> "" // Random dokumentasjon skal saksbehandler sette tittel på
             Dokumentasjonsbehov.BEKREFTELESE_PÅ_BARNEHAGEPLASS -> "Bekreftelse på barnehageplass"
         }
-    }
 }

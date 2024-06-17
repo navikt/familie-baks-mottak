@@ -8,9 +8,7 @@ import no.nav.familie.kontrakter.ks.søknad.v4.Søker
 fun <T> søknadsfelt(
     label: String,
     verdi: T,
-): Søknadsfelt<T> {
-    return Søknadsfelt(label = mapOf("nb" to label), verdi = mapOf("nb" to verdi))
-}
+): Søknadsfelt<T> = Søknadsfelt(label = mapOf("nb" to label), verdi = mapOf("nb" to verdi))
 
 object KontantstøtteSøknadTestData {
     fun kontantstøtteSøknad(): KontantstøtteSøknad =

@@ -191,9 +191,7 @@ class VurderLivshendelseService(
     private val Sivilstand.dato: LocalDate?
         get() = this.gyldigFraOgMed ?: this.bekreftelsesdato
 
-    private fun finnNyesteSivilstandEndring(pdlPersonData: PdlPersonData): Sivilstand? {
-        return pdlPersonData.sivilstand.filter { it.dato != null }.maxByOrNull { it.dato!! }
-    }
+    private fun finnNyesteSivilstandEndring(pdlPersonData: PdlPersonData): Sivilstand? = pdlPersonData.sivilstand.filter { it.dato != null }.maxByOrNull { it.dato!! }
 
     private fun opprettEllerOppdaterVurderLivshendelseOppgave(
         hendelseType: VurderLivshendelseType,
@@ -233,7 +231,8 @@ class VurderLivshendelseService(
                     beskrivelse = åpenOppgave.beskrivelse!!,
                     personIdent = personIdent,
                     personErBruker =
-                        åpenOppgave.identer?.map { it.ident }
+                        åpenOppgave.identer
+                            ?.map { it.ident }
                             ?.contains(personIdent),
                 )
 
@@ -261,9 +260,10 @@ class VurderLivshendelseService(
         val vurderLivshendelseOppgaver = oppgaveClient.finnOppgaverPåAktørId(aktørId, Oppgavetype.VurderLivshendelse, tema)
         secureLog.info("Fant følgende oppgaver: $vurderLivshendelseOppgaver")
         return vurderLivshendelseOppgaver.firstOrNull {
-            it.beskrivelse?.startsWith(type.beskrivelse) == true && (
-                it.status != StatusEnum.FERDIGSTILT || it.status != StatusEnum.FEILREGISTRERT
-            )
+            it.beskrivelse?.startsWith(type.beskrivelse) == true &&
+                (
+                    it.status != StatusEnum.FERDIGSTILT || it.status != StatusEnum.FEILREGISTRERT
+                )
         }
     }
 
@@ -271,12 +271,11 @@ class VurderLivshendelseService(
         beskrivelse: String,
         personIdent: String,
         personErBruker: Boolean?,
-    ): String {
-        return when (personErBruker) {
+    ): String =
+        when (personErBruker) {
             true -> if (!beskrivelse.contains("bruker")) leggTilBrukerIBeskrivelse(beskrivelse) else beskrivelse
             else -> if (!beskrivelse.contains(personIdent)) leggTilBarnIBeskrivelse(beskrivelse, personIdent) else beskrivelse
         }
-    }
 
     private fun leggTilBrukerIBeskrivelse(beskrivelse: String): String {
         val (livshendelseType, barn) = beskrivelse.split(":")
@@ -303,26 +302,23 @@ class VurderLivshendelseService(
     private fun hentRestFagsak(
         fagsakId: Long,
         tema: Tema,
-    ): RestMinimalFagsak {
-        return when (tema) {
+    ): RestMinimalFagsak =
+        when (tema) {
             Tema.BAR -> baSakClient.hentMinimalRestFagsak(fagsakId)
             Tema.KON -> ksSakClient.hentMinimalRestFagsak(fagsakId)
             Tema.ENF, Tema.OPP -> throw RuntimeException("Tema $tema er ikke støttet")
         }.also {
             secureLog.info("Hentet rest fagsak: $it, tema: $tema")
         }
-    }
 
-    private fun hentSisteBehandlingSomErIverksatt(restFagsak: RestMinimalFagsak): RestVisningBehandling? {
-        return restFagsak.behandlinger
+    private fun hentSisteBehandlingSomErIverksatt(restFagsak: RestMinimalFagsak): RestVisningBehandling? =
+        restFagsak.behandlinger
             .filter { it.status == BehandlingStatus.AVSLUTTET }
             .maxByOrNull { it.opprettetTidspunkt }
-    }
 
-    private fun hentAktivBehandling(restFagsak: RestMinimalFagsak): RestVisningBehandling {
-        return restFagsak.behandlinger.firstOrNull { it.aktiv }
+    private fun hentAktivBehandling(restFagsak: RestMinimalFagsak): RestVisningBehandling =
+        restFagsak.behandlinger.firstOrNull { it.aktiv }
             ?: error("Fagsak ${restFagsak.id} mangler aktiv behandling. Får ikke opprettet VurderLivshendelseOppgave")
-    }
 
     private fun opprettOppgavePåAktør(
         aktørId: String,
@@ -369,15 +365,14 @@ class VurderLivshendelseService(
         return listeMedFagsakIdOgTilknyttetAktør
     }
 
-    private fun tilBarnetrygdBehandlingstema(restBehandling: RestVisningBehandling?): Behandlingstema {
-        return when {
+    private fun tilBarnetrygdBehandlingstema(restBehandling: RestVisningBehandling?): Behandlingstema =
+        when {
             restBehandling == null -> Behandlingstema.Barnetrygd
             restBehandling.kategori == BehandlingKategori.EØS -> Behandlingstema.BarnetrygdEØS
             restBehandling.kategori == BehandlingKategori.NASJONAL && restBehandling.underkategori == BehandlingUnderkategori.ORDINÆR -> Behandlingstema.OrdinærBarnetrygd
             restBehandling.kategori == BehandlingKategori.NASJONAL && restBehandling.underkategori == BehandlingUnderkategori.UTVIDET -> Behandlingstema.UtvidetBarnetrygd
             else -> Behandlingstema.Barnetrygd
         }
-    }
 
     private fun tilKontanstøtteBehandlingstema(restBehandling: RestVisningBehandling?): Behandlingstema =
         when {
@@ -466,13 +461,17 @@ class VurderLivshendelseService(
         tema: Tema,
     ): LocalDate? {
         val personIdenter =
-            pdlClient.hentIdenter(personIdent, tema)
+            pdlClient
+                .hentIdenter(personIdent, tema)
                 .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
                 .map { it.ident }
         val tidligsteInfotrygdVedtak =
-            infotrygdBarnetrygdClient.hentVedtak(personIdenter).bruker
+            infotrygdBarnetrygdClient
+                .hentVedtak(personIdenter)
+                .bruker
                 .maxByOrNull { it.iverksattFom ?: "000000" } // maxBy... siden datoen er på "seq"-format
-        return tidligsteInfotrygdVedtak?.iverksattFom
+        return tidligsteInfotrygdVedtak
+            ?.iverksattFom
             ?.let { YearMonth.parse("${999999 - it.toInt()}", DateTimeFormatter.ofPattern("yyyyMM")) }
             ?.atDay(1)
     }
@@ -489,9 +488,14 @@ class VurderLivshendelseService(
     }
 }
 
-data class VurderLivshendelseTaskDTO(val personIdent: String, val type: VurderLivshendelseType)
+data class VurderLivshendelseTaskDTO(
+    val personIdent: String,
+    val type: VurderLivshendelseType,
+)
 
-enum class VurderLivshendelseType(val beskrivelse: String) {
+enum class VurderLivshendelseType(
+    val beskrivelse: String,
+) {
     DØDSFALL("Dødsfall"),
     SIVILSTAND("Endring i sivilstand"),
     ADDRESSE("Addresse"),

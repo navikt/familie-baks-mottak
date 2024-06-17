@@ -20,8 +20,7 @@ private val logger = LoggerFactory.getLogger(DokarkivClient::class.java)
 class DokarkivClient(
     @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonUri: URI,
     @Qualifier("clientCredentials") restOperations: RestOperations,
-) :
-    AbstractRestClient(restOperations, "integrasjon") {
+) : AbstractRestClient(restOperations, "integrasjon") {
     fun oppdaterJournalpostSak(
         jp: Journalpost,
         fagsakId: String,
@@ -73,24 +72,23 @@ class DokarkivClient(
     private fun utførRequest(
         uri: URI,
         request: Any = "",
-    ): Any {
-        return Result.runCatching {
-            putForEntity<Ressurs<Any>>(uri, request)
-        }.fold(
-            onSuccess = { response -> assertGyldig(response) },
-            onFailure = { it },
-        )
-    }
+    ): Any =
+        Result
+            .runCatching {
+                putForEntity<Ressurs<Any>>(uri, request)
+            }.fold(
+                onSuccess = { response -> assertGyldig(response) },
+                onFailure = { it },
+            )
 
-    private inline fun <reified T : Any> assertGyldig(ressurs: Ressurs<T>?): T {
-        return when {
+    private inline fun <reified T : Any> assertGyldig(ressurs: Ressurs<T>?): T =
+        when {
             ressurs == null -> error("Finner ikke ressurs")
             ressurs.data == null -> error("Ressurs mangler data")
             ressurs.status != Ressurs.Status.SUKSESS -> error("Ressurs returnerer 2xx men har ressurs status failure")
 
             else -> ressurs.data!!
         }
-    }
 
     data class TilknyttFagsakRequest(
         val bruker: Bruker,

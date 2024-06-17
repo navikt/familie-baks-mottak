@@ -105,8 +105,8 @@ abstract class AbstractOppgaveMapper(
         return "${journalpost.hentHovedDokumentTittel().orEmpty()} $bindestrek ${beskrivelse.orEmpty()}".trim()
     }
 
-    private fun utledEnhetsnummer(journalpost: Journalpost): String? {
-        return when {
+    private fun utledEnhetsnummer(journalpost: Journalpost): String? =
+        when {
             journalpost.journalforendeEnhet == "2101" -> "4806" // Enhet 2101 er nedlagt. Rutes til 4806
             journalpost.journalforendeEnhet == "4847" -> "4817" // Enhet 4847 skal legges ned. Rutes til 4817
             journalpost.journalforendeEnhet.isNullOrBlank() -> null
@@ -117,18 +117,20 @@ abstract class AbstractOppgaveMapper(
                 null
             }
         }
-    }
 
     private fun hentAktørIdFraPdl(
         brukerId: String,
         tema: Tema,
-    ): String? {
-        return try {
-            pdlClient.hentIdenter(brukerId, tema).filter { it.gruppe == Identgruppe.AKTORID.name && !it.historisk }.lastOrNull()?.ident
+    ): String? =
+        try {
+            pdlClient
+                .hentIdenter(brukerId, tema)
+                .filter { it.gruppe == Identgruppe.AKTORID.name && !it.historisk }
+                .lastOrNull()
+                ?.ident
         } catch (e: IntegrasjonException) {
             null
         }
-    }
 
     fun erEØS(
         journalpost: Journalpost,
@@ -161,7 +163,9 @@ interface IOppgaveMapper {
     fun støtterTema(tema: Tema) = this.tema == tema
 }
 
-@Service class OppgaveMapperService(val oppgaveMappers: Collection<IOppgaveMapper>) {
+@Service class OppgaveMapperService(
+    val oppgaveMappers: Collection<IOppgaveMapper>,
+) {
     fun tilOpprettOppgaveRequest(
         oppgavetype: Oppgavetype,
         journalpost: Journalpost,

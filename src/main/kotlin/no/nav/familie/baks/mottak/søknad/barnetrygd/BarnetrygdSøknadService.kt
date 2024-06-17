@@ -52,13 +52,9 @@ class BarnetrygdSøknadService(
         return dbSøknad
     }
 
-    fun lagreDBSøknad(dbBarnetrygdSøknad: DBBarnetrygdSøknad): DBBarnetrygdSøknad {
-        return søknadRepository.save(dbBarnetrygdSøknad)
-    }
+    fun lagreDBSøknad(dbBarnetrygdSøknad: DBBarnetrygdSøknad): DBBarnetrygdSøknad = søknadRepository.save(dbBarnetrygdSøknad)
 
-    fun hentDBSøknad(søknadId: Long): DBBarnetrygdSøknad? {
-        return søknadRepository.hentDBSøknad(søknadId)
-    }
+    fun hentDBSøknad(søknadId: Long): DBBarnetrygdSøknad? = søknadRepository.hentDBSøknad(søknadId)
 
     fun hentLagredeVedlegg(søknad: DBBarnetrygdSøknad): Map<String, DBVedlegg> {
         val map = mutableMapOf<String, DBVedlegg>()

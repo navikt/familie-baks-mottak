@@ -8,7 +8,9 @@ import org.springframework.jdbc.datasource.init.ScriptUtils
 
 @Profile("!postgres")
 @TestConfiguration
-class JdbcConfig(jdbcTemplate: JdbcTemplate) {
+class JdbcConfig(
+    jdbcTemplate: JdbcTemplate,
+) {
     init {
         jdbcTemplate.dataSource.connection.use { conn ->
             ScriptUtils.executeSqlScript(conn, ClassPathResource("sql/prosessering_jdbc.sql"))

@@ -28,12 +28,10 @@ data class DBBarnetrygdSøknad(
     @Column(name = "journalpost_id")
     val journalpostId: String? = null,
 ) {
-    private fun hentSøknadV8(): SøknadV8 {
-        return objectMapper.readValue(søknadJson)
-    }
+    private fun hentSøknadV8(): SøknadV8 = objectMapper.readValue(søknadJson)
 
-    private fun hentSøknadVersjon(): String {
-        return try {
+    private fun hentSøknadVersjon(): String =
+        try {
             val søknad = objectMapper.readTree(søknadJson)
             if (søknad.get("kontraktVersjon")?.asInt() == 8) {
                 "v8"
@@ -43,7 +41,6 @@ data class DBBarnetrygdSøknad(
         } catch (e: Error) {
             "v7"
         }
-    }
 
     fun hentVersjonertSøknad(): VersjonertBarnetrygdSøknad {
         val versjon = this.hentSøknadVersjon()
@@ -75,7 +72,9 @@ fun SøknadV8.tilDBSøknad(): DBBarnetrygdSøknad {
     try {
         return DBBarnetrygdSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
-            fnr = this.søker.ident.verdi.getValue("nb"),
+            fnr =
+                this.søker.ident.verdi
+                    .getValue("nb"),
         )
     } catch (e: KotlinNullPointerException) {
         throw FødselsnummerErNullException()
@@ -85,13 +84,12 @@ fun SøknadV8.tilDBSøknad(): DBBarnetrygdSøknad {
 fun Søknadsvedlegg.tilDBVedlegg(
     søknad: DBBarnetrygdSøknad,
     data: ByteArray,
-): DBVedlegg {
-    return DBVedlegg(
+): DBVedlegg =
+    DBVedlegg(
         dokumentId = this.dokumentId,
         søknadId = søknad.id,
         data = data,
     )
-}
 
 fun DBBarnetrygdSøknad.harEøsSteg(): Boolean {
     val versjonertSøknad = this.hentVersjonertSøknad()

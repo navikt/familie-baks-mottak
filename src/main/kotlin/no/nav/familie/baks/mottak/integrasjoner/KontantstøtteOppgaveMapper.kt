@@ -15,20 +15,17 @@ class KontantstøtteOppgaveMapper(
 ) : AbstractOppgaveMapper(hentEnhetClient, pdlClient) {
     override val tema: Tema = Tema.KON
 
-    override fun hentBehandlingstema(journalpost: Journalpost): Behandlingstema? {
-        return null
-    }
+    override fun hentBehandlingstema(journalpost: Journalpost): Behandlingstema? = null
 
     override fun hentBehandlingstemaVerdi(journalpost: Journalpost) = hentBehandlingstema(journalpost)?.value
 
     override fun hentBehandlingstypeVerdi(journalpost: Journalpost) = hentBehandlingstype(journalpost).value
 
-    override fun hentBehandlingstype(journalpost: Journalpost): Behandlingstype {
-        return when {
+    override fun hentBehandlingstype(journalpost: Journalpost): Behandlingstype =
+        when {
             erEØS(journalpost) -> Behandlingstype.EØS
             else -> Behandlingstype.NASJONAL
         }
-    }
 
     fun utledBehandlingKategoriFraSøknad(journalpost: Journalpost): BehandlingKategori {
         check(journalpost.erKontantstøtteSøknad()) { "Journalpost m/ id ${journalpost.journalpostId} er ikke en kontantstøtte søknad" }

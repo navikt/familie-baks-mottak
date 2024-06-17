@@ -19,14 +19,11 @@ data class PersonIdent(
     val id: String,
 )
 
-fun Person.harAdresseGradering(): Boolean {
-    return if (this.adressebeskyttelseGradering == null) {
+fun Person.harAdresseGradering(): Boolean =
+    if (this.adressebeskyttelseGradering == null) {
         false
     } else {
         this.adressebeskyttelseGradering != "UGRADERT"
     }
-}
 
-fun Person.harBostedsadresse(): Boolean {
-    return this.bostedsadresse != null
-}
+fun Person.harBostedsadresse(): Boolean = this.bostedsadresse != null

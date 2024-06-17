@@ -48,10 +48,9 @@ class SøknadSpråkvelgerService {
         return kontantstøtteSøknadMapForSpråk
     }
 
-    fun hentObjectMapperForSpråk(språk: String): ObjectMapper {
-        return getObjectMapper.registerModules(
+    fun hentObjectMapperForSpråk(språk: String): ObjectMapper =
+        getObjectMapper.registerModules(
             BarnetrygdSøknadObjectMapperModule(språk),
             KontantstøtteObjectMapperModule(språk),
         )
-    }
 }

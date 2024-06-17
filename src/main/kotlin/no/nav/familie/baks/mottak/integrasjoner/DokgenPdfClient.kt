@@ -14,7 +14,8 @@ import java.net.URI
 class DokgenPdfClient(
     @Qualifier("restTemplateUnsecured") operations: RestOperations,
     @Value("\${FAMILIE_BAKS_DOKGEN_API_URL}") private val dokgenUri: String,
-) : PdfClient, AbstractRestClient(operations, "pdf") {
+) : AbstractRestClient(operations, "pdf"),
+    PdfClient {
     override fun lagPdf(
         templateNavn: String,
         inputData: Map<String, Any>,

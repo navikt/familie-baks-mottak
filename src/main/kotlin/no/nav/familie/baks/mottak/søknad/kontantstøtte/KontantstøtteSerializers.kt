@@ -7,36 +7,38 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsfelt
 import no.nav.familie.kontrakter.ks.søknad.v1.TekstPåSpråkMap
 
-class KontantstøtteObjectMapperModule(språk: String) : SimpleModule() {
+class KontantstøtteObjectMapperModule(
+    språk: String,
+) : SimpleModule() {
     init {
         addSerializer(Søknadsfelt::class.java, SøknadsfeltSerializer(språk))
         addSerializer(TekstPåSpråkMap::class.java, TekstPåSpråkMapSerializer(språk))
     }
 }
 
-class SøknadsfeltSerializer(private val språk: String) : JsonSerializer<Søknadsfelt<*>>() {
+class SøknadsfeltSerializer(
+    private val språk: String,
+) : JsonSerializer<Søknadsfelt<*>>() {
     override fun serialize(
         søknadsFelt: Søknadsfelt<*>,
         jsonGenerator: JsonGenerator,
         serializerProvider: SerializerProvider,
-    ) {
-        return jsonGenerator.writeObject(
-            mapOf(
-                "label" to søknadsFelt.label[språk],
-                "verdi" to søknadsFelt.verdi[språk],
-            ),
-        )
-    }
+    ) = jsonGenerator.writeObject(
+        mapOf(
+            "label" to søknadsFelt.label[språk],
+            "verdi" to søknadsFelt.verdi[språk],
+        ),
+    )
 }
 
-class TekstPåSpråkMapSerializer(private val språk: String) : JsonSerializer<TekstPåSpråkMap>() {
+class TekstPåSpråkMapSerializer(
+    private val språk: String,
+) : JsonSerializer<TekstPåSpråkMap>() {
     override fun serialize(
         tekstPåSpråkMap: TekstPåSpråkMap,
         jsonGenerator: JsonGenerator,
         serializerProvider: SerializerProvider,
-    ) {
-        return jsonGenerator.writeObject(
-            tekstPåSpråkMap[språk],
-        )
-    }
+    ) = jsonGenerator.writeObject(
+        tekstPåSpråkMap[språk],
+    )
 }

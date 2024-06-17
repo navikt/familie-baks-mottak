@@ -57,19 +57,19 @@ class KsSakClient
             behandlingType: BehandlingType,
         ) {
             val uri = URI.create("$ksSakServiceUri/behandlinger")
-            kotlin.runCatching {
-                postForEntity<Ressurs<Any>>(
-                    uri,
-                    RestOpprettBehandlingKontantstøtteRequest(
-                        kategori = kategori,
-                        søkersIdent = søkersIdent,
-                        behandlingÅrsak = behandlingÅrsak,
-                        søknadMottattDato = søknadMottattDato,
-                        behandlingType = behandlingType,
-                    ),
-                )
-            }
-                .onFailure {
+            kotlin
+                .runCatching {
+                    postForEntity<Ressurs<Any>>(
+                        uri,
+                        RestOpprettBehandlingKontantstøtteRequest(
+                            kategori = kategori,
+                            søkersIdent = søkersIdent,
+                            behandlingÅrsak = behandlingÅrsak,
+                            søknadMottattDato = søknadMottattDato,
+                            behandlingType = behandlingType,
+                        ),
+                    )
+                }.onFailure {
                     throw IntegrasjonException("Feil ved opprettelse av behandling i ks-sak.", it, uri)
                 }
         }

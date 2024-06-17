@@ -30,8 +30,8 @@ class KontantstøtteSøknadController(
     ): ResponseEntity<Ressurs<Kvittering>> =
         mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = KontantstøtteSøknadV4(kontantstøtteSøknad = søknad))
 
-    fun mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad): ResponseEntity<Ressurs<Kvittering>> {
-        return try {
+    fun mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad): ResponseEntity<Ressurs<Kvittering>> =
+        try {
             val dbKontantstøtteSøknad =
                 kontantstøtteSøknadService.mottaKontantstøtteSøknad(versjonertKontantstøtteSøknad)
             kontantstøtteSøknadMetrikkService.sendMottakMetrikker(versjonertKontantstøtteSøknad)
@@ -47,11 +47,8 @@ class KontantstøtteSøknadController(
             kontantstøtteSøknadMetrikkService.sendMottakFeiletMetrikker()
             ResponseEntity.status(500).body(Ressurs.failure("Lagring av søknad om kontantstøtte feilet"))
         }
-    }
 
     @GetMapping(value = ["/ping"])
     @Unprotected
-    fun ping(): ResponseEntity<String> {
-        return ResponseEntity.ok().body("OK")
-    }
+    fun ping(): ResponseEntity<String> = ResponseEntity.ok().body("OK")
 }
