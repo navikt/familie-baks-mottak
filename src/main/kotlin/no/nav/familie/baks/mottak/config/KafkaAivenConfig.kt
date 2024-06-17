@@ -22,7 +22,9 @@ import java.time.Duration
     havingValue = "true",
     matchIfMissing = true,
 )
-class KafkaAivenConfig(val environment: Environment) {
+class KafkaAivenConfig(
+    val environment: Environment,
+) {
     @Bean
     fun kafkaAivenHendelseListenerContainerFactory(kafkaRestartingErrorHandler: KafkaRestartingErrorHandler): ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
@@ -54,9 +56,7 @@ class KafkaAivenConfig(val environment: Environment) {
     }
 
     @Bean(name = [KafkaListenerConfigUtils.KAFKA_LISTENER_ENDPOINT_REGISTRY_BEAN_NAME])
-    fun kafkaListenerEndpointRegistry(): KafkaListenerEndpointRegistry? {
-        return KafkaListenerEndpointRegistry()
-    }
+    fun kafkaListenerEndpointRegistry(): KafkaListenerEndpointRegistry? = KafkaListenerEndpointRegistry()
 
     private fun consumerConfigs(): Map<String, Any> {
         val kafkaBrokers = System.getenv("KAFKA_BROKERS") ?: "http://localhost:9092"

@@ -15,12 +15,11 @@ import java.time.YearMonth
 class InfotrygdKontantstøtteClient(
     @Qualifier("clientCredentials") restOperations: RestOperations,
     @Value("\${FAMILIE_KS_INFOTRYGD_API_URL}/api") private val clientUri: URI,
-) :
-    AbstractRestClient(restOperations, "familie-ks-infotrygd") {
+) : AbstractRestClient(restOperations, "familie-ks-infotrygd") {
     fun harKontantstøtteIInfotrygd(
         barnasIdenter: List<String>,
-    ): Boolean {
-        return infotrygdResponseFra(
+    ): Boolean =
+        infotrygdResponseFra(
             request = {
                 operations.postForObject(
                     uri("harLopendeKontantstotteIInfotrygd"),
@@ -35,7 +34,6 @@ class InfotrygdKontantstøtteClient(
                 )
             },
         )
-    }
 
     fun hentPerioderMedKontantstotteIInfotrygdByBarn(
         barnasIdenter: List<String>,

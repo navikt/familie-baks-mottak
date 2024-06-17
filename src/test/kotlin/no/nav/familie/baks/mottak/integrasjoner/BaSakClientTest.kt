@@ -71,8 +71,8 @@ class BaSakClientTest {
     }
 
     @Throws(IOException::class)
-    private fun gyldigResponse(): String {
-        return "{\n" +
+    private fun gyldigResponse(): String =
+        "{\n" +
             "    \"data\": {\n" +
             "        \"opprettetTidspunkt\": \"2020-03-19T10:36:21.678775\",\n" +
             "        \"id\": $fagsakId,\n" +
@@ -84,43 +84,41 @@ class BaSakClientTest {
             "    \"melding\": \"Innhenting av data var vellykket\",\n" +
             "    \"stacktrace\": null\n" +
             "}"
-    }
 
     @Throws(IOException::class)
-    private fun gyldigResponseMinimalSak(): String {
-        return """
-            {
-              "data": {
-                "opprettetTidspunkt": "2023-04-01T00:00:00.00",
-                "id": $fagsakId,
-                "søkerFødselsnummer": "42104200000",
-                "status": "LØPENDE",
-                "underBehandling": false,
-                "løpendeKategori": "NASJONAL",
-                "behandlinger": [
-                  {
-                    "behandlingId": 1000,
-                    "opprettetTidspunkt": "2023-04-02T00:00:00.00",
-                    "kategori": "NASJONAL",
-                    "underkategori": "ORDINÆR",
-                    "aktiv": true,
-                    "årsak": "SØKNAD",
-                    "type": "FØRSTEGANGSBEHANDLING",
-                    "status": "AVSLUTTET",
-                    "resultat": "INNVILGET",
-                    "vedtaksdato": "2023-04-03T00:00:00.00"
-                  }
-                ],
-                "tilbakekrevingsbehandlinger": [],
-                "gjeldendeUtbetalingsperioder": []
-              },
-              "status": "SUKSESS",
-              "melding": "Innhenting av data var vellykket",
-              "frontendFeilmelding": null,
-              "stacktrace": null
-            }                                   
-            """.trimIndent()
-    }
+    private fun gyldigResponseMinimalSak(): String =
+        """
+        {
+          "data": {
+            "opprettetTidspunkt": "2023-04-01T00:00:00.00",
+            "id": $fagsakId,
+            "søkerFødselsnummer": "42104200000",
+            "status": "LØPENDE",
+            "underBehandling": false,
+            "løpendeKategori": "NASJONAL",
+            "behandlinger": [
+              {
+                "behandlingId": 1000,
+                "opprettetTidspunkt": "2023-04-02T00:00:00.00",
+                "kategori": "NASJONAL",
+                "underkategori": "ORDINÆR",
+                "aktiv": true,
+                "årsak": "SØKNAD",
+                "type": "FØRSTEGANGSBEHANDLING",
+                "status": "AVSLUTTET",
+                "resultat": "INNVILGET",
+                "vedtaksdato": "2023-04-03T00:00:00.00"
+              }
+            ],
+            "tilbakekrevingsbehandlinger": [],
+            "gjeldendeUtbetalingsperioder": []
+          },
+          "status": "SUKSESS",
+          "melding": "Innhenting av data var vellykket",
+          "frontendFeilmelding": null,
+          "stacktrace": null
+        }                                   
+        """.trimIndent()
 
     companion object {
         private val personIdent = "12345678910"

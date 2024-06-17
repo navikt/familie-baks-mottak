@@ -33,9 +33,7 @@ data class DBKontantstøtteSøknad(
     @Column(name = "journalpost_id")
     val journalpostId: String? = null,
 ) {
-    private fun hentSøknadV4(): KontantstøtteSøknadV4 {
-        return objectMapper.readValue(søknadJson)
-    }
+    private fun hentSøknadV4(): KontantstøtteSøknadV4 = objectMapper.readValue(søknadJson)
 
     private fun hentSøknadVersjon(): String {
         val søknad = objectMapper.readTree(søknadJson)
@@ -78,7 +76,9 @@ fun KontantstøtteSøknadV4.tilDBKontantstøtteSøknad(): DBKontantstøtteSøkna
     try {
         return DBKontantstøtteSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
-            fnr = this.søker.ident.verdi.getValue("nb"),
+            fnr =
+                this.søker.ident.verdi
+                    .getValue("nb"),
         )
     } catch (e: KotlinNullPointerException) {
         throw FødselsnummerErNullException()
@@ -88,12 +88,11 @@ fun KontantstøtteSøknadV4.tilDBKontantstøtteSøknad(): DBKontantstøtteSøkna
 fun Søknadsvedlegg.tilDBKontantstøtteVedlegg(
     søknad: DBKontantstøtteSøknad,
     data: ByteArray,
-): DBKontantstotteVedlegg {
-    return DBKontantstotteVedlegg(
+): DBKontantstotteVedlegg =
+    DBKontantstotteVedlegg(
         dokumentId = this.dokumentId,
         søknadId = søknad.id,
         data = data,
     )
-}
 
 class FødselsnummerErNullException : Exception()

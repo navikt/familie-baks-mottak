@@ -93,19 +93,20 @@ class OppgaveClient
         ): OppgaveResponse {
             val uri = URI.create("$integrasjonUri/oppgave/${patchOppgave.id}/oppdater")
 
-            return Result.runCatching {
-                patchForEntity<Ressurs<OppgaveResponse>>(uri, patchOppgave.copy(beskrivelse = beskrivelse))
-            }.fold(
-                onSuccess = { response -> assertGyldig(response) },
-                onFailure = {
-                    throw IntegrasjonException(
-                        "Patch-kall mot $uri feilet ved oppdatering av oppgave",
-                        it,
-                        uri,
-                        null,
-                    )
-                },
-            )
+            return Result
+                .runCatching {
+                    patchForEntity<Ressurs<OppgaveResponse>>(uri, patchOppgave.copy(beskrivelse = beskrivelse))
+                }.fold(
+                    onSuccess = { response -> assertGyldig(response) },
+                    onFailure = {
+                        throw IntegrasjonException(
+                            "Patch-kall mot $uri feilet ved oppdatering av oppgave",
+                            it,
+                            uri,
+                            null,
+                        )
+                    },
+                )
         }
 
         @Retryable(
@@ -126,23 +127,24 @@ class OppgaveClient
                     oppgavetype = oppgavetype,
                 )
 
-            return Result.runCatching {
-                postForEntity<Ressurs<FinnOppgaveResponseDto>>(uri, request)
-            }.fold(
-                onSuccess = { response -> assertGyldig(response).oppgaver },
-                onFailure = {
-                    secureLogger.error(
-                        "Finn oppgaver feilet mot $uri og request: $request",
-                        NestedExceptionUtils.getMostSpecificCause(it),
-                    )
-                    throw IntegrasjonException(
-                        "GET $uri feilet ved henting av oppgaver",
-                        it,
-                        uri,
-                        null,
-                    )
-                },
-            )
+            return Result
+                .runCatching {
+                    postForEntity<Ressurs<FinnOppgaveResponseDto>>(uri, request)
+                }.fold(
+                    onSuccess = { response -> assertGyldig(response).oppgaver },
+                    onFailure = {
+                        secureLogger.error(
+                            "Finn oppgaver feilet mot $uri og request: $request",
+                            NestedExceptionUtils.getMostSpecificCause(it),
+                        )
+                        throw IntegrasjonException(
+                            "GET $uri feilet ved henting av oppgaver",
+                            it,
+                            uri,
+                            null,
+                        )
+                    },
+                )
         }
 
         @Retryable(
@@ -164,59 +166,59 @@ class OppgaveClient
                     oppgavetype = oppgavetype,
                 )
 
-            return Result.runCatching {
-                postForEntity<Ressurs<FinnOppgaveResponseDto>>(uri, request)
-            }.fold(
-                onSuccess = { response -> assertGyldig(response).oppgaver },
-                onFailure = {
-                    secureLogger.error(
-                        "Finn oppgave feilet for $aktørId og $oppgavetype",
-                        NestedExceptionUtils.getMostSpecificCause(it),
-                    )
-                    throw IntegrasjonException(
-                        "GET $uri feilet ved henting av oppgaver",
-                        it,
-                        uri,
-                        null,
-                    )
-                },
-            )
+            return Result
+                .runCatching {
+                    postForEntity<Ressurs<FinnOppgaveResponseDto>>(uri, request)
+                }.fold(
+                    onSuccess = { response -> assertGyldig(response).oppgaver },
+                    onFailure = {
+                        secureLogger.error(
+                            "Finn oppgave feilet for $aktørId og $oppgavetype",
+                            NestedExceptionUtils.getMostSpecificCause(it),
+                        )
+                        throw IntegrasjonException(
+                            "GET $uri feilet ved henting av oppgaver",
+                            it,
+                            uri,
+                            null,
+                        )
+                    },
+                )
         }
 
         private fun responseFraOpprettOppgave(
             uri: URI,
             request: OpprettOppgaveRequest,
-        ): OppgaveResponse {
-            return Result.runCatching {
-                secureLog.info("Sender OpprettOppgaveRequest $request")
-                postForEntity<Ressurs<OppgaveResponse>>(uri, request)
-            }.fold(
-                onSuccess = { response -> assertGyldig(response) },
-                onFailure = {
-                    secureLogger.error(
-                        "Opprett oppgave feilet mot $uri og request: $request",
-                        NestedExceptionUtils.getMostSpecificCause(it),
-                    )
-                    log.warn("Post-kall mot $uri feilet ved opprettelse av oppgave", it)
-                    throw IntegrasjonException(
-                        "Post-kall mot $uri feilet ved opprettelse av oppgave",
-                        it,
-                        uri,
-                        null,
-                    )
-                },
-            )
-        }
+        ): OppgaveResponse =
+            Result
+                .runCatching {
+                    secureLog.info("Sender OpprettOppgaveRequest $request")
+                    postForEntity<Ressurs<OppgaveResponse>>(uri, request)
+                }.fold(
+                    onSuccess = { response -> assertGyldig(response) },
+                    onFailure = {
+                        secureLogger.error(
+                            "Opprett oppgave feilet mot $uri og request: $request",
+                            NestedExceptionUtils.getMostSpecificCause(it),
+                        )
+                        log.warn("Post-kall mot $uri feilet ved opprettelse av oppgave", it)
+                        throw IntegrasjonException(
+                            "Post-kall mot $uri feilet ved opprettelse av oppgave",
+                            it,
+                            uri,
+                            null,
+                        )
+                    },
+                )
 
-        private fun <T> assertGyldig(ressurs: Ressurs<T>?): T {
-            return when {
+        private fun <T> assertGyldig(ressurs: Ressurs<T>?): T =
+            when {
                 ressurs == null -> error("Finner ikke ressurs")
                 ressurs.data == null -> error("Ressurs mangler data")
                 ressurs.status != Ressurs.Status.SUKSESS -> error("Ressurs returnerer 2xx men har ressurs status failure")
 
                 else -> ressurs.data!!
             }
-        }
     }
 
 data class OppgaveVurderLivshendelseDto(

@@ -4,5 +4,6 @@ import no.nav.familie.kontrakter.ks.søknad.v4.KontantstøtteSøknad as Kontants
 
 sealed class VersjonertKontantstøtteSøknad
 
-data class KontantstøtteSøknadV4(val kontantstøtteSøknad: KontantstøtteSøknadV4) :
-    VersjonertKontantstøtteSøknad()
+data class KontantstøtteSøknadV4(
+    val kontantstøtteSøknad: KontantstøtteSøknadV4,
+) : VersjonertKontantstøtteSøknad()

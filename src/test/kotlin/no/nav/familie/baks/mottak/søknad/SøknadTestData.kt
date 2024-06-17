@@ -15,13 +15,11 @@ import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadV8
 fun <T> søknadsfelt(
     label: String,
     verdi: T,
-): SøknadsfeltV4<T> {
-    return SøknadsfeltV4(label = mapOf("nb" to label), verdi = mapOf("nb" to verdi))
-}
+): SøknadsfeltV4<T> = SøknadsfeltV4(label = mapOf("nb" to label), verdi = mapOf("nb" to verdi))
 
 object SøknadTestData {
-    private fun søkerV8(): SøkerV8 {
-        return SøkerV8(
+    private fun søkerV8(): SøkerV8 =
+        SøkerV8(
             harEøsSteg = true,
             navn = søknadsfelt("navn", "Navn Navnessen"),
             ident = søknadsfelt("fødselsnummer", "1234578901"),
@@ -45,10 +43,9 @@ object SøknadTestData {
             tidligereSamboere = listOf(),
             arbeidsperioderUtland = listOf(),
         )
-    }
 
-    private fun barnV8(): List<BarnV8> {
-        return listOf(
+    private fun barnV8(): List<BarnV8> =
+        listOf(
             BarnV8(
                 harEøsSteg = true,
                 navn = søknadsfelt("Barnets fulle navn", "barn1"),
@@ -80,7 +77,6 @@ object SøknadTestData {
                 eøsBarnetrygdsperioder = listOf(),
             ),
         )
-    }
 
     fun søknadV8(): SøknadV8 =
         SøknadV8(

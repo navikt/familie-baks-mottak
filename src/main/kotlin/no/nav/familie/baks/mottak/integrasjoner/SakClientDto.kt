@@ -91,7 +91,10 @@ data class RestFagsakDeltager(
     val fagsakStatus: FagsakStatus,
 )
 
-data class RestAnnullerFødsel(val barnasIdenter: List<String>, val tidligereHendelseId: String)
+data class RestAnnullerFødsel(
+    val barnasIdenter: List<String>,
+    val tidligereHendelseId: String,
+)
 
 enum class FagsakDeltagerRolle {
     BARN,

@@ -48,7 +48,9 @@ data class DokumentInfo(
     val dokumentvarianter: List<Dokumentvariant>?,
 )
 
-data class Dokumentvariant(val variantformat: String)
+data class Dokumentvariant(
+    val variantformat: String,
+)
 
 enum class Journalposttype {
     I,

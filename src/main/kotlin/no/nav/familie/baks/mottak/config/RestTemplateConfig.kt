@@ -25,23 +25,19 @@ class RestTemplateConfig {
     fun restTemplateClientCredentials(
         consumerIdClientInterceptor: ConsumerIdClientInterceptor,
         bearerTokenClientInterceptor: BearerTokenClientInterceptor,
-    ): RestOperations {
-        return RestTemplateBuilder()
+    ): RestOperations =
+        RestTemplateBuilder()
             .interceptors(
                 consumerIdClientInterceptor,
                 bearerTokenClientInterceptor,
                 MdcValuesPropagatingClientInterceptor(),
-            )
-            .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
+            ).additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
             .build()
-    }
 
     @Bean("restTemplateUnsecured")
     fun restTemplate(
         restTemplateBuilder: RestTemplateBuilder,
         mdcInterceptor: MdcValuesPropagatingClientInterceptor,
         consumerIdClientInterceptor: ConsumerIdClientInterceptor,
-    ): RestOperations {
-        return restTemplateBuilder.interceptors(mdcInterceptor, consumerIdClientInterceptor).build()
-    }
+    ): RestOperations = restTemplateBuilder.interceptors(mdcInterceptor, consumerIdClientInterceptor).build()
 }

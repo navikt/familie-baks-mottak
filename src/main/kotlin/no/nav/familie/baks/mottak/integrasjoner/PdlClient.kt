@@ -58,22 +58,20 @@ class PdlClient(
             log.warn("Advarsel ved henting av identer fra PDL. Se securelogs for detaljer.")
             secureLogger.warn("Advarsel ved henting av identer fra PDL: ${response.extensions?.warnings}")
         }
-        return response.data.pdlIdenter?.identer.orEmpty()
+        return response.data.pdlIdenter
+            ?.identer
+            .orEmpty()
     }
 
     fun hentPersonident(
         aktørId: String,
         tema: Tema,
-    ): String {
-        return hentIdenter(aktørId, tema).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name && !it.historisk }.last().ident
-    }
+    ): String = hentIdenter(aktørId, tema).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name && !it.historisk }.last().ident
 
     fun hentAktørId(
         personIdent: String,
         tema: Tema,
-    ): String {
-        return hentIdenter(personIdent, tema).filter { it.gruppe == Identgruppe.AKTORID.name && !it.historisk }.last().ident
-    }
+    ): String = hentIdenter(personIdent, tema).filter { it.gruppe == Identgruppe.AKTORID.name && !it.historisk }.last().ident
 
     fun hentPersonMedRelasjoner(
         personIdent: String,
@@ -98,34 +96,41 @@ class PdlClient(
                 log.warn("Advarsel ved oppslag på person. Se securelogs for detaljer.")
                 secureLogger.warn("Advarsel ved oppslag på person: ${response.extensions?.warnings}")
             }
-            return Result.runCatching {
-                val forelderBarnRelasjoner: Set<ForelderBarnRelasjon> =
-                    response.data.person!!.forelderBarnRelasjon.map { relasjon ->
-                        ForelderBarnRelasjon(
-                            relatertPersonsIdent = relasjon.relatertPersonsIdent,
-                            relatertPersonsRolle = relasjon.relatertPersonsRolle,
-                        )
-                    }.toSet()
+            return Result
+                .runCatching {
+                    val forelderBarnRelasjoner: Set<ForelderBarnRelasjon> =
+                        response.data.person!!
+                            .forelderBarnRelasjon
+                            .map { relasjon ->
+                                ForelderBarnRelasjon(
+                                    relatertPersonsIdent = relasjon.relatertPersonsIdent,
+                                    relatertPersonsRolle = relasjon.relatertPersonsRolle,
+                                )
+                            }.toSet()
 
-                response.data.person.let {
-                    Person(
-                        navn = null,
-                        forelderBarnRelasjoner = forelderBarnRelasjoner,
-                        adressebeskyttelseGradering = it.adressebeskyttelse.firstOrNull()?.gradering?.name,
-                        bostedsadresse = it.bostedsadresse.firstOrNull(),
-                    )
-                }
-            }.fold(
-                onSuccess = { it },
-                onFailure = {
-                    throw IntegrasjonException(
-                        "Fant ikke forespurte data på person.",
-                        it,
-                        pdlUri,
-                        personIdent,
-                    )
-                },
-            )
+                    response.data.person.let {
+                        Person(
+                            navn = null,
+                            forelderBarnRelasjoner = forelderBarnRelasjoner,
+                            adressebeskyttelseGradering =
+                                it.adressebeskyttelse
+                                    .firstOrNull()
+                                    ?.gradering
+                                    ?.name,
+                            bostedsadresse = it.bostedsadresse.firstOrNull(),
+                        )
+                    }
+                }.fold(
+                    onSuccess = { it },
+                    onFailure = {
+                        throw IntegrasjonException(
+                            "Fant ikke forespurte data på person.",
+                            it,
+                            pdlUri,
+                            personIdent,
+                        )
+                    },
+                )
         } catch (e: Exception) {
             when (e) {
                 is IntegrasjonException -> throw e
@@ -184,20 +189,18 @@ class PdlClient(
         "query" to personInfoQuery,
     )
 
-    protected fun httpHeaders(tema: Tema): HttpHeaders {
-        return HttpHeaders().apply {
+    protected fun httpHeaders(tema: Tema): HttpHeaders =
+        HttpHeaders().apply {
             contentType = MediaType.APPLICATION_JSON
             accept = listOf(MediaType.APPLICATION_JSON)
             add("Tema", TEMA)
             add("behandlingsnummer", tema.behandlingsnummer)
         }
-    }
 
-    private fun hentGraphqlQuery(pdlResource: String): String {
-        return this::class.java.getResource("/pdl/$pdlResource.graphql").readText().let {
+    private fun hentGraphqlQuery(pdlResource: String): String =
+        this::class.java.getResource("/pdl/$pdlResource.graphql").readText().let {
             StringUtils.normalizeSpace(it.replace("\n", ""))
         }
-    }
 
     companion object {
         private const val PATH_GRAPHQL = "graphql"
@@ -222,13 +225,22 @@ data class PdlError(
     val extensions: PdlErrorExtensions?,
 )
 
-data class PdlErrorExtensions(val code: String?) {
+data class PdlErrorExtensions(
+    val code: String?,
+) {
     fun notFound() = code == "not_found"
 }
 
-data class PdlExtensions(val warnings: List<PdlWarning>?)
+data class PdlExtensions(
+    val warnings: List<PdlWarning>?,
+)
 
-data class PdlWarning(val details: Any?, val id: String?, val message: String?, val query: String?)
+data class PdlWarning(
+    val details: Any?,
+    val id: String?,
+    val message: String?,
+    val query: String?,
+)
 
 data class PdlHentPersonResponse(
     val data: PdlPerson,
@@ -242,9 +254,13 @@ data class PdlHentIdenterResponse(
     override val extensions: PdlExtensions?,
 ) : PdlBaseResponse
 
-data class Data(val pdlIdenter: PdlIdenter?)
+data class Data(
+    val pdlIdenter: PdlIdenter?,
+)
 
-data class PdlIdenter(val identer: List<IdentInformasjon>)
+data class PdlIdenter(
+    val identer: List<IdentInformasjon>,
+)
 
 data class IdentInformasjon(
     val ident: String,
@@ -252,7 +268,9 @@ data class IdentInformasjon(
     val gruppe: String,
 )
 
-data class PdlPerson(val person: PdlPersonData?)
+data class PdlPerson(
+    val person: PdlPersonData?,
+)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PdlPersonData(

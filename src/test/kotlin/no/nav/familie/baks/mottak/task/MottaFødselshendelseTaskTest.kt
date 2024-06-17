@@ -81,7 +81,8 @@ class MottaFødselshendelseTaskTest {
         mottaFødselshendelseTask.doTask(Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn))
 
         val taskerMedCallId =
-            taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
+            taskService
+                .finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).hasSize(1).extracting("type").containsOnly(SendTilBaSakTask.TASK_STEP_TYPE)
@@ -119,7 +120,8 @@ class MottaFødselshendelseTaskTest {
         mottaFødselshendelseTask.doTask(Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
 
         val taskerMedCallId =
-            taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
+            taskService
+                .finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).hasSize(1).extracting("type").containsOnly(SendTilBaSakTask.TASK_STEP_TYPE)
@@ -137,7 +139,8 @@ class MottaFødselshendelseTaskTest {
         mottaFødselshendelseTask.doTask(task)
 
         val taskerMedCallId =
-            taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
+            taskService
+                .finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).isEmpty()
@@ -176,7 +179,8 @@ class MottaFødselshendelseTaskTest {
         mottaFødselshendelseTask.doTask(task)
 
         val taskerMedCallId =
-            taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
+            taskService
+                .finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).isEmpty()
@@ -214,7 +218,8 @@ class MottaFødselshendelseTaskTest {
         mottaFødselshendelseTask.doTask(task)
 
         val taskerMedCallId =
-            taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
+            taskService
+                .finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).isEmpty()
@@ -241,7 +246,8 @@ class MottaFødselshendelseTaskTest {
         mottaFødselshendelseTask.doTask(task)
 
         val taskerMedCallId =
-            taskService.finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
+            taskService
+                .finnTasksMedStatus(listOf(Status.UBEHANDLET), null, Pageable.unpaged())
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).isEmpty()
@@ -275,12 +281,13 @@ class MottaFødselshendelseTaskTest {
 
         val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = "02091901252")
 
-        assertThatThrownBy { mottaFødselshendelseTask.doTask(task) }.isInstanceOf(IntegrasjonException::class.java)
+        assertThatThrownBy { mottaFødselshendelseTask.doTask(task) }
+            .isInstanceOf(IntegrasjonException::class.java)
             .hasMessage("Feil ved oppslag på person: Feilmelding")
     }
 
-    private fun lagTestPdlPerson(): PdlPersonData {
-        return PdlPersonData(
+    private fun lagTestPdlPerson(): PdlPersonData =
+        PdlPersonData(
             forelderBarnRelasjon =
                 listOf(
                     PdlForeldreBarnRelasjon(
@@ -290,7 +297,6 @@ class MottaFødselshendelseTaskTest {
                 ),
             bostedsadresse = listOf(Bostedsadresse(matrikkeladresse = Matrikkeladresse(1, "1", null, "0576", "3000"))),
         )
-    }
 
     companion object {
         private fun mockResponseForPdlQuery(
@@ -311,16 +317,10 @@ class MottaFødselshendelseTaskTest {
         private fun gyldigRequest(
             queryFilnavn: String,
             ident: String,
-        ): String {
-            return "{\"variables\":{\"ident\":\"$ident\"},\"query\":\"${readfile(queryFilnavn).graphqlCompatible()}\"}"
-        }
+        ): String = "{\"variables\":{\"ident\":\"$ident\"},\"query\":\"${readfile(queryFilnavn).graphqlCompatible()}\"}"
 
-        private fun readfile(filnavn: String): String {
-            return this::class.java.getResource("/pdl/$filnavn").readText()
-        }
+        private fun readfile(filnavn: String): String = this::class.java.getResource("/pdl/$filnavn").readText()
 
-        private fun String.graphqlCompatible(): String {
-            return StringUtils.normalizeSpace(this.replace("\n", ""))
-        }
+        private fun String.graphqlCompatible(): String = StringUtils.normalizeSpace(this.replace("\n", ""))
     }
 }

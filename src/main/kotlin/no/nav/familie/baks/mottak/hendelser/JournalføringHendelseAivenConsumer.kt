@@ -19,7 +19,9 @@ import org.springframework.transaction.annotation.Transactional
     havingValue = "true",
     matchIfMissing = true,
 )
-class JournalføringHendelseAivenConsumer(val journalhendelseService: JournalhendelseService) {
+class JournalføringHendelseAivenConsumer(
+    val journalhendelseService: JournalhendelseService,
+) {
     val journalføringshendelseAivenConsumerFeilCounter: Counter = Metrics.counter("joark.hendelse.journalføring.feil")
 
     @KafkaListener(

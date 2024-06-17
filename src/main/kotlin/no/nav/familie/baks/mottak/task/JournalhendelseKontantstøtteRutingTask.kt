@@ -112,11 +112,14 @@ class JournalhendelseKontantstøtteRutingTask(
         tema: Tema,
     ): List<String> {
         val barnasIdenter =
-            pdlClient.hentPersonMedRelasjoner(brukersIdent, tema).forelderBarnRelasjoner
+            pdlClient
+                .hentPersonMedRelasjoner(brukersIdent, tema)
+                .forelderBarnRelasjoner
                 .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
                 .mapNotNull { it.relatertPersonsIdent }
 
-        return barnasIdenter.flatMap { pdlClient.hentIdenter(it, Tema.KON) }
+        return barnasIdenter
+            .flatMap { pdlClient.hentIdenter(it, Tema.KON) }
             .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
             .map { it.ident }
     }
@@ -142,12 +145,11 @@ class JournalhendelseKontantstøtteRutingTask(
     private fun tilPersonIdent(
         bruker: Bruker,
         tema: Tema,
-    ): String {
-        return when (bruker.type) {
+    ): String =
+        when (bruker.type) {
             BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema)
             else -> bruker.id
         }
-    }
 
     companion object {
         const val TASK_STEP_TYPE = "journalhendelseKontantstøtteRuting"
@@ -156,11 +158,10 @@ class JournalhendelseKontantstøtteRutingTask(
 
 private fun List<StonadDto>.harPågåendeSak(): Boolean = any { it.erPågåendeSak() }
 
-private fun StonadDto.erPågåendeSak(): Boolean {
-    return when {
+private fun StonadDto.erPågåendeSak(): Boolean =
+    when {
         tom == null -> true
         tom.isBefore(YearMonth.now()) -> false
         tom.isAfter(YearMonth.now()) -> true
         else -> true
     }
-}

@@ -10,7 +10,9 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Component
-class FjernGamleHendelseLoggInnslag(val hendelsesloggRepository: HendelsesloggRepository) {
+class FjernGamleHendelseLoggInnslag(
+    val hendelsesloggRepository: HendelsesloggRepository,
+) {
     @Scheduled(cron = "0 0 9 * * *")
     fun fjernGamleHendelseLoggInnslag() {
         if (LeaderClient.isLeader() == true) {
@@ -21,9 +23,11 @@ class FjernGamleHendelseLoggInnslag(val hendelsesloggRepository: HendelsesloggRe
     @Transactional
     fun slettHendelserEldreEnn2MånederFraTopicsMedMindreRetentionTid() {
         val gamleHendelser =
-            hendelsesloggRepository.findAll().filter {
-                it.opprettetTidspunkt.isBefore(LocalDateTime.now().minusMonths(2))
-            }.filterNot { it.consumer == HendelseConsumer.EF_VEDTAK_INFOTRYGD_V1 }
+            hendelsesloggRepository
+                .findAll()
+                .filter {
+                    it.opprettetTidspunkt.isBefore(LocalDateTime.now().minusMonths(2))
+                }.filterNot { it.consumer == HendelseConsumer.EF_VEDTAK_INFOTRYGD_V1 }
 
         LOG.info("Fjerner gamle hendelser eldre enn 2 måneder fra hendelse_logg")
         hendelsesloggRepository.deleteAll(gamleHendelser)

@@ -209,8 +209,8 @@ class OppgaveClientTest {
         oppgavetype: String,
         behandlingstema: String,
         beskrivelse: String,
-    ): String {
-        return "{\n" +
+    ): String =
+        "{\n" +
             "  \"ident\": {\n" +
             "    \"ident\": \"1234567891011\",\n" +
             "    \"gruppe\": \"AKTOERID\"\n" +
@@ -225,7 +225,6 @@ class OppgaveClientTest {
             "  \"beskrivelse\": \"${beskrivelse}\",\n" +
             "  \"prioritet\": \"NORM\"\n" +
             "}"
-    }
 
     companion object {
         private val journalPost =
@@ -249,12 +248,8 @@ class OppgaveClientTest {
                 ),
             )
 
-        private fun readfile(filnavn: String): String {
-            return this::class.java.getResource("/pdl/$filnavn").readText()
-        }
+        private fun readfile(filnavn: String): String = this::class.java.getResource("/pdl/$filnavn").readText()
 
-        private fun String.graphqlCompatible(): String {
-            return StringUtils.normalizeSpace(this.replace("\n", ""))
-        }
+        private fun String.graphqlCompatible(): String = StringUtils.normalizeSpace(this.replace("\n", ""))
     }
 }

@@ -56,13 +56,9 @@ import java.util.Properties
         return dbKontantstøtteSøknad
     }
 
-    fun lagreDBKontantstøtteSøknad(dbKontantstøtteSøknad: DBKontantstøtteSøknad): DBKontantstøtteSøknad {
-        return kontantstøtteSøknadRepository.save(dbKontantstøtteSøknad)
-    }
+    fun lagreDBKontantstøtteSøknad(dbKontantstøtteSøknad: DBKontantstøtteSøknad): DBKontantstøtteSøknad = kontantstøtteSøknadRepository.save(dbKontantstøtteSøknad)
 
-    fun hentDBKontantstøtteSøknad(søknadId: Long): DBKontantstøtteSøknad? {
-        return kontantstøtteSøknadRepository.hentSøknad(søknadId)
-    }
+    fun hentDBKontantstøtteSøknad(søknadId: Long): DBKontantstøtteSøknad? = kontantstøtteSøknadRepository.hentSøknad(søknadId)
 
     fun hentLagredeDBKontantstøtteVedlegg(søknad: DBKontantstøtteSøknad): Map<String, DBKontantstotteVedlegg> {
         val vedleggMap = mutableMapOf<String, DBKontantstotteVedlegg>()

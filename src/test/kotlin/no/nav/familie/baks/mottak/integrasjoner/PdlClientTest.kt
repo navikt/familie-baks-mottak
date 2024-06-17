@@ -119,16 +119,10 @@ class PdlClientTest {
         private fun gyldigRequest(
             queryFilnavn: String,
             ident: String,
-        ): String {
-            return "{\"variables\":{\"ident\":\"$ident\"},\"query\":\"${readfile(queryFilnavn).graphqlCompatible()}\"}"
-        }
+        ): String = "{\"variables\":{\"ident\":\"$ident\"},\"query\":\"${readfile(queryFilnavn).graphqlCompatible()}\"}"
 
-        private fun readfile(filnavn: String): String {
-            return this::class.java.getResource("/pdl/$filnavn").readText()
-        }
+        private fun readfile(filnavn: String): String = this::class.java.getResource("/pdl/$filnavn").readText()
 
-        private fun String.graphqlCompatible(): String {
-            return StringUtils.normalizeSpace(this.replace("\n", ""))
-        }
+        private fun String.graphqlCompatible(): String = StringUtils.normalizeSpace(this.replace("\n", ""))
     }
 }

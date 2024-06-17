@@ -55,7 +55,8 @@ class HentEnhetClientTest {
                 ),
         )
 
-        Assertions.assertThatThrownBy { client.hentEnhet("4321") }
+        Assertions
+            .assertThatThrownBy { client.hentEnhet("4321") }
             .hasMessageContaining("Henting av enhet med id 4321 feilet. 500 INTERNAL_SERVER_ERROR feilmelding")
             .isInstanceOf(java.lang.IllegalStateException::class.java)
     }

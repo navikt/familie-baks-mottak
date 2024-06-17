@@ -300,20 +300,15 @@ class LeesahService(
             }
     }
 
-    private fun erUnder18år(fødselsDato: LocalDate): Boolean {
-        return LocalDate.now().isBefore(fødselsDato.plusYears(18))
-    }
+    private fun erUnder18år(fødselsDato: LocalDate): Boolean = LocalDate.now().isBefore(fødselsDato.plusYears(18))
 
-    private fun erUnder6mnd(fødselsDato: LocalDate): Boolean {
-        return LocalDate.now().isBefore(fødselsDato.plusMonths(6))
-    }
+    private fun erUnder6mnd(fødselsDato: LocalDate): Boolean = LocalDate.now().isBefore(fødselsDato.plusMonths(6))
 
-    private fun erUtenforNorge(fødeland: String?): Boolean {
-        return when (fødeland) {
+    private fun erUtenforNorge(fødeland: String?): Boolean =
+        when (fødeland) {
             null, "NOR" -> false
             else -> true
         }
-    }
 
     companion object {
         private val CONSUMER_PDL = HendelseConsumer.PDL

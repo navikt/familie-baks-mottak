@@ -101,14 +101,11 @@ class JournalhendelseService(
         )
     }
 
-    fun CharSequence.toStringOrNull(): String? {
-        return if (this.isNotBlank()) this.toString() else null
-    }
+    fun CharSequence.toStringOrNull(): String? = if (this.isNotBlank()) this.toString() else null
 
-    private fun erGyldigHendelsetype(hendelseRecord: JournalfoeringHendelseRecord): Boolean {
-        return GYLDIGE_HENDELSE_TYPER.contains(hendelseRecord.hendelsesType.toString()) &&
+    private fun erGyldigHendelsetype(hendelseRecord: JournalfoeringHendelseRecord): Boolean =
+        GYLDIGE_HENDELSE_TYPER.contains(hendelseRecord.hendelsesType.toString()) &&
             (hendelseRecord.temaNytt != null && GYLDIGE_JOURNALPOST_TEMAER.contains(hendelseRecord.temaNytt.toString()))
-    }
 
     fun behandleJournalhendelse(hendelseRecord: JournalfoeringHendelseRecord) {
         // hent journalpost fra saf
@@ -198,8 +195,8 @@ class JournalhendelseService(
         }
     }
 
-    private fun opprettMetadata(journalpost: Journalpost): Properties {
-        return Properties().apply {
+    private fun opprettMetadata(journalpost: Journalpost): Properties =
+        Properties().apply {
             if (journalpost.bruker != null && journalpost.bruker.type != ORGNR) {
                 this["personIdent"] = journalpost.bruker.id
             }
@@ -208,7 +205,6 @@ class JournalhendelseService(
                 this["callId"] = MDC.get(MDCConstants.MDC_CALL_ID) ?: IdUtils.generateId()
             }
         }
-    }
 
     companion object {
         private val GYLDIGE_HENDELSE_TYPER = arrayOf("JournalpostMottatt", "TemaEndret")

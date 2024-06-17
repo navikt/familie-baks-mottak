@@ -31,12 +31,12 @@ class MottaAnnullerFødselTask(
         val tidligereHendelseId = restAnnullerFødsel.tidligereHendelseId
 
         val tasker =
-            taskService.finnTasksMedStatus(
-                listOf(Status.KLAR_TIL_PLUKK, Status.UBEHANDLET, Status.FEILET),
-                null,
-                Pageable.unpaged(),
-            )
-                .filter {
+            taskService
+                .finnTasksMedStatus(
+                    listOf(Status.KLAR_TIL_PLUKK, Status.UBEHANDLET, Status.FEILET),
+                    null,
+                    Pageable.unpaged(),
+                ).filter {
                     it.callId == tidligereHendelseId &&
                         (it.type == MottaFødselshendelseTask.TASK_STEP_TYPE || it.type == SendTilBaSakTask.TASK_STEP_TYPE)
                 }

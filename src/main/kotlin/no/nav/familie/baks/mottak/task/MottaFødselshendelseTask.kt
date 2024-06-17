@@ -96,13 +96,12 @@ class MottaFødselshendelseTask(
         return null
     }
 
-    fun skalFiltrerePåBostedsadresse(person: Person): Boolean {
-        return if (person.harAdresseGradering()) {
+    fun skalFiltrerePåBostedsadresse(person: Person): Boolean =
+        if (person.harAdresseGradering()) {
             false
         } else {
             !person.harBostedsadresse()
         }
-    }
 
     companion object {
         const val TASK_STEP_TYPE = "mottaFødselshendelse"

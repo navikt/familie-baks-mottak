@@ -415,8 +415,8 @@ class JournalføringHendelseServiceTest {
         journalpostId: String,
         hendelseType: String = "JournalpostMottatt",
         temaNytt: String = "BAR",
-    ): JournalfoeringHendelseRecord {
-        return JournalfoeringHendelseRecord(
+    ): JournalfoeringHendelseRecord =
+        JournalfoeringHendelseRecord(
             HENDELSE_ID,
             1,
             hendelseType,
@@ -428,7 +428,6 @@ class JournalføringHendelseServiceTest {
             "kanalReferanseId",
             "BAR",
         )
-    }
 
     companion object {
         const val JOURNALPOST_PAPIRSØKNAD = "111"

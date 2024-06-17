@@ -74,7 +74,8 @@ class EnsligForsørgerInfotrygdHendelseConsumer(
         try {
             logger.info("$TOPIC_INFOTRYGD_VEDTAK melding mottatt. Offset: ${consumerRecord.offset()}")
             secureLogger.info("$TOPIC_INFOTRYGD_VEDTAK melding mottatt. Offset: ${consumerRecord.offset()} Key: ${consumerRecord.key()} Value: ${consumerRecord.value()}")
-            objectMapper.readValue(consumerRecord.value(), EnsligForsørgerInfotrygdHendelse::class.java)
+            objectMapper
+                .readValue(consumerRecord.value(), EnsligForsørgerInfotrygdHendelse::class.java)
                 .also {
                     MDC.put(MDCConstants.MDC_CALL_ID, "CallId_ef_infotrygd_${it.after.hendelseId}")
                     vedtakOmOvergangsstønadService.prosesserEfInfotrygdHendelse(consumerRecord.offset(), it.after)
@@ -102,7 +103,9 @@ class EnsligForsørgerInfotrygdHendelseConsumer(
     }
 }
 
-data class EnsligForsørgerInfotrygdHendelse(val after: InfotrygdHendelse)
+data class EnsligForsørgerInfotrygdHendelse(
+    val after: InfotrygdHendelse,
+)
 
 data class InfotrygdHendelse(
     @JsonProperty("HENDELSE_ID") val hendelseId: String,
