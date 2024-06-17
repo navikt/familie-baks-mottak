@@ -1,50 +1,8 @@
 # familie-baks-mottak
 Mottaksapplikasjon for barnetrygd. Lytter på ulike hendelser (fødsler, dødsfall mm) og mottar søknader. 
 
-## Lokal kjøring
-Appen bygges med maven og kan kjøres fra DevLauncher-klassen. Sett `-Dspring.profiles.active=dev` under Edit Configurations -> VM Options. Lokalt må man kjøre serveren sammen med [navkafka-docker-compose][1].
-Topicene vi lytter på må da opprettes via deres api med følgende data:
-```
-{
-  "topics": [
-    {
-      "topicName": "aapen-person-pdl-leesah-v1",
-      "members": [
-        {"member":"srvc01", "role":"CONSUMER"}
-      ],
-      "numPartitions": 3
-    },
-    {
-      "topicName": "aapen-dok-journalfoering-v1",
-      "members": [
-        {"member":"srvc01", "role":"CONSUMER"}
-      ],
-      "numPartitions": 3
-    },
-    {
-      "topicName": "aapen-person-pdl-aktor-v1",
-      "members": [
-        {"member":"srvc01", "role":"CONSUMER"}
-      ],
-      "numPartitions": 3
-    },
-  ]
-}
-```
-Dette kan gjøres via følgende kommandoer:\
-(for Windows, kjør disse via Cygwin)
-```
-curl -X POST "http://igroup:itest@localhost:8840/api/v1/topics" -H "Accept: application/json" -H "Content-Type: application/json" --data "{"name": "aapen-person-pdl-leesah-v1", "members": [{ "member": "srvc01", "role": "CONSUMER" }], "numPartitions": 3 }"
-
-curl -X POST "http://igroup:itest@localhost:8840/api/v1/topics" -H "Accept: application/json" -H "Content-Type: application/json" --data "{"name": "aapen-dok-journalfoering-v1", "members": [{ "member": "srvc01", "role": "CONSUMER" }], "numPartitions": 3 }"
-
-curl -X POST "http://igroup:itest@localhost:8840/api/v1/topics" -H "Accept: application/json" -H "Content-Type: application/json" --data "{"name": "aapen-person-pdl-aktor-v1", "members": [{ "member": "srvc01", "role": "CONSUMER" }], "numPartitions": 3 }"
-```
-
-Se README i navkafka-docker-compose for mer info om hvordan man kjører den og kaller apiet.
-
 ## Lokal kjøring med Postgres
-For å kjøre mot lokal postgress så kan man kjøre DevLauncherPostgress.
+For å kjøre mot lokal postgress så kan man kjøre DevLauncherPostgres.
 ```
 docker run --name familie-baks-mottak -p 5432:5432 -e POSTGRES_PASSWORD=test -d postgres
 docker ps (finn container id)
@@ -53,17 +11,28 @@ psql -U postgres
 CREATE DATABASE "familie-baks-mottak";
 ```
 
-Man må legge følgende endring til i application-postgres.yaml under spring-seksjonen
+Det er også en profil DevLauncher, hvor man kan starte appen uten postgres, men med H2. Det anbefales å bruke DevLauncherPostgres
 
-```
-+  cloud:
-+    vault:
-+      enabled: false
-+      database:
-+        role: postgres
+### For å få Lokal kjøring til å integrere mot Kafka
+For utvikling lokalt så trenger man ikke å starte opp applikasjonen med Kafka, men hvis man ønsker å teste noe med Kafka, så kan man gjøre følgende:
+Klon repo  [navkafka-docker-compose][1].
+
+For å starte kafka:
+```bash
+cd navkafka-docker-compose
+docker-compose build
+docker-compose up
 ```
 
-og `-Dspring.profiles.active=postgres` under Edit Configurations -> VM Options.
+opprett topics i navkafka fra rota i familie-baks-mottak
+```bash
+curl -X PUT "http://igroup:itest@localhost:8840/api/v1/oneshot" -H  "Accept: application/json" -H  "Content-Type: application/json" --data "./src/test/resources/lokal-kafka-topics.json"
+```
+Sett property
+```
+funksjonsbrytere:
+  kafka.enabled: true
+```
 
 ## Produksjonssetting
 Appen blir produksjonssatt ved push til main
