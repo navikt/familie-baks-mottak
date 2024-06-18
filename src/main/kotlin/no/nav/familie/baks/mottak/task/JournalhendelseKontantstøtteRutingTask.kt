@@ -44,12 +44,11 @@ class JournalhendelseKontantstøtteRutingTask(
     val tema = Tema.KON
 
     override fun doTask(task: Task) {
-        val brukersIdent = task.metadata["personIdent"] as String
-
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
+        val brukersIdent = tilPersonIdent(journalpost.bruker!!, tema)
         val journalførendeEnhet = journalpost.journalforendeEnhet
 
-        val fagsakId by lazy { ksSakClient.hentFagsaknummerPåPersonident(tilPersonIdent(journalpost.bruker!!, tema)) }
+        val fagsakId by lazy { ksSakClient.hentFagsaknummerPåPersonident(brukersIdent) }
 
         val harÅpenBehandlingIFagsak by lazy { ksSakClient.hentMinimalRestFagsak(fagsakId).finnesÅpenBehandlingPåFagsak() }
         val harLøpendeSakIInfotrygd = harLøpendeSakIInfotrygd(brukersIdent)
