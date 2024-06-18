@@ -4,6 +4,7 @@ import no.nav.familie.baks.mottak.util.fristFerdigstillelse
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import no.nav.familie.kontrakter.felles.oppgave.FinnOppgaveRequest
 import no.nav.familie.kontrakter.felles.oppgave.FinnOppgaveResponseDto
 import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
@@ -73,7 +74,7 @@ class OppgaveClient
                     beskrivelse = dto.beskrivelse,
                     enhetsnummer = dto.enhetsId,
                     behandlingstema = dto.behandlingstema,
-                    behandlingstype = null,
+                    behandlingstype = dto.behandlingstype?.value,
                     behandlesAvApplikasjon = dto.behandlesAvApplikasjon,
                 )
 
@@ -229,4 +230,5 @@ data class OppgaveVurderLivshendelseDto(
     val enhetsId: String? = null,
     val behandlesAvApplikasjon: String? = null,
     val tema: Tema,
+    val behandlingstype: Behandlingstype?,
 )
