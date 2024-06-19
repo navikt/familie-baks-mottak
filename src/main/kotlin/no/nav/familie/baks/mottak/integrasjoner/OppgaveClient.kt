@@ -73,7 +73,7 @@ class OppgaveClient
                     beskrivelse = dto.beskrivelse,
                     enhetsnummer = dto.enhetsId,
                     behandlingstema = dto.behandlingstema,
-                    behandlingstype = null,
+                    behandlingstype = dto.behandlingstype,
                     behandlesAvApplikasjon = dto.behandlesAvApplikasjon,
                 )
 
@@ -225,8 +225,9 @@ data class OppgaveVurderLivshendelseDto(
     val aktørId: String,
     val beskrivelse: String,
     val saksId: String,
-    val behandlingstema: String,
+    val tema: Tema,
+    val behandlingstema: String?,
     val enhetsId: String? = null,
     val behandlesAvApplikasjon: String? = null,
-    val tema: Tema,
+    val behandlingstype: String? = null,
 )

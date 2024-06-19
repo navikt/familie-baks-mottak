@@ -22,6 +22,7 @@ import no.nav.familie.baks.mottak.integrasjoner.Sivilstand
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
@@ -214,8 +215,17 @@ class VurderLivshendelseService(
             val restBehandling = hentSisteBehandlingSomErIverksatt(restFagsak) ?: hentAktivBehandling(restFagsak)
 
             val behandlingstema = hentBehandlingstema(tema, restBehandling)
+            val behandlingstype = hentBehandlingstype(tema, restBehandling)
 
-            val oppgave = opprettOppgavePåAktør(aktørIdForOppgave, fagsakIdForOppgave, beskrivelse, behandlingstema, tema)
+            val oppgave =
+                opprettOppgavePåAktør(
+                    aktørId = aktørIdForOppgave,
+                    fagsakId = fagsakIdForOppgave,
+                    beskrivelse = beskrivelse,
+                    tema = tema,
+                    behandlingstema = behandlingstema,
+                    behandlingstype = behandlingstype,
+                )
 
             task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
             secureLog.info(
@@ -248,7 +258,19 @@ class VurderLivshendelseService(
         restBehandling: RestVisningBehandling,
     ) = when (tema) {
         Tema.BAR -> tilBarnetrygdBehandlingstema(restBehandling)
-        Tema.KON -> tilKontanstøtteBehandlingstema(restBehandling)
+        // behandlingstema brukes ikke i kombinasjon med behandlingstype for kontantstøtte
+        Tema.KON -> null
+        Tema.ENF, Tema.OPP -> throw RuntimeException("Tema $tema er ikke støttet")
+    }
+
+    private fun hentBehandlingstype(
+        tema: Tema,
+        restBehandling: RestVisningBehandling,
+    ) = when (tema) {
+        Tema.BAR -> null
+        // Setter behandlingstype i stedet fore behandlingstema i KS. Siden behandlingstema for KS EØS
+        // ikke finnes i oppgave, og det er slik man gjør det i KS
+        Tema.KON -> tilKontanstøtteBehandlingstype(restBehandling)
         Tema.ENF, Tema.OPP -> throw RuntimeException("Tema $tema er ikke støttet")
     }
 
@@ -324,8 +346,9 @@ class VurderLivshendelseService(
         aktørId: String,
         fagsakId: Long,
         beskrivelse: String,
-        behandlingstema: Behandlingstema,
         tema: Tema,
+        behandlingstema: Behandlingstema?,
+        behandlingstype: Behandlingstype? = null,
     ): OppgaveResponse {
         log.info("Oppretter oppgave for aktørId=$aktørId")
 
@@ -334,8 +357,9 @@ class VurderLivshendelseService(
                 aktørId = aktørId,
                 beskrivelse = beskrivelse,
                 saksId = fagsakId.toString(),
-                behandlingstema = behandlingstema.value,
                 tema = tema,
+                behandlingstema = behandlingstema?.value,
+                behandlingstype = behandlingstype?.value,
             ),
         )
     }
@@ -374,11 +398,10 @@ class VurderLivshendelseService(
             else -> Behandlingstema.Barnetrygd
         }
 
-    private fun tilKontanstøtteBehandlingstema(restBehandling: RestVisningBehandling?): Behandlingstema =
+    private fun tilKontanstøtteBehandlingstype(restBehandling: RestVisningBehandling?): Behandlingstype =
         when {
-            restBehandling == null -> Behandlingstema.Kontantstøtte
-            restBehandling.kategori == BehandlingKategori.EØS -> Behandlingstema.KontantstøtteEØS
-            else -> Behandlingstema.Kontantstøtte
+            restBehandling?.kategori == BehandlingKategori.EØS -> Behandlingstype.EØS
+            else -> Behandlingstype.NASJONAL
         }
 
     private fun sjekkOmDatoErEtterEldsteVedtaksdato(
@@ -432,8 +455,8 @@ class VurderLivshendelseService(
                     aktørId = aktørIdForOppgave,
                     fagsakId = fagsakIdForOppgave,
                     beskrivelse = initiellBeskrivelse,
-                    behandlingstema = Behandlingstema.UtvidetBarnetrygd,
                     tema = tema,
+                    behandlingstema = Behandlingstema.UtvidetBarnetrygd,
                 )
 
         when (oppgave) {
