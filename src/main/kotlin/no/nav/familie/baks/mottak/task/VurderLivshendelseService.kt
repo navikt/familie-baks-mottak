@@ -22,6 +22,7 @@ import no.nav.familie.baks.mottak.integrasjoner.Sivilstand
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
@@ -329,6 +330,14 @@ class VurderLivshendelseService(
     ): OppgaveResponse {
         log.info("Oppretter oppgave for aktørId=$aktørId")
 
+        val behandlingstype =
+            when (behandlingstema) {
+                Behandlingstema.KontantstøtteEØS -> Behandlingstype.EØS
+                Behandlingstema.Kontantstøtte -> Behandlingstype.NASJONAL
+                // Oppgave krever at man sender med behandlingstype for Kontantstøtte, men ikke Barnetrygd
+                else -> null
+            }
+
         return oppgaveClient.opprettVurderLivshendelseOppgave(
             OppgaveVurderLivshendelseDto(
                 aktørId = aktørId,
@@ -336,6 +345,7 @@ class VurderLivshendelseService(
                 saksId = fagsakId.toString(),
                 behandlingstema = behandlingstema.value,
                 tema = tema,
+                behandlingstype = behandlingstype,
             ),
         )
     }
