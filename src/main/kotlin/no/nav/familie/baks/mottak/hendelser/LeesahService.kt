@@ -54,10 +54,9 @@ class LeesahService(
     fun prosesserNyHendelse(pdlHendelse: PdlHendelse) {
         when (pdlHendelse.opplysningstype) {
             OPPLYSNINGSTYPE_DØDSFALL -> behandleDødsfallHendelse(pdlHendelse)
-            OPPLYSNINGSTYPE_FØDSEL -> behandleFødselsHendelse(pdlHendelse)
+            OPPLYSNINGSTYPE_FØDSELSDATO -> behandleFødselsdatoHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_UTFLYTTING -> behandleUtflyttingHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_SIVILSTAND -> behandleSivilstandHendelse(pdlHendelse)
-            OPPLYSNINGSTYPE_FØDSELSDATO -> behandleFødselsdatoHendelse(pdlHendelse)
         }
     }
 
@@ -88,7 +87,7 @@ class LeesahService(
         oppdaterHendelseslogg(pdlHendelse)
     }
 
-    private fun behandleFødselsHendelse(pdlHendelse: PdlHendelse) {
+    private fun behandleFødselsdatoHendelse(pdlHendelse: PdlHendelse) {
         if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
             leesahDuplikatCounter.increment()
             return
@@ -161,14 +160,6 @@ class LeesahService(
             else -> {
                 logHendelse(pdlHendelse)
             }
-        }
-        oppdaterHendelseslogg(pdlHendelse)
-    }
-
-    private fun behandleFødselsdatoHendelse(pdlHendelse: PdlHendelse) {
-        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
-            leesahDuplikatCounter.increment()
-            return
         }
         oppdaterHendelseslogg(pdlHendelse)
     }
@@ -326,7 +317,6 @@ class LeesahService(
         const val KORRIGERT = "KORRIGERT"
         const val ANNULLERT = "ANNULLERT"
         const val OPPLYSNINGSTYPE_DØDSFALL = "DOEDSFALL_V1"
-        const val OPPLYSNINGSTYPE_FØDSEL = "FOEDSEL_V1"
         const val OPPLYSNINGSTYPE_FØDSELSDATO = "FOEDSELSDATO_V1"
         const val OPPLYSNINGSTYPE_UTFLYTTING = "UTFLYTTING_FRA_NORGE"
         const val OPPLYSNINGSTYPE_SIVILSTAND = "SIVILSTAND_V1"

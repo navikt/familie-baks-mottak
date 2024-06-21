@@ -151,7 +151,7 @@ class LeesahServiceTest {
                 hendelseId = hendelseId,
                 personIdenter = listOf("12345678901", "1234567890123"),
                 endringstype = LeesahService.OPPRETTET,
-                opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
+                opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSELSDATO,
                 fødselsdato = LocalDate.now(),
                 fødeland = "NOR",
             )
@@ -182,7 +182,7 @@ class LeesahServiceTest {
                 hendelseId = hendelseId,
                 personIdenter = listOf("12345678901", "1234567890123"),
                 endringstype = LeesahService.OPPRETTET,
-                opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
+                opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSELSDATO,
                 fødselsdato = LocalDate.now(),
                 fødeland = "POL",
             )
@@ -210,7 +210,7 @@ class LeesahServiceTest {
                 hendelseId = hendelseId,
                 personIdenter = listOf("12345678901", "1234567890123"),
                 endringstype = LeesahService.ANNULLERT,
-                opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSEL,
+                opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSELSDATO,
                 fødselsdato = LocalDate.now(),
                 fødeland = "NOR",
                 tidligereHendelseId = "unknown",
