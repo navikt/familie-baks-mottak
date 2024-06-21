@@ -57,6 +57,7 @@ class LeesahService(
             OPPLYSNINGSTYPE_FØDSEL -> behandleFødselsHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_UTFLYTTING -> behandleUtflyttingHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_SIVILSTAND -> behandleSivilstandHendelse(pdlHendelse)
+            OPPLYSNINGSTYPE_FØDSELSDATO -> behandleFødselsdatoHendelse(pdlHendelse)
         }
     }
 
@@ -160,6 +161,14 @@ class LeesahService(
             else -> {
                 logHendelse(pdlHendelse)
             }
+        }
+        oppdaterHendelseslogg(pdlHendelse)
+    }
+
+    private fun behandleFødselsdatoHendelse(pdlHendelse: PdlHendelse) {
+        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
+            leesahDuplikatCounter.increment()
+            return
         }
         oppdaterHendelseslogg(pdlHendelse)
     }
@@ -318,6 +327,7 @@ class LeesahService(
         const val ANNULLERT = "ANNULLERT"
         const val OPPLYSNINGSTYPE_DØDSFALL = "DOEDSFALL_V1"
         const val OPPLYSNINGSTYPE_FØDSEL = "FOEDSEL_V1"
+        const val OPPLYSNINGSTYPE_FØDSELSDATO = "FOEDSELSDATO_V1"
         const val OPPLYSNINGSTYPE_UTFLYTTING = "UTFLYTTING_FRA_NORGE"
         const val OPPLYSNINGSTYPE_SIVILSTAND = "SIVILSTAND_V1"
     }
