@@ -43,7 +43,7 @@ class LeesahService(
 
     val fødselIgnorertCounter: Counter = Metrics.counter("fodsel.ignorert")
     val fødselIgnorertUnder18årCounter: Counter = Metrics.counter("fodsel.ignorert.under18")
-    val fødselIgnorertFødelandCounter: Counter = Metrics.counter("hendelse.ignorert.fodeland.nor")
+
     val sivilstandOpprettetCounter: Counter = Metrics.counter("sivilstand.opprettet")
     val sivilstandIgnorertCounter: Counter = Metrics.counter("sivilstand.ignorert")
     val utflyttingOpprettetCounter: Counter = Metrics.counter("utflytting.opprettet")
@@ -101,29 +101,28 @@ class LeesahService(
                     log.warn("Mangler fødselsdato. Ignorerer hendelse ${pdlHendelse.hendelseId}")
                     fødselIgnorertCounter.increment()
                 } else if (erUnder6mnd(fødselsdato)) {
-                    if (erUtenforNorge(pdlHendelse.fødeland)) {
-                        log.info("Fødeland er ikke Norge. Ignorerer hendelse ${pdlHendelse.hendelseId}")
-                        fødselIgnorertFødelandCounter.increment()
-                    } else {
-                        when (pdlHendelse.endringstype) {
-                            OPPRETTET -> fødselOpprettetCounter.increment()
-                            KORRIGERT -> fødselKorrigertCounter.increment()
-                        }
-
-                        val task =
-                            Task(
-                                type = MottaFødselshendelseTask.TASK_STEP_TYPE,
-                                payload = pdlHendelse.hentPersonident(),
-                                properties =
-                                    Properties().apply {
-                                        this["ident"] = pdlHendelse.hentPersonident()
-                                        this["callId"] = pdlHendelse.hendelseId
-                                    },
-                            ).medTriggerTid(
-                                nesteGyldigeTriggertidFødselshendelser(triggerTidForTps),
-                            )
-                        taskService.save(task)
+//                    if (erUtenforNorge(pdlHendelse.fødeland)) {
+//                        log.info("Fødeland er ikke Norge. Ignorerer hendelse ${pdlHendelse.hendelseId}")
+//                        fødselIgnorertFødelandCounter.increment()
+//                    } else {
+                    when (pdlHendelse.endringstype) {
+                        OPPRETTET -> fødselOpprettetCounter.increment()
+                        KORRIGERT -> fødselKorrigertCounter.increment()
                     }
+
+                    val task =
+                        Task(
+                            type = MottaFødselshendelseTask.TASK_STEP_TYPE,
+                            payload = pdlHendelse.hentPersonident(),
+                            properties =
+                                Properties().apply {
+                                    this["ident"] = pdlHendelse.hentPersonident()
+                                    this["callId"] = pdlHendelse.hendelseId
+                                },
+                        ).medTriggerTid(
+                            nesteGyldigeTriggertidFødselshendelser(triggerTidForTps),
+                        )
+                    taskService.save(task)
                 } else if (erUnder18år(fødselsdato)) {
                     fødselIgnorertUnder18årCounter.increment()
                 } else {

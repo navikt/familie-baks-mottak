@@ -171,34 +171,34 @@ class LeesahServiceTest {
             mockHendelsesloggRepository.save(any())
         }
     }
-
-    @Test
-    fun `Skal ignorere fødselshendelser utenfor norge`() {
-        val hendelseId = UUID.randomUUID().toString()
-        val pdlHendelse =
-            PdlHendelse(
-                offset = Random.nextUInt().toLong(),
-                gjeldendeAktørId = "1234567890123",
-                hendelseId = hendelseId,
-                personIdenter = listOf("12345678901", "1234567890123"),
-                endringstype = LeesahService.OPPRETTET,
-                opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSELSDATO,
-                fødselsdato = LocalDate.now(),
-                fødeland = "POL",
-            )
-
-        service.prosesserNyHendelse(pdlHendelse)
-
-        verify(exactly = 0) { mockTaskService.save(any()) }
-
-        service.prosesserNyHendelse(pdlHendelse.copy(fødeland = "NOR"))
-
-        verify(exactly = 1) { mockTaskService.save(any()) }
-
-        service.prosesserNyHendelse(pdlHendelse.copy(fødeland = null))
-
-        verify(exactly = 2) { mockTaskService.save(any()) }
-    }
+//
+//    @Test
+//    fun `Skal ignorere fødselshendelser utenfor norge`() {
+//        val hendelseId = UUID.randomUUID().toString()
+//        val pdlHendelse =
+//            PdlHendelse(
+//                offset = Random.nextUInt().toLong(),
+//                gjeldendeAktørId = "1234567890123",
+//                hendelseId = hendelseId,
+//                personIdenter = listOf("12345678901", "1234567890123"),
+//                endringstype = LeesahService.OPPRETTET,
+//                opplysningstype = LeesahService.OPPLYSNINGSTYPE_FØDSELSDATO,
+//                fødselsdato = LocalDate.now(),
+//                fødeland = "POL",
+//            )
+//
+//        service.prosesserNyHendelse(pdlHendelse)
+//
+//        verify(exactly = 0) { mockTaskService.save(any()) }
+//
+//        service.prosesserNyHendelse(pdlHendelse.copy(fødeland = "NOR"))
+//
+//        verify(exactly = 1) { mockTaskService.save(any()) }
+//
+//        service.prosesserNyHendelse(pdlHendelse.copy(fødeland = null))
+//
+//        verify(exactly = 2) { mockTaskService.save(any()) }
+//    }
 
     @Test
     fun `Skal opprette MottaAnnullerFødselTask når endringstype er ANNULLERT`() {
