@@ -8,7 +8,6 @@ import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtte
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
-import no.nav.familie.unleash.UnleashService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -19,9 +18,7 @@ import java.util.Locale
 @Service
 class PdfService(
     private val familieDokumentPdfClient: PdfClient,
-    private val dokgenPdfClient: PdfClient,
     private val søknadSpråkvelgerService: SøknadSpråkvelgerService,
-    private val unleashService: UnleashService,
 ) {
     fun lagBarnetrygdPdf(
         versjonertBarnetrygdSøknad: VersjonertBarnetrygdSøknad,
