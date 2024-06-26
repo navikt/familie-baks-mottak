@@ -1,6 +1,5 @@
 package no.nav.familie.baks.mottak.søknad
 
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.integrasjoner.PdfClient
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
@@ -52,11 +51,7 @@ class PdfService(
                     },
             )
 
-        return if (unleashService.isEnabled(FeatureToggleConfig.BRUK_NY_DOKGEN_LØSNING)) {
-            familieDokumentPdfClient.lagPdf(path, barnetrygdSøknadMapForSpråk + ekstraFelterMap)
-        } else {
-            dokgenPdfClient.lagPdf(path, barnetrygdSøknadMapForSpråk + ekstraFelterMap)
-        }
+        return familieDokumentPdfClient.lagPdf(path, barnetrygdSøknadMapForSpråk + ekstraFelterMap)
     }
 
     fun lagKontantstøttePdf(
@@ -80,11 +75,7 @@ class PdfService(
                 label = "Søknad om kontantstøtte",
             )
 
-        return if (unleashService.isEnabled(FeatureToggleConfig.BRUK_NY_DOKGEN_LØSNING)) {
-            familieDokumentPdfClient.lagPdf("kontantstotte-soknad", kontantstøtteSøknadMapForSpråk + ekstraFelterMap)
-        } else {
-            dokgenPdfClient.lagPdf("kontantstotte-soknad", kontantstøtteSøknadMapForSpråk + ekstraFelterMap)
-        }
+        return familieDokumentPdfClient.lagPdf("kontantstotte-soknad", kontantstøtteSøknadMapForSpråk + ekstraFelterMap)
     }
 
     private fun søknadstypeTilPath(søknadstype: Søknadstype): String =
