@@ -101,10 +101,6 @@ class LeesahService(
                     log.warn("Mangler fødselsdato. Ignorerer hendelse ${pdlHendelse.hendelseId}")
                     fødselIgnorertCounter.increment()
                 } else if (erUnder6mnd(fødselsdato)) {
-//                    if (erUtenforNorge(pdlHendelse.fødeland)) {
-//                        log.info("Fødeland er ikke Norge. Ignorerer hendelse ${pdlHendelse.hendelseId}")
-//                        fødselIgnorertFødelandCounter.increment()
-//                    } else {
                     when (pdlHendelse.endringstype) {
                         OPPRETTET -> fødselOpprettetCounter.increment()
                         KORRIGERT -> fødselKorrigertCounter.increment()
