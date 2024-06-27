@@ -10,6 +10,7 @@ import no.nav.familie.baks.mottak.DevLauncherPostgres
 import no.nav.familie.baks.mottak.domene.NyBehandling
 import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelse
 import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelsesgradering
+import no.nav.familie.baks.mottak.integrasjoner.Fødested
 import no.nav.familie.baks.mottak.integrasjoner.IntegrasjonException
 import no.nav.familie.baks.mottak.integrasjoner.PdlError
 import no.nav.familie.baks.mottak.integrasjoner.PdlForeldreBarnRelasjon
@@ -77,6 +78,7 @@ class MottaFødselshendelseTaskTest {
                     extensions = null,
                 ),
         )
+        mockFødestedNorge(fnrBarn)
 
         mottaFødselshendelseTask.doTask(Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn))
 
@@ -89,6 +91,18 @@ class MottaFødselshendelseTaskTest {
         assertThat(objectMapper.readValue(taskerMedCallId.first().payload, NyBehandling::class.java))
             .hasFieldOrPropertyWithValue("morsIdent", "20107678901")
             .hasFieldOrPropertyWithValue("barnasIdenter", arrayOf(fnrBarn))
+    }
+
+    private fun mockFødestedNorge(fnrBarn: String) {
+        mockResponseForPdlQuery(
+            pdlRequestBody = gyldigRequest("hentperson-fødested.graphql", fnrBarn),
+            mockResponse =
+                PdlHentPersonResponse(
+                    data = PdlPerson(PdlPersonData(fødested = listOf(Fødested(fødeland = "NOR")))),
+                    errors = emptyList(),
+                    extensions = null,
+                ),
+        )
     }
 
     @Test
@@ -116,6 +130,7 @@ class MottaFødselshendelseTaskTest {
                     extensions = null,
                 ),
         )
+        mockFødestedNorge(fnrBarn)
 
         mottaFødselshendelseTask.doTask(Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, fnrBarn))
 
@@ -173,6 +188,7 @@ class MottaFødselshendelseTaskTest {
                     extensions = null,
                 ),
         )
+        mockFødestedNorge(fnrBarn)
 
         val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn)
 
@@ -212,6 +228,7 @@ class MottaFødselshendelseTaskTest {
                     extensions = null,
                 ),
         )
+        mockFødestedNorge(fnrBarn)
 
         val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn)
 
@@ -240,6 +257,7 @@ class MottaFødselshendelseTaskTest {
                     extensions = null,
                 ),
         )
+        mockFødestedNorge(fnrBarn)
 
         val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = fnrBarn)
 
@@ -278,6 +296,7 @@ class MottaFødselshendelseTaskTest {
                     extensions = null,
                 ),
         )
+        mockFødestedNorge("02091901252")
 
         val task = Task(type = MottaFødselshendelseTask.TASK_STEP_TYPE, payload = "02091901252")
 

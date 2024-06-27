@@ -69,6 +69,18 @@ class PdlClientTest {
     }
 
     @Test
+    fun hentPersonFødested() {
+        mockResponseForPdlQuery(
+            pdlRequestBody = gyldigRequest("hentperson-fødested.graphql", testIdent),
+            mockResponse = readfile("mock-hentperson-fødested.json"),
+        )
+
+        val pdlPersonData = pdlClient.hentPerson(testIdent, "hentperson-fødested", Tema.BAR)
+
+        assertThat(pdlPersonData.fødested.first().fødeland).isEqualTo("NOR")
+    }
+
+    @Test
     fun hentPersonFeilerMedInternalServerOgKasterIntegrasjonsException() {
         stubFor(
             post(urlEqualTo("/api/graphql"))

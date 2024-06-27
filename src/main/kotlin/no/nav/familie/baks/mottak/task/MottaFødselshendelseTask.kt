@@ -9,6 +9,7 @@ import no.nav.familie.baks.mottak.domene.personopplysning.PersonIdent
 import no.nav.familie.baks.mottak.domene.personopplysning.harAdresseGradering
 import no.nav.familie.baks.mottak.domene.personopplysning.harBostedsadresse
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.erUtenforNorge
 import no.nav.familie.baks.mottak.util.erBostNummer
 import no.nav.familie.baks.mottak.util.erDnummer
 import no.nav.familie.baks.mottak.util.erFDatnummer
@@ -37,6 +38,7 @@ class MottaFødselshendelseTask(
     val barnHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.barn.har.dnr.eller.fdatnr")
     val forsørgerHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.forsorger.har.dnr.eller.fdatnr")
     val barnetManglerBostedsadresse: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.bostedsadresse.null")
+    val fødselIgnorertFødelandCounter: Counter = Metrics.counter("hendelse.ignorert.fodeland.nor")
 
     override fun doTask(task: Task) {
         val barnetsId = task.payload
@@ -45,6 +47,12 @@ class MottaFødselshendelseTask(
             log.info("Ignorer fødselshendelse: Barnet har DNR/FDAT/BOST-nummer")
             barnHarDnrCounter.increment()
             return
+        }
+
+        val pdlPersonData = pdlClient.hentPerson(barnetsId, "hentperson-fødested", Tema.BAR)
+        if (pdlPersonData.fødested.first().erUtenforNorge()) {
+            log.info("Fødeland er ikke Norge. Ignorerer hendelse")
+            fødselIgnorertFødelandCounter.increment()
         }
 
         try {

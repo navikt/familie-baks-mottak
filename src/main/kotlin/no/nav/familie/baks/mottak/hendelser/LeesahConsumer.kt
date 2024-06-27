@@ -89,7 +89,7 @@ class LeesahConsumer(
 
     private fun GenericRecord.hentDødsdato(): LocalDate? = deserialiserDatofeltFraSubrecord("doedsfall", "doedsdato")
 
-    private fun GenericRecord.hentFødselsdato(): LocalDate? = deserialiserDatofeltFraSubrecord("foedsel", "foedselsdato")
+    private fun GenericRecord.hentFødselsdato(): LocalDate? = deserialiserDatofeltFraSubrecord("foedselsdato", "foedselsdato")
 
     private fun GenericRecord.hentFødeland(): String? = (get("foedsel") as GenericRecord?)?.get("foedeland")?.toString()
 

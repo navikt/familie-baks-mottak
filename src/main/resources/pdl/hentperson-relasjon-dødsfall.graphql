@@ -7,7 +7,7 @@ query($ident: ID!) {person: hentPerson(ident: $ident) {
     doedsfall {
         doedsdato
     }
-    foedsel {
+    foedselsdato {
         foedselsdato
     }
 }}
