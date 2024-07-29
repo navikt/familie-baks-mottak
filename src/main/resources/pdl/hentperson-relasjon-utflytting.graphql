@@ -5,7 +5,7 @@ query($ident: ID!) {
             relatertPersonsRolle,
             minRolleForPerson
         }
-        foedsel {
+        foedselsdato {
             foedselsdato
         }
     }

@@ -278,8 +278,9 @@ data class PdlPersonData(
     val adressebeskyttelse: List<Adressebeskyttelse> = emptyList(),
     val bostedsadresse: List<Bostedsadresse?> = emptyList(),
     @JsonProperty(value = "doedsfall") val dødsfall: List<Dødsfall> = emptyList(),
-    @JsonProperty(value = "foedsel") val fødsel: List<Fødsel> = emptyList(),
+    @JsonProperty(value = "foedselsdato") val fødsel: List<Fødsel> = emptyList(),
     val sivilstand: List<Sivilstand> = emptyList(),
+    @JsonProperty(value = "foedested") val fødested: List<Fødested> = emptyList(),
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -303,6 +304,17 @@ data class Dødsfall(
 data class Fødsel(
     @JsonProperty(value = "foedselsdato") val fødselsdato: LocalDate,
 )
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Fødested(
+    @JsonProperty(value = "foedeland") val fødeland: String,
+)
+
+fun Fødested.erUtenforNorge(): Boolean =
+    when (this.fødeland) {
+        null, "NOR" -> false
+        else -> true
+    }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Sivilstand(
