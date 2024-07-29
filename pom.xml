@@ -22,7 +22,7 @@
         <jvmTarget>21</jvmTarget>
         <kotlin.version>1.9.24</kotlin.version>
         <mockk.version>1.13.11</mockk.version>
-        <confluent.version>7.6.1</confluent.version>
+        <confluent.version>7.7.0</confluent.version>
         <prosessering.version>2.20240603145215_c56e179</prosessering.version>
 
         <felles.version>3.20240624143824_64bf8f2</felles.version>
