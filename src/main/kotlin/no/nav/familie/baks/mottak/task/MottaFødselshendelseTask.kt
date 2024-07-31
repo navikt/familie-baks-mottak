@@ -53,6 +53,7 @@ class MottaFødselshendelseTask(
         if (pdlPersonData.fødested.first().erUtenforNorge()) {
             log.info("Fødeland er ikke Norge. Ignorerer hendelse")
             fødselIgnorertFødelandCounter.increment()
+            return
         }
 
         try {
