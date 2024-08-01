@@ -22,6 +22,7 @@ import no.nav.familie.baks.mottak.integrasjoner.RestFagsak
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.integrasjoner.StatusKode
 import no.nav.familie.baks.mottak.integrasjoner.erBarnetrygdSøknad
+import no.nav.familie.baks.mottak.integrasjoner.erDigitalKanal
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.kontrakter.felles.Tema
@@ -82,8 +83,9 @@ class JournalhendelseBarnetrygdRutingTask(
             featureToggleForAutomatiskJournalføringSkruddPå &&
                 erBarnetrygdSøknad &&
                 !brukerHarSakIInfotrygd &&
-                !harÅpenBehandlingIFagsak &&
-                journalførendeEnhet !in enheterSomIkkeSkalHaAutomatiskJournalføring
+                journalførendeEnhet !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
+                journalpost.erDigitalKanal() &&
+                !harÅpenBehandlingIFagsak
 
         if (skalAutomatiskJournalføreJournalpost) {
             log.info("Oppretter OppdaterOgFerdigstillJournalpostTask for journalpost med id ${journalpost.journalpostId}")

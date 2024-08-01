@@ -53,6 +53,10 @@ data class RestFagsak(
     val behandlinger: List<RestUtvidetBehandling>,
 )
 
+data class RestFagsakId(
+    val id: Long,
+)
+
 data class RestUtvidetBehandling(
     val aktiv: Boolean,
     val arbeidsfordelingPåBehandling: RestArbeidsfordelingPåBehandling?,
@@ -60,7 +64,7 @@ data class RestUtvidetBehandling(
     val kategori: BehandlingKategori,
     val opprettetTidspunkt: LocalDateTime,
     val resultat: String,
-    val steg: String,
+    val steg: String?,
     val type: String,
     val underkategori: BehandlingUnderkategori,
 )
