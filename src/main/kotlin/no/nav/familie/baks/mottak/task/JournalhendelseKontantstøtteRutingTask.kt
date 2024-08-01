@@ -65,8 +65,9 @@ class JournalhendelseKontantstøtteRutingTask(
             featureToggleForAutomatiskJournalføringSkruddPå &&
                 erKontantstøtteSøknad &&
                 !harLøpendeSakIInfotrygd &&
-                !harÅpenBehandlingIFagsak &&
-                journalførendeEnhet !in enheterSomIkkeSkalHaAutomatiskJournalføring
+                journalpost.kanal == "NAV_NO" &&
+                journalførendeEnhet !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
+                !harÅpenBehandlingIFagsak
 
         if (skalAutomatiskJournalføreJournalpost) {
             log.info("Oppretter OppdaterOgFerdigstillJournalpostTask for journalpost med id ${journalpost.journalpostId}")

@@ -82,8 +82,9 @@ class JournalhendelseBarnetrygdRutingTask(
             featureToggleForAutomatiskJournalføringSkruddPå &&
                 erBarnetrygdSøknad &&
                 !brukerHarSakIInfotrygd &&
-                !harÅpenBehandlingIFagsak &&
-                journalførendeEnhet !in enheterSomIkkeSkalHaAutomatiskJournalføring
+                journalførendeEnhet !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
+                journalpost.kanal == "NAV_NO" &&
+                !harÅpenBehandlingIFagsak
 
         if (skalAutomatiskJournalføreJournalpost) {
             log.info("Oppretter OppdaterOgFerdigstillJournalpostTask for journalpost med id ${journalpost.journalpostId}")
