@@ -29,6 +29,8 @@ fun Journalpost.erBarnetrygdUtvidetSøknad(): Boolean = dokumenter?.any { it.bre
 
 fun Journalpost.erBarnetrygdSøknad(): Boolean = erBarnetrygdOrdinærSøknad() || erBarnetrygdUtvidetSøknad()
 
+fun Journalpost.erDigitalKanal(): Boolean = kanal == "NAV_NO"
+
 data class Sak(
     val arkivsaksnummer: String?,
     var arkivsaksystem: String?,

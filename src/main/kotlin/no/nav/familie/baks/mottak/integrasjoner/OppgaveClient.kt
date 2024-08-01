@@ -40,7 +40,7 @@ class OppgaveClient
             journalpost: Journalpost,
             beskrivelse: String? = null,
         ): OppgaveResponse {
-            logger.info("Oppretter journalføringsoppgave for ${if (journalpost.kanal == "NAV_NO") "digital søknad" else "papirsøknad"}")
+            logger.info("Oppretter journalføringsoppgave for ${if (journalpost.erDigitalKanal()) "digital søknad" else "papirsøknad"}")
             val uri = URI.create("$integrasjonUri/oppgave/opprett")
             val request =
                 oppgaveMapperService.tilOpprettOppgaveRequest(

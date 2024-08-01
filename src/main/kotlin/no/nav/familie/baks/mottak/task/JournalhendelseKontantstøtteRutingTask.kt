@@ -12,6 +12,7 @@ import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.StonadDto
+import no.nav.familie.baks.mottak.integrasjoner.erDigitalKanal
 import no.nav.familie.baks.mottak.integrasjoner.erKontantstøtteSøknad
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
 import no.nav.familie.kontrakter.felles.Tema
@@ -65,7 +66,7 @@ class JournalhendelseKontantstøtteRutingTask(
             featureToggleForAutomatiskJournalføringSkruddPå &&
                 erKontantstøtteSøknad &&
                 !harLøpendeSakIInfotrygd &&
-                journalpost.kanal == "NAV_NO" &&
+                journalpost.erDigitalKanal() &&
                 journalførendeEnhet !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
                 !harÅpenBehandlingIFagsak
 
