@@ -18,7 +18,7 @@ class BarnetrygdOppgaveMapper(
     // Behandlingstema og behandlingstype settes basert på regelsettet som er dokumentert nederst her: https://confluence.adeo.no/display/TFA/Mottak+av+dokumenter
     override fun hentBehandlingstema(journalpost: Journalpost): Behandlingstema? =
          when {
-            journalpost.erBarnetrygdSøknad() ->
+            journalpost.erBarnetrygdSøknad() && journalpost.erDigitalKanal() ->
                 if (utledBehandlingKategoriFraSøknad(journalpost) == BehandlingKategori.EØS) {
                     Behandlingstema.BarnetrygdEØS
                 } else {
