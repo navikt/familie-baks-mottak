@@ -34,7 +34,7 @@ class BarnetrygdOppgaveMapper(
 
     override fun hentBehandlingstype(journalpost: Journalpost): Behandlingstype? =
         when {
-            journalpost.erBarnetrygdSøknad() ->
+            journalpost.erBarnetrygdSøknad() && journalpost.erDigitalKanal() ->
                 if (utledBehandlingKategoriFraSøknad(journalpost) == BehandlingKategori.EØS) {
                     Behandlingstype.EØS
                 } else {
