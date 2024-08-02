@@ -22,17 +22,17 @@ class KontantstøtteOppgaveMapper(
     override fun hentBehandlingstypeVerdi(journalpost: Journalpost) = hentBehandlingstype(journalpost).value
 
     override fun hentBehandlingstype(journalpost: Journalpost): Behandlingstype =
-         when {
-             journalpost.erKontantstøtteSøknad() && journalpost.erDigitalKanal()->
-                 if (utledBehandlingKategoriFraSøknad(journalpost) == BehandlingKategori.EØS) {
-                     Behandlingstype.EØS
-                 } else {
-                     Behandlingstype.NASJONAL
-                 }
+        when {
+            journalpost.erKontantstøtteSøknad() && journalpost.erDigitalKanal() ->
+                if (utledBehandlingKategoriFraSøknad(journalpost) == BehandlingKategori.EØS) {
+                    Behandlingstype.EØS
+                } else {
+                    Behandlingstype.NASJONAL
+                }
 
-             erDnummerPåJournalpost(journalpost) -> Behandlingstype.EØS
-             else -> Behandlingstype.NASJONAL
-         }
+            erDnummerPåJournalpost(journalpost) -> Behandlingstype.EØS
+            else -> Behandlingstype.NASJONAL
+        }
 
     fun utledBehandlingKategoriFraSøknad(journalpost: Journalpost): BehandlingKategori {
         check(journalpost.erKontantstøtteSøknad()) { "Journalpost m/ id ${journalpost.journalpostId} er ikke en kontantstøtte søknad" }
