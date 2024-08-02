@@ -22,6 +22,7 @@ import no.nav.familie.baks.mottak.integrasjoner.Sivilstand
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
@@ -191,9 +192,7 @@ class VurderLivshendelseService(
     private val Sivilstand.dato: LocalDate?
         get() = this.gyldigFraOgMed ?: this.bekreftelsesdato
 
-    private fun finnNyesteSivilstandEndring(pdlPersonData: PdlPersonData): Sivilstand? {
-        return pdlPersonData.sivilstand.filter { it.dato != null }.maxByOrNull { it.dato!! }
-    }
+    private fun finnNyesteSivilstandEndring(pdlPersonData: PdlPersonData): Sivilstand? = pdlPersonData.sivilstand.filter { it.dato != null }.maxByOrNull { it.dato!! }
 
     private fun opprettEllerOppdaterVurderLivshendelseOppgave(
         hendelseType: VurderLivshendelseType,
@@ -216,8 +215,17 @@ class VurderLivshendelseService(
             val restBehandling = hentSisteBehandlingSomErIverksatt(restFagsak) ?: hentAktivBehandling(restFagsak)
 
             val behandlingstema = hentBehandlingstema(tema, restBehandling)
+            val behandlingstype = hentBehandlingstype(tema, restBehandling)
 
-            val oppgave = opprettOppgavePåAktør(aktørIdForOppgave, fagsakIdForOppgave, beskrivelse, behandlingstema, tema)
+            val oppgave =
+                opprettOppgavePåAktør(
+                    aktørId = aktørIdForOppgave,
+                    fagsakId = fagsakIdForOppgave,
+                    beskrivelse = beskrivelse,
+                    tema = tema,
+                    behandlingstema = behandlingstema,
+                    behandlingstype = behandlingstype,
+                )
 
             task.metadata["oppgaveId"] = oppgave.oppgaveId.toString()
             secureLog.info(
@@ -233,7 +241,8 @@ class VurderLivshendelseService(
                     beskrivelse = åpenOppgave.beskrivelse!!,
                     personIdent = personIdent,
                     personErBruker =
-                        åpenOppgave.identer?.map { it.ident }
+                        åpenOppgave.identer
+                            ?.map { it.ident }
                             ?.contains(personIdent),
                 )
 
@@ -249,7 +258,19 @@ class VurderLivshendelseService(
         restBehandling: RestVisningBehandling,
     ) = when (tema) {
         Tema.BAR -> tilBarnetrygdBehandlingstema(restBehandling)
-        Tema.KON -> tilKontanstøtteBehandlingstema(restBehandling)
+        // behandlingstema brukes ikke i kombinasjon med behandlingstype for kontantstøtte
+        Tema.KON -> null
+        Tema.ENF, Tema.OPP -> throw RuntimeException("Tema $tema er ikke støttet")
+    }
+
+    private fun hentBehandlingstype(
+        tema: Tema,
+        restBehandling: RestVisningBehandling,
+    ) = when (tema) {
+        Tema.BAR -> null
+        // Setter behandlingstype i stedet fore behandlingstema i KS. Siden behandlingstema for KS EØS
+        // ikke finnes i oppgave, og det er slik man gjør det i KS
+        Tema.KON -> tilKontanstøtteBehandlingstype(restBehandling)
         Tema.ENF, Tema.OPP -> throw RuntimeException("Tema $tema er ikke støttet")
     }
 
@@ -261,9 +282,10 @@ class VurderLivshendelseService(
         val vurderLivshendelseOppgaver = oppgaveClient.finnOppgaverPåAktørId(aktørId, Oppgavetype.VurderLivshendelse, tema)
         secureLog.info("Fant følgende oppgaver: $vurderLivshendelseOppgaver")
         return vurderLivshendelseOppgaver.firstOrNull {
-            it.beskrivelse?.startsWith(type.beskrivelse) == true && (
-                it.status != StatusEnum.FERDIGSTILT || it.status != StatusEnum.FEILREGISTRERT
-            )
+            it.beskrivelse?.startsWith(type.beskrivelse) == true &&
+                (
+                    it.status != StatusEnum.FERDIGSTILT || it.status != StatusEnum.FEILREGISTRERT
+                )
         }
     }
 
@@ -271,12 +293,11 @@ class VurderLivshendelseService(
         beskrivelse: String,
         personIdent: String,
         personErBruker: Boolean?,
-    ): String {
-        return when (personErBruker) {
+    ): String =
+        when (personErBruker) {
             true -> if (!beskrivelse.contains("bruker")) leggTilBrukerIBeskrivelse(beskrivelse) else beskrivelse
             else -> if (!beskrivelse.contains(personIdent)) leggTilBarnIBeskrivelse(beskrivelse, personIdent) else beskrivelse
         }
-    }
 
     private fun leggTilBrukerIBeskrivelse(beskrivelse: String): String {
         val (livshendelseType, barn) = beskrivelse.split(":")
@@ -303,33 +324,31 @@ class VurderLivshendelseService(
     private fun hentRestFagsak(
         fagsakId: Long,
         tema: Tema,
-    ): RestMinimalFagsak {
-        return when (tema) {
+    ): RestMinimalFagsak =
+        when (tema) {
             Tema.BAR -> baSakClient.hentMinimalRestFagsak(fagsakId)
             Tema.KON -> ksSakClient.hentMinimalRestFagsak(fagsakId)
             Tema.ENF, Tema.OPP -> throw RuntimeException("Tema $tema er ikke støttet")
         }.also {
             secureLog.info("Hentet rest fagsak: $it, tema: $tema")
         }
-    }
 
-    private fun hentSisteBehandlingSomErIverksatt(restFagsak: RestMinimalFagsak): RestVisningBehandling? {
-        return restFagsak.behandlinger
+    private fun hentSisteBehandlingSomErIverksatt(restFagsak: RestMinimalFagsak): RestVisningBehandling? =
+        restFagsak.behandlinger
             .filter { it.status == BehandlingStatus.AVSLUTTET }
             .maxByOrNull { it.opprettetTidspunkt }
-    }
 
-    private fun hentAktivBehandling(restFagsak: RestMinimalFagsak): RestVisningBehandling {
-        return restFagsak.behandlinger.firstOrNull { it.aktiv }
+    private fun hentAktivBehandling(restFagsak: RestMinimalFagsak): RestVisningBehandling =
+        restFagsak.behandlinger.firstOrNull { it.aktiv }
             ?: error("Fagsak ${restFagsak.id} mangler aktiv behandling. Får ikke opprettet VurderLivshendelseOppgave")
-    }
 
     private fun opprettOppgavePåAktør(
         aktørId: String,
         fagsakId: Long,
         beskrivelse: String,
-        behandlingstema: Behandlingstema,
         tema: Tema,
+        behandlingstema: Behandlingstema?,
+        behandlingstype: Behandlingstype? = null,
     ): OppgaveResponse {
         log.info("Oppretter oppgave for aktørId=$aktørId")
 
@@ -338,8 +357,9 @@ class VurderLivshendelseService(
                 aktørId = aktørId,
                 beskrivelse = beskrivelse,
                 saksId = fagsakId.toString(),
-                behandlingstema = behandlingstema.value,
                 tema = tema,
+                behandlingstema = behandlingstema?.value,
+                behandlingstype = behandlingstype?.value,
             ),
         )
     }
@@ -369,21 +389,19 @@ class VurderLivshendelseService(
         return listeMedFagsakIdOgTilknyttetAktør
     }
 
-    private fun tilBarnetrygdBehandlingstema(restBehandling: RestVisningBehandling?): Behandlingstema {
-        return when {
+    private fun tilBarnetrygdBehandlingstema(restBehandling: RestVisningBehandling?): Behandlingstema =
+        when {
             restBehandling == null -> Behandlingstema.Barnetrygd
             restBehandling.kategori == BehandlingKategori.EØS -> Behandlingstema.BarnetrygdEØS
             restBehandling.kategori == BehandlingKategori.NASJONAL && restBehandling.underkategori == BehandlingUnderkategori.ORDINÆR -> Behandlingstema.OrdinærBarnetrygd
             restBehandling.kategori == BehandlingKategori.NASJONAL && restBehandling.underkategori == BehandlingUnderkategori.UTVIDET -> Behandlingstema.UtvidetBarnetrygd
             else -> Behandlingstema.Barnetrygd
         }
-    }
 
-    private fun tilKontanstøtteBehandlingstema(restBehandling: RestVisningBehandling?): Behandlingstema =
+    private fun tilKontanstøtteBehandlingstype(restBehandling: RestVisningBehandling?): Behandlingstype =
         when {
-            restBehandling == null -> Behandlingstema.Kontantstøtte
-            restBehandling.kategori == BehandlingKategori.EØS -> Behandlingstema.KontantstøtteEØS
-            else -> Behandlingstema.Kontantstøtte
+            restBehandling?.kategori == BehandlingKategori.EØS -> Behandlingstype.EØS
+            else -> Behandlingstype.NASJONAL
         }
 
     private fun sjekkOmDatoErEtterEldsteVedtaksdato(
@@ -437,8 +455,8 @@ class VurderLivshendelseService(
                     aktørId = aktørIdForOppgave,
                     fagsakId = fagsakIdForOppgave,
                     beskrivelse = initiellBeskrivelse,
-                    behandlingstema = Behandlingstema.UtvidetBarnetrygd,
                     tema = tema,
+                    behandlingstema = Behandlingstema.UtvidetBarnetrygd,
                 )
 
         when (oppgave) {
@@ -466,13 +484,17 @@ class VurderLivshendelseService(
         tema: Tema,
     ): LocalDate? {
         val personIdenter =
-            pdlClient.hentIdenter(personIdent, tema)
+            pdlClient
+                .hentIdenter(personIdent, tema)
                 .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
                 .map { it.ident }
         val tidligsteInfotrygdVedtak =
-            infotrygdBarnetrygdClient.hentVedtak(personIdenter).bruker
+            infotrygdBarnetrygdClient
+                .hentVedtak(personIdenter)
+                .bruker
                 .maxByOrNull { it.iverksattFom ?: "000000" } // maxBy... siden datoen er på "seq"-format
-        return tidligsteInfotrygdVedtak?.iverksattFom
+        return tidligsteInfotrygdVedtak
+            ?.iverksattFom
             ?.let { YearMonth.parse("${999999 - it.toInt()}", DateTimeFormatter.ofPattern("yyyyMM")) }
             ?.atDay(1)
     }
@@ -489,9 +511,14 @@ class VurderLivshendelseService(
     }
 }
 
-data class VurderLivshendelseTaskDTO(val personIdent: String, val type: VurderLivshendelseType)
+data class VurderLivshendelseTaskDTO(
+    val personIdent: String,
+    val type: VurderLivshendelseType,
+)
 
-enum class VurderLivshendelseType(val beskrivelse: String) {
+enum class VurderLivshendelseType(
+    val beskrivelse: String,
+) {
     DØDSFALL("Dødsfall"),
     SIVILSTAND("Endring i sivilstand"),
     ADDRESSE("Addresse"),

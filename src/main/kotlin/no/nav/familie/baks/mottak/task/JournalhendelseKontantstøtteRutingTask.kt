@@ -12,6 +12,7 @@ import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.StonadDto
+import no.nav.familie.baks.mottak.integrasjoner.erDigitalKanal
 import no.nav.familie.baks.mottak.integrasjoner.erKontantstøtteSøknad
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
 import no.nav.familie.kontrakter.felles.Tema
@@ -44,12 +45,11 @@ class JournalhendelseKontantstøtteRutingTask(
     val tema = Tema.KON
 
     override fun doTask(task: Task) {
-        val brukersIdent = task.metadata["personIdent"] as String
-
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
+        val brukersIdent = tilPersonIdent(journalpost.bruker!!, tema)
         val journalførendeEnhet = journalpost.journalforendeEnhet
 
-        val fagsakId by lazy { ksSakClient.hentFagsaknummerPåPersonident(tilPersonIdent(journalpost.bruker!!, tema)) }
+        val fagsakId by lazy { ksSakClient.hentFagsaknummerPåPersonident(brukersIdent) }
 
         val harÅpenBehandlingIFagsak by lazy { ksSakClient.hentMinimalRestFagsak(fagsakId).finnesÅpenBehandlingPåFagsak() }
         val harLøpendeSakIInfotrygd = harLøpendeSakIInfotrygd(brukersIdent)
@@ -66,8 +66,9 @@ class JournalhendelseKontantstøtteRutingTask(
             featureToggleForAutomatiskJournalføringSkruddPå &&
                 erKontantstøtteSøknad &&
                 !harLøpendeSakIInfotrygd &&
-                !harÅpenBehandlingIFagsak &&
-                journalførendeEnhet !in enheterSomIkkeSkalHaAutomatiskJournalføring
+                journalpost.erDigitalKanal() &&
+                journalførendeEnhet !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
+                !harÅpenBehandlingIFagsak
 
         if (skalAutomatiskJournalføreJournalpost) {
             log.info("Oppretter OppdaterOgFerdigstillJournalpostTask for journalpost med id ${journalpost.journalpostId}")
@@ -112,11 +113,14 @@ class JournalhendelseKontantstøtteRutingTask(
         tema: Tema,
     ): List<String> {
         val barnasIdenter =
-            pdlClient.hentPersonMedRelasjoner(brukersIdent, tema).forelderBarnRelasjoner
+            pdlClient
+                .hentPersonMedRelasjoner(brukersIdent, tema)
+                .forelderBarnRelasjoner
                 .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
                 .mapNotNull { it.relatertPersonsIdent }
 
-        return barnasIdenter.flatMap { pdlClient.hentIdenter(it, Tema.KON) }
+        return barnasIdenter
+            .flatMap { pdlClient.hentIdenter(it, Tema.KON) }
             .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
             .map { it.ident }
     }
@@ -142,12 +146,11 @@ class JournalhendelseKontantstøtteRutingTask(
     private fun tilPersonIdent(
         bruker: Bruker,
         tema: Tema,
-    ): String {
-        return when (bruker.type) {
+    ): String =
+        when (bruker.type) {
             BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema)
             else -> bruker.id
         }
-    }
 
     companion object {
         const val TASK_STEP_TYPE = "journalhendelseKontantstøtteRuting"
@@ -156,11 +159,10 @@ class JournalhendelseKontantstøtteRutingTask(
 
 private fun List<StonadDto>.harPågåendeSak(): Boolean = any { it.erPågåendeSak() }
 
-private fun StonadDto.erPågåendeSak(): Boolean {
-    return when {
+private fun StonadDto.erPågåendeSak(): Boolean =
+    when {
         tom == null -> true
         tom.isBefore(YearMonth.now()) -> false
         tom.isAfter(YearMonth.now()) -> true
         else -> true
     }
-}

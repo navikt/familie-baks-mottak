@@ -72,7 +72,8 @@ class ArkiverDokumentRequestMapperTest {
                     listOf(
                         Filtype.PDFA,
                         Filtype.JSON,
-                    ) && it.dokumenttype == Dokumenttype.KONTANTSTØTTE_SØKNAD
+                    ) &&
+                    it.dokumenttype == Dokumenttype.KONTANTSTØTTE_SØKNAD
             },
         )
         assertEquals(1, arkiverDokumentRequest.vedleggsdokumenter.size)
@@ -137,7 +138,8 @@ class ArkiverDokumentRequestMapperTest {
                     listOf(
                         Filtype.PDFA,
                         Filtype.JSON,
-                    ) && it.dokumenttype == Dokumenttype.BARNETRYGD_ORDINÆR
+                    ) &&
+                    it.dokumenttype == Dokumenttype.BARNETRYGD_ORDINÆR
             },
         )
         assertEquals(1, arkiverDokumentRequest.vedleggsdokumenter.size)

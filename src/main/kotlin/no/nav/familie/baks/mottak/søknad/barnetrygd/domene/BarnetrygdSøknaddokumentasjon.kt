@@ -5,7 +5,9 @@ import no.nav.familie.baks.mottak.søknad.Søknadsvedlegg
 import no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
 
-data class BarnetrygdSøknaddokumentasjon(val søknaddokumentasjon: Søknaddokumentasjon) : ISøknaddokumentasjon {
+data class BarnetrygdSøknaddokumentasjon(
+    val søknaddokumentasjon: Søknaddokumentasjon,
+) : ISøknaddokumentasjon {
     override val opplastedeVedlegg: List<Søknadsvedlegg> =
         søknaddokumentasjon.opplastedeVedlegg.map {
             Søknadsvedlegg(
@@ -14,8 +16,8 @@ data class BarnetrygdSøknaddokumentasjon(val søknaddokumentasjon: Søknaddokum
             )
         }
 
-    private fun dokumentasjonsbehovTilTittel(dokumentasjonsbehov: Dokumentasjonsbehov): String {
-        return when (dokumentasjonsbehov) {
+    private fun dokumentasjonsbehovTilTittel(dokumentasjonsbehov: Dokumentasjonsbehov): String =
+        when (dokumentasjonsbehov) {
             Dokumentasjonsbehov.ADOPSJON_DATO -> "Adopsjonsdato"
             Dokumentasjonsbehov.AVTALE_DELT_BOSTED -> "Avtale om delt bosted"
             Dokumentasjonsbehov.VEDTAK_OPPHOLDSTILLATELSE -> "Vedtak om oppholdstillatelse"
@@ -25,5 +27,4 @@ data class BarnetrygdSøknaddokumentasjon(val søknaddokumentasjon: Søknaddokum
             Dokumentasjonsbehov.MEKLINGSATTEST -> "Meklingsattest"
             Dokumentasjonsbehov.ANNEN_DOKUMENTASJON -> "" // Random dokumentasjon skal saksbehandler sette tittel på
         }
-    }
 }

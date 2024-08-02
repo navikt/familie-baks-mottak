@@ -8,13 +8,16 @@ import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import org.springframework.stereotype.Service
 
 @Service
-class BarnetrygdOppgaveMapper(hentEnhetClient: HentEnhetClient, pdlClient: PdlClient, val søknadRepository: SøknadRepository) :
-    AbstractOppgaveMapper(hentEnhetClient, pdlClient) {
+class BarnetrygdOppgaveMapper(
+    hentEnhetClient: HentEnhetClient,
+    pdlClient: PdlClient,
+    val søknadRepository: SøknadRepository,
+) : AbstractOppgaveMapper(hentEnhetClient, pdlClient) {
     override val tema: Tema = Tema.BAR
 
     // Behandlingstema og behandlingstype settes basert på regelsettet som er dokumentert nederst her: https://confluence.adeo.no/display/TFA/Mottak+av+dokumenter
-    override fun hentBehandlingstema(journalpost: Journalpost): Behandlingstema? {
-        return when {
+    override fun hentBehandlingstema(journalpost: Journalpost): Behandlingstema? =
+         when {
             journalpost.erBarnetrygdSøknad() ->
                 if (utledBehandlingKategoriFraSøknad(journalpost) == BehandlingKategori.EØS) {
                     Behandlingstema.BarnetrygdEØS
@@ -26,12 +29,11 @@ class BarnetrygdOppgaveMapper(hentEnhetClient: HentEnhetClient, pdlClient: PdlCl
             hoveddokumentErÅrligDifferanseutbetalingAvBarnetrygd(journalpost) -> null
             else -> Behandlingstema.OrdinærBarnetrygd
         }
-    }
 
     override fun hentBehandlingstemaVerdi(journalpost: Journalpost) = hentBehandlingstema(journalpost)?.value
 
-    override fun hentBehandlingstype(journalpost: Journalpost): Behandlingstype? {
-        return when {
+    override fun hentBehandlingstype(journalpost: Journalpost): Behandlingstype? =
+        when {
             journalpost.erBarnetrygdSøknad() ->
                 if (utledBehandlingKategoriFraSøknad(journalpost) == BehandlingKategori.EØS) {
                     Behandlingstype.EØS
@@ -41,7 +43,6 @@ class BarnetrygdOppgaveMapper(hentEnhetClient: HentEnhetClient, pdlClient: PdlCl
             hoveddokumentErÅrligDifferanseutbetalingAvBarnetrygd(journalpost) -> Behandlingstype.Utland
             else -> null
         }
-    }
 
     override fun hentBehandlingstypeVerdi(journalpost: Journalpost): String? = hentBehandlingstype(journalpost)?.value
 

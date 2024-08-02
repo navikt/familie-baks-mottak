@@ -43,9 +43,7 @@ import java.time.temporal.ChronoUnit
 @EnableRetry
 class ApplicationConfig {
     @Bean
-    fun servletWebServerFactory(): ServletWebServerFactory {
-        return JettyServletWebServerFactory()
-    }
+    fun servletWebServerFactory(): ServletWebServerFactory = JettyServletWebServerFactory()
 
     @Bean
     fun logFilter(): FilterRegistrationBean<LogFilter> {
@@ -75,15 +73,15 @@ class ApplicationConfig {
      */
     @Bean
     @Primary
-    fun oAuth2HttpClient(): OAuth2HttpClient {
-        return DefaultOAuth2HttpClient(
+    fun oAuth2HttpClient(): OAuth2HttpClient =
+        DefaultOAuth2HttpClient(
             RestClient.create(
                 RestTemplateBuilder()
                     .setConnectTimeout(Duration.of(2, ChronoUnit.SECONDS))
-                    .setReadTimeout(Duration.of(4, ChronoUnit.SECONDS)).build(),
+                    .setReadTimeout(Duration.of(4, ChronoUnit.SECONDS))
+                    .build(),
             ),
         )
-    }
 
     @Bean
     fun prosesseringInfoProvider(
@@ -98,13 +96,14 @@ class ApplicationConfig {
 
         override fun harTilgang(): Boolean = grupper().contains(prosesseringRolle)
 
-        private fun grupper(): List<String> {
-            return try {
-                SpringTokenValidationContextHolder().getTokenValidationContext().getClaims("azuread")
+        private fun grupper(): List<String> =
+            try {
+                SpringTokenValidationContextHolder()
+                    .getTokenValidationContext()
+                    .getClaims("azuread")
                     .get("groups") as List<String>? ?: emptyList()
             } catch (e: Exception) {
                 emptyList()
             }
-        }
     }
 }

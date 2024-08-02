@@ -78,7 +78,6 @@ prosessering.rolle: "928636f4-fd0d-4149-978e-a6fb68bb19de"
 
 #Brukes til tilgangskontroll av familie-ks-mottak-frontend
 MOTTAK_ROLLE: group1
-FAMILIE_BAKS_DOKGEN_API_URL: http://localhost:5914
 FAMILIE_INTEGRASJONER_API_URL: http://localhost:8085/api
 FAMILIE_BA_SAK_API_URL: http://localhost:8090/api
 FAMILIE_KS_SAK_API_URL: http://localhost:8083/api
@@ -98,6 +97,8 @@ NAIS_APP_NAME: familie-baks-mottak
 # Kreves for at unleash mock skal fungere:
 UNLEASH_SERVER_API_URL: http://dummy/api/
 UNLEASH_SERVER_API_TOKEN: dummy-token
+
+JOURNALFOERINGHENDELSE_V1_TOPIC_AIVEN_URL: teamdokumenthandtering.aapen-dok-journalfoering
 
 # Disabler unleash her for å unngå feilmeldinger tilknyttet oppkobling når vi uansett mocker alle unleash-kall i testene.
 unleash:

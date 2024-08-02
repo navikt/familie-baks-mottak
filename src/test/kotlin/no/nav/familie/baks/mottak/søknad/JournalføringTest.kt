@@ -42,7 +42,7 @@ class JournalføringTest(
         val arkiverDokumentRequest =
             ArkiverDokumentRequestMapper.toDto(
                 dbBarnetrygdSøknad = dbSøknad,
-                versjonertSøknad = dbSøknad.hentVersjonertSøknad(),
+                versjonertBarnetrygdSøknad = dbSøknad.hentVersjonertSøknad(),
                 pdf = testPDF,
                 vedleggMap = emptyMap(),
                 pdfOriginalSpråk = ByteArray(0),

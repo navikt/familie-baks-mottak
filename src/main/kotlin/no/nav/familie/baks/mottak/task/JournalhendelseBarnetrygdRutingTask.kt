@@ -22,6 +22,7 @@ import no.nav.familie.baks.mottak.integrasjoner.RestFagsak
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.integrasjoner.StatusKode
 import no.nav.familie.baks.mottak.integrasjoner.erBarnetrygdSøknad
+import no.nav.familie.baks.mottak.integrasjoner.erDigitalKanal
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.kontrakter.felles.Tema
@@ -82,8 +83,9 @@ class JournalhendelseBarnetrygdRutingTask(
             featureToggleForAutomatiskJournalføringSkruddPå &&
                 erBarnetrygdSøknad &&
                 !brukerHarSakIInfotrygd &&
-                !harÅpenBehandlingIFagsak &&
-                journalførendeEnhet !in enheterSomIkkeSkalHaAutomatiskJournalføring
+                journalførendeEnhet !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
+                journalpost.erDigitalKanal() &&
+                !harÅpenBehandlingIFagsak
 
         if (skalAutomatiskJournalføreJournalpost) {
             log.info("Oppretter OppdaterOgFerdigstillJournalpostTask for journalpost med id ${journalpost.journalpostId}")
@@ -148,7 +150,8 @@ class JournalhendelseBarnetrygdRutingTask(
     private fun søkEtterSakIBaSakOgInfotrygd(brukersIdent: String): Pair<Sakspart?, Sakspart?> {
         val (brukersHistoriskeFnr, brukersFnr) =
             try {
-                pdlClient.hentIdenter(brukersIdent, tema)
+                pdlClient
+                    .hentIdenter(brukersIdent, tema)
                     .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
                     .partition { it.historisk }
             } catch (e: IntegrasjonException) {
@@ -156,10 +159,14 @@ class JournalhendelseBarnetrygdRutingTask(
             }
         val brukersIdenter = brukersFnr.plus(brukersHistoriskeFnr).map { it.ident }
         val barnasIdenter =
-            pdlClient.hentPersonMedRelasjoner(brukersIdent, tema).forelderBarnRelasjoner
-                .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }.mapNotNull { it.relatertPersonsIdent }
+            pdlClient
+                .hentPersonMedRelasjoner(brukersIdent, tema)
+                .forelderBarnRelasjoner
+                .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
+                .mapNotNull { it.relatertPersonsIdent }
         val alleBarnasIdenter =
-            barnasIdenter.flatMap { pdlClient.hentIdenter(it, tema) }
+            barnasIdenter
+                .flatMap { pdlClient.hentIdenter(it, tema) }
                 .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
                 .map { it.ident }
 
@@ -176,12 +183,11 @@ class JournalhendelseBarnetrygdRutingTask(
     private fun tilPersonIdent(
         bruker: Bruker,
         tema: Tema,
-    ): String {
-        return when (bruker.type) {
+    ): String =
+        when (bruker.type) {
             BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema)
             else -> bruker.id
         }
-    }
 
     companion object {
         const val TASK_STEP_TYPE = "journalhendelseBarnetrygdRuting"
@@ -216,13 +222,14 @@ private fun List<SakDto>.harSak(): Boolean {
         sakerUtenVedtak.any { it.status != StatusKode.FB.name }
 }
 
-private fun personErMigrert(saker: List<no.nav.familie.kontrakter.ba.infotrygd.Sak>): Boolean {
-    return saker.any {
+private fun personErMigrert(saker: List<no.nav.familie.kontrakter.ba.infotrygd.Sak>): Boolean =
+    saker.any {
         it.stønad!!.opphørsgrunn == Opphørsgrunn.MIGRERT.kode && it.vedtaksdato!!.isAfter(LocalDate.of(2020, 1, 1))
     }
-}
 
-enum class Sakspart(val part: String) {
+enum class Sakspart(
+    val part: String,
+) {
     SØKER("Bruker"),
     ANNEN("Søsken"),
 }
@@ -234,12 +241,11 @@ private fun List<RestFagsakDeltager>.harForelderEllerBarnPågåendeSak(baSakClie
         else -> null
     }
 
-private fun RestFagsakDeltager.harPågåendeSak(baSakClient: BaSakClient): Boolean {
-    return when (fagsakStatus) {
+private fun RestFagsakDeltager.harPågåendeSak(baSakClient: BaSakClient): Boolean =
+    when (fagsakStatus) {
         OPPRETTET, LØPENDE -> true
         AVSLUTTET -> !sisteBehandlingHenlagtEllerTekniskOpphør(baSakClient.hentRestFagsak(fagsakId))
     }
-}
 
 private fun sisteBehandlingHenlagtEllerTekniskOpphør(fagsak: RestFagsak): Boolean {
     val sisteBehandling =

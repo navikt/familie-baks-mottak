@@ -14,7 +14,10 @@ import java.time.LocalDateTime
 
 @RestController
 @RequestMapping(path = ["/api/status"], produces = [MediaType.APPLICATION_JSON_VALUE])
-class StatusController(val barnetrygdSøknadRepository: SøknadRepository, val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository) {
+class StatusController(
+    val barnetrygdSøknadRepository: SøknadRepository,
+    val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
+) {
     val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     @GetMapping(value = ["/barnetrygd"])
@@ -96,7 +99,11 @@ class StatusController(val barnetrygdSøknadRepository: SøknadRepository, val k
 
 const val LOG_URL = "https://logs.adeo.no/app/r/s/OJZqp"
 
-data class StatusDto(val status: Plattformstatus, val description: String? = null, val logLink: String? = LOG_URL)
+data class StatusDto(
+    val status: Plattformstatus,
+    val description: String? = null,
+    val logLink: String? = LOG_URL,
+)
 
 enum class Plattformstatus {
     OK,

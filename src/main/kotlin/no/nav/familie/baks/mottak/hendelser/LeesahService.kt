@@ -43,7 +43,7 @@ class LeesahService(
 
     val fødselIgnorertCounter: Counter = Metrics.counter("fodsel.ignorert")
     val fødselIgnorertUnder18årCounter: Counter = Metrics.counter("fodsel.ignorert.under18")
-    val fødselIgnorertFødelandCounter: Counter = Metrics.counter("hendelse.ignorert.fodeland.nor")
+
     val sivilstandOpprettetCounter: Counter = Metrics.counter("sivilstand.opprettet")
     val sivilstandIgnorertCounter: Counter = Metrics.counter("sivilstand.ignorert")
     val utflyttingOpprettetCounter: Counter = Metrics.counter("utflytting.opprettet")
@@ -54,7 +54,7 @@ class LeesahService(
     fun prosesserNyHendelse(pdlHendelse: PdlHendelse) {
         when (pdlHendelse.opplysningstype) {
             OPPLYSNINGSTYPE_DØDSFALL -> behandleDødsfallHendelse(pdlHendelse)
-            OPPLYSNINGSTYPE_FØDSEL -> behandleFødselsHendelse(pdlHendelse)
+            OPPLYSNINGSTYPE_FØDSELSDATO -> behandleFødselsdatoHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_UTFLYTTING -> behandleUtflyttingHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_SIVILSTAND -> behandleSivilstandHendelse(pdlHendelse)
         }
@@ -87,7 +87,7 @@ class LeesahService(
         oppdaterHendelseslogg(pdlHendelse)
     }
 
-    private fun behandleFødselsHendelse(pdlHendelse: PdlHendelse) {
+    private fun behandleFødselsdatoHendelse(pdlHendelse: PdlHendelse) {
         if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
             leesahDuplikatCounter.increment()
             return
@@ -101,29 +101,24 @@ class LeesahService(
                     log.warn("Mangler fødselsdato. Ignorerer hendelse ${pdlHendelse.hendelseId}")
                     fødselIgnorertCounter.increment()
                 } else if (erUnder6mnd(fødselsdato)) {
-                    if (erUtenforNorge(pdlHendelse.fødeland)) {
-                        log.info("Fødeland er ikke Norge. Ignorerer hendelse ${pdlHendelse.hendelseId}")
-                        fødselIgnorertFødelandCounter.increment()
-                    } else {
-                        when (pdlHendelse.endringstype) {
-                            OPPRETTET -> fødselOpprettetCounter.increment()
-                            KORRIGERT -> fødselKorrigertCounter.increment()
-                        }
-
-                        val task =
-                            Task(
-                                type = MottaFødselshendelseTask.TASK_STEP_TYPE,
-                                payload = pdlHendelse.hentPersonident(),
-                                properties =
-                                    Properties().apply {
-                                        this["ident"] = pdlHendelse.hentPersonident()
-                                        this["callId"] = pdlHendelse.hendelseId
-                                    },
-                            ).medTriggerTid(
-                                nesteGyldigeTriggertidFødselshendelser(triggerTidForTps),
-                            )
-                        taskService.save(task)
+                    when (pdlHendelse.endringstype) {
+                        OPPRETTET -> fødselOpprettetCounter.increment()
+                        KORRIGERT -> fødselKorrigertCounter.increment()
                     }
+
+                    val task =
+                        Task(
+                            type = MottaFødselshendelseTask.TASK_STEP_TYPE,
+                            payload = pdlHendelse.hentPersonident(),
+                            properties =
+                                Properties().apply {
+                                    this["ident"] = pdlHendelse.hentPersonident()
+                                    this["callId"] = pdlHendelse.hendelseId
+                                },
+                        ).medTriggerTid(
+                            nesteGyldigeTriggertidFødselshendelser(triggerTidForTps),
+                        )
+                    taskService.save(task)
                 } else if (erUnder18år(fødselsdato)) {
                     fødselIgnorertUnder18årCounter.increment()
                 } else {
@@ -300,20 +295,15 @@ class LeesahService(
             }
     }
 
-    private fun erUnder18år(fødselsDato: LocalDate): Boolean {
-        return LocalDate.now().isBefore(fødselsDato.plusYears(18))
-    }
+    private fun erUnder18år(fødselsDato: LocalDate): Boolean = LocalDate.now().isBefore(fødselsDato.plusYears(18))
 
-    private fun erUnder6mnd(fødselsDato: LocalDate): Boolean {
-        return LocalDate.now().isBefore(fødselsDato.plusMonths(6))
-    }
+    private fun erUnder6mnd(fødselsDato: LocalDate): Boolean = LocalDate.now().isBefore(fødselsDato.plusMonths(6))
 
-    private fun erUtenforNorge(fødeland: String?): Boolean {
-        return when (fødeland) {
+    private fun erUtenforNorge(fødeland: String?): Boolean =
+        when (fødeland) {
             null, "NOR" -> false
             else -> true
         }
-    }
 
     companion object {
         private val CONSUMER_PDL = HendelseConsumer.PDL
@@ -322,7 +312,7 @@ class LeesahService(
         const val KORRIGERT = "KORRIGERT"
         const val ANNULLERT = "ANNULLERT"
         const val OPPLYSNINGSTYPE_DØDSFALL = "DOEDSFALL_V1"
-        const val OPPLYSNINGSTYPE_FØDSEL = "FOEDSEL_V1"
+        const val OPPLYSNINGSTYPE_FØDSELSDATO = "FOEDSELSDATO_V1"
         const val OPPLYSNINGSTYPE_UTFLYTTING = "UTFLYTTING_FRA_NORGE"
         const val OPPLYSNINGSTYPE_SIVILSTAND = "SIVILSTAND_V1"
     }

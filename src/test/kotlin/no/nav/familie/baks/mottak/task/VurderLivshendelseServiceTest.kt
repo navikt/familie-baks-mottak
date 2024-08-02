@@ -33,6 +33,7 @@ import no.nav.familie.kontrakter.ba.infotrygd.Stønad
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
@@ -289,7 +290,8 @@ class VurderLivshendelseServiceTest {
         Assertions.assertThat(oppgaveDto.captured.aktørId).isEqualTo(PERSONIDENT_MOR + "00")
         Assertions.assertThat(oppgaveDto.captured.saksId).isEqualTo(SAKS_ID.toString())
         Assertions.assertThat(oppgaveDto.captured.enhetsId).isNull()
-        Assertions.assertThat(oppgaveDto.captured.behandlingstema).isEqualTo(Behandlingstema.Kontantstøtte.value)
+        Assertions.assertThat(oppgaveDto.captured.behandlingstema).isNull()
+        Assertions.assertThat(oppgaveDto.captured.behandlingstype).isEqualTo(Behandlingstype.NASJONAL.value)
         Assertions.assertThat(oppgaveDto.captured.behandlesAvApplikasjon).isNull()
         Assertions.assertThat(oppgaveDto.captured.tema).isEqualTo(Tema.KON)
     }
@@ -358,6 +360,7 @@ class VurderLivshendelseServiceTest {
         Assertions.assertThat(oppgaveDto.captured.saksId).isEqualTo(SAKS_ID.toString())
         Assertions.assertThat(oppgaveDto.captured.enhetsId).isNull()
         Assertions.assertThat(oppgaveDto.captured.behandlingstema).isEqualTo(Behandlingstema.UtvidetBarnetrygd.value)
+        Assertions.assertThat(oppgaveDto.captured.behandlingstype).isNull()
         Assertions.assertThat(oppgaveDto.captured.behandlesAvApplikasjon).isNull()
         Assertions.assertThat(oppgaveDto.captured.tema).isEqualTo(Tema.BAR)
     }
@@ -425,7 +428,8 @@ class VurderLivshendelseServiceTest {
         Assertions.assertThat(oppgaveDto.captured.aktørId).isEqualTo(PERSONIDENT_MOR + "00")
         Assertions.assertThat(oppgaveDto.captured.saksId).isEqualTo(SAKS_ID.toString())
         Assertions.assertThat(oppgaveDto.captured.enhetsId).isNull()
-        Assertions.assertThat(oppgaveDto.captured.behandlingstema).isEqualTo(Behandlingstema.Kontantstøtte.value)
+        Assertions.assertThat(oppgaveDto.captured.behandlingstema).isNull()
+        Assertions.assertThat(oppgaveDto.captured.behandlingstype).isEqualTo(Behandlingstype.NASJONAL.value)
         Assertions.assertThat(oppgaveDto.captured.behandlesAvApplikasjon).isNull()
         Assertions.assertThat(oppgaveDto.captured.tema).isEqualTo(Tema.KON)
     }

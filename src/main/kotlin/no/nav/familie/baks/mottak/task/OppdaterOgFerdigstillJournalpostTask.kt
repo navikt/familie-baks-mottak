@@ -26,7 +26,8 @@ class OppdaterOgFerdigstillJournalpostTask(
 
     override fun doTask(task: Task) {
         val journalpost =
-            journalpostClient.hentJournalpost(task.payload)
+            journalpostClient
+                .hentJournalpost(task.payload)
                 .takeUnless { it.bruker == null } ?: error("Journalpost ${task.payload} mangler bruker")
 
         val fagsakId = task.metadata["fagsakId"] as String
@@ -34,7 +35,8 @@ class OppdaterOgFerdigstillJournalpostTask(
 
         when (journalpost.journalstatus) {
             Journalstatus.MOTTATT -> {
-                runCatching { // forsøk å journalføre automatisk
+                runCatching {
+                    // forsøk å journalføre automatisk
                     dokarkivClient.oppdaterJournalpostSak(journalpost, fagsakId, tema)
                     dokarkivClient.ferdigstillJournalpost(journalpost.journalpostId)
                 }.fold(

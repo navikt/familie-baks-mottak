@@ -4,6 +4,7 @@ protocol PersonhendelseProto {
   import idl "doedfoedtbarn/DoedfoedtBarn.avdl";
   import idl "doedsfall/Doedsfall.avdl";
   import idl "foedsel/Foedsel.avdl";
+  import idl "foedselsdato/Foedselsdato.avdl";
   import idl "familierelasjon/Familierelasjon.avdl";
   import idl "verge/VergemaalEllerFremtidsfullmakt.avdl";
   import idl "forelderbarnrelasjon/ForelderBarnRelasjon.avdl";
@@ -40,6 +41,7 @@ protocol PersonhendelseProto {
     union { null, no.nav.person.pdl.leesah.doedfoedtbarn.DoedfoedtBarn } doedfoedtBarn = null;
     union { null, no.nav.person.pdl.leesah.doedsfall.Doedsfall } doedsfall = null;
     union { null, no.nav.person.pdl.leesah.foedsel.Foedsel } foedsel = null;
+    union { null, no.nav.person.pdl.leesah.foedselsdato.Foedselsdato } foedselsdato = null;
     union { null, no.nav.person.pdl.leesah.forelderbarnrelasjon.ForelderBarnRelasjon } forelderBarnRelasjon = null;
     union { null, no.nav.person.pdl.leesah.familierelasjon.Familierelasjon } familierelasjon = null; // Blir DEPRECATED i fremtiden. Erstattes av forelderBarnRelasjon.
     union { null, no.nav.person.pdl.leesah.sivilstand.Sivilstand } sivilstand = null;

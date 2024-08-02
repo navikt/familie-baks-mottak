@@ -98,14 +98,16 @@ class DokarkivClientTest {
                 ),
         )
 
-        Assertions.assertThatThrownBy {
-            dokarkivClient.ferdigstillJournalpost("12345678")
-        }.isInstanceOf(IntegrasjonException::class.java).hasCauseInstanceOf(RessursException::class.java)
+        Assertions
+            .assertThatThrownBy {
+                dokarkivClient.ferdigstillJournalpost("12345678")
+            }.isInstanceOf(IntegrasjonException::class.java)
+            .hasCauseInstanceOf(RessursException::class.java)
             .hasMessageContaining("Ferdigstilling av journalpost 12345678 feilet")
     }
 
-    fun forventetRequestJson(): String {
-        return "{ \n" +
+    fun forventetRequestJson(): String =
+        "{ \n" +
             "  \"bruker\" : {\n" +
             "    \"idType\" : \"FNR\",\n" +
             "    \"id\" : \"12345678910\"\n" +
@@ -116,7 +118,6 @@ class DokarkivClientTest {
             "    \"fagsaksystem\" : \"BA\"\n" +
             "  }\n" +
             "}"
-    }
 
     companion object {
         private val response = objectMapper.writeValueAsString(Ressurs.success(mapOf("journalpostId" to "12345678"), "test"))

@@ -31,13 +31,12 @@ open class IntegrasjonException(
         fun responseFra(
             uri: URI?,
             e: Throwable?,
-        ): String? {
-            return when (e) {
+        ): String? =
+            when (e) {
                 is RestClientResponseException,
                 -> "Error mot $uri status=${e.statusCode} body=${e.responseBodyAsString}" else
                 -> null
             }
-        }
     }
 }
 

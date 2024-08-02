@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.0</version>
+        <version>3.3.2</version>
     </parent>
 
     <properties>
@@ -21,15 +21,15 @@
         <java.version>21</java.version>
         <jvmTarget>21</jvmTarget>
         <kotlin.version>1.9.24</kotlin.version>
-        <mockk.version>1.13.11</mockk.version>
-        <confluent.version>7.6.1</confluent.version>
-        <prosessering.version>2.20240426120029_490d299</prosessering.version>
+        <mockk.version>1.13.12</mockk.version>
+        <confluent.version>7.7.0</confluent.version>
+        <prosessering.version>2.20240603145215_c56e179</prosessering.version>
 
-        <felles.version>3.20240515152313_9dd5659</felles.version>
-        <kontrakter.version>3.0_20240515103524_00490ae</kontrakter.version>
+        <felles.version>3.20240715145751_fc025c1</felles.version>
+        <kontrakter.version>3.0_20240731134554_8101d8c</kontrakter.version>
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
-        <spring.cloud.version>4.1.2</spring.cloud.version>
-        <token-validation-spring.version>4.1.7</token-validation-spring.version>
+        <spring.cloud.version>4.1.4</spring.cloud.version>
+        <token-validation-spring.version>5.0.1</token-validation-spring.version>
         <avro.version>1.11.3</avro.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
@@ -165,7 +165,7 @@
         <dependency>
             <groupId>no.nav.familie</groupId>
             <artifactId>baks-dokgen</artifactId>
-            <version>1.0_20240527154407_c6a58c5</version>
+            <version>1.0_20240627141649_53c4360</version>
         </dependency>
         <!-- Kafka -->
         <dependency>
@@ -201,7 +201,6 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
-            <version>10.13.0</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -262,7 +261,7 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
-            <version>1.19.8</version>
+            <version>1.20.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -306,7 +305,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>3.11.0.3922</version>
+                    <version>4.0.0.4121</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -446,7 +445,7 @@
                     <dependency>
                         <groupId>com.pinterest.ktlint</groupId>
                         <artifactId>ktlint-cli</artifactId>
-                        <version>1.2.1</version>
+                        <version>1.3.1</version>
                     </dependency>
                     <!-- additional 3rd party ruleset(s) can be specified here -->
                 </dependencies>

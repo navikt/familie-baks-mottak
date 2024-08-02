@@ -24,7 +24,9 @@ import java.time.LocalDate
     havingValue = "true",
     matchIfMissing = true,
 )
-class LeesahConsumer(val leesahService: LeesahService) {
+class LeesahConsumer(
+    val leesahService: LeesahService,
+) {
     val leesahFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesha.feilet")
 
     @KafkaListener(
@@ -85,29 +87,17 @@ class LeesahConsumer(val leesahService: LeesahService) {
     private fun GenericRecord.hentHendelseId() =
         get("hendelseId").toString()
 
-    private fun GenericRecord.hentDødsdato(): LocalDate? {
-        return deserialiserDatofeltFraSubrecord("doedsfall", "doedsdato")
-    }
+    private fun GenericRecord.hentDødsdato(): LocalDate? = deserialiserDatofeltFraSubrecord("doedsfall", "doedsdato")
 
-    private fun GenericRecord.hentFødselsdato(): LocalDate? {
-        return deserialiserDatofeltFraSubrecord("foedsel", "foedselsdato")
-    }
+    private fun GenericRecord.hentFødselsdato(): LocalDate? = deserialiserDatofeltFraSubrecord("foedselsdato", "foedselsdato")
 
-    private fun GenericRecord.hentFødeland(): String? {
-        return (get("foedsel") as GenericRecord?)?.get("foedeland")?.toString()
-    }
+    private fun GenericRecord.hentFødeland(): String? = (get("foedsel") as GenericRecord?)?.get("foedeland")?.toString()
 
-    private fun GenericRecord.hentTidligereHendelseId(): String? {
-        return get("tidligereHendelseId")?.toString()
-    }
+    private fun GenericRecord.hentTidligereHendelseId(): String? = get("tidligereHendelseId")?.toString()
 
-    private fun GenericRecord.hentUtflyttingsdato(): LocalDate? {
-        return deserialiserDatofeltFraSubrecord("utflyttingFraNorge", "utflyttingsdato")
-    }
+    private fun GenericRecord.hentUtflyttingsdato(): LocalDate? = deserialiserDatofeltFraSubrecord("utflyttingFraNorge", "utflyttingsdato")
 
-    private fun GenericRecord.hentSivilstandType(): String? {
-        return (get("sivilstand") as GenericRecord?)?.get("type")?.toString()
-    }
+    private fun GenericRecord.hentSivilstandType(): String? = (get("sivilstand") as GenericRecord?)?.get("type")?.toString()
 
     private fun GenericRecord.hentSivilstandDato(): LocalDate? {
         return deserialiserDatofeltFraSubrecord("sivilstand", "gyldigFraOgMed")
@@ -118,8 +108,8 @@ class LeesahConsumer(val leesahService: LeesahService) {
     private fun GenericRecord.deserialiserDatofeltFraSubrecord(
         subrecord: String,
         datofelt: String,
-    ): LocalDate? {
-        return try {
+    ): LocalDate? =
+        try {
             val dato = (get(subrecord) as GenericRecord?)?.get(datofelt)
 
             // Integrasjonstester bruker EmbeddedKafka, der en datoverdi tolkes direkte som en LocalDate.
@@ -133,7 +123,6 @@ class LeesahConsumer(val leesahService: LeesahService) {
             log.error("Deserialisering av $datofelt feiler")
             throw exception
         }
-    }
 
     companion object {
         val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")

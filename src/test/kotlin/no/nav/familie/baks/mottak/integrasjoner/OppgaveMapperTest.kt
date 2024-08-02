@@ -43,7 +43,8 @@ class OppgaveMapperTest(
         Assertions.assertThrows(IllegalStateException::class.java) {
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
+                journalpostClient
+                    .hentJournalpost("123")
                     .copy(dokumenter = listOf()),
             )
         }
@@ -54,7 +55,8 @@ class OppgaveMapperTest(
         Assertions.assertThrows(IllegalStateException::class.java) {
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.BehandleSak,
-                journalpostClient.hentJournalpost("123")
+                journalpostClient
+                    .hentJournalpost("123")
                     .copy(
                         dokumenter =
                             listOf(
@@ -78,7 +80,8 @@ class OppgaveMapperTest(
         val oppgave =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("321")
+                journalpostClient
+                    .hentJournalpost("321")
                     .copy(
                         dokumenter =
                             listOf(
@@ -99,7 +102,8 @@ class OppgaveMapperTest(
         Assertions.assertDoesNotThrow {
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
+                journalpostClient
+                    .hentJournalpost("123")
                     .copy(
                         dokumenter =
                             listOf(
@@ -121,7 +125,8 @@ class OppgaveMapperTest(
         val oppgave =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
+                journalpostClient
+                    .hentJournalpost("123")
                     .copy(
                         dokumenter =
                             listOf(
@@ -142,7 +147,8 @@ class OppgaveMapperTest(
         val oppgave =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
+                journalpostClient
+                    .hentJournalpost("123")
                     .copy(
                         dokumenter =
                             listOf(
@@ -164,7 +170,8 @@ class OppgaveMapperTest(
         val oppgave =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
+                journalpostClient
+                    .hentJournalpost("123")
                     .copy(
                         dokumenter =
                             listOf(
@@ -191,7 +198,8 @@ class OppgaveMapperTest(
         val oppgave =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
+                journalpostClient
+                    .hentJournalpost("123")
                     .copy(
                         dokumenter =
                             listOf(
@@ -220,7 +228,8 @@ class OppgaveMapperTest(
         val oppgave =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
+                journalpostClient
+                    .hentJournalpost("123")
                     .copy(
                         dokumenter =
                             listOf(
@@ -243,7 +252,8 @@ class OppgaveMapperTest(
         val oppgaveUtenBeskrivelse1 =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
+                journalpostClient
+                    .hentJournalpost("123")
                     .copy(
                         dokumenter =
                             listOf(
@@ -265,7 +275,8 @@ class OppgaveMapperTest(
         val oppgaveUtenBeskrivelse2 =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
+                journalpostClient
+                    .hentJournalpost("123")
                     .copy(
                         dokumenter =
                             listOf(
@@ -287,7 +298,8 @@ class OppgaveMapperTest(
         val oppgaveUtenBeskrivelse2 =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
+                journalpostClient
+                    .hentJournalpost("123")
                     .copy(
                         dokumenter =
                             listOf(
@@ -310,7 +322,8 @@ class OppgaveMapperTest(
         val oppgaveUtenBeskrivelse2 =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
+                journalpostClient
+                    .hentJournalpost("123")
                     .copy(
                         dokumenter =
                             listOf(
@@ -333,7 +346,8 @@ class OppgaveMapperTest(
         val oppgave =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
+                journalpostClient
+                    .hentJournalpost("123")
                     .copy(
                         journalforendeEnhet = "2101",
                         dokumenter =
@@ -356,7 +370,8 @@ class OppgaveMapperTest(
         val oppgave =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
+                journalpostClient
+                    .hentJournalpost("123")
                     .copy(
                         journalforendeEnhet = null,
                         dokumenter =
@@ -380,7 +395,8 @@ class OppgaveMapperTest(
         val oppgave =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
+                journalpostClient
+                    .hentJournalpost("123")
                     .copy(
                         journalforendeEnhet = "4",
                         dokumenter =
@@ -404,7 +420,8 @@ class OppgaveMapperTest(
         val oppgave =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
+                journalpostClient
+                    .hentJournalpost("123")
                     .copy(
                         journalforendeEnhet = "5",
                         dokumenter =
@@ -428,7 +445,8 @@ class OppgaveMapperTest(
         val oppgave =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
+                journalpostClient
+                    .hentJournalpost("123")
                     .copy(
                         journalforendeEnhet = "5",
                         dokumenter =
@@ -451,7 +469,8 @@ class OppgaveMapperTest(
         val oppgave =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
+                journalpostClient
+                    .hentJournalpost("123")
                     .copy(
                         journalforendeEnhet = "5",
                         bruker = Bruker("000000000", BrukerIdType.ORGNR),
@@ -475,7 +494,8 @@ class OppgaveMapperTest(
         val oppgave =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
-                journalpostClient.hentJournalpost("123")
+                journalpostClient
+                    .hentJournalpost("123")
                     .copy(
                         journalforendeEnhet = "5",
                         bruker = Bruker("900000000", BrukerIdType.ORGNR),

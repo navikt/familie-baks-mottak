@@ -37,8 +37,7 @@ class InfotrygdBarnetrygdClientTest {
                             "  \"barn\": [\"31038600000\"]\n" +
                             "}",
                     ),
-                )
-                .willReturn(
+                ).willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(gyldigSakResponse()),
@@ -60,8 +59,7 @@ class InfotrygdBarnetrygdClientTest {
                             "  \"barn\": [\"31038600000\"]\n" +
                             "}",
                     ),
-                )
-                .willReturn(
+                ).willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(gyldigStønadResponse()),
@@ -71,19 +69,17 @@ class InfotrygdBarnetrygdClientTest {
         val stønadDto = infotrygdClient.hentLøpendeUtbetalinger(brukersIdenter, barnasIdenter).bruker.first()
     }
 
-    private fun gyldigStønadResponse(): String {
-        return Files.readString(
+    private fun gyldigStønadResponse(): String =
+        Files.readString(
             ClassPathResource("testdata/hentInfotrygdstønad-response.json").file.toPath(),
             StandardCharsets.UTF_8,
         )
-    }
 
-    private fun gyldigSakResponse(): String {
-        return Files.readString(
+    private fun gyldigSakResponse(): String =
+        Files.readString(
             ClassPathResource("testdata/hentInfotrygdsaker-response.json").file.toPath(),
             StandardCharsets.UTF_8,
         )
-    }
 
     companion object {
         private val brukersIdenter = listOf("20086600000")

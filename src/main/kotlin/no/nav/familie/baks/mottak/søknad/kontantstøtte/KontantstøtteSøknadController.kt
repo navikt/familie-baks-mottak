@@ -2,7 +2,6 @@ package no.nav.familie.baks.mottak.søknad.kontantstøtte
 
 import no.nav.familie.baks.mottak.søknad.Kvittering
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.FødselsnummerErNullException
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV3
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.felles.Ressurs
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
-import no.nav.familie.kontrakter.ks.søknad.v3.KontantstøtteSøknad as KontantstøtteSøknadKontraktV3
 import no.nav.familie.kontrakter.ks.søknad.v4.KontantstøtteSøknad as KontantstøtteSøknadKontraktV4
 
 @RestController
@@ -26,20 +24,14 @@ class KontantstøtteSøknadController(
     private val kontantstøtteSøknadService: KontantstøtteSøknadService,
     private val kontantstøtteSøknadMetrikkService: KontantstøtteSøknadMetrikkService,
 ) {
-    @PostMapping(value = ["/soknad/v3"], consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun taImotSøknad(
-        @RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV3,
-    ): ResponseEntity<Ressurs<Kvittering>> =
-        mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = KontantstøtteSøknadV3(kontantstøtteSøknad = søknad))
-
     @PostMapping(value = ["/soknad/v4"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(
         @RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV4,
     ): ResponseEntity<Ressurs<Kvittering>> =
         mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = KontantstøtteSøknadV4(kontantstøtteSøknad = søknad))
 
-    fun mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad): ResponseEntity<Ressurs<Kvittering>> {
-        return try {
+    fun mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad): ResponseEntity<Ressurs<Kvittering>> =
+        try {
             val dbKontantstøtteSøknad =
                 kontantstøtteSøknadService.mottaKontantstøtteSøknad(versjonertKontantstøtteSøknad)
             kontantstøtteSøknadMetrikkService.sendMottakMetrikker(versjonertKontantstøtteSøknad)
@@ -55,11 +47,8 @@ class KontantstøtteSøknadController(
             kontantstøtteSøknadMetrikkService.sendMottakFeiletMetrikker()
             ResponseEntity.status(500).body(Ressurs.failure("Lagring av søknad om kontantstøtte feilet"))
         }
-    }
 
     @GetMapping(value = ["/ping"])
     @Unprotected
-    fun ping(): ResponseEntity<String> {
-        return ResponseEntity.ok().body("OK")
-    }
+    fun ping(): ResponseEntity<String> = ResponseEntity.ok().body("OK")
 }

@@ -5,10 +5,9 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBVedlegg
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.FødselsnummerErNullException
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV7
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadVedleggRepository
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBVedlegg
 import no.nav.familie.baks.mottak.task.JournalførSøknadTask
@@ -28,15 +27,11 @@ class BarnetrygdSøknadService(
 ) {
     @Transactional
     @Throws(FødselsnummerErNullException::class)
-    fun motta(versjonertSøknad: VersjonertSøknad): DBBarnetrygdSøknad {
+    fun motta(versjonertBarnetrygdSøknad: VersjonertBarnetrygdSøknad): DBBarnetrygdSøknad {
         val (dbSøknad, dokumentasjon) =
-            when (versjonertSøknad) {
-                is SøknadV7 -> {
-                    Pair(versjonertSøknad.søknad.tilDBSøknad(), versjonertSøknad.søknad.dokumentasjon)
-                }
-
+            when (versjonertBarnetrygdSøknad) {
                 is SøknadV8 -> {
-                    Pair(versjonertSøknad.søknad.tilDBSøknad(), versjonertSøknad.søknad.dokumentasjon)
+                    Pair(versjonertBarnetrygdSøknad.søknad.tilDBSøknad(), versjonertBarnetrygdSøknad.søknad.dokumentasjon)
                 }
             }
 
@@ -57,13 +52,9 @@ class BarnetrygdSøknadService(
         return dbSøknad
     }
 
-    fun lagreDBSøknad(dbBarnetrygdSøknad: DBBarnetrygdSøknad): DBBarnetrygdSøknad {
-        return søknadRepository.save(dbBarnetrygdSøknad)
-    }
+    fun lagreDBSøknad(dbBarnetrygdSøknad: DBBarnetrygdSøknad): DBBarnetrygdSøknad = søknadRepository.save(dbBarnetrygdSøknad)
 
-    fun hentDBSøknad(søknadId: Long): DBBarnetrygdSøknad? {
-        return søknadRepository.hentDBSøknad(søknadId)
-    }
+    fun hentDBSøknad(søknadId: Long): DBBarnetrygdSøknad? = søknadRepository.hentDBSøknad(søknadId)
 
     fun hentLagredeVedlegg(søknad: DBBarnetrygdSøknad): Map<String, DBVedlegg> {
         val map = mutableMapOf<String, DBVedlegg>()

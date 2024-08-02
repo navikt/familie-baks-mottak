@@ -39,8 +39,7 @@ class InfotrygdKontantstøtteClientTest {
                             "  \"barn\": [\"barnFnr\"]\n" +
                             "}",
                     ),
-                )
-                .willReturn(
+                ).willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(gyldigStønadResponse()),
@@ -52,7 +51,11 @@ class InfotrygdKontantstøtteClientTest {
         assertThat(sakDto.data.first().fom).isEqualTo(YearMonth.of(2023, 4))
         assertThat(sakDto.data.first().tom).isEqualTo(YearMonth.of(2023, 7))
         assertThat(sakDto.data.first().belop).isEqualTo(7500)
-        assertThat(sakDto.data.first().fnr.asString).isEqualTo("søkerFnr")
+        assertThat(
+            sakDto.data
+                .first()
+                .fnr.asString,
+        ).isEqualTo("søkerFnr")
         assertThat(sakDto.data.first().barn).hasSize(1).contains(BarnDto(fnr = Foedselsnummer("barnFnr")))
     }
 
@@ -67,8 +70,7 @@ class InfotrygdKontantstøtteClientTest {
                             "  \"barn\": [\"barnFnr\"]\n" +
                             "}",
                     ),
-                )
-                .willReturn(
+                ).willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody("true"),
@@ -78,12 +80,11 @@ class InfotrygdKontantstøtteClientTest {
         assertTrue(infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(barnasIdenter))
     }
 
-    private fun gyldigStønadResponse(): String {
-        return Files.readString(
+    private fun gyldigStønadResponse(): String =
+        Files.readString(
             ClassPathResource("testdata/hentInfotrygdKontantstøtteStønad-response.json").file.toPath(),
             StandardCharsets.UTF_8,
         )
-    }
 
     companion object {
         private val barnasIdenter = listOf("barnFnr")

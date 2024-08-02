@@ -12,7 +12,6 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.Vedlegg
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsvedlegg
 import java.time.LocalDateTime
-import no.nav.familie.kontrakter.ks.søknad.v3.KontantstøtteSøknad as KontantstøtteSøknadV3
 import no.nav.familie.kontrakter.ks.søknad.v4.KontantstøtteSøknad as KontantstøtteSøknadV4
 
 @Entity(name = "kontantstotte_soknad")
@@ -34,13 +33,7 @@ data class DBKontantstøtteSøknad(
     @Column(name = "journalpost_id")
     val journalpostId: String? = null,
 ) {
-    private fun hentSøknadV3(): KontantstøtteSøknadV3 {
-        return objectMapper.readValue(søknadJson)
-    }
-
-    private fun hentSøknadV4(): KontantstøtteSøknadV4 {
-        return objectMapper.readValue(søknadJson)
-    }
+    private fun hentSøknadV4(): KontantstøtteSøknadV4 = objectMapper.readValue(søknadJson)
 
     private fun hentSøknadVersjon(): String {
         val søknad = objectMapper.readTree(søknadJson)
@@ -53,10 +46,10 @@ data class DBKontantstøtteSøknad(
 
     fun hentVersjonertKontantstøtteSøknad(): VersjonertKontantstøtteSøknad {
         val versjon = this.hentSøknadVersjon()
-        if (versjon == "v4") {
-            return KontantstøtteSøknadV4(kontantstøtteSøknad = hentSøknadV4())
+        return when (versjon) {
+            "v4" -> KontantstøtteSøknadV4(kontantstøtteSøknad = hentSøknadV4())
+            else -> error("Ikke støttet versjon $versjon av kontrakt for Kontantstøtte")
         }
-        return KontantstøtteSøknadV3(kontantstøtteSøknad = hentSøknadV3())
     }
 }
 
@@ -64,7 +57,6 @@ fun DBKontantstøtteSøknad.harEøsSteg(): Boolean {
     val versjonertSøknad = this.hentVersjonertKontantstøtteSøknad()
 
     return when (versjonertSøknad) {
-        is no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV3 -> versjonertSøknad.kontantstøtteSøknad.søker.harEøsSteg
         is no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.søker.harEøsSteg
     }
 }
@@ -80,22 +72,13 @@ data class DBKontantstotteVedlegg(
     override val data: ByteArray,
 ) : Vedlegg
 
-fun KontantstøtteSøknadV3.tilDBKontantstøtteSøknad(): DBKontantstøtteSøknad {
-    try {
-        return DBKontantstøtteSøknad(
-            søknadJson = objectMapper.writeValueAsString(this),
-            fnr = this.søker.ident.verdi.getValue("nb"),
-        )
-    } catch (e: KotlinNullPointerException) {
-        throw FødselsnummerErNullException()
-    }
-}
-
 fun KontantstøtteSøknadV4.tilDBKontantstøtteSøknad(): DBKontantstøtteSøknad {
     try {
         return DBKontantstøtteSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
-            fnr = this.søker.ident.verdi.getValue("nb"),
+            fnr =
+                this.søker.ident.verdi
+                    .getValue("nb"),
         )
     } catch (e: KotlinNullPointerException) {
         throw FødselsnummerErNullException()
@@ -105,12 +88,11 @@ fun KontantstøtteSøknadV4.tilDBKontantstøtteSøknad(): DBKontantstøtteSøkna
 fun Søknadsvedlegg.tilDBKontantstøtteVedlegg(
     søknad: DBKontantstøtteSøknad,
     data: ByteArray,
-): DBKontantstotteVedlegg {
-    return DBKontantstotteVedlegg(
+): DBKontantstotteVedlegg =
+    DBKontantstotteVedlegg(
         dokumentId = this.dokumentId,
         søknadId = søknad.id,
         data = data,
     )
-}
 
 class FødselsnummerErNullException : Exception()

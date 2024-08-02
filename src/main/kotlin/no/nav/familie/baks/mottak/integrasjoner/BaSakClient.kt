@@ -52,7 +52,7 @@ class BaSakClient
         fun hentFagsaknummerPåPersonident(personIdent: String): String {
             val uri = URI.create("$sakServiceUri/fagsaker")
             return runCatching {
-                postForEntity<Ressurs<RestFagsak>>(uri, mapOf("personIdent" to personIdent))
+                postForEntity<Ressurs<RestFagsakId>>(uri, mapOf("personIdent" to personIdent))
             }.fold(
                 onSuccess = { it.data?.id?.toString() ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av saksnummer fra ba-sak.", it, uri, personIdent) },
@@ -140,21 +140,21 @@ class BaSakClient
             fagsakId: Long,
         ) {
             val uri = URI.create("$sakServiceUri/behandlinger")
-            kotlin.runCatching {
-                postForEntity<Ressurs<Any>>(
-                    uri,
-                    RestOpprettBehandlingBarnetrygdRequest(
-                        kategori = kategori.name,
-                        underkategori = underkategori.name,
-                        søkersIdent = søkersIdent,
-                        behandlingÅrsak = behandlingÅrsak,
-                        søknadMottattDato = søknadMottattDato,
-                        behandlingType = behandlingType,
-                        fagsakId = fagsakId,
-                    ),
-                )
-            }
-                .onFailure {
+            kotlin
+                .runCatching {
+                    postForEntity<Ressurs<Any>>(
+                        uri,
+                        RestOpprettBehandlingBarnetrygdRequest(
+                            kategori = kategori.name,
+                            underkategori = underkategori.name,
+                            søkersIdent = søkersIdent,
+                            behandlingÅrsak = behandlingÅrsak,
+                            søknadMottattDato = søknadMottattDato,
+                            behandlingType = behandlingType,
+                            fagsakId = fagsakId,
+                        ),
+                    )
+                }.onFailure {
                     throw IntegrasjonException("Feil ved opprettelse av behandling i ba-sak.", it, uri)
                 }
         }

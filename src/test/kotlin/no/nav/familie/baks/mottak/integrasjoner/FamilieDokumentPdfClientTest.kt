@@ -26,7 +26,8 @@ class FamilieDokumentPdfClientTest {
             )
 
         val inputData =
-            File("./src/test/kotlin/no/nav/familie/baks/mottak/søknad/testdata/dokgen/testdata_input.json").readText()
+            File("./src/test/kotlin/no/nav/familie/baks/mottak/søknad/testdata/dokgen/testdata_input.json")
+                .readText()
                 .let {
                     ObjectMapper().readValue(it, Map::class.java) as Map<String, Any>
                 }

@@ -29,6 +29,8 @@ fun Journalpost.erBarnetrygdUtvidetSøknad(): Boolean = dokumenter?.any { it.bre
 
 fun Journalpost.erBarnetrygdSøknad(): Boolean = erBarnetrygdOrdinærSøknad() || erBarnetrygdUtvidetSøknad()
 
+fun Journalpost.erDigitalKanal(): Boolean = kanal == "NAV_NO"
+
 data class Sak(
     val arkivsaksnummer: String?,
     var arkivsaksystem: String?,
@@ -48,7 +50,9 @@ data class DokumentInfo(
     val dokumentvarianter: List<Dokumentvariant>?,
 )
 
-data class Dokumentvariant(val variantformat: String)
+data class Dokumentvariant(
+    val variantformat: String,
+)
 
 enum class Journalposttype {
     I,

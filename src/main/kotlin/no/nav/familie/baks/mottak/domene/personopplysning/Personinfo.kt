@@ -83,7 +83,9 @@ enum class RelasjonsRolleType {
     MMOR,
 }
 
-data class Landkode(var kode: String?) {
+data class Landkode(
+    var kode: String?,
+) {
     companion object {
         val UDEFINERT = Landkode("UDEFINERT")
         val NORGE = Landkode("NOR")
