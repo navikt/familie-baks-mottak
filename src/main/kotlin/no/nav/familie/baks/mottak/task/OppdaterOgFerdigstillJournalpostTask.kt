@@ -1,5 +1,7 @@
 package no.nav.familie.baks.mottak.task
 
+import io.micrometer.core.instrument.Counter
+import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.integrasjoner.DokarkivClient
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
@@ -23,6 +25,10 @@ class OppdaterOgFerdigstillJournalpostTask(
     private val taskService: TaskService,
 ) : AsyncTaskStep {
     val log: Logger = LoggerFactory.getLogger(OppdaterOgFerdigstillJournalpostTask::class.java)
+    val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
+
+    val barnetrygdFeiledeFerdigstilteJournalpostCounter: Counter = Metrics.counter("barnetrygd.journalpost.ferdigstill.feil")
+    val kontantstøtteFeiledeFerdigstilteJournalpostCounter: Counter = Metrics.counter("kontantstotte.journalpost.ferdigstill.feil")
 
     override fun doTask(task: Task) {
         val journalpost =
@@ -50,16 +56,21 @@ class OppdaterOgFerdigstillJournalpostTask(
                         ).also(taskService::save)
                     },
                     onFailure = {
-                        log.warn(
-                            "Automatisk ferdigstilling feilet. Oppretter ny journalføringsoppgave for journalpost " +
-                                "${journalpost.journalpostId}.",
-                        )
+                        when (tema) {
+                            Tema.BAR -> barnetrygdFeiledeFerdigstilteJournalpostCounter.increment()
+                            Tema.KON -> kontantstøtteFeiledeFerdigstilteJournalpostCounter.increment()
+                            else -> log.info("Ukjent tema ${tema.name}")
+                        }
+
+                        log.warn("Automatisk ferdigstilling feilet. Oppretter ny journalføringsoppgave for journalpost ${journalpost.journalpostId}.")
+                        secureLogger.warn("Automatisk ferdigstilling feilet. Oppretter ny journalføringsoppgave for journalpost ${journalpost.journalpostId}.", it)
+
                         Task(
                             type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
                             payload = task.metadata["sakssystemMarkering"] as String,
                             properties =
                                 task.metadata.apply {
-                                    this["tema"] = tema
+                                    this["tema"] = tema.toString()
                                 },
                         ).also(taskService::save)
 
