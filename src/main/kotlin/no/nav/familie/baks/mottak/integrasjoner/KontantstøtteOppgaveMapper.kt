@@ -23,7 +23,14 @@ class KontantstøtteOppgaveMapper(
 
     override fun hentBehandlingstype(journalpost: Journalpost): Behandlingstype =
         when {
-            erEØS(journalpost) -> Behandlingstype.EØS
+            journalpost.erKontantstøtteSøknad() && journalpost.erDigitalKanal() ->
+                if (utledBehandlingKategoriFraSøknad(journalpost) == BehandlingKategori.EØS) {
+                    Behandlingstype.EØS
+                } else {
+                    Behandlingstype.NASJONAL
+                }
+
+            erDnummerPåJournalpost(journalpost) -> Behandlingstype.EØS
             else -> Behandlingstype.NASJONAL
         }
 
