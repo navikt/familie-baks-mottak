@@ -32,6 +32,7 @@ class StatusController(
     @GetMapping(value = ["/kontantstotte"])
     @Unprotected
     fun statusKontantstøtte(): StatusDto {
+        logger.info("Sjekker status på kontantstøtte søknad.")
         val sistKontantstøtteSøknad = kontantstøtteSøknadRepository.finnSisteLagredeSøknad()
         val tidSidenSisteKontantstøtteSøknad = Duration.between(LocalDateTime.now(), sistKontantstøtteSøknad.opprettetTid)
         loggHvisLiteAktivitet(tidSidenSisteKontantstøtteSøknad, Søknadstype.KONTANTSTØTTE)
@@ -69,6 +70,7 @@ class StatusController(
                     status = Plattformstatus.DOWN,
                     description = "Det er over 12 timer siden sist vi mottok en søknad om ${søknadstype.name.lowercase()}",
                 )
+
             else -> StatusDto(status = Plattformstatus.OK, description = "Alt er OK", logLink = null)
         }
 
@@ -82,11 +84,13 @@ class StatusController(
                     status = Plattformstatus.DOWN,
                     description = "Det er over 24 timer siden sist vi mottok en søknad om ${søknadstype.name.lowercase()}",
                 )
+
             tidSidenSisteSøknad.toHours() > 12 ->
                 StatusDto(
                     status = Plattformstatus.ISSUE,
                     description = "Det er over 12 timer siden sist vi mottok en søknad om ${søknadstype.name.lowercase()}",
                 )
+
             else -> StatusDto(status = Plattformstatus.OK, description = "Alt er OK", logLink = null)
         }
 
