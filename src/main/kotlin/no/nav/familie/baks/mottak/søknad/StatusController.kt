@@ -23,8 +23,9 @@ class StatusController(
     @GetMapping(value = ["/barnetrygd"])
     @Unprotected
     fun statusBarnetrygd(): StatusDto {
+        logger.info("Sjekker status på barnetrygd søknad.")
         val sistBarnetrygdSøknad = barnetrygdSøknadRepository.finnSisteLagredeSøknad()
-        val tidSidenSisteBarnetrygdSøknad = Duration.between(LocalDateTime.now(), sistBarnetrygdSøknad.opprettetTid)
+        val tidSidenSisteBarnetrygdSøknad = Duration.between(sistBarnetrygdSøknad.opprettetTid, LocalDateTime.now())
         loggHvisLiteAktivitet(tidSidenSisteBarnetrygdSøknad, Søknadstype.BARNETRYGD)
         return lagStatusDto(tidSidenSisteBarnetrygdSøknad, Søknadstype.BARNETRYGD)
     }
@@ -32,8 +33,9 @@ class StatusController(
     @GetMapping(value = ["/kontantstotte"])
     @Unprotected
     fun statusKontantstøtte(): StatusDto {
+        logger.info("Sjekker status på kontantstøtte søknad.")
         val sistKontantstøtteSøknad = kontantstøtteSøknadRepository.finnSisteLagredeSøknad()
-        val tidSidenSisteKontantstøtteSøknad = Duration.between(LocalDateTime.now(), sistKontantstøtteSøknad.opprettetTid)
+        val tidSidenSisteKontantstøtteSøknad = Duration.between(sistKontantstøtteSøknad.opprettetTid, LocalDateTime.now())
         loggHvisLiteAktivitet(tidSidenSisteKontantstøtteSøknad, Søknadstype.KONTANTSTØTTE)
         return lagStatusDto(tidSidenSisteKontantstøtteSøknad, Søknadstype.KONTANTSTØTTE)
     }
@@ -44,8 +46,9 @@ class StatusController(
     ) {
         if (erDagtid() && !erHelg()) {
             when {
-                tidSidenSisteSøknad.toHours() > 3 -> logger.error("Status baks-mottak: Det er ${tidSidenSisteSøknad.toHours()} timer siden vi sist mottok en søknad om ${søknadstype.name.lowercase()}")
-                tidSidenSisteSøknad.toMinutes() > 20 -> logger.warn("Status baks-mottak: Det er ${tidSidenSisteSøknad.toMinutes()} minutter siden vi sist mottok en søknad om ${søknadstype.name.lowercase()}")
+                tidSidenSisteSøknad.toHours() >= 3 -> logger.error("Status baks-mottak: Det er ${tidSidenSisteSøknad.toHours()} timer siden vi sist mottok en søknad om ${søknadstype.name.lowercase()}")
+                tidSidenSisteSøknad.toMinutes() >= 20 -> logger.warn("Status baks-mottak: Det er ${tidSidenSisteSøknad.toMinutes()} minutter siden vi sist mottok en søknad om ${søknadstype.name.lowercase()}")
+                else -> logger.info("Status baks-mottak: Det er ${tidSidenSisteSøknad.toMinutes()} minutter siden vi sist mottok en søknad om ${søknadstype.name.lowercase()}")
             }
         }
     }
@@ -64,11 +67,12 @@ class StatusController(
         søknadstype: Søknadstype,
     ) =
         when {
-            tidSidenSisteSøknad.toHours() > 12 ->
+            tidSidenSisteSøknad.toHours() >= 12 ->
                 StatusDto(
                     status = Plattformstatus.DOWN,
                     description = "Det er over 12 timer siden sist vi mottok en søknad om ${søknadstype.name.lowercase()}",
                 )
+
             else -> StatusDto(status = Plattformstatus.OK, description = "Alt er OK", logLink = null)
         }
 
@@ -77,16 +81,18 @@ class StatusController(
         søknadstype: Søknadstype,
     ) =
         when {
-            tidSidenSisteSøknad.toHours() > 24 ->
+            tidSidenSisteSøknad.toHours() >= 24 ->
                 StatusDto(
                     status = Plattformstatus.DOWN,
                     description = "Det er over 24 timer siden sist vi mottok en søknad om ${søknadstype.name.lowercase()}",
                 )
-            tidSidenSisteSøknad.toHours() > 12 ->
+
+            tidSidenSisteSøknad.toHours() >= 12 ->
                 StatusDto(
                     status = Plattformstatus.ISSUE,
                     description = "Det er over 12 timer siden sist vi mottok en søknad om ${søknadstype.name.lowercase()}",
                 )
+
             else -> StatusDto(status = Plattformstatus.OK, description = "Alt er OK", logLink = null)
         }
 
@@ -94,7 +100,7 @@ class StatusController(
 
     private fun erDagtid() = LocalDateTime.now().hour in 9..22
 
-    private fun erTidspunktMedForventetAktivitet() = LocalDateTime.now().hour in 12..21
+    private fun erTidspunktMedForventetAktivitet() = LocalDateTime.now().hour in 9..22
 }
 
 const val LOG_URL = "https://logs.adeo.no/app/r/s/OJZqp"
