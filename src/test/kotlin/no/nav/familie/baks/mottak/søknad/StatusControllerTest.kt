@@ -39,7 +39,8 @@ class StatusControllerTest {
     }
 
     @Test
-    fun `skal gi status DOWN dersom det ikke har kommet inn noen søknader på 12 timer`() {
+    fun `skal gi status DOWN dersom det ikke har kommet inn noen søknader på 12 timer for kontantstøtte`() {
+        // Arrange
         every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 10, 0)
         every { kontantstøtteSøknadRepository.finnSisteLagredeSøknad() } returns
             DBKontantstøtteSøknad(
@@ -47,21 +48,37 @@ class StatusControllerTest {
                 opprettetTid = LocalDateTime.of(2024, 8, 1, 21, 59),
                 fnr = "",
             )
+
+        // Act
+        val statusKontantstøtte = statusController.statusKontantstøtte()
+
+        // Assert
+        assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.DOWN)
+        assertThat(logAppender.logEvents.filter { it.level == Level.ERROR }.size).isEqualTo(1)
+    }
+
+    @Test
+    fun `skal gi status DOWN dersom det ikke har kommet inn noen søknader på 12 timer for barnetrygd`() {
+        // Arrange
+        every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 10, 0)
         every { søknadRepository.finnSisteLagredeSøknad() } returns
             DBBarnetrygdSøknad(
                 søknadJson = "",
                 opprettetTid = LocalDateTime.of(2024, 8, 1, 21, 59),
                 fnr = "",
             )
-        val statusKontantstøtte = statusController.statusKontantstøtte()
+
+        // Act
         val statusBarnetrygd = statusController.statusBarnetrygd()
-        assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.DOWN)
+
+        // Assert
         assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.DOWN)
-        assertThat(logAppender.logEvents.filter { it.level == Level.ERROR }.size).isEqualTo(2)
+        assertThat(logAppender.logEvents.filter { it.level == Level.ERROR }.size).isEqualTo(1)
     }
 
     @Test
-    fun `skal gi status DOWN dersom det er natt og det ikke har kommet inn noen søknader på 24 timer`() {
+    fun `skal gi status DOWN dersom det er natt og det ikke har kommet inn noen søknader på 24 timer for kontantstøtte`() {
+        // Arrange
         every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 2, 0)
         every { kontantstøtteSøknadRepository.finnSisteLagredeSøknad() } returns
             DBKontantstøtteSøknad(
@@ -69,20 +86,35 @@ class StatusControllerTest {
                 opprettetTid = LocalDateTime.of(2024, 8, 1, 1, 59),
                 fnr = "",
             )
+
+        // Act
+        val statusKontantstøtte = statusController.statusKontantstøtte()
+
+        // Assert
+        assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.DOWN)
+    }
+
+    @Test
+    fun `skal gi status DOWN dersom det er natt og det ikke har kommet inn noen søknader på 24 timer for barnetrygd`() {
+        // Arrange
+        every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 2, 0)
         every { søknadRepository.finnSisteLagredeSøknad() } returns
             DBBarnetrygdSøknad(
                 søknadJson = "",
                 opprettetTid = LocalDateTime.of(2024, 8, 1, 1, 59),
                 fnr = "",
             )
-        val statusKontantstøtte = statusController.statusKontantstøtte()
+
+        // Act
         val statusBarnetrygd = statusController.statusBarnetrygd()
-        assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.DOWN)
+
+        // Assert
         assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.DOWN)
     }
 
     @Test
-    fun `skal gi status ISSUE dersom det er natt og det ikke har kommet inn noen søknader på 12 timer`() {
+    fun `skal gi status ISSUE dersom det er natt og det ikke har kommet inn noen søknader på 12 timer for kontantstøtte`() {
+        // Arrange
         every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 2, 0)
         every { kontantstøtteSøknadRepository.finnSisteLagredeSøknad() } returns
             DBKontantstøtteSøknad(
@@ -90,20 +122,35 @@ class StatusControllerTest {
                 opprettetTid = LocalDateTime.of(2024, 8, 1, 13, 59),
                 fnr = "",
             )
-        every { søknadRepository.finnSisteLagredeSøknad() } returns
-            DBBarnetrygdSøknad(
-                søknadJson = "",
-                opprettetTid = LocalDateTime.of(2024, 8, 1, 13, 59),
-                fnr = "",
-            )
+
+        // Act
         val statusKontantstøtte = statusController.statusKontantstøtte()
-        val statusBarnetrygd = statusController.statusBarnetrygd()
+
+        // Assert
         assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.ISSUE)
+    }
+
+    @Test
+    fun `skal gi status ISSUE dersom det er natt og det ikke har kommet inn noen søknader på 12 timer for barnetrygd`() {
+        // Arrange
+        every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 2, 0)
+        every { søknadRepository.finnSisteLagredeSøknad() } returns
+            DBBarnetrygdSøknad(
+                søknadJson = "",
+                opprettetTid = LocalDateTime.of(2024, 8, 1, 13, 59),
+                fnr = "",
+            )
+
+        // Act
+        val statusBarnetrygd = statusController.statusBarnetrygd()
+
+        // Assert
         assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.ISSUE)
     }
 
     @Test
-    fun `skal logge error dersom det er dagtid og ikke helg og mer enn 3 timer siden vi har mottatt en søknad`() {
+    fun `skal logge error dersom det er dagtid og ikke helg og mer enn 3 timer siden vi har mottatt en søknad for kontantstøtte`() {
+        // Arrange
         every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 10, 0)
         every { kontantstøtteSøknadRepository.finnSisteLagredeSøknad() } returns
             DBKontantstøtteSøknad(
@@ -111,21 +158,37 @@ class StatusControllerTest {
                 opprettetTid = LocalDateTime.of(2024, 8, 2, 6, 59),
                 fnr = "",
             )
-        every { søknadRepository.finnSisteLagredeSøknad() } returns
-            DBBarnetrygdSøknad(
-                søknadJson = "",
-                opprettetTid = LocalDateTime.of(2024, 8, 2, 6, 59),
-                fnr = "",
-            )
+
+        // Act
         val statusKontantstøtte = statusController.statusKontantstøtte()
-        val statusBarnetrygd = statusController.statusBarnetrygd()
+
+        // Assert
         assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.OK)
-        assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.OK)
-        assertThat(logAppender.logEvents.filter { it.level == Level.ERROR }.size).isEqualTo(2)
+        assertThat(logAppender.logEvents.filter { it.level == Level.ERROR }.size).isEqualTo(1)
     }
 
     @Test
-    fun `skal logge warning dersom det er dagtid og ikke helg og mer enn 20 minutter siden vi har mottatt en søknad`() {
+    fun `skal logge error dersom det er dagtid og ikke helg og mer enn 3 timer siden vi har mottatt en søknad for barnetrygd`() {
+        // Arrange
+        every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 10, 0)
+        every { søknadRepository.finnSisteLagredeSøknad() } returns
+            DBBarnetrygdSøknad(
+                søknadJson = "",
+                opprettetTid = LocalDateTime.of(2024, 8, 2, 6, 59),
+                fnr = "",
+            )
+
+        // Act
+        val statusBarnetrygd = statusController.statusBarnetrygd()
+
+        // Assert
+        assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.OK)
+        assertThat(logAppender.logEvents.filter { it.level == Level.ERROR }.size).isEqualTo(1)
+    }
+
+    @Test
+    fun `skal logge warning dersom det er dagtid og ikke helg og mer enn 20 minutter siden vi har mottatt en søknad for kontantstøtte`() {
+        // Arrange
         every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 10, 0)
         every { kontantstøtteSøknadRepository.finnSisteLagredeSøknad() } returns
             DBKontantstøtteSøknad(
@@ -133,17 +196,32 @@ class StatusControllerTest {
                 opprettetTid = LocalDateTime.of(2024, 8, 2, 9, 40),
                 fnr = "",
             )
+
+        // Act
+        val statusKontantstøtte = statusController.statusKontantstøtte()
+
+        // Assert
+        assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.OK)
+        assertThat(logAppender.logEvents.filter { it.level == Level.WARN }.size).isEqualTo(1)
+    }
+
+    @Test
+    fun `skal logge warning dersom det er dagtid og ikke helg og mer enn 20 minutter siden vi har mottatt en søknad for barnetrygd`() {
+        // Arrange
+        every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 10, 0)
         every { søknadRepository.finnSisteLagredeSøknad() } returns
             DBBarnetrygdSøknad(
                 søknadJson = "",
                 opprettetTid = LocalDateTime.of(2024, 8, 2, 9, 40),
                 fnr = "",
             )
-        val statusKontantstøtte = statusController.statusKontantstøtte()
+
+        // Act
         val statusBarnetrygd = statusController.statusBarnetrygd()
-        assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.OK)
+
+        // Assert
         assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.OK)
-        assertThat(logAppender.logEvents.filter { it.level == Level.WARN }.size).isEqualTo(2)
+        assertThat(logAppender.logEvents.filter { it.level == Level.WARN }.size).isEqualTo(1)
     }
 
     class LogAppender : AppenderBase<ILoggingEvent>() {
