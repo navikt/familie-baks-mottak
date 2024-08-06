@@ -19,8 +19,8 @@ class BarnetrygdOppgaveMapper(
     override fun hentBehandlingstema(journalpost: Journalpost): Behandlingstema? =
         when {
             journalpost.erBarnetrygdSøknad() && journalpost.erDigitalKanal() ->
-                if (utledBehandlingKategoriFraSøknad(journalpost) == BehandlingKategori.EØS) {
-                    Behandlingstema.BarnetrygdEØS
+                if (utledBehandlingUnderkategoriFraSøknad(journalpost) == BehandlingUnderkategori.UTVIDET) {
+                    Behandlingstema.UtvidetBarnetrygd
                 } else {
                     Behandlingstema.OrdinærBarnetrygd
                 }
