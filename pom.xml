@@ -30,7 +30,7 @@
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
         <spring.cloud.version>4.1.4</spring.cloud.version>
         <token-validation-spring.version>5.0.1</token-validation-spring.version>
-        <avro.version>1.11.3</avro.version>
+        <avro.version>1.12.0</avro.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
