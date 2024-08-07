@@ -93,14 +93,10 @@ class OpprettSøknadBehandlingISakTask(
     }
 
     private fun utledBehandlingstype(fagsak: RestMinimalFagsak): BehandlingType {
-        val erFagsakLøpendeOgAktiveBehandlingerAvsluttet =
-            fagsak.behandlinger.any { behandling ->
-                val kanOppretteBehandling = behandling.status == BehandlingStatus.AVSLUTTET && behandling.aktiv
-                fagsak.status != FagsakStatus.LØPENDE && kanOppretteBehandling
-            }
+        val erFagsakLøpende = fagsak.status == FagsakStatus.LØPENDE
 
         val type =
-            if (erFagsakLøpendeOgAktiveBehandlingerAvsluttet || fagsak.behandlinger.isEmpty()) {
+            if (!erFagsakLøpende) {
                 BehandlingType.FØRSTEGANGSBEHANDLING
             } else {
                 BehandlingType.REVURDERING
