@@ -2,7 +2,6 @@ package no.nav.familie.baks.mottak.task
 
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.BarnetrygdOppgaveMapper
-import no.nav.familie.baks.mottak.integrasjoner.BehandlingStatus
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingType
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
@@ -93,14 +92,10 @@ class OpprettSøknadBehandlingISakTask(
     }
 
     private fun utledBehandlingstype(fagsak: RestMinimalFagsak): BehandlingType {
-        val erFagsakLøpendeOgAktiveBehandlingerAvsluttet =
-            fagsak.behandlinger.any { behandling ->
-                val kanOppretteBehandling = behandling.status == BehandlingStatus.AVSLUTTET && behandling.aktiv
-                fagsak.status != FagsakStatus.LØPENDE && kanOppretteBehandling
-            }
+        val erFagsakLøpende = fagsak.status == FagsakStatus.LØPENDE
 
         val type =
-            if (erFagsakLøpendeOgAktiveBehandlingerAvsluttet || fagsak.behandlinger.isEmpty()) {
+            if (!erFagsakLøpende) {
                 BehandlingType.FØRSTEGANGSBEHANDLING
             } else {
                 BehandlingType.REVURDERING
