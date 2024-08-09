@@ -11,7 +11,7 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -53,8 +53,8 @@ class SøknadStatusServiceTest {
         val statusKontantstøtte = søknadStatusService.statusKontantstøtte()
 
         // Assert
-        Assertions.assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.DOWN)
-        Assertions.assertThat(logAppender.logEvents.filter { it.level == Level.ERROR }.size).isEqualTo(1)
+        assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.DOWN)
+        assertThat(logAppender.logEvents.filter { it.level == Level.ERROR }.size).isEqualTo(1)
     }
 
     @Test
@@ -72,8 +72,8 @@ class SøknadStatusServiceTest {
         val statusBarnetrygd = søknadStatusService.statusBarnetrygd()
 
         // Assert
-        Assertions.assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.DOWN)
-        Assertions.assertThat(logAppender.logEvents.filter { it.level == Level.ERROR }.size).isEqualTo(1)
+        assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.DOWN)
+        assertThat(logAppender.logEvents.filter { it.level == Level.ERROR }.size).isEqualTo(1)
     }
 
     @Test
@@ -91,7 +91,7 @@ class SøknadStatusServiceTest {
         val statusKontantstøtte = søknadStatusService.statusKontantstøtte()
 
         // Assert
-        Assertions.assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.DOWN)
+        assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.DOWN)
     }
 
     @Test
@@ -109,7 +109,7 @@ class SøknadStatusServiceTest {
         val statusBarnetrygd = søknadStatusService.statusBarnetrygd()
 
         // Assert
-        Assertions.assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.DOWN)
+        assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.DOWN)
     }
 
     @Test
@@ -127,7 +127,7 @@ class SøknadStatusServiceTest {
         val statusKontantstøtte = søknadStatusService.statusKontantstøtte()
 
         // Assert
-        Assertions.assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.ISSUE)
+        assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.ISSUE)
     }
 
     @Test
@@ -145,7 +145,7 @@ class SøknadStatusServiceTest {
         val statusBarnetrygd = søknadStatusService.statusBarnetrygd()
 
         // Assert
-        Assertions.assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.ISSUE)
+        assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.ISSUE)
     }
 
     @Test
@@ -163,8 +163,8 @@ class SøknadStatusServiceTest {
         val statusKontantstøtte = søknadStatusService.statusKontantstøtte()
 
         // Assert
-        Assertions.assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.OK)
-        Assertions.assertThat(logAppender.logEvents.filter { it.level == Level.ERROR }.size).isEqualTo(1)
+        assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.OK)
+        assertThat(logAppender.logEvents.filter { it.level == Level.ERROR }.size).isEqualTo(1)
     }
 
     @Test
@@ -182,8 +182,8 @@ class SøknadStatusServiceTest {
         val statusBarnetrygd = søknadStatusService.statusBarnetrygd()
 
         // Assert
-        Assertions.assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.OK)
-        Assertions.assertThat(logAppender.logEvents.filter { it.level == Level.ERROR }.size).isEqualTo(1)
+        assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.OK)
+        assertThat(logAppender.logEvents.filter { it.level == Level.ERROR }.size).isEqualTo(1)
     }
 
     @Test
@@ -201,8 +201,8 @@ class SøknadStatusServiceTest {
         val statusKontantstøtte = søknadStatusService.statusKontantstøtte()
 
         // Assert
-        Assertions.assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.OK)
-        Assertions.assertThat(logAppender.logEvents.filter { it.level == Level.WARN }.size).isEqualTo(1)
+        assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.OK)
+        assertThat(logAppender.logEvents.filter { it.level == Level.WARN }.size).isEqualTo(1)
     }
 
     @Test
@@ -220,8 +220,8 @@ class SøknadStatusServiceTest {
         val statusBarnetrygd = søknadStatusService.statusBarnetrygd()
 
         // Assert
-        Assertions.assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.OK)
-        Assertions.assertThat(logAppender.logEvents.filter { it.level == Level.WARN }.size).isEqualTo(1)
+        assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.OK)
+        assertThat(logAppender.logEvents.filter { it.level == Level.WARN }.size).isEqualTo(1)
     }
 
     class LogAppender : AppenderBase<ILoggingEvent>() {
