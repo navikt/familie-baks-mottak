@@ -2,26 +2,25 @@ package no.nav.familie.baks.mottak.søknad
 
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
-import no.nav.security.token.support.core.api.Unprotected
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.http.MediaType
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.stereotype.Service
 import java.time.Duration
 import java.time.LocalDateTime
 
-@RestController
-@RequestMapping(path = ["/api/status"], produces = [MediaType.APPLICATION_JSON_VALUE])
-class StatusController(
+@Service
+class SøknadStatusService(
     val barnetrygdSøknadRepository: SøknadRepository,
     val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
 ) {
-    val logger: Logger = LoggerFactory.getLogger(javaClass)
+    @Scheduled(cron = "0 0/30 * * * ?")
+    private fun sjekkStatusForBarnetrygdOgKontantstøtte() {
+        logger.info("Sjekker status for barnetrygd og kontantstøtte")
+        statusBarnetrygd()
+        statusKontantstøtte()
+    }
 
-    @GetMapping(value = ["/barnetrygd"])
-    @Unprotected
     fun statusBarnetrygd(): StatusDto {
         logger.info("Sjekker status på barnetrygd søknad.")
         val sistBarnetrygdSøknad = barnetrygdSøknadRepository.finnSisteLagredeSøknad()
@@ -30,8 +29,6 @@ class StatusController(
         return lagStatusDto(tidSidenSisteBarnetrygdSøknad, Søknadstype.BARNETRYGD)
     }
 
-    @GetMapping(value = ["/kontantstotte"])
-    @Unprotected
     fun statusKontantstøtte(): StatusDto {
         logger.info("Sjekker status på kontantstøtte søknad.")
         val sistKontantstøtteSøknad = kontantstøtteSøknadRepository.finnSisteLagredeSøknad()
@@ -101,6 +98,10 @@ class StatusController(
     private fun erDagtid() = LocalDateTime.now().hour in 9..22
 
     private fun erTidspunktMedForventetAktivitet() = LocalDateTime.now().hour in 9..22
+
+    companion object {
+        val logger: Logger = LoggerFactory.getLogger(SøknadStatusService::class.java)
+    }
 }
 
 const val LOG_URL = "https://logs.adeo.no/app/r/s/OJZqp"
