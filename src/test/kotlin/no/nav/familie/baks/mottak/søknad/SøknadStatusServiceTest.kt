@@ -19,10 +19,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
-class StatusControllerTest {
+class SøknadStatusServiceTest {
     private val søknadRepository = mockk<SøknadRepository>()
     private val kontantstøtteSøknadRepository = mockk<KontantstøtteSøknadRepository>()
-    private val statusController = StatusController(søknadRepository, kontantstøtteSøknadRepository)
+    private val søknadStatusService = SøknadStatusService(søknadRepository, kontantstøtteSøknadRepository)
     private val logAppender = LogAppender()
     private val logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as ch.qos.logback.classic.Logger
 
@@ -50,7 +50,7 @@ class StatusControllerTest {
             )
 
         // Act
-        val statusKontantstøtte = statusController.statusKontantstøtte()
+        val statusKontantstøtte = søknadStatusService.statusKontantstøtte()
 
         // Assert
         assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.DOWN)
@@ -69,7 +69,7 @@ class StatusControllerTest {
             )
 
         // Act
-        val statusBarnetrygd = statusController.statusBarnetrygd()
+        val statusBarnetrygd = søknadStatusService.statusBarnetrygd()
 
         // Assert
         assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.DOWN)
@@ -88,7 +88,7 @@ class StatusControllerTest {
             )
 
         // Act
-        val statusKontantstøtte = statusController.statusKontantstøtte()
+        val statusKontantstøtte = søknadStatusService.statusKontantstøtte()
 
         // Assert
         assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.DOWN)
@@ -106,7 +106,7 @@ class StatusControllerTest {
             )
 
         // Act
-        val statusBarnetrygd = statusController.statusBarnetrygd()
+        val statusBarnetrygd = søknadStatusService.statusBarnetrygd()
 
         // Assert
         assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.DOWN)
@@ -124,7 +124,7 @@ class StatusControllerTest {
             )
 
         // Act
-        val statusKontantstøtte = statusController.statusKontantstøtte()
+        val statusKontantstøtte = søknadStatusService.statusKontantstøtte()
 
         // Assert
         assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.ISSUE)
@@ -142,7 +142,7 @@ class StatusControllerTest {
             )
 
         // Act
-        val statusBarnetrygd = statusController.statusBarnetrygd()
+        val statusBarnetrygd = søknadStatusService.statusBarnetrygd()
 
         // Assert
         assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.ISSUE)
@@ -160,7 +160,7 @@ class StatusControllerTest {
             )
 
         // Act
-        val statusKontantstøtte = statusController.statusKontantstøtte()
+        val statusKontantstøtte = søknadStatusService.statusKontantstøtte()
 
         // Assert
         assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.OK)
@@ -179,7 +179,7 @@ class StatusControllerTest {
             )
 
         // Act
-        val statusBarnetrygd = statusController.statusBarnetrygd()
+        val statusBarnetrygd = søknadStatusService.statusBarnetrygd()
 
         // Assert
         assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.OK)
@@ -198,7 +198,7 @@ class StatusControllerTest {
             )
 
         // Act
-        val statusKontantstøtte = statusController.statusKontantstøtte()
+        val statusKontantstøtte = søknadStatusService.statusKontantstøtte()
 
         // Assert
         assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.OK)
@@ -217,7 +217,7 @@ class StatusControllerTest {
             )
 
         // Act
-        val statusBarnetrygd = statusController.statusBarnetrygd()
+        val statusBarnetrygd = søknadStatusService.statusBarnetrygd()
 
         // Assert
         assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.OK)
