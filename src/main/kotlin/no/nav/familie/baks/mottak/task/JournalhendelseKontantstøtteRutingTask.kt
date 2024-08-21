@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
+import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.Identgruppe
@@ -38,6 +39,7 @@ class JournalhendelseKontantstøtteRutingTask(
     private val journalpostClient: JournalpostClient,
     private val ksSakClient: KsSakClient,
     private val unleashService: UnleashNextMedContextService,
+    private val arbeidsfordelingClient: ArbeidsfordelingClient,
 ) : AsyncTaskStep {
     val log: Logger = LoggerFactory.getLogger(JournalhendelseKontantstøtteRutingTask::class.java)
     val enheterSomIkkeSkalHaAutomatiskJournalføring = listOf("4863")
@@ -47,7 +49,6 @@ class JournalhendelseKontantstøtteRutingTask(
     override fun doTask(task: Task) {
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
         val brukersIdent = tilPersonIdent(journalpost.bruker!!, tema)
-        val journalførendeEnhet = journalpost.journalforendeEnhet
 
         val fagsakId by lazy { ksSakClient.hentFagsaknummerPåPersonident(brukersIdent) }
 
@@ -67,7 +68,7 @@ class JournalhendelseKontantstøtteRutingTask(
                 erKontantstøtteSøknad &&
                 !harLøpendeSakIInfotrygd &&
                 journalpost.erDigitalKanal() &&
-                journalførendeEnhet !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
+                arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(brukersIdent, tema).enhetId !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
                 !harÅpenBehandlingIFagsak
 
         if (skalAutomatiskJournalføreJournalpost) {

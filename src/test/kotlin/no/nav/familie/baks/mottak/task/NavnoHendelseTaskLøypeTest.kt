@@ -6,6 +6,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
+import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
@@ -42,6 +43,7 @@ class NavnoHendelseTaskLøypeTest {
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
     private val mockUnleashNextMedContextService: UnleashNextMedContextService = mockk()
+    private val mockkArbeidsfordelingClient: ArbeidsfordelingClient = mockk()
 
     private val rutingSteg =
         JournalhendelseBarnetrygdRutingTask(
@@ -51,6 +53,7 @@ class NavnoHendelseTaskLøypeTest {
             mockTaskService,
             mockUnleashNextMedContextService,
             mockJournalpostClient,
+            mockkArbeidsfordelingClient,
         )
 
     private val journalføringSteg =
