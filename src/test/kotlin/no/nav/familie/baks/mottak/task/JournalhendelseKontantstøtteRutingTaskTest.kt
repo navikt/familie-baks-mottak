@@ -9,6 +9,7 @@ import io.mockk.slot
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.domene.personopplysning.Person
+import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BarnDto
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
@@ -56,6 +57,9 @@ class JournalhendelseKontantstøtteRutingTaskTest {
 
     @MockK
     private lateinit var unleashService: UnleashNextMedContextService
+
+    @MockK
+    private lateinit var arbeidsfordelingClient: ArbeidsfordelingClient
 
     @InjectMockKs
     private lateinit var journalhendelseKontantstøtteRutingTask: JournalhendelseKontantstøtteRutingTask

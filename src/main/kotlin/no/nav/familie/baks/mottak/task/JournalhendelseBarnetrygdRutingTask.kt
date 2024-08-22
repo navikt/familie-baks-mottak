@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
+import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
@@ -50,6 +51,7 @@ class JournalhendelseBarnetrygdRutingTask(
     private val taskService: TaskService,
     private val unleashService: UnleashNextMedContextService,
     private val journalpostClient: JournalpostClient,
+    private val arbeidsfordelingClient: ArbeidsfordelingClient,
 ) : AsyncTaskStep {
     private val tema = Tema.BAR
 
@@ -60,7 +62,6 @@ class JournalhendelseBarnetrygdRutingTask(
     override fun doTask(task: Task) {
         val brukersIdent = task.metadata["personIdent"] as String?
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
-        val journalførendeEnhet = journalpost.journalforendeEnhet
 
         val erBarnetrygdSøknad = journalpost.erBarnetrygdSøknad()
 
@@ -74,7 +75,8 @@ class JournalhendelseBarnetrygdRutingTask(
                 defaultValue = false,
             )
 
-        val fagsakId by lazy { baSakClient.hentFagsaknummerPåPersonident(tilPersonIdent(journalpost.bruker!!, tema)) }
+        val personIdent by lazy { tilPersonIdent(journalpost.bruker!!, tema) }
+        val fagsakId by lazy { baSakClient.hentFagsaknummerPåPersonident(personIdent) }
         val harÅpenBehandlingIFagsak by lazy { baSakClient.hentMinimalRestFagsak(fagsakId.toLong()).finnesÅpenBehandlingPåFagsak() }
 
         val sakssystemMarkering = hentSakssystemMarkering(brukerHarFagsakIBaSak, brukerHarSakIInfotrygd, baSak, infotrygdSak)
@@ -83,7 +85,7 @@ class JournalhendelseBarnetrygdRutingTask(
             featureToggleForAutomatiskJournalføringSkruddPå &&
                 erBarnetrygdSøknad &&
                 !brukerHarSakIInfotrygd &&
-                journalførendeEnhet !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
+                arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdent, tema).enhetId !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
                 journalpost.erDigitalKanal() &&
                 !harÅpenBehandlingIFagsak
 
