@@ -27,7 +27,7 @@ class ArbeidsfordelingClientTest {
     @Tag("integration")
     fun `hentBehandlendeEnhetPåIdent skal returnere enhet på person`() {
         stubFor(
-            WireMock.post(urlEqualTo("/api/arbeidsfordeling/enhet/KON")).withRequestBody(WireMock.equalToJson("""{"personIdent":"123"}""")).willReturn(
+            WireMock.post(urlEqualTo("/api/arbeidsfordeling/enhet/KON")).withRequestBody(WireMock.equalToJson("""{"ident":"123"}""")).willReturn(
                 aResponse().withHeader("Content-Type", "application/json").withBody(
                     gyldigEnhetResponse(),
                 ),
