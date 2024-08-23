@@ -16,13 +16,13 @@ class ArbeidsfordelingClient(
     @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonUri: URI,
     @Qualifier("clientCredentials") restOperations: RestOperations,
 ) : AbstractRestClient(restOperations, "integrasjon") {
-    fun hentBehandlendeEnhetPåIdent(
+    fun hentBehandlendeEnheterPåIdent(
         personIdent: String,
         tema: Tema,
-    ): Enhet {
+    ): List<Enhet> {
         val uri = URI.create("$integrasjonUri/arbeidsfordeling/enhet/$tema")
         return runCatching {
-            postForEntity<Ressurs<Enhet>>(uri, PersonIdent(personIdent))
+            postForEntity<Ressurs<List<Enhet>>>(uri, PersonIdent(personIdent))
         }.fold(
             onSuccess = { it.data ?: throw IntegrasjonException(it.melding, uri = uri, ident = personIdent) },
             onFailure = { throw IntegrasjonException("Feil ved henting av behandlende enhet på ident m/ tema $tema", it, uri, personIdent) },
