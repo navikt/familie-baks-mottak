@@ -8,8 +8,8 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import no.nav.familie.baks.mottak.integrasjoner.PdfClient
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -38,7 +38,7 @@ internal class PdfServiceTest {
                 .readText(Charsets.UTF_8)
         val søknad: SøknadKontraktV8 = mapper.readValue(jsonString)
         val dbBarnetrygdSøknad: DBBarnetrygdSøknad = søknad.tilDBSøknad()
-        pdfService.lagBarnetrygdPdf(SøknadV8(søknad = søknad), dbBarnetrygdSøknad, språk = "nb")
+        pdfService.lagBarnetrygdPdf(BarnetrygdSøknadV8(barnetrygdSøknad = søknad), dbBarnetrygdSøknad, språk = "nb")
 
         // Kommenter inn dette for å logge generert json til console
         // val jsonToDokgen: String = mapper.writeValueAsString(jsonSlot)

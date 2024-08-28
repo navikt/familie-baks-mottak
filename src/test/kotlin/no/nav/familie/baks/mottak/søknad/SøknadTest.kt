@@ -2,8 +2,8 @@ package no.nav.familie.baks.mottak.søknad
 
 import no.nav.familie.baks.mottak.DevLauncherPostgres
 import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadService
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
 import no.nav.familie.baks.mottak.util.DbContainerInitializer
 import no.nav.familie.kontrakter.felles.objectMapper
@@ -31,12 +31,12 @@ class SøknadTest(
     @Test
     fun `Lagring av søknad`() {
         val dbSøknadFraMapper = søknadV8.tilDBSøknad()
-        assertThat(dbSøknadFraMapper.hentVersjonertSøknad() is SøknadV8).isTrue
+        assertThat(dbSøknadFraMapper.hentVersjonertSøknad() is BarnetrygdSøknadV8).isTrue
 
         val dbSøknadFraDB = barnetrygdSøknadService.lagreDBSøknad(dbSøknadFraMapper)
         val hentetSøknad = barnetrygdSøknadService.hentDBSøknad(dbSøknadFraDB.id)
         assertEquals(dbSøknadFraDB.id, hentetSøknad!!.id)
-        assertThat(hentetSøknad.hentVersjonertSøknad() is SøknadV8)
+        assertThat(hentetSøknad.hentVersjonertSøknad() is BarnetrygdSøknadV8)
     }
 
     @Test
@@ -44,7 +44,7 @@ class SøknadTest(
         val dbSøknadFraMapper = søknadV8.tilDBSøknad()
         val versjon: Int? =
             when (val versjonertSøknad = dbSøknadFraMapper.hentVersjonertSøknad()) {
-                is SøknadV8 -> versjonertSøknad.søknad.kontraktVersjon
+                is BarnetrygdSøknadV8 -> versjonertSøknad.barnetrygdSøknad.kontraktVersjon
                 else -> {
                     null
                 }
@@ -54,7 +54,7 @@ class SøknadTest(
         val dbSøknadFraDB = barnetrygdSøknadService.lagreDBSøknad(dbSøknadFraMapper)
         val hentetSøknad = barnetrygdSøknadService.hentDBSøknad(dbSøknadFraDB.id)
         assertEquals(dbSøknadFraDB.id, hentetSøknad!!.id)
-        assertThat(hentetSøknad.hentVersjonertSøknad() is SøknadV8).isTrue
+        assertThat(hentetSøknad.hentVersjonertSøknad() is BarnetrygdSøknadV8).isTrue
     }
 
     @Test
@@ -66,6 +66,6 @@ class SøknadTest(
                 søknadJson = lagraV8SøknadData,
                 fnr = "1234123412",
             )
-        assertThat(v8DbBarnetrygdSøknad.hentVersjonertSøknad() is SøknadV8).isTrue
+        assertThat(v8DbBarnetrygdSøknad.hentVersjonertSøknad() is BarnetrygdSøknadV8).isTrue
     }
 }

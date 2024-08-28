@@ -9,9 +9,10 @@ import jakarta.persistence.Id
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg
+import no.nav.familie.kontrakter.ba.søknad.v8.Søknad
+import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad
 import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.LocalDateTime
-import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadV8
 
 @Entity(name = "Soknad")
 @Table(name = "Soknad")
@@ -28,24 +29,25 @@ data class DBBarnetrygdSøknad(
     @Column(name = "journalpost_id")
     val journalpostId: String? = null,
 ) {
-    private fun hentSøknadV8(): SøknadV8 = objectMapper.readValue(søknadJson)
+    private fun hentSøknadV8(): Søknad = objectMapper.readValue(søknadJson)
 
-    private fun hentSøknadVersjon(): String =
-        try {
-            val søknad = objectMapper.readTree(søknadJson)
-            if (søknad.get("kontraktVersjon")?.asInt() == 8) {
-                "v8"
-            } else {
-                "v7"
-            }
-        } catch (e: Error) {
-            "v7"
+    private fun hentSøknadV9(): BarnetrygdSøknad = objectMapper.readValue(søknadJson)
+
+    private fun hentSøknadVersjon(): String {
+        val søknad = objectMapper.readTree(søknadJson)
+        val kontraktversjon = søknad.get("kontraktVersjon")?.asInt()
+        return when (kontraktversjon) {
+            8 -> "v8"
+            9 -> "v9"
+            else -> "v$kontraktversjon"
         }
+    }
 
     fun hentVersjonertSøknad(): VersjonertBarnetrygdSøknad {
         val versjon = this.hentSøknadVersjon()
         return when (versjon) {
-            "v8" -> SøknadV8(søknad = hentSøknadV8())
+            "v8" -> BarnetrygdSøknadV8(barnetrygdSøknad = hentSøknadV8())
+            "v9" -> BarnetrygdSøknadV9(barnetrygdSøknad = hentSøknadV9())
             else -> error("Ikke støttet versjon $versjon av kontrakt for Barnetrygd")
         }
     }
@@ -68,7 +70,20 @@ interface Vedlegg {
     val data: ByteArray
 }
 
-fun SøknadV8.tilDBSøknad(): DBBarnetrygdSøknad {
+fun Søknad.tilDBSøknad(): DBBarnetrygdSøknad {
+    try {
+        return DBBarnetrygdSøknad(
+            søknadJson = objectMapper.writeValueAsString(this),
+            fnr =
+                this.søker.ident.verdi
+                    .getValue("nb"),
+        )
+    } catch (e: KotlinNullPointerException) {
+        throw FødselsnummerErNullException()
+    }
+}
+
+fun BarnetrygdSøknad.tilDBSøknad(): DBBarnetrygdSøknad {
     try {
         return DBBarnetrygdSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
@@ -95,7 +110,8 @@ fun DBBarnetrygdSøknad.harEøsSteg(): Boolean {
     val versjonertSøknad = this.hentVersjonertSøknad()
 
     return when (versjonertSøknad) {
-        is no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8 -> versjonertSøknad.søknad.søker.harEøsSteg
+        is no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV8 -> versjonertSøknad.barnetrygdSøknad.søker.harEøsSteg
+        is no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9 -> versjonertSøknad.barnetrygdSøknad.søker.harEøsSteg
     }
 }
 

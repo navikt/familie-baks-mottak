@@ -3,9 +3,9 @@ package no.nav.familie.baks.mottak.søknad
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBVedlegg
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteVedlegg
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
@@ -123,7 +123,7 @@ class ArkiverDokumentRequestMapperTest {
         val arkiverDokumentRequest =
             ArkiverDokumentRequestMapper.toDto(
                 dbBarnetrygdSøknad,
-                SøknadV8(søknad),
+                BarnetrygdSøknadV8(søknad),
                 ByteArray(0),
                 vedleggMap,
                 ByteArray(0),
