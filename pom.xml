@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.2</version>
+        <version>3.3.3</version>
     </parent>
 
     <properties>
@@ -20,7 +20,7 @@
         <changelist>-SNAPSHOT</changelist>
         <java.version>21</java.version>
         <jvmTarget>21</jvmTarget>
-        <kotlin.version>2.0.10</kotlin.version>
+        <kotlin.version>2.0.20</kotlin.version>
         <mockk.version>1.13.12</mockk.version>
         <confluent.version>7.7.0</confluent.version>
         <prosessering.version>2.20240809130157_d33fbc4</prosessering.version>
@@ -206,7 +206,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.3</version>
+            <version>42.7.4</version>
         </dependency>
         <dependency>
             <groupId>com.papertrailapp</groupId>
