@@ -85,7 +85,7 @@ class JournalhendelseBarnetrygdRutingTask(
             featureToggleForAutomatiskJournalføringSkruddPå &&
                 erBarnetrygdSøknad &&
                 !brukerHarSakIInfotrygd &&
-                arbeidsfordelingClient.hentBehandlendeEnheterPåIdent(personIdent, tema).all { it.enhetId !in enheterSomIkkeSkalHaAutomatiskJournalføring } &&
+                arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdent, tema).enhetId !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
                 journalpost.erDigitalKanal() &&
                 !harÅpenBehandlingIFagsak
 

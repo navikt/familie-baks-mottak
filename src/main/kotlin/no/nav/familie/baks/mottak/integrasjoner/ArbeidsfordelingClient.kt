@@ -25,7 +25,13 @@ class ArbeidsfordelingClient(
             postForEntity<Ressurs<List<Enhet>>>(uri, PersonIdent(personIdent))
         }.fold(
             onSuccess = { it.data ?: throw IntegrasjonException(it.melding, uri = uri, ident = personIdent) },
-            onFailure = { throw IntegrasjonException("Feil ved henting av behandlende enhet på ident m/ tema $tema", it, uri, personIdent) },
+            onFailure = { throw IntegrasjonException("Feil ved henting av behandlende enheter på ident m/ tema $tema", it, uri, personIdent) },
         )
     }
+
+    fun hentBehandlendeEnhetPåIdent(
+        personIdent: String,
+        tema: Tema,
+    ): Enhet =
+        hentBehandlendeEnheterPåIdent(personIdent, tema).singleOrNull() ?: throw IllegalStateException("Forventet bare 1 enhet på ident men fantes flere")
 }

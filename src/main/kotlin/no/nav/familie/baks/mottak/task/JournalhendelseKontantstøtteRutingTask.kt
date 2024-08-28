@@ -68,7 +68,7 @@ class JournalhendelseKontantstøtteRutingTask(
                 erKontantstøtteSøknad &&
                 !harLøpendeSakIInfotrygd &&
                 journalpost.erDigitalKanal() &&
-                arbeidsfordelingClient.hentBehandlendeEnheterPåIdent(brukersIdent, tema).all { it.enhetId !in enheterSomIkkeSkalHaAutomatiskJournalføring } &&
+                arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(brukersIdent, tema).enhetId !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
                 !harÅpenBehandlingIFagsak
 
         if (skalAutomatiskJournalføreJournalpost) {

@@ -34,9 +34,11 @@ class OppgaveMapperTest(
 ) {
     private val mockHentEnhetClient: HentEnhetClient = mockk(relaxed = true)
 
-    private val barnetrygdOppgaveMapper: IOppgaveMapper = BarnetrygdOppgaveMapper(mockHentEnhetClient, mockPdlClient, barnetrygdSøknadRepository)
+    private val mockArbeidsfordelingClient: ArbeidsfordelingClient = mockk(relaxed = true)
 
-    private val kontantstøtteOppgaveMapper: IOppgaveMapper = KontantstøtteOppgaveMapper(mockHentEnhetClient, mockPdlClient, kontantstøtteSøknadRepository)
+    private val barnetrygdOppgaveMapper: IOppgaveMapper = BarnetrygdOppgaveMapper(mockHentEnhetClient, mockArbeidsfordelingClient, mockPdlClient, barnetrygdSøknadRepository)
+
+    private val kontantstøtteOppgaveMapper: IOppgaveMapper = KontantstøtteOppgaveMapper(mockHentEnhetClient, mockArbeidsfordelingClient, mockPdlClient, kontantstøtteSøknadRepository)
 
     @Test
     fun `skal kaste exception dersom dokumentlisten er tom`() {
