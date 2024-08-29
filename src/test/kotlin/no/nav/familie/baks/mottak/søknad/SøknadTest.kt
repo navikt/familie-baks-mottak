@@ -60,12 +60,12 @@ class SøknadTest(
     @Test
     fun `Version detection ved henting av søknad fra database`() {
         val barnetrygdSøknadSomString = objectMapper.writeValueAsString(SøknadTestData.barnetrygdSøknad())
-        val DBBarnetrygdSøknad =
+        val dbBarnetrygdSøknad =
             DBBarnetrygdSøknad(
                 id = 2L,
                 søknadJson = barnetrygdSøknadSomString,
                 fnr = "1234123412",
             )
-        assertThat(DBBarnetrygdSøknad.hentVersjonertSøknad() is BarnetrygdSøknadV9).isTrue
+        assertThat(dbBarnetrygdSøknad.hentVersjonertSøknad() is BarnetrygdSøknadV9).isTrue
     }
 }
