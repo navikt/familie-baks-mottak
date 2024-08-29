@@ -34,25 +34,12 @@ data class DBKontantstøtteSøknad(
     @Column(name = "journalpost_id")
     val journalpostId: String? = null,
 ) {
-    private fun hentSøknadV5(): KontantstøtteSøknadV5 = objectMapper.readValue(søknadJson)
-
-    private fun hentSøknadV4(): KontantstøtteSøknadV4 = objectMapper.readValue(søknadJson)
-
-    private fun hentSøknadVersjon(): String {
-        val søknad = objectMapper.readTree(søknadJson)
-        val kontraktversjon = søknad.get("kontraktVersjon")?.asInt()
-        return when (kontraktversjon) {
-            4 -> "v4"
-            5 -> "v5"
-            else -> "v$kontraktversjon"
-        }
-    }
-
     fun hentVersjonertKontantstøtteSøknad(): VersjonertKontantstøtteSøknad {
-        val versjon = this.hentSøknadVersjon()
+        val søknad = objectMapper.readTree(søknadJson)
+        val versjon = søknad.get("kontraktVersjon")?.asInt()
         return when (versjon) {
-            "v5" -> KontantstøtteSøknadV5(kontantstøtteSøknad = hentSøknadV5())
-            "v4" -> KontantstøtteSøknadV4(kontantstøtteSøknad = hentSøknadV4())
+            4 -> KontantstøtteSøknadV4(kontantstøtteSøknad = objectMapper.readValue<KontantstøtteSøknadV4>(søknadJson))
+            5 -> KontantstøtteSøknadV5(kontantstøtteSøknad = objectMapper.readValue<KontantstøtteSøknadV5>(søknadJson))
             else -> error("Ikke støttet versjon $versjon av kontrakt for Kontantstøtte")
         }
     }

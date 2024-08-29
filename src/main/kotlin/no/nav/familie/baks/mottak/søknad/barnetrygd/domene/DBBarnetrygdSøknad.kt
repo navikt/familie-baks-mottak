@@ -9,10 +9,10 @@ import jakarta.persistence.Id
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg
-import no.nav.familie.kontrakter.ba.søknad.v8.Søknad
-import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad
 import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.LocalDateTime
+import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as BarnetrygdSøknadV8
+import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad as BarnetrygdSøknadV9
 
 @Entity(name = "Soknad")
 @Table(name = "Soknad")
@@ -29,25 +29,12 @@ data class DBBarnetrygdSøknad(
     @Column(name = "journalpost_id")
     val journalpostId: String? = null,
 ) {
-    private fun hentSøknadV8(): Søknad = objectMapper.readValue(søknadJson)
-
-    private fun hentSøknadV9(): BarnetrygdSøknad = objectMapper.readValue(søknadJson)
-
-    private fun hentSøknadVersjon(): String {
-        val søknad = objectMapper.readTree(søknadJson)
-        val kontraktversjon = søknad.get("kontraktVersjon")?.asInt()
-        return when (kontraktversjon) {
-            8 -> "v8"
-            9 -> "v9"
-            else -> "v$kontraktversjon"
-        }
-    }
-
     fun hentVersjonertSøknad(): VersjonertBarnetrygdSøknad {
-        val versjon = this.hentSøknadVersjon()
+        val søknad = objectMapper.readTree(søknadJson)
+        val versjon = søknad.get("kontraktVersjon")?.asInt()
         return when (versjon) {
-            "v8" -> BarnetrygdSøknadV8(barnetrygdSøknad = hentSøknadV8())
-            "v9" -> BarnetrygdSøknadV9(barnetrygdSøknad = hentSøknadV9())
+            8 -> BarnetrygdSøknadV8(barnetrygdSøknad = objectMapper.readValue<BarnetrygdSøknadV8>(søknadJson))
+            9 -> BarnetrygdSøknadV9(barnetrygdSøknad = objectMapper.readValue<BarnetrygdSøknadV9>(søknadJson))
             else -> error("Ikke støttet versjon $versjon av kontrakt for Barnetrygd")
         }
     }
@@ -70,7 +57,7 @@ interface Vedlegg {
     val data: ByteArray
 }
 
-fun Søknad.tilDBSøknad(): DBBarnetrygdSøknad {
+fun BarnetrygdSøknadV8.tilDBSøknad(): DBBarnetrygdSøknad {
     try {
         return DBBarnetrygdSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
@@ -83,7 +70,7 @@ fun Søknad.tilDBSøknad(): DBBarnetrygdSøknad {
     }
 }
 
-fun BarnetrygdSøknad.tilDBSøknad(): DBBarnetrygdSøknad {
+fun BarnetrygdSøknadV9.tilDBSøknad(): DBBarnetrygdSøknad {
     try {
         return DBBarnetrygdSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
