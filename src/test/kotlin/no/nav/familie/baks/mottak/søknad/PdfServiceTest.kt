@@ -44,6 +44,6 @@ internal class PdfServiceTest {
         // val jsonToDokgen: String = mapper.writeValueAsString(jsonSlot)
         // println(jsonToDokgen)
 
-        assertThat(jsonSlot.captured["kontraktVersjon"]).isEqualTo(8)
+        assertThat(jsonSlot.captured["kontraktVersjon"]).isEqualTo(9)
     }
 }

@@ -31,7 +31,7 @@ class JournalføringTest(
     @Autowired
     val kontantstøtteSøknadService: KontantstøtteSøknadService,
 ) {
-    val søknad = SøknadTestData.søknadV8()
+    val søknad = SøknadTestData.barnetrygdSøknad()
     val dbSøknad = søknad.tilDBSøknad()
     val kontantstøtteSøknad = KontantstøtteSøknadTestData.kontantstøtteSøknad()
     val dbKontantstøtteSøknad = kontantstøtteSøknad.tilDBKontantstøtteSøknad()

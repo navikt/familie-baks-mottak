@@ -13,7 +13,7 @@ fun <T> søknadsfelt(
 object KontantstøtteSøknadTestData {
     fun kontantstøtteSøknad(): KontantstøtteSøknad =
         KontantstøtteSøknad(
-            kontraktVersjon = 4,
+            kontraktVersjon = 5,
             antallEøsSteg = 2,
             søker = lagSøker(),
             barn = emptyList(),
