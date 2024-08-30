@@ -8,14 +8,14 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import no.nav.familie.baks.mottak.integrasjoner.PdfClient
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV8
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
+import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.io.File
-import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as SøknadKontraktV8
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class PdfServiceTest {
@@ -36,9 +36,9 @@ internal class PdfServiceTest {
         val jsonString: String =
             File("./src/test/kotlin/no/nav/familie/baks/mottak/søknad/testdata/testdata1.json")
                 .readText(Charsets.UTF_8)
-        val søknad: SøknadKontraktV8 = mapper.readValue(jsonString)
-        val dbBarnetrygdSøknad: DBBarnetrygdSøknad = søknad.tilDBSøknad()
-        pdfService.lagBarnetrygdPdf(BarnetrygdSøknadV8(barnetrygdSøknad = søknad), dbBarnetrygdSøknad, språk = "nb")
+        val barnetrygdSøknad: BarnetrygdSøknad = mapper.readValue(jsonString)
+        val dbBarnetrygdSøknad: DBBarnetrygdSøknad = barnetrygdSøknad.tilDBSøknad()
+        pdfService.lagBarnetrygdPdf(BarnetrygdSøknadV9(barnetrygdSøknad = barnetrygdSøknad), dbBarnetrygdSøknad, språk = "nb")
 
         // Kommenter inn dette for å logge generert json til console
         // val jsonToDokgen: String = mapper.writeValueAsString(jsonSlot)
