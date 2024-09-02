@@ -1,6 +1,7 @@
 package no.nav.familie.baks.mottak.søknad.kontantstøtte
 
 import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClient
+import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteVedlegg
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.FødselsnummerErNullException
@@ -68,6 +69,9 @@ class KontantstøtteSøknadService(
     fun lagreDBKontantstøtteSøknad(dbKontantstøtteSøknad: DBKontantstøtteSøknad): DBKontantstøtteSøknad = kontantstøtteSøknadRepository.save(dbKontantstøtteSøknad)
 
     fun hentDBKontantstøtteSøknad(søknadId: Long): DBKontantstøtteSøknad? = kontantstøtteSøknadRepository.hentSøknad(søknadId)
+
+    fun hentDBKontantstøtteSøknadForJournalpost(journalpostId: String): DBKontantstøtteSøknad? =
+        kontantstøtteSøknadRepository.hentSøknadForJournalpost(journalpostId = journalpostId)
 
     fun hentLagredeDBKontantstøtteVedlegg(søknad: DBKontantstøtteSøknad): Map<String, DBKontantstotteVedlegg> {
         val vedleggMap = mutableMapOf<String, DBKontantstotteVedlegg>()

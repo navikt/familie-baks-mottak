@@ -61,6 +61,9 @@ class BarnetrygdSøknadService(
 
     fun hentDBSøknad(søknadId: Long): DBBarnetrygdSøknad? = søknadRepository.hentDBSøknad(søknadId)
 
+    fun hentDBSøknadFraJournalpost(journalpostId: String): DBBarnetrygdSøknad? =
+        søknadRepository.hentDBSøknadForJournalpost(journalpostId = journalpostId)
+
     fun hentLagredeVedlegg(søknad: DBBarnetrygdSøknad): Map<String, DBVedlegg> {
         val map = mutableMapOf<String, DBVedlegg>()
         vedleggRepository.hentAlleVedlegg(søknad.id).forEach {
