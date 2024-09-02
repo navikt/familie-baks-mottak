@@ -3,13 +3,13 @@ package no.nav.familie.baks.mottak.integrasjoner
 import no.nav.familie.kontrakter.felles.Tema
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.Locale
 
 @Service
 class EnhetsnummerService(
     private val hentEnhetClient: HentEnhetClient,
     private val pdlClient: PdlClient,
-    private val søknadFraJournalpostService: SøknadFraJournalpostService
+    private val søknadFraJournalpostService: SøknadFraJournalpostService,
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -26,14 +26,16 @@ class EnhetsnummerService(
 
         val tema = Tema.valueOf(journalpost.tema)
 
-        val identer = when (tema) {
-            Tema.BAR -> søknadFraJournalpostService.hentIdenterForBarnetrygd(journalpost.journalpostId)
-            Tema.KON -> søknadFraJournalpostService.hentIdenterForKontantstøtte(journalpost.journalpostId)
-            Tema.ENF,
-            Tema.OPP -> {
-                throw IllegalStateException("Støtter ikke tema $tema")
+        val identer =
+            when (tema) {
+                Tema.BAR -> søknadFraJournalpostService.hentIdenterForBarnetrygd(journalpost.journalpostId)
+                Tema.KON -> søknadFraJournalpostService.hentIdenterForKontantstøtte(journalpost.journalpostId)
+                Tema.ENF,
+                Tema.OPP,
+                -> {
+                    throw IllegalStateException("Støtter ikke tema $tema")
+                }
             }
-        }
 
         val erStrengtFortrolig =
             identer
@@ -55,5 +57,4 @@ class EnhetsnummerService(
             }
         }
     }
-
 }

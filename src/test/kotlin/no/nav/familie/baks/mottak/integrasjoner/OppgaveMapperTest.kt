@@ -13,6 +13,7 @@ import no.nav.familie.kontrakter.felles.oppgave.OppgaveIdentV2
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -31,24 +32,25 @@ class OppgaveMapperTest(
     private val barnetrygdSøknadRepository: SøknadRepository,
     @Autowired
     private val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
-    @Autowired
-    private val enhetsnummerService: EnhetsnummerService
 ) {
     private val mockHentEnhetClient: HentEnhetClient = mockk(relaxed = true)
+    private val mockEnhetsnummerService: EnhetsnummerService = mockk()
 
-    private val barnetrygdOppgaveMapper: IOppgaveMapper = BarnetrygdOppgaveMapper(
-        enhetsnummerService,
-        mockHentEnhetClient,
-        mockPdlClient,
-        barnetrygdSøknadRepository
-    )
+    private val barnetrygdOppgaveMapper: IOppgaveMapper =
+        BarnetrygdOppgaveMapper(
+            enhetsnummerService = mockEnhetsnummerService,
+            hentEnhetClient = mockHentEnhetClient,
+            pdlClient = mockPdlClient,
+            søknadRepository = barnetrygdSøknadRepository,
+        )
 
-    private val kontantstøtteOppgaveMapper: IOppgaveMapper = KontantstøtteOppgaveMapper(
-        enhetsnummerService,
-        mockHentEnhetClient,
-        mockPdlClient,
-        kontantstøtteSøknadRepository
-    )
+    private val kontantstøtteOppgaveMapper: IOppgaveMapper =
+        KontantstøtteOppgaveMapper(
+            enhetsnummerService = mockEnhetsnummerService,
+            hentEnhetClient = mockHentEnhetClient,
+            pdlClient = mockPdlClient,
+            kontantstøtteSøknadRepository = kontantstøtteSøknadRepository,
+        )
 
     @Test
     fun `skal kaste exception dersom dokumentlisten er tom`() {
@@ -355,6 +357,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette enhet 4806 hvis enhet på journalpost er 2101`() {
+        every { mockEnhetsnummerService.hentEnhetsnummer(any()) } returns "2101"
         val oppgave =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
@@ -379,6 +382,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette enhet null hvis enhet på journalpost er null`() {
+        every { mockEnhetsnummerService.hentEnhetsnummer(any()) } returns null
         val oppgave =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
@@ -404,6 +408,7 @@ class OppgaveMapperTest(
     @Test
     fun `skal sette enhet fra journalpost hvis enhet kan behandle oppgaver`() {
         every { mockHentEnhetClient.hentEnhet("4") } returns Enhet("4", "enhetnavn", true, "Aktiv")
+        every { mockEnhetsnummerService.hentEnhetsnummer(any()) } returns "4"
         val oppgave =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
                 Oppgavetype.Journalføring,
@@ -428,6 +433,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette enhet null hvis enhet ikke kan behandle oppgaver`() {
+        every { mockEnhetsnummerService.hentEnhetsnummer(any()) } returns "5"
         every { mockHentEnhetClient.hentEnhet("5") } returns Enhet("4", "enhetnavn", false, "Aktiv")
         val oppgave =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
@@ -453,6 +459,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette enhet null hvis enhet er nedlagt`() {
+        every { mockEnhetsnummerService.hentEnhetsnummer(any()) } returns null
         every { mockHentEnhetClient.hentEnhet("5") } returns Enhet("4", "enhetnavn", true, "Nedlagt")
         val oppgave =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(

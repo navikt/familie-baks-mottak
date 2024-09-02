@@ -1,6 +1,5 @@
 package no.nav.familie.baks.mottak.søknad.kontantstøtte.domene
 
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query

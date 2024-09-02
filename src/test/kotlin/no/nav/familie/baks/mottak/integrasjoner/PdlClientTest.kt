@@ -48,7 +48,7 @@ class PdlClientTest {
         )
 
         val personInfo = pdlClient.hentPersonMedRelasjoner(testIdent, Tema.BAR)
-        assertThat(personInfo.adressebeskyttelseGradering).isEqualTo(Adressebeskyttelsesgradering.UGRADERT.name)
+        assertThat(personInfo.adressebeskyttelseGradering).isEqualTo(listOf(Adressebeskyttelsesgradering.UGRADERT))
         assertThat(personInfo.forelderBarnRelasjoner.size).isEqualTo(2)
         assertThat(personInfo.bostedsadresse?.vegadresse).isNotNull
     }

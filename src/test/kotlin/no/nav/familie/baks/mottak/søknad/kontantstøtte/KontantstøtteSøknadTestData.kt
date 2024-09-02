@@ -15,7 +15,7 @@ fun <T> søknadsfelt(
 object KontantstøtteSøknadTestData {
     fun kontantstøtteSøknad(
         søker: Søker = lagSøker(),
-        barn: List<Barn> = lagBarn()
+        barn: List<Barn> = listOf(lagBarn()),
     ): KontantstøtteSøknad =
         KontantstøtteSøknad(
             kontraktVersjon = 5,
@@ -69,40 +69,38 @@ object KontantstøtteSøknadTestData {
         )
 
     fun lagBarn(
-        identer: List<String> = listOf("12345678999"),
-    ): List<Barn> =
-        identer.map {
-            Barn(
-                harEøsSteg = true,
-                navn = søknadsfelt("Barnets fulle navn", "barn1"),
-                ident = søknadsfelt("Fødselsnummer", it),
-                registrertBostedType = søknadsfelt("Skal ha samme adresse", RegistrertBostedType.REGISTRERT_ANNEN_ADRESSE),
-                alder = søknadsfelt("alder", "4 år"),
-                utenlandsperioder = emptyList(),
-                teksterTilPdf = emptyMap(),
-                erFosterbarn = søknadsfelt("erFosterbarn", "JA"),
-                oppholderSegIInstitusjon = søknadsfelt("oppholderSegIInstitusjon", "JA"),
-                adresse = søknadsfelt("adresse", "Galtvort 123"),
-                andreForelder = null,
-                andreForelderErDød = null,
-                boddMindreEnn12MndINorge = søknadsfelt("boddMindreEnn12MndINorge", "JA"),
-                borFastMedSøker = søknadsfelt("borFastMedSøker", "JA"),
-                borMedAndreForelder = null,
-                borMedOmsorgsperson = null,
-                erAdoptert = søknadsfelt("erAdoptert", "NEI"),
-                erAsylsøker = søknadsfelt("erAsylsøker", "NEI"),
-                foreldreBorSammen = null,
-                harBarnehageplass = søknadsfelt("harBarnehageplass", "NEI"),
-                kontantstøtteFraAnnetEøsland = søknadsfelt("kontantstøtteFraAnnetEøsland", "NEI"),
-                mottarEllerMottokEøsKontantstøtte = null,
-                omsorgsperson = null,
-                planleggerÅBoINorge12Mnd = null,
-                pågåendeSøknadHvilketLand = null,
-                pågåendeSøknadFraAnnetEøsLand = null,
-                søkerDeltKontantstøtte = null,
-                søkersSlektsforhold = null,
-                søkersSlektsforholdSpesifisering = null,
-                utbetaltForeldrepengerEllerEngangsstønad = null
-            )
-        }
+        fnr: String = "12345678999",
+    ): Barn =
+        Barn(
+            harEøsSteg = true,
+            navn = søknadsfelt("Barnets fulle navn", "barn1"),
+            ident = søknadsfelt("Fødselsnummer", fnr),
+            registrertBostedType = søknadsfelt("Skal ha samme adresse", RegistrertBostedType.REGISTRERT_ANNEN_ADRESSE),
+            alder = søknadsfelt("alder", "4 år"),
+            utenlandsperioder = emptyList(),
+            teksterTilPdf = emptyMap(),
+            erFosterbarn = søknadsfelt("erFosterbarn", "JA"),
+            oppholderSegIInstitusjon = søknadsfelt("oppholderSegIInstitusjon", "JA"),
+            adresse = søknadsfelt("adresse", "Galtvort 123"),
+            andreForelder = null,
+            andreForelderErDød = null,
+            boddMindreEnn12MndINorge = søknadsfelt("boddMindreEnn12MndINorge", "JA"),
+            borFastMedSøker = søknadsfelt("borFastMedSøker", "JA"),
+            borMedAndreForelder = null,
+            borMedOmsorgsperson = null,
+            erAdoptert = søknadsfelt("erAdoptert", "NEI"),
+            erAsylsøker = søknadsfelt("erAsylsøker", "NEI"),
+            foreldreBorSammen = null,
+            harBarnehageplass = søknadsfelt("harBarnehageplass", "NEI"),
+            kontantstøtteFraAnnetEøsland = søknadsfelt("kontantstøtteFraAnnetEøsland", "NEI"),
+            mottarEllerMottokEøsKontantstøtte = null,
+            omsorgsperson = null,
+            planleggerÅBoINorge12Mnd = null,
+            pågåendeSøknadHvilketLand = null,
+            pågåendeSøknadFraAnnetEøsLand = null,
+            søkerDeltKontantstøtte = null,
+            søkersSlektsforhold = null,
+            søkersSlektsforholdSpesifisering = null,
+            utbetaltForeldrepengerEllerEngangsstønad = null,
+        )
 }

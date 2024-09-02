@@ -1,7 +1,6 @@
 package no.nav.familie.baks.mottak.søknad.kontantstøtte
 
 import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClient
-import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteVedlegg
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.FødselsnummerErNullException
