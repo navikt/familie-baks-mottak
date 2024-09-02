@@ -9,44 +9,44 @@ import java.util.*
 @Service
 class EnhetsnummerService(
     private val hentEnhetClient: HentEnhetClient,
-    private val pdlClient: PdlClient
+    private val pdlClient: PdlClient,
 ) {
-
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     fun hentEnhetsnummer(
         journalpost: Journalpost,
     ): String? {
-
         if (journalpost.tema == null) {
-            throw IllegalStateException("Tema finnes ikke")
+            throw IllegalStateException("Tema er null")
         }
 
         if (journalpost.bruker == null) {
-            throw IllegalStateException("Bruker finnes ikke")
+            throw IllegalStateException("Bruker er null")
         }
 
         val tema = Tema.valueOf(journalpost.tema)
         val brukersIdent = tilPersonIdent(journalpost.bruker, tema)
 
         val person = pdlClient.hentPersonMedRelasjoner(brukersIdent, tema)
-        val barna = person
-            .forelderBarnRelasjoner
-            .filter {
-                it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN ||
-                // TODO : Kan et dødfødt barn ha kode 6/7/19?
-                it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.DOEDFOEDT_BARN
-            }
+        val barna =
+            person
+                .forelderBarnRelasjoner
+                .filter {
+                    it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN ||
+                        it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.DOEDFOEDT_BARN
+                }
 
-        val personErStrengtFortrolig = person
-            .adressebeskyttelseGradering
-            .any { it.erStrengtFortrolig() }
+        val personErStrengtFortrolig =
+            person
+                .adressebeskyttelseGradering
+                .any { it.erStrengtFortrolig() }
 
-        val minstEtBarnErStrengtFortrolig = barna
-            .mapNotNull { it.relatertPersonsIdent }
-            .map { pdlClient.hentPerson(it, "hentperson-barn", tema) }
-            .flatMap { it.adressebeskyttelse }
-            .any { it.gradering.erStrengtFortrolig()}
+        val minstEtBarnErStrengtFortrolig =
+            barna
+                .mapNotNull { it.relatertPersonsIdent }
+                .map { pdlClient.hentPerson(it, "hentperson-barn", tema) }
+                .flatMap { it.adressebeskyttelse }
+                .any { it.gradering.erStrengtFortrolig() }
 
         return when {
             personErStrengtFortrolig -> "2103"
@@ -71,5 +71,4 @@ class EnhetsnummerService(
             BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema)
             else -> bruker.id
         }
-
 }
