@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service
 import java.util.Locale
 
 abstract class AbstractOppgaveMapper(
+    private val enhetsnummerService: EnhetsnummerService,
     private val hentEnhetClient: HentEnhetClient,
     val pdlClient: PdlClient,
 ) : IOppgaveMapper {
@@ -33,7 +34,7 @@ abstract class AbstractOppgaveMapper(
             oppgavetype = oppgavetype,
             fristFerdigstillelse = fristFerdigstillelse(),
             beskrivelse = tilBeskrivelse(journalpost, beskrivelse),
-            enhetsnummer = utledEnhetsnummer(journalpost),
+            enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost),
             behandlingstema = hentBehandlingstemaVerdi(journalpost),
             behandlingstype = hentBehandlingstypeVerdi(journalpost),
         )

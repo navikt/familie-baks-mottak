@@ -9,10 +9,11 @@ import org.springframework.stereotype.Service
 
 @Service
 class BarnetrygdOppgaveMapper(
+    enhetsnummerService: EnhetsnummerService,
     hentEnhetClient: HentEnhetClient,
     pdlClient: PdlClient,
     val søknadRepository: SøknadRepository,
-) : AbstractOppgaveMapper(hentEnhetClient, pdlClient) {
+) : AbstractOppgaveMapper(enhetsnummerService, hentEnhetClient, pdlClient) {
     override val tema: Tema = Tema.BAR
 
     // Behandlingstema og behandlingstype settes basert på regelsettet som er dokumentert nederst her: https://confluence.adeo.no/display/TFA/Mottak+av+dokumenter

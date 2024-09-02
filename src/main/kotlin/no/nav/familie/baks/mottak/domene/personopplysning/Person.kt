@@ -1,5 +1,6 @@
 package no.nav.familie.baks.mottak.domene.personopplysning
 
+import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelsesgradering
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import no.nav.familie.kontrakter.felles.personopplysning.ForelderBarnRelasjon
 
@@ -7,7 +8,7 @@ data class Person(
     val navn: String?,
     val forelderBarnRelasjoner: Set<ForelderBarnRelasjon>,
     val bostedsadresse: Bostedsadresse? = null,
-    val adressebeskyttelseGradering: String? = null,
+    val adressebeskyttelseGradering: List<Adressebeskyttelsesgradering>,
 )
 
 data class Familierelasjon(
@@ -20,10 +21,6 @@ data class PersonIdent(
 )
 
 fun Person.harAdresseGradering(): Boolean =
-    if (this.adressebeskyttelseGradering == null) {
-        false
-    } else {
-        this.adressebeskyttelseGradering != "UGRADERT"
-    }
+    this.adressebeskyttelseGradering.any { it.erFortrolig()}
 
 fun Person.harBostedsadresse(): Boolean = this.bostedsadresse != null

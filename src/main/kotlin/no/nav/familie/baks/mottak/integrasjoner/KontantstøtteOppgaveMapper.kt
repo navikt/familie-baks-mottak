@@ -9,10 +9,11 @@ import org.springframework.stereotype.Service
 
 @Service
 class KontantstøtteOppgaveMapper(
+    enhetsnummerService: EnhetsnummerService,
     hentEnhetClient: HentEnhetClient,
     pdlClient: PdlClient,
     val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
-) : AbstractOppgaveMapper(hentEnhetClient, pdlClient) {
+) : AbstractOppgaveMapper(enhetsnummerService, hentEnhetClient, pdlClient) {
     override val tema: Tema = Tema.KON
 
     override fun hentBehandlingstema(journalpost: Journalpost): Behandlingstema? = null
