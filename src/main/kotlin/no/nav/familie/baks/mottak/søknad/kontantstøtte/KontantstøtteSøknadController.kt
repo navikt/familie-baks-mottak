@@ -3,6 +3,7 @@ package no.nav.familie.baks.mottak.søknad.kontantstøtte
 import no.nav.familie.baks.mottak.søknad.Kvittering
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.FødselsnummerErNullException
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV5
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import no.nav.familie.kontrakter.ks.søknad.v4.KontantstøtteSøknad as KontantstøtteSøknadKontraktV4
+import no.nav.familie.kontrakter.ks.søknad.v5.KontantstøtteSøknad as KontantstøtteSøknadKontraktV5
 
 @RestController
 @RequestMapping(path = ["/api/kontantstotte/"], produces = [APPLICATION_JSON_VALUE])
@@ -29,6 +31,12 @@ class KontantstøtteSøknadController(
         @RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV4,
     ): ResponseEntity<Ressurs<Kvittering>> =
         mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = KontantstøtteSøknadV4(kontantstøtteSøknad = søknad))
+
+    @PostMapping(value = ["/soknad/v5"], consumes = [MULTIPART_FORM_DATA_VALUE])
+    fun taImotSøknad(
+        @RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV5,
+    ): ResponseEntity<Ressurs<Kvittering>> =
+        mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = KontantstøtteSøknadV5(kontantstøtteSøknad = søknad))
 
     fun mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad): ResponseEntity<Ressurs<Kvittering>> =
         try {

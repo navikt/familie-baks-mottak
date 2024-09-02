@@ -165,7 +165,7 @@
         <dependency>
             <groupId>no.nav.familie</groupId>
             <artifactId>baks-dokgen</artifactId>
-            <version>1.0_20240627141649_53c4360</version>
+            <version>1.0_20240829133759_de4a212</version>
         </dependency>
         <!-- Kafka -->
         <dependency>
@@ -414,7 +414,8 @@
                         <phase>verify</phase>
                         <configuration>
                             <target name="ktlint">
-                                <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true" classpathref="maven.plugin.classpath" classname="com.pinterest.ktlint.Main">
+                                <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true"
+                                      classpathref="maven.plugin.classpath" classname="com.pinterest.ktlint.Main">
                                     <arg value="src/**/*.kt"/>
                                 </java>
                             </target>
@@ -428,7 +429,8 @@
                         <phase>validate</phase>
                         <configuration>
                             <target name="ktlint">
-                                <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true" classpathref="maven.plugin.classpath" classname="com.pinterest.ktlint.Main">
+                                <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true"
+                                      classpathref="maven.plugin.classpath" classname="com.pinterest.ktlint.Main">
                                     <jvmarg value="--add-opens"/>
                                     <jvmarg value="java.base/java.lang=ALL-UNNAMED"/>
                                     <arg value="-F"/>

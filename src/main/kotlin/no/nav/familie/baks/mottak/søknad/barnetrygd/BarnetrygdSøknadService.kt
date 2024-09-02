@@ -1,11 +1,12 @@
 package no.nav.familie.baks.mottak.søknad.barnetrygd
 
 import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClient
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV8
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBVedlegg
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.FødselsnummerErNullException
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadVedleggRepository
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
@@ -30,8 +31,12 @@ class BarnetrygdSøknadService(
     fun motta(versjonertBarnetrygdSøknad: VersjonertBarnetrygdSøknad): DBBarnetrygdSøknad {
         val (dbSøknad, dokumentasjon) =
             when (versjonertBarnetrygdSøknad) {
-                is SøknadV8 -> {
-                    Pair(versjonertBarnetrygdSøknad.søknad.tilDBSøknad(), versjonertBarnetrygdSøknad.søknad.dokumentasjon)
+                is BarnetrygdSøknadV8 -> {
+                    Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.tilDBSøknad(), versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon)
+                }
+
+                is BarnetrygdSøknadV9 -> {
+                    Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.tilDBSøknad(), versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon)
                 }
             }
 

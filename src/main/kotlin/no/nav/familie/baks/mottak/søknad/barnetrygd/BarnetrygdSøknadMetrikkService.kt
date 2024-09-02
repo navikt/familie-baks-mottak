@@ -1,7 +1,8 @@
 package no.nav.familie.baks.mottak.søknad.barnetrygd
 
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV8
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertBarnetrygdSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov
@@ -38,12 +39,14 @@ class BarnetrygdSøknadMetrikkService {
     fun sendMottakMetrikker(versjonertBarnetrygdSøknad: VersjonertBarnetrygdSøknad) {
         val (søknadstype, dokumentasjon) =
             when (versjonertBarnetrygdSøknad) {
-                is SøknadV8 -> Pair(versjonertBarnetrygdSøknad.søknad.søknadstype, versjonertBarnetrygdSøknad.søknad.dokumentasjon)
+                is BarnetrygdSøknadV8 -> Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype, versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon)
+                is BarnetrygdSøknadV9 -> Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype, versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon)
             }
 
         val harEøsSteg =
             when (versjonertBarnetrygdSøknad) {
-                is SøknadV8 -> versjonertBarnetrygdSøknad.søknad.antallEøsSteg > 0
+                is BarnetrygdSøknadV8 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.antallEøsSteg > 0
+                is BarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.antallEøsSteg > 0
             }
 
         val erUtvidet = søknadstype == Søknadstype.UTVIDET
@@ -55,7 +58,8 @@ class BarnetrygdSøknadMetrikkService {
     fun sendMottakFeiletMetrikker(versjonertBarnetrygdSøknad: VersjonertBarnetrygdSøknad) {
         val søknadstype =
             when (versjonertBarnetrygdSøknad) {
-                is SøknadV8 -> versjonertBarnetrygdSøknad.søknad.søknadstype
+                is BarnetrygdSøknadV8 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
+                is BarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
             }
         if (søknadstype == Søknadstype.UTVIDET) søknadUtvidetMottattFeil.increment() else søknadMottattFeil.increment()
     }
