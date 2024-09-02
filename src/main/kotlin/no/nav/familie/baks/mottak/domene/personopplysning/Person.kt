@@ -8,7 +8,7 @@ data class Person(
     val navn: String?,
     val forelderBarnRelasjoner: Set<ForelderBarnRelasjon>,
     val bostedsadresse: Bostedsadresse? = null,
-    val adressebeskyttelseGradering: List<Adressebeskyttelsesgradering>,
+    val adressebeskyttelseGradering: List<Adressebeskyttelsesgradering> = emptyList(),
 )
 
 data class Familierelasjon(
