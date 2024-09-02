@@ -15,13 +15,13 @@ fun <T> søknadsfelt(
 object KontantstøtteSøknadTestData {
     fun kontantstøtteSøknad(
         søker: Søker = lagSøker(),
-        barn: Barn
+        barn: List<Barn> = lagBarn()
     ): KontantstøtteSøknad =
         KontantstøtteSøknad(
             kontraktVersjon = 5,
             antallEøsSteg = 2,
             søker = søker,
-            barn = emptyList(),
+            barn = barn,
             dokumentasjon = emptyList(),
             teksterTilPdf = emptyMap(),
             originalSpråk = "nb",
@@ -69,15 +69,13 @@ object KontantstøtteSøknadTestData {
         )
 
     fun lagBarn(
-        identer: List<String> = listOf(
-            "12345678999"
-        ),
+        identer: List<String> = listOf("12345678999"),
     ): List<Barn> =
-        listOf(
+        identer.map {
             Barn(
                 harEøsSteg = true,
                 navn = søknadsfelt("Barnets fulle navn", "barn1"),
-                ident = søknadsfelt("Fødselsnummer", "12345678999"),
+                ident = søknadsfelt("Fødselsnummer", it),
                 registrertBostedType = søknadsfelt("Skal ha samme adresse", RegistrertBostedType.REGISTRERT_ANNEN_ADRESSE),
                 alder = søknadsfelt("alder", "4 år"),
                 utenlandsperioder = emptyList(),
@@ -106,5 +104,5 @@ object KontantstøtteSøknadTestData {
                 søkersSlektsforholdSpesifisering = null,
                 utbetaltForeldrepengerEllerEngangsstønad = null
             )
-        )
+        }
 }
