@@ -6,6 +6,9 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadService
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV5
+import no.nav.familie.baks.mottak.task.JournalhendelseKontantstøtteRutingTask
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
@@ -13,67 +16,58 @@ class SøknadFraJournalpostService(
     private val barnetrygdSøknadService: BarnetrygdSøknadService,
     private val kontantstøtteSøknadService: KontantstøtteSøknadService,
 ) {
-    fun hentIdenterForKontantstøtte(journalpostId: String): List<String> {
+
+    private val logger: Logger = LoggerFactory.getLogger(SøknadFraJournalpostService::class.java)
+
+    fun hentBarnasIdenterForKontantstøtte(journalpostId: String): List<String> {
         val søknad = kontantstøtteSøknadService.hentDBKontantstøtteSøknadForJournalpost(journalpostId)
-        val versjonertSøknad = søknad?.hentVersjonertKontantstøtteSøknad()
+        if (søknad == null) {
+            logger.error("Fant ikke søknad for journalpost=$journalpostId")
+            throw IllegalStateException("Fant ikke søknad for journalpost=$journalpostId")
+        }
+        val versjonertSøknad = søknad.hentVersjonertKontantstøtteSøknad()
         return when (versjonertSøknad) {
-            is KontantstøtteSøknadV4 -> {
-                val identSøker =
-                    versjonertSøknad.kontantstøtteSøknad.søker.ident.verdi.values
-                        .first()
-                val identBarn =
-                    versjonertSøknad.kontantstøtteSøknad.barn.map {
-                        it.ident.verdi.values
-                            .first()
-                    }
-                identBarn + identSøker
-            }
-
-            is KontantstøtteSøknadV5 -> {
-                val identSøker =
-                    versjonertSøknad.kontantstøtteSøknad.søker.ident.verdi.values
-                        .first()
-                val identBarn =
-                    versjonertSøknad.kontantstøtteSøknad.barn.map {
-                        it.ident.verdi.values
-                            .first()
-                    }
-                identBarn + identSøker
-            }
-
-            null -> throw IllegalStateException("Støtter ikke versjonert søknad $versjonertSøknad")
+            is KontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.barn.map { it.ident.verdi.values.first() }
+            is KontantstøtteSøknadV5 -> versjonertSøknad.kontantstøtteSøknad.barn.map { it.ident.verdi.values.first() }
         }
     }
 
-    fun hentIdenterForBarnetrygd(journalpostId: String): List<String> {
-        val søknad = barnetrygdSøknadService.hentDBSøknadFraJournalpost(journalpostId)
-        val versjonertSøknad = søknad?.hentVersjonertSøknad()
+    fun hentSøkersIdentForKontantstøtte(journalpostId: String): String {
+        val søknad = kontantstøtteSøknadService.hentDBKontantstøtteSøknadForJournalpost(journalpostId)
+        if (søknad == null) {
+            logger.error("Fant ikke søknad for journalpost=$journalpostId")
+            throw IllegalStateException("Fant ikke søknad for journalpost=$journalpostId")
+        }
+        val versjonertSøknad = søknad.hentVersjonertKontantstøtteSøknad()
         return when (versjonertSøknad) {
-            is BarnetrygdSøknadV8 -> {
-                val identSøker =
-                    versjonertSøknad.barnetrygdSøknad.søker.ident.verdi.values
-                        .first()
-                val identBarn =
-                    versjonertSøknad.barnetrygdSøknad.barn.map {
-                        it.ident.verdi.values
-                            .first()
-                    }
-                identBarn + identSøker
-            }
+            is KontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.søker.ident.verdi.values.first()
+            is KontantstøtteSøknadV5 -> versjonertSøknad.kontantstøtteSøknad.søker.ident.verdi.values.first()
+        }
+    }
 
-            is BarnetrygdSøknadV9 -> {
-                val identSøker =
-                    versjonertSøknad.barnetrygdSøknad.søker.ident.verdi.values
-                        .first()
-                val identBarn =
-                    versjonertSøknad.barnetrygdSøknad.barn.map {
-                        it.ident.verdi.values
-                            .first()
-                    }
-                identBarn + identSøker
-            }
+    fun hentBarnasIdenterForBarnetrygd(journalpostId: String): List<String> {
+        val søknad = barnetrygdSøknadService.hentDBSøknadFraJournalpost(journalpostId)
+        if (søknad == null) {
+            logger.error("Fant ikke søknad for journalpost=$journalpostId")
+            throw IllegalStateException("Fant ikke søknad for journalpost=$journalpostId")
+        }
+        val versjonertSøknad = søknad.hentVersjonertSøknad()
+        return when (versjonertSøknad) {
+            is BarnetrygdSøknadV8 -> versjonertSøknad.barnetrygdSøknad.barn.map { it.ident.verdi.values.first() }
+            is BarnetrygdSøknadV9 -> versjonertSøknad.barnetrygdSøknad.barn.map { it.ident.verdi.values.first() }
+        }
+    }
 
-            null -> throw IllegalStateException("Støtter ikke versjonert søknad $versjonertSøknad")
+    fun hentSøkersIdentForBarnetrygd(journalpostId: String): String {
+        val søknad = barnetrygdSøknadService.hentDBSøknadFraJournalpost(journalpostId)
+        if (søknad == null) {
+            logger.error("Fant ikke søknad for journalpost=$journalpostId")
+            throw IllegalStateException("Fant ikke søknad for journalpost=$journalpostId")
+        }
+        val versjonertSøknad = søknad.hentVersjonertSøknad()
+        return when (versjonertSøknad) {
+            is BarnetrygdSøknadV8 -> versjonertSøknad.barnetrygdSøknad.søker.ident.verdi.values.first()
+            is BarnetrygdSøknadV9 -> versjonertSøknad.barnetrygdSøknad.søker.ident.verdi.values.first()
         }
     }
 }

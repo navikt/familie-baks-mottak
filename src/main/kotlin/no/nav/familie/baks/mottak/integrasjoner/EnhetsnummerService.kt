@@ -10,6 +10,7 @@ class EnhetsnummerService(
     private val hentEnhetClient: HentEnhetClient,
     private val pdlClient: PdlClient,
     private val søknadFraJournalpostService: SøknadFraJournalpostService,
+    private val arbeidsfordelingClient: ArbeidsfordelingClient
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -20,12 +21,17 @@ class EnhetsnummerService(
             throw IllegalStateException("Tema er null")
         }
 
+        if (journalpost.bruker == null) {
+            throw IllegalStateException("Fant ikke bruker på journalpost ved forsøk på henting av behandlende enhet")
+        }
+
+        val erPapirsøknad = !journalpost.erDigitalKanal()
         val tema = Tema.valueOf(journalpost.tema)
 
-        val identer =
+        val (søkersIdent, barnasIdenter) =
             when (tema) {
-                Tema.BAR -> søknadFraJournalpostService.hentIdenterForBarnetrygd(journalpost.journalpostId)
-                Tema.KON -> søknadFraJournalpostService.hentIdenterForKontantstøtte(journalpost.journalpostId)
+                Tema.BAR -> finnIdenterForBarnetrygd(erPapirsøknad, tema, journalpost.bruker, journalpost.journalpostId)
+                Tema.KON -> finnIdenterForKontantstøtte(erPapirsøknad, tema, journalpost.bruker, journalpost.journalpostId)
                 Tema.ENF,
                 Tema.OPP,
                 -> {
@@ -33,9 +39,10 @@ class EnhetsnummerService(
                 }
             }
 
+        val alleIdenter = barnasIdenter + søkersIdent
+
         val erStrengtFortrolig =
-            identer
-                // TODO : Kan vi forbedre graphql-spørringen?
+            alleIdenter
                 .map { pdlClient.hentPerson(it, "hentperson-med-adressebeskyttelse", tema) }
                 .flatMap { it.adressebeskyttelse }
                 .any { it.gradering.erStrengtFortrolig() }
@@ -44,6 +51,8 @@ class EnhetsnummerService(
             erStrengtFortrolig -> "2103"
             journalpost.journalforendeEnhet == "2101" -> "4806" // Enhet 2101 er nedlagt. Rutes til 4806
             journalpost.journalforendeEnhet == "4847" -> "4817" // Enhet 4847 skal legges ned. Rutes til 4817
+            journalpost.erDigitalKanal() && (journalpost.erBarnetrygdSøknad() || journalpost.erKontantstøtteSøknad()) ->
+                arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(søkersIdent, tema).enhetId
             journalpost.journalforendeEnhet.isNullOrBlank() -> null
             hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).status.uppercase(Locale.getDefault()) == "NEDLAGT" -> null
             hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).oppgavebehandler -> journalpost.journalforendeEnhet
@@ -53,4 +62,52 @@ class EnhetsnummerService(
             }
         }
     }
+
+    private fun finnIdenterForKontantstøtte(
+        erPapirsøknad: Boolean,
+        tema: Tema,
+        bruker: Bruker,
+        journalpostId: String
+    ): Pair<String, List<String>> {
+        return if (erPapirsøknad) {
+            Pair(
+                tilPersonIdent(bruker, tema),
+                emptyList()
+            )
+        } else {
+            Pair(
+                søknadFraJournalpostService.hentSøkersIdentForKontantstøtte(journalpostId = journalpostId),
+                søknadFraJournalpostService.hentBarnasIdenterForKontantstøtte(journalpostId = journalpostId)
+            )
+        }
+    }
+
+    private fun finnIdenterForBarnetrygd(
+        erPapirsøknad: Boolean,
+        tema: Tema,
+        bruker: Bruker,
+        journalpostId: String
+    ): Pair<String, List<String>> {
+        return if (erPapirsøknad) {
+            Pair(
+                tilPersonIdent(bruker, tema),
+                emptyList()
+            )
+        } else {
+            Pair(
+                søknadFraJournalpostService.hentSøkersIdentForBarnetrygd(journalpostId = journalpostId),
+                søknadFraJournalpostService.hentBarnasIdenterForBarnetrygd(journalpostId = journalpostId)
+            )
+        }
+    }
+
+    private fun tilPersonIdent(
+        bruker: Bruker,
+        tema: Tema,
+    ): String =
+        when (bruker.type) {
+            BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema)
+            else -> bruker.id
+        }
+
 }
