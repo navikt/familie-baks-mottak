@@ -35,6 +35,7 @@ class OppgaveMapperTest(
 ) {
     private val mockHentEnhetClient: HentEnhetClient = mockk(relaxed = true)
     private val mockEnhetsnummerService: EnhetsnummerService = mockk()
+    private val mockArbeidsfordelingClient: ArbeidsfordelingClient = mockk(relaxed = true)
 
     private val barnetrygdOppgaveMapper: IOppgaveMapper =
         BarnetrygdOppgaveMapper(
@@ -42,6 +43,7 @@ class OppgaveMapperTest(
             hentEnhetClient = mockHentEnhetClient,
             pdlClient = mockPdlClient,
             søknadRepository = barnetrygdSøknadRepository,
+            arbeidsfordelingClient = mockArbeidsfordelingClient
         )
 
     private val kontantstøtteOppgaveMapper: IOppgaveMapper =
@@ -50,6 +52,7 @@ class OppgaveMapperTest(
             hentEnhetClient = mockHentEnhetClient,
             pdlClient = mockPdlClient,
             kontantstøtteSøknadRepository = kontantstøtteSøknadRepository,
+            arbeidsfordelingClient = mockArbeidsfordelingClient
         )
 
     @BeforeEach

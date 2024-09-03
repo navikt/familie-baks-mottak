@@ -18,6 +18,7 @@ abstract class AbstractOppgaveMapper(
     private val enhetsnummerService: EnhetsnummerService,
     private val hentEnhetClient: HentEnhetClient,
     val pdlClient: PdlClient,
+    val arbeidsfordelingClient: ArbeidsfordelingClient,
 ) : IOppgaveMapper {
     override fun tilOpprettOppgaveRequest(
         oppgavetype: Oppgavetype,
@@ -110,6 +111,7 @@ abstract class AbstractOppgaveMapper(
         when {
             journalpost.journalforendeEnhet == "2101" -> "4806" // Enhet 2101 er nedlagt. Rutes til 4806
             journalpost.journalforendeEnhet == "4847" -> "4817" // Enhet 4847 skal legges ned. Rutes til 4817
+            journalpost.erDigitalKanal() && (journalpost.erBarnetrygdSøknad() || journalpost.erKontantstøtteSøknad()) -> hentBehandlendeEnhetForPerson(journalpost)
             journalpost.journalforendeEnhet.isNullOrBlank() -> null
             hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).status.uppercase(Locale.getDefault()) == "NEDLAGT" -> null
             hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).oppgavebehandler -> journalpost.journalforendeEnhet
@@ -117,6 +119,26 @@ abstract class AbstractOppgaveMapper(
                 logger.warn("Enhet ${journalpost.journalforendeEnhet} kan ikke ta i mot oppgaver")
                 null
             }
+        }
+
+    private fun hentBehandlendeEnhetForPerson(journalpost: Journalpost): String? =
+        if (journalpost.bruker != null) {
+            val personIdentPåJournalpost = tilPersonIdent(journalpost.bruker, this.tema)
+            val behandlendeEnhetPåIdent = arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdentPåJournalpost, this.tema)
+
+            behandlendeEnhetPåIdent.enhetId
+        } else {
+            logger.warn("Fant ikke bruker på journalpost ved forsøk på henting av behandlende enhet")
+            null
+        }
+
+    private fun tilPersonIdent(
+        bruker: Bruker,
+        tema: Tema,
+    ): String =
+        when (bruker.type) {
+            BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema)
+            else -> bruker.id
         }
 
     private fun hentAktørIdFraPdl(
@@ -164,7 +186,8 @@ interface IOppgaveMapper {
     fun støtterTema(tema: Tema) = this.tema == tema
 }
 
-@Service class OppgaveMapperService(
+@Service
+class OppgaveMapperService(
     val oppgaveMappers: Collection<IOppgaveMapper>,
 ) {
     fun tilOpprettOppgaveRequest(

@@ -54,6 +54,7 @@ class SkanHendelseTaskLøypeTest {
             mockUnleashNextMedContextService,
             mockJournalpostClient,
             mockkArbeidsfordelingClient,
+            mockUnleashNextMedContextService,
         )
 
     private val journalføringSteg =
