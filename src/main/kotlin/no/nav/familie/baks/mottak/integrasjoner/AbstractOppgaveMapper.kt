@@ -120,12 +120,16 @@ abstract class AbstractOppgaveMapper(
             }
         }
 
-    private fun hentBehandlendeEnhetForPerson(journalpost: Journalpost): String {
-        val personIdentPåJournalpost = tilPersonIdent(journalpost.bruker!!, this.tema)
-        val behandlendeEnhetPåIdent = arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdentPåJournalpost, this.tema)
+    private fun hentBehandlendeEnhetForPerson(journalpost: Journalpost): String? =
+        if (journalpost.bruker != null) {
+            val personIdentPåJournalpost = tilPersonIdent(journalpost.bruker, this.tema)
+            val behandlendeEnhetPåIdent = arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdentPåJournalpost, this.tema)
 
-        return behandlendeEnhetPåIdent.enhetId
-    }
+            behandlendeEnhetPåIdent.enhetId
+        } else {
+            logger.warn("Fant ikke bruker på journalpost ved forsøk på henting av behandlende enhet")
+            null
+        }
 
     private fun tilPersonIdent(
         bruker: Bruker,
