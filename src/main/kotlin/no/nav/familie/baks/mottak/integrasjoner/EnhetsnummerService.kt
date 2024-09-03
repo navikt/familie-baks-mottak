@@ -20,10 +20,6 @@ class EnhetsnummerService(
             throw IllegalStateException("Tema er null")
         }
 
-        if (journalpost.bruker == null) {
-            throw IllegalStateException("Bruker er null")
-        }
-
         val tema = Tema.valueOf(journalpost.tema)
 
         val identer =

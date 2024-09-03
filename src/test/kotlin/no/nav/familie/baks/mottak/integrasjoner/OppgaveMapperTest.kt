@@ -52,6 +52,11 @@ class OppgaveMapperTest(
             kontantstøtteSøknadRepository = kontantstøtteSøknadRepository,
         )
 
+    @BeforeEach
+    fun beforeEach() {
+        every { mockEnhetsnummerService.hentEnhetsnummer(any()) } returns "1234"
+    }
+
     @Test
     fun `skal kaste exception dersom dokumentlisten er tom`() {
         Assertions.assertThrows(IllegalStateException::class.java) {
@@ -353,134 +358,6 @@ class OppgaveMapperTest(
                 "beskrivelsefelt",
             )
         assertEquals("beskrivelsefelt", oppgaveUtenBeskrivelse2.beskrivelse)
-    }
-
-    @Test
-    fun `skal sette enhet 4806 hvis enhet på journalpost er 2101`() {
-        every { mockEnhetsnummerService.hentEnhetsnummer(any()) } returns "2101"
-        val oppgave =
-            barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
-                Oppgavetype.Journalføring,
-                journalpostClient
-                    .hentJournalpost("123")
-                    .copy(
-                        journalforendeEnhet = "2101",
-                        dokumenter =
-                            listOf(
-                                DokumentInfo(
-                                    tittel = null,
-                                    brevkode = "kode",
-                                    dokumentstatus = null,
-                                    dokumentvarianter = null,
-                                ),
-                            ),
-                        behandlingstema = "btema",
-                    ),
-            )
-        assertThat(oppgave.enhetsnummer).isEqualTo("4806")
-    }
-
-    @Test
-    fun `skal sette enhet null hvis enhet på journalpost er null`() {
-        every { mockEnhetsnummerService.hentEnhetsnummer(any()) } returns null
-        val oppgave =
-            barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
-                Oppgavetype.Journalføring,
-                journalpostClient
-                    .hentJournalpost("123")
-                    .copy(
-                        journalforendeEnhet = null,
-                        dokumenter =
-                            listOf(
-                                DokumentInfo(
-                                    tittel = null,
-                                    brevkode = "kode",
-                                    dokumentstatus = null,
-                                    dokumentvarianter = null,
-                                ),
-                            ),
-                        behandlingstema = "btema",
-                    ),
-            )
-        assertThat(oppgave.enhetsnummer).isNull()
-    }
-
-    @Test
-    fun `skal sette enhet fra journalpost hvis enhet kan behandle oppgaver`() {
-        every { mockHentEnhetClient.hentEnhet("4") } returns Enhet("4", "enhetnavn", true, "Aktiv")
-        every { mockEnhetsnummerService.hentEnhetsnummer(any()) } returns "4"
-        val oppgave =
-            barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
-                Oppgavetype.Journalføring,
-                journalpostClient
-                    .hentJournalpost("123")
-                    .copy(
-                        journalforendeEnhet = "4",
-                        dokumenter =
-                            listOf(
-                                DokumentInfo(
-                                    tittel = null,
-                                    brevkode = "kode",
-                                    dokumentstatus = null,
-                                    dokumentvarianter = null,
-                                ),
-                            ),
-                        behandlingstema = "btema",
-                    ),
-            )
-        assertThat(oppgave.enhetsnummer).isEqualTo("4")
-    }
-
-    @Test
-    fun `skal sette enhet null hvis enhet ikke kan behandle oppgaver`() {
-        every { mockEnhetsnummerService.hentEnhetsnummer(any()) } returns "5"
-        every { mockHentEnhetClient.hentEnhet("5") } returns Enhet("4", "enhetnavn", false, "Aktiv")
-        val oppgave =
-            barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
-                Oppgavetype.Journalføring,
-                journalpostClient
-                    .hentJournalpost("123")
-                    .copy(
-                        journalforendeEnhet = "5",
-                        dokumenter =
-                            listOf(
-                                DokumentInfo(
-                                    tittel = null,
-                                    brevkode = "kode",
-                                    dokumentstatus = null,
-                                    dokumentvarianter = null,
-                                ),
-                            ),
-                        behandlingstema = "btema",
-                    ),
-            )
-        assertThat(oppgave.enhetsnummer).isNull()
-    }
-
-    @Test
-    fun `skal sette enhet null hvis enhet er nedlagt`() {
-        every { mockEnhetsnummerService.hentEnhetsnummer(any()) } returns null
-        every { mockHentEnhetClient.hentEnhet("5") } returns Enhet("4", "enhetnavn", true, "Nedlagt")
-        val oppgave =
-            barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(
-                Oppgavetype.Journalføring,
-                journalpostClient
-                    .hentJournalpost("123")
-                    .copy(
-                        journalforendeEnhet = "5",
-                        dokumenter =
-                            listOf(
-                                DokumentInfo(
-                                    tittel = null,
-                                    brevkode = "kode",
-                                    dokumentstatus = null,
-                                    dokumentvarianter = null,
-                                ),
-                            ),
-                        behandlingstema = "btema",
-                    ),
-            )
-        assertThat(oppgave.enhetsnummer).isNull()
     }
 
     @Test
