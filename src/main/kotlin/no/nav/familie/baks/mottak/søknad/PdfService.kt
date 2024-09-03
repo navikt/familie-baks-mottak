@@ -1,11 +1,13 @@
 package no.nav.familie.baks.mottak.søknad
 
 import no.nav.familie.baks.mottak.integrasjoner.PdfClient
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV8
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV5
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import org.slf4j.LoggerFactory
@@ -30,9 +32,11 @@ class PdfService(
 
         val (søknadstype, navn) =
             when (versjonertBarnetrygdSøknad) {
-                is SøknadV8 -> {
-                    Pair(versjonertBarnetrygdSøknad.søknad.søknadstype, versjonertBarnetrygdSøknad.søknad.søker.navn)
-                }
+                is BarnetrygdSøknadV8 ->
+                    Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype, versjonertBarnetrygdSøknad.barnetrygdSøknad.søker.navn)
+
+                is BarnetrygdSøknadV9 ->
+                    Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype, versjonertBarnetrygdSøknad.barnetrygdSøknad.søker.navn)
             }
 
         val path: String = søknadstypeTilPath(søknadstype)
@@ -47,7 +51,6 @@ class PdfService(
                         else -> "Søknad om ordinær barnetrygd"
                     },
             )
-
         return familieDokumentPdfClient.lagPdf(path, barnetrygdSøknadMapForSpråk + ekstraFelterMap)
     }
 
@@ -62,6 +65,7 @@ class PdfService(
         val navn =
             when (versjonertSøknad) {
                 is KontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
+                is KontantstøtteSøknadV5 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
             }
 
         val ekstraFelterMap =
@@ -71,7 +75,6 @@ class PdfService(
                 fnr = dbKontantstøtteSøknad.fnr,
                 label = "Søknad om kontantstøtte",
             )
-
         return familieDokumentPdfClient.lagPdf("kontantstotte-soknad", kontantstøtteSøknadMapForSpråk + ekstraFelterMap)
     }
 

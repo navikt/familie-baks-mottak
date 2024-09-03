@@ -2,9 +2,10 @@ package no.nav.familie.baks.mottak.task
 
 import no.nav.familie.baks.mottak.søknad.JournalføringService
 import no.nav.familie.baks.mottak.søknad.PdfService
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV8
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertBarnetrygdSøknad
 import no.nav.familie.http.client.RessursException
 import no.nav.familie.prosessering.AsyncTaskStep
@@ -32,7 +33,8 @@ class JournalførSøknadTask(
 
             val søknadstype =
                 when (versjonertBarnetrygdSøknad) {
-                    is SøknadV8 -> versjonertBarnetrygdSøknad.søknad.søknadstype
+                    is BarnetrygdSøknadV8 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
+                    is BarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
                 }
             log.info("Generer pdf og journalfør søknad om ${søknadstype.name.lowercase()} barnetrygd")
             val bokmålPdf =
@@ -45,7 +47,8 @@ class JournalførSøknadTask(
 
             val orginalspråk =
                 when (versjonertBarnetrygdSøknad) {
-                    is SøknadV8 -> versjonertBarnetrygdSøknad.søknad.originalSpråk
+                    is BarnetrygdSøknadV8 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.originalSpråk
+                    is BarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.originalSpråk
                 }
 
             val orginalspråkPdf: ByteArray =

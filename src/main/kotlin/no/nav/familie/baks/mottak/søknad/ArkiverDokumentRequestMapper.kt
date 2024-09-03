@@ -1,14 +1,16 @@
 package no.nav.familie.baks.mottak.søknad
 
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV8
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknaddokumentasjon
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBVedlegg
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.Vedlegg
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteVedlegg
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV5
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknaddokumentasjon
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
@@ -31,10 +33,16 @@ object ArkiverDokumentRequestMapper {
     ): ArkiverDokumentRequest {
         val (søknadstype, dokumentasjon) =
             when (versjonertBarnetrygdSøknad) {
-                is SøknadV8 ->
+                is BarnetrygdSøknadV8 ->
                     Pair(
-                        versjonertBarnetrygdSøknad.søknad.søknadstype,
-                        versjonertBarnetrygdSøknad.søknad.dokumentasjon.map { BarnetrygdSøknaddokumentasjon(it) },
+                        versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype,
+                        versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon.map { BarnetrygdSøknaddokumentasjon(it) },
+                    )
+
+                is BarnetrygdSøknadV9 ->
+                    Pair(
+                        versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype,
+                        versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon.map { BarnetrygdSøknaddokumentasjon(it) },
                     )
             }
 
@@ -94,6 +102,9 @@ object ArkiverDokumentRequestMapper {
         val dokumentasjon =
             when (versjonertSøknad) {
                 is KontantstøtteSøknadV4 ->
+                    versjonertSøknad.kontantstøtteSøknad.dokumentasjon.map { KontantstøtteSøknaddokumentasjon(it) }
+
+                is KontantstøtteSøknadV5 ->
                     versjonertSøknad.kontantstøtteSøknad.dokumentasjon.map { KontantstøtteSøknaddokumentasjon(it) }
             }
 

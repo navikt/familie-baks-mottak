@@ -6,6 +6,7 @@ import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtte
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.FødselsnummerErNullException
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV5
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteVedleggRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.tilDBKontantstøtteSøknad
@@ -18,7 +19,8 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.Properties
 
-@Service class KontantstøtteSøknadService(
+@Service
+class KontantstøtteSøknadService(
     private val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
     private val kontantstøtteVedleggRepository: KontantstøtteVedleggRepository,
     private val taskService: TaskService,
@@ -30,6 +32,13 @@ import java.util.Properties
         val (dbKontantstøtteSøknad, dokumentasjon) =
             when (versjonertKontantstøtteSøknad) {
                 is KontantstøtteSøknadV4 -> {
+                    Pair(
+                        versjonertKontantstøtteSøknad.kontantstøtteSøknad.tilDBKontantstøtteSøknad(),
+                        versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon,
+                    )
+                }
+
+                is KontantstøtteSøknadV5 -> {
                     Pair(
                         versjonertKontantstøtteSøknad.kontantstøtteSøknad.tilDBKontantstøtteSøknad(),
                         versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon,

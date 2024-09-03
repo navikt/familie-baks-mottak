@@ -2,8 +2,8 @@ package no.nav.familie.baks.mottak.søknad.kontantstøtte
 
 import no.nav.familie.kontrakter.ks.søknad.v1.SIVILSTANDTYPE
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsfelt
-import no.nav.familie.kontrakter.ks.søknad.v4.KontantstøtteSøknad
 import no.nav.familie.kontrakter.ks.søknad.v4.Søker
+import no.nav.familie.kontrakter.ks.søknad.v5.KontantstøtteSøknad
 
 fun <T> søknadsfelt(
     label: String,
@@ -13,7 +13,7 @@ fun <T> søknadsfelt(
 object KontantstøtteSøknadTestData {
     fun kontantstøtteSøknad(): KontantstøtteSøknad =
         KontantstøtteSøknad(
-            kontraktVersjon = 4,
+            kontraktVersjon = 5,
             antallEøsSteg = 2,
             søker = lagSøker(),
             barn = emptyList(),
@@ -28,6 +28,7 @@ object KontantstøtteSøknadTestData {
             mottarKontantstøtteForBarnFraAnnetEøsland = søknadsfelt("Kontantstøtte annet land", "NEI"),
             harEllerTildeltBarnehageplass = søknadsfelt("Har barnehageplass", "NEI"),
             erAvdødPartnerForelder = null,
+            finnesPersonMedAdressebeskyttelse = false,
         )
 
     private fun lagSøker(): Søker =
