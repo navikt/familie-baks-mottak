@@ -40,7 +40,6 @@ class OppgaveMapperTest(
     private val barnetrygdOppgaveMapper: IOppgaveMapper =
         BarnetrygdOppgaveMapper(
             enhetsnummerService = mockEnhetsnummerService,
-            hentEnhetClient = mockHentEnhetClient,
             pdlClient = mockPdlClient,
             søknadRepository = barnetrygdSøknadRepository,
             arbeidsfordelingClient = mockArbeidsfordelingClient,
@@ -49,7 +48,6 @@ class OppgaveMapperTest(
     private val kontantstøtteOppgaveMapper: IOppgaveMapper =
         KontantstøtteOppgaveMapper(
             enhetsnummerService = mockEnhetsnummerService,
-            hentEnhetClient = mockHentEnhetClient,
             pdlClient = mockPdlClient,
             kontantstøtteSøknadRepository = kontantstøtteSøknadRepository,
             arbeidsfordelingClient = mockArbeidsfordelingClient,
