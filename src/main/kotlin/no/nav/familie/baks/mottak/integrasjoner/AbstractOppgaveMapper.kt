@@ -12,7 +12,6 @@ import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.kontrakter.felles.oppgave.OpprettOppgaveRequest
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.Locale
 
 abstract class AbstractOppgaveMapper(
     private val enhetsnummerService: EnhetsnummerService,
