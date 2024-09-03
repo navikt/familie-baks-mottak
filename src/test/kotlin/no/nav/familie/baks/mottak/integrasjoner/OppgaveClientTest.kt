@@ -68,10 +68,21 @@ class OppgaveClientTest {
         )
         stubFor(
             post(urlEqualTo("/api/graphql"))
+                .withRequestBody(equalToJson(PdlClientTest.gyldigRequest("hentIdenter.graphql", journalPost.bruker!!.id)))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(readfile("mockIdentInformasjonResponse.json")),
+                ),
+        )
+
+        stubFor(
+            post(urlEqualTo("/api/graphql"))
+                .withRequestBody(equalToJson(PdlClientTest.gyldigRequest("hentperson-med-adressebeskyttelse.graphql", "12345678901")))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(readfile("mock-hentperson-adressebeskyttelse.json")),
                 ),
         )
     }
@@ -133,7 +144,6 @@ class OppgaveClientTest {
                         .withBody(objectMapper.writeValueAsString(Ressurs.failure<String>("test"))),
                 ),
         )
-
         assertThatThrownBy {
             oppgaveClient.opprettJournalføringsoppgave(journalPost)
         }.isInstanceOf(IntegrasjonException::class.java)

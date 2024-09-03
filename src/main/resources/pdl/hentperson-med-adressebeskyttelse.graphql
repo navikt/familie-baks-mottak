@@ -1,5 +1,7 @@
-query($ident: ID!) {person: hentPerson(ident: $ident) {
-    adressebeskyttelse {
-        gradering
+query($ident: ID!) {
+    person: hentPerson(ident: $ident) {
+        adressebeskyttelse {
+            gradering
+        }
     }
-}}
+}

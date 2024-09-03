@@ -81,6 +81,18 @@ class PdlClientTest {
     }
 
     @Test
+    fun hentPersonAdressebeskyttelse() {
+        mockResponseForPdlQuery(
+            pdlRequestBody = gyldigRequest("hentperson-med-adressebeskyttelse.graphql", testIdent),
+            mockResponse = readfile("mock-hentperson-adressebeskyttelse.json"),
+        )
+
+        val pdlPersonData = pdlClient.hentPerson(testIdent, "hentperson-med-adressebeskyttelse", Tema.BAR)
+
+        assertThat(pdlPersonData.adressebeskyttelse.first().gradering).isEqualTo(Adressebeskyttelsesgradering.UGRADERT)
+    }
+
+    @Test
     fun hentPersonFeilerMedInternalServerOgKasterIntegrasjonsException() {
         stubFor(
             post(urlEqualTo("/api/graphql"))
@@ -113,7 +125,7 @@ class PdlClientTest {
     companion object {
         val testIdent = "12345678901"
 
-        private fun mockResponseForPdlQuery(
+        fun mockResponseForPdlQuery(
             pdlRequestBody: String,
             mockResponse: String,
         ) {
@@ -128,12 +140,12 @@ class PdlClientTest {
             )
         }
 
-        private fun gyldigRequest(
+        fun gyldigRequest(
             queryFilnavn: String,
             ident: String,
         ): String = "{\"variables\":{\"ident\":\"$ident\"},\"query\":\"${readfile(queryFilnavn).graphqlCompatible()}\"}"
 
-        private fun readfile(filnavn: String): String = this::class.java.getResource("/pdl/$filnavn").readText()
+        fun readfile(filnavn: String): String = this::class.java.getResource("/pdl/$filnavn").readText()
 
         private fun String.graphqlCompatible(): String = StringUtils.normalizeSpace(this.replace("\n", ""))
     }
