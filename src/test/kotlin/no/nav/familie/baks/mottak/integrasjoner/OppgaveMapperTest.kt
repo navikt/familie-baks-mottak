@@ -43,7 +43,7 @@ class OppgaveMapperTest(
             hentEnhetClient = mockHentEnhetClient,
             pdlClient = mockPdlClient,
             søknadRepository = barnetrygdSøknadRepository,
-            arbeidsfordelingClient = mockArbeidsfordelingClient
+            arbeidsfordelingClient = mockArbeidsfordelingClient,
         )
 
     private val kontantstøtteOppgaveMapper: IOppgaveMapper =
@@ -52,7 +52,7 @@ class OppgaveMapperTest(
             hentEnhetClient = mockHentEnhetClient,
             pdlClient = mockPdlClient,
             kontantstøtteSøknadRepository = kontantstøtteSøknadRepository,
-            arbeidsfordelingClient = mockArbeidsfordelingClient
+            arbeidsfordelingClient = mockArbeidsfordelingClient,
         )
 
     @BeforeEach

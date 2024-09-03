@@ -4,14 +4,11 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.baks.mottak.søknad.SøknadTestData
 import no.nav.familie.baks.mottak.søknad.SøknadTestData.barnetrygdSøknad
-
 import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadService
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadTestData
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadTestData.kontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadTestData.lagBarn
-
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.kontrakter.felles.objectMapper
 import org.assertj.core.api.Assertions.assertThat
@@ -28,26 +25,26 @@ class SøknadFraJournalpostServiceTest {
         )
 
     @Nested
-    inner class HentIdenterForKontantstøtteTest {
+    inner class HentBarnasIdenterForKontantstøtteTest {
         @Test
-        fun `skal hente identer for søker med barn`() {
+        fun `skal hente identer for barna`() {
             // Arrange
             val journalpostId = "1"
-            val fødselsnummer = "123"
 
             val kontantstøtteSøknad =
                 kontantstøtteSøknad(
-                    søker =
-                        KontantstøtteSøknadTestData.lagSøker(
-                            fnr = fødselsnummer,
+                    barn =
+                        listOf(
+                            lagBarn("815"),
+                            lagBarn("493"),
+                            lagBarn("00"),
                         ),
-                    barn = listOf(lagBarn("815"), lagBarn("493"), lagBarn("00")),
                 )
 
             val dbKontantstøtteSøknad =
                 DBKontantstøtteSøknad(
                     søknadJson = objectMapper.writeValueAsString(kontantstøtteSøknad),
-                    fnr = fødselsnummer,
+                    fnr = "123",
                     journalpostId = journalpostId,
                 )
 
@@ -56,37 +53,34 @@ class SøknadFraJournalpostServiceTest {
             } returns dbKontantstøtteSøknad
 
             // Act
-            val identer = søknadFraJournalpostService.hentIdenterForKontantstøtte(journalpostId)
+            val identer = søknadFraJournalpostService.hentBarnasIdenterForKontantstøtte(journalpostId)
 
             // Assert
-            assertThat(identer).contains(
-                fødselsnummer,
-                "815",
-                "493",
-                "00",
-            )
+            assertThat(identer).contains("815", "493", "00")
         }
     }
 
     @Nested
-    inner class HentIdenterForBarnetrygdTest {
+    inner class HentBarnasIdenterForBarnetrygdTest {
         @Test
-        fun `skal hente identer for søker med barn`() {
+        fun `skal hente identer for barna`() {
             // Arrange
             val journalpostId = "1"
-            val fødselsnummer = "123"
 
             val kontantstøtteSøknad =
                 barnetrygdSøknad(
-                    søker =
-                        SøknadTestData.lagSøker(fnr = fødselsnummer),
-                    barn = listOf(SøknadTestData.lagBarn("815"), SøknadTestData.lagBarn("493"), SøknadTestData.lagBarn("00")),
+                    barn =
+                        listOf(
+                            SøknadTestData.lagBarn("815"),
+                            SøknadTestData.lagBarn("493"),
+                            SøknadTestData.lagBarn("00"),
+                        ),
                 )
 
             val dbBarnetrygdSøknad =
                 DBBarnetrygdSøknad(
                     søknadJson = objectMapper.writeValueAsString(kontantstøtteSøknad),
-                    fnr = fødselsnummer,
+                    fnr = "123",
                     journalpostId = journalpostId,
                 )
 
@@ -95,15 +89,10 @@ class SøknadFraJournalpostServiceTest {
             } returns dbBarnetrygdSøknad
 
             // Act
-            val identer = søknadFraJournalpostService.hentIdenterForBarnetrygd(journalpostId)
+            val identer = søknadFraJournalpostService.hentBarnasIdenterForBarnetrygd(journalpostId)
 
             // Assert
-            assertThat(identer).contains(
-                fødselsnummer,
-                "815",
-                "493",
-                "00",
-            )
+            assertThat(identer).contains("815", "493", "00")
         }
     }
 }

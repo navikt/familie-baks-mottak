@@ -10,7 +10,7 @@ class EnhetsnummerService(
     private val hentEnhetClient: HentEnhetClient,
     private val pdlClient: PdlClient,
     private val søknadFraJournalpostService: SøknadFraJournalpostService,
-    private val arbeidsfordelingClient: ArbeidsfordelingClient
+    private val arbeidsfordelingClient: ArbeidsfordelingClient,
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -67,39 +67,37 @@ class EnhetsnummerService(
         erPapirsøknad: Boolean,
         tema: Tema,
         bruker: Bruker,
-        journalpostId: String
-    ): Pair<String, List<String>> {
-        return if (erPapirsøknad) {
+        journalpostId: String,
+    ): Pair<String, List<String>> =
+        if (erPapirsøknad) {
             Pair(
                 tilPersonIdent(bruker, tema),
-                emptyList()
+                emptyList(),
             )
         } else {
             Pair(
                 søknadFraJournalpostService.hentSøkersIdentForKontantstøtte(journalpostId = journalpostId),
-                søknadFraJournalpostService.hentBarnasIdenterForKontantstøtte(journalpostId = journalpostId)
+                søknadFraJournalpostService.hentBarnasIdenterForKontantstøtte(journalpostId = journalpostId),
             )
         }
-    }
 
     private fun finnIdenterForBarnetrygd(
         erPapirsøknad: Boolean,
         tema: Tema,
         bruker: Bruker,
-        journalpostId: String
-    ): Pair<String, List<String>> {
-        return if (erPapirsøknad) {
+        journalpostId: String,
+    ): Pair<String, List<String>> =
+        if (erPapirsøknad) {
             Pair(
                 tilPersonIdent(bruker, tema),
-                emptyList()
+                emptyList(),
             )
         } else {
             Pair(
                 søknadFraJournalpostService.hentSøkersIdentForBarnetrygd(journalpostId = journalpostId),
-                søknadFraJournalpostService.hentBarnasIdenterForBarnetrygd(journalpostId = journalpostId)
+                søknadFraJournalpostService.hentBarnasIdenterForBarnetrygd(journalpostId = journalpostId),
             )
         }
-    }
 
     private fun tilPersonIdent(
         bruker: Bruker,
@@ -109,5 +107,4 @@ class EnhetsnummerService(
             BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema)
             else -> bruker.id
         }
-
 }

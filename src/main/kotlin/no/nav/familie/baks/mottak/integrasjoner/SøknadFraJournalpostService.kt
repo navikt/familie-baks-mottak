@@ -6,7 +6,6 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadService
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV5
-import no.nav.familie.baks.mottak.task.JournalhendelseKontantstøtteRutingTask
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -16,7 +15,6 @@ class SøknadFraJournalpostService(
     private val barnetrygdSøknadService: BarnetrygdSøknadService,
     private val kontantstøtteSøknadService: KontantstøtteSøknadService,
 ) {
-
     private val logger: Logger = LoggerFactory.getLogger(SøknadFraJournalpostService::class.java)
 
     fun hentBarnasIdenterForKontantstøtte(journalpostId: String): List<String> {
@@ -27,8 +25,16 @@ class SøknadFraJournalpostService(
         }
         val versjonertSøknad = søknad.hentVersjonertKontantstøtteSøknad()
         return when (versjonertSøknad) {
-            is KontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.barn.map { it.ident.verdi.values.first() }
-            is KontantstøtteSøknadV5 -> versjonertSøknad.kontantstøtteSøknad.barn.map { it.ident.verdi.values.first() }
+            is KontantstøtteSøknadV4 ->
+                versjonertSøknad.kontantstøtteSøknad.barn.map {
+                    it.ident.verdi.values
+                        .first()
+                }
+            is KontantstøtteSøknadV5 ->
+                versjonertSøknad.kontantstøtteSøknad.barn.map {
+                    it.ident.verdi.values
+                        .first()
+                }
         }
     }
 
@@ -40,8 +46,12 @@ class SøknadFraJournalpostService(
         }
         val versjonertSøknad = søknad.hentVersjonertKontantstøtteSøknad()
         return when (versjonertSøknad) {
-            is KontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.søker.ident.verdi.values.first()
-            is KontantstøtteSøknadV5 -> versjonertSøknad.kontantstøtteSøknad.søker.ident.verdi.values.first()
+            is KontantstøtteSøknadV4 ->
+                versjonertSøknad.kontantstøtteSøknad.søker.ident.verdi.values
+                    .first()
+            is KontantstøtteSøknadV5 ->
+                versjonertSøknad.kontantstøtteSøknad.søker.ident.verdi.values
+                    .first()
         }
     }
 
@@ -53,8 +63,16 @@ class SøknadFraJournalpostService(
         }
         val versjonertSøknad = søknad.hentVersjonertSøknad()
         return when (versjonertSøknad) {
-            is BarnetrygdSøknadV8 -> versjonertSøknad.barnetrygdSøknad.barn.map { it.ident.verdi.values.first() }
-            is BarnetrygdSøknadV9 -> versjonertSøknad.barnetrygdSøknad.barn.map { it.ident.verdi.values.first() }
+            is BarnetrygdSøknadV8 ->
+                versjonertSøknad.barnetrygdSøknad.barn.map {
+                    it.ident.verdi.values
+                        .first()
+                }
+            is BarnetrygdSøknadV9 ->
+                versjonertSøknad.barnetrygdSøknad.barn.map {
+                    it.ident.verdi.values
+                        .first()
+                }
         }
     }
 
@@ -66,8 +84,12 @@ class SøknadFraJournalpostService(
         }
         val versjonertSøknad = søknad.hentVersjonertSøknad()
         return when (versjonertSøknad) {
-            is BarnetrygdSøknadV8 -> versjonertSøknad.barnetrygdSøknad.søker.ident.verdi.values.first()
-            is BarnetrygdSøknadV9 -> versjonertSøknad.barnetrygdSøknad.søker.ident.verdi.values.first()
+            is BarnetrygdSøknadV8 ->
+                versjonertSøknad.barnetrygdSøknad.søker.ident.verdi.values
+                    .first()
+            is BarnetrygdSøknadV9 ->
+                versjonertSøknad.barnetrygdSøknad.søker.ident.verdi.values
+                    .first()
         }
     }
 }
