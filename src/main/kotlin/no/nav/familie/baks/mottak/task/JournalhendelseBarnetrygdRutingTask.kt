@@ -3,6 +3,7 @@ package no.nav.familie.baks.mottak.task
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig.Companion.HOPP_OVER_INFOTRYGD_SJEKK
 import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
@@ -52,6 +53,7 @@ class JournalhendelseBarnetrygdRutingTask(
     private val unleashService: UnleashNextMedContextService,
     private val journalpostClient: JournalpostClient,
     private val arbeidsfordelingClient: ArbeidsfordelingClient,
+    private val unleashNextMedContextService: UnleashNextMedContextService,
 ) : AsyncTaskStep {
     private val tema = Tema.BAR
 
@@ -172,11 +174,19 @@ class JournalhendelseBarnetrygdRutingTask(
                 .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
                 .map { it.ident }
 
+        val hoppOverInfotrygdToggleErPå = unleashNextMedContextService.isEnabled(HOPP_OVER_INFOTRYGD_SJEKK, false)
+
+        val sakspart =
+            if (hoppOverInfotrygdToggleErPå) {
+                null
+            } else {
+                infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, alleBarnasIdenter).sakspart
+                    ?: infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).sakspart
+            }
+
         return Pair(
             first = baSakClient.hentRestFagsakDeltagerListe(brukersFnr.last().ident, barnasIdenter).harForelderEllerBarnPågåendeSak(baSakClient),
-            second =
-                infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(brukersIdenter, alleBarnasIdenter).sakspart
-                    ?: infotrygdBarnetrygdClient.hentSaker(brukersIdenter, alleBarnasIdenter).sakspart,
+            second = sakspart,
         )
     }
 

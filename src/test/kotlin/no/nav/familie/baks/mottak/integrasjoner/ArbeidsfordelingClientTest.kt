@@ -27,7 +27,7 @@ class ArbeidsfordelingClientTest {
     @Tag("integration")
     fun `hentBehandlendeEnhetPåIdent skal returnere enhet på person`() {
         stubFor(
-            WireMock.post(urlEqualTo("/api/arbeidsfordeling/enhet/KON")).withRequestBody(WireMock.equalToJson("""{"personIdent":"123"}""")).willReturn(
+            WireMock.post(urlEqualTo("/api/arbeidsfordeling/enhet/KON")).withRequestBody(WireMock.equalToJson("""{"ident":"123"}""")).willReturn(
                 aResponse().withHeader("Content-Type", "application/json").withBody(
                     gyldigEnhetResponse(),
                 ),
@@ -35,24 +35,26 @@ class ArbeidsfordelingClientTest {
         )
 
         val response =
-            arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
+            arbeidsfordelingClient.hentBehandlendeEnheterPåIdent(
                 personIdent = "123",
                 tema = Tema.KON,
             )
-        assertThat(response.enhetId).isEqualTo("4863")
-        assertThat(response.enhetNavn).isEqualTo("Enhet 4863")
+        assertThat(response.single().enhetId).isEqualTo("4863")
+        assertThat(response.single().enhetNavn).isEqualTo("NAV Familie- og pensjonsytelser midlertidig enhet")
     }
 
     private fun gyldigEnhetResponse() = """
+{
+  "data": [
     {
-      "data": {
-        "enhetId": "4863",
-        "enhetNavn": "Enhet 4863"
-      },
-      "status": "SUKSESS",
-      "melding": "Innhenting av data var vellykket",
-      "frontendFeilmelding": null,
-      "stacktrace": null
-    }                                   
+      "enhetId": "4863",
+      "enhetNavn": "NAV Familie- og pensjonsytelser midlertidig enhet"
+    }
+  ],
+  "status": "SUKSESS",
+  "melding": "Innhenting av data var vellykket",
+  "frontendFeilmelding": null,
+  "stacktrace": null
+}                              
         """
 }
