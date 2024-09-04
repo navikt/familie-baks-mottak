@@ -387,4 +387,35 @@ class EnhetsnummerServiceTest {
 
         assertThat(exception.message).isEqualTo("Støtter ikke tema $tema")
     }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = Tema::class,
+        names = ["BAR", "KON"],
+    )
+    fun `skal sette enhet 2103 Vikafossen for papirsøkand hvor søker er strengt fortrolig`(tema: Tema) {
+        // Arrange
+        val fnr = "321"
+
+        val journalpost =
+            Journalpost(
+                journalpostId = "123",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                tema = tema.name,
+                journalforendeEnhet = "2101",
+                bruker = Bruker(fnr, BrukerIdType.FNR),
+                kanal = "SKAN_NETS",
+            )
+
+        every {
+            mockedPdlClient.hentPerson(fnr, "hentperson-med-adressebeskyttelse", tema)
+        } returns PdlPersonData(adressebeskyttelse = listOf(Adressebeskyttelse(gradering = Adressebeskyttelsesgradering.STRENGT_FORTROLIG)))
+
+        // Act
+        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
+
+        // Assert
+        assertThat(enhetsnummer).isEqualTo("2103")
+    }
 }
