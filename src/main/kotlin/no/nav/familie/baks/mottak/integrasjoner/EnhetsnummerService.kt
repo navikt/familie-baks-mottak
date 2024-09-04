@@ -29,13 +29,20 @@ class EnhetsnummerService(
         val tema = Tema.valueOf(journalpost.tema)
 
         val (søkersIdent, barnasIdenter) =
-            when (tema) {
-                Tema.BAR -> finnIdenterForBarnetrygd(erPapirsøknad, tema, journalpost.bruker, journalpost.journalpostId)
-                Tema.KON -> finnIdenterForKontantstøtte(erPapirsøknad, tema, journalpost.bruker, journalpost.journalpostId)
-                Tema.ENF,
-                Tema.OPP,
-                -> {
-                    throw IllegalStateException("Støtter ikke tema $tema")
+            if (erPapirsøknad) {
+                Pair(
+                    tilPersonIdent(journalpost.bruker, tema),
+                    emptyList(),
+                )
+            } else {
+                when (tema) {
+                    Tema.BAR -> søknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
+                    Tema.KON -> søknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
+                    Tema.ENF,
+                    Tema.OPP,
+                    -> {
+                        throw IllegalStateException("Støtter ikke tema $tema")
+                    }
                 }
             }
 
@@ -51,7 +58,6 @@ class EnhetsnummerService(
             erStrengtFortrolig -> "2103"
             journalpost.journalforendeEnhet == "2101" -> "4806" // Enhet 2101 er nedlagt. Rutes til 4806
             journalpost.journalforendeEnhet == "4847" -> "4817" // Enhet 4847 skal legges ned. Rutes til 4817
-            // TODO : Kan vi bare kaste exception øverst i metoden om journalpost ikke er BA eller KS?
             journalpost.erDigitalKanal() && (journalpost.erBarnetrygdSøknad() || journalpost.erKontantstøtteSøknad()) ->
                 arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(søkersIdent, tema).enhetId
             journalpost.journalforendeEnhet.isNullOrBlank() -> null
@@ -63,36 +69,6 @@ class EnhetsnummerService(
             }
         }
     }
-
-    private fun finnIdenterForKontantstøtte(
-        erPapirsøknad: Boolean,
-        tema: Tema,
-        bruker: Bruker,
-        journalpostId: String,
-    ): Pair<String, List<String>> =
-        if (erPapirsøknad) {
-            Pair(
-                tilPersonIdent(bruker, tema),
-                emptyList(),
-            )
-        } else {
-            søknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpostId)
-        }
-
-    private fun finnIdenterForBarnetrygd(
-        erPapirsøknad: Boolean,
-        tema: Tema,
-        bruker: Bruker,
-        journalpostId: String,
-    ): Pair<String, List<String>> =
-        if (erPapirsøknad) {
-            Pair(
-                tilPersonIdent(bruker, tema),
-                emptyList(),
-            )
-        } else {
-            søknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpostId)
-        }
 
     private fun tilPersonIdent(
         bruker: Bruker,
