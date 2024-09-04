@@ -29,20 +29,13 @@ class EnhetsnummerService(
         val tema = Tema.valueOf(journalpost.tema)
 
         val (søkersIdent, barnasIdenter) =
-            if (erPapirsøknad) {
-                Pair(
-                    tilPersonIdent(journalpost.bruker, tema),
-                    emptyList(),
-                )
-            } else {
-                when (tema) {
-                    Tema.BAR -> søknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
-                    Tema.KON -> søknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
-                    Tema.ENF,
-                    Tema.OPP,
-                    -> {
-                        throw IllegalStateException("Støtter ikke tema $tema")
-                    }
+            when (tema) {
+                Tema.BAR -> finnIdenterForBarnetrygd(erPapirsøknad, tema, journalpost.bruker, journalpost.journalpostId)
+                Tema.KON -> finnIdenterForKontantstøtte(erPapirsøknad, tema, journalpost.bruker, journalpost.journalpostId)
+                Tema.ENF,
+                Tema.OPP,
+                -> {
+                    throw IllegalStateException("Støtter ikke tema $tema")
                 }
             }
 
@@ -69,6 +62,42 @@ class EnhetsnummerService(
             }
         }
     }
+
+    private fun finnIdenterForKontantstøtte(
+        erPapirsøknad: Boolean,
+        tema: Tema,
+        bruker: Bruker,
+        journalpostId: String,
+    ): Pair<String, List<String>> =
+        if (erPapirsøknad) {
+            Pair(
+                tilPersonIdent(
+                    bruker,
+                    tema,
+                ),
+                emptyList(),
+            )
+        } else {
+            søknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpostId)
+        }
+
+    private fun finnIdenterForBarnetrygd(
+        erPapirsøknad: Boolean,
+        tema: Tema,
+        bruker: Bruker,
+        journalpostId: String,
+    ): Pair<String, List<String>> =
+        if (erPapirsøknad) {
+            Pair(
+                tilPersonIdent(
+                    bruker,
+                    tema,
+                ),
+                emptyList(),
+            )
+        } else {
+            søknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpostId)
+        }
 
     private fun tilPersonIdent(
         bruker: Bruker,
