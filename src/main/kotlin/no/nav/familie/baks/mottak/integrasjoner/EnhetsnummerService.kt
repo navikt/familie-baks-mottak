@@ -9,7 +9,7 @@ import java.util.Locale
 class EnhetsnummerService(
     private val hentEnhetClient: HentEnhetClient,
     private val pdlClient: PdlClient,
-    private val søknadFraJournalpostService: SøknadFraJournalpostService,
+    private val søknadsidenterService: SøknadsidenterService,
     private val arbeidsfordelingClient: ArbeidsfordelingClient,
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
@@ -75,10 +75,7 @@ class EnhetsnummerService(
                 emptyList(),
             )
         } else {
-            Pair(
-                søknadFraJournalpostService.hentSøkersIdentForKontantstøtte(journalpostId = journalpostId),
-                søknadFraJournalpostService.hentBarnasIdenterForKontantstøtte(journalpostId = journalpostId),
-            )
+            søknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpostId)
         }
 
     private fun finnIdenterForBarnetrygd(
@@ -93,10 +90,7 @@ class EnhetsnummerService(
                 emptyList(),
             )
         } else {
-            Pair(
-                søknadFraJournalpostService.hentSøkersIdentForBarnetrygd(journalpostId = journalpostId),
-                søknadFraJournalpostService.hentBarnasIdenterForBarnetrygd(journalpostId = journalpostId),
-            )
+            søknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpostId)
         }
 
     private fun tilPersonIdent(

@@ -9,23 +9,28 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadService
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadTestData.kontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadTestData.lagBarn
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadTestData.lagSøker
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.kontrakter.felles.objectMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
-class SøknadFraJournalpostServiceTest {
+
+class SøknadsidenterServiceTest {
     private val mockedBarnetrygdSøknadService: BarnetrygdSøknadService = mockk()
     private val mockedKontantstøtteSøknadService: KontantstøtteSøknadService = mockk()
-    private val søknadFraJournalpostService: SøknadFraJournalpostService =
-        SøknadFraJournalpostService(
+    private val søknadsidenterService: SøknadsidenterService =
+        SøknadsidenterService(
             mockedBarnetrygdSøknadService,
             mockedKontantstøtteSøknadService,
         )
 
+    private val søkersFødselsnummer: String = "123"
+
     @Nested
-    inner class HentBarnasIdenterForKontantstøtteTest {
+    inner class HentIdenterForKontantstøtteViaJournalpostTest {
         @Test
         fun `skal hente identer for barna`() {
             // Arrange
@@ -33,6 +38,9 @@ class SøknadFraJournalpostServiceTest {
 
             val kontantstøtteSøknad =
                 kontantstøtteSøknad(
+                    søker = lagSøker(
+                        søkersFødselsnummer
+                    ),
                     barn =
                         listOf(
                             lagBarn("815"),
@@ -44,7 +52,7 @@ class SøknadFraJournalpostServiceTest {
             val dbKontantstøtteSøknad =
                 DBKontantstøtteSøknad(
                     søknadJson = objectMapper.writeValueAsString(kontantstøtteSøknad),
-                    fnr = "123",
+                    fnr = søkersFødselsnummer,
                     journalpostId = journalpostId,
                 )
 
@@ -53,15 +61,33 @@ class SøknadFraJournalpostServiceTest {
             } returns dbKontantstøtteSøknad
 
             // Act
-            val identer = søknadFraJournalpostService.hentBarnasIdenterForKontantstøtte(journalpostId)
+            val identer = søknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpostId)
 
             // Assert
-            assertThat(identer).contains("815", "493", "00")
+            assertThat(identer.first).isEqualTo(søkersFødselsnummer)
+            assertThat(identer.second).isEqualTo(listOf("815", "493", "00"))
         }
+
+        @Test
+        fun `skal kaste exception om søknad er null` () {
+            // Arrange
+            val journalpostId = "1"
+
+            every {
+                mockedKontantstøtteSøknadService.hentDBKontantstøtteSøknadForJournalpost(journalpostId)
+            } returns null
+
+            // Act & assert
+            val exception = assertThrows<IllegalStateException> {
+                søknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpostId)
+            }
+            assertThat(exception.message).isEqualTo("Fant ikke søknad for journalpost=$journalpostId")
+        }
+
     }
 
     @Nested
-    inner class HentBarnasIdenterForBarnetrygdTest {
+    inner class hentIdenterViaJournalpostBA {
         @Test
         fun `skal hente identer for barna`() {
             // Arrange
@@ -69,6 +95,9 @@ class SøknadFraJournalpostServiceTest {
 
             val kontantstøtteSøknad =
                 barnetrygdSøknad(
+                    søker = SøknadTestData.lagSøker(
+                        søkersFødselsnummer
+                    ),
                     barn =
                         listOf(
                             SøknadTestData.lagBarn("815"),
@@ -80,7 +109,7 @@ class SøknadFraJournalpostServiceTest {
             val dbBarnetrygdSøknad =
                 DBBarnetrygdSøknad(
                     søknadJson = objectMapper.writeValueAsString(kontantstøtteSøknad),
-                    fnr = "123",
+                    fnr = søkersFødselsnummer,
                     journalpostId = journalpostId,
                 )
 
@@ -89,10 +118,27 @@ class SøknadFraJournalpostServiceTest {
             } returns dbBarnetrygdSøknad
 
             // Act
-            val identer = søknadFraJournalpostService.hentBarnasIdenterForBarnetrygd(journalpostId)
+            val identer = søknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpostId)
 
             // Assert
-            assertThat(identer).contains("815", "493", "00")
+            assertThat(identer.first).isEqualTo(søkersFødselsnummer)
+            assertThat(identer.second).isEqualTo(listOf("815", "493", "00"))
+        }
+
+        @Test
+        fun `skal kaste exception om søknad er null` () {
+            // Arrange
+            val journalpostId = "1"
+
+            every {
+                mockedBarnetrygdSøknadService.hentDBSøknadFraJournalpost(journalpostId)
+            } returns null
+
+            // Act & assert
+            val exception = assertThrows<IllegalStateException> {
+                søknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpostId)
+            }
+            assertThat(exception.message).isEqualTo("Fant ikke søknad for journalpost=$journalpostId")
         }
     }
 }

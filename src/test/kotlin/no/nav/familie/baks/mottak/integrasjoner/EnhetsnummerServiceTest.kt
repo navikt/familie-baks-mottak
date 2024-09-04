@@ -12,13 +12,13 @@ import org.junit.jupiter.params.provider.EnumSource
 class EnhetsnummerServiceTest {
     private val mockedHentEnhetClient: HentEnhetClient = mockk()
     private val mockedPdlClient: PdlClient = mockk()
-    private val mockedSøknadFraJournalpostService: SøknadFraJournalpostService = mockk()
+    private val mockedSøknadsidenterService: SøknadsidenterService = mockk()
     private val arbeidsfordelingClient: ArbeidsfordelingClient = mockk()
     private val enhetsnummerService: EnhetsnummerService =
         EnhetsnummerService(
             hentEnhetClient = mockedHentEnhetClient,
             pdlClient = mockedPdlClient,
-            søknadFraJournalpostService = mockedSøknadFraJournalpostService,
+            søknadsidenterService = mockedSøknadsidenterService,
             arbeidsfordelingClient = arbeidsfordelingClient,
         )
 
@@ -43,20 +43,12 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedSøknadFraJournalpostService.hentSøkersIdentForBarnetrygd(journalpost.journalpostId)
-        } returns fnr
+            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpost.journalpostId)
+        } returns Pair(fnr, emptyList())
 
         every {
-            mockedSøknadFraJournalpostService.hentSøkersIdentForKontantstøtte(journalpost.journalpostId)
-        } returns fnr
-
-        every {
-            mockedSøknadFraJournalpostService.hentBarnasIdenterForBarnetrygd(journalpost.journalpostId)
-        } returns emptyList()
-
-        every {
-            mockedSøknadFraJournalpostService.hentBarnasIdenterForKontantstøtte(journalpost.journalpostId)
-        } returns emptyList()
+            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
+        } returns Pair(fnr, emptyList())
 
         every {
             mockedPdlClient.hentPerson(fnr, "hentperson-med-adressebeskyttelse", tema)
@@ -90,20 +82,12 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedSøknadFraJournalpostService.hentSøkersIdentForBarnetrygd(journalpost.journalpostId)
-        } returns fnr
+            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpost.journalpostId)
+        } returns Pair(fnr, emptyList())
 
         every {
-            mockedSøknadFraJournalpostService.hentSøkersIdentForKontantstøtte(journalpost.journalpostId)
-        } returns fnr
-
-        every {
-            mockedSøknadFraJournalpostService.hentBarnasIdenterForBarnetrygd(journalpost.journalpostId)
-        } returns emptyList()
-
-        every {
-            mockedSøknadFraJournalpostService.hentBarnasIdenterForKontantstøtte(journalpost.journalpostId)
-        } returns emptyList()
+            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
+        } returns Pair(fnr, emptyList())
 
         every {
             mockedPdlClient.hentPerson(fnr, "hentperson-med-adressebeskyttelse", tema)
@@ -137,20 +121,12 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedSøknadFraJournalpostService.hentSøkersIdentForBarnetrygd(journalpost.journalpostId)
-        } returns fnr
+            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpost.journalpostId)
+        } returns Pair(fnr, emptyList())
 
         every {
-            mockedSøknadFraJournalpostService.hentSøkersIdentForKontantstøtte(journalpost.journalpostId)
-        } returns fnr
-
-        every {
-            mockedSøknadFraJournalpostService.hentBarnasIdenterForBarnetrygd(journalpost.journalpostId)
-        } returns emptyList()
-
-        every {
-            mockedSøknadFraJournalpostService.hentBarnasIdenterForKontantstøtte(journalpost.journalpostId)
-        } returns emptyList()
+            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
+        } returns Pair(fnr, emptyList())
 
         every {
             mockedPdlClient.hentPerson(fnr, "hentperson-med-adressebeskyttelse", tema)
@@ -184,20 +160,12 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedSøknadFraJournalpostService.hentSøkersIdentForBarnetrygd(journalpost.journalpostId)
-        } returns fnr
+            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpost.journalpostId)
+        } returns Pair(fnr, emptyList())
 
         every {
-            mockedSøknadFraJournalpostService.hentSøkersIdentForKontantstøtte(journalpost.journalpostId)
-        } returns fnr
-
-        every {
-            mockedSøknadFraJournalpostService.hentBarnasIdenterForBarnetrygd(journalpost.journalpostId)
-        } returns emptyList()
-
-        every {
-            mockedSøknadFraJournalpostService.hentBarnasIdenterForKontantstøtte(journalpost.journalpostId)
-        } returns emptyList()
+            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
+        } returns Pair(fnr, emptyList())
 
         every {
             mockedPdlClient.hentPerson(fnr, "hentperson-med-adressebeskyttelse", tema)
@@ -235,20 +203,12 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedSøknadFraJournalpostService.hentSøkersIdentForBarnetrygd(journalpost.journalpostId)
-        } returns fnr
+            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpost.journalpostId)
+        } returns Pair(fnr, emptyList())
 
         every {
-            mockedSøknadFraJournalpostService.hentSøkersIdentForKontantstøtte(journalpost.journalpostId)
-        } returns fnr
-
-        every {
-            mockedSøknadFraJournalpostService.hentBarnasIdenterForBarnetrygd(journalpost.journalpostId)
-        } returns emptyList()
-
-        every {
-            mockedSøknadFraJournalpostService.hentBarnasIdenterForKontantstøtte(journalpost.journalpostId)
-        } returns emptyList()
+            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
+        } returns Pair(fnr, emptyList())
 
         every {
             mockedPdlClient.hentPerson(fnr, "hentperson-med-adressebeskyttelse", tema)
@@ -286,20 +246,12 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedSøknadFraJournalpostService.hentSøkersIdentForBarnetrygd(journalpost.journalpostId)
-        } returns fnr
+            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpost.journalpostId)
+        } returns Pair(fnr, emptyList())
 
         every {
-            mockedSøknadFraJournalpostService.hentSøkersIdentForKontantstøtte(journalpost.journalpostId)
-        } returns fnr
-
-        every {
-            mockedSøknadFraJournalpostService.hentBarnasIdenterForBarnetrygd(journalpost.journalpostId)
-        } returns emptyList()
-
-        every {
-            mockedSøknadFraJournalpostService.hentBarnasIdenterForKontantstøtte(journalpost.journalpostId)
-        } returns emptyList()
+            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
+        } returns Pair(fnr, emptyList())
 
         every {
             mockedPdlClient.hentPerson(fnr, "hentperson-med-adressebeskyttelse", tema)
@@ -337,20 +289,12 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedSøknadFraJournalpostService.hentSøkersIdentForBarnetrygd(journalpost.journalpostId)
-        } returns fnr
+            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpost.journalpostId)
+        } returns Pair(fnr, listOf("123", "456"))
 
         every {
-            mockedSøknadFraJournalpostService.hentSøkersIdentForKontantstøtte(journalpost.journalpostId)
-        } returns fnr
-
-        every {
-            mockedSøknadFraJournalpostService.hentBarnasIdenterForBarnetrygd(journalpost.journalpostId)
-        } returns listOf("123", "456")
-
-        every {
-            mockedSøknadFraJournalpostService.hentBarnasIdenterForKontantstøtte(journalpost.journalpostId)
-        } returns listOf("123", "456")
+            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
+        } returns Pair(fnr, listOf("123", "456"))
 
         every {
             mockedPdlClient.hentPerson(fnr, "hentperson-med-adressebeskyttelse", tema)
