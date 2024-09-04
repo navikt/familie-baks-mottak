@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-
 class SøknadsidenterServiceTest {
     private val mockedBarnetrygdSøknadService: BarnetrygdSøknadService = mockk()
     private val mockedKontantstøtteSøknadService: KontantstøtteSøknadService = mockk()
@@ -38,9 +37,10 @@ class SøknadsidenterServiceTest {
 
             val kontantstøtteSøknad =
                 kontantstøtteSøknad(
-                    søker = lagSøker(
-                        søkersFødselsnummer
-                    ),
+                    søker =
+                        lagSøker(
+                            søkersFødselsnummer,
+                        ),
                     barn =
                         listOf(
                             lagBarn("815"),
@@ -69,7 +69,7 @@ class SøknadsidenterServiceTest {
         }
 
         @Test
-        fun `skal kaste exception om søknad er null` () {
+        fun `skal kaste exception om søknad er null`() {
             // Arrange
             val journalpostId = "1"
 
@@ -78,16 +78,16 @@ class SøknadsidenterServiceTest {
             } returns null
 
             // Act & assert
-            val exception = assertThrows<IllegalStateException> {
-                søknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpostId)
-            }
+            val exception =
+                assertThrows<IllegalStateException> {
+                    søknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpostId)
+                }
             assertThat(exception.message).isEqualTo("Fant ikke søknad for journalpost=$journalpostId")
         }
-
     }
 
     @Nested
-    inner class hentIdenterViaJournalpostBA {
+    inner class HentIdenterForBarnetrygdViaJournalpostTest {
         @Test
         fun `skal hente identer for barna`() {
             // Arrange
@@ -95,9 +95,10 @@ class SøknadsidenterServiceTest {
 
             val kontantstøtteSøknad =
                 barnetrygdSøknad(
-                    søker = SøknadTestData.lagSøker(
-                        søkersFødselsnummer
-                    ),
+                    søker =
+                        SøknadTestData.lagSøker(
+                            søkersFødselsnummer,
+                        ),
                     barn =
                         listOf(
                             SøknadTestData.lagBarn("815"),
@@ -126,7 +127,7 @@ class SøknadsidenterServiceTest {
         }
 
         @Test
-        fun `skal kaste exception om søknad er null` () {
+        fun `skal kaste exception om søknad er null`() {
             // Arrange
             val journalpostId = "1"
 
@@ -135,9 +136,10 @@ class SøknadsidenterServiceTest {
             } returns null
 
             // Act & assert
-            val exception = assertThrows<IllegalStateException> {
-                søknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpostId)
-            }
+            val exception =
+                assertThrows<IllegalStateException> {
+                    søknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpostId)
+                }
             assertThat(exception.message).isEqualTo("Fant ikke søknad for journalpost=$journalpostId")
         }
     }

@@ -27,13 +27,21 @@ class SøknadsidenterService(
         return when (versjonertSøknad) {
             is KontantstøtteSøknadV4 ->
                 Pair(
-                    versjonertSøknad.kontantstøtteSøknad.søker.ident.verdi.values.first(),
-                    versjonertSøknad.kontantstøtteSøknad.barn.map { it.ident.verdi.values.first() },
+                    versjonertSøknad.kontantstøtteSøknad.søker.ident.verdi.values
+                        .first(),
+                    versjonertSøknad.kontantstøtteSøknad.barn.map {
+                        it.ident.verdi.values
+                            .first()
+                    },
                 )
             is KontantstøtteSøknadV5 ->
                 Pair(
-                    versjonertSøknad.kontantstøtteSøknad.søker.ident.verdi.values.first(),
-                    versjonertSøknad.kontantstøtteSøknad.barn.map { it.ident.verdi.values.first() },
+                    versjonertSøknad.kontantstøtteSøknad.søker.ident.verdi.values
+                        .first(),
+                    versjonertSøknad.kontantstøtteSøknad.barn.map {
+                        it.ident.verdi.values
+                            .first()
+                    },
                 )
         }
     }
@@ -48,13 +56,21 @@ class SøknadsidenterService(
         return when (versjonertSøknad) {
             is BarnetrygdSøknadV8 ->
                 Pair(
-                    versjonertSøknad.barnetrygdSøknad.søker.ident.verdi.values.first(),
-                    versjonertSøknad.barnetrygdSøknad.barn.map { it.ident.verdi.values.first() }
+                    versjonertSøknad.barnetrygdSøknad.søker.ident.verdi.values
+                        .first(),
+                    versjonertSøknad.barnetrygdSøknad.barn.map {
+                        it.ident.verdi.values
+                            .first()
+                    },
                 )
             is BarnetrygdSøknadV9 ->
                 Pair(
-                    versjonertSøknad.barnetrygdSøknad.søker.ident.verdi.values.first(),
-                    versjonertSøknad.barnetrygdSøknad.barn.map { it.ident.verdi.values.first() }
+                    versjonertSøknad.barnetrygdSøknad.søker.ident.verdi.values
+                        .first(),
+                    versjonertSøknad.barnetrygdSøknad.barn.map {
+                        it.ident.verdi.values
+                            .first()
+                    },
                 )
         }
     }

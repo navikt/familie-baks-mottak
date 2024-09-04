@@ -337,6 +337,29 @@ class EnhetsnummerServiceTest {
         assertThat(exception.message).isEqualTo("Tema er null")
     }
 
+    @Test
+    fun `skal kaste exception hvis journalpost bruker er null`() {
+        // Arrange
+        val journalpost =
+            Journalpost(
+                journalpostId = "123",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                tema = Tema.BAR.name,
+                journalforendeEnhet = "1",
+                kanal = "NAV_NO",
+                bruker = null,
+            )
+
+        // Act & Assert
+        val exception =
+            assertThrows<IllegalStateException> {
+                enhetsnummerService.hentEnhetsnummer(journalpost)
+            }
+
+        assertThat(exception.message).isEqualTo("Fant ikke bruker på journalpost ved forsøk på henting av behandlende enhet")
+    }
+
     @ParameterizedTest
     @EnumSource(
         value = Tema::class,
@@ -353,6 +376,7 @@ class EnhetsnummerServiceTest {
                 tema = tema.name,
                 journalforendeEnhet = "1",
                 kanal = "NAV_NO",
+                bruker = Bruker("312", BrukerIdType.FNR),
             )
 
         // Act & Assert
@@ -361,6 +385,6 @@ class EnhetsnummerServiceTest {
                 enhetsnummerService.hentEnhetsnummer(journalpost)
             }
 
-        assertThat(exception.message).isEqualTo("Fant ikke bruker på journalpost ved forsøk på henting av behandlende enhet")
+        assertThat(exception.message).isEqualTo("Støtter ikke tema $tema")
     }
 }
