@@ -5,15 +5,18 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.harEøsSteg
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
+import no.nav.familie.unleash.UnleashService
 import org.springframework.stereotype.Service
 
 @Service
 class BarnetrygdOppgaveMapper(
+    hentEnhetClient: HentEnhetClient,
+    unleashService: UnleashService,
     enhetsnummerService: EnhetsnummerService,
     arbeidsfordelingClient: ArbeidsfordelingClient,
     pdlClient: PdlClient,
     val søknadRepository: SøknadRepository,
-) : AbstractOppgaveMapper(enhetsnummerService, pdlClient, arbeidsfordelingClient) {
+) : AbstractOppgaveMapper(hentEnhetClient, unleashService, enhetsnummerService, pdlClient, arbeidsfordelingClient) {
     override val tema: Tema = Tema.BAR
 
     // Behandlingstema og behandlingstype settes basert på regelsettet som er dokumentert nederst her: https://confluence.adeo.no/display/TFA/Mottak+av+dokumenter

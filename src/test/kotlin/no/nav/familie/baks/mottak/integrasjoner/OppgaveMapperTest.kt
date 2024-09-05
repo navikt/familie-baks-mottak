@@ -11,6 +11,7 @@ import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveIdentV2
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
+import no.nav.familie.unleash.UnleashService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -33,12 +34,15 @@ class OppgaveMapperTest(
     @Autowired
     private val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
 ) {
+    private val mockUnleashService: UnleashService = mockk()
     private val mockHentEnhetClient: HentEnhetClient = mockk(relaxed = true)
     private val mockEnhetsnummerService: EnhetsnummerService = mockk()
     private val mockArbeidsfordelingClient: ArbeidsfordelingClient = mockk(relaxed = true)
 
     private val barnetrygdOppgaveMapper: IOppgaveMapper =
         BarnetrygdOppgaveMapper(
+            hentEnhetClient = mockHentEnhetClient,
+            unleashService = mockUnleashService,
             enhetsnummerService = mockEnhetsnummerService,
             pdlClient = mockPdlClient,
             søknadRepository = barnetrygdSøknadRepository,
@@ -47,6 +51,8 @@ class OppgaveMapperTest(
 
     private val kontantstøtteOppgaveMapper: IOppgaveMapper =
         KontantstøtteOppgaveMapper(
+            hentEnhetClient = mockHentEnhetClient,
+            unleashService = mockUnleashService,
             enhetsnummerService = mockEnhetsnummerService,
             pdlClient = mockPdlClient,
             kontantstøtteSøknadRepository = kontantstøtteSøknadRepository,
@@ -56,6 +62,7 @@ class OppgaveMapperTest(
     @BeforeEach
     fun beforeEach() {
         every { mockEnhetsnummerService.hentEnhetsnummer(any()) } returns "1234"
+        every { mockUnleashService.isEnabled(any()) } returns true
     }
 
     @Test

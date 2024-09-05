@@ -1,5 +1,6 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.util.erDnummer
 import no.nav.familie.baks.mottak.util.erOrgnr
 import no.nav.familie.baks.mottak.util.fristFerdigstillelse
@@ -10,10 +11,14 @@ import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveIdentV2
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.kontrakter.felles.oppgave.OpprettOppgaveRequest
+import no.nav.familie.unleash.UnleashService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.util.Locale
 
 abstract class AbstractOppgaveMapper(
+    private val hentEnhetClient: HentEnhetClient,
+    private val unleashService: UnleashService,
     private val enhetsnummerService: EnhetsnummerService,
     val pdlClient: PdlClient,
     val arbeidsfordelingClient: ArbeidsfordelingClient,
@@ -33,7 +38,12 @@ abstract class AbstractOppgaveMapper(
             oppgavetype = oppgavetype,
             fristFerdigstillelse = fristFerdigstillelse(),
             beskrivelse = tilBeskrivelse(journalpost, beskrivelse),
-            enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost),
+            enhetsnummer =
+                if (unleashService.isEnabled(FeatureToggleConfig.BRUK_ENHETSNUMMERSERVICE)) {
+                    enhetsnummerService.hentEnhetsnummer(journalpost)
+                } else {
+                    utledEnhetsnummer(journalpost)
+                },
             behandlingstema = hentBehandlingstemaVerdi(journalpost),
             behandlingstype = hentBehandlingstypeVerdi(journalpost),
         )
@@ -104,6 +114,40 @@ abstract class AbstractOppgaveMapper(
 
         return "${journalpost.hentHovedDokumentTittel().orEmpty()} $bindestrek ${beskrivelse.orEmpty()}".trim()
     }
+
+    private fun utledEnhetsnummer(journalpost: Journalpost): String? =
+        when {
+            journalpost.journalforendeEnhet == "2101" -> "4806" // Enhet 2101 er nedlagt. Rutes til 4806
+            journalpost.journalforendeEnhet == "4847" -> "4817" // Enhet 4847 skal legges ned. Rutes til 4817
+            journalpost.erDigitalKanal() && (journalpost.erBarnetrygdSøknad() || journalpost.erKontantstøtteSøknad()) -> hentBehandlendeEnhetForPerson(journalpost)
+            journalpost.journalforendeEnhet.isNullOrBlank() -> null
+            hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).status.uppercase(Locale.getDefault()) == "NEDLAGT" -> null
+            hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).oppgavebehandler -> journalpost.journalforendeEnhet
+            else -> {
+                logger.warn("Enhet ${journalpost.journalforendeEnhet} kan ikke ta i mot oppgaver")
+                null
+            }
+        }
+
+    private fun hentBehandlendeEnhetForPerson(journalpost: Journalpost): String? =
+        if (journalpost.bruker != null) {
+            val personIdentPåJournalpost = tilPersonIdent(journalpost.bruker, this.tema)
+            val behandlendeEnhetPåIdent = arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdentPåJournalpost, this.tema)
+
+            behandlendeEnhetPåIdent.enhetId
+        } else {
+            logger.warn("Fant ikke bruker på journalpost ved forsøk på henting av behandlende enhet")
+            null
+        }
+
+    private fun tilPersonIdent(
+        bruker: Bruker,
+        tema: Tema,
+    ): String =
+        when (bruker.type) {
+            BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema)
+            else -> bruker.id
+        }
 
     private fun hentAktørIdFraPdl(
         brukerId: String,
