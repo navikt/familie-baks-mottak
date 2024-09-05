@@ -22,6 +22,8 @@ class EnhetsnummerServiceTest {
             arbeidsfordelingClient = mockedArbeidsfordelingClient,
         )
 
+    private val digitalKanal = "NAV_NO"
+
     @ParameterizedTest
     @EnumSource(
         value = Tema::class,
@@ -39,7 +41,8 @@ class EnhetsnummerServiceTest {
                 tema = tema.name,
                 journalforendeEnhet = "2101",
                 bruker = Bruker(fnr, BrukerIdType.FNR),
-                kanal = "NAV_NO",
+                kanal = digitalKanal,
+                dokumenter = hentDokumenterMedRiktigBrevkode(tema),
             )
 
         every {
@@ -78,7 +81,8 @@ class EnhetsnummerServiceTest {
                 tema = tema.name,
                 journalforendeEnhet = "4847",
                 bruker = Bruker(fnr, BrukerIdType.FNR),
-                kanal = "NAV_NO",
+                kanal = digitalKanal,
+                dokumenter = hentDokumenterMedRiktigBrevkode(tema),
             )
 
         every {
@@ -117,7 +121,7 @@ class EnhetsnummerServiceTest {
                 tema = tema.name,
                 journalforendeEnhet = null,
                 bruker = Bruker(fnr, BrukerIdType.FNR),
-                kanal = "NAV_NO",
+                kanal = digitalKanal,
             )
 
         every {
@@ -156,7 +160,7 @@ class EnhetsnummerServiceTest {
                 tema = tema.name,
                 journalforendeEnhet = "1234",
                 bruker = Bruker(fnr, BrukerIdType.FNR),
-                kanal = "NAV_NO",
+                kanal = digitalKanal,
             )
 
         every {
@@ -199,7 +203,7 @@ class EnhetsnummerServiceTest {
                 tema = tema.name,
                 journalforendeEnhet = "1234",
                 bruker = Bruker(fnr, BrukerIdType.FNR),
-                kanal = "NAV_NO",
+                kanal = digitalKanal,
             )
 
         every {
@@ -242,7 +246,7 @@ class EnhetsnummerServiceTest {
                 tema = tema.name,
                 journalforendeEnhet = "1234",
                 bruker = Bruker(fnr, BrukerIdType.FNR),
-                kanal = "NAV_NO",
+                kanal = digitalKanal,
             )
 
         every {
@@ -285,8 +289,8 @@ class EnhetsnummerServiceTest {
                 tema = tema.name,
                 journalforendeEnhet = "1234",
                 bruker = Bruker(fnr, BrukerIdType.FNR),
-                kanal = "NAV_NO",
-                dokumenter = listOf(DokumentInfo(brevkode = "NAV 34-00.08", tittel = "Kontantstøtte søknad", dokumentstatus = Dokumentstatus.FERDIGSTILT, dokumentvarianter = emptyList())),
+                kanal = digitalKanal,
+                dokumenter = hentDokumenterMedRiktigBrevkode(tema),
             )
 
         every {
@@ -326,7 +330,8 @@ class EnhetsnummerServiceTest {
                 journalstatus = Journalstatus.MOTTATT,
                 tema = null,
                 journalforendeEnhet = "1",
-                kanal = "NAV_NO",
+                kanal = digitalKanal,
+                dokumenter = hentDokumenterMedRiktigBrevkode(Tema.BAR),
             )
 
         // Act & Assert
@@ -348,7 +353,8 @@ class EnhetsnummerServiceTest {
                 journalstatus = Journalstatus.MOTTATT,
                 tema = Tema.BAR.name,
                 journalforendeEnhet = "1",
-                kanal = "NAV_NO",
+                kanal = digitalKanal,
+                dokumenter = hentDokumenterMedRiktigBrevkode(Tema.BAR),
                 bruker = null,
             )
 
@@ -376,7 +382,8 @@ class EnhetsnummerServiceTest {
                 journalstatus = Journalstatus.MOTTATT,
                 tema = tema.name,
                 journalforendeEnhet = "1",
-                kanal = "NAV_NO",
+                kanal = digitalKanal,
+                dokumenter = hentDokumenterMedRiktigBrevkode(tema),
                 bruker = Bruker("312", BrukerIdType.FNR),
             )
 
@@ -407,6 +414,7 @@ class EnhetsnummerServiceTest {
                 journalforendeEnhet = "2101",
                 bruker = Bruker(fnr, BrukerIdType.FNR),
                 kanal = "SKAN_NETS",
+                dokumenter = hentDokumenterMedRiktigBrevkode(tema),
             )
 
         every {
@@ -437,8 +445,8 @@ class EnhetsnummerServiceTest {
                 tema = tema.name,
                 journalforendeEnhet = "1234",
                 bruker = Bruker(fnr, BrukerIdType.FNR),
-                kanal = "NAV_NO",
-                dokumenter = listOf(DokumentInfo(brevkode = "NAV 33-00.07", tittel = "Barnetrygdsøknad", dokumentstatus = Dokumentstatus.FERDIGSTILT, dokumentvarianter = emptyList())),
+                kanal = digitalKanal,
+                dokumenter = hentDokumenterMedRiktigBrevkode(tema),
             )
 
         every {
@@ -463,5 +471,15 @@ class EnhetsnummerServiceTest {
 
         // Assert
         assertThat(enhetsnummer).isEqualTo("789")
+    }
+
+    private fun hentDokumenterMedRiktigBrevkode(tema: Tema): List<DokumentInfo> {
+        val brevkode =
+            when (tema) {
+                Tema.BAR -> "NAV 33-00.07"
+                Tema.KON -> "NAV 34-00.08"
+                else -> ""
+            }
+        return listOf(DokumentInfo(brevkode = brevkode, tittel = "Søknad", dokumentstatus = Dokumentstatus.FERDIGSTILT, dokumentvarianter = emptyList()))
     }
 }
