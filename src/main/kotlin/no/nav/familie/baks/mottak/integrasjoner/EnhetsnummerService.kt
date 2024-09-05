@@ -1,6 +1,7 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
 import no.nav.familie.kontrakter.felles.Tema
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.Locale
@@ -13,16 +14,20 @@ class EnhetsnummerService(
     private val arbeidsfordelingClient: ArbeidsfordelingClient,
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
+    private val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
 
     fun hentEnhetsnummer(
         journalpost: Journalpost,
     ): String? {
         if (journalpost.tema == null) {
+            logger.error("Journalpost tema er null for journalpost ${journalpost.journalpostId}.")
             throw IllegalStateException("Tema er null")
         }
 
         if (journalpost.bruker == null) {
-            throw IllegalStateException("Fant ikke bruker på journalpost ved forsøk på henting av behandlende enhet")
+            logger.error("Bruker for journalpost er null for journalpost ${journalpost.journalpostId}. Se SecureLogs.")
+            secureLogger.error("Bruker for journalpost er null for journalpost $journalpost.")
+            throw IllegalStateException("Journalpost bruker er null")
         }
 
         val erDigitalSøknad = journalpost.erDigitalKanal() && (journalpost.erKontantstøtteSøknad() || journalpost.erBarnetrygdSøknad())

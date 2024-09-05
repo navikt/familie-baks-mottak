@@ -364,7 +364,7 @@ class EnhetsnummerServiceTest {
                 enhetsnummerService.hentEnhetsnummer(journalpost)
             }
 
-        assertThat(exception.message).isEqualTo("Fant ikke bruker på journalpost ved forsøk på henting av behandlende enhet")
+        assertThat(exception.message).isEqualTo("Journalpost bruker er null")
     }
 
     @ParameterizedTest
