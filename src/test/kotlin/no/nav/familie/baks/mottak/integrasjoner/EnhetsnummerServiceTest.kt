@@ -13,13 +13,13 @@ class EnhetsnummerServiceTest {
     private val mockedHentEnhetClient: HentEnhetClient = mockk()
     private val mockedPdlClient: PdlClient = mockk()
     private val mockedSøknadsidenterService: SøknadsidenterService = mockk()
-    private val arbeidsfordelingClient: ArbeidsfordelingClient = mockk()
+    private val mockedArbeidsfordelingClient: ArbeidsfordelingClient = mockk()
     private val enhetsnummerService: EnhetsnummerService =
         EnhetsnummerService(
             hentEnhetClient = mockedHentEnhetClient,
             pdlClient = mockedPdlClient,
             søknadsidenterService = mockedSøknadsidenterService,
-            arbeidsfordelingClient = arbeidsfordelingClient,
+            arbeidsfordelingClient = mockedArbeidsfordelingClient,
         )
 
     @ParameterizedTest
@@ -286,6 +286,7 @@ class EnhetsnummerServiceTest {
                 journalforendeEnhet = "1234",
                 bruker = Bruker(fnr, BrukerIdType.FNR),
                 kanal = "NAV_NO",
+                dokumenter = listOf(DokumentInfo(brevkode = "NAV 34-00.08", tittel = "Kontantstøtte søknad", dokumentstatus = Dokumentstatus.FERDIGSTILT, dokumentvarianter = emptyList())),
             )
 
         every {
@@ -417,5 +418,50 @@ class EnhetsnummerServiceTest {
 
         // Assert
         assertThat(enhetsnummer).isEqualTo("2103")
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = Tema::class,
+        names = ["BAR", "KON"],
+    )
+    fun `skal finne og sette geografisk behandlende enhet på digitale søknader dersom ingen adressebeskyttelse er nødvendig`(tema: Tema) {
+        // Arrange
+        val fnr = "321"
+
+        val journalpost =
+            Journalpost(
+                journalpostId = "123",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                tema = tema.name,
+                journalforendeEnhet = "1234",
+                bruker = Bruker(fnr, BrukerIdType.FNR),
+                kanal = "NAV_NO",
+                dokumenter = listOf(DokumentInfo(brevkode = "NAV 33-00.07", tittel = "Barnetrygdsøknad", dokumentstatus = Dokumentstatus.FERDIGSTILT, dokumentvarianter = emptyList())),
+            )
+
+        every {
+            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpost.journalpostId)
+        } returns Pair(fnr, listOf("123", "456"))
+
+        every {
+            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
+        } returns Pair(fnr, listOf("123", "456"))
+
+        every {
+            mockedPdlClient.hentPerson(any(), any(), any())
+        } returns PdlPersonData(adressebeskyttelse = listOf(Adressebeskyttelse(gradering = Adressebeskyttelsesgradering.UGRADERT)))
+
+        every {
+            mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(any(), any())
+        } returns
+            no.nav.familie.kontrakter.felles.arbeidsfordeling
+                .Enhet(enhetId = "789", "Hønefoss")
+        // Act
+        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
+
+        // Assert
+        assertThat(enhetsnummer).isEqualTo("789")
     }
 }
