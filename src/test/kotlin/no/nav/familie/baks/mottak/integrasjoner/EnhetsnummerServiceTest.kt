@@ -30,7 +30,7 @@ class EnhetsnummerServiceTest {
         names = ["BAR", "KON"],
     )
     fun `skal sette enhet 4806 hvis enhet på journalpost er 2101 gitt at ingen personer har adressebeskyttelse strengt fortrolig`(
-        tema: Tema
+        tema: Tema,
     ) {
         // Arrange
         val fnr = "321"
@@ -72,7 +72,7 @@ class EnhetsnummerServiceTest {
         names = ["BAR", "KON"],
     )
     fun `skal sette enhet 4817 hvis enhet på journalpost er 4847 gitt at ingen personer har adressebeskyttelse strengt fortrolig`(
-        tema: Tema
+        tema: Tema,
     ) {
         // Arrange
         val fnr = "321"
@@ -114,7 +114,7 @@ class EnhetsnummerServiceTest {
         names = ["BAR", "KON"],
     )
     fun `skal sette enhet null hvis enhet på journalpost er null gitt at ingen personer har adressebeskyttelse strengt fortrolig`(
-        tema: Tema
+        tema: Tema,
     ) {
         // Arrange
         val fnr = "321"
@@ -155,7 +155,7 @@ class EnhetsnummerServiceTest {
         names = ["BAR", "KON"],
     )
     fun `skal sette enhet fra journalpost hvis enhet kan behandle oppgaver gitt at ingen personer har adressebeskyttelse strengt fortrolig`(
-        tema: Tema
+        tema: Tema,
     ) {
         // Arrange
         val fnr = "321"
@@ -200,7 +200,7 @@ class EnhetsnummerServiceTest {
         names = ["BAR", "KON"],
     )
     fun `skal sette enhet null hvis enhet ikke kan behandle oppgaver gitt at ingen personer har adressebeskyttelse strengt fortrolig`(
-        tema: Tema
+        tema: Tema,
     ) {
         // Arrange
         val fnr = "321"
@@ -245,7 +245,7 @@ class EnhetsnummerServiceTest {
         names = ["BAR", "KON"],
     )
     fun `skal sette enhet null hvis enhet er nedlagt gitt at ingen personer har adressebeskyttelse strengt fortrolig`(
-        tema: Tema
+        tema: Tema,
     ) {
         // Arrange
         val fnr = "321"
@@ -290,7 +290,7 @@ class EnhetsnummerServiceTest {
         names = ["BAR", "KON"],
     )
     fun `skal sette enhet til 2103 Vikafossen hvis søker har adressebeskyttelse strengt fortrolig`(
-        tema: Tema
+        tema: Tema,
     ) {
         // Arrange
         val fnr = "321"
@@ -390,7 +390,7 @@ class EnhetsnummerServiceTest {
         mode = EnumSource.Mode.EXCLUDE,
     )
     fun `skal kaste feil når tema ikke er støttet`(
-        tema: Tema
+        tema: Tema,
     ) {
         // Arrange
         val journalpost =
@@ -420,7 +420,7 @@ class EnhetsnummerServiceTest {
         names = ["BAR", "KON"],
     )
     fun `skal sette enhet 2103 Vikafossen for papirsøkand hvor søker er strengt fortrolig`(
-        tema: Tema
+        tema: Tema,
     ) {
         // Arrange
         val fnr = "321"
@@ -454,7 +454,7 @@ class EnhetsnummerServiceTest {
         names = ["BAR", "KON"],
     )
     fun `skal finne og sette geografisk behandlende enhet på digitale søknader dersom ingen adressebeskyttelse er nødvendig`(
-        tema: Tema
+        tema: Tema,
     ) {
         // Arrange
         val fnr = "321"
