@@ -25,9 +25,9 @@ class EnhetsnummerService(
         }
 
         if (journalpost.bruker == null) {
-            logger.error("Bruker for journalpost er null for journalpost ${journalpost.journalpostId}. Se SecureLogs.")
-            secureLogger.error("Bruker for journalpost er null for journalpost $journalpost.")
-            throw IllegalStateException("Journalpost bruker er null")
+            logger.error("Bruker for journalpost ${journalpost.journalpostId} er null. Usikker på hvordan dette burde håndteres. Se SecureLogs.")
+            secureLogger.error("Bruker for journalpost $journalpost er null. Usikker på hvordan dette burde håndteres.")
+            throw IllegalStateException("Bruker for journalpost ${journalpost.journalpostId} er null. Usikker på hvordan dette burde håndteres.")
         }
 
         val erDigitalSøknad = journalpost.erDigitalKanal() && (journalpost.erKontantstøtteSøknad() || journalpost.erBarnetrygdSøknad())
