@@ -112,11 +112,7 @@ class PdlClient(
                         Person(
                             navn = null,
                             forelderBarnRelasjoner = forelderBarnRelasjoner,
-                            adressebeskyttelseGradering =
-                                it.adressebeskyttelse
-                                    .firstOrNull()
-                                    ?.gradering
-                                    ?.name,
+                            adressebeskyttelseGradering = it.adressebeskyttelse.map { it.gradering },
                             bostedsadresse = it.bostedsadresse.firstOrNull(),
                         )
                     }
@@ -328,6 +324,11 @@ enum class Adressebeskyttelsesgradering {
     FORTROLIG, // Kode 7
     STRENGT_FORTROLIG, // Kode 6
     UGRADERT,
+    ;
+
+    fun erStrengtFortrolig() = this == STRENGT_FORTROLIG || this == STRENGT_FORTROLIG_UTLAND
+
+    fun erFortrolig(): Boolean = this == FORTROLIG
 }
 
 enum class Identgruppe {

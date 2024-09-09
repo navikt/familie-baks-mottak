@@ -1,7 +1,9 @@
 package no.nav.familie.baks.mottak.søknad.kontantstøtte
 
+import no.nav.familie.kontrakter.ks.søknad.v1.RegistrertBostedType
 import no.nav.familie.kontrakter.ks.søknad.v1.SIVILSTANDTYPE
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsfelt
+import no.nav.familie.kontrakter.ks.søknad.v4.Barn
 import no.nav.familie.kontrakter.ks.søknad.v4.Søker
 import no.nav.familie.kontrakter.ks.søknad.v5.KontantstøtteSøknad
 
@@ -11,12 +13,15 @@ fun <T> søknadsfelt(
 ): Søknadsfelt<T> = Søknadsfelt(label = mapOf("nb" to label), verdi = mapOf("nb" to verdi))
 
 object KontantstøtteSøknadTestData {
-    fun kontantstøtteSøknad(): KontantstøtteSøknad =
+    fun kontantstøtteSøknad(
+        søker: Søker = lagSøker(),
+        barn: List<Barn> = listOf(lagBarn()),
+    ): KontantstøtteSøknad =
         KontantstøtteSøknad(
             kontraktVersjon = 5,
             antallEøsSteg = 2,
-            søker = lagSøker(),
-            barn = emptyList(),
+            søker = søker,
+            barn = barn,
             dokumentasjon = emptyList(),
             teksterTilPdf = emptyMap(),
             originalSpråk = "nb",
@@ -31,10 +36,12 @@ object KontantstøtteSøknadTestData {
             finnesPersonMedAdressebeskyttelse = false,
         )
 
-    private fun lagSøker(): Søker =
+    fun lagSøker(
+        fnr: String = "12345678910",
+    ): Søker =
         Søker(
             harEøsSteg = false,
-            ident = søknadsfelt("Fødselsnummer", "12345678910"),
+            ident = søknadsfelt("Fødselsnummer", fnr),
             navn = søknadsfelt("Navn", "Ola Norman"),
             statsborgerskap = søknadsfelt("Statsborgerskap", listOf("Norge")),
             adresse = søknadsfelt("Adresse", null),
@@ -59,5 +66,41 @@ object KontantstøtteSøknadTestData {
             idNummer = emptyList(),
             andreUtbetalinger = søknadsfelt("Andre utbetalinger", "NEI"),
             adresseISøkeperiode = søknadsfelt("Adresse i søknadsperiode", "Testgate 123"),
+        )
+
+    fun lagBarn(
+        fnr: String = "12345678999",
+    ): Barn =
+        Barn(
+            harEøsSteg = true,
+            navn = søknadsfelt("Barnets fulle navn", "barn1"),
+            ident = søknadsfelt("Fødselsnummer", fnr),
+            registrertBostedType = søknadsfelt("Skal ha samme adresse", RegistrertBostedType.REGISTRERT_ANNEN_ADRESSE),
+            alder = søknadsfelt("alder", "4 år"),
+            utenlandsperioder = emptyList(),
+            teksterTilPdf = emptyMap(),
+            erFosterbarn = søknadsfelt("erFosterbarn", "JA"),
+            oppholderSegIInstitusjon = søknadsfelt("oppholderSegIInstitusjon", "JA"),
+            adresse = søknadsfelt("adresse", "Galtvort 123"),
+            andreForelder = null,
+            andreForelderErDød = null,
+            boddMindreEnn12MndINorge = søknadsfelt("boddMindreEnn12MndINorge", "JA"),
+            borFastMedSøker = søknadsfelt("borFastMedSøker", "JA"),
+            borMedAndreForelder = null,
+            borMedOmsorgsperson = null,
+            erAdoptert = søknadsfelt("erAdoptert", "NEI"),
+            erAsylsøker = søknadsfelt("erAsylsøker", "NEI"),
+            foreldreBorSammen = null,
+            harBarnehageplass = søknadsfelt("harBarnehageplass", "NEI"),
+            kontantstøtteFraAnnetEøsland = søknadsfelt("kontantstøtteFraAnnetEøsland", "NEI"),
+            mottarEllerMottokEøsKontantstøtte = null,
+            omsorgsperson = null,
+            planleggerÅBoINorge12Mnd = null,
+            pågåendeSøknadHvilketLand = null,
+            pågåendeSøknadFraAnnetEøsLand = null,
+            søkerDeltKontantstøtte = null,
+            søkersSlektsforhold = null,
+            søkersSlektsforholdSpesifisering = null,
+            utbetaltForeldrepengerEllerEngangsstønad = null,
         )
 }

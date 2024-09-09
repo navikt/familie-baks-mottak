@@ -1,5 +1,6 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.util.erDnummer
 import no.nav.familie.baks.mottak.util.erOrgnr
 import no.nav.familie.baks.mottak.util.fristFerdigstillelse
@@ -10,12 +11,15 @@ import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveIdentV2
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.kontrakter.felles.oppgave.OpprettOppgaveRequest
+import no.nav.familie.unleash.UnleashService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.Locale
 
 abstract class AbstractOppgaveMapper(
     private val hentEnhetClient: HentEnhetClient,
+    private val unleashService: UnleashService,
+    private val enhetsnummerService: EnhetsnummerService,
     val pdlClient: PdlClient,
     val arbeidsfordelingClient: ArbeidsfordelingClient,
 ) : IOppgaveMapper {
@@ -34,7 +38,12 @@ abstract class AbstractOppgaveMapper(
             oppgavetype = oppgavetype,
             fristFerdigstillelse = fristFerdigstillelse(),
             beskrivelse = tilBeskrivelse(journalpost, beskrivelse),
-            enhetsnummer = utledEnhetsnummer(journalpost),
+            enhetsnummer =
+                if (unleashService.isEnabled(FeatureToggleConfig.BRUK_ENHETSNUMMERSERVICE)) {
+                    enhetsnummerService.hentEnhetsnummer(journalpost)
+                } else {
+                    utledEnhetsnummer(journalpost)
+                },
             behandlingstema = hentBehandlingstemaVerdi(journalpost),
             behandlingstype = hentBehandlingstypeVerdi(journalpost),
         )

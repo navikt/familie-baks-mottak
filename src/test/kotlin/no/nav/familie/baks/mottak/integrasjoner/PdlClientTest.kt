@@ -48,7 +48,7 @@ class PdlClientTest {
         )
 
         val personInfo = pdlClient.hentPersonMedRelasjoner(testIdent, Tema.BAR)
-        assertThat(personInfo.adressebeskyttelseGradering).isEqualTo(Adressebeskyttelsesgradering.UGRADERT.name)
+        assertThat(personInfo.adressebeskyttelseGradering).isEqualTo(listOf(Adressebeskyttelsesgradering.UGRADERT))
         assertThat(personInfo.forelderBarnRelasjoner.size).isEqualTo(2)
         assertThat(personInfo.bostedsadresse?.vegadresse).isNotNull
     }
@@ -78,6 +78,27 @@ class PdlClientTest {
         val pdlPersonData = pdlClient.hentPerson(testIdent, "hentperson-fødested", Tema.BAR)
 
         assertThat(pdlPersonData.fødested.first().fødeland).isEqualTo("NOR")
+    }
+
+    @Test
+    fun `skal hente person med adressebeskyttelse fra pdl`() {
+        // Arrange
+        mockResponseForPdlQuery(
+            pdlRequestBody = gyldigRequest("hentperson-med-adressebeskyttelse.graphql", testIdent),
+            mockResponse = readfile("mock-hentperson-adressebeskyttelse.json"),
+        )
+
+        // Act
+        val pdlPersonData =
+            pdlClient.hentPerson(
+                personIdent = testIdent,
+                graphqlfil = "hentperson-med-adressebeskyttelse",
+                tema = Tema.BAR,
+            )
+
+        // Assert
+        assertThat(pdlPersonData.adressebeskyttelse).hasSize(1)
+        assertThat(pdlPersonData.adressebeskyttelse.first().gradering).isEqualTo(Adressebeskyttelsesgradering.UGRADERT)
     }
 
     @Test
@@ -113,7 +134,7 @@ class PdlClientTest {
     companion object {
         val testIdent = "12345678901"
 
-        private fun mockResponseForPdlQuery(
+        fun mockResponseForPdlQuery(
             pdlRequestBody: String,
             mockResponse: String,
         ) {
@@ -128,12 +149,12 @@ class PdlClientTest {
             )
         }
 
-        private fun gyldigRequest(
+        fun gyldigRequest(
             queryFilnavn: String,
             ident: String,
         ): String = "{\"variables\":{\"ident\":\"$ident\"},\"query\":\"${readfile(queryFilnavn).graphqlCompatible()}\"}"
 
-        private fun readfile(filnavn: String): String = this::class.java.getResource("/pdl/$filnavn").readText()
+        fun readfile(filnavn: String): String = this::class.java.getResource("/pdl/$filnavn").readText()
 
         private fun String.graphqlCompatible(): String = StringUtils.normalizeSpace(this.replace("\n", ""))
     }
