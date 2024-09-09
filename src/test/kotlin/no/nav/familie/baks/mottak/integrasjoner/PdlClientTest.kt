@@ -81,14 +81,23 @@ class PdlClientTest {
     }
 
     @Test
-    fun hentPersonAdressebeskyttelse() {
+    fun `skal hente person med adressebeskyttelse fra pdl`() {
+        // Arrange
         mockResponseForPdlQuery(
             pdlRequestBody = gyldigRequest("hentperson-med-adressebeskyttelse.graphql", testIdent),
             mockResponse = readfile("mock-hentperson-adressebeskyttelse.json"),
         )
 
-        val pdlPersonData = pdlClient.hentPerson(testIdent, "hentperson-med-adressebeskyttelse", Tema.BAR)
+        // Act
+        val pdlPersonData =
+            pdlClient.hentPerson(
+                personIdent = testIdent,
+                graphqlfil = "hentperson-med-adressebeskyttelse",
+                tema = Tema.BAR,
+            )
 
+        // Assert
+        assertThat(pdlPersonData.adressebeskyttelse).hasSize(1)
         assertThat(pdlPersonData.adressebeskyttelse.first().gradering).isEqualTo(Adressebeskyttelsesgradering.UGRADERT)
     }
 

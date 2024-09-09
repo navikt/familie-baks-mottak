@@ -61,8 +61,12 @@ class BarnetrygdSøknadService(
 
     fun hentDBSøknad(søknadId: Long): DBBarnetrygdSøknad? = søknadRepository.hentDBSøknad(søknadId)
 
-    fun hentDBSøknadFraJournalpost(journalpostId: String): DBBarnetrygdSøknad? =
+    fun finnDBSøknadFraJournalpost(journalpostId: String): DBBarnetrygdSøknad? =
         søknadRepository.hentDBSøknadForJournalpost(journalpostId = journalpostId)
+
+    fun hentDBSøknadFraJournalpost(journalpostId: String): DBBarnetrygdSøknad =
+        søknadRepository.hentDBSøknadForJournalpost(journalpostId = journalpostId)
+            ?: throw IllegalStateException("Fant ikke søknad for journalpost $journalpostId")
 
     fun hentLagredeVedlegg(søknad: DBBarnetrygdSøknad): Map<String, DBVedlegg> {
         val map = mutableMapOf<String, DBVedlegg>()

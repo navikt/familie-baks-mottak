@@ -69,8 +69,12 @@ class KontantstøtteSøknadService(
 
     fun hentDBKontantstøtteSøknad(søknadId: Long): DBKontantstøtteSøknad? = kontantstøtteSøknadRepository.hentSøknad(søknadId)
 
-    fun hentDBKontantstøtteSøknadForJournalpost(journalpostId: String): DBKontantstøtteSøknad? =
+    fun finnDBKontantstøtteSøknadForJournalpost(journalpostId: String): DBKontantstøtteSøknad? =
         kontantstøtteSøknadRepository.hentSøknadForJournalpost(journalpostId = journalpostId)
+
+    fun hentDBKontantstøtteSøknadForJournalpost(journalpostId: String): DBKontantstøtteSøknad =
+        kontantstøtteSøknadRepository.hentSøknadForJournalpost(journalpostId = journalpostId)
+            ?: throw IllegalStateException("Fant ikke søknad for journalpost $journalpostId")
 
     fun hentLagredeDBKontantstøtteVedlegg(søknad: DBKontantstøtteSøknad): Map<String, DBKontantstotteVedlegg> {
         val vedleggMap = mutableMapOf<String, DBKontantstotteVedlegg>()

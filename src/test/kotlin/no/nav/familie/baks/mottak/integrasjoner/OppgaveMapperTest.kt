@@ -3,6 +3,7 @@ package no.nav.familie.baks.mottak.integrasjoner
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.baks.mottak.DevLauncher
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
 import no.nav.familie.kontrakter.felles.Behandlingstema
@@ -62,7 +63,7 @@ class OppgaveMapperTest(
     @BeforeEach
     fun beforeEach() {
         every { mockEnhetsnummerService.hentEnhetsnummer(any()) } returns "1234"
-        every { mockUnleashService.isEnabled(any()) } returns true
+        every { mockUnleashService.isEnabled(FeatureToggleConfig.BRUK_ENHETSNUMMERSERVICE) } returns true
     }
 
     @Test

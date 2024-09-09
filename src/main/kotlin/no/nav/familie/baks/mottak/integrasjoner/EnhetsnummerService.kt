@@ -46,14 +46,14 @@ class EnhetsnummerService(
 
         val alleIdenter = barnasIdenter + søkersIdent
 
-        val erStrengtFortrolig =
+        val erEnAvPersoneneStrengtFortrolig =
             alleIdenter
                 .map { pdlClient.hentPerson(it, "hentperson-med-adressebeskyttelse", tema) }
                 .flatMap { it.adressebeskyttelse }
                 .any { it.gradering.erStrengtFortrolig() }
 
         return when {
-            erStrengtFortrolig -> "2103"
+            erEnAvPersoneneStrengtFortrolig -> "2103"
             journalpost.journalforendeEnhet == "2101" -> "4806" // Enhet 2101 er nedlagt. Rutes til 4806
             journalpost.journalforendeEnhet == "4847" -> "4817" // Enhet 4847 skal legges ned. Rutes til 4817
             erDigitalSøknad ->

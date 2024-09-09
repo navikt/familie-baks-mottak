@@ -15,7 +15,6 @@ import no.nav.familie.kontrakter.felles.objectMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class SøknadsidenterServiceTest {
     private val mockedBarnetrygdSøknadService: BarnetrygdSøknadService = mockk()
@@ -67,23 +66,6 @@ class SøknadsidenterServiceTest {
             assertThat(identer.first).isEqualTo(søkersFødselsnummer)
             assertThat(identer.second).isEqualTo(listOf("815", "493", "00"))
         }
-
-        @Test
-        fun `skal kaste exception om søknad er null`() {
-            // Arrange
-            val journalpostId = "1"
-
-            every {
-                mockedKontantstøtteSøknadService.hentDBKontantstøtteSøknadForJournalpost(journalpostId)
-            } returns null
-
-            // Act & assert
-            val exception =
-                assertThrows<IllegalStateException> {
-                    søknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpostId)
-                }
-            assertThat(exception.message).isEqualTo("Fant ikke søknad for journalpost=$journalpostId")
-        }
     }
 
     @Nested
@@ -124,23 +106,6 @@ class SøknadsidenterServiceTest {
             // Assert
             assertThat(identer.first).isEqualTo(søkersFødselsnummer)
             assertThat(identer.second).isEqualTo(listOf("815", "493", "00"))
-        }
-
-        @Test
-        fun `skal kaste exception om søknad er null`() {
-            // Arrange
-            val journalpostId = "1"
-
-            every {
-                mockedBarnetrygdSøknadService.hentDBSøknadFraJournalpost(journalpostId)
-            } returns null
-
-            // Act & assert
-            val exception =
-                assertThrows<IllegalStateException> {
-                    søknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpostId)
-                }
-            assertThat(exception.message).isEqualTo("Fant ikke søknad for journalpost=$journalpostId")
         }
     }
 }
