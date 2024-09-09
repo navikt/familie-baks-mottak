@@ -62,10 +62,10 @@ class BarnetrygdSøknadService(
     fun hentDBSøknad(søknadId: Long): DBBarnetrygdSøknad? = søknadRepository.hentDBSøknad(søknadId)
 
     fun finnDBSøknadFraJournalpost(journalpostId: String): DBBarnetrygdSøknad? =
-        søknadRepository.hentDBSøknadForJournalpost(journalpostId = journalpostId)
+        søknadRepository.finnDBSøknadForJournalpost(journalpostId = journalpostId)
 
     fun hentDBSøknadFraJournalpost(journalpostId: String): DBBarnetrygdSøknad =
-        søknadRepository.hentDBSøknadForJournalpost(journalpostId = journalpostId)
+        søknadRepository.finnDBSøknadForJournalpost(journalpostId = journalpostId)
             ?: throw IllegalStateException("Fant ikke søknad for journalpost $journalpostId")
 
     fun hentLagredeVedlegg(søknad: DBBarnetrygdSøknad): Map<String, DBVedlegg> {

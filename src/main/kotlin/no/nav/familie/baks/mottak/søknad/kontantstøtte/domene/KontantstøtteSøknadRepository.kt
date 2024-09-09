@@ -12,7 +12,7 @@ interface KontantstøtteSøknadRepository : JpaRepository<DBKontantstøtteSøkna
     fun hentSøknad(soknadId: Long): DBKontantstøtteSøknad?
 
     @Query(value = "SELECT s FROM kontantstotte_soknad s WHERE s.journalpostId = :journalpostId")
-    fun hentSøknadForJournalpost(journalpostId: String): DBKontantstøtteSøknad?
+    fun finnSøknadForJournalpost(journalpostId: String): DBKontantstøtteSøknad?
 
     @Query(
         "SELECT s FROM kontantstotte_soknad s ORDER BY s.opprettetTid DESC LIMIT 1",

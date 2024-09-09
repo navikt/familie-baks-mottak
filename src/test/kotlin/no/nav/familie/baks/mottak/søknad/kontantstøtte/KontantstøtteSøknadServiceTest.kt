@@ -40,7 +40,7 @@ class KontantstøtteSøknadServiceTest {
                 )
 
             every {
-                mockKontantstøtteSøknadRepository.hentSøknadForJournalpost(journalpostId)
+                mockKontantstøtteSøknadRepository.finnSøknadForJournalpost(journalpostId)
             } returns søknad
 
             // Act
@@ -59,7 +59,7 @@ class KontantstøtteSøknadServiceTest {
             val journalpostId = "1"
 
             every {
-                mockKontantstøtteSøknadRepository.hentSøknadForJournalpost(journalpostId)
+                mockKontantstøtteSøknadRepository.finnSøknadForJournalpost(journalpostId)
             } returns null
 
             // Act
@@ -87,7 +87,7 @@ class KontantstøtteSøknadServiceTest {
                 )
 
             every {
-                mockKontantstøtteSøknadRepository.hentSøknadForJournalpost(journalpostId)
+                mockKontantstøtteSøknadRepository.finnSøknadForJournalpost(journalpostId)
             } returns søknad
 
             // Act
@@ -106,7 +106,7 @@ class KontantstøtteSøknadServiceTest {
             val journalpostId = "1"
 
             every {
-                mockKontantstøtteSøknadRepository.hentSøknadForJournalpost(journalpostId)
+                mockKontantstøtteSøknadRepository.finnSøknadForJournalpost(journalpostId)
             } returns null
 
             // Act & assert

@@ -12,7 +12,7 @@ interface SøknadRepository : JpaRepository<DBBarnetrygdSøknad, String> {
     fun hentDBSøknad(soknadId: Long): DBBarnetrygdSøknad?
 
     @Query(value = "SELECT s FROM Soknad s WHERE s.journalpostId = :journalpostId")
-    fun hentDBSøknadForJournalpost(journalpostId: String): DBBarnetrygdSøknad?
+    fun finnDBSøknadForJournalpost(journalpostId: String): DBBarnetrygdSøknad?
 
     @Query(
         "SELECT s FROM Soknad s ORDER BY s.opprettetTid DESC LIMIT 1",

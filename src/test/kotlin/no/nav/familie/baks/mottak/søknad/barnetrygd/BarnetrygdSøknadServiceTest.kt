@@ -40,7 +40,7 @@ class BarnetrygdSøknadServiceTest {
                 )
 
             every {
-                mockSøknadRepository.hentDBSøknadForJournalpost(journalpostId)
+                mockSøknadRepository.finnDBSøknadForJournalpost(journalpostId)
             } returns søknad
 
             // Act
@@ -59,7 +59,7 @@ class BarnetrygdSøknadServiceTest {
             val journalpostId = "1"
 
             every {
-                mockSøknadRepository.hentDBSøknadForJournalpost(journalpostId)
+                mockSøknadRepository.finnDBSøknadForJournalpost(journalpostId)
             } returns null
 
             // Act
@@ -87,7 +87,7 @@ class BarnetrygdSøknadServiceTest {
                 )
 
             every {
-                mockSøknadRepository.hentDBSøknadForJournalpost(journalpostId)
+                mockSøknadRepository.finnDBSøknadForJournalpost(journalpostId)
             } returns søknad
 
             // Act
@@ -106,7 +106,7 @@ class BarnetrygdSøknadServiceTest {
             val journalpostId = "1"
 
             every {
-                mockSøknadRepository.hentDBSøknadForJournalpost(journalpostId)
+                mockSøknadRepository.finnDBSøknadForJournalpost(journalpostId)
             } returns null
 
             // Act & assert

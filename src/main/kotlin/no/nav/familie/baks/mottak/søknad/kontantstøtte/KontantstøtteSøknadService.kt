@@ -70,10 +70,10 @@ class KontantstøtteSøknadService(
     fun hentDBKontantstøtteSøknad(søknadId: Long): DBKontantstøtteSøknad? = kontantstøtteSøknadRepository.hentSøknad(søknadId)
 
     fun finnDBKontantstøtteSøknadForJournalpost(journalpostId: String): DBKontantstøtteSøknad? =
-        kontantstøtteSøknadRepository.hentSøknadForJournalpost(journalpostId = journalpostId)
+        kontantstøtteSøknadRepository.finnSøknadForJournalpost(journalpostId = journalpostId)
 
     fun hentDBKontantstøtteSøknadForJournalpost(journalpostId: String): DBKontantstøtteSøknad =
-        kontantstøtteSøknadRepository.hentSøknadForJournalpost(journalpostId = journalpostId)
+        kontantstøtteSøknadRepository.finnSøknadForJournalpost(journalpostId = journalpostId)
             ?: throw IllegalStateException("Fant ikke søknad for journalpost $journalpostId")
 
     fun hentLagredeDBKontantstøtteVedlegg(søknad: DBKontantstøtteSøknad): Map<String, DBKontantstotteVedlegg> {
