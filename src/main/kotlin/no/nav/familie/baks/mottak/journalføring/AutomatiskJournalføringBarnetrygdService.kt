@@ -18,7 +18,6 @@ class AutomatiskJournalføringBarnetrygdService(
     private val enheterSomIkkeSkalHaAutomatiskJournalføring = listOf("4863")
 
     fun skalAutomatiskJournalføres(
-        brukersIdent: String?,
         journalpost: Journalpost,
         brukerHarSakIInfotrygd: Boolean,
     ): Boolean {

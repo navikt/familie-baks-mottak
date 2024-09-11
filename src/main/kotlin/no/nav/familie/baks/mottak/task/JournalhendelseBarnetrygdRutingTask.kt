@@ -71,7 +71,6 @@ class JournalhendelseBarnetrygdRutingTask(
 
         val skalAutomatiskJournalføreJournalpost =
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
-                brukersIdent,
                 journalpost,
                 brukerHarSakIInfotrygd,
             )
