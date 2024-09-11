@@ -32,7 +32,6 @@ class EnhetsnummerService(
         }
 
         val tema = Tema.valueOf(journalpost.tema)
-        val søkersIdent = tilPersonIdent(journalpost.bruker, tema)
 
         val erEnAvPersoneneStrengtFortrolig =
             adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
@@ -44,7 +43,7 @@ class EnhetsnummerService(
             erEnAvPersoneneStrengtFortrolig -> "2103"
             journalpost.journalforendeEnhet == "2101" -> "4806" // Enhet 2101 er nedlagt. Rutes til 4806
             journalpost.journalforendeEnhet == "4847" -> "4817" // Enhet 4847 skal legges ned. Rutes til 4817
-            journalpost.erDigitalSøknad() -> arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(søkersIdent, tema).enhetId
+            journalpost.erDigitalSøknad() -> arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(tilPersonIdent(journalpost.bruker, tema), tema).enhetId
             journalpost.journalforendeEnhet.isNullOrBlank() -> null
             hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).status.uppercase(Locale.getDefault()) == "NEDLAGT" -> null
             hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).oppgavebehandler -> journalpost.journalforendeEnhet

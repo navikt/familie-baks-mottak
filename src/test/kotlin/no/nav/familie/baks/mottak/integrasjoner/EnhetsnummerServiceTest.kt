@@ -13,7 +13,6 @@ import org.junit.jupiter.params.provider.EnumSource
 class EnhetsnummerServiceTest {
     private val mockedHentEnhetClient: HentEnhetClient = mockk()
     private val mockedPdlClient: PdlClient = mockk()
-    private val mockedSøknadsidenterService: SøknadsidenterService = mockk()
     private val mockedArbeidsfordelingClient: ArbeidsfordelingClient = mockk()
     private val mockedAdressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService = mockk()
     private val enhetsnummerService: EnhetsnummerService =
@@ -50,16 +49,8 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpost.journalpostId)
-        } returns Pair(fnr, emptyList())
-
-        every {
-            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
-        } returns Pair(fnr, emptyList())
-
-        every {
-            mockedPdlClient.hentPerson(fnr, "hentperson-med-adressebeskyttelse", tema)
-        } returns PdlPersonData(adressebeskyttelse = listOf(Adressebeskyttelse(gradering = Adressebeskyttelsesgradering.UGRADERT)))
+            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)
+        } returns false
 
         // Act
         val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
@@ -92,16 +83,8 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpost.journalpostId)
-        } returns Pair(fnr, emptyList())
-
-        every {
-            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
-        } returns Pair(fnr, emptyList())
-
-        every {
-            mockedPdlClient.hentPerson(fnr, "hentperson-med-adressebeskyttelse", tema)
-        } returns PdlPersonData(adressebeskyttelse = listOf(Adressebeskyttelse(gradering = Adressebeskyttelsesgradering.UGRADERT)))
+            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)
+        } returns false
 
         // Act
         val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
@@ -133,16 +116,8 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpost.journalpostId)
-        } returns Pair(fnr, emptyList())
-
-        every {
-            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
-        } returns Pair(fnr, emptyList())
-
-        every {
-            mockedPdlClient.hentPerson(fnr, "hentperson-med-adressebeskyttelse", tema)
-        } returns PdlPersonData(adressebeskyttelse = listOf(Adressebeskyttelse(gradering = Adressebeskyttelsesgradering.UGRADERT)))
+            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)
+        } returns false
 
         // Act
         val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
@@ -174,16 +149,8 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpost.journalpostId)
-        } returns Pair(fnr, emptyList())
-
-        every {
-            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
-        } returns Pair(fnr, emptyList())
-
-        every {
-            mockedPdlClient.hentPerson(fnr, "hentperson-med-adressebeskyttelse", tema)
-        } returns PdlPersonData(adressebeskyttelse = listOf(Adressebeskyttelse(gradering = Adressebeskyttelsesgradering.UGRADERT)))
+            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)
+        } returns false
 
         every {
             mockedHentEnhetClient.hentEnhet("1234")
@@ -219,16 +186,8 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpost.journalpostId)
-        } returns Pair(fnr, emptyList())
-
-        every {
-            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
-        } returns Pair(fnr, emptyList())
-
-        every {
-            mockedPdlClient.hentPerson(fnr, "hentperson-med-adressebeskyttelse", tema)
-        } returns PdlPersonData(adressebeskyttelse = listOf(Adressebeskyttelse(gradering = Adressebeskyttelsesgradering.UGRADERT)))
+            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)
+        } returns false
 
         every {
             mockedHentEnhetClient.hentEnhet("1234")
@@ -264,16 +223,8 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpost.journalpostId)
-        } returns Pair(fnr, emptyList())
-
-        every {
-            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
-        } returns Pair(fnr, emptyList())
-
-        every {
-            mockedPdlClient.hentPerson(fnr, "hentperson-med-adressebeskyttelse", tema)
-        } returns PdlPersonData(adressebeskyttelse = listOf(Adressebeskyttelse(gradering = Adressebeskyttelsesgradering.UGRADERT)))
+            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)
+        } returns false
 
         every {
             mockedHentEnhetClient.hentEnhet("1234")
@@ -310,24 +261,8 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpost.journalpostId)
-        } returns Pair(fnr, listOf("123", "456"))
-
-        every {
-            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
-        } returns Pair(fnr, listOf("123", "456"))
-
-        every {
-            mockedPdlClient.hentPerson(fnr, "hentperson-med-adressebeskyttelse", tema)
-        } returns PdlPersonData(adressebeskyttelse = listOf(Adressebeskyttelse(gradering = Adressebeskyttelsesgradering.UGRADERT)))
-
-        every {
-            mockedPdlClient.hentPerson("123", graphqlfil = "hentperson-med-adressebeskyttelse", tema = tema)
-        } returns PdlPersonData(adressebeskyttelse = listOf(Adressebeskyttelse(gradering = Adressebeskyttelsesgradering.STRENGT_FORTROLIG)))
-
-        every {
-            mockedPdlClient.hentPerson("456", graphqlfil = "hentperson-med-adressebeskyttelse", tema = tema)
-        } returns PdlPersonData(adressebeskyttelse = listOf(Adressebeskyttelse(gradering = Adressebeskyttelsesgradering.UGRADERT)))
+            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)
+        } returns true
 
         // Act
         val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
@@ -389,71 +324,6 @@ class EnhetsnummerServiceTest {
     @EnumSource(
         value = Tema::class,
         names = ["BAR", "KON"],
-        mode = EnumSource.Mode.EXCLUDE,
-    )
-    fun `skal kaste feil når tema ikke er støttet`(
-        tema: Tema,
-    ) {
-        // Arrange
-        val journalpost =
-            Journalpost(
-                journalpostId = "123",
-                journalposttype = Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                tema = tema.name,
-                journalforendeEnhet = "1",
-                kanal = digitalKanal,
-                dokumenter = hentDokumenterMedRiktigBrevkode(tema),
-                bruker = Bruker("312", BrukerIdType.FNR),
-            )
-
-        // Act & Assert
-        val exception =
-            assertThrows<IllegalStateException> {
-                enhetsnummerService.hentEnhetsnummer(journalpost)
-            }
-
-        assertThat(exception.message).isEqualTo("Støtter ikke tema $tema")
-    }
-
-    @ParameterizedTest
-    @EnumSource(
-        value = Tema::class,
-        names = ["BAR", "KON"],
-    )
-    fun `skal sette enhet 2103 Vikafossen for papirsøkand hvor søker er strengt fortrolig`(
-        tema: Tema,
-    ) {
-        // Arrange
-        val fnr = "321"
-
-        val journalpost =
-            Journalpost(
-                journalpostId = "123",
-                journalposttype = Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                tema = tema.name,
-                journalforendeEnhet = "2101",
-                bruker = Bruker(fnr, BrukerIdType.FNR),
-                kanal = "SKAN_NETS",
-                dokumenter = hentDokumenterMedRiktigBrevkode(tema),
-            )
-
-        every {
-            mockedPdlClient.hentPerson(fnr, "hentperson-med-adressebeskyttelse", tema)
-        } returns PdlPersonData(adressebeskyttelse = listOf(Adressebeskyttelse(gradering = Adressebeskyttelsesgradering.STRENGT_FORTROLIG)))
-
-        // Act
-        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
-
-        // Assert
-        assertThat(enhetsnummer).isEqualTo("2103")
-    }
-
-    @ParameterizedTest
-    @EnumSource(
-        value = Tema::class,
-        names = ["BAR", "KON"],
     )
     fun `skal finne og sette geografisk behandlende enhet på digitale søknader dersom ingen adressebeskyttelse er nødvendig`(
         tema: Tema,
@@ -474,22 +344,16 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpost.journalpostId)
-        } returns Pair(fnr, listOf("123", "456"))
+            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)
+        } returns false
 
         every {
-            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpost.journalpostId)
-        } returns Pair(fnr, listOf("123", "456"))
-
-        every {
-            mockedPdlClient.hentPerson(any(), any(), any())
-        } returns PdlPersonData(adressebeskyttelse = listOf(Adressebeskyttelse(gradering = Adressebeskyttelsesgradering.UGRADERT)))
+            mockedPdlClient.hentPersonident(journalpost.bruker!!.id, tema)
+        } returns "123456789"
 
         every {
             mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(any(), any())
-        } returns
-            no.nav.familie.kontrakter.felles.arbeidsfordeling
-                .Enhet(enhetId = "789", "Hønefoss")
+        } returns no.nav.familie.kontrakter.felles.arbeidsfordeling.Enhet(enhetId = "789", "Hønefoss")
         // Act
         val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
 
