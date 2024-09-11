@@ -16,7 +16,7 @@ import no.nav.familie.baks.mottak.task.VurderLivshendelseType
 import no.nav.familie.baks.mottak.task.VurderLivshendelseType.SIVILSTAND
 import no.nav.familie.baks.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.kontrakter.felles.objectMapper
-import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND.GIFT
+import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE.GIFT
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
