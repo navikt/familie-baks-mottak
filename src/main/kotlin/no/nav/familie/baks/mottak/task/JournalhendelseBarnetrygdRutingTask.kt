@@ -59,7 +59,7 @@ class JournalhendelseBarnetrygdRutingTask(
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
         val brukersIdent = task.metadata["personIdent"] as String?
         val personIdent by lazy { tilPersonIdent(journalpost.bruker!!, tema) }
-        val fagsakId by lazy { baSakClient.hentFagsaknummerPåPersonident(personIdent) }
+        val fagsakId = baSakClient.hentFagsaknummerPåPersonident(personIdent)
 
         val (baSak, infotrygdSak) = brukersIdent?.run { søkEtterSakIBaSakOgInfotrygd(this) } ?: Pair(null, null)
         val brukerHarFagsakIBaSak = baSak.finnes()
