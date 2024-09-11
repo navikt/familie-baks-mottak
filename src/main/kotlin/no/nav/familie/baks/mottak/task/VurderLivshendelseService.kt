@@ -27,7 +27,7 @@ import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.kontrakter.felles.oppgave.StatusEnum
-import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND
+import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.error.RekjørSenereException
 import org.slf4j.Logger
@@ -143,7 +143,7 @@ class VurderLivshendelseService(
                         secureLog.info("Ignorerer sivilstandhendelse for $personIdent uten dato: $pdlPersonData")
                         return
                     }
-                if (sivilstand.type != SIVILSTAND.GIFT) {
+                if (sivilstand.type != SIVILSTANDTYPE.GIFT) {
                     secureLog.info("Endringen til sivilstand GIFT for $personIdent er korrigert/annulert: $pdlPersonData")
                     return
                 }

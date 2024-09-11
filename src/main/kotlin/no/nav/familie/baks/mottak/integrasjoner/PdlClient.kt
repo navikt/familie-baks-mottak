@@ -9,7 +9,7 @@ import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.kontrakter.felles.personopplysning.ForelderBarnRelasjon
-import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND
+import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -314,7 +314,7 @@ fun Fødested.erUtenforNorge(): Boolean =
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Sivilstand(
-    val type: SIVILSTAND,
+    val type: SIVILSTANDTYPE,
     val gyldigFraOgMed: LocalDate? = null,
     val bekreftelsesdato: LocalDate? = null,
 )

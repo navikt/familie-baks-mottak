@@ -38,7 +38,7 @@ import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
-import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTAND
+import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE
 import no.nav.familie.prosessering.domene.Task
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -188,7 +188,7 @@ class VurderLivshendelseServiceTest {
                 sivilstand =
                     listOf(
                         Sivilstand(
-                            type = SIVILSTAND.GIFT,
+                            type = SIVILSTANDTYPE.GIFT,
                             gyldigFraOgMed = LocalDate.now(),
                         ),
                     ),
@@ -259,7 +259,7 @@ class VurderLivshendelseServiceTest {
                 sivilstand =
                     listOf(
                         Sivilstand(
-                            type = SIVILSTAND.GIFT,
+                            type = SIVILSTANDTYPE.GIFT,
                             gyldigFraOgMed = LocalDate.now(),
                         ),
                     ),
@@ -327,7 +327,7 @@ class VurderLivshendelseServiceTest {
                 sivilstand =
                     listOf(
                         Sivilstand(
-                            type = SIVILSTAND.GIFT,
+                            type = SIVILSTANDTYPE.GIFT,
                             gyldigFraOgMed = LocalDate.now(),
                         ),
                     ),
@@ -396,7 +396,7 @@ class VurderLivshendelseServiceTest {
                 sivilstand =
                     listOf(
                         Sivilstand(
-                            type = SIVILSTAND.GIFT,
+                            type = SIVILSTANDTYPE.GIFT,
                             gyldigFraOgMed = LocalDate.now(),
                         ),
                     ),
@@ -448,13 +448,13 @@ class VurderLivshendelseServiceTest {
             PdlPersonData(
                 sivilstand =
                     listOf(
-                        Sivilstand(type = SIVILSTAND.GIFT),
+                        Sivilstand(type = SIVILSTANDTYPE.GIFT),
                         Sivilstand(
-                            type = SIVILSTAND.GIFT,
+                            type = SIVILSTANDTYPE.GIFT,
                             gyldigFraOgMed = LocalDate.now().minusYears(10),
                         ),
                         Sivilstand(
-                            type = SIVILSTAND.GIFT,
+                            type = SIVILSTANDTYPE.GIFT,
                             bekreftelsesdato = LocalDate.now(),
                         ),
                     ),
@@ -488,10 +488,10 @@ class VurderLivshendelseServiceTest {
     fun `Skal ignorere sivilstandhendelser uten dato eller dato eldre enn tidligste vedtak`() {
         every { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(PERSONIDENT_MOR) } returns
             listOf(RestFagsakIdOgTilknyttetAktørId(PERSONIDENT_MOR + "00", SAKS_ID))
-        val sivilstandUtenDato = Sivilstand(SIVILSTAND.GIFT)
-        val sivilstandEldreEnnTidligsteInfotrygdVedtak = Sivilstand(SIVILSTAND.GIFT, LocalDate.now().minusYears(6))
-        val sivilstandMedDagensDato = Sivilstand(SIVILSTAND.GIFT, LocalDate.now())
-        val sivilstandEldreEnnBasakVedtakMenNyereEnnInfotrygdVedtak = Sivilstand(SIVILSTAND.GIFT, LocalDate.now().minusYears(4))
+        val sivilstandUtenDato = Sivilstand(SIVILSTANDTYPE.GIFT)
+        val sivilstandEldreEnnTidligsteInfotrygdVedtak = Sivilstand(SIVILSTANDTYPE.GIFT, LocalDate.now().minusYears(6))
+        val sivilstandMedDagensDato = Sivilstand(SIVILSTANDTYPE.GIFT, LocalDate.now())
+        val sivilstandEldreEnnBasakVedtakMenNyereEnnInfotrygdVedtak = Sivilstand(SIVILSTANDTYPE.GIFT, LocalDate.now().minusYears(4))
 
         every {
             mockPdlClient.hentPerson(any(), "hentperson-sivilstand", any())
