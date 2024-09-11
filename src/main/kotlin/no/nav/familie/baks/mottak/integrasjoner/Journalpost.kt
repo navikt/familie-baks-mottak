@@ -31,6 +31,8 @@ fun Journalpost.erBarnetrygdSøknad(): Boolean = erBarnetrygdOrdinærSøknad() |
 
 fun Journalpost.erDigitalKanal(): Boolean = kanal == "NAV_NO"
 
+fun Journalpost.erDigitalSøknad(): Boolean = this.erDigitalKanal() && (this.erKontantstøtteSøknad() || this.erBarnetrygdSøknad())
+
 data class Sak(
     val arkivsaksnummer: String?,
     var arkivsaksystem: String?,
