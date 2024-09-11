@@ -26,6 +26,7 @@ import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
 import no.nav.familie.baks.mottak.integrasjoner.StonadDto
+import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringKontantstøtteService
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
@@ -38,31 +39,22 @@ import java.time.YearMonth
 import java.util.Properties
 import kotlin.test.assertEquals
 
-@ExtendWith(MockKExtension::class)
 class JournalhendelseKontantstøtteRutingTaskTest {
-    @MockK
-    private lateinit var pdlClient: PdlClient
-
-    @MockK
-    private lateinit var infotrygdKontantstøtteClient: InfotrygdKontantstøtteClient
-
-    @MockK
-    private lateinit var taskService: TaskService
-
-    @MockK
-    private lateinit var ksSakClient: KsSakClient
-
-    @MockK
-    private lateinit var journalpostClient: JournalpostClient
-
-    @MockK
-    private lateinit var unleashService: UnleashNextMedContextService
-
-    @MockK
-    private lateinit var arbeidsfordelingClient: ArbeidsfordelingClient
-
-    @InjectMockKs
-    private lateinit var journalhendelseKontantstøtteRutingTask: JournalhendelseKontantstøtteRutingTask
+    private val pdlClient: PdlClient = mockk()
+    private val infotrygdKontantstøtteClient: InfotrygdKontantstøtteClient = mockk()
+    private val taskService: TaskService = mockk()
+    private val ksSakClient: KsSakClient = mockk()
+    private val journalpostClient: JournalpostClient = mockk()
+    private val unleashService: UnleashNextMedContextService = mockk()
+    private val automatiskJournalføringKontantstøtteService: AutomatiskJournalføringKontantstøtteService = mockk()
+    private val journalhendelseKontantstøtteRutingTask: JournalhendelseKontantstøtteRutingTask = JournalhendelseKontantstøtteRutingTask(
+        pdlClient = pdlClient,
+        ksSakClient = ksSakClient,
+        infotrygdKontantstøtteClient = infotrygdKontantstøtteClient,
+        taskService = taskService,
+        journalpostClient = journalpostClient,
+        automatiskJournalføringKontantstøtteService = automatiskJournalføringKontantstøtteService,
+    )
 
     val søkerFnr = "12345678910"
     val barn1Fnr = "11223344556"
@@ -70,6 +62,7 @@ class JournalhendelseKontantstøtteRutingTaskTest {
 
     @Test
     fun `doTask - skal opprette OpprettJournalføringOppgaveTask med informasjon om at det finnes løpende sak i Infotrygd når et eller flere av barna har løpende sak i Infotrygd`() {
+        // Arrange
         val taskSlot = slot<Task>()
         setupPDLMocks()
         setupKsSakClientMocks()
@@ -102,6 +95,11 @@ class JournalhendelseKontantstøtteRutingTaskTest {
             )
         every { taskService.save(capture(taskSlot)) } returns mockk()
 
+        every {
+            automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(any(), any(), any())
+        } returns false
+
+        // Act
         journalhendelseKontantstøtteRutingTask.doTask(
             Task(
                 type = JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE,
@@ -116,11 +114,13 @@ class JournalhendelseKontantstøtteRutingTaskTest {
             ),
         )
 
+        // Assert
         assertEquals("Et eller flere av barna har løpende sak i Infotrygd", taskSlot.captured.payload)
     }
 
     @Test
     fun `doTask - skal opprette OpprettJournalføringOppgaveTask med tom sakssystem-markering når et eller flere av barna har sak i Infotrygd men ingen løpende`() {
+        // Arrange
         val taskSlot = slot<Task>()
         setupPDLMocks()
         setupKsSakClientMocks()
@@ -153,6 +153,11 @@ class JournalhendelseKontantstøtteRutingTaskTest {
             )
         every { taskService.save(capture(taskSlot)) } returns mockk()
 
+        every {
+            automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(any(), any(), any())
+        } returns false
+
+        // Act
         journalhendelseKontantstøtteRutingTask.doTask(
             Task(
                 type = JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE,
@@ -167,11 +172,13 @@ class JournalhendelseKontantstøtteRutingTaskTest {
             ),
         )
 
+        // Assert
         assertEquals("", taskSlot.captured.payload)
     }
 
     @Test
     fun `doTask - skal opprette OpprettJournalføringOppgaveTask med tom sakssystem-markering når ingen av barna har sak i Infotrygd`() {
+        // Arrange
         val taskSlot = slot<Task>()
         setupPDLMocks()
         setupKsSakClientMocks()
@@ -188,6 +195,12 @@ class JournalhendelseKontantstøtteRutingTaskTest {
                 journalstatus = Journalstatus.JOURNALFOERT,
                 bruker = Bruker("testId", type = BrukerIdType.AKTOERID),
             )
+
+        every {
+            automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(any(), any(), any())
+        } returns false
+
+        // Act
         journalhendelseKontantstøtteRutingTask.doTask(
             Task(
                 type = JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE,
@@ -202,6 +215,7 @@ class JournalhendelseKontantstøtteRutingTaskTest {
             ),
         )
 
+        // Assert
         assertEquals("", taskSlot.captured.payload)
     }
 
