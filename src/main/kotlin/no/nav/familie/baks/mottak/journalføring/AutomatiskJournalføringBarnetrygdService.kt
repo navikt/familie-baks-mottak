@@ -20,6 +20,7 @@ class AutomatiskJournalføringBarnetrygdService(
     fun skalAutomatiskJournalføres(
         journalpost: Journalpost,
         brukerHarSakIInfotrygd: Boolean,
+        fagsakId: Long,
     ): Boolean {
         val erBarnetrygdSøknad = journalpost.erBarnetrygdSøknad()
 
@@ -30,22 +31,18 @@ class AutomatiskJournalføringBarnetrygdService(
             )
 
         val personIdent by lazy { tilPersonIdent(journalpost.bruker!!, tema) }
-        val fagsakId by lazy { baSakClient.hentFagsaknummerPåPersonident(personIdent) }
         val harÅpenBehandlingIFagsak by lazy { baSakClient.hentMinimalRestFagsak(fagsakId.toLong()).finnesÅpenBehandlingPåFagsak() }
 
         if (adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)) {
             return false
         }
 
-        val skalAutomatiskJournalføreJournalpost =
-            featureToggleForAutomatiskJournalføringSkruddPå &&
-                erBarnetrygdSøknad &&
-                !brukerHarSakIInfotrygd &&
-                arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdent, tema).enhetId !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
-                journalpost.erDigitalKanal() &&
-                !harÅpenBehandlingIFagsak
-
-        return skalAutomatiskJournalføreJournalpost
+        return featureToggleForAutomatiskJournalføringSkruddPå &&
+            erBarnetrygdSøknad &&
+            !brukerHarSakIInfotrygd &&
+            journalpost.erDigitalKanal() &&
+            arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdent, tema).enhetId !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
+            !harÅpenBehandlingIFagsak
     }
 
     private fun tilPersonIdent(

@@ -12,6 +12,7 @@ class AutomatiskJournalføringKontantstøtteService(
     private val arbeidsfordelingClient: ArbeidsfordelingClient,
     private val ksSakClient: KsSakClient,
     private val pdlClient: PdlClient,
+    private val adressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService,
 ) {
     private val tema = Tema.KON
     private val enheterSomIkkeSkalHaAutomatiskJournalføring = listOf("4863")
@@ -21,25 +22,27 @@ class AutomatiskJournalføringKontantstøtteService(
         brukerHarSakIInfotrygd: Boolean,
         fagsakId: Long,
     ): Boolean {
+        val erKontantstøtteSøknad = journalpost.erKontantstøtteSøknad()
+
         val featureToggleForAutomatiskJournalføringSkruddPå =
             unleashService.isEnabled(
                 toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER,
                 defaultValue = false,
             )
-        val erKontantstøtteSøknad = journalpost.erKontantstøtteSøknad()
-        val personIdent by lazy { tilPersonIdent(journalpost.bruker!!, tema) }
 
+        val personIdent by lazy { tilPersonIdent(journalpost.bruker!!, tema) }
         val harÅpenBehandlingIFagsak by lazy { ksSakClient.hentMinimalRestFagsak(fagsakId).finnesÅpenBehandlingPåFagsak() }
 
-        val skalAutomatiskJournalføreJournalpost =
-            featureToggleForAutomatiskJournalføringSkruddPå &&
-                erKontantstøtteSøknad &&
-                !brukerHarSakIInfotrygd &&
-                journalpost.erDigitalKanal() &&
-                arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdent, tema).enhetId !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
-                !harÅpenBehandlingIFagsak
+        if (adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)) {
+            return false
+        }
 
-        return skalAutomatiskJournalføreJournalpost
+        return featureToggleForAutomatiskJournalføringSkruddPå &&
+            erKontantstøtteSøknad &&
+            !brukerHarSakIInfotrygd &&
+            journalpost.erDigitalKanal() &&
+            arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdent, tema).enhetId !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
+            !harÅpenBehandlingIFagsak
     }
 
     private fun tilPersonIdent(

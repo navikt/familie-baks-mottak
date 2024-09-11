@@ -51,28 +51,26 @@ class JournalhendelseBarnetrygdRutingTask(
     private val automatiskJournalføringBarnetrygdService: AutomatiskJournalføringBarnetrygdService,
 ) : AsyncTaskStep {
     private val tema = Tema.BAR
+    private val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
 
-    val log: Logger = LoggerFactory.getLogger(JournalhendelseBarnetrygdRutingTask::class.java)
-    val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
+    private val log: Logger = LoggerFactory.getLogger(JournalhendelseBarnetrygdRutingTask::class.java)
 
     override fun doTask(task: Task) {
-        val brukersIdent = task.metadata["personIdent"] as String?
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
-
-        val (baSak, infotrygdSak) = brukersIdent?.run { søkEtterSakIBaSakOgInfotrygd(this) } ?: Pair(null, null)
-
-        val brukerHarFagsakIBaSak = baSak.finnes()
-        val brukerHarSakIInfotrygd = infotrygdSak.finnes()
-
+        val brukersIdent = task.metadata["personIdent"] as String?
         val personIdent by lazy { tilPersonIdent(journalpost.bruker!!, tema) }
         val fagsakId by lazy { baSakClient.hentFagsaknummerPåPersonident(personIdent) }
 
+        val (baSak, infotrygdSak) = brukersIdent?.run { søkEtterSakIBaSakOgInfotrygd(this) } ?: Pair(null, null)
+        val brukerHarFagsakIBaSak = baSak.finnes()
+        val brukerHarSakIInfotrygd = infotrygdSak.finnes()
         val sakssystemMarkering = hentSakssystemMarkering(brukerHarFagsakIBaSak, brukerHarSakIInfotrygd, baSak, infotrygdSak)
 
         val skalAutomatiskJournalføreJournalpost =
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
                 brukerHarSakIInfotrygd,
+                fagsakId,
             )
 
         if (skalAutomatiskJournalføreJournalpost) {

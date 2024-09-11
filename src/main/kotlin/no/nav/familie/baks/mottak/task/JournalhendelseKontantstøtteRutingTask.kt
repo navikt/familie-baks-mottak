@@ -29,25 +29,31 @@ import java.time.YearMonth
 )
 class JournalhendelseKontantstøtteRutingTask(
     private val pdlClient: PdlClient,
+    private val ksSakClient: KsSakClient,
     private val infotrygdKontantstøtteClient: InfotrygdKontantstøtteClient,
     private val taskService: TaskService,
     private val journalpostClient: JournalpostClient,
-    private val ksSakClient: KsSakClient,
     private val automatiskJournalføringKontantstøtteService: AutomatiskJournalføringKontantstøtteService,
 ) : AsyncTaskStep {
-    val log: Logger = LoggerFactory.getLogger(JournalhendelseKontantstøtteRutingTask::class.java)
-    val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
-    val tema = Tema.KON
+    private val tema = Tema.KON
+    private val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
+
+    private val log: Logger = LoggerFactory.getLogger(JournalhendelseKontantstøtteRutingTask::class.java)
 
     override fun doTask(task: Task) {
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
         val brukersIdent = tilPersonIdent(journalpost.bruker!!, tema)
         val fagsakId by lazy { ksSakClient.hentFagsaknummerPåPersonident(brukersIdent) }
-        val harLøpendeSakIInfotrygd = harLøpendeSakIInfotrygd(brukersIdent)
 
+        val harLøpendeSakIInfotrygd = harLøpendeSakIInfotrygd(brukersIdent)
         val sakssystemMarkering = hentSakssystemMarkering(harLøpendeSakIInfotrygd)
 
-        val skalAutomatiskJournalføreJournalpost = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, harLøpendeSakIInfotrygd, fagsakId)
+        val skalAutomatiskJournalføreJournalpost =
+            automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(
+                journalpost,
+                harLøpendeSakIInfotrygd,
+                fagsakId,
+            )
 
         if (skalAutomatiskJournalføreJournalpost) {
             log.info("Oppretter OppdaterOgFerdigstillJournalpostTask for journalpost med id ${journalpost.journalpostId}")
