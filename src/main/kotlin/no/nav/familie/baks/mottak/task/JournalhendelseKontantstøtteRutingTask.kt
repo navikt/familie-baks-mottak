@@ -43,7 +43,7 @@ class JournalhendelseKontantstøtteRutingTask(
     override fun doTask(task: Task) {
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
         val brukersIdent = tilPersonIdent(journalpost.bruker!!, tema)
-        val fagsakId by lazy { ksSakClient.hentFagsaknummerPåPersonident(brukersIdent) }
+        val fagsakId = ksSakClient.hentFagsaknummerPåPersonident(brukersIdent)
 
         val harLøpendeSakIInfotrygd = harLøpendeSakIInfotrygd(brukersIdent)
         val sakssystemMarkering = hentSakssystemMarkering(harLøpendeSakIInfotrygd)
