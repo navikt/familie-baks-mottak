@@ -11,7 +11,6 @@ import java.util.Locale
 class EnhetsnummerService(
     private val hentEnhetClient: HentEnhetClient,
     private val pdlClient: PdlClient,
-    private val søknadsidenterService: SøknadsidenterService,
     private val arbeidsfordelingClient: ArbeidsfordelingClient,
     private val adressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService,
 ) {

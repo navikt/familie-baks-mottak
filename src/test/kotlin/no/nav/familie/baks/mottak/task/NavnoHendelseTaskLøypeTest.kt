@@ -23,6 +23,7 @@ import no.nav.familie.baks.mottak.integrasjoner.Opphørsgrunn.MIGRERT
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.integrasjoner.StatusKode
+import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringBarnetrygdService
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
@@ -43,18 +44,17 @@ class NavnoHendelseTaskLøypeTest {
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
     private val mockUnleashNextMedContextService: UnleashNextMedContextService = mockk()
-    private val mockkArbeidsfordelingClient: ArbeidsfordelingClient = mockk()
+    private val mockAutomatiskJournalføringBarnetrygdService: AutomatiskJournalføringBarnetrygdService = mockk();
 
     private val rutingSteg =
         JournalhendelseBarnetrygdRutingTask(
-            mockPdlClient,
-            mockSakClient,
-            mockInfotrygdBarnetrygdClient,
-            mockTaskService,
-            mockUnleashNextMedContextService,
-            mockJournalpostClient,
-            mockkArbeidsfordelingClient,
-            mockUnleashNextMedContextService,
+            pdlClient = mockPdlClient,
+            baSakClient = mockSakClient,
+            infotrygdBarnetrygdClient = mockInfotrygdBarnetrygdClient,
+            taskService = mockTaskService,
+            journalpostClient = mockJournalpostClient,
+            unleashNextMedContextService = mockUnleashNextMedContextService,
+            automatiskJournalføringBarnetrygdService = mockAutomatiskJournalføringBarnetrygdService
         )
 
     private val journalføringSteg =
@@ -239,7 +239,7 @@ class NavnoHendelseTaskLøypeTest {
 
     companion object {
         private const val JOURNALPOST_ID = "222"
-        private const val FAGSAK_ID = "1"
+        private const val FAGSAK_ID = 1L
         private const val MOTTAK_KANAL = "NAV_NO"
     }
 }

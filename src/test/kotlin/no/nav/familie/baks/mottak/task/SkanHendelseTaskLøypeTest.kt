@@ -23,6 +23,7 @@ import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
+import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringBarnetrygdService
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.prosessering.domene.Task
@@ -43,18 +44,17 @@ class SkanHendelseTaskLøypeTest {
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
     private val mockUnleashNextMedContextService: UnleashNextMedContextService = mockk()
-    private val mockkArbeidsfordelingClient: ArbeidsfordelingClient = mockk()
+    private val mockAutomatiskJournalføringBarnetrygdService: AutomatiskJournalføringBarnetrygdService = mockk()
 
     private val rutingSteg =
         JournalhendelseBarnetrygdRutingTask(
-            mockPdlClient,
-            mockSakClient,
-            mockInfotrygdBarnetrygdClient,
-            mockTaskService,
-            mockUnleashNextMedContextService,
-            mockJournalpostClient,
-            mockkArbeidsfordelingClient,
-            mockUnleashNextMedContextService,
+            pdlClient = mockPdlClient,
+            baSakClient = mockSakClient,
+            infotrygdBarnetrygdClient = mockInfotrygdBarnetrygdClient,
+            taskService = mockTaskService,
+            journalpostClient = mockJournalpostClient,
+            unleashNextMedContextService = mockUnleashNextMedContextService,
+            automatiskJournalføringBarnetrygdService = mockAutomatiskJournalføringBarnetrygdService
         )
 
     private val journalføringSteg =

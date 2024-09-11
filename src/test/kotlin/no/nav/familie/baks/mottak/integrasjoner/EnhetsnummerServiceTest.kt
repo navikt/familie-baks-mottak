@@ -2,6 +2,7 @@ package no.nav.familie.baks.mottak.integrasjoner
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.familie.baks.mottak.journalføring.AdressebeskyttelesesgraderingService
 import no.nav.familie.kontrakter.felles.Tema
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -14,13 +15,14 @@ class EnhetsnummerServiceTest {
     private val mockedPdlClient: PdlClient = mockk()
     private val mockedSøknadsidenterService: SøknadsidenterService = mockk()
     private val mockedArbeidsfordelingClient: ArbeidsfordelingClient = mockk()
+    private val mockedAdressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService = mockk()
     private val enhetsnummerService: EnhetsnummerService =
         EnhetsnummerService(
             hentEnhetClient = mockedHentEnhetClient,
             pdlClient = mockedPdlClient,
-            søknadsidenterService = mockedSøknadsidenterService,
             arbeidsfordelingClient = mockedArbeidsfordelingClient,
-        )
+            adressebeskyttelesesgraderingService = mockedAdressebeskyttelesesgraderingService
+    )
 
     private val digitalKanal = "NAV_NO"
 
