@@ -28,14 +28,11 @@ class AutomatiskJournalføringKontantstøtteService(
         brukerHarSakIInfotrygd: Boolean,
         fagsakId: Long,
     ): Boolean {
-        val erKontantstøtteSøknad = journalpost.erKontantstøtteSøknad()
-
-        val featureToggleForAutomatiskJournalføringSkruddPå = unleashService.isEnabled(toggleId = toggleId, defaultValue = false)
-        if (!featureToggleForAutomatiskJournalføringSkruddPå) {
+        if (!unleashService.isEnabled(toggleId = toggleId, defaultValue = false)) {
             return false
         }
 
-        if (!erKontantstøtteSøknad) {
+        if (!journalpost.erKontantstøtteSøknad()) {
             return false
         }
 
