@@ -5,7 +5,6 @@ import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextServ
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.erDigitalKanal
 import no.nav.familie.baks.mottak.integrasjoner.erKontantstøtteSøknad
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
@@ -17,7 +16,6 @@ class AutomatiskJournalføringKontantstøtteService(
     private val unleashService: UnleashNextMedContextService,
     private val arbeidsfordelingClient: ArbeidsfordelingClient,
     private val ksSakClient: KsSakClient,
-    private val pdlClient: PdlClient,
     private val adressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService,
     private val journalpostBrukerService: JournalpostBrukerService,
 ) {
