@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service
 class JournalpostBrukerService(
     private val pdlClient: PdlClient,
 ) {
+    // TODO : Spør om bedre navn, er det en person ident om det er orgnr ?
     fun tilPersonIdent(
         bruker: Bruker,
         tema: Tema,
