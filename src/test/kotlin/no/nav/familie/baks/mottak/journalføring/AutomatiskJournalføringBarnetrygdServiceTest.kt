@@ -435,7 +435,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             )
 
         // Assert
-        assertThat(skalAutomatiskJournalføres).isTrue()
+        assertThat(skalAutomatiskJournalføres).isFalse()
     }
 
     @Test
