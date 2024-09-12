@@ -9,6 +9,7 @@ import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.arbeidsfordeling.Enhet
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 
 class AutomatiskJournalføringKontantstøtteServiceTest {
     private val mockedUnleashService: UnleashNextMedContextService = mockk()
@@ -415,4 +416,93 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
         // Assert
         assertThat(skalAutomatiskJournalføres).isFalse()
     }
+
+    @Test
+    fun `skal ikke automatisk journalføre journalposten om det finnes en åpen behandling på fagsak`() {
+        // Arrange
+        val identifikator = "123"
+        val fagsakId = 1L
+
+        val journalpost =
+            Journalpost(
+                journalpostId = "1",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker =
+                Bruker(
+                    id = identifikator,
+                    type = BrukerIdType.FNR,
+                ),
+                kanal = "NAV_NO",
+                dokumenter =
+                listOf(
+                    DokumentInfo(
+                        brevkode = "NAV 34-00.08",
+                        tittel = "Søknad",
+                        dokumentstatus = Dokumentstatus.FERDIGSTILT,
+                        dokumentvarianter = emptyList(),
+                    ),
+                ),
+            )
+
+        every {
+            mockedUnleashService.isEnabled(
+                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER,
+                defaultValue = false,
+            )
+        } returns true
+
+        every {
+            mockedJournalpostBrukerService.tilPersonIdent(
+                bruker = journalpost.bruker!!,
+                tema = Tema.KON,
+            )
+        } returns identifikator
+
+        every {
+            mockedKsSakClient.hentMinimalRestFagsak(
+                fagsakId = fagsakId,
+            )
+        } returns
+                RestMinimalFagsak(
+                    id = fagsakId,
+                    behandlinger = listOf(
+                        RestVisningBehandling(
+                            behandlingId = 12931230L,
+                            opprettetTidspunkt = LocalDateTime.now(),
+                            kategori = BehandlingKategori.NASJONAL,
+                            aktiv = true,
+                            underkategori = BehandlingUnderkategori.ORDINÆR,
+                            status = BehandlingStatus.UTREDES,
+                            type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                        )
+                    ),
+                    status = FagsakStatus.LØPENDE,
+                )
+
+        every {
+            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+                tema = Tema.KON,
+                journalpost = journalpost,
+            )
+        } returns false
+
+        every {
+            mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
+                personIdent = identifikator,
+                tema = Tema.KON,
+            )
+        } returns
+                Enhet(
+                    enhetId = "enhetId",
+                    enhetNavn = "enhetNavn",
+                )
+
+        // Act
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, false, fagsakId)
+
+        // Assert
+        assertThat(skalAutomatiskJournalføres).isFalse()
+    }
+
 }

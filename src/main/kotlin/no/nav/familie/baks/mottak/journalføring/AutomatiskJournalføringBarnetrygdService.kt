@@ -56,8 +56,12 @@ class AutomatiskJournalføringBarnetrygdService(
         }
 
         val minialFagsak = baSakClient.hentMinimalRestFagsak(fagsakId)
-        val finnesIngenÅpenBehandlingPåFagsak = !minialFagsak.finnesÅpenBehandlingPåFagsak()
 
-        return finnesIngenÅpenBehandlingPåFagsak
+        if (minialFagsak.finnesÅpenBehandlingPåFagsak()) {
+            return false
+        }
+
+        return true
+
     }
 }

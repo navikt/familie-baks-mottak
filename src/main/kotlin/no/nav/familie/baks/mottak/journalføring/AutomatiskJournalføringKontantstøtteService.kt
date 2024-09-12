@@ -19,6 +19,7 @@ class AutomatiskJournalføringKontantstøtteService(
     private val adressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService,
     private val journalpostBrukerService: JournalpostBrukerService,
 ) {
+    private val toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER
     private val tema = Tema.KON
     private val enheterSomIkkeSkalHaAutomatiskJournalføring = listOf("4863")
 
@@ -29,24 +30,41 @@ class AutomatiskJournalføringKontantstøtteService(
     ): Boolean {
         val erKontantstøtteSøknad = journalpost.erKontantstøtteSøknad()
 
-        val featureToggleForAutomatiskJournalføringSkruddPå =
-            unleashService.isEnabled(
-                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER,
-                defaultValue = false,
-            )
+        val featureToggleForAutomatiskJournalføringSkruddPå = unleashService.isEnabled(toggleId = toggleId, defaultValue = false)
+        if (!featureToggleForAutomatiskJournalføringSkruddPå) {
+            return false
+        }
 
-        val personIdent by lazy { journalpostBrukerService.tilPersonIdent(journalpost.bruker!!, tema) }
-        val harÅpenBehandlingIFagsak by lazy { ksSakClient.hentMinimalRestFagsak(fagsakId).finnesÅpenBehandlingPåFagsak() }
+        if (!erKontantstøtteSøknad) {
+            return false
+        }
+
+        if (brukerHarSakIInfotrygd) {
+            return false
+        }
+
+        if (!journalpost.erDigitalKanal()) {
+            return false
+        }
 
         if (adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)) {
             return false
         }
 
-        return featureToggleForAutomatiskJournalføringSkruddPå &&
-            erKontantstøtteSøknad &&
-            !brukerHarSakIInfotrygd &&
-            journalpost.erDigitalKanal() &&
-            arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdent, tema).enhetId !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
-            !harÅpenBehandlingIFagsak
+        val personIdent = journalpostBrukerService.tilPersonIdent(journalpost.bruker!!, tema)
+        val enhetId = arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdent, tema).enhetId
+
+        if (enhetId in enheterSomIkkeSkalHaAutomatiskJournalføring) {
+            return false
+        }
+
+        val minialFagsak = ksSakClient.hentMinimalRestFagsak(fagsakId)
+
+        if (minialFagsak.finnesÅpenBehandlingPåFagsak()) {
+            return false
+        }
+
+        return true
+
     }
 }

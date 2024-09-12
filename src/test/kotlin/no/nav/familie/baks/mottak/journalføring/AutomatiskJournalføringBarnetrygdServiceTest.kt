@@ -406,6 +406,60 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
     }
 
     @Test
+    fun `skal ikke automatisk journalføre journalpost hvis det finnes en tilknyttet strengt fortrolig person`() {
+        // Arrange
+        val identifikator = "123"
+        val fagsakId = 1L
+
+        val journalpost =
+            Journalpost(
+                journalpostId = "1",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker =
+                Bruker(
+                    id = identifikator,
+                    type = BrukerIdType.FNR,
+                ),
+                kanal = "NAV_NO",
+                dokumenter =
+                listOf(
+                    DokumentInfo(
+                        brevkode = "NAV 33-00.07",
+                        tittel = "Søknad",
+                        dokumentstatus = Dokumentstatus.FERDIGSTILT,
+                        dokumentvarianter = emptyList(),
+                    ),
+                ),
+            )
+
+        every {
+            mockedUnleashService.isEnabled(
+                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_BARNETRYGD_SØKNADER,
+                defaultValue = false,
+            )
+        } returns true
+
+        every {
+            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+                tema = Tema.BAR,
+                journalpost = journalpost,
+            )
+        } returns true
+
+        // Act
+        val skalAutomatiskJournalføres =
+            automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
+                journalpost,
+                false,
+                fagsakId,
+            )
+
+        // Assert
+        assertThat(skalAutomatiskJournalføres).isFalse()
+    }
+
+    @Test
     fun `skal automatisk journalføre journalpost`() {
         // Arrange
         val identifikator = "123"
