@@ -20,7 +20,7 @@ class AutomatiskJournalføringBarnetrygdService(
     private val journalpostBrukerService: JournalpostBrukerService,
 ) {
     private val tema = Tema.BAR
-    private val enheterSomIkkeSkalHaAutomatiskJournalføring = listOf("4863")
+    private val enheterSomIkkeSkalHaAutomatiskJournalføring = listOf("4863", "2103")
 
     fun skalAutomatiskJournalføres(
         journalpost: Journalpost,
@@ -36,7 +36,7 @@ class AutomatiskJournalføringBarnetrygdService(
             )
 
         val personIdent by lazy { journalpostBrukerService.tilPersonIdent(journalpost.bruker!!, tema) }
-        val harÅpenBehandlingIFagsak by lazy { baSakClient.hentMinimalRestFagsak(fagsakId.toLong()).finnesÅpenBehandlingPåFagsak() }
+        val harÅpenBehandlingIFagsak by lazy { baSakClient.hentMinimalRestFagsak(fagsakId).finnesÅpenBehandlingPåFagsak() }
 
         if (adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)) {
             return false
