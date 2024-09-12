@@ -2,13 +2,9 @@ package no.nav.familie.baks.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig.Companion.HOPP_OVER_INFOTRYGD_SJEKK
 import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
-import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
-import no.nav.familie.baks.mottak.integrasjoner.Bruker
-import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.BARN
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus.AVSLUTTET
@@ -23,9 +19,8 @@ import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsak
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.integrasjoner.StatusKode
-import no.nav.familie.baks.mottak.integrasjoner.erBarnetrygdSøknad
-import no.nav.familie.baks.mottak.integrasjoner.erDigitalKanal
-import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
+import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringBarnetrygdService
+import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
@@ -50,46 +45,33 @@ class JournalhendelseBarnetrygdRutingTask(
     private val baSakClient: BaSakClient,
     private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,
     private val taskService: TaskService,
-    private val unleashService: UnleashNextMedContextService,
     private val journalpostClient: JournalpostClient,
-    private val arbeidsfordelingClient: ArbeidsfordelingClient,
     private val unleashNextMedContextService: UnleashNextMedContextService,
+    private val automatiskJournalføringBarnetrygdService: AutomatiskJournalføringBarnetrygdService,
+    private val journalpostBrukerService: JournalpostBrukerService,
 ) : AsyncTaskStep {
     private val tema = Tema.BAR
+    private val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
 
-    val log: Logger = LoggerFactory.getLogger(JournalhendelseBarnetrygdRutingTask::class.java)
-    val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
-    val enheterSomIkkeSkalHaAutomatiskJournalføring = listOf("4863")
+    private val log: Logger = LoggerFactory.getLogger(JournalhendelseBarnetrygdRutingTask::class.java)
 
     override fun doTask(task: Task) {
-        val brukersIdent = task.metadata["personIdent"] as String?
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
-
-        val erBarnetrygdSøknad = journalpost.erBarnetrygdSøknad()
+        val brukersIdent = task.metadata["personIdent"] as String?
+        val personIdent by lazy { journalpostBrukerService.tilPersonIdent(journalpost.bruker!!, tema) }
+        val fagsakId = baSakClient.hentFagsaknummerPåPersonident(personIdent)
 
         val (baSak, infotrygdSak) = brukersIdent?.run { søkEtterSakIBaSakOgInfotrygd(this) } ?: Pair(null, null)
-
         val brukerHarFagsakIBaSak = baSak.finnes()
         val brukerHarSakIInfotrygd = infotrygdSak.finnes()
-        val featureToggleForAutomatiskJournalføringSkruddPå =
-            unleashService.isEnabled(
-                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_BARNETRYGD_SØKNADER,
-                defaultValue = false,
-            )
-
-        val personIdent by lazy { tilPersonIdent(journalpost.bruker!!, tema) }
-        val fagsakId by lazy { baSakClient.hentFagsaknummerPåPersonident(personIdent) }
-        val harÅpenBehandlingIFagsak by lazy { baSakClient.hentMinimalRestFagsak(fagsakId.toLong()).finnesÅpenBehandlingPåFagsak() }
-
         val sakssystemMarkering = hentSakssystemMarkering(brukerHarFagsakIBaSak, brukerHarSakIInfotrygd, baSak, infotrygdSak)
 
         val skalAutomatiskJournalføreJournalpost =
-            featureToggleForAutomatiskJournalføringSkruddPå &&
-                erBarnetrygdSøknad &&
-                !brukerHarSakIInfotrygd &&
-                arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdent, tema).enhetId !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
-                journalpost.erDigitalKanal() &&
-                !harÅpenBehandlingIFagsak
+            automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
+                journalpost,
+                brukerHarSakIInfotrygd,
+                fagsakId,
+            )
 
         if (skalAutomatiskJournalføreJournalpost) {
             log.info("Oppretter OppdaterOgFerdigstillJournalpostTask for journalpost med id ${journalpost.journalpostId}")
@@ -191,15 +173,6 @@ class JournalhendelseBarnetrygdRutingTask(
     }
 
     fun Sakspart?.finnes(): Boolean = this != null
-
-    private fun tilPersonIdent(
-        bruker: Bruker,
-        tema: Tema,
-    ): String =
-        when (bruker.type) {
-            BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema)
-            else -> bruker.id
-        }
 
     companion object {
         const val TASK_STEP_TYPE = "journalhendelseBarnetrygdRuting"

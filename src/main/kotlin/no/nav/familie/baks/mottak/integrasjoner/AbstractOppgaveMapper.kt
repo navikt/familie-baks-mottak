@@ -1,6 +1,7 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
+import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.baks.mottak.util.erDnummer
 import no.nav.familie.baks.mottak.util.erOrgnr
 import no.nav.familie.baks.mottak.util.fristFerdigstillelse
@@ -20,8 +21,9 @@ abstract class AbstractOppgaveMapper(
     private val hentEnhetClient: HentEnhetClient,
     private val unleashService: UnleashService,
     private val enhetsnummerService: EnhetsnummerService,
-    val pdlClient: PdlClient,
-    val arbeidsfordelingClient: ArbeidsfordelingClient,
+    private val pdlClient: PdlClient,
+    private val arbeidsfordelingClient: ArbeidsfordelingClient,
+    private val journalpostBrukerService: JournalpostBrukerService,
 ) : IOppgaveMapper {
     override fun tilOpprettOppgaveRequest(
         oppgavetype: Oppgavetype,
@@ -131,22 +133,13 @@ abstract class AbstractOppgaveMapper(
 
     private fun hentBehandlendeEnhetForPerson(journalpost: Journalpost): String? =
         if (journalpost.bruker != null) {
-            val personIdentPåJournalpost = tilPersonIdent(journalpost.bruker, this.tema)
+            val personIdentPåJournalpost = journalpostBrukerService.tilPersonIdent(journalpost.bruker, this.tema)
             val behandlendeEnhetPåIdent = arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdentPåJournalpost, this.tema)
 
             behandlendeEnhetPåIdent.enhetId
         } else {
             logger.warn("Fant ikke bruker på journalpost ved forsøk på henting av behandlende enhet")
             null
-        }
-
-    private fun tilPersonIdent(
-        bruker: Bruker,
-        tema: Tema,
-    ): String =
-        when (bruker.type) {
-            BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema)
-            else -> bruker.id
         }
 
     private fun hentAktørIdFraPdl(

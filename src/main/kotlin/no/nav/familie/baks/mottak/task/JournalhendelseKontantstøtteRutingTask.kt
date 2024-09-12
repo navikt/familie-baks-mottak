@@ -2,20 +2,14 @@ package no.nav.familie.baks.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
-import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
-import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
-import no.nav.familie.baks.mottak.integrasjoner.Bruker
-import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.Identgruppe
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdKontantstøtteClient
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.StonadDto
-import no.nav.familie.baks.mottak.integrasjoner.erDigitalKanal
-import no.nav.familie.baks.mottak.integrasjoner.erKontantstøtteSøknad
-import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
+import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringKontantstøtteService
+import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.prosessering.AsyncTaskStep
@@ -34,42 +28,32 @@ import java.time.YearMonth
 )
 class JournalhendelseKontantstøtteRutingTask(
     private val pdlClient: PdlClient,
+    private val ksSakClient: KsSakClient,
     private val infotrygdKontantstøtteClient: InfotrygdKontantstøtteClient,
     private val taskService: TaskService,
     private val journalpostClient: JournalpostClient,
-    private val ksSakClient: KsSakClient,
-    private val unleashService: UnleashNextMedContextService,
-    private val arbeidsfordelingClient: ArbeidsfordelingClient,
+    private val automatiskJournalføringKontantstøtteService: AutomatiskJournalføringKontantstøtteService,
+    private val journalpostBrukerService: JournalpostBrukerService,
 ) : AsyncTaskStep {
-    val log: Logger = LoggerFactory.getLogger(JournalhendelseKontantstøtteRutingTask::class.java)
-    val enheterSomIkkeSkalHaAutomatiskJournalføring = listOf("4863")
-    val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
-    val tema = Tema.KON
+    private val tema = Tema.KON
+    private val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
+
+    private val log: Logger = LoggerFactory.getLogger(JournalhendelseKontantstøtteRutingTask::class.java)
 
     override fun doTask(task: Task) {
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
-        val brukersIdent = tilPersonIdent(journalpost.bruker!!, tema)
+        val brukersIdent = journalpostBrukerService.tilPersonIdent(journalpost.bruker!!, tema)
+        val fagsakId = ksSakClient.hentFagsaknummerPåPersonident(brukersIdent)
 
-        val fagsakId by lazy { ksSakClient.hentFagsaknummerPåPersonident(brukersIdent) }
-
-        val harÅpenBehandlingIFagsak by lazy { ksSakClient.hentMinimalRestFagsak(fagsakId).finnesÅpenBehandlingPåFagsak() }
         val harLøpendeSakIInfotrygd = harLøpendeSakIInfotrygd(brukersIdent)
-        val erKontantstøtteSøknad = journalpost.erKontantstøtteSøknad()
-        val featureToggleForAutomatiskJournalføringSkruddPå =
-            unleashService.isEnabled(
-                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER,
-                defaultValue = false,
-            )
-
         val sakssystemMarkering = hentSakssystemMarkering(harLøpendeSakIInfotrygd)
 
         val skalAutomatiskJournalføreJournalpost =
-            featureToggleForAutomatiskJournalføringSkruddPå &&
-                erKontantstøtteSøknad &&
-                !harLøpendeSakIInfotrygd &&
-                journalpost.erDigitalKanal() &&
-                arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(brukersIdent, tema).enhetId !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
-                !harÅpenBehandlingIFagsak
+            automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(
+                journalpost,
+                harLøpendeSakIInfotrygd,
+                fagsakId,
+            )
 
         if (skalAutomatiskJournalføreJournalpost) {
             log.info("Oppretter OppdaterOgFerdigstillJournalpostTask for journalpost med id ${journalpost.journalpostId}")
@@ -143,15 +127,6 @@ class JournalhendelseKontantstøtteRutingTask(
             false
         }
     }
-
-    private fun tilPersonIdent(
-        bruker: Bruker,
-        tema: Tema,
-    ): String =
-        when (bruker.type) {
-            BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema)
-            else -> bruker.id
-        }
 
     companion object {
         const val TASK_STEP_TYPE = "journalhendelseKontantstøtteRuting"

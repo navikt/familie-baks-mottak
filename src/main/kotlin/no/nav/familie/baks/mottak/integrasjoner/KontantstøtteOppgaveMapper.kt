@@ -1,5 +1,6 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
+import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.harEøsSteg
 import no.nav.familie.kontrakter.felles.Behandlingstema
@@ -15,8 +16,16 @@ class KontantstøtteOppgaveMapper(
     enhetsnummerService: EnhetsnummerService,
     arbeidsfordelingClient: ArbeidsfordelingClient,
     pdlClient: PdlClient,
+    journalpostBrukerService: JournalpostBrukerService,
     val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
-) : AbstractOppgaveMapper(hentEnhetClient, unleashService, enhetsnummerService, pdlClient, arbeidsfordelingClient) {
+) : AbstractOppgaveMapper(
+        hentEnhetClient = hentEnhetClient,
+        unleashService = unleashService,
+        enhetsnummerService = enhetsnummerService,
+        pdlClient = pdlClient,
+        arbeidsfordelingClient = arbeidsfordelingClient,
+        journalpostBrukerService = journalpostBrukerService,
+    ) {
     override val tema: Tema = Tema.KON
 
     override fun hentBehandlingstema(journalpost: Journalpost): Behandlingstema? = null

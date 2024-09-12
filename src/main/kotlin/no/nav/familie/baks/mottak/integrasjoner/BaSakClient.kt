@@ -49,12 +49,12 @@ class BaSakClient
             }
         }
 
-        fun hentFagsaknummerPåPersonident(personIdent: String): String {
+        fun hentFagsaknummerPåPersonident(personIdent: String): Long {
             val uri = URI.create("$sakServiceUri/fagsaker")
             return runCatching {
                 postForEntity<Ressurs<RestFagsakId>>(uri, mapOf("personIdent" to personIdent))
             }.fold(
-                onSuccess = { it.data?.id?.toString() ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
+                onSuccess = { it.data?.id ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av saksnummer fra ba-sak.", it, uri, personIdent) },
             )
         }
