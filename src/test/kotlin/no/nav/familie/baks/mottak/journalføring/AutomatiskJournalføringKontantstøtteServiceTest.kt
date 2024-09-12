@@ -4,7 +4,22 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
-import no.nav.familie.baks.mottak.integrasjoner.*
+import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
+import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
+import no.nav.familie.baks.mottak.integrasjoner.BehandlingStatus
+import no.nav.familie.baks.mottak.integrasjoner.BehandlingType
+import no.nav.familie.baks.mottak.integrasjoner.BehandlingUnderkategori
+import no.nav.familie.baks.mottak.integrasjoner.Bruker
+import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
+import no.nav.familie.baks.mottak.integrasjoner.DokumentInfo
+import no.nav.familie.baks.mottak.integrasjoner.Dokumentstatus
+import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus
+import no.nav.familie.baks.mottak.integrasjoner.Journalpost
+import no.nav.familie.baks.mottak.integrasjoner.Journalposttype
+import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
+import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
+import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
+import no.nav.familie.baks.mottak.integrasjoner.RestVisningBehandling
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.arbeidsfordeling.Enhet
 import org.assertj.core.api.Assertions.assertThat
@@ -429,20 +444,20 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
                 journalposttype = Journalposttype.I,
                 journalstatus = Journalstatus.MOTTATT,
                 bruker =
-                Bruker(
-                    id = identifikator,
-                    type = BrukerIdType.FNR,
-                ),
+                    Bruker(
+                        id = identifikator,
+                        type = BrukerIdType.FNR,
+                    ),
                 kanal = "NAV_NO",
                 dokumenter =
-                listOf(
-                    DokumentInfo(
-                        brevkode = "NAV 34-00.08",
-                        tittel = "Søknad",
-                        dokumentstatus = Dokumentstatus.FERDIGSTILT,
-                        dokumentvarianter = emptyList(),
+                    listOf(
+                        DokumentInfo(
+                            brevkode = "NAV 34-00.08",
+                            tittel = "Søknad",
+                            dokumentstatus = Dokumentstatus.FERDIGSTILT,
+                            dokumentvarianter = emptyList(),
+                        ),
                     ),
-                ),
             )
 
         every {
@@ -464,9 +479,10 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
                 fagsakId = fagsakId,
             )
         } returns
-                RestMinimalFagsak(
-                    id = fagsakId,
-                    behandlinger = listOf(
+            RestMinimalFagsak(
+                id = fagsakId,
+                behandlinger =
+                    listOf(
                         RestVisningBehandling(
                             behandlingId = 12931230L,
                             opprettetTidspunkt = LocalDateTime.now(),
@@ -475,10 +491,10 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
                             underkategori = BehandlingUnderkategori.ORDINÆR,
                             status = BehandlingStatus.UTREDES,
                             type = BehandlingType.FØRSTEGANGSBEHANDLING,
-                        )
+                        ),
                     ),
-                    status = FagsakStatus.LØPENDE,
-                )
+                status = FagsakStatus.LØPENDE,
+            )
 
         every {
             mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
@@ -493,10 +509,10 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
                 tema = Tema.KON,
             )
         } returns
-                Enhet(
-                    enhetId = "enhetId",
-                    enhetNavn = "enhetNavn",
-                )
+            Enhet(
+                enhetId = "enhetId",
+                enhetNavn = "enhetNavn",
+            )
 
         // Act
         val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, false, fagsakId)
@@ -504,5 +520,4 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
         // Assert
         assertThat(skalAutomatiskJournalføres).isFalse()
     }
-
 }

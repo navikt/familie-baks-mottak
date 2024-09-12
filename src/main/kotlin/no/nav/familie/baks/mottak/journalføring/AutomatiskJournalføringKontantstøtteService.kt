@@ -65,6 +65,5 @@ class AutomatiskJournalføringKontantstøtteService(
         }
 
         return true
-
     }
 }

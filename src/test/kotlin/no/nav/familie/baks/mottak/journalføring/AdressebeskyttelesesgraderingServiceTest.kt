@@ -45,12 +45,13 @@ class AdressebeskyttelesesgraderingServiceTest {
             )
 
         // Act & Assert
-        val exception = assertThrows<IllegalStateException> {
-            adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
-                tema = Tema.BAR,
-                journalpost = journalpost
-            )
-        }
+        val exception =
+            assertThrows<IllegalStateException> {
+                adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+                    tema = Tema.BAR,
+                    journalpost = journalpost,
+                )
+            }
         assertThat(exception.message).isEqualTo("Bruker på journalpost ${journalpost.journalpostId} kan ikke være null")
     }
 
@@ -74,12 +75,13 @@ class AdressebeskyttelesesgraderingServiceTest {
             )
 
         // Act & Assert
-        val exception = assertThrows<IllegalStateException> {
-            adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
-                tema = tema,
-                journalpost = journalpost
-            )
-        }
+        val exception =
+            assertThrows<IllegalStateException> {
+                adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+                    tema = tema,
+                    journalpost = journalpost,
+                )
+            }
         assertThat(exception.message).isEqualTo("Støtter ikke tema $tema")
     }
 
@@ -106,13 +108,13 @@ class AdressebeskyttelesesgraderingServiceTest {
 
         every {
             mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(
-                journalpostId = journalpost.journalpostId
+                journalpostId = journalpost.journalpostId,
             )
         } returns Pair("123456789", emptyList())
 
         every {
             mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(
-                journalpostId = journalpost.journalpostId
+                journalpostId = journalpost.journalpostId,
             )
         } returns Pair("123456789", emptyList())
 
@@ -120,26 +122,27 @@ class AdressebeskyttelesesgraderingServiceTest {
             mockedPdlClient.hentPerson(
                 personIdent = "123456789",
                 graphqlfil = "hentperson-med-adressebeskyttelse",
-                tema = tema
+                tema = tema,
             )
-        } returns PdlPersonData(
-            adressebeskyttelse = listOf(
-                Adressebeskyttelse(
-                    gradering = Adressebeskyttelsesgradering.STRENGT_FORTROLIG
-                )
+        } returns
+            PdlPersonData(
+                adressebeskyttelse =
+                    listOf(
+                        Adressebeskyttelse(
+                            gradering = Adressebeskyttelsesgradering.STRENGT_FORTROLIG,
+                        ),
+                    ),
             )
-        )
 
         // Act
         val finnesAdressebeskyttelsegradringPåJournalpost =
             adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
                 tema = tema,
-                journalpost = journalpost
+                journalpost = journalpost,
             )
 
         // Assert
         assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isTrue()
-
     }
 
     @ParameterizedTest
@@ -166,7 +169,7 @@ class AdressebeskyttelesesgraderingServiceTest {
         every {
             mockedJournalpostBrukerService.tilPersonIdent(
                 bruker = journalpost.bruker!!,
-                tema = tema
+                tema = tema,
             )
         } returns "123456789"
 
@@ -174,26 +177,27 @@ class AdressebeskyttelesesgraderingServiceTest {
             mockedPdlClient.hentPerson(
                 personIdent = "123456789",
                 graphqlfil = "hentperson-med-adressebeskyttelse",
-                tema = tema
+                tema = tema,
             )
-        } returns PdlPersonData(
-            adressebeskyttelse = listOf(
-                Adressebeskyttelse(
-                    gradering = Adressebeskyttelsesgradering.STRENGT_FORTROLIG
-                )
+        } returns
+            PdlPersonData(
+                adressebeskyttelse =
+                    listOf(
+                        Adressebeskyttelse(
+                            gradering = Adressebeskyttelsesgradering.STRENGT_FORTROLIG,
+                        ),
+                    ),
             )
-        )
 
         // Act
         val finnesAdressebeskyttelsegradringPåJournalpost =
             adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
                 tema = tema,
-                journalpost = journalpost
+                journalpost = journalpost,
             )
 
         // Assert
         assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isTrue()
-
     }
 
     private fun hentDokumenterMedRiktigBrevkode(tema: Tema): List<DokumentInfo> {

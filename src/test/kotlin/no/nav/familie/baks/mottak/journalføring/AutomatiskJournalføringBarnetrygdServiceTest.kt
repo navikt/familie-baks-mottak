@@ -417,20 +417,20 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
                 journalposttype = Journalposttype.I,
                 journalstatus = Journalstatus.MOTTATT,
                 bruker =
-                Bruker(
-                    id = identifikator,
-                    type = BrukerIdType.FNR,
-                ),
+                    Bruker(
+                        id = identifikator,
+                        type = BrukerIdType.FNR,
+                    ),
                 kanal = "NAV_NO",
                 dokumenter =
-                listOf(
-                    DokumentInfo(
-                        brevkode = "NAV 33-00.07",
-                        tittel = "Søknad",
-                        dokumentstatus = Dokumentstatus.FERDIGSTILT,
-                        dokumentvarianter = emptyList(),
+                    listOf(
+                        DokumentInfo(
+                            brevkode = "NAV 33-00.07",
+                            tittel = "Søknad",
+                            dokumentstatus = Dokumentstatus.FERDIGSTILT,
+                            dokumentvarianter = emptyList(),
+                        ),
                     ),
-                ),
             )
 
         every {

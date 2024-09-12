@@ -62,6 +62,5 @@ class AutomatiskJournalføringBarnetrygdService(
         }
 
         return true
-
     }
 }
