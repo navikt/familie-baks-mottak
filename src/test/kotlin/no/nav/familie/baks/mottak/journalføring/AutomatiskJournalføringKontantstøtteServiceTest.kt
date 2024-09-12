@@ -103,4 +103,316 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
         // Assert
         assertThat(skalAutomatiskJournalføres).isTrue()
     }
+
+    @Test
+    fun `skal ikke automatisk journalføre journalposten hvis feature toggle er skrudd av`() {
+        // Arrange
+        val identifikator = "123"
+        val fagsakId = 1L
+
+        val journalpost =
+            Journalpost(
+                journalpostId = "1",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker =
+                    Bruker(
+                        id = identifikator,
+                        type = BrukerIdType.FNR,
+                    ),
+                kanal = "NAV_NO",
+                dokumenter =
+                    listOf(
+                        DokumentInfo(
+                            brevkode = "NAV 34-00.08",
+                            tittel = "Søknad",
+                            dokumentstatus = Dokumentstatus.FERDIGSTILT,
+                            dokumentvarianter = emptyList(),
+                        ),
+                    ),
+            )
+
+        every {
+            mockedUnleashService.isEnabled(
+                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER,
+                defaultValue = false,
+            )
+        } returns false
+
+        every {
+            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+                tema = Tema.KON,
+                journalpost = journalpost,
+            )
+        } returns false
+
+        // Act
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, false, fagsakId)
+
+        // Assert
+        assertThat(skalAutomatiskJournalføres).isFalse()
+    }
+
+    @Test
+    fun `skal ikke automatisk journalføre journalposten om journalposten ikke er kontanstøtte søknad`() {
+        // Arrange
+        val identifikator = "123"
+        val fagsakId = 1L
+
+        val journalpost =
+            Journalpost(
+                journalpostId = "1",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker =
+                    Bruker(
+                        id = identifikator,
+                        type = BrukerIdType.FNR,
+                    ),
+                kanal = "NAV_NO",
+                dokumenter =
+                    listOf(
+                        DokumentInfo(
+                            brevkode = "NAV 33-00.07",
+                            tittel = "Søknad",
+                            dokumentstatus = Dokumentstatus.FERDIGSTILT,
+                            dokumentvarianter = emptyList(),
+                        ),
+                    ),
+            )
+
+        every {
+            mockedUnleashService.isEnabled(
+                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER,
+                defaultValue = false,
+            )
+        } returns true
+
+        every {
+            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+                tema = Tema.KON,
+                journalpost = journalpost,
+            )
+        } returns false
+
+        // Act
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, false, fagsakId)
+
+        // Assert
+        assertThat(skalAutomatiskJournalføres).isFalse()
+    }
+
+    @Test
+    fun `skal ikke automatisk journalføre journalposten hvis bruker has sak i infotrygd`() {
+        // Arrange
+        val identifikator = "123"
+        val fagsakId = 1L
+
+        val journalpost =
+            Journalpost(
+                journalpostId = "1",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker =
+                    Bruker(
+                        id = identifikator,
+                        type = BrukerIdType.FNR,
+                    ),
+                kanal = "NAV_NO",
+                dokumenter =
+                    listOf(
+                        DokumentInfo(
+                            brevkode = "NAV 34-00.08",
+                            tittel = "Søknad",
+                            dokumentstatus = Dokumentstatus.FERDIGSTILT,
+                            dokumentvarianter = emptyList(),
+                        ),
+                    ),
+            )
+
+        every {
+            mockedUnleashService.isEnabled(
+                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER,
+                defaultValue = false,
+            )
+        } returns true
+
+        every {
+            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+                tema = Tema.KON,
+                journalpost = journalpost,
+            )
+        } returns false
+
+        // Act
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, true, fagsakId)
+
+        // Assert
+        assertThat(skalAutomatiskJournalføres).isFalse()
+    }
+
+    @Test
+    fun `skal ikke automatisk journalføre journalposten hvis søknad ikke er sendt inn digitalt`() {
+        // Arrange
+        val identifikator = "123"
+        val fagsakId = 1L
+
+        val journalpost =
+            Journalpost(
+                journalpostId = "1",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker =
+                    Bruker(
+                        id = identifikator,
+                        type = BrukerIdType.FNR,
+                    ),
+                kanal = "SKAN_NETS",
+                dokumenter =
+                    listOf(
+                        DokumentInfo(
+                            brevkode = "NAV 34-00.08",
+                            tittel = "Søknad",
+                            dokumentstatus = Dokumentstatus.FERDIGSTILT,
+                            dokumentvarianter = emptyList(),
+                        ),
+                    ),
+            )
+
+        every {
+            mockedUnleashService.isEnabled(
+                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER,
+                defaultValue = false,
+            )
+        } returns true
+
+        every {
+            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+                tema = Tema.KON,
+                journalpost = journalpost,
+            )
+        } returns false
+
+        // Act
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, false, fagsakId)
+
+        // Assert
+        assertThat(skalAutomatiskJournalføres).isFalse()
+    }
+
+    @Test
+    fun `skal ikke automatisk journalføre journalposten hvis geografisk behandlende enhet er i listen over eksluderte enheter`() {
+        // Arrange
+        val identifikator = "123"
+        val fagsakId = 1L
+
+        val journalpost =
+            Journalpost(
+                journalpostId = "1",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker =
+                    Bruker(
+                        id = identifikator,
+                        type = BrukerIdType.FNR,
+                    ),
+                kanal = "NAV_NO",
+                dokumenter =
+                    listOf(
+                        DokumentInfo(
+                            brevkode = "NAV 34-00.08",
+                            tittel = "Søknad",
+                            dokumentstatus = Dokumentstatus.FERDIGSTILT,
+                            dokumentvarianter = emptyList(),
+                        ),
+                    ),
+            )
+
+        every {
+            mockedUnleashService.isEnabled(
+                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER,
+                defaultValue = false,
+            )
+        } returns true
+
+        every {
+            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+                tema = Tema.KON,
+                journalpost = journalpost,
+            )
+        } returns false
+
+        every {
+            mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
+                personIdent = identifikator,
+                tema = Tema.KON,
+            )
+        } returns
+            Enhet(
+                enhetId = "4863",
+                enhetNavn = "midlertidigEnhet",
+            )
+
+        every {
+            mockedJournalpostBrukerService.tilPersonIdent(
+                bruker = journalpost.bruker!!,
+                tema = Tema.KON,
+            )
+        } returns identifikator
+
+        // Act
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, false, fagsakId)
+
+        // Assert
+        assertThat(skalAutomatiskJournalføres).isFalse()
+    }
+
+    @Test
+    fun `skal ikke automatisk journalføre journalposten hvis en av personene i søknaden har adressebeskyttelsegradering strengt fortrolig`() {
+        // Arrange
+        val identifikator = "123"
+        val fagsakId = 1L
+
+        val journalpost =
+            Journalpost(
+                journalpostId = "1",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker =
+                    Bruker(
+                        id = identifikator,
+                        type = BrukerIdType.FNR,
+                    ),
+                kanal = "NAV_NO",
+                dokumenter =
+                    listOf(
+                        DokumentInfo(
+                            brevkode = "NAV 34-00.08",
+                            tittel = "Søknad",
+                            dokumentstatus = Dokumentstatus.FERDIGSTILT,
+                            dokumentvarianter = emptyList(),
+                        ),
+                    ),
+            )
+
+        every {
+            mockedUnleashService.isEnabled(
+                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER,
+                defaultValue = false,
+            )
+        } returns true
+
+        every {
+            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+                tema = Tema.KON,
+                journalpost = journalpost,
+            )
+        } returns true
+
+        // Act
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, false, fagsakId)
+
+        // Assert
+        assertThat(skalAutomatiskJournalføres).isFalse()
+    }
 }
