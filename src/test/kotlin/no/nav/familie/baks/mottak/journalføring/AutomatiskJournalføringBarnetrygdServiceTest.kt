@@ -246,7 +246,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
         } returns identifikator
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                 tema = Tema.BAR,
                 journalpost = journalpost,
             )
@@ -340,7 +340,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             )
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                 tema = Tema.BAR,
                 journalpost = journalpost,
             )
@@ -387,7 +387,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
         } returns true
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                 tema = Tema.BAR,
                 journalpost = journalpost,
             )
@@ -441,7 +441,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
         } returns true
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                 tema = Tema.BAR,
                 journalpost = journalpost,
             )
@@ -513,7 +513,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             )
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                 tema = Tema.BAR,
                 journalpost = journalpost,
             )

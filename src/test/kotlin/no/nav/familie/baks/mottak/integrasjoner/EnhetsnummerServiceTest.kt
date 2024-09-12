@@ -50,7 +50,7 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(tema, journalpost)
         } returns false
 
         // Act
@@ -84,7 +84,7 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(tema, journalpost)
         } returns false
 
         // Act
@@ -117,7 +117,7 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(tema, journalpost)
         } returns false
 
         // Act
@@ -150,7 +150,7 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(tema, journalpost)
         } returns false
 
         every {
@@ -187,7 +187,7 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(tema, journalpost)
         } returns false
 
         every {
@@ -224,7 +224,7 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(tema, journalpost)
         } returns false
 
         every {
@@ -262,7 +262,7 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(tema, journalpost)
         } returns true
 
         // Act
@@ -345,7 +345,7 @@ class EnhetsnummerServiceTest {
             )
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(tema, journalpost)
         } returns false
 
         every {

@@ -47,7 +47,7 @@ class AdressebeskyttelesesgraderingServiceTest {
         // Act & Assert
         val exception =
             assertThrows<IllegalStateException> {
-                adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+                adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                     tema = Tema.BAR,
                     journalpost = journalpost,
                 )
@@ -77,7 +77,7 @@ class AdressebeskyttelesesgraderingServiceTest {
         // Act & Assert
         val exception =
             assertThrows<IllegalStateException> {
-                adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+                adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                     tema = tema,
                     journalpost = journalpost,
                 )
@@ -136,7 +136,7 @@ class AdressebeskyttelesesgraderingServiceTest {
 
         // Act
         val finnesAdressebeskyttelsegradringPåJournalpost =
-            adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+            adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                 tema = tema,
                 journalpost = journalpost,
             )
@@ -191,7 +191,7 @@ class AdressebeskyttelesesgraderingServiceTest {
 
         // Act
         val finnesAdressebeskyttelsegradringPåJournalpost =
-            adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+            adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                 tema = tema,
                 journalpost = journalpost,
             )

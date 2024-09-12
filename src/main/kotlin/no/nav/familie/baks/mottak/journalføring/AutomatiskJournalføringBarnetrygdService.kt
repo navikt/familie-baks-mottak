@@ -44,7 +44,7 @@ class AutomatiskJournalføringBarnetrygdService(
             return false
         }
 
-        if (adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)) {
+        if (adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(tema, journalpost)) {
             return false
         }
 

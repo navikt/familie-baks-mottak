@@ -96,7 +96,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
             )
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                 tema = Tema.KON,
                 journalpost = journalpost,
             )
@@ -156,7 +156,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
         } returns false
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                 tema = Tema.KON,
                 journalpost = journalpost,
             )
@@ -205,7 +205,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
         } returns true
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                 tema = Tema.KON,
                 journalpost = journalpost,
             )
@@ -254,7 +254,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
         } returns true
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                 tema = Tema.KON,
                 journalpost = journalpost,
             )
@@ -303,7 +303,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
         } returns true
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                 tema = Tema.KON,
                 journalpost = journalpost,
             )
@@ -352,7 +352,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
         } returns true
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                 tema = Tema.KON,
                 journalpost = journalpost,
             )
@@ -419,7 +419,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
         } returns true
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                 tema = Tema.KON,
                 journalpost = journalpost,
             )
@@ -497,7 +497,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
             )
 
         every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                 tema = Tema.KON,
                 journalpost = journalpost,
             )

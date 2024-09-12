@@ -14,7 +14,7 @@ class AdressebeskyttelesesgraderingService(
     private val søknadsidenterService: SøknadsidenterService,
     private val journalpostBrukerService: JournalpostBrukerService,
 ) {
-    fun finnesAdressebeskyttelsegradringPåJournalpost(
+    fun finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
         tema: Tema,
         journalpost: Journalpost,
     ): Boolean {

@@ -35,7 +35,7 @@ class EnhetsnummerService(
         val tema = Tema.valueOf(journalpost.tema)
 
         val erEnAvPersoneneStrengtFortrolig =
-            adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+            adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                 tema = tema,
                 journalpost = journalpost,
             )
