@@ -1,6 +1,9 @@
 package no.nav.familie.baks.mottak.journalføring
 
+import io.mockk.every
 import io.mockk.mockk
+import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelse
+import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelsesgradering
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.DokumentInfo
@@ -9,6 +12,7 @@ import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.Journalposttype
 import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlPersonData
 import no.nav.familie.baks.mottak.integrasjoner.SøknadsidenterService
 import no.nav.familie.kontrakter.felles.Tema
 import org.assertj.core.api.Assertions.assertThat
@@ -29,6 +33,27 @@ class AdressebeskyttelesesgraderingServiceTest {
             journalpostBrukerService = mockedJournalpostBrukerService,
         )
 
+    @Test
+    fun `skal kaste feil når bruker ikke er satt på journalpost`() {
+        // Arrange
+        val journalpost =
+            Journalpost(
+                journalpostId = "123",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker = null,
+            )
+
+        // Act & Assert
+        val exception = assertThrows<IllegalStateException> {
+            adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+                tema = Tema.BAR,
+                journalpost = journalpost
+            )
+        }
+        assertThat(exception.message).isEqualTo("Bruker på journalpost ${journalpost.journalpostId} kan ikke være null")
+    }
+
     @ParameterizedTest
     @EnumSource(
         value = Tema::class,
@@ -45,43 +70,17 @@ class AdressebeskyttelesesgraderingServiceTest {
                 journalposttype = Journalposttype.I,
                 journalstatus = Journalstatus.MOTTATT,
                 tema = tema.name,
-                journalforendeEnhet = "1",
-                kanal = "NAV_NO",
-                dokumenter = hentDokumenterMedRiktigBrevkode(tema),
                 bruker = Bruker("312", BrukerIdType.FNR),
             )
 
         // Act & Assert
-        val exception =
-            assertThrows<IllegalStateException> {
-                adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)
-            }
-
-        assertThat(exception.message).isEqualTo("Støtter ikke tema $tema")
-    }
-
-    @Test
-    fun `skal kaste feil når bruker ikke er satt på journalpost`() {
-        // Arrange
-        val journalpost =
-            Journalpost(
-                journalpostId = "123",
-                journalposttype = Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                tema = Tema.BAR.name,
-                journalforendeEnhet = "1",
-                kanal = "NAV_NO",
-                dokumenter = hentDokumenterMedRiktigBrevkode(Tema.BAR),
-                bruker = null,
+        val exception = assertThrows<IllegalStateException> {
+            adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+                tema = tema,
+                journalpost = journalpost
             )
-
-        // Act & Assert
-        val exception =
-            assertThrows<IllegalStateException> {
-                adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(Tema.BAR, journalpost)
-            }
-
-        assertThat(exception.message).isEqualTo("Bruker på journalpost ${journalpost.journalpostId} kan ikke være null")
+        }
+        assertThat(exception.message).isEqualTo("Støtter ikke tema $tema")
     }
 
     @ParameterizedTest
@@ -89,7 +88,7 @@ class AdressebeskyttelesesgraderingServiceTest {
         value = Tema::class,
         names = ["BAR", "KON"],
     )
-    fun `asd`(
+    fun `skal returnere true om journalpost fra digital søknad er tilknyttet en strengt fotrolig person`(
         tema: Tema,
     ) {
         // Arrange
@@ -105,13 +104,96 @@ class AdressebeskyttelesesgraderingServiceTest {
                 bruker = Bruker("312", BrukerIdType.FNR),
             )
 
-        // Act & Assert
-        val exception =
-            assertThrows<IllegalStateException> {
-                adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)
-            }
+        every {
+            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(
+                journalpostId = journalpost.journalpostId
+            )
+        } returns Pair("123456789", emptyList())
 
-        assertThat(exception.message).isEqualTo("Støtter ikke tema $tema")
+        every {
+            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(
+                journalpostId = journalpost.journalpostId
+            )
+        } returns Pair("123456789", emptyList())
+
+        every {
+            mockedPdlClient.hentPerson(
+                personIdent = "123456789",
+                graphqlfil = "hentperson-med-adressebeskyttelse",
+                tema = tema
+            )
+        } returns PdlPersonData(
+            adressebeskyttelse = listOf(
+                Adressebeskyttelse(
+                    gradering = Adressebeskyttelsesgradering.STRENGT_FORTROLIG
+                )
+            )
+        )
+
+        // Act
+        val finnesAdressebeskyttelsegradringPåJournalpost =
+            adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+                tema = tema,
+                journalpost = journalpost
+            )
+
+        // Assert
+        assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isTrue()
+
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = Tema::class,
+        names = ["BAR", "KON"],
+    )
+    fun `skal returnere true om journalpost fra papirsøknad er tilknyttet en strengt fotrolig person`(
+        tema: Tema,
+    ) {
+        // Arrange
+        val journalpost =
+            Journalpost(
+                journalpostId = "123",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                tema = tema.name,
+                journalforendeEnhet = "1",
+                kanal = "IKKE_NAV_NO",
+                dokumenter = hentDokumenterMedRiktigBrevkode(tema),
+                bruker = Bruker("312", BrukerIdType.FNR),
+            )
+
+        every {
+            mockedJournalpostBrukerService.tilPersonIdent(
+                bruker = journalpost.bruker!!,
+                tema = tema
+            )
+        } returns "123456789"
+
+        every {
+            mockedPdlClient.hentPerson(
+                personIdent = "123456789",
+                graphqlfil = "hentperson-med-adressebeskyttelse",
+                tema = tema
+            )
+        } returns PdlPersonData(
+            adressebeskyttelse = listOf(
+                Adressebeskyttelse(
+                    gradering = Adressebeskyttelsesgradering.STRENGT_FORTROLIG
+                )
+            )
+        )
+
+        // Act
+        val finnesAdressebeskyttelsegradringPåJournalpost =
+            adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
+                tema = tema,
+                journalpost = journalpost
+            )
+
+        // Assert
+        assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isTrue()
+
     }
 
     private fun hentDokumenterMedRiktigBrevkode(tema: Tema): List<DokumentInfo> {

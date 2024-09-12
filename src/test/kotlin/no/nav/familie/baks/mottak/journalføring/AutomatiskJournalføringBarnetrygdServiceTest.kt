@@ -76,14 +76,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             )
         } returns false
 
-        // TODO : Remove me
-        every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
-                tema = Tema.BAR,
-                journalpost = journalpost,
-            )
-        } returns false
-
         // Act
         val skalAutomatiskJournalføres =
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
@@ -122,14 +114,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             )
         } returns true
 
-        // TODO : Remove me
-        every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
-                tema = Tema.BAR,
-                journalpost = journalpost,
-            )
-        } returns false
-
         // Act
         val skalAutomatiskJournalføres =
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
@@ -143,7 +127,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
     }
 
     @Test
-    fun `skal ikke utomatisk journalføre journalpost om bruker har fagsak i infotrygd`() {
+    fun `skal ikke automatisk journalføre journalpost om bruker har fagsak i infotrygd`() {
         // Arrange
         val journalpost =
             Journalpost(
@@ -167,14 +151,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
                 defaultValue = false,
             )
         } returns true
-
-        // TODO : Remove me
-        every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
-                tema = Tema.BAR,
-                journalpost = journalpost,
-            )
-        } returns false
 
         // Act
         val skalAutomatiskJournalføres =
@@ -214,14 +190,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
                 defaultValue = false,
             )
         } returns true
-
-        // TODO : Remove me
-        every {
-            mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
-                tema = Tema.BAR,
-                journalpost = journalpost,
-            )
-        } returns false
 
         // Act
         val skalAutomatiskJournalføres =
@@ -277,7 +245,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             )
         } returns identifikator
 
-        // TODO : Remove me?
         every {
             mockedAdressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(
                 tema = Tema.BAR,
