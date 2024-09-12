@@ -3,6 +3,7 @@ package no.nav.familie.baks.mottak.integrasjoner
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.baks.mottak.journalføring.AdressebeskyttelesesgraderingService
+import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.kontrakter.felles.Tema
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -12,16 +13,16 @@ import org.junit.jupiter.params.provider.EnumSource
 
 class EnhetsnummerServiceTest {
     private val mockedHentEnhetClient: HentEnhetClient = mockk()
-    private val mockedPdlClient: PdlClient = mockk()
     private val mockedArbeidsfordelingClient: ArbeidsfordelingClient = mockk()
     private val mockedAdressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService = mockk()
+    private val mockedJournalpostBrukerService: JournalpostBrukerService = mockk()
     private val enhetsnummerService: EnhetsnummerService =
         EnhetsnummerService(
             hentEnhetClient = mockedHentEnhetClient,
-            pdlClient = mockedPdlClient,
             arbeidsfordelingClient = mockedArbeidsfordelingClient,
-            adressebeskyttelesesgraderingService = mockedAdressebeskyttelesesgraderingService
-    )
+            adressebeskyttelesesgraderingService = mockedAdressebeskyttelesesgraderingService,
+            journalpostBrukerService = mockedJournalpostBrukerService,
+        )
 
     private val digitalKanal = "NAV_NO"
 
@@ -348,12 +349,14 @@ class EnhetsnummerServiceTest {
         } returns false
 
         every {
-            mockedPdlClient.hentPersonident(journalpost.bruker!!.id, tema)
+            mockedJournalpostBrukerService.tilPersonIdent(journalpost.bruker!!, tema)
         } returns "123456789"
 
         every {
             mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(any(), any())
-        } returns no.nav.familie.kontrakter.felles.arbeidsfordeling.Enhet(enhetId = "789", "Hønefoss")
+        } returns
+            no.nav.familie.kontrakter.felles.arbeidsfordeling
+                .Enhet(enhetId = "789", "Hønefoss")
         // Act
         val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
 

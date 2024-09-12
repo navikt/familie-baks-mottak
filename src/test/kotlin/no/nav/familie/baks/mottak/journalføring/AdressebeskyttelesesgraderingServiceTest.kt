@@ -1,9 +1,6 @@
 package no.nav.familie.baks.mottak.journalføring
 
-import org.junit.jupiter.api.Assertions.*
-
 class AdressebeskyttelesesgraderingServiceTest {
-
     /*
 
     TODO : Fix this test

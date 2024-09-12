@@ -5,8 +5,6 @@ import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig.Companion.HOPP_OVER_INFOTRYGD_SJEKK
 import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
-import no.nav.familie.baks.mottak.integrasjoner.Bruker
-import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.BARN
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus.AVSLUTTET
@@ -22,6 +20,7 @@ import no.nav.familie.baks.mottak.integrasjoner.RestFagsak
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.integrasjoner.StatusKode
 import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringBarnetrygdService
+import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
@@ -49,6 +48,7 @@ class JournalhendelseBarnetrygdRutingTask(
     private val journalpostClient: JournalpostClient,
     private val unleashNextMedContextService: UnleashNextMedContextService,
     private val automatiskJournalføringBarnetrygdService: AutomatiskJournalføringBarnetrygdService,
+    private val journalpostBrukerService: JournalpostBrukerService,
 ) : AsyncTaskStep {
     private val tema = Tema.BAR
     private val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
@@ -58,7 +58,7 @@ class JournalhendelseBarnetrygdRutingTask(
     override fun doTask(task: Task) {
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
         val brukersIdent = task.metadata["personIdent"] as String?
-        val personIdent by lazy { tilPersonIdent(journalpost.bruker!!, tema) }
+        val personIdent by lazy { journalpostBrukerService.tilPersonIdent(journalpost.bruker!!, tema) }
         val fagsakId = baSakClient.hentFagsaknummerPåPersonident(personIdent)
 
         val (baSak, infotrygdSak) = brukersIdent?.run { søkEtterSakIBaSakOgInfotrygd(this) } ?: Pair(null, null)
@@ -173,15 +173,6 @@ class JournalhendelseBarnetrygdRutingTask(
     }
 
     fun Sakspart?.finnes(): Boolean = this != null
-
-    private fun tilPersonIdent(
-        bruker: Bruker,
-        tema: Tema,
-    ): String =
-        when (bruker.type) {
-            BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema)
-            else -> bruker.id
-        }
 
     companion object {
         const val TASK_STEP_TYPE = "journalhendelseBarnetrygdRuting"

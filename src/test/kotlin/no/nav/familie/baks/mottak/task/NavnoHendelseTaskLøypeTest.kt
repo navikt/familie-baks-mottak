@@ -23,6 +23,7 @@ import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.integrasjoner.StatusKode
 import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringBarnetrygdService
+import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
@@ -43,7 +44,8 @@ class NavnoHendelseTaskLøypeTest {
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
     private val mockUnleashNextMedContextService: UnleashNextMedContextService = mockk()
-    private val mockAutomatiskJournalføringBarnetrygdService: AutomatiskJournalføringBarnetrygdService = mockk();
+    private val mockAutomatiskJournalføringBarnetrygdService: AutomatiskJournalføringBarnetrygdService = mockk()
+    private val mockJournalpostBrukerService: JournalpostBrukerService = mockk()
 
     private val rutingSteg =
         JournalhendelseBarnetrygdRutingTask(
@@ -53,7 +55,8 @@ class NavnoHendelseTaskLøypeTest {
             taskService = mockTaskService,
             journalpostClient = mockJournalpostClient,
             unleashNextMedContextService = mockUnleashNextMedContextService,
-            automatiskJournalføringBarnetrygdService = mockAutomatiskJournalføringBarnetrygdService
+            automatiskJournalføringBarnetrygdService = mockAutomatiskJournalføringBarnetrygdService,
+            journalpostBrukerService = mockJournalpostBrukerService,
         )
 
     private val journalføringSteg =
@@ -108,11 +111,12 @@ class NavnoHendelseTaskLøypeTest {
         every {
             mockUnleashNextMedContextService.isEnabled(any(), any())
         } returns false
+
+        every { mockJournalpostBrukerService.tilPersonIdent(any(), any()) } returns "12345678910"
     }
 
     @Test
     fun `Skal opprette JFR-oppgave med tekst om at bruker har sak i BA-sak`() {
-
         // Arrange
         every {
             mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
@@ -120,7 +124,7 @@ class NavnoHendelseTaskLøypeTest {
 
         every { mockSakClient.hentFagsaknummerPåPersonident(any()) } returns FAGSAK_ID
 
-        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any()) } returns  false
+        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any()) } returns false
 
         // Act
         kjørRutingTaskOgReturnerNesteTask().run {
@@ -146,7 +150,7 @@ class NavnoHendelseTaskLøypeTest {
 
         every { mockSakClient.hentFagsaknummerPåPersonident(any()) } returns FAGSAK_ID
 
-        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any()) } returns  false
+        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any()) } returns false
 
         // Act
         kjørRutingTaskOgReturnerNesteTask().run {
@@ -176,7 +180,7 @@ class NavnoHendelseTaskLøypeTest {
             mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
         } returns InfotrygdSøkResponse(listOf(StønadDto()), listOf(StønadDto()))
 
-        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any()) } returns  false
+        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any()) } returns false
 
         // Act
         kjørRutingTaskOgReturnerNesteTask().run { journalføringSteg.doTask(this) }
@@ -192,11 +196,10 @@ class NavnoHendelseTaskLøypeTest {
 
     @Test
     fun `Skal opprette JFR-oppgave uten tekst siden bruker ikke har sak i noen system`() {
-
         // Arrange
         every { mockSakClient.hentFagsaknummerPåPersonident(any()) } returns FAGSAK_ID
 
-        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any()) } returns  false
+        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any()) } returns false
 
         // Act
         kjørRutingTaskOgReturnerNesteTask().run { journalføringSteg.doTask(this) }
@@ -230,7 +233,7 @@ class NavnoHendelseTaskLøypeTest {
                 emptyList(),
             )
 
-        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any()) } returns  false
+        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any()) } returns false
 
         // Act
         kjørRutingTaskOgReturnerNesteTask().run { journalføringSteg.doTask(this) }

@@ -1,5 +1,6 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
+import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.harEøsSteg
 import no.nav.familie.kontrakter.felles.Behandlingstema
@@ -15,8 +16,16 @@ class BarnetrygdOppgaveMapper(
     enhetsnummerService: EnhetsnummerService,
     arbeidsfordelingClient: ArbeidsfordelingClient,
     pdlClient: PdlClient,
+    journalpostBrukerService: JournalpostBrukerService,
     val søknadRepository: SøknadRepository,
-) : AbstractOppgaveMapper(hentEnhetClient, unleashService, enhetsnummerService, pdlClient, arbeidsfordelingClient) {
+) : AbstractOppgaveMapper(
+        hentEnhetClient = hentEnhetClient,
+        unleashService = unleashService,
+        enhetsnummerService = enhetsnummerService,
+        pdlClient = pdlClient,
+        arbeidsfordelingClient = arbeidsfordelingClient,
+        journalpostBrukerService = journalpostBrukerService,
+    ) {
     override val tema: Tema = Tema.BAR
 
     // Behandlingstema og behandlingstype settes basert på regelsettet som er dokumentert nederst her: https://confluence.adeo.no/display/TFA/Mottak+av+dokumenter
@@ -44,6 +53,7 @@ class BarnetrygdOppgaveMapper(
                 } else {
                     Behandlingstype.NASJONAL
                 }
+
             hoveddokumentErÅrligDifferanseutbetalingAvBarnetrygd(journalpost) -> Behandlingstype.Utland
             else -> null
         }

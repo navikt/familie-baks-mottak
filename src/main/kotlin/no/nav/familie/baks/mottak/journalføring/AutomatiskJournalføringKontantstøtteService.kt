@@ -2,7 +2,13 @@ package no.nav.familie.baks.mottak.journalføring
 
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
-import no.nav.familie.baks.mottak.integrasjoner.*
+import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
+import no.nav.familie.baks.mottak.integrasjoner.Journalpost
+import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.erDigitalKanal
+import no.nav.familie.baks.mottak.integrasjoner.erKontantstøtteSøknad
+import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
 import no.nav.familie.kontrakter.felles.Tema
 import org.springframework.stereotype.Service
 
@@ -13,6 +19,7 @@ class AutomatiskJournalføringKontantstøtteService(
     private val ksSakClient: KsSakClient,
     private val pdlClient: PdlClient,
     private val adressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService,
+    private val journalpostBrukerService: JournalpostBrukerService,
 ) {
     private val tema = Tema.KON
     private val enheterSomIkkeSkalHaAutomatiskJournalføring = listOf("4863")
@@ -30,7 +37,7 @@ class AutomatiskJournalføringKontantstøtteService(
                 defaultValue = false,
             )
 
-        val personIdent by lazy { tilPersonIdent(journalpost.bruker!!, tema) }
+        val personIdent by lazy { journalpostBrukerService.tilPersonIdent(journalpost.bruker!!, tema) }
         val harÅpenBehandlingIFagsak by lazy { ksSakClient.hentMinimalRestFagsak(fagsakId).finnesÅpenBehandlingPåFagsak() }
 
         if (adressebeskyttelesesgraderingService.finnesAdressebeskyttelsegradringPåJournalpost(tema, journalpost)) {
@@ -44,13 +51,4 @@ class AutomatiskJournalføringKontantstøtteService(
             arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdent, tema).enhetId !in enheterSomIkkeSkalHaAutomatiskJournalføring &&
             !harÅpenBehandlingIFagsak
     }
-
-    private fun tilPersonIdent(
-        bruker: Bruker,
-        tema: Tema,
-    ): String =
-        when (bruker.type) {
-            BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema)
-            else -> bruker.id
-        }
 }

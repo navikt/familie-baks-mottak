@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.baks.mottak.DevLauncher
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
+import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
 import no.nav.familie.kontrakter.felles.Behandlingstema
@@ -39,6 +40,7 @@ class OppgaveMapperTest(
     private val mockHentEnhetClient: HentEnhetClient = mockk(relaxed = true)
     private val mockEnhetsnummerService: EnhetsnummerService = mockk()
     private val mockArbeidsfordelingClient: ArbeidsfordelingClient = mockk(relaxed = true)
+    private val mockJournalpostBrukerService: JournalpostBrukerService = mockk()
 
     private val barnetrygdOppgaveMapper: IOppgaveMapper =
         BarnetrygdOppgaveMapper(
@@ -48,6 +50,7 @@ class OppgaveMapperTest(
             pdlClient = mockPdlClient,
             søknadRepository = barnetrygdSøknadRepository,
             arbeidsfordelingClient = mockArbeidsfordelingClient,
+            journalpostBrukerService = mockJournalpostBrukerService,
         )
 
     private val kontantstøtteOppgaveMapper: IOppgaveMapper =
@@ -58,6 +61,7 @@ class OppgaveMapperTest(
             pdlClient = mockPdlClient,
             kontantstøtteSøknadRepository = kontantstøtteSøknadRepository,
             arbeidsfordelingClient = mockArbeidsfordelingClient,
+            journalpostBrukerService = mockJournalpostBrukerService,
         )
 
     @BeforeEach

@@ -23,6 +23,7 @@ import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringBarnetrygdService
+import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.prosessering.domene.Task
@@ -44,6 +45,7 @@ class SkanHendelseTaskLøypeTest {
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
     private val mockUnleashNextMedContextService: UnleashNextMedContextService = mockk()
     private val mockAutomatiskJournalføringBarnetrygdService: AutomatiskJournalføringBarnetrygdService = mockk()
+    private val mockJournalpostBrukerService: JournalpostBrukerService = mockk()
 
     private val rutingSteg =
         JournalhendelseBarnetrygdRutingTask(
@@ -53,7 +55,8 @@ class SkanHendelseTaskLøypeTest {
             taskService = mockTaskService,
             journalpostClient = mockJournalpostClient,
             unleashNextMedContextService = mockUnleashNextMedContextService,
-            automatiskJournalføringBarnetrygdService = mockAutomatiskJournalføringBarnetrygdService
+            automatiskJournalføringBarnetrygdService = mockAutomatiskJournalføringBarnetrygdService,
+            journalpostBrukerService = mockJournalpostBrukerService,
         )
 
     private val journalføringSteg =
@@ -91,10 +94,6 @@ class SkanHendelseTaskLøypeTest {
         } returns Task("dummy", "payload")
 
         every {
-            mockPdlClient.hentPersonident(any(), any())
-        } returns "12345678910"
-
-        every {
             mockPdlClient.hentIdenter(any(), any())
         } returns listOf(IdentInformasjon("12345678910", historisk = false, gruppe = "FOLKEREGISTERIDENT"))
 
@@ -113,11 +112,12 @@ class SkanHendelseTaskLøypeTest {
         every {
             mockUnleashNextMedContextService.isEnabled(any(), any())
         } returns false
+
+        every { mockJournalpostBrukerService.tilPersonIdent(any(), any()) } returns "12345678910"
     }
 
     @Test
     fun `Oppretter oppgave med beskrivelse som sier at bruker på journalpost har sak i ba-sak`() {
-
         // Arrange
         val sakssystemMarkering = slot<String>()
         every {

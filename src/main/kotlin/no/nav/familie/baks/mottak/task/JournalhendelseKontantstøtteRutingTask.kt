@@ -2,8 +2,6 @@ package no.nav.familie.baks.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.baks.mottak.integrasjoner.Bruker
-import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.Identgruppe
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdKontantstøtteClient
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
@@ -11,6 +9,7 @@ import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.StonadDto
 import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringKontantstøtteService
+import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.prosessering.AsyncTaskStep
@@ -34,6 +33,7 @@ class JournalhendelseKontantstøtteRutingTask(
     private val taskService: TaskService,
     private val journalpostClient: JournalpostClient,
     private val automatiskJournalføringKontantstøtteService: AutomatiskJournalføringKontantstøtteService,
+    private val journalpostBrukerService: JournalpostBrukerService,
 ) : AsyncTaskStep {
     private val tema = Tema.KON
     private val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
@@ -42,7 +42,7 @@ class JournalhendelseKontantstøtteRutingTask(
 
     override fun doTask(task: Task) {
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
-        val brukersIdent = tilPersonIdent(journalpost.bruker!!, tema)
+        val brukersIdent = journalpostBrukerService.tilPersonIdent(journalpost.bruker!!, tema)
         val fagsakId = ksSakClient.hentFagsaknummerPåPersonident(brukersIdent)
 
         val harLøpendeSakIInfotrygd = harLøpendeSakIInfotrygd(brukersIdent)
@@ -127,15 +127,6 @@ class JournalhendelseKontantstøtteRutingTask(
             false
         }
     }
-
-    private fun tilPersonIdent(
-        bruker: Bruker,
-        tema: Tema,
-    ): String =
-        when (bruker.type) {
-            BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema)
-            else -> bruker.id
-        }
 
     companion object {
         const val TASK_STEP_TYPE = "journalhendelseKontantstøtteRuting"

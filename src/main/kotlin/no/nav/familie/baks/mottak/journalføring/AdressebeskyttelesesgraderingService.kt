@@ -1,6 +1,10 @@
 package no.nav.familie.baks.mottak.journalføring
 
-import no.nav.familie.baks.mottak.integrasjoner.*
+import no.nav.familie.baks.mottak.integrasjoner.Bruker
+import no.nav.familie.baks.mottak.integrasjoner.Journalpost
+import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.SøknadsidenterService
+import no.nav.familie.baks.mottak.integrasjoner.erDigitalSøknad
 import no.nav.familie.kontrakter.felles.Tema
 import org.springframework.stereotype.Service
 
@@ -8,6 +12,7 @@ import org.springframework.stereotype.Service
 class AdressebeskyttelesesgraderingService(
     private val pdlClient: PdlClient,
     private val søknadsidenterService: SøknadsidenterService,
+    private val journalpostBrukerService: JournalpostBrukerService,
 ) {
     fun finnesAdressebeskyttelsegradringPåJournalpost(
         tema: Tema,
@@ -46,7 +51,7 @@ class AdressebeskyttelesesgraderingService(
             søknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpostId)
         } else {
             Pair(
-                tilPersonIdent(
+                journalpostBrukerService.tilPersonIdent(
                     bruker,
                     tema,
                 ),
@@ -64,20 +69,11 @@ class AdressebeskyttelesesgraderingService(
             søknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpostId)
         } else {
             Pair(
-                tilPersonIdent(
+                journalpostBrukerService.tilPersonIdent(
                     bruker,
                     tema,
                 ),
                 emptyList(),
             )
-        }
-
-    private fun tilPersonIdent(
-        bruker: Bruker,
-        tema: Tema,
-    ): String =
-        when (bruker.type) {
-            BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema)
-            else -> bruker.id
         }
 }

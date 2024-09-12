@@ -1,15 +1,11 @@
 package no.nav.familie.baks.mottak.task
 
 import io.mockk.every
-import io.mockk.impl.annotations.InjectMockKs
-import io.mockk.impl.annotations.MockK
-import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.slot
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.domene.personopplysning.Person
-import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BarnDto
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
@@ -27,6 +23,7 @@ import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
 import no.nav.familie.baks.mottak.integrasjoner.StonadDto
 import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringKontantstøtteService
+import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
@@ -34,7 +31,6 @@ import no.nav.familie.kontrakter.felles.personopplysning.ForelderBarnRelasjon
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import java.time.YearMonth
 import java.util.Properties
 import kotlin.test.assertEquals
@@ -47,14 +43,17 @@ class JournalhendelseKontantstøtteRutingTaskTest {
     private val journalpostClient: JournalpostClient = mockk()
     private val unleashService: UnleashNextMedContextService = mockk()
     private val automatiskJournalføringKontantstøtteService: AutomatiskJournalføringKontantstøtteService = mockk()
-    private val journalhendelseKontantstøtteRutingTask: JournalhendelseKontantstøtteRutingTask = JournalhendelseKontantstøtteRutingTask(
-        pdlClient = pdlClient,
-        ksSakClient = ksSakClient,
-        infotrygdKontantstøtteClient = infotrygdKontantstøtteClient,
-        taskService = taskService,
-        journalpostClient = journalpostClient,
-        automatiskJournalføringKontantstøtteService = automatiskJournalføringKontantstøtteService,
-    )
+    private val journalpostBrukerService: JournalpostBrukerService = mockk()
+    private val journalhendelseKontantstøtteRutingTask: JournalhendelseKontantstøtteRutingTask =
+        JournalhendelseKontantstøtteRutingTask(
+            pdlClient = pdlClient,
+            ksSakClient = ksSakClient,
+            infotrygdKontantstøtteClient = infotrygdKontantstøtteClient,
+            taskService = taskService,
+            journalpostClient = journalpostClient,
+            automatiskJournalføringKontantstøtteService = automatiskJournalføringKontantstøtteService,
+            journalpostBrukerService = journalpostBrukerService,
+        )
 
     val søkerFnr = "12345678910"
     val barn1Fnr = "11223344556"
@@ -66,6 +65,7 @@ class JournalhendelseKontantstøtteRutingTaskTest {
         val taskSlot = slot<Task>()
         setupPDLMocks()
         setupKsSakClientMocks()
+        every { journalpostBrukerService.tilPersonIdent(any(), any()) } returns "TEST"
 
         every { unleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER, false) } returns false
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
@@ -124,6 +124,7 @@ class JournalhendelseKontantstøtteRutingTaskTest {
         val taskSlot = slot<Task>()
         setupPDLMocks()
         setupKsSakClientMocks()
+        every { journalpostBrukerService.tilPersonIdent(any(), any()) } returns "TEST"
 
         every { unleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER, false) } returns false
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns true
@@ -182,6 +183,7 @@ class JournalhendelseKontantstøtteRutingTaskTest {
         val taskSlot = slot<Task>()
         setupPDLMocks()
         setupKsSakClientMocks()
+        every { journalpostBrukerService.tilPersonIdent(any(), any()) } returns "TEST"
 
         every { unleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER, false) } returns false
         every { infotrygdKontantstøtteClient.harKontantstøtteIInfotrygd(any()) } returns false
@@ -253,8 +255,6 @@ class JournalhendelseKontantstøtteRutingTaskTest {
                     historisk = false,
                 ),
             )
-
-        every { pdlClient.hentPersonident(any(), any()) } returns "TEST"
     }
 
     private fun setupKsSakClientMocks() {
