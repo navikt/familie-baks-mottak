@@ -31,9 +31,10 @@ jobs:
     name: Build and push
     runs-on: ubuntu-latest
     permissions:
-      contents: "read"
-      id-token: "write"
+      contents: read
+      id-token: write
       packages: write
+      pull-requests: write
     steps:
       - run: echo "event navn er:" ${{ github.event_name }} ${{ github.event.action }}
       - uses: actions/checkout@v4
@@ -51,9 +52,28 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.READER_TOKEN }}
         run: mvn -B --no-transfer-progress package --settings .m2/maven-settings.xml --file pom.xml
 
+      - name: Upload Report
+        uses: 'actions/upload-artifact@v4'
+        if: github.event_name != 'merge_group'
+        with:
+          name: jacoco-report
+          path: ${{ github.workspace }}/target/site/jacoco/
+          retention-days: 2
+
+      - name: Add coverage to PR
+        id: jacoco
+        if: github.event_name != 'merge_group'
+        uses: madrapps/jacoco-report@v1.7.0
+        with:
+          paths: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 70
+          min-coverage-changed-files: 70
+          title: Code Coverage
+
       - uses: nais/docker-build-push@v0
         id: docker-push
-        if: github.event.pull_request.user.login != 'dependabot[bot]'
+        if: github.event_name != 'merge_group'
         with:
           team: teamfamilie
           push_image: true
