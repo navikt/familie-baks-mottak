@@ -54,6 +54,7 @@ jobs:
 
       - name: Upload Report
         uses: 'actions/upload-artifact@v4'
+        if: github.event_name != 'merge_group'
         with:
           name: jacoco-report
           path: ${{ github.workspace }}/target/site/jacoco/
@@ -61,6 +62,7 @@ jobs:
 
       - name: Add coverage to PR
         id: jacoco
+        if: github.event_name != 'merge_group'
         uses: madrapps/jacoco-report@v1.7.0
         with:
           paths: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
