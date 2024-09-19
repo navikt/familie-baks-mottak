@@ -472,6 +472,7 @@
                 <configuration>
                     <excludes>
                         <exclude>**/*config.*</exclude>
+                        <exclude>no.nav.joarkjournalfoeringhendelser.*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
