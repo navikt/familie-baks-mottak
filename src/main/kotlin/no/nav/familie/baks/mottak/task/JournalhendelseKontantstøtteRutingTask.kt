@@ -12,7 +12,6 @@ import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringKontant
 import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
-import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
@@ -34,7 +33,7 @@ class JournalhendelseKontantstøtteRutingTask(
     private val journalpostClient: JournalpostClient,
     private val automatiskJournalføringKontantstøtteService: AutomatiskJournalføringKontantstøtteService,
     private val journalpostBrukerService: JournalpostBrukerService,
-) : AsyncTaskStep {
+) : AbstractJournalhendelseRutingTask(taskService) {
     private val tema = Tema.KON
     private val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
 
@@ -42,7 +41,16 @@ class JournalhendelseKontantstøtteRutingTask(
 
     override fun doTask(task: Task) {
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
-        val brukersIdent = journalpostBrukerService.tilPersonIdent(journalpost.bruker!!, tema)
+
+        if (journalpost.bruker == null) {
+            opprettJournalføringOppgaveTask(
+                sakssystemMarkering = "Ingen bruker er satt på journalpost. Kan ikke utlede om bruker har sak i Infotrygd eller KS-sak.",
+                task = task,
+            )
+            return
+        }
+
+        val brukersIdent = journalpostBrukerService.tilPersonIdent(journalpost.bruker, tema)
         val fagsakId = ksSakClient.hentFagsaknummerPåPersonident(brukersIdent)
 
         val harLøpendeSakIInfotrygd = harLøpendeSakIInfotrygd(brukersIdent)
@@ -69,11 +77,7 @@ class JournalhendelseKontantstøtteRutingTask(
                     },
             ).apply { taskService.save(this) }
         } else {
-            Task(
-                type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
-                payload = sakssystemMarkering,
-                properties = task.metadata,
-            ).apply { taskService.save(this) }
+            opprettJournalføringOppgaveTask(sakssystemMarkering = sakssystemMarkering, task = task)
         }
     }
 
