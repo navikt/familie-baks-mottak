@@ -72,8 +72,8 @@ class JournalhendelseBarnetrygdRutingTaskTest {
                     },
             ),
         )
-        // Assert
 
+        // Assert
         val opprettetTask = taskSlot.captured
 
         verify(exactly = 1) { taskService.save(any()) }
