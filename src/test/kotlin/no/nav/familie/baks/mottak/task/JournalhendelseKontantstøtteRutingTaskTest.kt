@@ -3,6 +3,7 @@ package no.nav.familie.baks.mottak.task
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import io.mockk.verify
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.domene.personopplysning.Person
@@ -219,6 +220,44 @@ class JournalhendelseKontantstøtteRutingTaskTest {
 
         // Assert
         assertEquals("", taskSlot.captured.payload)
+    }
+
+    @Test
+    fun `doTask - skal opprette journalføring-oppgave dersom bruker er null på journalpost`() {
+        // Arrange
+        val journalpostId = "1"
+        val taskSlot = slot<Task>()
+
+        every { journalpostClient.hentJournalpost(journalpostId) } returns
+            Journalpost(
+                journalpostId = journalpostId,
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker = null,
+            )
+
+        every { taskService.save(capture(taskSlot)) } returns mockk()
+
+        // Act
+        journalhendelseKontantstøtteRutingTask.doTask(
+            Task(
+                type = JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE,
+                payload = "SKAN_IM",
+                properties =
+                    Properties().apply {
+                        this["journalpostId"] = journalpostId
+                        this["fagsakId"] = "123"
+                        this["tema"] = Tema.KON.name
+                    },
+            ),
+        )
+        // Assert
+
+        val opprettetTask = taskSlot.captured
+
+        verify(exactly = 1) { taskService.save(any()) }
+        assertEquals(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE, opprettetTask.type)
+        assertEquals("Ingen bruker er satt på journalpost. Kan ikke utlede om bruker har sak i Infotrygd eller KS-sak.", opprettetTask.payload)
     }
 
     private fun setupPDLMocks() {

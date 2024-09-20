@@ -42,7 +42,16 @@ class JournalhendelseKontantstøtteRutingTask(
 
     override fun doTask(task: Task) {
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
-        val brukersIdent = journalpostBrukerService.tilPersonIdent(journalpost.bruker!!, tema)
+
+        if (journalpost.bruker == null) {
+            opprettJournalføringOppgaveTask(
+                sakssystemMarkering = "Ingen bruker er satt på journalpost. Kan ikke utlede om bruker har sak i Infotrygd eller KS-sak.",
+                task = task,
+            )
+            return
+        }
+
+        val brukersIdent = journalpostBrukerService.tilPersonIdent(journalpost.bruker, tema)
         val fagsakId = ksSakClient.hentFagsaknummerPåPersonident(brukersIdent)
 
         val harLøpendeSakIInfotrygd = harLøpendeSakIInfotrygd(brukersIdent)
@@ -69,12 +78,19 @@ class JournalhendelseKontantstøtteRutingTask(
                     },
             ).apply { taskService.save(this) }
         } else {
-            Task(
-                type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
-                payload = sakssystemMarkering,
-                properties = task.metadata,
-            ).apply { taskService.save(this) }
+            opprettJournalføringOppgaveTask(sakssystemMarkering = sakssystemMarkering, task = task)
         }
+    }
+
+    private fun opprettJournalføringOppgaveTask(
+        sakssystemMarkering: String,
+        task: Task,
+    ) {
+        Task(
+            type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
+            payload = sakssystemMarkering,
+            properties = task.metadata,
+        ).apply { taskService.save(this) }
     }
 
     private fun hentSakssystemMarkering(harLøpendeSakIInfotrygd: Boolean): String {
