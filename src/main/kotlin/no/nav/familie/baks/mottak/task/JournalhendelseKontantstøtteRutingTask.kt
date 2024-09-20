@@ -12,7 +12,6 @@ import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringKontant
 import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
-import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
@@ -34,7 +33,7 @@ class JournalhendelseKontantstøtteRutingTask(
     private val journalpostClient: JournalpostClient,
     private val automatiskJournalføringKontantstøtteService: AutomatiskJournalføringKontantstøtteService,
     private val journalpostBrukerService: JournalpostBrukerService,
-) : AsyncTaskStep {
+) : AbstractJournalhendelseRutingTask(taskService) {
     private val tema = Tema.KON
     private val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
 
@@ -80,17 +79,6 @@ class JournalhendelseKontantstøtteRutingTask(
         } else {
             opprettJournalføringOppgaveTask(sakssystemMarkering = sakssystemMarkering, task = task)
         }
-    }
-
-    private fun opprettJournalføringOppgaveTask(
-        sakssystemMarkering: String,
-        task: Task,
-    ) {
-        Task(
-            type = OpprettJournalføringOppgaveTask.TASK_STEP_TYPE,
-            payload = sakssystemMarkering,
-            properties = task.metadata,
-        ).apply { taskService.save(this) }
     }
 
     private fun hentSakssystemMarkering(harLøpendeSakIInfotrygd: Boolean): String {
