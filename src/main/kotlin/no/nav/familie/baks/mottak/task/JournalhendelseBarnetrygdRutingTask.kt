@@ -60,7 +60,10 @@ class JournalhendelseBarnetrygdRutingTask(
         val brukersIdent = task.metadata["personIdent"] as String?
 
         if (journalpost.bruker == null) {
-            opprettJournalføringOppgaveTask("Ingen bruker er satt på journalpost. Kan ikke utlede om bruker har sak i Infotrygd eller BA-sak.", task)
+            opprettJournalføringOppgaveTask(
+                sakssystemMarkering = "Ingen bruker er satt på journalpost. Kan ikke utlede om bruker har sak i Infotrygd eller BA-sak.",
+                task = task,
+            )
             return
         }
 
@@ -93,7 +96,7 @@ class JournalhendelseBarnetrygdRutingTask(
                     },
             ).apply { taskService.save(this) }
         } else {
-            opprettJournalføringOppgaveTask(sakssystemMarkering, task)
+            opprettJournalføringOppgaveTask(sakssystemMarkering = sakssystemMarkering, task = task)
         }
     }
 

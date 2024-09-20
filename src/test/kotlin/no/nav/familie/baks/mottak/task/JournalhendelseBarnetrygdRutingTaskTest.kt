@@ -18,7 +18,7 @@ import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.Properties
 import kotlin.test.assertEquals
 
 class JournalhendelseBarnetrygdRutingTaskTest {
