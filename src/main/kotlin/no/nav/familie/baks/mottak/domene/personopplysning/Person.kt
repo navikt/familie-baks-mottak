@@ -21,6 +21,6 @@ data class PersonIdent(
 )
 
 fun Person.harAdresseGradering(): Boolean =
-    this.adressebeskyttelseGradering.any { it.erFortrolig() || it.erStrengtFortroligEllerStrengtFortroligUtland() }
+    this.adressebeskyttelseGradering.any { it.erFortrolig() || it.erStrengtFortrolig() || it.erStrengtFortroligUtland() }
 
 fun Person.harBostedsadresse(): Boolean = this.bostedsadresse != null
