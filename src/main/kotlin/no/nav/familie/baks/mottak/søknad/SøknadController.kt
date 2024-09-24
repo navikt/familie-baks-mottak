@@ -8,8 +8,8 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -21,8 +21,8 @@ class SøknadController(
 ) {
     @GetMapping(value = ["/hent-adressebeskyttelse/{tema}/{journalpostId}"])
     fun hentStrengesteAdressebeskyttelsegraderingIDigitalSøknad(
-        @RequestParam("tema") tema: Tema,
-        @RequestParam("journalpostId") journalpostId: String,
+        @PathVariable("tema") tema: Tema,
+        @PathVariable("journalpostId") journalpostId: String,
     ): ResponseEntity<ADRESSEBESKYTTELSEGRADERING> {
         val journalpost = journalpostClient.hentJournalpost(journalpostId = journalpostId)
         val strengesteAdressebeskyttelsesgradering = adressebeskyttelesesgraderingService.finnStrengesteAdressebeskyttelsegraderingPåJournalpost(tema = tema, journalpost = journalpost)
