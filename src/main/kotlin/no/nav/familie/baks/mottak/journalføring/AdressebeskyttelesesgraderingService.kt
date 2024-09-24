@@ -1,11 +1,13 @@
 package no.nav.familie.baks.mottak.journalføring
 
+import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelsesgradering
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.SøknadsidenterService
 import no.nav.familie.baks.mottak.integrasjoner.erDigitalSøknad
 import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.personopplysning.ADRESSEBESKYTTELSEGRADERING
 import org.springframework.stereotype.Service
 
 @Service
@@ -17,7 +19,25 @@ class AdressebeskyttelesesgraderingService(
     fun finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
         tema: Tema,
         journalpost: Journalpost,
-    ): Boolean {
+    ): Boolean = finnAdressebeskyttelsegraderingPåJournalpost(tema, journalpost).any { it.erStrengtFortrolig() || it.erStrengtFortroligUtland() }
+
+    fun finnStrengesteAdressebeskyttelsegraderingPåJournalpost(
+        tema: Tema,
+        journalpost: Journalpost,
+    ): ADRESSEBESKYTTELSEGRADERING {
+        val adressebeskyttelsesgraderingPåJournalpost = finnAdressebeskyttelsegraderingPåJournalpost(tema, journalpost)
+        return when {
+            adressebeskyttelsesgraderingPåJournalpost.any { it.erStrengtFortroligUtland() } -> ADRESSEBESKYTTELSEGRADERING.STRENGT_FORTROLIG_UTLAND
+            adressebeskyttelsesgraderingPåJournalpost.any { it.erStrengtFortrolig() } -> ADRESSEBESKYTTELSEGRADERING.STRENGT_FORTROLIG
+            adressebeskyttelsesgraderingPåJournalpost.any { it.erFortrolig() } -> ADRESSEBESKYTTELSEGRADERING.FORTROLIG
+            else -> ADRESSEBESKYTTELSEGRADERING.UGRADERT
+        }
+    }
+
+    private fun finnAdressebeskyttelsegraderingPåJournalpost(
+        tema: Tema,
+        journalpost: Journalpost,
+    ): List<Adressebeskyttelsesgradering> {
         if (journalpost.bruker == null) {
             throw IllegalStateException("Bruker på journalpost ${journalpost.journalpostId} kan ikke være null")
         }
@@ -38,7 +58,7 @@ class AdressebeskyttelesesgraderingService(
         return alleIdenter
             .map { pdlClient.hentPerson(it, "hentperson-med-adressebeskyttelse", tema) }
             .flatMap { it.adressebeskyttelse }
-            .any { it.gradering.erStrengtFortrolig() }
+            .map { it.gradering }
     }
 
     private fun finnIdenterForKontantstøtte(

@@ -326,7 +326,9 @@ enum class Adressebeskyttelsesgradering {
     UGRADERT,
     ;
 
-    fun erStrengtFortrolig() = this == STRENGT_FORTROLIG || this == STRENGT_FORTROLIG_UTLAND
+    fun erStrengtFortrolig() = this == STRENGT_FORTROLIG
+
+    fun erStrengtFortroligUtland() = this == STRENGT_FORTROLIG_UTLAND
 
     fun erFortrolig(): Boolean = this == FORTROLIG
 }
