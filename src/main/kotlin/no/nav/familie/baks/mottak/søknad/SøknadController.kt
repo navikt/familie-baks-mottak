@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping(path = ["/api/hent-soknad/"], produces = [APPLICATION_JSON_VALUE])
+@RequestMapping(path = ["/api/soknad/"], produces = [APPLICATION_JSON_VALUE])
 @ProtectedWithClaims(issuer = "azuread")
 class SøknadController {
     @GetMapping(value = ["/hent-adressebeskyttelse/{tema}/{journalpostId}"])
