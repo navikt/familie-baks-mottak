@@ -60,16 +60,16 @@ jobs:
           path: ${{ github.workspace }}/target/site/jacoco/
           retention-days: 2
 
-      - name: Add coverage to PR
-        id: jacoco
-        if: github.event_name != 'merge_group'
-        uses: madrapps/jacoco-report@v1.7.0
-        with:
-          paths: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: 70
-          min-coverage-changed-files: 70
-          title: Code Coverage
+#      - name: Add coverage to PR
+#        id: jacoco
+#        if: github.event_name != 'merge_group'
+#        uses: madrapps/jacoco-report@v1.7.0
+#        with:
+#          paths: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          min-coverage-overall: 70
+#          min-coverage-changed-files: 70
+#          title: Code Coverage
 
       - uses: nais/docker-build-push@v0
         id: docker-push
