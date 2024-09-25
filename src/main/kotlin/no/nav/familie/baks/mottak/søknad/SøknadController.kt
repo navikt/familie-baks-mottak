@@ -19,7 +19,7 @@ class SøknadController(
     private val journalpostClient: JournalpostClient,
     private val adressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService,
 ) {
-    @GetMapping(value = ["/hent-adressebeskyttelse/{tema}/{journalpostId}"])
+    @GetMapping(value = ["/adressebeskyttelse/{tema}/{journalpostId}"])
     fun hentStrengesteAdressebeskyttelsegraderingIDigitalSøknad(
         @PathVariable("tema") tema: Tema,
         @PathVariable("journalpostId") journalpostId: String,
