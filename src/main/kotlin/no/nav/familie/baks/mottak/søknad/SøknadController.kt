@@ -23,7 +23,7 @@ class SøknadController(
     fun hentStrengesteAdressebeskyttelsegraderingIDigitalSøknad(
         @PathVariable("tema") tema: Tema,
         @PathVariable("journalpostId") journalpostId: String,
-    ): ResponseEntity<ADRESSEBESKYTTELSEGRADERING> {
+    ): ResponseEntity<ADRESSEBESKYTTELSEGRADERING?> {
         val journalpost = journalpostClient.hentJournalpost(journalpostId = journalpostId)
         val strengesteAdressebeskyttelsesgradering = adressebeskyttelesesgraderingService.finnStrengesteAdressebeskyttelsegraderingPåJournalpost(tema = tema, journalpost = journalpost)
         return ResponseEntity.ok(strengesteAdressebeskyttelsesgradering)

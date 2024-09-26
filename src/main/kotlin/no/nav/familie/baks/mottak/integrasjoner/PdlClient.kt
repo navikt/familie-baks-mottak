@@ -331,6 +331,8 @@ enum class Adressebeskyttelsesgradering {
     fun erStrengtFortroligUtland() = this == STRENGT_FORTROLIG_UTLAND
 
     fun erFortrolig(): Boolean = this == FORTROLIG
+
+    fun erUgradert(): Boolean = this == UGRADERT
 }
 
 enum class Identgruppe {

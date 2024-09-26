@@ -24,13 +24,14 @@ class AdressebeskyttelesesgraderingService(
     fun finnStrengesteAdressebeskyttelsegraderingPåJournalpost(
         tema: Tema,
         journalpost: Journalpost,
-    ): ADRESSEBESKYTTELSEGRADERING {
+    ): ADRESSEBESKYTTELSEGRADERING? {
         val adressebeskyttelsesgraderingPåJournalpost = finnAdressebeskyttelsegraderingPåJournalpost(tema, journalpost)
         return when {
             adressebeskyttelsesgraderingPåJournalpost.any { it.erStrengtFortroligUtland() } -> ADRESSEBESKYTTELSEGRADERING.STRENGT_FORTROLIG_UTLAND
             adressebeskyttelsesgraderingPåJournalpost.any { it.erStrengtFortrolig() } -> ADRESSEBESKYTTELSEGRADERING.STRENGT_FORTROLIG
             adressebeskyttelsesgraderingPåJournalpost.any { it.erFortrolig() } -> ADRESSEBESKYTTELSEGRADERING.FORTROLIG
-            else -> ADRESSEBESKYTTELSEGRADERING.UGRADERT
+            adressebeskyttelsesgraderingPåJournalpost.any { it.erUgradert() } -> ADRESSEBESKYTTELSEGRADERING.UGRADERT
+            else -> null
         }
     }
 
