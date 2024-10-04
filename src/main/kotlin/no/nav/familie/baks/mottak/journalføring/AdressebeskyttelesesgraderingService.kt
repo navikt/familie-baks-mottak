@@ -19,13 +19,13 @@ class AdressebeskyttelesesgraderingService(
     fun finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
         tema: Tema,
         journalpost: Journalpost,
-    ): Boolean = finnAdressebeskyttelsegraderingPåJournalpost(tema, journalpost).any { it.erStrengtFortrolig() || it.erStrengtFortroligUtland() }
+    ): Boolean = finnAdressebeskyttelsegraderingerPåJournalpost(tema, journalpost).any { it.erStrengtFortrolig() || it.erStrengtFortroligUtland() }
 
     fun finnStrengesteAdressebeskyttelsegraderingPåJournalpost(
         tema: Tema,
         journalpost: Journalpost,
     ): ADRESSEBESKYTTELSEGRADERING? {
-        val adressebeskyttelsesgraderingPåJournalpost = finnAdressebeskyttelsegraderingPåJournalpost(tema, journalpost)
+        val adressebeskyttelsesgraderingPåJournalpost = finnAdressebeskyttelsegraderingerPåJournalpost(tema, journalpost)
         return when {
             adressebeskyttelsesgraderingPåJournalpost.any { it.erStrengtFortroligUtland() } -> ADRESSEBESKYTTELSEGRADERING.STRENGT_FORTROLIG_UTLAND
             adressebeskyttelsesgraderingPåJournalpost.any { it.erStrengtFortrolig() } -> ADRESSEBESKYTTELSEGRADERING.STRENGT_FORTROLIG
@@ -35,7 +35,7 @@ class AdressebeskyttelesesgraderingService(
         }
     }
 
-    private fun finnAdressebeskyttelsegraderingPåJournalpost(
+    private fun finnAdressebeskyttelsegraderingerPåJournalpost(
         tema: Tema,
         journalpost: Journalpost,
     ): List<Adressebeskyttelsesgradering> {
@@ -49,7 +49,7 @@ class AdressebeskyttelesesgraderingService(
                 Tema.KON -> finnIdenterForKontantstøtte(tema, journalpost.bruker, journalpost.journalpostId, journalpost.erDigitalSøknad())
                 Tema.ENF,
                 Tema.OPP,
-                -> {
+                    -> {
                     throw IllegalStateException("Støtter ikke tema $tema")
                 }
             }
