@@ -17,6 +17,7 @@ import no.nav.familie.baks.mottak.integrasjoner.SøknadsidenterService
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.ADRESSEBESKYTTELSEGRADERING
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
@@ -34,573 +35,580 @@ class AdressebeskyttelesesgraderingServiceTest {
             journalpostBrukerService = mockedJournalpostBrukerService,
         )
 
-    @Test
-    fun `skal kaste feil når bruker ikke er satt på journalpost`() {
-        // Arrange
-        val journalpost =
-            Journalpost(
-                journalpostId = "123",
-                journalposttype = Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                bruker = null,
-            )
+    @Nested
+    inner class FinnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost {
 
-        // Act & Assert
-        val exception =
-            assertThrows<IllegalStateException> {
-                adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
-                    tema = Tema.BAR,
-                    journalpost = journalpost,
+        @Test
+        fun `skal kaste feil når bruker ikke er satt på journalpost`() {
+            // Arrange
+            val journalpost =
+                Journalpost(
+                    journalpostId = "123",
+                    journalposttype = Journalposttype.I,
+                    journalstatus = Journalstatus.MOTTATT,
+                    bruker = null,
                 )
-            }
-        assertThat(exception.message).isEqualTo("Bruker på journalpost ${journalpost.journalpostId} kan ikke være null")
-    }
 
-    @ParameterizedTest
-    @EnumSource(
-        value = Tema::class,
-        names = ["BAR", "KON"],
-        mode = EnumSource.Mode.EXCLUDE,
-    )
-    fun `skal kaste feil når tema ikke er støttet`(
-        tema: Tema,
-    ) {
-        // Arrange
-        val journalpost =
-            Journalpost(
-                journalpostId = "123",
-                journalposttype = Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                tema = tema.name,
-                bruker = Bruker("312", BrukerIdType.FNR),
-            )
+            // Act & Assert
+            val exception =
+                assertThrows<IllegalStateException> {
+                    adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
+                        tema = Tema.BAR,
+                        journalpost = journalpost,
+                    )
+                }
+            assertThat(exception.message).isEqualTo("Bruker på journalpost ${journalpost.journalpostId} kan ikke være null")
+        }
 
-        // Act & Assert
-        val exception =
-            assertThrows<IllegalStateException> {
+        @ParameterizedTest
+        @EnumSource(
+            value = Tema::class,
+            names = ["BAR", "KON"],
+            mode = EnumSource.Mode.EXCLUDE,
+        )
+        fun `skal kaste feil når tema ikke er støttet`(
+            tema: Tema,
+        ) {
+            // Arrange
+            val journalpost =
+                Journalpost(
+                    journalpostId = "123",
+                    journalposttype = Journalposttype.I,
+                    journalstatus = Journalstatus.MOTTATT,
+                    tema = tema.name,
+                    bruker = Bruker("312", BrukerIdType.FNR),
+                )
+
+            // Act & Assert
+            val exception =
+                assertThrows<IllegalStateException> {
+                    adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
+                        tema = tema,
+                        journalpost = journalpost,
+                    )
+                }
+            assertThat(exception.message).isEqualTo("Støtter ikke tema $tema")
+        }
+
+        @ParameterizedTest
+        @EnumSource(
+            value = Tema::class,
+            names = ["BAR", "KON"],
+        )
+        fun `skal returnere true om journalpost fra digital søknad er tilknyttet en strengt fotrolig person`(
+            tema: Tema,
+        ) {
+            // Arrange
+            val journalpost =
+                Journalpost(
+                    journalpostId = "123",
+                    journalposttype = Journalposttype.I,
+                    journalstatus = Journalstatus.MOTTATT,
+                    tema = tema.name,
+                    journalforendeEnhet = "1",
+                    kanal = "NAV_NO",
+                    dokumenter = hentDokumenterMedRiktigBrevkode(tema),
+                    bruker = Bruker("312", BrukerIdType.FNR),
+                )
+
+            every {
+                mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(
+                    journalpostId = journalpost.journalpostId,
+                )
+            } returns Pair("123456789", emptyList())
+
+            every {
+                mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(
+                    journalpostId = journalpost.journalpostId,
+                )
+            } returns Pair("123456789", emptyList())
+
+            every {
+                mockedPdlClient.hentPerson(
+                    personIdent = "123456789",
+                    graphqlfil = "hentperson-med-adressebeskyttelse",
+                    tema = tema,
+                )
+            } returns
+                    PdlPersonData(
+                        adressebeskyttelse =
+                        listOf(
+                            Adressebeskyttelse(
+                                gradering = Adressebeskyttelsesgradering.STRENGT_FORTROLIG,
+                            ),
+                        ),
+                    )
+
+            // Act
+            val finnesAdressebeskyttelsegradringPåJournalpost =
                 adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                     tema = tema,
                     journalpost = journalpost,
                 )
-            }
-        assertThat(exception.message).isEqualTo("Støtter ikke tema $tema")
+
+            // Assert
+            assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isTrue()
+        }
+
+        @ParameterizedTest
+        @EnumSource(
+            value = Tema::class,
+            names = ["BAR", "KON"],
+        )
+        fun `skal returnere true om journalpost fra papirsøknad er tilknyttet en strengt fotrolig person`(
+            tema: Tema,
+        ) {
+            // Arrange
+            val journalpost =
+                Journalpost(
+                    journalpostId = "123",
+                    journalposttype = Journalposttype.I,
+                    journalstatus = Journalstatus.MOTTATT,
+                    tema = tema.name,
+                    journalforendeEnhet = "1",
+                    kanal = "IKKE_NAV_NO",
+                    dokumenter = hentDokumenterMedRiktigBrevkode(tema),
+                    bruker = Bruker("312", BrukerIdType.FNR),
+                )
+
+            every {
+                mockedJournalpostBrukerService.tilPersonIdent(
+                    bruker = journalpost.bruker!!,
+                    tema = tema,
+                )
+            } returns "123456789"
+
+            every {
+                mockedPdlClient.hentPerson(
+                    personIdent = "123456789",
+                    graphqlfil = "hentperson-med-adressebeskyttelse",
+                    tema = tema,
+                )
+            } returns
+                    PdlPersonData(
+                        adressebeskyttelse =
+                        listOf(
+                            Adressebeskyttelse(
+                                gradering = Adressebeskyttelsesgradering.STRENGT_FORTROLIG,
+                            ),
+                        ),
+                    )
+
+            // Act
+            val finnesAdressebeskyttelsegradringPåJournalpost =
+                adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
+                    tema = tema,
+                    journalpost = journalpost,
+                )
+
+            // Assert
+            assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isTrue()
+        }
+
+        @ParameterizedTest
+        @EnumSource(
+            value = Tema::class,
+            names = ["BAR", "KON"],
+        )
+        fun `skal returnere false om journalpost fra digital søknad ikke er tilknyttet en strengt fotrolig person`(
+            tema: Tema,
+        ) {
+            // Arrange
+            val journalpost =
+                Journalpost(
+                    journalpostId = "123",
+                    journalposttype = Journalposttype.I,
+                    journalstatus = Journalstatus.MOTTATT,
+                    tema = tema.name,
+                    journalforendeEnhet = "1",
+                    kanal = "NAV_NO",
+                    dokumenter = hentDokumenterMedRiktigBrevkode(tema),
+                    bruker = Bruker("312", BrukerIdType.FNR),
+                )
+
+            every {
+                mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(
+                    journalpostId = journalpost.journalpostId,
+                )
+            } returns Pair("123456789", emptyList())
+
+            every {
+                mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(
+                    journalpostId = journalpost.journalpostId,
+                )
+            } returns Pair("123456789", emptyList())
+
+            every {
+                mockedPdlClient.hentPerson(
+                    personIdent = "123456789",
+                    graphqlfil = "hentperson-med-adressebeskyttelse",
+                    tema = tema,
+                )
+            } returns
+                    PdlPersonData(
+                        adressebeskyttelse =
+                        listOf(
+                            Adressebeskyttelse(
+                                gradering = Adressebeskyttelsesgradering.UGRADERT,
+                            ),
+                        ),
+                    )
+
+            // Act
+            val finnesAdressebeskyttelsegradringPåJournalpost =
+                adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
+                    tema = tema,
+                    journalpost = journalpost,
+                )
+
+            // Assert
+            assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isFalse()
+        }
+
+        @ParameterizedTest
+        @EnumSource(
+            value = Tema::class,
+            names = ["BAR", "KON"],
+        )
+        fun `skal returnere false om journalpost fra papirsøknad ikke er tilknyttet en strengt fotrolig person`(
+            tema: Tema,
+        ) {
+            // Arrange
+            val journalpost =
+                Journalpost(
+                    journalpostId = "123",
+                    journalposttype = Journalposttype.I,
+                    journalstatus = Journalstatus.MOTTATT,
+                    tema = tema.name,
+                    journalforendeEnhet = "1",
+                    kanal = "IKKE_NAV_NO",
+                    dokumenter = hentDokumenterMedRiktigBrevkode(tema),
+                    bruker = Bruker("312", BrukerIdType.FNR),
+                )
+
+            every {
+                mockedJournalpostBrukerService.tilPersonIdent(
+                    bruker = journalpost.bruker!!,
+                    tema = tema,
+                )
+            } returns "123456789"
+
+            every {
+                mockedPdlClient.hentPerson(
+                    personIdent = "123456789",
+                    graphqlfil = "hentperson-med-adressebeskyttelse",
+                    tema = tema,
+                )
+            } returns
+                    PdlPersonData(
+                        adressebeskyttelse =
+                        listOf(
+                            Adressebeskyttelse(
+                                gradering = Adressebeskyttelsesgradering.UGRADERT,
+                            ),
+                        ),
+                    )
+
+            // Act
+            val finnesAdressebeskyttelsegradringPåJournalpost =
+                adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
+                    tema = tema,
+                    journalpost = journalpost,
+                )
+
+            // Assert
+            assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isFalse()
+        }
     }
 
-    @ParameterizedTest
-    @EnumSource(
-        value = Tema::class,
-        names = ["BAR", "KON"],
-    )
-    fun `skal returnere true om journalpost fra digital søknad er tilknyttet en strengt fotrolig person`(
-        tema: Tema,
-    ) {
-        // Arrange
-        val journalpost =
-            Journalpost(
-                journalpostId = "123",
-                journalposttype = Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                tema = tema.name,
-                journalforendeEnhet = "1",
-                kanal = "NAV_NO",
-                dokumenter = hentDokumenterMedRiktigBrevkode(tema),
-                bruker = Bruker("312", BrukerIdType.FNR),
-            )
+    @Nested
+    inner class FinnStrengesteAdressebeskyttelsegraderingPåJournalpost {
+        @ParameterizedTest
+        @EnumSource(
+            value = Tema::class,
+            names = ["BAR", "KON"],
+        )
+        fun `skal returnere UGRADERT om journalpost fra digital søknad ikke er tilknyttet en strengt fotrolig person`(
+            tema: Tema,
+        ) {
+            // Arrange
+            val journalpost =
+                Journalpost(
+                    journalpostId = "123",
+                    journalposttype = Journalposttype.I,
+                    journalstatus = Journalstatus.MOTTATT,
+                    tema = tema.name,
+                    journalforendeEnhet = "1",
+                    kanal = "NAV_NO",
+                    dokumenter = hentDokumenterMedRiktigBrevkode(tema),
+                    bruker = Bruker("312", BrukerIdType.FNR),
+                )
 
-        every {
-            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(
-                journalpostId = journalpost.journalpostId,
-            )
-        } returns Pair("123456789", emptyList())
+            every {
+                mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(
+                    journalpostId = journalpost.journalpostId,
+                )
+            } returns Pair("123456789", emptyList())
 
-        every {
-            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(
-                journalpostId = journalpost.journalpostId,
-            )
-        } returns Pair("123456789", emptyList())
+            every {
+                mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(
+                    journalpostId = journalpost.journalpostId,
+                )
+            } returns Pair("123456789", emptyList())
 
-        every {
-            mockedPdlClient.hentPerson(
-                personIdent = "123456789",
-                graphqlfil = "hentperson-med-adressebeskyttelse",
-                tema = tema,
-            )
-        } returns
-            PdlPersonData(
-                adressebeskyttelse =
-                    listOf(
-                        Adressebeskyttelse(
-                            gradering = Adressebeskyttelsesgradering.STRENGT_FORTROLIG,
+            every {
+                mockedPdlClient.hentPerson(
+                    personIdent = "123456789",
+                    graphqlfil = "hentperson-med-adressebeskyttelse",
+                    tema = tema,
+                )
+            } returns
+                    PdlPersonData(
+                        adressebeskyttelse =
+                        listOf(
+                            Adressebeskyttelse(
+                                gradering = Adressebeskyttelsesgradering.UGRADERT,
+                            ),
                         ),
-                    ),
-            )
+                    )
 
-        // Act
-        val finnesAdressebeskyttelsegradringPåJournalpost =
-            adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
-                tema = tema,
-                journalpost = journalpost,
-            )
+            // Act
+            val finnesAdressebeskyttelsegradringPåJournalpost =
+                adressebeskyttelesesgraderingService.finnStrengesteAdressebeskyttelsegraderingPåJournalpost(
+                    tema = tema,
+                    journalpost = journalpost,
+                )
 
-        // Assert
-        assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isTrue()
-    }
+            // Assert
+            assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isEqualTo(ADRESSEBESKYTTELSEGRADERING.UGRADERT)
+        }
 
-    @ParameterizedTest
-    @EnumSource(
-        value = Tema::class,
-        names = ["BAR", "KON"],
-    )
-    fun `skal returnere true om journalpost fra papirsøknad er tilknyttet en strengt fotrolig person`(
-        tema: Tema,
-    ) {
-        // Arrange
-        val journalpost =
-            Journalpost(
-                journalpostId = "123",
-                journalposttype = Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                tema = tema.name,
-                journalforendeEnhet = "1",
-                kanal = "IKKE_NAV_NO",
-                dokumenter = hentDokumenterMedRiktigBrevkode(tema),
-                bruker = Bruker("312", BrukerIdType.FNR),
-            )
+        @ParameterizedTest
+        @EnumSource(
+            value = Tema::class,
+            names = ["BAR", "KON"],
+        )
+        fun `skal returnere FORTROLIG om journalpost fra digital søknad er tilknyttet en person med adressebeskyttelsegradering FORTROLIG`(
+            tema: Tema,
+        ) {
+            // Arrange
+            val journalpost =
+                Journalpost(
+                    journalpostId = "123",
+                    journalposttype = Journalposttype.I,
+                    journalstatus = Journalstatus.MOTTATT,
+                    tema = tema.name,
+                    journalforendeEnhet = "1",
+                    kanal = "NAV_NO",
+                    dokumenter = hentDokumenterMedRiktigBrevkode(tema),
+                    bruker = Bruker("312", BrukerIdType.FNR),
+                )
 
-        every {
-            mockedJournalpostBrukerService.tilPersonIdent(
-                bruker = journalpost.bruker!!,
-                tema = tema,
-            )
-        } returns "123456789"
+            every {
+                mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(
+                    journalpostId = journalpost.journalpostId,
+                )
+            } returns Pair("123456789", emptyList())
 
-        every {
-            mockedPdlClient.hentPerson(
-                personIdent = "123456789",
-                graphqlfil = "hentperson-med-adressebeskyttelse",
-                tema = tema,
-            )
-        } returns
-            PdlPersonData(
-                adressebeskyttelse =
-                    listOf(
-                        Adressebeskyttelse(
-                            gradering = Adressebeskyttelsesgradering.STRENGT_FORTROLIG,
+            every {
+                mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(
+                    journalpostId = journalpost.journalpostId,
+                )
+            } returns Pair("123456789", listOf("345"))
+
+            every {
+                mockedPdlClient.hentPerson(
+                    personIdent = "123456789",
+                    graphqlfil = "hentperson-med-adressebeskyttelse",
+                    tema = tema,
+                )
+            } returns
+                    PdlPersonData(
+                        adressebeskyttelse =
+                        listOf(
+                            Adressebeskyttelse(
+                                gradering = Adressebeskyttelsesgradering.FORTROLIG,
+                            ),
                         ),
-                    ),
-            )
+                    )
 
-        // Act
-        val finnesAdressebeskyttelsegradringPåJournalpost =
-            adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
-                tema = tema,
-                journalpost = journalpost,
-            )
-
-        // Assert
-        assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isTrue()
-    }
-
-    @ParameterizedTest
-    @EnumSource(
-        value = Tema::class,
-        names = ["BAR", "KON"],
-    )
-    fun `skal returnere false om journalpost fra digital søknad ikke er tilknyttet en strengt fotrolig person`(
-        tema: Tema,
-    ) {
-        // Arrange
-        val journalpost =
-            Journalpost(
-                journalpostId = "123",
-                journalposttype = Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                tema = tema.name,
-                journalforendeEnhet = "1",
-                kanal = "NAV_NO",
-                dokumenter = hentDokumenterMedRiktigBrevkode(tema),
-                bruker = Bruker("312", BrukerIdType.FNR),
-            )
-
-        every {
-            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(
-                journalpostId = journalpost.journalpostId,
-            )
-        } returns Pair("123456789", emptyList())
-
-        every {
-            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(
-                journalpostId = journalpost.journalpostId,
-            )
-        } returns Pair("123456789", emptyList())
-
-        every {
-            mockedPdlClient.hentPerson(
-                personIdent = "123456789",
-                graphqlfil = "hentperson-med-adressebeskyttelse",
-                tema = tema,
-            )
-        } returns
-            PdlPersonData(
-                adressebeskyttelse =
-                    listOf(
-                        Adressebeskyttelse(
-                            gradering = Adressebeskyttelsesgradering.UGRADERT,
+            every {
+                mockedPdlClient.hentPerson(
+                    personIdent = "345",
+                    graphqlfil = "hentperson-med-adressebeskyttelse",
+                    tema = tema,
+                )
+            } returns
+                    PdlPersonData(
+                        adressebeskyttelse =
+                        listOf(
+                            Adressebeskyttelse(
+                                gradering = Adressebeskyttelsesgradering.UGRADERT,
+                            ),
                         ),
-                    ),
-            )
+                    )
 
-        // Act
-        val finnesAdressebeskyttelsegradringPåJournalpost =
-            adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
-                tema = tema,
-                journalpost = journalpost,
-            )
+            // Act
+            val finnesAdressebeskyttelsegradringPåJournalpost =
+                adressebeskyttelesesgraderingService.finnStrengesteAdressebeskyttelsegraderingPåJournalpost(
+                    tema = tema,
+                    journalpost = journalpost,
+                )
 
-        // Assert
-        assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isFalse()
-    }
+            // Assert
+            assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isEqualTo(ADRESSEBESKYTTELSEGRADERING.FORTROLIG)
+        }
 
-    @ParameterizedTest
-    @EnumSource(
-        value = Tema::class,
-        names = ["BAR", "KON"],
-    )
-    fun `skal returnere false om journalpost fra papirsøknad ikke er tilknyttet en strengt fotrolig person`(
-        tema: Tema,
-    ) {
-        // Arrange
-        val journalpost =
-            Journalpost(
-                journalpostId = "123",
-                journalposttype = Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                tema = tema.name,
-                journalforendeEnhet = "1",
-                kanal = "IKKE_NAV_NO",
-                dokumenter = hentDokumenterMedRiktigBrevkode(tema),
-                bruker = Bruker("312", BrukerIdType.FNR),
-            )
+        @ParameterizedTest
+        @EnumSource(
+            value = Tema::class,
+            names = ["BAR", "KON"],
+        )
+        fun `skal returnere STRENGT_FORTROLIG om journalpost fra digital søknad er tilknyttet en person med adressebeskyttelsegradering STRENGT_FORTROLIG`(
+            tema: Tema,
+        ) {
+            // Arrange
+            val journalpost =
+                Journalpost(
+                    journalpostId = "123",
+                    journalposttype = Journalposttype.I,
+                    journalstatus = Journalstatus.MOTTATT,
+                    tema = tema.name,
+                    journalforendeEnhet = "1",
+                    kanal = "NAV_NO",
+                    dokumenter = hentDokumenterMedRiktigBrevkode(tema),
+                    bruker = Bruker("312", BrukerIdType.FNR),
+                )
 
-        every {
-            mockedJournalpostBrukerService.tilPersonIdent(
-                bruker = journalpost.bruker!!,
-                tema = tema,
-            )
-        } returns "123456789"
+            every {
+                mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(
+                    journalpostId = journalpost.journalpostId,
+                )
+            } returns Pair("123456789", emptyList())
 
-        every {
-            mockedPdlClient.hentPerson(
-                personIdent = "123456789",
-                graphqlfil = "hentperson-med-adressebeskyttelse",
-                tema = tema,
-            )
-        } returns
-            PdlPersonData(
-                adressebeskyttelse =
-                    listOf(
-                        Adressebeskyttelse(
-                            gradering = Adressebeskyttelsesgradering.UGRADERT,
+            every {
+                mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(
+                    journalpostId = journalpost.journalpostId,
+                )
+            } returns Pair("123456789", listOf("345"))
+
+            every {
+                mockedPdlClient.hentPerson(
+                    personIdent = "123456789",
+                    graphqlfil = "hentperson-med-adressebeskyttelse",
+                    tema = tema,
+                )
+            } returns
+                    PdlPersonData(
+                        adressebeskyttelse =
+                        listOf(
+                            Adressebeskyttelse(
+                                gradering = Adressebeskyttelsesgradering.STRENGT_FORTROLIG,
+                            ),
                         ),
-                    ),
-            )
-
-        // Act
-        val finnesAdressebeskyttelsegradringPåJournalpost =
-            adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
-                tema = tema,
-                journalpost = journalpost,
-            )
-
-        // Assert
-        assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isFalse()
-    }
-
-    @ParameterizedTest
-    @EnumSource(
-        value = Tema::class,
-        names = ["BAR", "KON"],
-    )
-    fun `skal returnere UGRADERT om journalpost fra digital søknad ikke er tilknyttet en strengt fotrolig person`(
-        tema: Tema,
-    ) {
-        // Arrange
-        val journalpost =
-            Journalpost(
-                journalpostId = "123",
-                journalposttype = Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                tema = tema.name,
-                journalforendeEnhet = "1",
-                kanal = "NAV_NO",
-                dokumenter = hentDokumenterMedRiktigBrevkode(tema),
-                bruker = Bruker("312", BrukerIdType.FNR),
-            )
-
-        every {
-            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(
-                journalpostId = journalpost.journalpostId,
-            )
-        } returns Pair("123456789", emptyList())
-
-        every {
-            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(
-                journalpostId = journalpost.journalpostId,
-            )
-        } returns Pair("123456789", emptyList())
-
-        every {
-            mockedPdlClient.hentPerson(
-                personIdent = "123456789",
-                graphqlfil = "hentperson-med-adressebeskyttelse",
-                tema = tema,
-            )
-        } returns
-            PdlPersonData(
-                adressebeskyttelse =
-                    listOf(
-                        Adressebeskyttelse(
-                            gradering = Adressebeskyttelsesgradering.UGRADERT,
+                    )
+            every {
+                mockedPdlClient.hentPerson(
+                    personIdent = "345",
+                    graphqlfil = "hentperson-med-adressebeskyttelse",
+                    tema = tema,
+                )
+            } returns
+                    PdlPersonData(
+                        adressebeskyttelse =
+                        listOf(
+                            Adressebeskyttelse(
+                                gradering = Adressebeskyttelsesgradering.UGRADERT,
+                            ),
                         ),
-                    ),
-            )
+                    )
 
-        // Act
-        val finnesAdressebeskyttelsegradringPåJournalpost =
-            adressebeskyttelesesgraderingService.finnStrengesteAdressebeskyttelsegraderingPåJournalpost(
-                tema = tema,
-                journalpost = journalpost,
-            )
+            // Act
+            val finnesAdressebeskyttelsegradringPåJournalpost =
+                adressebeskyttelesesgraderingService.finnStrengesteAdressebeskyttelsegraderingPåJournalpost(
+                    tema = tema,
+                    journalpost = journalpost,
+                )
 
-        // Assert
-        assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isEqualTo(ADRESSEBESKYTTELSEGRADERING.UGRADERT)
-    }
+            // Assert
+            assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isEqualTo(ADRESSEBESKYTTELSEGRADERING.STRENGT_FORTROLIG)
+        }
 
-    @ParameterizedTest
-    @EnumSource(
-        value = Tema::class,
-        names = ["BAR", "KON"],
-    )
-    fun `skal returnere FORTROLIG om journalpost fra digital søknad er tilknyttet en person med adressebeskyttelsegradering FORTROLIG`(
-        tema: Tema,
-    ) {
-        // Arrange
-        val journalpost =
-            Journalpost(
-                journalpostId = "123",
-                journalposttype = Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                tema = tema.name,
-                journalforendeEnhet = "1",
-                kanal = "NAV_NO",
-                dokumenter = hentDokumenterMedRiktigBrevkode(tema),
-                bruker = Bruker("312", BrukerIdType.FNR),
-            )
+        @ParameterizedTest
+        @EnumSource(
+            value = Tema::class,
+            names = ["BAR", "KON"],
+        )
+        fun `skal returnere STRENGT_FORTROLIG_UTLAND om journalpost fra digital søknad er tilknyttet en person med adressebeskyttelsegradering STRENGT_FORTROLIG_UTLAND`(
+            tema: Tema,
+        ) {
+            // Arrange
+            val journalpost =
+                Journalpost(
+                    journalpostId = "123",
+                    journalposttype = Journalposttype.I,
+                    journalstatus = Journalstatus.MOTTATT,
+                    tema = tema.name,
+                    journalforendeEnhet = "1",
+                    kanal = "NAV_NO",
+                    dokumenter = hentDokumenterMedRiktigBrevkode(tema),
+                    bruker = Bruker("312", BrukerIdType.FNR),
+                )
 
-        every {
-            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(
-                journalpostId = journalpost.journalpostId,
-            )
-        } returns Pair("123456789", emptyList())
+            every {
+                mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(
+                    journalpostId = journalpost.journalpostId,
+                )
+            } returns Pair("123456789", emptyList())
 
-        every {
-            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(
-                journalpostId = journalpost.journalpostId,
-            )
-        } returns Pair("123456789", listOf("345"))
+            every {
+                mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(
+                    journalpostId = journalpost.journalpostId,
+                )
+            } returns Pair("123456789", listOf("345"))
 
-        every {
-            mockedPdlClient.hentPerson(
-                personIdent = "123456789",
-                graphqlfil = "hentperson-med-adressebeskyttelse",
-                tema = tema,
-            )
-        } returns
-            PdlPersonData(
-                adressebeskyttelse =
-                    listOf(
-                        Adressebeskyttelse(
-                            gradering = Adressebeskyttelsesgradering.FORTROLIG,
+            every {
+                mockedPdlClient.hentPerson(
+                    personIdent = "123456789",
+                    graphqlfil = "hentperson-med-adressebeskyttelse",
+                    tema = tema,
+                )
+            } returns
+                    PdlPersonData(
+                        adressebeskyttelse =
+                        listOf(
+                            Adressebeskyttelse(
+                                gradering = Adressebeskyttelsesgradering.STRENGT_FORTROLIG_UTLAND,
+                            ),
                         ),
-                    ),
-            )
+                    )
 
-        every {
-            mockedPdlClient.hentPerson(
-                personIdent = "345",
-                graphqlfil = "hentperson-med-adressebeskyttelse",
-                tema = tema,
-            )
-        } returns
-            PdlPersonData(
-                adressebeskyttelse =
-                    listOf(
-                        Adressebeskyttelse(
-                            gradering = Adressebeskyttelsesgradering.UGRADERT,
+            every {
+                mockedPdlClient.hentPerson(
+                    personIdent = "345",
+                    graphqlfil = "hentperson-med-adressebeskyttelse",
+                    tema = tema,
+                )
+            } returns
+                    PdlPersonData(
+                        adressebeskyttelse =
+                        listOf(
+                            Adressebeskyttelse(
+                                gradering = Adressebeskyttelsesgradering.FORTROLIG,
+                            ),
                         ),
-                    ),
-            )
+                    )
 
-        // Act
-        val finnesAdressebeskyttelsegradringPåJournalpost =
-            adressebeskyttelesesgraderingService.finnStrengesteAdressebeskyttelsegraderingPåJournalpost(
-                tema = tema,
-                journalpost = journalpost,
-            )
+            // Act
+            val finnesAdressebeskyttelsegradringPåJournalpost =
+                adressebeskyttelesesgraderingService.finnStrengesteAdressebeskyttelsegraderingPåJournalpost(
+                    tema = tema,
+                    journalpost = journalpost,
+                )
 
-        // Assert
-        assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isEqualTo(ADRESSEBESKYTTELSEGRADERING.FORTROLIG)
-    }
-
-    @ParameterizedTest
-    @EnumSource(
-        value = Tema::class,
-        names = ["BAR", "KON"],
-    )
-    fun `skal returnere STRENGT_FORTROLIG om journalpost fra digital søknad er tilknyttet en person med adressebeskyttelsegradering STRENGT_FORTROLIG`(
-        tema: Tema,
-    ) {
-        // Arrange
-        val journalpost =
-            Journalpost(
-                journalpostId = "123",
-                journalposttype = Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                tema = tema.name,
-                journalforendeEnhet = "1",
-                kanal = "NAV_NO",
-                dokumenter = hentDokumenterMedRiktigBrevkode(tema),
-                bruker = Bruker("312", BrukerIdType.FNR),
-            )
-
-        every {
-            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(
-                journalpostId = journalpost.journalpostId,
-            )
-        } returns Pair("123456789", emptyList())
-
-        every {
-            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(
-                journalpostId = journalpost.journalpostId,
-            )
-        } returns Pair("123456789", listOf("345"))
-
-        every {
-            mockedPdlClient.hentPerson(
-                personIdent = "123456789",
-                graphqlfil = "hentperson-med-adressebeskyttelse",
-                tema = tema,
-            )
-        } returns
-            PdlPersonData(
-                adressebeskyttelse =
-                    listOf(
-                        Adressebeskyttelse(
-                            gradering = Adressebeskyttelsesgradering.STRENGT_FORTROLIG,
-                        ),
-                    ),
-            )
-        every {
-            mockedPdlClient.hentPerson(
-                personIdent = "345",
-                graphqlfil = "hentperson-med-adressebeskyttelse",
-                tema = tema,
-            )
-        } returns
-            PdlPersonData(
-                adressebeskyttelse =
-                    listOf(
-                        Adressebeskyttelse(
-                            gradering = Adressebeskyttelsesgradering.UGRADERT,
-                        ),
-                    ),
-            )
-
-        // Act
-        val finnesAdressebeskyttelsegradringPåJournalpost =
-            adressebeskyttelesesgraderingService.finnStrengesteAdressebeskyttelsegraderingPåJournalpost(
-                tema = tema,
-                journalpost = journalpost,
-            )
-
-        // Assert
-        assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isEqualTo(ADRESSEBESKYTTELSEGRADERING.STRENGT_FORTROLIG)
-    }
-
-    @ParameterizedTest
-    @EnumSource(
-        value = Tema::class,
-        names = ["BAR", "KON"],
-    )
-    fun `skal returnere STRENGT_FORTROLIG_UTLAND om journalpost fra digital søknad er tilknyttet en person med adressebeskyttelsegradering STRENGT_FORTROLIG_UTLAND`(
-        tema: Tema,
-    ) {
-        // Arrange
-        val journalpost =
-            Journalpost(
-                journalpostId = "123",
-                journalposttype = Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                tema = tema.name,
-                journalforendeEnhet = "1",
-                kanal = "NAV_NO",
-                dokumenter = hentDokumenterMedRiktigBrevkode(tema),
-                bruker = Bruker("312", BrukerIdType.FNR),
-            )
-
-        every {
-            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(
-                journalpostId = journalpost.journalpostId,
-            )
-        } returns Pair("123456789", emptyList())
-
-        every {
-            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(
-                journalpostId = journalpost.journalpostId,
-            )
-        } returns Pair("123456789", listOf("345"))
-
-        every {
-            mockedPdlClient.hentPerson(
-                personIdent = "123456789",
-                graphqlfil = "hentperson-med-adressebeskyttelse",
-                tema = tema,
-            )
-        } returns
-            PdlPersonData(
-                adressebeskyttelse =
-                    listOf(
-                        Adressebeskyttelse(
-                            gradering = Adressebeskyttelsesgradering.STRENGT_FORTROLIG_UTLAND,
-                        ),
-                    ),
-            )
-
-        every {
-            mockedPdlClient.hentPerson(
-                personIdent = "345",
-                graphqlfil = "hentperson-med-adressebeskyttelse",
-                tema = tema,
-            )
-        } returns
-            PdlPersonData(
-                adressebeskyttelse =
-                    listOf(
-                        Adressebeskyttelse(
-                            gradering = Adressebeskyttelsesgradering.FORTROLIG,
-                        ),
-                    ),
-            )
-
-        // Act
-        val finnesAdressebeskyttelsegradringPåJournalpost =
-            adressebeskyttelesesgraderingService.finnStrengesteAdressebeskyttelsegraderingPåJournalpost(
-                tema = tema,
-                journalpost = journalpost,
-            )
-
-        // Assert
-        assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isEqualTo(ADRESSEBESKYTTELSEGRADERING.STRENGT_FORTROLIG_UTLAND)
+            // Assert
+            assertThat(finnesAdressebeskyttelsegradringPåJournalpost).isEqualTo(ADRESSEBESKYTTELSEGRADERING.STRENGT_FORTROLIG_UTLAND)
+        }
     }
 
     private fun hentDokumenterMedRiktigBrevkode(tema: Tema): List<DokumentInfo> {
