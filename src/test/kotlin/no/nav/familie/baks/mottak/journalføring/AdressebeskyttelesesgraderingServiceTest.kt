@@ -2,8 +2,8 @@ package no.nav.familie.baks.mottak.journalføring
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.familie.baks.mottak.domene.personopplysning.Adressebeskyttelsesgradering
 import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelse
-import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelsesgradering
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.DokumentInfo

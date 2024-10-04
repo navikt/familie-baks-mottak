@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.journalføring
 
-import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelsesgradering
+import no.nav.familie.baks.mottak.domene.personopplysning.Adressebeskyttelsesgradering
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient

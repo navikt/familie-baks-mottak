@@ -1,6 +1,5 @@
 package no.nav.familie.baks.mottak.domene.personopplysning
 
-import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelsesgradering
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import no.nav.familie.kontrakter.felles.personopplysning.ForelderBarnRelasjon
 
