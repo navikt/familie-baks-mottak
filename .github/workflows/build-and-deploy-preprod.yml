@@ -73,7 +73,7 @@ jobs:
 
       - uses: nais/docker-build-push@v0
         id: docker-push
-        if: (github.event.pull_request.user.login != 'dependabot[bot]' || github.event_name != 'merge_group')
+        if: (github.event.pull_request.user.login != 'dependabot[bot]' && github.event_name != 'merge_group')
         with:
           team: teamfamilie
           push_image: true
@@ -95,7 +95,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Deploy til dev-gcp team namespace
-        if: (github.event.pull_request.user.login != 'dependabot[bot]'|| github.event_name != 'merge_group')
+        if: (github.event.pull_request.user.login != 'dependabot[bot]' && github.event_name != 'merge_group')
         uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: dev-gcp
