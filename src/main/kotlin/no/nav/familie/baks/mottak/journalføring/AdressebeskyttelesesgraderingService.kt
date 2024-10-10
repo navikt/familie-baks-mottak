@@ -7,7 +7,6 @@ import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.SøknadsidenterService
 import no.nav.familie.baks.mottak.integrasjoner.erDigitalSøknad
 import no.nav.familie.kontrakter.felles.Tema
-import no.nav.familie.kontrakter.felles.personopplysning.ADRESSEBESKYTTELSEGRADERING
 import org.springframework.stereotype.Service
 
 @Service
@@ -20,20 +19,6 @@ class AdressebeskyttelesesgraderingService(
         tema: Tema,
         journalpost: Journalpost,
     ): Boolean = finnAdressebeskyttelsegraderingerPåJournalpost(tema, journalpost).any { it.erStrengtFortrolig() || it.erStrengtFortroligUtland() }
-
-    fun finnStrengesteAdressebeskyttelsegraderingPåJournalpost(
-        tema: Tema,
-        journalpost: Journalpost,
-    ): ADRESSEBESKYTTELSEGRADERING? {
-        val adressebeskyttelsesgraderingPåJournalpost = finnAdressebeskyttelsegraderingerPåJournalpost(tema, journalpost)
-        return when {
-            adressebeskyttelsesgraderingPåJournalpost.any { it.erStrengtFortroligUtland() } -> ADRESSEBESKYTTELSEGRADERING.STRENGT_FORTROLIG_UTLAND
-            adressebeskyttelsesgraderingPåJournalpost.any { it.erStrengtFortrolig() } -> ADRESSEBESKYTTELSEGRADERING.STRENGT_FORTROLIG
-            adressebeskyttelsesgraderingPåJournalpost.any { it.erFortrolig() } -> ADRESSEBESKYTTELSEGRADERING.FORTROLIG
-            adressebeskyttelsesgraderingPåJournalpost.any { it.erUgradert() } -> ADRESSEBESKYTTELSEGRADERING.UGRADERT
-            else -> null
-        }
-    }
 
     private fun finnAdressebeskyttelsegraderingerPåJournalpost(
         tema: Tema,

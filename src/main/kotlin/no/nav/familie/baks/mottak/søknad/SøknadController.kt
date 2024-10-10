@@ -1,9 +1,7 @@
 package no.nav.familie.baks.mottak.søknad
 
-import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
-import no.nav.familie.baks.mottak.journalføring.AdressebeskyttelesesgraderingService
+import no.nav.familie.baks.mottak.integrasjoner.SøknadsidenterService
 import no.nav.familie.kontrakter.felles.Tema
-import no.nav.familie.kontrakter.felles.personopplysning.ADRESSEBESKYTTELSEGRADERING
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
@@ -16,16 +14,14 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping(path = ["/api/soknad/"], produces = [APPLICATION_JSON_VALUE])
 @ProtectedWithClaims(issuer = "azuread")
 class SøknadController(
-    private val journalpostClient: JournalpostClient,
-    private val adressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService,
+    private val søknadsidenterService: SøknadsidenterService
 ) {
-    @GetMapping(value = ["/adressebeskyttelse/{tema}/{journalpostId}"])
-    fun hentStrengesteAdressebeskyttelsegraderingIDigitalSøknad(
+    @GetMapping(value = ["/hent-personer-i-digital-soknad/{tema}/{journalpostId}"])
+    fun hentPersonerIDigitalSøknad(
         @PathVariable("tema") tema: Tema,
         @PathVariable("journalpostId") journalpostId: String,
-    ): ResponseEntity<ADRESSEBESKYTTELSEGRADERING?> {
-        val journalpost = journalpostClient.hentJournalpost(journalpostId = journalpostId)
-        val strengesteAdressebeskyttelsesgradering = adressebeskyttelesesgraderingService.finnStrengesteAdressebeskyttelsegraderingPåJournalpost(tema = tema, journalpost = journalpost)
-        return ResponseEntity.ok(strengesteAdressebeskyttelsesgradering)
+    ): ResponseEntity<List<String>> {
+        val identerIDigitalSøknad = søknadsidenterService.hentIdenterIDigitalSøknadFraJournalpost(tema, journalpostId)
+        return ResponseEntity.ok(identerIDigitalSøknad)
     }
 }
