@@ -6,6 +6,7 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadService
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV5
+import no.nav.familie.kontrakter.felles.Tema
 import org.springframework.stereotype.Service
 
 @Service
@@ -68,4 +69,15 @@ class SøknadsidenterService(
                 )
         }
     }
+
+    fun hentIdenterIDigitalSøknadFraJournalpost(tema: Tema, journalpostId: String): List<String> {
+        val (søker, barn) = when (tema) {
+            Tema.BAR -> hentIdenterForBarnetrygdViaJournalpost(journalpostId = journalpostId)
+            Tema.KON -> hentIdenterForKontantstøtteViaJournalpost(journalpostId = journalpostId)
+            else -> throw Error("Kan ikke hente identer i digital søknad for tema $tema")
+        }
+        return listOf(søker).plus(barn)
+    }
+
+
 }

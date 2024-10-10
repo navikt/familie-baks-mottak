@@ -1,5 +1,6 @@
 package no.nav.familie.baks.mottak.journalføring
 
+import no.nav.familie.baks.mottak.domene.personopplysning.Adressebeskyttelsesgradering
 import no.nav.familie.baks.mottak.integrasjoner.Bruker
 import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
@@ -17,7 +18,12 @@ class AdressebeskyttelesesgraderingService(
     fun finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
         tema: Tema,
         journalpost: Journalpost,
-    ): Boolean {
+    ): Boolean = finnAdressebeskyttelsegraderingerPåJournalpost(tema, journalpost).any { it.erStrengtFortrolig() || it.erStrengtFortroligUtland() }
+
+    private fun finnAdressebeskyttelsegraderingerPåJournalpost(
+        tema: Tema,
+        journalpost: Journalpost,
+    ): List<Adressebeskyttelsesgradering> {
         if (journalpost.bruker == null) {
             throw IllegalStateException("Bruker på journalpost ${journalpost.journalpostId} kan ikke være null")
         }
@@ -28,7 +34,7 @@ class AdressebeskyttelesesgraderingService(
                 Tema.KON -> finnIdenterForKontantstøtte(tema, journalpost.bruker, journalpost.journalpostId, journalpost.erDigitalSøknad())
                 Tema.ENF,
                 Tema.OPP,
-                -> {
+                    -> {
                     throw IllegalStateException("Støtter ikke tema $tema")
                 }
             }
@@ -38,7 +44,7 @@ class AdressebeskyttelesesgraderingService(
         return alleIdenter
             .map { pdlClient.hentPerson(it, "hentperson-med-adressebeskyttelse", tema) }
             .flatMap { it.adressebeskyttelse }
-            .any { it.gradering.erStrengtFortrolig() }
+            .map { it.gradering }
     }
 
     private fun finnIdenterForKontantstøtte(

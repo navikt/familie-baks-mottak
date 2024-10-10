@@ -44,14 +44,15 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: familie-ba-soknad-api
-          namespace: teamfamilie
-          cluster: dev-gcp
         - application: familie-baks-soknad-api
           namespace: teamfamilie
           cluster: dev-gcp
         - application: familie-prosessering
           namespace: teamfamilie
+          cluster: dev-gcp
+        - application: familie-ba-sak
+          cluster: dev-gcp
+        - application: familie-ks-sak
           cluster: dev-gcp
         - application: statuspoll
           namespace: navdig
