@@ -41,15 +41,15 @@ class SøknadsidenterServiceTest {
             val kontantstøtteSøknad =
                 kontantstøtteSøknad(
                     søker =
-                    lagSøker(
-                        søkersFødselsnummer,
-                    ),
+                        lagSøker(
+                            søkersFødselsnummer,
+                        ),
                     barn =
-                    listOf(
-                        lagBarn("815"),
-                        lagBarn("493"),
-                        lagBarn("00"),
-                    ),
+                        listOf(
+                            lagBarn("815"),
+                            lagBarn("493"),
+                            lagBarn("00"),
+                        ),
                 )
 
             val dbKontantstøtteSøknad =
@@ -82,15 +82,15 @@ class SøknadsidenterServiceTest {
             val kontantstøtteSøknad =
                 barnetrygdSøknad(
                     søker =
-                    SøknadTestData.lagSøker(
-                        søkersFødselsnummer,
-                    ),
+                        SøknadTestData.lagSøker(
+                            søkersFødselsnummer,
+                        ),
                     barn =
-                    listOf(
-                        SøknadTestData.lagBarn("815"),
-                        SøknadTestData.lagBarn("493"),
-                        SøknadTestData.lagBarn("00"),
-                    ),
+                        listOf(
+                            SøknadTestData.lagBarn("815"),
+                            SøknadTestData.lagBarn("493"),
+                            SøknadTestData.lagBarn("00"),
+                        ),
                 )
 
             val dbBarnetrygdSøknad =
@@ -114,7 +114,7 @@ class SøknadsidenterServiceTest {
     }
 
     @Nested
-    inner class hentIdenterIDigitalSøknadFraJournalpost() {
+    inner class HentIdenterIDigitalSøknadFraJournalpost {
         @Test
         fun `skal hente identer i digital søknad om barnetrygd fra journalpostId`() {
             // Arrange
@@ -123,15 +123,15 @@ class SøknadsidenterServiceTest {
             val barnetrygdSøknad =
                 barnetrygdSøknad(
                     søker =
-                    SøknadTestData.lagSøker(
-                        søkersFødselsnummer,
-                    ),
+                        SøknadTestData.lagSøker(
+                            søkersFødselsnummer,
+                        ),
                     barn =
-                    listOf(
-                        SøknadTestData.lagBarn("815"),
-                        SøknadTestData.lagBarn("493"),
-                        SøknadTestData.lagBarn("00"),
-                    ),
+                        listOf(
+                            SøknadTestData.lagBarn("815"),
+                            SøknadTestData.lagBarn("493"),
+                            SøknadTestData.lagBarn("00"),
+                        ),
                 )
 
             val dbBarnetrygdSøknad =
@@ -160,15 +160,15 @@ class SøknadsidenterServiceTest {
             val kontantstøtteSøknad =
                 kontantstøtteSøknad(
                     søker =
-                    lagSøker(
-                        søkersFødselsnummer,
-                    ),
+                        lagSøker(
+                            søkersFødselsnummer,
+                        ),
                     barn =
-                    listOf(
-                        lagBarn("815"),
-                        lagBarn("493"),
-                        lagBarn("00"),
-                    ),
+                        listOf(
+                            lagBarn("815"),
+                            lagBarn("493"),
+                            lagBarn("00"),
+                        ),
                 )
 
             val dbKontantstøtteSøknad =

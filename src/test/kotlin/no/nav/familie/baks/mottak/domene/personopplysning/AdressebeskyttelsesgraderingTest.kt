@@ -7,10 +7,8 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 
 class AdressebeskyttelsesgraderingTest {
-
     @Nested
     inner class ErStrengtFortrolig {
-
         @ParameterizedTest
         @EnumSource(value = Adressebeskyttelsesgradering::class, names = ["STRENGT_FORTROLIG"], mode = EnumSource.Mode.EXCLUDE)
         fun `skal returnere false dersom adressebeskyttelsegradering ikke er STRENGT_FORTROLIG`(adressebeskyttelsesgradering: Adressebeskyttelsesgradering) {
@@ -23,12 +21,10 @@ class AdressebeskyttelsesgraderingTest {
             // Act & Assert
             assertThat(Adressebeskyttelsesgradering.STRENGT_FORTROLIG.erStrengtFortrolig()).isTrue
         }
-
     }
 
     @Nested
     inner class ErStregtFortroligUtland {
-
         @ParameterizedTest
         @EnumSource(value = Adressebeskyttelsesgradering::class, names = ["STRENGT_FORTROLIG_UTLAND"], mode = EnumSource.Mode.EXCLUDE)
         fun `skal returnere false dersom adressebeskyttelsegradering ikke er STRENGT_FORTROLIG_UTLAND`(adressebeskyttelsesgradering: Adressebeskyttelsesgradering) {
@@ -45,7 +41,6 @@ class AdressebeskyttelsesgraderingTest {
 
     @Nested
     inner class ErFortrolig {
-
         @ParameterizedTest
         @EnumSource(value = Adressebeskyttelsesgradering::class, names = ["FORTROLIG"], mode = EnumSource.Mode.EXCLUDE)
         fun `skal returnere false dersom adressebeskyttelsegradering ikke er FORTROLIG`(adressebeskyttelsesgradering: Adressebeskyttelsesgradering) {
@@ -58,12 +53,10 @@ class AdressebeskyttelsesgraderingTest {
             // Act & Assert
             assertThat(Adressebeskyttelsesgradering.FORTROLIG.erFortrolig()).isTrue
         }
-
     }
 
     @Nested
     inner class ErUgradert {
-
         @ParameterizedTest
         @EnumSource(value = Adressebeskyttelsesgradering::class, names = ["UGRADERT"], mode = EnumSource.Mode.EXCLUDE)
         fun `skal returnere false dersom adressebeskyttelsegradering ikke er UGRADERT`(adressebeskyttelsesgradering: Adressebeskyttelsesgradering) {

@@ -36,7 +36,6 @@ class AdressebeskyttelesesgraderingServiceTest {
 
     @Nested
     inner class FinnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost {
-
         @Test
         fun `skal kaste feil når bruker ikke er satt på journalpost`() {
             // Arrange
@@ -129,14 +128,14 @@ class AdressebeskyttelesesgraderingServiceTest {
                     tema = tema,
                 )
             } returns
-                    PdlPersonData(
-                        adressebeskyttelse =
+                PdlPersonData(
+                    adressebeskyttelse =
                         listOf(
                             Adressebeskyttelse(
                                 gradering = Adressebeskyttelsesgradering.STRENGT_FORTROLIG,
                             ),
                         ),
-                    )
+                )
 
             // Act
             val finnesAdressebeskyttelsegradringPåJournalpost =
@@ -184,14 +183,14 @@ class AdressebeskyttelesesgraderingServiceTest {
                     tema = tema,
                 )
             } returns
-                    PdlPersonData(
-                        adressebeskyttelse =
+                PdlPersonData(
+                    adressebeskyttelse =
                         listOf(
                             Adressebeskyttelse(
                                 gradering = Adressebeskyttelsesgradering.STRENGT_FORTROLIG,
                             ),
                         ),
-                    )
+                )
 
             // Act
             val finnesAdressebeskyttelsegradringPåJournalpost =
@@ -244,14 +243,14 @@ class AdressebeskyttelesesgraderingServiceTest {
                     tema = tema,
                 )
             } returns
-                    PdlPersonData(
-                        adressebeskyttelse =
+                PdlPersonData(
+                    adressebeskyttelse =
                         listOf(
                             Adressebeskyttelse(
                                 gradering = Adressebeskyttelsesgradering.UGRADERT,
                             ),
                         ),
-                    )
+                )
 
             // Act
             val finnesAdressebeskyttelsegradringPåJournalpost =
@@ -299,14 +298,14 @@ class AdressebeskyttelesesgraderingServiceTest {
                     tema = tema,
                 )
             } returns
-                    PdlPersonData(
-                        adressebeskyttelse =
+                PdlPersonData(
+                    adressebeskyttelse =
                         listOf(
                             Adressebeskyttelse(
                                 gradering = Adressebeskyttelsesgradering.UGRADERT,
                             ),
                         ),
-                    )
+                )
 
             // Act
             val finnesAdressebeskyttelsegradringPåJournalpost =

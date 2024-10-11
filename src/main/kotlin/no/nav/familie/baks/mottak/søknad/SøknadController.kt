@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping(path = ["/api/soknad/"], produces = [APPLICATION_JSON_VALUE])
 @ProtectedWithClaims(issuer = "azuread")
 class SøknadController(
-    private val søknadsidenterService: SøknadsidenterService
+    private val søknadsidenterService: SøknadsidenterService,
 ) {
     @GetMapping(value = ["/hent-personer-i-digital-soknad/{tema}/{journalpostId}"])
     fun hentPersonerIDigitalSøknad(
