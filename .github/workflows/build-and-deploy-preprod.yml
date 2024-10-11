@@ -63,7 +63,7 @@ jobs:
       - name: Add coverage to PR
         id: jacoco
         if: github.event_name != 'merge_group'
-        uses: madrapps/jacoco-report@v1.7.0
+        uses: madrapps/jacoco-report@v1.7.1
         with:
           paths: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -73,7 +73,7 @@ jobs:
 
       - uses: nais/docker-build-push@v0
         id: docker-push
-        if: github.event_name != 'merge_group'
+        if: (github.event.pull_request.user.login != 'dependabot[bot]' && github.event_name != 'merge_group')
         with:
           team: teamfamilie
           push_image: true
