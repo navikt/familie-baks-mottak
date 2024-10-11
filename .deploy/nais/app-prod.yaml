@@ -53,8 +53,15 @@ spec:
         - application: familie-prosessering
           namespace: teamfamilie
           cluster: prod-gcp
+        - application: familie-ba-sak
+          cluster: prod-gcp
+        - application: familie-ks-sak
+          cluster: prod-gcp
         - application: statuspoll
           namespace: navdig
+        - application: familie-integrasjoner
+          namespace: teamfamilie
+          cluster: prod-fss
     outbound:
       rules:
         - application: familie-ba-sak

@@ -8,8 +8,8 @@ import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import io.mockk.clearAllMocks
 import no.nav.familie.baks.mottak.DevLauncherPostgres
 import no.nav.familie.baks.mottak.domene.NyBehandling
+import no.nav.familie.baks.mottak.domene.personopplysning.Adressebeskyttelsesgradering
 import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelse
-import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelsesgradering
 import no.nav.familie.baks.mottak.integrasjoner.Fødested
 import no.nav.familie.baks.mottak.integrasjoner.IntegrasjonException
 import no.nav.familie.baks.mottak.integrasjoner.PdlError
