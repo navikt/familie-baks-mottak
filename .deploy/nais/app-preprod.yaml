@@ -56,6 +56,9 @@ spec:
           cluster: dev-gcp
         - application: statuspoll
           namespace: navdig
+        - application: familie-integrasjoner
+          namespace: teamfamilie
+          cluster: dev-fss
     outbound:
       rules:
         - application: familie-ba-sak

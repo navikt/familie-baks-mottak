@@ -59,6 +59,9 @@ spec:
           cluster: prod-gcp
         - application: statuspoll
           namespace: navdig
+        - application: familie-integrasjoner
+          namespace: teamfamilie
+          cluster: prod-fss
     outbound:
       rules:
         - application: familie-ba-sak
