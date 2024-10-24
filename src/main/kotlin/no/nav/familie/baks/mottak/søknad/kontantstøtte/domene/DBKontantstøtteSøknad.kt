@@ -11,7 +11,6 @@ import jakarta.persistence.Table
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.Vedlegg
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.ks.søknad.StøttetVersjonertKontantstøtteSøknad
-import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsvedlegg
@@ -38,9 +37,7 @@ data class DBKontantstøtteSøknad(
     @Column(name = "journalpost_id")
     val journalpostId: String? = null,
 ) {
-    fun hentVersjonertKontantstøtteSøknad(): StøttetVersjonertKontantstøtteSøknad {
-        return objectMapper.readValue<StøttetVersjonertKontantstøtteSøknad>(søknadJson)
-    }
+    fun hentVersjonertKontantstøtteSøknad(): StøttetVersjonertKontantstøtteSøknad = objectMapper.readValue<StøttetVersjonertKontantstøtteSøknad>(søknadJson)
 }
 
 fun DBKontantstøtteSøknad.harEøsSteg(): Boolean {
@@ -68,8 +65,8 @@ fun KontantstøtteSøknadV4.tilDBKontantstøtteSøknad(): DBKontantstøtteSøkna
         return DBKontantstøtteSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
             fnr =
-            this.søker.ident.verdi
-                .getValue("nb"),
+                this.søker.ident.verdi
+                    .getValue("nb"),
         )
     } catch (e: KotlinNullPointerException) {
         throw FødselsnummerErNullException()
@@ -81,8 +78,8 @@ fun KontantstøtteSøknadV5.tilDBKontantstøtteSøknad(): DBKontantstøtteSøkna
         return DBKontantstøtteSøknad(
             søknadJson = objectMapper.writeValueAsString(this),
             fnr =
-            this.søker.ident.verdi
-                .getValue("nb"),
+                this.søker.ident.verdi
+                    .getValue("nb"),
         )
     } catch (e: KotlinNullPointerException) {
         throw FødselsnummerErNullException()

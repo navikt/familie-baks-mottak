@@ -1,17 +1,17 @@
 package no.nav.familie.baks.mottak.søknad.barnetrygd
 
 import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClient
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV8
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBVedlegg
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.FødselsnummerErNullException
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadVedleggRepository
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBVedlegg
 import no.nav.familie.baks.mottak.task.JournalførSøknadTask
+import no.nav.familie.kontrakter.ba.søknad.StøttetVersjonertBarnetrygdSøknad
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV8
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
@@ -28,14 +28,14 @@ class BarnetrygdSøknadService(
 ) {
     @Transactional
     @Throws(FødselsnummerErNullException::class)
-    fun motta(versjonertBarnetrygdSøknad: VersjonertBarnetrygdSøknad): DBBarnetrygdSøknad {
+    fun motta(versjonertBarnetrygdSøknad: StøttetVersjonertBarnetrygdSøknad): DBBarnetrygdSøknad {
         val (dbSøknad, dokumentasjon) =
             when (versjonertBarnetrygdSøknad) {
-                is BarnetrygdSøknadV8 -> {
+                is VersjonertBarnetrygdSøknadV8 -> {
                     Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.tilDBSøknad(), versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon)
                 }
 
-                is BarnetrygdSøknadV9 -> {
+                is VersjonertBarnetrygdSøknadV9 -> {
                     Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.tilDBSøknad(), versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon)
                 }
             }

@@ -1,9 +1,9 @@
 package no.nav.familie.baks.mottak.søknad.barnetrygd
 
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV8
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertBarnetrygdSøknad
+import no.nav.familie.kontrakter.ba.søknad.StøttetVersjonertBarnetrygdSøknad
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV8
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
@@ -36,17 +36,17 @@ class BarnetrygdSøknadMetrikkService {
     private val ordinærSøknadEøs = Metrics.counter("barnetrygd.ordinaer.soknad.eos")
     private val utvidetSøknadEøs = Metrics.counter("barnetrygd.utvidet.soknad.eos")
 
-    fun sendMottakMetrikker(versjonertBarnetrygdSøknad: VersjonertBarnetrygdSøknad) {
+    fun sendMottakMetrikker(versjonertBarnetrygdSøknad: StøttetVersjonertBarnetrygdSøknad) {
         val (søknadstype, dokumentasjon) =
             when (versjonertBarnetrygdSøknad) {
-                is BarnetrygdSøknadV8 -> Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype, versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon)
-                is BarnetrygdSøknadV9 -> Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype, versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon)
+                is VersjonertBarnetrygdSøknadV8 -> Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype, versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon)
+                is VersjonertBarnetrygdSøknadV9 -> Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype, versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon)
             }
 
         val harEøsSteg =
             when (versjonertBarnetrygdSøknad) {
-                is BarnetrygdSøknadV8 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.antallEøsSteg > 0
-                is BarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.antallEøsSteg > 0
+                is VersjonertBarnetrygdSøknadV8 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.antallEøsSteg > 0
+                is VersjonertBarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.antallEøsSteg > 0
             }
 
         val erUtvidet = søknadstype == Søknadstype.UTVIDET
@@ -55,11 +55,11 @@ class BarnetrygdSøknadMetrikkService {
         sendDokumentasjonMetrikker(erUtvidet, dokumentasjon)
     }
 
-    fun sendMottakFeiletMetrikker(versjonertBarnetrygdSøknad: VersjonertBarnetrygdSøknad) {
+    fun sendMottakFeiletMetrikker(versjonertBarnetrygdSøknad: StøttetVersjonertBarnetrygdSøknad) {
         val søknadstype =
             when (versjonertBarnetrygdSøknad) {
-                is BarnetrygdSøknadV8 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
-                is BarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
+                is VersjonertBarnetrygdSøknadV8 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
+                is VersjonertBarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
             }
         if (søknadstype == Søknadstype.UTVIDET) søknadUtvidetMottattFeil.increment() else søknadMottattFeil.increment()
     }

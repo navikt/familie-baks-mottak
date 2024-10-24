@@ -26,17 +26,17 @@ object SøknadTestData {
             statsborgerskap = søknadsfelt("statsborgerskap", listOf("NOR")),
             adressebeskyttelse = false,
             adresse =
-            søknadsfelt(
-                "adresse",
-                SøknadAdresse(
-                    adressenavn = null,
-                    postnummer = null,
-                    husbokstav = null,
-                    bruksenhetsnummer = null,
-                    husnummer = null,
-                    poststed = null,
+                søknadsfelt(
+                    "adresse",
+                    SøknadAdresse(
+                        adressenavn = null,
+                        postnummer = null,
+                        husbokstav = null,
+                        bruksenhetsnummer = null,
+                        husnummer = null,
+                        poststed = null,
+                    ),
                 ),
-            ),
             sivilstand = søknadsfelt("sivilstand", SIVILSTANDTYPE.GIFT),
             spørsmål = mapOf(),
             nåværendeSamboer = null,
@@ -69,21 +69,21 @@ object SøknadTestData {
             barn = barn,
             spørsmål = mapOf(),
             dokumentasjon =
-            listOf(
-                Søknaddokumentasjon(
-                    dokumentasjonsbehov = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON,
-                    harSendtInn = false,
-                    opplastedeVedlegg =
-                    listOf(
-                        Søknadsvedlegg(
-                            dokumentId = "en-slags-uuid",
-                            navn = "IMG 1337.png",
-                            tittel = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON,
-                        ),
+                listOf(
+                    Søknaddokumentasjon(
+                        dokumentasjonsbehov = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON,
+                        harSendtInn = false,
+                        opplastedeVedlegg =
+                            listOf(
+                                Søknadsvedlegg(
+                                    dokumentId = "en-slags-uuid",
+                                    navn = "IMG 1337.png",
+                                    tittel = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON,
+                                ),
+                            ),
+                        dokumentasjonSpråkTittel = mapOf("nb" to "Bekreftelse fra barnevernet"),
                     ),
-                    dokumentasjonSpråkTittel = mapOf("nb" to "Bekreftelse fra barnevernet"),
                 ),
-            ),
             originalSpråk = "nb",
             teksterUtenomSpørsmål = mapOf(),
             finnesPersonMedAdressebeskyttelse = false,

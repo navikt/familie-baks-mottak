@@ -3,11 +3,11 @@ package no.nav.familie.baks.mottak.søknad
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBVedlegg
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteVedlegg
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad
 import no.nav.familie.kontrakter.felles.dokarkiv.Dokumenttype
@@ -46,9 +46,9 @@ class ArkiverDokumentRequestMapperTest {
                 ),
             )
         every { kontantstøtteSøknad.dokumentasjon } returns
-                listOf(
-                    dokumentasjon,
-                )
+            listOf(
+                dokumentasjon,
+            )
         val dbKontantstøtteSøknad = DBKontantstøtteSøknad(søknadJson = "{}", fnr = "12345678910")
         val vedleggMap =
             mapOf(
@@ -69,11 +69,11 @@ class ArkiverDokumentRequestMapperTest {
             true,
             arkiverDokumentRequest.hoveddokumentvarianter.all {
                 it.filtype in
-                        listOf(
-                            Filtype.PDFA,
-                            Filtype.JSON,
-                        ) &&
-                        it.dokumenttype == Dokumenttype.KONTANTSTØTTE_SØKNAD
+                    listOf(
+                        Filtype.PDFA,
+                        Filtype.JSON,
+                    ) &&
+                    it.dokumenttype == Dokumenttype.KONTANTSTØTTE_SØKNAD
             },
         )
         assertEquals(1, arkiverDokumentRequest.vedleggsdokumenter.size)
@@ -110,9 +110,9 @@ class ArkiverDokumentRequestMapperTest {
                 ),
             )
         every { barnetrygdSøknad.dokumentasjon } returns
-                listOf(
-                    dokumentasjon,
-                )
+            listOf(
+                dokumentasjon,
+            )
         every { barnetrygdSøknad.søknadstype } returns Søknadstype.ORDINÆR
 
         val dbBarnetrygdSøknad = DBBarnetrygdSøknad(søknadJson = "{}", fnr = "12345678910")
@@ -123,7 +123,7 @@ class ArkiverDokumentRequestMapperTest {
         val arkiverDokumentRequest =
             ArkiverDokumentRequestMapper.toDto(
                 dbBarnetrygdSøknad,
-                BarnetrygdSøknadV9(barnetrygdSøknad),
+                VersjonertBarnetrygdSøknadV9(barnetrygdSøknad),
                 ByteArray(0),
                 vedleggMap,
                 ByteArray(0),
@@ -135,11 +135,11 @@ class ArkiverDokumentRequestMapperTest {
             true,
             arkiverDokumentRequest.hoveddokumentvarianter.all {
                 it.filtype in
-                        listOf(
-                            Filtype.PDFA,
-                            Filtype.JSON,
-                        ) &&
-                        it.dokumenttype == Dokumenttype.BARNETRYGD_ORDINÆR
+                    listOf(
+                        Filtype.PDFA,
+                        Filtype.JSON,
+                    ) &&
+                    it.dokumenttype == Dokumenttype.BARNETRYGD_ORDINÆR
             },
         )
         assertEquals(1, arkiverDokumentRequest.vedleggsdokumenter.size)

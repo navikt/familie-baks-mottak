@@ -1,11 +1,11 @@
 package no.nav.familie.baks.mottak.søknad
 
 import no.nav.familie.baks.mottak.integrasjoner.PdfClient
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV8
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
+import no.nav.familie.kontrakter.ba.søknad.StøttetVersjonertBarnetrygdSøknad
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV8
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.ks.søknad.StøttetVersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
@@ -23,7 +23,7 @@ class PdfService(
     private val søknadSpråkvelgerService: SøknadSpråkvelgerService,
 ) {
     fun lagBarnetrygdPdf(
-        versjonertBarnetrygdSøknad: VersjonertBarnetrygdSøknad,
+        versjonertBarnetrygdSøknad: StøttetVersjonertBarnetrygdSøknad,
         dbBarnetrygdSøknad: DBBarnetrygdSøknad,
         språk: String,
     ): ByteArray {
@@ -32,10 +32,10 @@ class PdfService(
 
         val (søknadstype, navn) =
             when (versjonertBarnetrygdSøknad) {
-                is BarnetrygdSøknadV8 ->
+                is VersjonertBarnetrygdSøknadV8 ->
                     Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype, versjonertBarnetrygdSøknad.barnetrygdSøknad.søker.navn)
 
-                is BarnetrygdSøknadV9 ->
+                is VersjonertBarnetrygdSøknadV9 ->
                     Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype, versjonertBarnetrygdSøknad.barnetrygdSøknad.søker.navn)
             }
 
@@ -46,10 +46,10 @@ class PdfService(
                 opprettetTid = dbBarnetrygdSøknad.opprettetTid,
                 fnr = dbBarnetrygdSøknad.fnr,
                 label =
-                when (søknadstype) {
-                    Søknadstype.UTVIDET -> "Søknad om utvidet barnetrygd"
-                    else -> "Søknad om ordinær barnetrygd"
-                },
+                    when (søknadstype) {
+                        Søknadstype.UTVIDET -> "Søknad om utvidet barnetrygd"
+                        else -> "Søknad om ordinær barnetrygd"
+                    },
             )
         return familieDokumentPdfClient.lagPdf(path, barnetrygdSøknadMapForSpråk + ekstraFelterMap)
     }
@@ -92,9 +92,9 @@ class PdfService(
     ): Map<String, String> =
         mapOf(
             "dokumentDato" to
-                    opprettetTid.format(
-                        DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale.of("no")),
-                    ),
+                opprettetTid.format(
+                    DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale.of("no")),
+                ),
             "navn" to navn,
             "fodselsnummer" to fnr,
             "label" to label,

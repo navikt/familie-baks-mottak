@@ -33,26 +33,26 @@ class SøknadSpråkvelgerServiceTest {
         val teksterTilPdf =
             mapOf(
                 "testApiNavn" to
-                        TekstPåSpråkMap(
-                            tekstPåSpråk,
-                        ),
+                    TekstPåSpråkMap(
+                        tekstPåSpråk,
+                    ),
             )
         every { barn.teksterTilPdf } returns teksterTilPdf
         every { kontantstøtteSøknad.barn } returns
-                listOf(
-                    barn,
-                )
+            listOf(
+                barn,
+            )
         every { kontantstøtteSøknad.teksterTilPdf } returns teksterTilPdf
         every { kontantstøtteSøknad.erBarnAdoptert } returns
-                Søknadsfelt(
-                    label = tekstPåSpråk,
-                    verdi = tekstPåSpråk,
-                )
+            Søknadsfelt(
+                label = tekstPåSpråk,
+                verdi = tekstPåSpråk,
+            )
         every { dokumentasjon.dokumentasjonSpråkTittel } returns TekstPåSpråkMap(tekstPåSpråk)
         every { kontantstøtteSøknad.dokumentasjon } returns
-                listOf(
-                    dokumentasjon,
-                )
+            listOf(
+                dokumentasjon,
+            )
 
         val versjonertKontantstøtteSøknad = VersjonertKontantstøtteSøknadV5(kontantstøtteSøknad = kontantstøtteSøknad)
 

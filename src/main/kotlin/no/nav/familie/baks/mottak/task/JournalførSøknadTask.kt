@@ -2,12 +2,11 @@ package no.nav.familie.baks.mottak.task
 
 import no.nav.familie.baks.mottak.søknad.JournalføringService
 import no.nav.familie.baks.mottak.søknad.PdfService
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV8
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertBarnetrygdSøknad
 import no.nav.familie.http.client.RessursException
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV8
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -29,12 +28,12 @@ class JournalførSøknadTask(
             log.info("Prøver å hente søknadspdf for $id")
             val dbBarnetrygdSøknad: DBBarnetrygdSøknad =
                 søknadRepository.hentDBSøknad(id.toLong()) ?: error("Kunne ikke finne søknad ($id) i database")
-            val versjonertBarnetrygdSøknad: VersjonertBarnetrygdSøknad = dbBarnetrygdSøknad.hentVersjonertSøknad()
+            val versjonertBarnetrygdSøknad = dbBarnetrygdSøknad.hentVersjonertBarnetrygdSøknad()
 
             val søknadstype =
                 when (versjonertBarnetrygdSøknad) {
-                    is BarnetrygdSøknadV8 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
-                    is BarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
+                    is VersjonertBarnetrygdSøknadV8 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
+                    is VersjonertBarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
                 }
             log.info("Generer pdf og journalfør søknad om ${søknadstype.name.lowercase()} barnetrygd")
             val bokmålPdf =
@@ -47,8 +46,8 @@ class JournalførSøknadTask(
 
             val orginalspråk =
                 when (versjonertBarnetrygdSøknad) {
-                    is BarnetrygdSøknadV8 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.originalSpråk
-                    is BarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.originalSpråk
+                    is VersjonertBarnetrygdSøknadV8 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.originalSpråk
+                    is VersjonertBarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.originalSpråk
                 }
 
             val orginalspråkPdf: ByteArray =

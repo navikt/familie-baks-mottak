@@ -1,10 +1,10 @@
 package no.nav.familie.baks.mottak.søknad.barnetrygd
 
 import no.nav.familie.baks.mottak.søknad.Kvittering
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV8
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.FødselsnummerErNullException
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertBarnetrygdSøknad
+import no.nav.familie.kontrakter.ba.søknad.StøttetVersjonertBarnetrygdSøknad
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV8
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ba.søknad.v8.Søknad
 import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad
 import no.nav.familie.kontrakter.felles.Ressurs
@@ -31,7 +31,7 @@ class BarnetrygdSøknadController(
         @RequestPart("søknad") søknad: Søknad,
     ): ResponseEntity<Ressurs<Kvittering>> =
         mottaVersjonertSøknadOgSendMetrikker(
-            versjonertBarnetrygdSøknad = BarnetrygdSøknadV8(barnetrygdSøknad = søknad),
+            versjonertBarnetrygdSøknad = VersjonertBarnetrygdSøknadV8(barnetrygdSøknad = søknad),
         )
 
     @PostMapping(value = ["/soknad/v9"], consumes = [MULTIPART_FORM_DATA_VALUE])
@@ -40,10 +40,10 @@ class BarnetrygdSøknadController(
     ): ResponseEntity<Ressurs<Kvittering>> =
         mottaVersjonertSøknadOgSendMetrikker(
             versjonertBarnetrygdSøknad =
-                BarnetrygdSøknadV9(barnetrygdSøknad = søknad),
+            VersjonertBarnetrygdSøknadV9(barnetrygdSøknad = søknad),
         )
 
-    fun mottaVersjonertSøknadOgSendMetrikker(versjonertBarnetrygdSøknad: VersjonertBarnetrygdSøknad): ResponseEntity<Ressurs<Kvittering>> =
+    fun mottaVersjonertSøknadOgSendMetrikker(versjonertBarnetrygdSøknad: StøttetVersjonertBarnetrygdSøknad): ResponseEntity<Ressurs<Kvittering>> =
         try {
             val dbSøknad = barnetrygdSøknadService.motta(versjonertBarnetrygdSøknad = versjonertBarnetrygdSøknad)
             barnetrygdSøknadMetrikkService.sendMottakMetrikker(versjonertBarnetrygdSøknad)
