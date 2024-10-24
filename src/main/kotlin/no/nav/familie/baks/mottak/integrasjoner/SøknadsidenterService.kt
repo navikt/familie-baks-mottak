@@ -4,8 +4,8 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV8
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadService
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV5
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
 import org.springframework.stereotype.Service
 
 @Service
@@ -19,7 +19,7 @@ class SøknadsidenterService(
                 .hentDBKontantstøtteSøknadForJournalpost(journalpostId)
                 .hentVersjonertKontantstøtteSøknad()
         return when (versjonertSøknad) {
-            is KontantstøtteSøknadV4 ->
+            is VersjonertKontantstøtteSøknadV4 ->
                 Pair(
                     versjonertSøknad.kontantstøtteSøknad.søker.ident.verdi.values
                         .first(),
@@ -29,7 +29,7 @@ class SøknadsidenterService(
                     },
                 )
 
-            is KontantstøtteSøknadV5 ->
+            is VersjonertKontantstøtteSøknadV5 ->
                 Pair(
                     versjonertSøknad.kontantstøtteSøknad.søker.ident.verdi.values
                         .first(),

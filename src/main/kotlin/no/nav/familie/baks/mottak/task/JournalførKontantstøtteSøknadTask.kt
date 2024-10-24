@@ -4,9 +4,9 @@ import no.nav.familie.baks.mottak.søknad.JournalføringService
 import no.nav.familie.baks.mottak.søknad.PdfService
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV5
 import no.nav.familie.http.client.RessursException
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -45,8 +45,8 @@ class JournalførKontantstøtteSøknadTask(
 
             val orginalspråk =
                 when (versjonertSøknad) {
-                    is KontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.originalSpråk
-                    is KontantstøtteSøknadV5 -> versjonertSøknad.kontantstøtteSøknad.originalSpråk
+                    is VersjonertKontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.originalSpråk
+                    is VersjonertKontantstøtteSøknadV5 -> versjonertSøknad.kontantstøtteSøknad.originalSpråk
                 }
 
             val orginalspråkPdf: ByteArray =

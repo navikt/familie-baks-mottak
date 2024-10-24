@@ -9,15 +9,16 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.Vedlegg
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteVedlegg
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV5
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknaddokumentasjon
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.felles.dokarkiv.Dokumenttype
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.ArkiverDokumentRequest
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.Dokument
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.Filtype
+import no.nav.familie.kontrakter.ks.søknad.StøttetVersjonertKontantstøtteSøknad
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknad
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
 
 object ArkiverDokumentRequestMapper {
     private val KONTANTSTØTTE_ID_POSTFIX = "NAV_34-00.08"
@@ -67,11 +68,11 @@ object ArkiverDokumentRequestMapper {
                 filtype = Filtype.PDFA,
                 filnavn = null,
                 tittel =
-                    when (dokumenttype) {
-                        Dokumenttype.BARNETRYGD_UTVIDET -> "Søknad om utvidet barnetrygd"
-                        Dokumenttype.BARNETRYGD_ORDINÆR -> "Søknad om ordinær barnetrygd"
-                        else -> "Søknad om ordinær barnetrygd"
-                    },
+                when (dokumenttype) {
+                    Dokumenttype.BARNETRYGD_UTVIDET -> "Søknad om utvidet barnetrygd"
+                    Dokumenttype.BARNETRYGD_ORDINÆR -> "Søknad om ordinær barnetrygd"
+                    else -> "Søknad om ordinær barnetrygd"
+                },
                 dokumenttype = dokumenttype,
             )
 
@@ -80,19 +81,19 @@ object ArkiverDokumentRequestMapper {
             forsøkFerdigstill = false,
             hoveddokumentvarianter = listOf(søknadsdokumentPdf, søknadsdokumentJson),
             vedleggsdokumenter =
-                hentVedleggListeTilArkivering(
-                    dokumentasjon,
-                    vedleggMap,
-                    pdfOriginalSpråk,
-                    Dokumenttype.BARNETRYGD_VEDLEGG,
-                ),
+            hentVedleggListeTilArkivering(
+                dokumentasjon,
+                vedleggMap,
+                pdfOriginalSpråk,
+                Dokumenttype.BARNETRYGD_VEDLEGG,
+            ),
             eksternReferanseId = genererEksternReferanseId(dbBarnetrygdSøknad.id, dokumenttype),
         )
     }
 
     fun toDto(
         dbKontantstøtteSøknad: DBKontantstøtteSøknad,
-        versjonertSøknad: VersjonertKontantstøtteSøknad,
+        versjonertSøknad: StøttetVersjonertKontantstøtteSøknad,
         pdf: ByteArray,
         vedleggMap: Map<String, DBKontantstotteVedlegg>,
         pdfOriginalSpråk: ByteArray,
@@ -101,10 +102,10 @@ object ArkiverDokumentRequestMapper {
 
         val dokumentasjon =
             when (versjonertSøknad) {
-                is KontantstøtteSøknadV4 ->
+                is VersjonertKontantstøtteSøknadV4 ->
                     versjonertSøknad.kontantstøtteSøknad.dokumentasjon.map { KontantstøtteSøknaddokumentasjon(it) }
 
-                is KontantstøtteSøknadV5 ->
+                is VersjonertKontantstøtteSøknadV5 ->
                     versjonertSøknad.kontantstøtteSøknad.dokumentasjon.map { KontantstøtteSøknaddokumentasjon(it) }
             }
 
@@ -130,12 +131,12 @@ object ArkiverDokumentRequestMapper {
             forsøkFerdigstill = false,
             hoveddokumentvarianter = listOf(søknadsdokumentPdf, søknadsdokumentJson),
             vedleggsdokumenter =
-                hentVedleggListeTilArkivering(
-                    dokumentasjon,
-                    vedleggMap,
-                    pdfOriginalSpråk,
-                    Dokumenttype.KONTANTSTØTTE_VEDLEGG,
-                ),
+            hentVedleggListeTilArkivering(
+                dokumentasjon,
+                vedleggMap,
+                pdfOriginalSpråk,
+                Dokumenttype.KONTANTSTØTTE_VEDLEGG,
+            ),
             eksternReferanseId = genererEksternReferanseId(dbKontantstøtteSøknad.id, dokumenttype),
         )
     }

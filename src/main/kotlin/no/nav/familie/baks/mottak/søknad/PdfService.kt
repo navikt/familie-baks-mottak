@@ -6,10 +6,10 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV5
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
+import no.nav.familie.kontrakter.ks.søknad.StøttetVersjonertKontantstøtteSøknad
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -46,16 +46,16 @@ class PdfService(
                 opprettetTid = dbBarnetrygdSøknad.opprettetTid,
                 fnr = dbBarnetrygdSøknad.fnr,
                 label =
-                    when (søknadstype) {
-                        Søknadstype.UTVIDET -> "Søknad om utvidet barnetrygd"
-                        else -> "Søknad om ordinær barnetrygd"
-                    },
+                when (søknadstype) {
+                    Søknadstype.UTVIDET -> "Søknad om utvidet barnetrygd"
+                    else -> "Søknad om ordinær barnetrygd"
+                },
             )
         return familieDokumentPdfClient.lagPdf(path, barnetrygdSøknadMapForSpråk + ekstraFelterMap)
     }
 
     fun lagKontantstøttePdf(
-        versjonertSøknad: VersjonertKontantstøtteSøknad,
+        versjonertSøknad: StøttetVersjonertKontantstøtteSøknad,
         dbKontantstøtteSøknad: DBKontantstøtteSøknad,
         språk: String,
     ): ByteArray {
@@ -64,8 +64,8 @@ class PdfService(
 
         val navn =
             when (versjonertSøknad) {
-                is KontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
-                is KontantstøtteSøknadV5 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
+                is VersjonertKontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
+                is VersjonertKontantstøtteSøknadV5 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
             }
 
         val ekstraFelterMap =
@@ -92,9 +92,9 @@ class PdfService(
     ): Map<String, String> =
         mapOf(
             "dokumentDato" to
-                opprettetTid.format(
-                    DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale.of("no")),
-                ),
+                    opprettetTid.format(
+                        DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).localizedBy(Locale.of("no")),
+                    ),
             "navn" to navn,
             "fodselsnummer" to fnr,
             "label" to label,
