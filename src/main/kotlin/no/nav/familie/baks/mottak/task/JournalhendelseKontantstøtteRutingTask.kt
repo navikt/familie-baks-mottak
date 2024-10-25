@@ -50,7 +50,17 @@ class JournalhendelseKontantstøtteRutingTask(
             return
         }
 
-        val brukersIdent = journalpostBrukerService.tilPersonIdent(journalpost.bruker, tema)
+        val brukersIdent =
+            try {
+                journalpostBrukerService.tilPersonIdent(journalpost.bruker, tema)
+            } catch (error: NoSuchElementException) {
+                opprettJournalføringOppgaveTask(
+                    sakssystemMarkering = "Fant ingen aktiv personIdent for denne journalpost brukeren.",
+                    task = task,
+                )
+                return
+            }
+
         val fagsakId = ksSakClient.hentFagsaknummerPåPersonident(brukersIdent)
 
         val harLøpendeSakIInfotrygd = harLøpendeSakIInfotrygd(brukersIdent)

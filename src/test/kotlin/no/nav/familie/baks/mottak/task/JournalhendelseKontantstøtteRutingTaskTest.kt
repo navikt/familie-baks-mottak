@@ -260,6 +260,46 @@ class JournalhendelseKontantstøtteRutingTaskTest {
         assertEquals("Ingen bruker er satt på journalpost. Kan ikke utlede om bruker har sak i Infotrygd eller KS-sak.", opprettetTask.payload)
     }
 
+    @Test
+    fun `doTask - skal opprette journalføring-oppgave dersom vi ikke finner aktiv personIdent på aktørId`() {
+        // Arrange
+        val journalpostId = "1"
+        val taskSlot = slot<Task>()
+
+        every { journalpostClient.hentJournalpost(journalpostId) } returns
+            Journalpost(
+                journalpostId = journalpostId,
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
+            )
+
+        every { taskService.save(capture(taskSlot)) } returns mockk()
+
+        every { journalpostBrukerService.tilPersonIdent(any(), any()) } throws NoSuchElementException("List is empty.")
+
+        // Act
+        journalhendelseKontantstøtteRutingTask.doTask(
+            Task(
+                type = JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE,
+                payload = "SKAN_IM",
+                properties =
+                    Properties().apply {
+                        this["journalpostId"] = journalpostId
+                        this["fagsakId"] = "123"
+                        this["tema"] = Tema.KON.name
+                    },
+            ),
+        )
+
+        // Assert
+        val opprettetTask = taskSlot.captured
+
+        verify(exactly = 1) { taskService.save(any()) }
+        assertEquals(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE, opprettetTask.type)
+        assertEquals("Fant ingen aktiv personIdent for denne journalpost brukeren.", opprettetTask.payload)
+    }
+
     private fun setupPDLMocks() {
         every { pdlClient.hentPersonMedRelasjoner(any(), any()) } returns
             Person(

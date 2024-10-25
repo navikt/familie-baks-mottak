@@ -97,6 +97,8 @@ class JournalhendelseBarnetrygdRutingTaskTest {
                 bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
             )
 
+        every { journalpostBrukerService.tilPersonIdent(any(), any()) } throws NoSuchElementException("List is empty.")
+
         every { taskService.save(capture(taskSlot)) } returns mockk()
 
         // Act
@@ -118,6 +120,6 @@ class JournalhendelseBarnetrygdRutingTaskTest {
 
         verify(exactly = 1) { taskService.save(any()) }
         assertEquals(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE, opprettetTask.type)
-        assertEquals("Ingen bruker er satt på journalpost. Kan ikke utlede om bruker har sak i Infotrygd eller BA-sak.", opprettetTask.payload)
+        assertEquals("Fant ingen aktiv personIdent for denne journalpost brukeren.", opprettetTask.payload)
     }
 }
