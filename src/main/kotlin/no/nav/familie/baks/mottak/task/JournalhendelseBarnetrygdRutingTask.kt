@@ -13,6 +13,7 @@ import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus.OPPRETTET
 import no.nav.familie.baks.mottak.integrasjoner.Identgruppe
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.IntegrasjonException
+import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.Opphørsgrunn
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
@@ -58,15 +59,8 @@ class JournalhendelseBarnetrygdRutingTask(
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
         val brukersIdent = task.metadata["personIdent"] as String?
 
-        if (journalpost.bruker == null) {
-            opprettJournalføringOppgaveTask(
-                sakssystemMarkering = "Ingen bruker er satt på journalpost. Kan ikke utlede om bruker har sak i Infotrygd eller BA-sak.",
-                task = task,
-            )
-            return
-        }
-
-        val personIdent = journalpostBrukerService.tilPersonIdent(journalpost.bruker, tema)
+        val personIdent = hentPersonIdentForAutomatiskJournalføring(journalpost, task)
+        if (personIdent == null) return
         val fagsakId = baSakClient.hentFagsaknummerPåPersonident(personIdent)
 
         val (baSak, infotrygdSak) = brukersIdent?.run { søkEtterSakIBaSakOgInfotrygd(this) } ?: Pair(null, null)
@@ -177,6 +171,29 @@ class JournalhendelseBarnetrygdRutingTask(
     }
 
     fun Sakspart?.finnes(): Boolean = this != null
+
+    private fun hentPersonIdentForAutomatiskJournalføring(
+        journalpost: Journalpost,
+        task: Task,
+    ): String? {
+        if (journalpost.bruker == null) {
+            opprettJournalføringOppgaveTask(
+                sakssystemMarkering = "Ingen bruker er satt på journalpost. Kan ikke utlede om bruker har sak i Infotrygd eller BA-sak.",
+                task = task,
+            )
+            return null
+        }
+
+        try {
+            return journalpostBrukerService.tilPersonIdent(journalpost.bruker, tema)
+        } catch (error: NoSuchElementException) {
+            opprettJournalføringOppgaveTask(
+                sakssystemMarkering = "Fant ingen aktiv personIdent for denne journalpost brukeren.",
+                task = task,
+            )
+            return null
+        }
+    }
 
     companion object {
         const val TASK_STEP_TYPE = "journalhendelseBarnetrygdRuting"

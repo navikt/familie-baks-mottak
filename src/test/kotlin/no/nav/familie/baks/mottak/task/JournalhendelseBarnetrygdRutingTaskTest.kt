@@ -6,6 +6,8 @@ import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
+import no.nav.familie.baks.mottak.integrasjoner.Bruker
+import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
@@ -55,6 +57,44 @@ class JournalhendelseBarnetrygdRutingTaskTest {
                 journalposttype = Journalposttype.I,
                 journalstatus = Journalstatus.MOTTATT,
                 bruker = null,
+            )
+
+        every { taskService.save(capture(taskSlot)) } returns mockk()
+
+        // Act
+        journalhendelseBarnetrygdRutingTask.doTask(
+            Task(
+                type = JournalhendelseKontantstøtteRutingTask.TASK_STEP_TYPE,
+                payload = "SKAN_IM",
+                properties =
+                    Properties().apply {
+                        this["journalpostId"] = journalpostId
+                        this["fagsakId"] = "123"
+                        this["tema"] = Tema.BAR.name
+                    },
+            ),
+        )
+
+        // Assert
+        val opprettetTask = taskSlot.captured
+
+        verify(exactly = 1) { taskService.save(any()) }
+        assertEquals(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE, opprettetTask.type)
+        assertEquals("Ingen bruker er satt på journalpost. Kan ikke utlede om bruker har sak i Infotrygd eller BA-sak.", opprettetTask.payload)
+    }
+
+    @Test
+    fun `doTask - skal opprette journalføring-oppgave dersom vi ikke finner aktiv personIdent på aktørId`() {
+        // Arrange
+        val journalpostId = "1"
+        val taskSlot = slot<Task>()
+
+        every { journalpostClient.hentJournalpost(journalpostId) } returns
+            Journalpost(
+                journalpostId = journalpostId,
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
             )
 
         every { taskService.save(capture(taskSlot)) } returns mockk()
