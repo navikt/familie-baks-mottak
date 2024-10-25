@@ -39,8 +39,7 @@ class BarnetrygdSøknadController(
         @RequestPart("søknad") søknad: BarnetrygdSøknad,
     ): ResponseEntity<Ressurs<Kvittering>> =
         mottaVersjonertSøknadOgSendMetrikker(
-            versjonertBarnetrygdSøknad =
-            VersjonertBarnetrygdSøknadV9(barnetrygdSøknad = søknad),
+            versjonertBarnetrygdSøknad = VersjonertBarnetrygdSøknadV9(barnetrygdSøknad = søknad),
         )
 
     fun mottaVersjonertSøknadOgSendMetrikker(versjonertBarnetrygdSøknad: StøttetVersjonertBarnetrygdSøknad): ResponseEntity<Ressurs<Kvittering>> =
