@@ -7,6 +7,7 @@ import no.nav.familie.baks.mottak.integrasjoner.InfotrygdKontantstøtteClient
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlNotFoundException
 import no.nav.familie.baks.mottak.integrasjoner.StonadDto
 import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringKontantstøtteService
 import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
@@ -53,7 +54,7 @@ class JournalhendelseKontantstøtteRutingTask(
         val brukersIdent =
             try {
                 journalpostBrukerService.tilPersonIdent(journalpost.bruker, tema)
-            } catch (error: NoSuchElementException) {
+            } catch (error: PdlNotFoundException) {
                 opprettJournalføringOppgaveTask(
                     sakssystemMarkering = "Fant ingen aktiv personIdent for denne journalpost brukeren.",
                     task = task,

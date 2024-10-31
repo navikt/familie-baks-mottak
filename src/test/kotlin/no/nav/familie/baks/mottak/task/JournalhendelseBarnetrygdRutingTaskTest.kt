@@ -14,12 +14,14 @@ import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.Journalposttype
 import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlNotFoundException
 import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringBarnetrygdService
 import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.junit.jupiter.api.Test
+import java.net.URI
 import java.util.Properties
 import kotlin.test.assertEquals
 
@@ -97,7 +99,12 @@ class JournalhendelseBarnetrygdRutingTaskTest {
                 bruker = Bruker("123456789012", BrukerIdType.AKTOERID),
             )
 
-        every { journalpostBrukerService.tilPersonIdent(any(), any()) } throws NoSuchElementException("List is empty.")
+        every { journalpostBrukerService.tilPersonIdent(any(), any()) } throws
+            PdlNotFoundException(
+                msg = "Fant ikke aktive identer på person",
+                uri = URI("/"),
+                ident = "1234",
+            )
 
         every { taskService.save(capture(taskSlot)) } returns mockk()
 

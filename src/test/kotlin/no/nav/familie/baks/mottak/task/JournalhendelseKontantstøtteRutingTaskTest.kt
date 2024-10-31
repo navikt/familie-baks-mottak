@@ -21,6 +21,7 @@ import no.nav.familie.baks.mottak.integrasjoner.Journalposttype
 import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlNotFoundException
 import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
 import no.nav.familie.baks.mottak.integrasjoner.StonadDto
 import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringKontantstøtteService
@@ -32,6 +33,7 @@ import no.nav.familie.kontrakter.felles.personopplysning.ForelderBarnRelasjon
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.junit.jupiter.api.Test
+import java.net.URI
 import java.time.YearMonth
 import java.util.Properties
 import kotlin.test.assertEquals
@@ -276,7 +278,12 @@ class JournalhendelseKontantstøtteRutingTaskTest {
 
         every { taskService.save(capture(taskSlot)) } returns mockk()
 
-        every { journalpostBrukerService.tilPersonIdent(any(), any()) } throws NoSuchElementException("List is empty.")
+        every { journalpostBrukerService.tilPersonIdent(any(), any()) } throws
+            PdlNotFoundException(
+                msg = "Fant ikke aktive identer på person",
+                uri = URI("/"),
+                ident = "1234",
+            )
 
         // Act
         journalhendelseKontantstøtteRutingTask.doTask(
