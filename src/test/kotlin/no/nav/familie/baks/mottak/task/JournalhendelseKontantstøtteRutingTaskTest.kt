@@ -32,6 +32,7 @@ import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROL
 import no.nav.familie.kontrakter.felles.personopplysning.ForelderBarnRelasjon
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.net.URI
 import java.time.YearMonth
@@ -303,8 +304,8 @@ class JournalhendelseKontantstøtteRutingTaskTest {
         val opprettetTask = taskSlot.captured
 
         verify(exactly = 1) { taskService.save(any()) }
-        assertEquals(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE, opprettetTask.type)
-        assertEquals("Fant ingen aktiv personIdent for denne journalpost brukeren.", opprettetTask.payload)
+        assertThat(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE).isEqualTo(opprettetTask.type)
+        assertThat("Fant ingen aktiv personIdent for denne journalpost brukeren.").isEqualTo(opprettetTask.payload)
     }
 
     private fun setupPDLMocks() {

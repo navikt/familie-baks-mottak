@@ -20,6 +20,7 @@ import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.net.URI
 import java.util.Properties
@@ -126,7 +127,7 @@ class JournalhendelseBarnetrygdRutingTaskTest {
         val opprettetTask = taskSlot.captured
 
         verify(exactly = 1) { taskService.save(any()) }
-        assertEquals(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE, opprettetTask.type)
-        assertEquals("Fant ingen aktiv personIdent for denne journalpost brukeren.", opprettetTask.payload)
+        assertThat(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE).isEqualTo(opprettetTask.type)
+        assertThat("Fant ingen aktiv personIdent for denne journalpost brukeren.").isEqualTo(opprettetTask.payload)
     }
 }
