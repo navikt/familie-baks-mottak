@@ -1,7 +1,5 @@
 package no.nav.familie.baks.mottak.task
 
-import io.micrometer.core.instrument.Counter
-import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringKontantstøtteService
@@ -27,7 +25,6 @@ class JournalhendelseKontantstøtteRutingTask(
     private val journalpostBrukerService: JournalpostBrukerService,
 ) : AbstractJournalhendelseRutingTask(taskService) {
     private val tema = Tema.KON
-    private val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
 
     private val log: Logger = LoggerFactory.getLogger(JournalhendelseKontantstøtteRutingTask::class.java)
 
@@ -45,8 +42,6 @@ class JournalhendelseKontantstøtteRutingTask(
         val brukersIdent = journalpostBrukerService.tilPersonIdent(journalpost.bruker, tema)
         val fagsakId = ksSakClient.hentFagsaknummerPåPersonident(brukersIdent)
 
-        val sakssystemMarkering = "".also { incrementSakssystemMarkering("ingen") }
-
         val skalAutomatiskJournalføreJournalpost =
             automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(
                 journalpost,
@@ -63,20 +58,12 @@ class JournalhendelseKontantstøtteRutingTask(
                     task.metadata.apply {
                         this["fagsakId"] = "$fagsakId"
                         this["personIdent"] = brukersIdent
-                        this["sakssystemMarkering"] = sakssystemMarkering
+                        this["sakssystemMarkering"] = ""
                     },
             ).apply { taskService.save(this) }
         } else {
-            opprettJournalføringOppgaveTask(sakssystemMarkering = sakssystemMarkering, task = task)
+            opprettJournalføringOppgaveTask(sakssystemMarkering = "", task = task)
         }
-    }
-
-    private fun incrementSakssystemMarkering(saksystem: String) {
-        if (!sakssystemMarkeringCounter.containsKey(saksystem)) {
-            sakssystemMarkeringCounter[saksystem] =
-                Metrics.counter("kontantstotte.ruting.saksystem", "saksystem", saksystem)
-        }
-        sakssystemMarkeringCounter[saksystem]!!.increment()
     }
 
     companion object {
