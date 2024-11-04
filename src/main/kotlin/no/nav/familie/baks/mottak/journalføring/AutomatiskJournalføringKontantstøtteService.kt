@@ -25,7 +25,6 @@ class AutomatiskJournalføringKontantstøtteService(
 
     fun skalAutomatiskJournalføres(
         journalpost: Journalpost,
-        brukerHarSakIInfotrygd: Boolean,
         fagsakId: Long,
     ): Boolean {
         if (!unleashService.isEnabled(toggleId = toggleId, defaultValue = false)) {
@@ -33,10 +32,6 @@ class AutomatiskJournalføringKontantstøtteService(
         }
 
         if (!journalpost.erKontantstøtteSøknad()) {
-            return false
-        }
-
-        if (brukerHarSakIInfotrygd) {
             return false
         }
 
