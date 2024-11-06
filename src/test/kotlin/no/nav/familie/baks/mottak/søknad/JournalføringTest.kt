@@ -23,6 +23,7 @@ import kotlin.test.assertEquals
 @ActiveProfiles("postgres", "mock-dokarkiv")
 @Tag("integration")
 @SpringBootTest(classes = [DevLauncherPostgres::class])
+@MockKExtension.KeepMocks
 class JournalføringTest(
     @Autowired
     val journalføringService: JournalføringService,
