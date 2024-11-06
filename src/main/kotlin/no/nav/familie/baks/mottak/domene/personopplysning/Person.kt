@@ -20,7 +20,6 @@ data class PersonIdent(
     val id: String,
 )
 
-fun Person.harAdresseGradering(): Boolean =
-    this.adressebeskyttelseGradering.any { it.erFortrolig() || it.erStrengtFortrolig() }
+fun Person.harAdresseGradering(): Boolean = this.adressebeskyttelseGradering.any { it.erFortrolig() || it.erStrengtFortrolig() }
 
 fun Person.harBostedsadresse(): Boolean = this.bostedsadresse != null

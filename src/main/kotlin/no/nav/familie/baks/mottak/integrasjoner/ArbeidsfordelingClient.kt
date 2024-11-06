@@ -32,6 +32,5 @@ class ArbeidsfordelingClient(
     fun hentBehandlendeEnhetPåIdent(
         personIdent: String,
         tema: Tema,
-    ): Enhet =
-        hentBehandlendeEnheterPåIdent(personIdent, tema).singleOrNull() ?: throw IllegalStateException("Forventet bare 1 enhet på ident men fantes flere")
+    ): Enhet = hentBehandlendeEnheterPåIdent(personIdent, tema).singleOrNull() ?: throw IllegalStateException("Forventet bare 1 enhet på ident men fantes flere")
 }
