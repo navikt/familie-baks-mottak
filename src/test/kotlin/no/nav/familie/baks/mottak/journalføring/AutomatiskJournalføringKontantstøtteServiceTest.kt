@@ -114,7 +114,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
             )
 
         // Act
-        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, false, fagsakId)
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, fagsakId)
 
         // Assert
         assertThat(skalAutomatiskJournalføres).isTrue()
@@ -163,7 +163,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
         } returns false
 
         // Act
-        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, false, fagsakId)
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, fagsakId)
 
         // Assert
         assertThat(skalAutomatiskJournalføres).isFalse()
@@ -212,56 +212,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
         } returns false
 
         // Act
-        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, false, fagsakId)
-
-        // Assert
-        assertThat(skalAutomatiskJournalføres).isFalse()
-    }
-
-    @Test
-    fun `skal ikke automatisk journalføre journalposten hvis bruker has sak i infotrygd`() {
-        // Arrange
-        val identifikator = "123"
-        val fagsakId = 1L
-
-        val journalpost =
-            Journalpost(
-                journalpostId = "1",
-                journalposttype = Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                bruker =
-                    Bruker(
-                        id = identifikator,
-                        type = BrukerIdType.FNR,
-                    ),
-                kanal = "NAV_NO",
-                dokumenter =
-                    listOf(
-                        DokumentInfo(
-                            brevkode = "NAV 34-00.08",
-                            tittel = "Søknad",
-                            dokumentstatus = Dokumentstatus.FERDIGSTILT,
-                            dokumentvarianter = emptyList(),
-                        ),
-                    ),
-            )
-
-        every {
-            mockedUnleashService.isEnabled(
-                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER,
-                defaultValue = false,
-            )
-        } returns true
-
-        every {
-            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
-                tema = Tema.KON,
-                journalpost = journalpost,
-            )
-        } returns false
-
-        // Act
-        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, true, fagsakId)
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, fagsakId)
 
         // Assert
         assertThat(skalAutomatiskJournalføres).isFalse()
@@ -310,7 +261,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
         } returns false
 
         // Act
-        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, false, fagsakId)
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, fagsakId)
 
         // Assert
         assertThat(skalAutomatiskJournalføres).isFalse()
@@ -377,7 +328,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
         } returns identifikator
 
         // Act
-        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, false, fagsakId)
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, fagsakId)
 
         // Assert
         assertThat(skalAutomatiskJournalføres).isFalse()
@@ -426,7 +377,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
         } returns true
 
         // Act
-        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, false, fagsakId)
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, fagsakId)
 
         // Assert
         assertThat(skalAutomatiskJournalføres).isFalse()
@@ -515,7 +466,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
             )
 
         // Act
-        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, false, fagsakId)
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, fagsakId)
 
         // Assert
         assertThat(skalAutomatiskJournalføres).isFalse()

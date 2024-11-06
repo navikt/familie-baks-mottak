@@ -69,7 +69,6 @@ spec:
         - host: familie-integrasjoner.dev-fss-pub.nais.io
         - host: norg2.dev-fss-pub.nais.io
         - host: familie-ba-infotrygd.dev-fss-pub.nais.io
-        - host: familie-ks-infotrygd.dev-fss-pub.nais.io
         - host: teamfamilie-unleash-api.nav.cloud.nais.io
   env:
     - name: SPRING_PROFILES_ACTIVE
