@@ -74,18 +74,15 @@ class LeesahConsumer(
         ack.acknowledge()
     }
 
-    private fun GenericRecord.hentOpplysningstype() =
-        get("opplysningstype").toString()
+    private fun GenericRecord.hentOpplysningstype() = get("opplysningstype").toString()
 
     private fun GenericRecord.hentPersonidenter() =
         (get("personidenter") as GenericData.Array<*>)
             .map { it.toString() }
 
-    private fun GenericRecord.hentEndringstype() =
-        get("endringstype").toString()
+    private fun GenericRecord.hentEndringstype() = get("endringstype").toString()
 
-    private fun GenericRecord.hentHendelseId() =
-        get("hendelseId").toString()
+    private fun GenericRecord.hentHendelseId() = get("hendelseId").toString()
 
     private fun GenericRecord.hentDødsdato(): LocalDate? = deserialiserDatofeltFraSubrecord("doedsfall", "doedsdato")
 

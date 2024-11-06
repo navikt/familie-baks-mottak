@@ -176,8 +176,7 @@ class JournalhendelseService(
             Pair(kontantstøtteKanalCounter, "kontantstotte.journalhendelse.mottatt")
         }
 
-    private fun skalBehandleJournalpost(journalpost: Journalpost) =
-        GYLDIGE_JOURNALPOST_TEMAER.contains(journalpost.tema) && journalpost.journalposttype == Journalposttype.I
+    private fun skalBehandleJournalpost(journalpost: Journalpost) = GYLDIGE_JOURNALPOST_TEMAER.contains(journalpost.tema) && journalpost.journalposttype == Journalposttype.I
 
     private fun opprettJournalhendelseRutingTask(journalpost: Journalpost) {
         val taskType =
