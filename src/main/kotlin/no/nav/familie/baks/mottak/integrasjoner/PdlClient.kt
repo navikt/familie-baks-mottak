@@ -66,7 +66,18 @@ class PdlClient(
     fun hentPersonident(
         aktørId: String,
         tema: Tema,
-    ): String = hentIdenter(aktørId, tema).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name && !it.historisk }.last().ident
+    ): String {
+        val aktiveIdenter = hentIdenter(aktørId, tema).filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name && !it.historisk }
+        if (aktiveIdenter.isNotEmpty()) {
+            return aktiveIdenter.last().ident
+        } else {
+            throw PdlNotFoundException(
+                msg = "Fant ikke aktive identer på person",
+                uri = pdlUri,
+                ident = aktørId,
+            )
+        }
+    }
 
     fun hentAktørId(
         personIdent: String,

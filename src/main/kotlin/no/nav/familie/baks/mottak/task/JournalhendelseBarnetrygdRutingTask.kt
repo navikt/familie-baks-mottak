@@ -16,6 +16,7 @@ import no.nav.familie.baks.mottak.integrasjoner.IntegrasjonException
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.Opphørsgrunn
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlNotFoundException
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsak
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.integrasjoner.StatusKode
@@ -66,7 +67,17 @@ class JournalhendelseBarnetrygdRutingTask(
             return
         }
 
-        val personIdent = journalpostBrukerService.tilPersonIdent(journalpost.bruker, tema)
+        val personIdent =
+            try {
+                journalpostBrukerService.tilPersonIdent(journalpost.bruker, tema)
+            } catch (error: PdlNotFoundException) {
+                opprettJournalføringOppgaveTask(
+                    sakssystemMarkering = "Fant ingen aktiv personIdent for denne journalpost brukeren.",
+                    task = task,
+                )
+                return
+            }
+
         val fagsakId = baSakClient.hentFagsaknummerPåPersonident(personIdent)
 
         val (baSak, infotrygdSak) = brukersIdent?.run { søkEtterSakIBaSakOgInfotrygd(this) } ?: Pair(null, null)
