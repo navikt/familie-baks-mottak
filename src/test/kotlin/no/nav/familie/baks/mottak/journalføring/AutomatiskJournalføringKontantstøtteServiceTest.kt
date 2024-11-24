@@ -9,19 +9,19 @@ import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingStatus
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingType
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingUnderkategori
-import no.nav.familie.baks.mottak.integrasjoner.Bruker
-import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
-import no.nav.familie.baks.mottak.integrasjoner.DokumentInfo
-import no.nav.familie.baks.mottak.integrasjoner.Dokumentstatus
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus
-import no.nav.familie.baks.mottak.integrasjoner.Journalpost
-import no.nav.familie.baks.mottak.integrasjoner.Journalposttype
-import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
 import no.nav.familie.baks.mottak.integrasjoner.RestVisningBehandling
+import no.nav.familie.kontrakter.felles.BrukerIdType
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.arbeidsfordeling.Enhet
+import no.nav.familie.kontrakter.felles.journalpost.Bruker
+import no.nav.familie.kontrakter.felles.journalpost.DokumentInfo
+import no.nav.familie.kontrakter.felles.journalpost.Dokumentstatus
+import no.nav.familie.kontrakter.felles.journalpost.Journalpost
+import no.nav.familie.kontrakter.felles.journalpost.Journalposttype
+import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -66,6 +66,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
                             tittel = "Søknad",
                             dokumentstatus = Dokumentstatus.FERDIGSTILT,
                             dokumentvarianter = emptyList(),
+                            dokumentInfoId = "id",
                         ),
                     ),
             )
@@ -144,6 +145,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
                             tittel = "Søknad",
                             dokumentstatus = Dokumentstatus.FERDIGSTILT,
                             dokumentvarianter = emptyList(),
+                            dokumentInfoId = "id",
                         ),
                     ),
             )
@@ -193,6 +195,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
                             tittel = "Søknad",
                             dokumentstatus = Dokumentstatus.FERDIGSTILT,
                             dokumentvarianter = emptyList(),
+                            dokumentInfoId = "id",
                         ),
                     ),
             )
@@ -242,6 +245,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
                             tittel = "Søknad",
                             dokumentstatus = Dokumentstatus.FERDIGSTILT,
                             dokumentvarianter = emptyList(),
+                            dokumentInfoId = "id",
                         ),
                     ),
             )
@@ -291,6 +295,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
                             tittel = "Søknad",
                             dokumentstatus = Dokumentstatus.FERDIGSTILT,
                             dokumentvarianter = emptyList(),
+                            dokumentInfoId = "id",
                         ),
                     ),
             )
@@ -358,6 +363,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
                             tittel = "Søknad",
                             dokumentstatus = Dokumentstatus.FERDIGSTILT,
                             dokumentvarianter = emptyList(),
+                            dokumentInfoId = "id",
                         ),
                     ),
             )
@@ -407,6 +413,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
                             tittel = "Søknad",
                             dokumentstatus = Dokumentstatus.FERDIGSTILT,
                             dokumentvarianter = emptyList(),
+                            dokumentInfoId = "id",
                         ),
                     ),
             )

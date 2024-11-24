@@ -7,6 +7,7 @@ import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentResponse
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.ArkiverDokumentRequest
 import no.nav.familie.kontrakter.felles.getDataOrThrow
+import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -36,9 +37,11 @@ class DokarkivClient(
                 else -> throw IllegalArgumentException("Tema $tema støtter ikke oppdatering av journalpost sak")
             }
 
+        val journalpostBruker = jp.bruker
+
         val request =
             TilknyttFagsakRequest(
-                bruker = Bruker(idType = IdType.valueOf(jp.bruker!!.type.name), id = jp.bruker.id),
+                bruker = Bruker(idType = IdType.valueOf(journalpostBruker!!.type.name), id = journalpostBruker.id),
                 tema = tema.name,
                 sak = sak,
             )
@@ -48,7 +51,7 @@ class DokarkivClient(
                 "Oppdatering av journalpost ${jp.journalpostId} med fagsak $fagsakId feilet",
                 response,
                 uri,
-                jp.bruker.id,
+                journalpostBruker.id,
             )
         }
     }

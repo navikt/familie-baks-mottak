@@ -31,8 +31,9 @@ class JournalhendelseKontantstøtteRutingTask(
 
     override fun doTask(task: Task) {
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
+        val journalpostBruker = journalpost.bruker
 
-        if (journalpost.bruker == null) {
+        if (journalpostBruker == null) {
             opprettJournalføringOppgaveTask(
                 sakssystemMarkering = "Ingen bruker er satt på journalpost. Kan ikke utlede om bruker har sak i Infotrygd eller KS-sak.",
                 task = task,
@@ -42,7 +43,7 @@ class JournalhendelseKontantstøtteRutingTask(
 
         val brukersIdent =
             try {
-                journalpostBrukerService.tilPersonIdent(journalpost.bruker, tema)
+                journalpostBrukerService.tilPersonIdent(journalpostBruker, tema)
             } catch (error: PdlNotFoundException) {
                 opprettJournalføringOppgaveTask(
                     sakssystemMarkering = "Fant ingen aktiv personIdent for denne journalpost brukeren.",

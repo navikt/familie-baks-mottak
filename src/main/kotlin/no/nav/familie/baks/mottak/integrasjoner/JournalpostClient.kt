@@ -3,6 +3,7 @@ package no.nav.familie.baks.mottak.integrasjoner
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.getDataOrThrow
+import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -44,3 +45,16 @@ class JournalpostClient
             }
         }
     }
+
+fun Journalpost.erKontantstøtteSøknad(): Boolean = dokumenter?.any { it.brevkode == "NAV 34-00.08" } ?: false
+
+fun Journalpost.erBarnetrygdOrdinærSøknad(): Boolean = dokumenter?.any { it.brevkode == "NAV 33-00.07" } ?: false
+
+fun Journalpost.erBarnetrygdUtvidetSøknad(): Boolean = dokumenter?.any { it.brevkode == "NAV 33-00.09" } ?: false
+
+fun Journalpost.erBarnetrygdSøknad(): Boolean = erBarnetrygdOrdinærSøknad() || erBarnetrygdUtvidetSøknad()
+
+fun Journalpost.hentHovedDokumentTittel(): String? {
+    if (dokumenter.isNullOrEmpty()) error("Journalpost $journalpostId mangler dokumenter")
+    return dokumenter!!.firstOrNull { it.brevkode != null }?.tittel
+}

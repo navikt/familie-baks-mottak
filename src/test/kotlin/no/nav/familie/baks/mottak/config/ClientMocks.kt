@@ -2,20 +2,20 @@ package no.nav.familie.baks.mottak.config
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.baks.mottak.integrasjoner.Bruker
-import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType
 import no.nav.familie.baks.mottak.integrasjoner.DokarkivClient
-import no.nav.familie.baks.mottak.integrasjoner.DokumentInfo
-import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
-import no.nav.familie.baks.mottak.integrasjoner.Journalposttype
-import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.baks.mottak.integrasjoner.PdfClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.http.client.RessursException
+import no.nav.familie.kontrakter.felles.BrukerIdType
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentResponse
+import no.nav.familie.kontrakter.felles.journalpost.Bruker
+import no.nav.familie.kontrakter.felles.journalpost.DokumentInfo
+import no.nav.familie.kontrakter.felles.journalpost.Journalpost
+import no.nav.familie.kontrakter.felles.journalpost.Journalposttype
+import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
@@ -116,6 +116,7 @@ class ClientMocks {
                             brevkode = "34-00.08",
                             dokumentstatus = null,
                             dokumentvarianter = emptyList(),
+                            dokumentInfoId = "id",
                         ),
                     ),
                 journalforendeEnhet = null,

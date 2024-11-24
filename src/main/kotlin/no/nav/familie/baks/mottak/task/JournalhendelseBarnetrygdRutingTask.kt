@@ -59,7 +59,9 @@ class JournalhendelseBarnetrygdRutingTask(
         val journalpost = journalpostClient.hentJournalpost(task.metadata["journalpostId"] as String)
         val brukersIdent = task.metadata["personIdent"] as String?
 
-        if (journalpost.bruker == null) {
+        val journalpostBruker = journalpost.bruker
+
+        if (journalpostBruker == null) {
             opprettJournalføringOppgaveTask(
                 sakssystemMarkering = "Ingen bruker er satt på journalpost. Kan ikke utlede om bruker har sak i Infotrygd eller BA-sak.",
                 task = task,
@@ -69,7 +71,7 @@ class JournalhendelseBarnetrygdRutingTask(
 
         val personIdent =
             try {
-                journalpostBrukerService.tilPersonIdent(journalpost.bruker, tema)
+                journalpostBrukerService.tilPersonIdent(journalpostBruker, tema)
             } catch (error: PdlNotFoundException) {
                 opprettJournalføringOppgaveTask(
                     sakssystemMarkering = "Fant ingen aktiv personIdent for denne journalpost brukeren.",

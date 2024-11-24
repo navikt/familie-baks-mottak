@@ -1,11 +1,10 @@
 package no.nav.familie.baks.mottak.journalføring
 
-import no.nav.familie.baks.mottak.integrasjoner.Bruker
-import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.SøknadsidenterService
-import no.nav.familie.baks.mottak.integrasjoner.erDigitalSøknad
 import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.journalpost.Bruker
+import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import org.springframework.stereotype.Service
 
 @Service
@@ -18,14 +17,16 @@ class AdressebeskyttelesesgraderingService(
         tema: Tema,
         journalpost: Journalpost,
     ): Boolean {
-        if (journalpost.bruker == null) {
+        val journalpostBruker = journalpost.bruker
+
+        if (journalpostBruker == null) {
             throw IllegalStateException("Bruker på journalpost ${journalpost.journalpostId} kan ikke være null")
         }
 
         val (søkersIdent, barnasIdenter) =
             when (tema) {
-                Tema.BAR -> finnIdenterForBarnetrygd(tema, journalpost.bruker, journalpost.journalpostId, journalpost.erDigitalSøknad())
-                Tema.KON -> finnIdenterForKontantstøtte(tema, journalpost.bruker, journalpost.journalpostId, journalpost.erDigitalSøknad())
+                Tema.BAR -> finnIdenterForBarnetrygd(tema, journalpostBruker, journalpost.journalpostId, journalpost.erDigitalSøknad(tema))
+                Tema.KON -> finnIdenterForKontantstøtte(tema, journalpostBruker, journalpost.journalpostId, journalpost.erDigitalSøknad(tema))
                 Tema.ENF,
                 Tema.OPP,
                 -> {
