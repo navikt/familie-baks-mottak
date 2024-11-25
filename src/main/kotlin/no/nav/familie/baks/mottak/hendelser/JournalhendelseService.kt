@@ -6,8 +6,6 @@ import no.nav.familie.baks.mottak.domene.HendelseConsumer
 import no.nav.familie.baks.mottak.domene.Hendelseslogg
 import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
-import no.nav.familie.baks.mottak.integrasjoner.erBarnetrygdOrdinærSøknad
-import no.nav.familie.baks.mottak.integrasjoner.erBarnetrygdUtvidetSøknad
 import no.nav.familie.baks.mottak.task.JournalhendelseBarnetrygdRutingTask
 import no.nav.familie.baks.mottak.task.JournalhendelseKontantstøtteRutingTask
 import no.nav.familie.kontrakter.felles.BrukerIdType
@@ -144,15 +142,15 @@ class JournalhendelseService(
 
     private fun behandleSkanningHendelser(journalpost: Journalpost) {
         logger.info("Ny Journalhendelse med [journalpostId=${journalpost.journalpostId}, status=${journalpost.journalstatus}, tema=${journalpost.tema}, kanal=${journalpost.kanal}]")
-        val erOrdinærBarnetrygdSøknad = journalpost.erBarnetrygdOrdinærSøknad()
-        val erUtvidetBarnetrygdSøknad = journalpost.erBarnetrygdUtvidetSøknad()
-        val erKontantstøtteSøknad = journalpost.erDigitalKontantstøtteSøknad()
+        val harOrdinærBarnetrygdSøknad = journalpost.harBarnetrygdOrdinærSøknad()
+        val harUtvidetBarnetrygdSøknad = journalpost.harBarnetrygdUtvidetSøknad()
+        val harKontantstøtteSøknad = journalpost.harKontantstøtteSøknad()
 
         opprettJournalhendelseRutingTask(journalpost)
 
-        if (erOrdinærBarnetrygdSøknad) skannetOrdinærBarnetrygdSøknadCounter.increment()
-        if (erUtvidetBarnetrygdSøknad) skannetUtvidetBarnetrygdSøknadCounter.increment()
-        if (erKontantstøtteSøknad) skannetKontantstøtteSøknadCounter.increment()
+        if (harOrdinærBarnetrygdSøknad) skannetOrdinærBarnetrygdSøknadCounter.increment()
+        if (harUtvidetBarnetrygdSøknad) skannetUtvidetBarnetrygdSøknadCounter.increment()
+        if (harKontantstøtteSøknad) skannetKontantstøtteSøknadCounter.increment()
 
         incrementKanalCounter(journalpost)
     }
