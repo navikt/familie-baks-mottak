@@ -45,16 +45,3 @@ class JournalpostClient
             }
         }
     }
-
-fun Journalpost.erKontantstøtteSøknad(): Boolean = dokumenter?.any { it.brevkode == "NAV 34-00.08" } ?: false
-
-fun Journalpost.erBarnetrygdOrdinærSøknad(): Boolean = dokumenter?.any { it.brevkode == "NAV 33-00.07" } ?: false
-
-fun Journalpost.erBarnetrygdUtvidetSøknad(): Boolean = dokumenter?.any { it.brevkode == "NAV 33-00.09" } ?: false
-
-fun Journalpost.erBarnetrygdSøknad(): Boolean = erBarnetrygdOrdinærSøknad() || erBarnetrygdUtvidetSøknad()
-
-fun Journalpost.hentHovedDokumentTittel(): String? {
-    if (dokumenter.isNullOrEmpty()) error("Journalpost $journalpostId mangler dokumenter")
-    return dokumenter!!.firstOrNull { it.brevkode != null }?.tittel
-}
