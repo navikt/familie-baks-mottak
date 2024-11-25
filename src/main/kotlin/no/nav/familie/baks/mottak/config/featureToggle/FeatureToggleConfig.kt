@@ -8,6 +8,5 @@ class FeatureToggleConfig {
         // Release
         const val AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER = "familie-baks-mottak.automatisk-journalforing-av-ks-soknad"
         const val AUTOMATISK_JOURNALFØRING_AV_BARNETRYGD_SØKNADER = "familie-baks-mottak.automatisk-journalforing-av-ba-soknad"
-        const val BRUK_ENHETSNUMMERSERVICE = "familie-baks-mottak.bruk-enhetsnummerservice"
     }
 }
