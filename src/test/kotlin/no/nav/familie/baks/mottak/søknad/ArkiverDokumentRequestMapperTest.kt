@@ -3,16 +3,16 @@ package no.nav.familie.baks.mottak.søknad
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBVedlegg
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteVedlegg
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV5
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad
 import no.nav.familie.kontrakter.felles.dokarkiv.Dokumenttype
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.Filtype
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
 import no.nav.familie.kontrakter.ks.søknad.v1.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ks.søknad.v1.TekstPåSpråkMap
@@ -57,7 +57,7 @@ class ArkiverDokumentRequestMapperTest {
         val arkiverDokumentRequest =
             ArkiverDokumentRequestMapper.toDto(
                 dbKontantstøtteSøknad,
-                KontantstøtteSøknadV5(kontantstøtteSøknad = kontantstøtteSøknad),
+                VersjonertKontantstøtteSøknadV5(kontantstøtteSøknad = kontantstøtteSøknad),
                 ByteArray(0),
                 vedleggMap,
                 ByteArray(0),
@@ -123,7 +123,7 @@ class ArkiverDokumentRequestMapperTest {
         val arkiverDokumentRequest =
             ArkiverDokumentRequestMapper.toDto(
                 dbBarnetrygdSøknad,
-                BarnetrygdSøknadV9(barnetrygdSøknad),
+                VersjonertBarnetrygdSøknadV9(barnetrygdSøknad),
                 ByteArray(0),
                 vedleggMap,
                 ByteArray(0),

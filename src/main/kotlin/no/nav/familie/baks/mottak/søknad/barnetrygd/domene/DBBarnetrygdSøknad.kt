@@ -8,6 +8,9 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
+import no.nav.familie.kontrakter.ba.søknad.StøttetVersjonertBarnetrygdSøknad
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV8
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg
 import no.nav.familie.kontrakter.felles.objectMapper
 import java.time.LocalDateTime
@@ -29,15 +32,7 @@ data class DBBarnetrygdSøknad(
     @Column(name = "journalpost_id")
     val journalpostId: String? = null,
 ) {
-    fun hentVersjonertSøknad(): VersjonertBarnetrygdSøknad {
-        val søknad = objectMapper.readTree(søknadJson)
-        val versjon = søknad.get("kontraktVersjon")?.asInt()
-        return when (versjon) {
-            8 -> BarnetrygdSøknadV8(barnetrygdSøknad = objectMapper.readValue<BarnetrygdSøknadV8>(søknadJson))
-            9 -> BarnetrygdSøknadV9(barnetrygdSøknad = objectMapper.readValue<BarnetrygdSøknadV9>(søknadJson))
-            else -> error("Ikke støttet versjon $versjon av kontrakt for Barnetrygd")
-        }
-    }
+    fun hentVersjonertBarnetrygdSøknad(): StøttetVersjonertBarnetrygdSøknad = objectMapper.readValue<StøttetVersjonertBarnetrygdSøknad>(søknadJson)
 }
 
 @Entity(name = "SoknadVedlegg")
@@ -94,11 +89,11 @@ fun Søknadsvedlegg.tilDBVedlegg(
     )
 
 fun DBBarnetrygdSøknad.harEøsSteg(): Boolean {
-    val versjonertSøknad = this.hentVersjonertSøknad()
+    val versjonertSøknad = this.hentVersjonertBarnetrygdSøknad()
 
     return when (versjonertSøknad) {
-        is no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV8 -> versjonertSøknad.barnetrygdSøknad.søker.harEøsSteg
-        is no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9 -> versjonertSøknad.barnetrygdSøknad.søker.harEøsSteg
+        is VersjonertBarnetrygdSøknadV8 -> versjonertSøknad.barnetrygdSøknad.søker.harEøsSteg
+        is VersjonertBarnetrygdSøknadV9 -> versjonertSøknad.barnetrygdSøknad.søker.harEøsSteg
     }
 }
 

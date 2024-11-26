@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.baks.mottak.DevLauncherPostgres
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.util.DbContainerInitializer
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt
 import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad
 import no.nav.familie.kontrakter.felles.objectMapper
@@ -50,11 +50,11 @@ class SøknadsfeltSpråkTest(
             )
         every { barnetrygdSøknad.teksterUtenomSpørsmål } returns mapOf()
 
-        var barnetrygdSøknadMap = søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(BarnetrygdSøknadV9(barnetrygdSøknad = barnetrygdSøknad), "en")
+        var barnetrygdSøknadMap = søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(VersjonertBarnetrygdSøknadV9(barnetrygdSøknad = barnetrygdSøknad), "en")
         var barnetrygdSøknadJsonNode = objectMapper.valueToTree<JsonNode>(barnetrygdSøknadMap)
         assertEquals("TestAnswer", barnetrygdSøknadJsonNode["spørsmål"]["testSpørsmål"]["verdi"].textValue())
 
-        barnetrygdSøknadMap = søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(BarnetrygdSøknadV9(barnetrygdSøknad = barnetrygdSøknad), "nb")
+        barnetrygdSøknadMap = søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(VersjonertBarnetrygdSøknadV9(barnetrygdSøknad = barnetrygdSøknad), "nb")
         barnetrygdSøknadJsonNode = objectMapper.valueToTree<JsonNode>(barnetrygdSøknadMap)
         assertEquals("TestSvar", barnetrygdSøknadJsonNode["spørsmål"]["testSpørsmål"]["verdi"].textValue())
     }
@@ -133,7 +133,7 @@ class SøknadsfeltSpråkTest(
             )
         every { barnetrygdSøknad.teksterUtenomSpørsmål } returns mapOf()
 
-        val barnetrygdSøknadMap = søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(BarnetrygdSøknadV9(barnetrygdSøknad = barnetrygdSøknad), "nb")
+        val barnetrygdSøknadMap = søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(VersjonertBarnetrygdSøknadV9(barnetrygdSøknad = barnetrygdSøknad), "nb")
         val barnetrygdSøknadJsonNode = objectMapper.valueToTree<JsonNode>(barnetrygdSøknadMap)
         assertEquals("TestNøstetVerdi", barnetrygdSøknadJsonNode["spørsmål"]["testSpørsmål"]["verdi"]["verdi"].textValue())
     }
@@ -151,7 +151,7 @@ class SøknadsfeltSpråkTest(
                     ),
             )
 
-        val barnetrygdSøknadMap = søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(BarnetrygdSøknadV9(barnetrygdSøknad = barnetrygdSøknad), "nb")
+        val barnetrygdSøknadMap = søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(VersjonertBarnetrygdSøknadV9(barnetrygdSøknad = barnetrygdSøknad), "nb")
         val barnetrygdSøknadJsonNode = objectMapper.valueToTree<JsonNode>(barnetrygdSøknadMap)
         assertEquals("TestTekst", barnetrygdSøknadJsonNode["teksterUtenomSpørsmål"]["test.tekst"].textValue())
     }

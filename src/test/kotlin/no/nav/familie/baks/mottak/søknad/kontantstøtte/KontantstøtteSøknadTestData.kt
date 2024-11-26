@@ -1,8 +1,8 @@
 package no.nav.familie.baks.mottak.søknad.kontantstøtte
 
+import no.nav.familie.kontrakter.felles.søknad.Søknadsfelt
 import no.nav.familie.kontrakter.ks.søknad.v1.RegistrertBostedType
 import no.nav.familie.kontrakter.ks.søknad.v1.SIVILSTANDTYPE
-import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsfelt
 import no.nav.familie.kontrakter.ks.søknad.v4.Barn
 import no.nav.familie.kontrakter.ks.søknad.v4.Søker
 import no.nav.familie.kontrakter.ks.søknad.v5.KontantstøtteSøknad

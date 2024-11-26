@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV5
 import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.kontrakter.felles.søknad.Søknadsfelt
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
-import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsfelt
 import no.nav.familie.kontrakter.ks.søknad.v1.TekstPåSpråkMap
 import no.nav.familie.kontrakter.ks.søknad.v4.Barn
 import no.nav.familie.kontrakter.ks.søknad.v5.KontantstøtteSøknad
@@ -54,7 +54,7 @@ class SøknadSpråkvelgerServiceTest {
                 dokumentasjon,
             )
 
-        val versjonertKontantstøtteSøknad = KontantstøtteSøknadV5(kontantstøtteSøknad = kontantstøtteSøknad)
+        val versjonertKontantstøtteSøknad = VersjonertKontantstøtteSøknadV5(kontantstøtteSøknad = kontantstøtteSøknad)
 
         // Bokmål
         var kontantstøtteMapForSpråk =
