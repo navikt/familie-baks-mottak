@@ -37,7 +37,7 @@ class KontantstøtteOppgaveMapper(
 
     override fun hentBehandlingstype(journalpost: Journalpost): Behandlingstype =
         when {
-            journalpost.erKontantstøtteSøknad() && journalpost.erDigitalKanal() ->
+            journalpost.harKontantstøtteSøknad() && journalpost.erDigitalKanal() ->
                 if (utledBehandlingKategoriFraSøknad(journalpost) == BehandlingKategori.EØS) {
                     Behandlingstype.EØS
                 } else {
@@ -49,7 +49,7 @@ class KontantstøtteOppgaveMapper(
         }
 
     fun utledBehandlingKategoriFraSøknad(journalpost: Journalpost): BehandlingKategori {
-        check(journalpost.erKontantstøtteSøknad()) { "Journalpost m/ id ${journalpost.journalpostId} er ikke en kontantstøtte søknad" }
+        check(journalpost.harKontantstøtteSøknad()) { "Journalpost m/ id ${journalpost.journalpostId} er ikke en kontantstøtte søknad" }
 
         val søknad = kontantstøtteSøknadRepository.getByJournalpostId(journalpost.journalpostId)
 

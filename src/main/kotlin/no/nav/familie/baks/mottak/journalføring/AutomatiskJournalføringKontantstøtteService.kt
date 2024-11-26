@@ -4,7 +4,6 @@ import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
-import no.nav.familie.baks.mottak.integrasjoner.erKontantstøtteSøknad
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
@@ -30,7 +29,7 @@ class AutomatiskJournalføringKontantstøtteService(
             return false
         }
 
-        if (!journalpost.erKontantstøtteSøknad()) {
+        if (!journalpost.harKontantstøtteSøknad()) {
             return false
         }
 

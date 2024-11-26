@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
 
 class JournalpostTest {
     @Nested
-    inner class ErDigitalSøknadTest {
+    inner class HarDigitalSøknadTest {
         @Test
         fun `skal returnere false hvis brevkode ikke er riktig`() {
             // Arrange
@@ -34,10 +34,10 @@ class JournalpostTest {
                         ),
                 )
             // Act
-            val erDigitalSøknad = journalpost.erDigitalSøknad(Tema.BAR)
+            val harDigitalSøknad = journalpost.harDigitalSøknad(Tema.BAR)
 
             // Assert
-            assertThat(erDigitalSøknad).isFalse()
+            assertThat(harDigitalSøknad).isFalse()
         }
 
         @Test
@@ -61,10 +61,10 @@ class JournalpostTest {
                         ),
                 )
             // Act
-            val erDigitalSøknad = journalpost.erDigitalSøknad(Tema.BAR)
+            val harDigitalSøknad = journalpost.harDigitalSøknad(Tema.BAR)
 
             // Assert
-            assertThat(erDigitalSøknad).isFalse()
+            assertThat(harDigitalSøknad).isFalse()
         }
 
         @Test
@@ -88,10 +88,10 @@ class JournalpostTest {
                         ),
                 )
             // Act
-            val erDigitalSøknad = journalpost.erDigitalSøknad(Tema.KON)
+            val harDigitalSøknad = journalpost.harDigitalSøknad(Tema.KON)
 
             // Assert
-            assertThat(erDigitalSøknad).isTrue()
+            assertThat(harDigitalSøknad).isTrue()
         }
 
         @Test
@@ -115,10 +115,10 @@ class JournalpostTest {
                         ),
                 )
             // Act
-            val erDigitalSøknad = journalpost.erDigitalSøknad(Tema.BAR)
+            val harDigitalSøknad = journalpost.harDigitalSøknad(Tema.BAR)
 
             // Assert
-            assertThat(erDigitalSøknad).isTrue()
+            assertThat(harDigitalSøknad).isTrue()
         }
 
         @Test
@@ -142,10 +142,10 @@ class JournalpostTest {
                         ),
                 )
             // Act
-            val erDigitalSøknad = journalpost.erDigitalSøknad(Tema.BAR)
+            val harDigitalSøknad = journalpost.harDigitalSøknad(Tema.BAR)
 
             // Assert
-            assertThat(erDigitalSøknad).isTrue()
+            assertThat(harDigitalSøknad).isTrue()
         }
     }
 }

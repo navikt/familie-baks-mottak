@@ -25,8 +25,8 @@ class AdressebeskyttelesesgraderingService(
 
         val (søkersIdent, barnasIdenter) =
             when (tema) {
-                Tema.BAR -> finnIdenterForBarnetrygd(tema, journalpostBruker, journalpost.journalpostId, journalpost.erDigitalSøknad(tema))
-                Tema.KON -> finnIdenterForKontantstøtte(tema, journalpostBruker, journalpost.journalpostId, journalpost.erDigitalSøknad(tema))
+                Tema.BAR -> finnIdenterForBarnetrygd(tema, journalpostBruker, journalpost.journalpostId, journalpost.harDigitalSøknad(tema))
+                Tema.KON -> finnIdenterForKontantstøtte(tema, journalpostBruker, journalpost.journalpostId, journalpost.harDigitalSøknad(tema))
                 Tema.ENF,
                 Tema.OPP,
                 -> {

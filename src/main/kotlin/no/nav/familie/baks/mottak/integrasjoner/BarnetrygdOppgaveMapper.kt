@@ -32,7 +32,7 @@ class BarnetrygdOppgaveMapper(
     // Behandlingstema og behandlingstype settes basert på regelsettet som er dokumentert nederst her: https://confluence.adeo.no/display/TFA/Mottak+av+dokumenter
     override fun hentBehandlingstema(journalpost: Journalpost): Behandlingstema? =
         when {
-            journalpost.erBarnetrygdSøknad() && journalpost.erDigitalKanal() ->
+            journalpost.harBarnetrygdSøknad() && journalpost.erDigitalKanal() ->
                 if (utledBehandlingUnderkategoriFraSøknad(journalpost) == BehandlingUnderkategori.UTVIDET) {
                     Behandlingstema.UtvidetBarnetrygd
                 } else {
@@ -48,7 +48,7 @@ class BarnetrygdOppgaveMapper(
 
     override fun hentBehandlingstype(journalpost: Journalpost): Behandlingstype? =
         when {
-            journalpost.erBarnetrygdSøknad() && journalpost.erDigitalKanal() ->
+            journalpost.harBarnetrygdSøknad() && journalpost.erDigitalKanal() ->
                 if (utledBehandlingKategoriFraSøknad(journalpost) == BehandlingKategori.EØS) {
                     Behandlingstype.EØS
                 } else {
@@ -62,7 +62,7 @@ class BarnetrygdOppgaveMapper(
     override fun hentBehandlingstypeVerdi(journalpost: Journalpost): String? = hentBehandlingstype(journalpost)?.value
 
     fun utledBehandlingKategoriFraSøknad(journalpost: Journalpost): BehandlingKategori {
-        check(journalpost.erBarnetrygdSøknad()) { "Journalpost m/ id ${journalpost.journalpostId} er ikke en barnetrygd søknad" }
+        check(journalpost.harBarnetrygdSøknad()) { "Journalpost m/ id ${journalpost.journalpostId} er ikke en barnetrygd søknad" }
         val søknad = søknadRepository.getByJournalpostId(journalpost.journalpostId)
 
         return when {
@@ -73,7 +73,7 @@ class BarnetrygdOppgaveMapper(
 
     fun utledBehandlingUnderkategoriFraSøknad(journalpost: Journalpost) =
         when {
-            journalpost.erBarnetrygdUtvidetSøknad() -> BehandlingUnderkategori.UTVIDET
+            journalpost.harBarnetrygdUtvidetSøknad() -> BehandlingUnderkategori.UTVIDET
             else -> BehandlingUnderkategori.ORDINÆR
         }
 
