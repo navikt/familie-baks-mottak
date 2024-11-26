@@ -2,10 +2,10 @@ package no.nav.familie.baks.mottak.søknad
 
 import no.nav.familie.baks.mottak.DevLauncherPostgres
 import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadService
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
 import no.nav.familie.baks.mottak.util.DbContainerInitializer
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.felles.objectMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
@@ -31,20 +31,20 @@ class SøknadTest(
     @Test
     fun `Lagring av søknad`() {
         val dbSøknadFraMapper = barnetrygdSøknad.tilDBSøknad()
-        assertThat(dbSøknadFraMapper.hentVersjonertSøknad() is BarnetrygdSøknadV9).isTrue
+        assertThat(dbSøknadFraMapper.hentVersjonertBarnetrygdSøknad() is VersjonertBarnetrygdSøknadV9).isTrue
 
         val dbSøknadFraDB = barnetrygdSøknadService.lagreDBSøknad(dbSøknadFraMapper)
         val hentetSøknad = barnetrygdSøknadService.hentDBSøknad(dbSøknadFraDB.id)
         assertEquals(dbSøknadFraDB.id, hentetSøknad!!.id)
-        assertThat(hentetSøknad.hentVersjonertSøknad() is BarnetrygdSøknadV9)
+        assertThat(hentetSøknad.hentVersjonertBarnetrygdSøknad() is VersjonertBarnetrygdSøknadV9)
     }
 
     @Test
     fun `Få riktig versjon 9 ved mapping fra DBSøknad`() {
         val dbSøknadFraMapper = barnetrygdSøknad.tilDBSøknad()
         val versjon: Int? =
-            when (val versjonertSøknad = dbSøknadFraMapper.hentVersjonertSøknad()) {
-                is BarnetrygdSøknadV9 -> versjonertSøknad.barnetrygdSøknad.kontraktVersjon
+            when (val versjonertSøknad = dbSøknadFraMapper.hentVersjonertBarnetrygdSøknad()) {
+                is VersjonertBarnetrygdSøknadV9 -> versjonertSøknad.barnetrygdSøknad.kontraktVersjon
                 else -> {
                     null
                 }
@@ -54,7 +54,7 @@ class SøknadTest(
         val dbSøknadFraDB = barnetrygdSøknadService.lagreDBSøknad(dbSøknadFraMapper)
         val hentetSøknad = barnetrygdSøknadService.hentDBSøknad(dbSøknadFraDB.id)
         assertEquals(dbSøknadFraDB.id, hentetSøknad!!.id)
-        assertThat(hentetSøknad.hentVersjonertSøknad() is BarnetrygdSøknadV9).isTrue
+        assertThat(hentetSøknad.hentVersjonertBarnetrygdSøknad() is VersjonertBarnetrygdSøknadV9).isTrue
     }
 
     @Test
@@ -66,6 +66,6 @@ class SøknadTest(
                 søknadJson = barnetrygdSøknadSomString,
                 fnr = "1234123412",
             )
-        assertThat(dbBarnetrygdSøknad.hentVersjonertSøknad() is BarnetrygdSøknadV9).isTrue
+        assertThat(dbBarnetrygdSøknad.hentVersjonertBarnetrygdSøknad() is VersjonertBarnetrygdSøknadV9).isTrue
     }
 }

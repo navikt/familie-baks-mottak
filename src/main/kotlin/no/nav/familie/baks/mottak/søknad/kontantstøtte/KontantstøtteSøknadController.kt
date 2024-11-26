@@ -2,10 +2,10 @@ package no.nav.familie.baks.mottak.søknad.kontantstøtte
 
 import no.nav.familie.baks.mottak.søknad.Kvittering
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.FødselsnummerErNullException
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV5
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.felles.Ressurs
+import no.nav.familie.kontrakter.ks.søknad.StøttetVersjonertKontantstøtteSøknad
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
@@ -29,14 +29,14 @@ class KontantstøtteSøknadController(
     @PostMapping(value = ["/soknad/v4"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(
         @RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV4,
-    ): ResponseEntity<Ressurs<Kvittering>> = mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = KontantstøtteSøknadV4(kontantstøtteSøknad = søknad))
+    ): ResponseEntity<Ressurs<Kvittering>> = mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = VersjonertKontantstøtteSøknadV4(kontantstøtteSøknad = søknad))
 
     @PostMapping(value = ["/soknad/v5"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(
         @RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV5,
-    ): ResponseEntity<Ressurs<Kvittering>> = mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = KontantstøtteSøknadV5(kontantstøtteSøknad = søknad))
+    ): ResponseEntity<Ressurs<Kvittering>> = mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = VersjonertKontantstøtteSøknadV5(kontantstøtteSøknad = søknad))
 
-    fun mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad): ResponseEntity<Ressurs<Kvittering>> =
+    fun mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad: StøttetVersjonertKontantstøtteSøknad): ResponseEntity<Ressurs<Kvittering>> =
         try {
             val dbKontantstøtteSøknad =
                 kontantstøtteSøknadService.mottaKontantstøtteSøknad(versjonertKontantstøtteSøknad)

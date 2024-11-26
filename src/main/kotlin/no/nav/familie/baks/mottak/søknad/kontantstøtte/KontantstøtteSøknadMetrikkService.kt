@@ -1,9 +1,9 @@
 package no.nav.familie.baks.mottak.søknad.kontantstøtte
 
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV5
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
+import no.nav.familie.kontrakter.ks.søknad.StøttetVersjonertKontantstøtteSøknad
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
 import no.nav.familie.kontrakter.ks.søknad.v1.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
 import org.springframework.stereotype.Service
@@ -22,17 +22,17 @@ class KontantstøtteSøknadMetrikkService {
     // Metrics for EØS kontantstotte
     val søknadEøs = Metrics.counter("kontantstotte.soknad.eos")
 
-    fun sendMottakMetrikker(versjonertKontantstøtteSøknad: VersjonertKontantstøtteSøknad) {
+    fun sendMottakMetrikker(versjonertKontantstøtteSøknad: StøttetVersjonertKontantstøtteSøknad) {
         val dokumentasjon =
             when (versjonertKontantstøtteSøknad) {
-                is KontantstøtteSøknadV4 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon
-                is KontantstøtteSøknadV5 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon
+                is VersjonertKontantstøtteSøknadV4 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon
+                is VersjonertKontantstøtteSøknadV5 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon
             }
 
         val harEøsSteg =
             when (versjonertKontantstøtteSøknad) {
-                is KontantstøtteSøknadV4 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.antallEøsSteg > 0
-                is KontantstøtteSøknadV5 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.antallEøsSteg > 0
+                is VersjonertKontantstøtteSøknadV4 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.antallEøsSteg > 0
+                is VersjonertKontantstøtteSøknadV5 -> versjonertKontantstøtteSøknad.kontantstøtteSøknad.antallEøsSteg > 0
             }
 
         sendSøknadMetrikker(harEøsSteg)

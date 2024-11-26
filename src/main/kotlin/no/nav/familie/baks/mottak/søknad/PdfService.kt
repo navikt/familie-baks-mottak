@@ -1,15 +1,15 @@
 package no.nav.familie.baks.mottak.søknad
 
 import no.nav.familie.baks.mottak.integrasjoner.PdfClient
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV8
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.BarnetrygdSøknadV9
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.VersjonertBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV4
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadV5
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.VersjonertKontantstøtteSøknad
+import no.nav.familie.kontrakter.ba.søknad.StøttetVersjonertBarnetrygdSøknad
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV8
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
+import no.nav.familie.kontrakter.ks.søknad.StøttetVersjonertKontantstøtteSøknad
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -23,7 +23,7 @@ class PdfService(
     private val søknadSpråkvelgerService: SøknadSpråkvelgerService,
 ) {
     fun lagBarnetrygdPdf(
-        versjonertBarnetrygdSøknad: VersjonertBarnetrygdSøknad,
+        versjonertBarnetrygdSøknad: StøttetVersjonertBarnetrygdSøknad,
         dbBarnetrygdSøknad: DBBarnetrygdSøknad,
         språk: String,
     ): ByteArray {
@@ -32,10 +32,10 @@ class PdfService(
 
         val (søknadstype, navn) =
             when (versjonertBarnetrygdSøknad) {
-                is BarnetrygdSøknadV8 ->
+                is VersjonertBarnetrygdSøknadV8 ->
                     Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype, versjonertBarnetrygdSøknad.barnetrygdSøknad.søker.navn)
 
-                is BarnetrygdSøknadV9 ->
+                is VersjonertBarnetrygdSøknadV9 ->
                     Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype, versjonertBarnetrygdSøknad.barnetrygdSøknad.søker.navn)
             }
 
@@ -55,7 +55,7 @@ class PdfService(
     }
 
     fun lagKontantstøttePdf(
-        versjonertSøknad: VersjonertKontantstøtteSøknad,
+        versjonertSøknad: StøttetVersjonertKontantstøtteSøknad,
         dbKontantstøtteSøknad: DBKontantstøtteSøknad,
         språk: String,
     ): ByteArray {
@@ -64,8 +64,8 @@ class PdfService(
 
         val navn =
             when (versjonertSøknad) {
-                is KontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
-                is KontantstøtteSøknadV5 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
+                is VersjonertKontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
+                is VersjonertKontantstøtteSøknadV5 -> versjonertSøknad.kontantstøtteSøknad.søker.navn
             }
 
         val ekstraFelterMap =
