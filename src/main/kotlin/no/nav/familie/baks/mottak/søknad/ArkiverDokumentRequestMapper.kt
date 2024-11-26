@@ -180,8 +180,7 @@ object ArkiverDokumentRequestMapper {
     private fun genererEksternReferanseId(
         id: Long,
         dokumenttype: Dokumenttype,
-    ) =
-        "${id}_${postfixForDokumenttype(dokumenttype)}"
+    ) = "${id}_${postfixForDokumenttype(dokumenttype)}"
 
     private fun postfixForDokumenttype(dokumenttype: Dokumenttype) =
         when (dokumenttype) {

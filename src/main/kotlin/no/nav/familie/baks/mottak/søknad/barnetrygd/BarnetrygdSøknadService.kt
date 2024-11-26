@@ -61,8 +61,7 @@ class BarnetrygdSøknadService(
 
     fun hentDBSøknad(søknadId: Long): DBBarnetrygdSøknad? = søknadRepository.hentDBSøknad(søknadId)
 
-    fun finnDBSøknadFraJournalpost(journalpostId: String): DBBarnetrygdSøknad? =
-        søknadRepository.finnDBSøknadForJournalpost(journalpostId = journalpostId)
+    fun finnDBSøknadFraJournalpost(journalpostId: String): DBBarnetrygdSøknad? = søknadRepository.finnDBSøknadForJournalpost(journalpostId = journalpostId)
 
     fun hentDBSøknadFraJournalpost(journalpostId: String): DBBarnetrygdSøknad =
         søknadRepository.finnDBSøknadForJournalpost(journalpostId = journalpostId)

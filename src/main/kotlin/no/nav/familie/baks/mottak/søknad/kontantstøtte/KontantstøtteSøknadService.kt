@@ -69,8 +69,7 @@ class KontantstøtteSøknadService(
 
     fun hentDBKontantstøtteSøknad(søknadId: Long): DBKontantstøtteSøknad? = kontantstøtteSøknadRepository.hentSøknad(søknadId)
 
-    fun finnDBKontantstøtteSøknadForJournalpost(journalpostId: String): DBKontantstøtteSøknad? =
-        kontantstøtteSøknadRepository.finnSøknadForJournalpost(journalpostId = journalpostId)
+    fun finnDBKontantstøtteSøknadForJournalpost(journalpostId: String): DBKontantstøtteSøknad? = kontantstøtteSøknadRepository.finnSøknadForJournalpost(journalpostId = journalpostId)
 
     fun hentDBKontantstøtteSøknadForJournalpost(journalpostId: String): DBKontantstøtteSøknad =
         kontantstøtteSøknadRepository.finnSøknadForJournalpost(journalpostId = journalpostId)

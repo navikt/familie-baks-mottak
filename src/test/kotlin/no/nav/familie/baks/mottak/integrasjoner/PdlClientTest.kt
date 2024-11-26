@@ -13,6 +13,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
@@ -129,6 +130,37 @@ class PdlClientTest {
             pdlClient.hentPerson(testIdent, "hentperson-relasjon-dødsfall", Tema.BAR)
         }.isInstanceOf(IntegrasjonException::class.java)
             .hasMessageContaining("Feil ved oppslag på hentPerson mot PDL: Fant ikke person")
+    }
+
+    @Test
+    fun `skal kunne hente personIdent basert på aktørID`() {
+        // Arrange
+        mockResponseForPdlQuery(
+            pdlRequestBody = gyldigRequest("hentIdenter.graphql", testIdent),
+            mockResponse = readfile("mockIdentInformasjonResponse.json"),
+        )
+
+        // Act
+        val ident = pdlClient.hentPersonident(testIdent, Tema.BAR)
+
+        // Assert
+        assertThat(ident).contains(testIdent)
+    }
+
+    @Test
+    fun `skal kaste feil dersom vi ikke finner en aktiv personIdent basert på aktørID`() {
+        // Arrange
+        mockResponseForPdlQuery(
+            pdlRequestBody = gyldigRequest("hentIdenter.graphql", testIdent),
+            mockResponse = readfile("mock-ident-informasjon-kun-historiske-identer.json"),
+        )
+
+        // Act & assert
+        val exception =
+            assertThrows<PdlNotFoundException> {
+                val ident = pdlClient.hentPersonident(testIdent, Tema.BAR)
+            }
+        assertThat(exception.message).isEqualTo("Fant ikke aktive identer på person")
     }
 
     companion object {

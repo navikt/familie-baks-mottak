@@ -43,7 +43,8 @@ class ArbeidsfordelingClientTest {
         assertThat(response.single().enhetNavn).isEqualTo("NAV Familie- og pensjonsytelser midlertidig enhet")
     }
 
-    private fun gyldigEnhetResponse() = """
+    private fun gyldigEnhetResponse() =
+        """
 {
   "data": [
     {
