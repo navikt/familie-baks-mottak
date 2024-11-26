@@ -25,7 +25,7 @@
         <confluent.version>7.7.1</confluent.version>
         <prosessering.version>2.20241118095311_c66bd61</prosessering.version>
         
-        <kontrakter.version>3.0_20241025090301_fcf1202</kontrakter.version>
+        <kontrakter.version>3.0_20241125092101_ae3c67e</kontrakter.version>
         <felles.version>3.20241121151626_836e7ca</felles.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
