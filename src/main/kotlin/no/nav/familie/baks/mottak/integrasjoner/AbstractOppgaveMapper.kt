@@ -125,7 +125,7 @@ abstract class AbstractOppgaveMapper(
         when {
             journalpost.journalforendeEnhet == "2101" -> "4806" // Enhet 2101 er nedlagt. Rutes til 4806
             journalpost.journalforendeEnhet == "4847" -> "4817" // Enhet 4847 skal legges ned. Rutes til 4817
-            journalpost.erDigitalKanal() && (journalpost.harBarnetrygdSøknad() || journalpost.harKontantstøtteSøknad()) -> hentBehandlendeEnhetForPerson(journalpost)
+            journalpost.harDigitalBarnetrygdSøknad() || journalpost.harDigitalKontantstøtteSøknad() -> hentBehandlendeEnhetForPerson(journalpost)
             journalpost.journalforendeEnhet.isNullOrBlank() -> null
             hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet!!).status.uppercase(Locale.getDefault()) == "NEDLAGT" -> null
             hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet!!).oppgavebehandler -> journalpost.journalforendeEnhet
