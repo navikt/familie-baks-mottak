@@ -3,12 +3,10 @@ package no.nav.familie.baks.mottak.journalføring
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
-import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
-import no.nav.familie.baks.mottak.integrasjoner.erDigitalKanal
-import no.nav.familie.baks.mottak.integrasjoner.erKontantstøtteSøknad
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
 import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import org.springframework.stereotype.Service
 
 @Service
@@ -31,7 +29,7 @@ class AutomatiskJournalføringKontantstøtteService(
             return false
         }
 
-        if (!journalpost.erKontantstøtteSøknad()) {
+        if (!journalpost.harKontantstøtteSøknad()) {
             return false
         }
 

@@ -1,12 +1,18 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
+import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.journalpost.DokumentInfo
+import no.nav.familie.kontrakter.felles.journalpost.Dokumentstatus
+import no.nav.familie.kontrakter.felles.journalpost.Journalpost
+import no.nav.familie.kontrakter.felles.journalpost.Journalposttype
+import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class JournalpostTest {
     @Nested
-    inner class ErDigitalSøknadTest {
+    inner class HarDigitalSøknadTest {
         @Test
         fun `skal returnere false hvis brevkode ikke er riktig`() {
             // Arrange
@@ -23,14 +29,15 @@ class JournalpostTest {
                                 tittel = "Søknad",
                                 dokumentstatus = Dokumentstatus.FERDIGSTILT,
                                 dokumentvarianter = emptyList(),
+                                dokumentInfoId = "id",
                             ),
                         ),
                 )
             // Act
-            val erDigitalSøknad = journalpost.erDigitalSøknad()
+            val harDigitalSøknad = journalpost.harDigitalSøknad(Tema.BAR)
 
             // Assert
-            assertThat(erDigitalSøknad).isFalse()
+            assertThat(harDigitalSøknad).isFalse()
         }
 
         @Test
@@ -49,14 +56,15 @@ class JournalpostTest {
                                 tittel = "Søknad",
                                 dokumentstatus = Dokumentstatus.FERDIGSTILT,
                                 dokumentvarianter = emptyList(),
+                                dokumentInfoId = "id",
                             ),
                         ),
                 )
             // Act
-            val erDigitalSøknad = journalpost.erDigitalSøknad()
+            val harDigitalSøknad = journalpost.harDigitalSøknad(Tema.BAR)
 
             // Assert
-            assertThat(erDigitalSøknad).isFalse()
+            assertThat(harDigitalSøknad).isFalse()
         }
 
         @Test
@@ -75,14 +83,15 @@ class JournalpostTest {
                                 tittel = "Søknad",
                                 dokumentstatus = Dokumentstatus.FERDIGSTILT,
                                 dokumentvarianter = emptyList(),
+                                dokumentInfoId = "id",
                             ),
                         ),
                 )
             // Act
-            val erDigitalSøknad = journalpost.erDigitalSøknad()
+            val harDigitalSøknad = journalpost.harDigitalSøknad(Tema.KON)
 
             // Assert
-            assertThat(erDigitalSøknad).isTrue()
+            assertThat(harDigitalSøknad).isTrue()
         }
 
         @Test
@@ -101,14 +110,15 @@ class JournalpostTest {
                                 tittel = "Søknad",
                                 dokumentstatus = Dokumentstatus.FERDIGSTILT,
                                 dokumentvarianter = emptyList(),
+                                dokumentInfoId = "id",
                             ),
                         ),
                 )
             // Act
-            val erDigitalSøknad = journalpost.erDigitalSøknad()
+            val harDigitalSøknad = journalpost.harDigitalSøknad(Tema.BAR)
 
             // Assert
-            assertThat(erDigitalSøknad).isTrue()
+            assertThat(harDigitalSøknad).isTrue()
         }
 
         @Test
@@ -127,14 +137,15 @@ class JournalpostTest {
                                 tittel = "Søknad",
                                 dokumentstatus = Dokumentstatus.FERDIGSTILT,
                                 dokumentvarianter = emptyList(),
+                                dokumentInfoId = "id",
                             ),
                         ),
                 )
             // Act
-            val erDigitalSøknad = journalpost.erDigitalSøknad()
+            val harDigitalSøknad = journalpost.harDigitalSøknad(Tema.BAR)
 
             // Assert
-            assertThat(erDigitalSøknad).isTrue()
+            assertThat(harDigitalSøknad).isTrue()
         }
     }
 }

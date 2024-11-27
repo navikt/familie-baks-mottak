@@ -6,7 +6,9 @@ import no.nav.familie.baks.mottak.util.erDnummer
 import no.nav.familie.baks.mottak.util.erOrgnr
 import no.nav.familie.baks.mottak.util.fristFerdigstillelse
 import no.nav.familie.kontrakter.felles.Behandlingstema
+import no.nav.familie.kontrakter.felles.BrukerIdType
 import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveIdentV2
@@ -63,7 +65,9 @@ abstract class AbstractOppgaveMapper(
         journalpost: Journalpost,
         oppgavetype: Oppgavetype,
     ): OppgaveIdentV2? {
-        if (journalpost.bruker == null) {
+        val journalpostBruker = journalpost.bruker
+
+        if (journalpostBruker == null) {
             when (oppgavetype) {
                 Oppgavetype.BehandleSak -> error("Journalpost ${journalpost.journalpostId} mangler bruker")
                 Oppgavetype.Journalføring -> return null
@@ -73,9 +77,9 @@ abstract class AbstractOppgaveMapper(
             }
         }
 
-        return when (journalpost.bruker?.type) {
+        return when (journalpostBruker?.type) {
             BrukerIdType.FNR -> {
-                hentAktørIdFraPdl(journalpost.bruker.id.trim(), Tema.valueOf(journalpost.tema!!))?.let {
+                hentAktørIdFraPdl(journalpostBruker.id.trim(), Tema.valueOf(journalpost.tema!!))?.let {
                     OppgaveIdentV2(
                         ident = it,
                         gruppe = IdentGruppe.AKTOERID,
@@ -83,7 +87,7 @@ abstract class AbstractOppgaveMapper(
                 } ?: if (oppgavetype == Oppgavetype.BehandleSak) {
                     throw IntegrasjonException(
                         msg = "Fant ikke aktørId på person i PDL",
-                        ident = journalpost.bruker.id,
+                        ident = journalpostBruker.id,
                     )
                 } else {
                     null
@@ -91,14 +95,14 @@ abstract class AbstractOppgaveMapper(
             }
 
             BrukerIdType.ORGNR -> {
-                if (erOrgnr(journalpost.bruker.id.trim())) {
-                    OppgaveIdentV2(ident = journalpost.bruker.id.trim(), gruppe = IdentGruppe.ORGNR)
+                if (erOrgnr(journalpostBruker.id.trim())) {
+                    OppgaveIdentV2(ident = journalpostBruker.id.trim(), gruppe = IdentGruppe.ORGNR)
                 } else {
                     null
                 }
             }
 
-            BrukerIdType.AKTOERID -> OppgaveIdentV2(ident = journalpost.bruker.id.trim(), gruppe = IdentGruppe.AKTOERID)
+            BrukerIdType.AKTOERID -> OppgaveIdentV2(ident = journalpostBruker.id.trim(), gruppe = IdentGruppe.AKTOERID)
             else -> null
         }
     }
@@ -121,19 +125,21 @@ abstract class AbstractOppgaveMapper(
         when {
             journalpost.journalforendeEnhet == "2101" -> "4806" // Enhet 2101 er nedlagt. Rutes til 4806
             journalpost.journalforendeEnhet == "4847" -> "4817" // Enhet 4847 skal legges ned. Rutes til 4817
-            journalpost.erDigitalKanal() && (journalpost.erBarnetrygdSøknad() || journalpost.erKontantstøtteSøknad()) -> hentBehandlendeEnhetForPerson(journalpost)
+            journalpost.harDigitalBarnetrygdSøknad() || journalpost.harDigitalKontantstøtteSøknad() -> hentBehandlendeEnhetForPerson(journalpost)
             journalpost.journalforendeEnhet.isNullOrBlank() -> null
-            hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).status.uppercase(Locale.getDefault()) == "NEDLAGT" -> null
-            hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).oppgavebehandler -> journalpost.journalforendeEnhet
+            hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet!!).status.uppercase(Locale.getDefault()) == "NEDLAGT" -> null
+            hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet!!).oppgavebehandler -> journalpost.journalforendeEnhet
             else -> {
                 logger.warn("Enhet ${journalpost.journalforendeEnhet} kan ikke ta i mot oppgaver")
                 null
             }
         }
 
-    private fun hentBehandlendeEnhetForPerson(journalpost: Journalpost): String? =
-        if (journalpost.bruker != null) {
-            val personIdentPåJournalpost = journalpostBrukerService.tilPersonIdent(journalpost.bruker, this.tema)
+    private fun hentBehandlendeEnhetForPerson(journalpost: Journalpost): String? {
+        val journalpostBruker = journalpost.bruker
+
+        return if (journalpostBruker != null) {
+            val personIdentPåJournalpost = journalpostBrukerService.tilPersonIdent(journalpostBruker, this.tema)
             val behandlendeEnhetPåIdent = arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdentPåJournalpost, this.tema)
 
             behandlendeEnhetPåIdent.enhetId
@@ -141,6 +147,7 @@ abstract class AbstractOppgaveMapper(
             logger.warn("Fant ikke bruker på journalpost ved forsøk på henting av behandlende enhet")
             null
         }
+    }
 
     private fun hentAktørIdFraPdl(
         brukerId: String,
@@ -160,8 +167,8 @@ abstract class AbstractOppgaveMapper(
         journalpost: Journalpost,
     ): Boolean {
         return when (journalpost.bruker?.type) {
-            BrukerIdType.FNR -> erDnummer(journalpost.bruker.id)
-            BrukerIdType.AKTOERID -> erDnummer(pdlClient.hentPersonident(journalpost.bruker.id, tema).takeIf { it.isNotEmpty() } ?: return false)
+            BrukerIdType.FNR -> erDnummer(journalpost.bruker!!.id)
+            BrukerIdType.AKTOERID -> erDnummer(pdlClient.hentPersonident(journalpost.bruker!!.id, tema).takeIf { it.isNotEmpty() } ?: return false)
             else -> false
         }
     }

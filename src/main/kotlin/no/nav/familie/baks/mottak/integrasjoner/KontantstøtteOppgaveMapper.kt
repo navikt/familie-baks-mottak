@@ -5,6 +5,7 @@ import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteS�
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.harEøsSteg
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import no.nav.familie.unleash.UnleashService
 import org.springframework.stereotype.Service
@@ -36,7 +37,7 @@ class KontantstøtteOppgaveMapper(
 
     override fun hentBehandlingstype(journalpost: Journalpost): Behandlingstype =
         when {
-            journalpost.erKontantstøtteSøknad() && journalpost.erDigitalKanal() ->
+            journalpost.harKontantstøtteSøknad() && journalpost.erDigitalKanal() ->
                 if (utledBehandlingKategoriFraSøknad(journalpost) == BehandlingKategori.EØS) {
                     Behandlingstype.EØS
                 } else {
@@ -48,7 +49,7 @@ class KontantstøtteOppgaveMapper(
         }
 
     fun utledBehandlingKategoriFraSøknad(journalpost: Journalpost): BehandlingKategori {
-        check(journalpost.erKontantstøtteSøknad()) { "Journalpost m/ id ${journalpost.journalpostId} er ikke en kontantstøtte søknad" }
+        check(journalpost.harKontantstøtteSøknad()) { "Journalpost m/ id ${journalpost.journalpostId} er ikke en kontantstøtte søknad" }
 
         val søknad = kontantstøtteSøknadRepository.getByJournalpostId(journalpost.journalpostId)
 

@@ -3,6 +3,7 @@ package no.nav.familie.baks.mottak.integrasjoner
 import no.nav.familie.baks.mottak.journalføring.AdressebeskyttelesesgraderingService
 import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -21,18 +22,22 @@ class EnhetsnummerService(
     fun hentEnhetsnummer(
         journalpost: Journalpost,
     ): String? {
-        if (journalpost.tema == null) {
+        val journalpostTema = journalpost.tema
+
+        if (journalpostTema == null) {
             logger.error("Journalpost tema er null for journalpost ${journalpost.journalpostId}.")
             throw IllegalStateException("Tema er null")
         }
 
-        if (journalpost.bruker == null) {
+        val journalpostBruker = journalpost.bruker
+
+        if (journalpostBruker == null) {
             logger.error("Bruker for journalpost ${journalpost.journalpostId} er null. Usikker på hvordan dette burde håndteres. Se SecureLogs.")
             secureLogger.error("Bruker for journalpost $journalpost er null. Usikker på hvordan dette burde håndteres.")
             throw IllegalStateException("Bruker for journalpost ${journalpost.journalpostId} er null. Usikker på hvordan dette burde håndteres.")
         }
 
-        val tema = Tema.valueOf(journalpost.tema)
+        val tema = Tema.valueOf(journalpostTema)
 
         val erEnAvPersoneneStrengtFortrolig =
             adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
@@ -40,16 +45,18 @@ class EnhetsnummerService(
                 journalpost = journalpost,
             )
 
+        val journalførendeEnhet = journalpost.journalforendeEnhet
+
         return when {
             erEnAvPersoneneStrengtFortrolig -> "2103"
-            journalpost.journalforendeEnhet == "2101" -> "4806" // Enhet 2101 er nedlagt. Rutes til 4806
-            journalpost.journalforendeEnhet == "4847" -> "4817" // Enhet 4847 skal legges ned. Rutes til 4817
-            journalpost.erDigitalSøknad() -> arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(journalpostBrukerService.tilPersonIdent(journalpost.bruker, tema), tema).enhetId
-            journalpost.journalforendeEnhet.isNullOrBlank() -> null
-            hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).status.uppercase(Locale.getDefault()) == "NEDLAGT" -> null
-            hentEnhetClient.hentEnhet(journalpost.journalforendeEnhet).oppgavebehandler -> journalpost.journalforendeEnhet
+            journalførendeEnhet == "2101" -> "4806" // Enhet 2101 er nedlagt. Rutes til 4806
+            journalførendeEnhet == "4847" -> "4817" // Enhet 4847 skal legges ned. Rutes til 4817
+            journalpost.harDigitalSøknad(tema) -> arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(journalpostBrukerService.tilPersonIdent(journalpostBruker, tema), tema).enhetId
+            journalførendeEnhet.isNullOrBlank() -> null
+            hentEnhetClient.hentEnhet(journalførendeEnhet).status.uppercase(Locale.getDefault()) == "NEDLAGT" -> null
+            hentEnhetClient.hentEnhet(journalførendeEnhet).oppgavebehandler -> journalførendeEnhet
             else -> {
-                logger.warn("Enhet ${journalpost.journalforendeEnhet} kan ikke ta i mot oppgaver")
+                logger.warn("Enhet $journalførendeEnhet kan ikke ta i mot oppgaver")
                 null
             }
         }

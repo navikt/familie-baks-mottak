@@ -18,16 +18,21 @@ import io.mockk.mockkStatic
 import no.nav.familie.baks.mottak.DevLauncher
 import no.nav.familie.http.client.RessursException
 import no.nav.familie.kontrakter.felles.Behandlingstema
+import no.nav.familie.kontrakter.felles.BrukerIdType
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Ressurs.Companion.success
 import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.journalpost.Bruker
+import no.nav.familie.kontrakter.felles.journalpost.DokumentInfo
+import no.nav.familie.kontrakter.felles.journalpost.Journalpost
+import no.nav.familie.kontrakter.felles.journalpost.Journalposttype
+import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.FinnOppgaveResponseDto
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.log.NavHttpHeaders
-import org.apache.commons.lang3.StringUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
@@ -226,40 +231,45 @@ class OppgaveClientTest {
             "    \"gruppe\": \"AKTOERID\"\n" +
             "  },\n" +
             "  \"enhetsnummer\": \"9999\",\n" +
+            "  \"saksId\": null,\n" +
             "  \"journalpostId\": \"$journalpostId\",\n" +
             "  \"tema\": \"BAR\",\n" +
             "  \"oppgavetype\": \"$oppgavetype\",\n" +
             "  \"behandlingstema\": \"$behandlingstema\",\n" +
+            "  \"tilordnetRessurs\": null,\n" +
             "  \"fristFerdigstillelse\": \"2020-04-01\",\n" +
             "  \"aktivFra\": \"${LocalDate.now()}\",\n" +
             "  \"beskrivelse\": \"${beskrivelse}\",\n" +
-            "  \"prioritet\": \"NORM\"\n" +
+            "  \"prioritet\": \"NORM\",\n" +
+            "  \"behandlingstype\": null,\n" +
+            "  \"behandlesAvApplikasjon\": null,\n" +
+            "  \"mappeId\": null\n" +
+
             "}"
 
     companion object {
         private val journalPost =
             Journalpost(
-                "1234567",
-                Journalposttype.I,
-                Journalstatus.MOTTATT,
-                Tema.BAR.name,
-                "behandlingstemaFraJournalpost",
-                null,
-                Bruker("1234567891011", BrukerIdType.AKTOERID),
-                "9999",
-                "kanal",
-                listOf(
-                    DokumentInfo(
-                        "Tittel",
-                        "NAV- 99.00.07",
-                        null,
-                        null,
+                journalpostId = "1234567",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                tema = Tema.BAR.name,
+                behandlingstema = "behandlingstemaFraJournalpost",
+                tittel = null,
+                bruker = Bruker("1234567891011", BrukerIdType.AKTOERID),
+                journalforendeEnhet = "9999",
+                kanal = "kanal",
+                dokumenter =
+                    listOf(
+                        DokumentInfo(
+                            "id",
+                            "Tittel",
+                            "NAV- 99.00.07",
+                            null,
+                        ),
                     ),
-                ),
             )
 
         private fun readfile(filnavn: String): String = this::class.java.getResource("/pdl/$filnavn").readText()
-
-        private fun String.graphqlCompatible(): String = StringUtils.normalizeSpace(this.replace("\n", ""))
     }
 }

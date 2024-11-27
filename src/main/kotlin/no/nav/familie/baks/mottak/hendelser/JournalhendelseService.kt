@@ -5,17 +5,14 @@ import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.domene.HendelseConsumer
 import no.nav.familie.baks.mottak.domene.Hendelseslogg
 import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
-import no.nav.familie.baks.mottak.integrasjoner.BrukerIdType.ORGNR
-import no.nav.familie.baks.mottak.integrasjoner.Journalpost
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
-import no.nav.familie.baks.mottak.integrasjoner.Journalposttype
-import no.nav.familie.baks.mottak.integrasjoner.Journalstatus
-import no.nav.familie.baks.mottak.integrasjoner.erBarnetrygdOrdinærSøknad
-import no.nav.familie.baks.mottak.integrasjoner.erBarnetrygdUtvidetSøknad
-import no.nav.familie.baks.mottak.integrasjoner.erKontantstøtteSøknad
 import no.nav.familie.baks.mottak.task.JournalhendelseBarnetrygdRutingTask
 import no.nav.familie.baks.mottak.task.JournalhendelseKontantstøtteRutingTask
+import no.nav.familie.kontrakter.felles.BrukerIdType
 import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.journalpost.Journalpost
+import no.nav.familie.kontrakter.felles.journalpost.Journalposttype
+import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
 import no.nav.familie.log.IdUtils
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.domene.Task
@@ -145,15 +142,15 @@ class JournalhendelseService(
 
     private fun behandleSkanningHendelser(journalpost: Journalpost) {
         logger.info("Ny Journalhendelse med [journalpostId=${journalpost.journalpostId}, status=${journalpost.journalstatus}, tema=${journalpost.tema}, kanal=${journalpost.kanal}]")
-        val erOrdinærBarnetrygdSøknad = journalpost.erBarnetrygdOrdinærSøknad()
-        val erUtvidetBarnetrygdSøknad = journalpost.erBarnetrygdUtvidetSøknad()
-        val erKontantstøtteSøknad = journalpost.erKontantstøtteSøknad()
+        val harOrdinærBarnetrygdSøknad = journalpost.harBarnetrygdOrdinærSøknad()
+        val harUtvidetBarnetrygdSøknad = journalpost.harBarnetrygdUtvidetSøknad()
+        val harKontantstøtteSøknad = journalpost.harKontantstøtteSøknad()
 
         opprettJournalhendelseRutingTask(journalpost)
 
-        if (erOrdinærBarnetrygdSøknad) skannetOrdinærBarnetrygdSøknadCounter.increment()
-        if (erUtvidetBarnetrygdSøknad) skannetUtvidetBarnetrygdSøknadCounter.increment()
-        if (erKontantstøtteSøknad) skannetKontantstøtteSøknadCounter.increment()
+        if (harOrdinærBarnetrygdSøknad) skannetOrdinærBarnetrygdSøknadCounter.increment()
+        if (harUtvidetBarnetrygdSøknad) skannetUtvidetBarnetrygdSøknadCounter.increment()
+        if (harKontantstøtteSøknad) skannetKontantstøtteSøknadCounter.increment()
 
         incrementKanalCounter(journalpost)
     }
@@ -196,8 +193,10 @@ class JournalhendelseService(
 
     private fun opprettMetadata(journalpost: Journalpost): Properties =
         Properties().apply {
-            if (journalpost.bruker != null && journalpost.bruker.type != ORGNR) {
-                this["personIdent"] = journalpost.bruker.id
+            val journalpostBruker = journalpost.bruker
+
+            if (journalpostBruker != null && journalpostBruker.type != BrukerIdType.ORGNR) {
+                this["personIdent"] = journalpostBruker.id
             }
             this["journalpostId"] = journalpost.journalpostId
             if (!MDC.get(MDCConstants.MDC_CALL_ID).isNullOrEmpty()) {

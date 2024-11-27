@@ -8,7 +8,10 @@ import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
 import no.nav.familie.kontrakter.felles.Behandlingstema
+import no.nav.familie.kontrakter.felles.BrukerIdType
 import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.journalpost.Bruker
+import no.nav.familie.kontrakter.felles.journalpost.DokumentInfo
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveIdentV2
@@ -97,6 +100,7 @@ class OppgaveMapperTest(
                                     brevkode = "",
                                     dokumentstatus = null,
                                     dokumentvarianter = null,
+                                    dokumentInfoId = "id",
                                 ),
                             ),
                         bruker = null,
@@ -122,6 +126,7 @@ class OppgaveMapperTest(
                                     brevkode = "NAV 33-00.07",
                                     dokumentstatus = null,
                                     dokumentvarianter = null,
+                                    dokumentInfoId = "id",
                                 ),
                             ),
                     ),
@@ -144,6 +149,7 @@ class OppgaveMapperTest(
                                     brevkode = "",
                                     dokumentstatus = null,
                                     dokumentvarianter = null,
+                                    dokumentInfoId = "id",
                                 ),
                             ),
                         bruker = null,
@@ -167,6 +173,7 @@ class OppgaveMapperTest(
                                     brevkode = "NAV 33-00.07",
                                     dokumentstatus = null,
                                     dokumentvarianter = null,
+                                    dokumentInfoId = "id",
                                 ),
                             ),
                     ),
@@ -189,6 +196,7 @@ class OppgaveMapperTest(
                                     brevkode = null,
                                     dokumentstatus = null,
                                     dokumentvarianter = null,
+                                    dokumentInfoId = "id",
                                 ),
                             ),
                         behandlingstema = "btema",
@@ -212,6 +220,7 @@ class OppgaveMapperTest(
                                     brevkode = null,
                                     dokumentstatus = null,
                                     dokumentvarianter = null,
+                                    dokumentInfoId = "id",
                                 ),
                             ),
                         bruker =
@@ -240,12 +249,14 @@ class OppgaveMapperTest(
                                     brevkode = null,
                                     dokumentstatus = null,
                                     dokumentvarianter = null,
+                                    dokumentInfoId = "id",
                                 ),
                                 DokumentInfo(
                                     tittel = null,
                                     brevkode = "NAV 33-00.15",
                                     dokumentstatus = null,
                                     dokumentvarianter = null,
+                                    dokumentInfoId = "id",
                                 ),
                             ),
                         behandlingstema = Behandlingstema.OrdinærBarnetrygd.value,
@@ -269,7 +280,7 @@ class OppgaveMapperTest(
                                     tittel = "Whatever",
                                     brevkode = "kode",
                                     dokumentstatus = null,
-                                    dokumentvarianter = null,
+                                    dokumentInfoId = "id",
                                 ),
                             ),
                         behandlingstema = "btema",
@@ -294,6 +305,7 @@ class OppgaveMapperTest(
                                     brevkode = null,
                                     dokumentstatus = null,
                                     dokumentvarianter = null,
+                                    dokumentInfoId = "id",
                                 ),
                             ),
                         behandlingstema = "btema",
@@ -317,6 +329,7 @@ class OppgaveMapperTest(
                                     brevkode = "kode",
                                     dokumentstatus = null,
                                     dokumentvarianter = null,
+                                    dokumentInfoId = "id",
                                 ),
                             ),
                         behandlingstema = "btema",
@@ -340,6 +353,7 @@ class OppgaveMapperTest(
                                     brevkode = "kode",
                                     dokumentstatus = null,
                                     dokumentvarianter = null,
+                                    dokumentInfoId = "id",
                                 ),
                             ),
                         behandlingstema = "btema",
@@ -364,6 +378,7 @@ class OppgaveMapperTest(
                                     brevkode = "kode",
                                     dokumentstatus = null,
                                     dokumentvarianter = null,
+                                    dokumentInfoId = "id",
                                 ),
                             ),
                         behandlingstema = "btema",
@@ -390,6 +405,7 @@ class OppgaveMapperTest(
                                     brevkode = "kode",
                                     dokumentstatus = null,
                                     dokumentvarianter = null,
+                                    dokumentInfoId = "id",
                                 ),
                             ),
                         behandlingstema = "btema",
@@ -415,6 +431,7 @@ class OppgaveMapperTest(
                                     brevkode = "kode",
                                     dokumentstatus = null,
                                     dokumentvarianter = null,
+                                    dokumentInfoId = "id",
                                 ),
                             ),
                         behandlingstema = "btema",
