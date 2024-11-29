@@ -8,6 +8,7 @@ import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentResponse
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.ArkiverDokumentRequest
 import no.nav.familie.kontrakter.felles.getDataOrThrow
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
+import no.nav.familie.kontrakter.felles.objectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -58,6 +59,9 @@ class DokarkivClient(
 
     fun arkiver(arkiverDokumentRequest: ArkiverDokumentRequest): ArkiverDokumentResponse {
         val uri = URI.create("$integrasjonUri/arkiv/v4")
+        secureLogger.info("""Arkiverer dokumenter for journalpost 
+            |${objectMapper.writeValueAsString(arkiverDokumentRequest)}
+        """.trimMargin())
         val response =
             postForEntity<Ressurs<ArkiverDokumentResponse>>(uri, arkiverDokumentRequest)
         return response.getDataOrThrow()

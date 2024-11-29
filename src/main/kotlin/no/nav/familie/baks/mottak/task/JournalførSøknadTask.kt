@@ -61,7 +61,7 @@ class JournalførSøknadTask(
             when (e.cause) {
                 is HttpClientErrorException.Conflict -> {
                     // Dersom søknaden allerede er journalført får vi 409-Conflict. Vi ønsker ikke å feile tasken når dette skjer.
-                    log.error("409 conflict for eksternReferanseId ved journalføring av søknad. taskId=${task.id}. Se task eller securelog")
+                    log.error("409 conflict for eksternReferanseId ved journalføring av søknad. taskId=${task.id}. Se task eller securelog ${e.ressurs.toJson()}")
                     SECURE_LOGGER.error(
                         "409 conflict for eksternReferanseId ved journalføring søknad $task ${(e.cause as HttpClientErrorException.Conflict).responseBodyAsString}",
                         e,
