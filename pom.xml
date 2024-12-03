@@ -29,7 +29,7 @@
         <kontrakter.version>3.0_20241125142330_0a07b16</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
-        <spring.cloud.version>4.1.4</spring.cloud.version>
+        <spring.cloud.version>4.2.0</spring.cloud.version>
         <token-validation-spring.version>5.0.11</token-validation-spring.version>
         <avro.version>1.12.0</avro.version>
 
