@@ -26,7 +26,7 @@
         <prosessering.version>2.20241205111631_afe703f</prosessering.version>
 
         <felles.version>3.20241127123724_adfc561</felles.version>
-        <kontrakter.version>3.0_20241125142330_0a07b16</kontrakter.version>
+        <kontrakter.version>3.0_20241206132953_18ef9da</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
         <spring.cloud.version>4.2.0</spring.cloud.version>
