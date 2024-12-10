@@ -35,7 +35,7 @@ class TidKtTest {
         }
 
         @Test
-        fun `skal returnere false om sammenligningstidspunktet er etter det innsendte tidspunktet`() {
+        fun `skal returnere false om sammenligningstidspunktet er før det innsendte tidspunktet`() {
             // Arrange
             val kl1030 = LocalTime.of(10, 30)
             val etterKl1030 = kl1030.plusNanos(1)
@@ -51,7 +51,7 @@ class TidKtTest {
     @Nested
     inner class IsEqualOrBeforeTest {
         @Test
-        fun `skal returnere fal om sammenligningstidspunktet er etter det innsendte tidspunktet`() {
+        fun `skal returnere false om sammenligningstidspunktet er etter det innsendte tidspunktet`() {
             // Arrange
             val kl1030 = LocalTime.of(10, 30)
             val førKl1030 = kl1030.minusNanos(1)
@@ -77,7 +77,7 @@ class TidKtTest {
         }
 
         @Test
-        fun `skal returnere true om sammenligningstidspunktet er etter det innsendte tidspunktet`() {
+        fun `skal returnere true om sammenligningstidspunktet er før det innsendte tidspunktet`() {
             // Arrange
             val kl1030 = LocalTime.of(10, 30)
             val etterKl1030 = kl1030.plusNanos(1)
