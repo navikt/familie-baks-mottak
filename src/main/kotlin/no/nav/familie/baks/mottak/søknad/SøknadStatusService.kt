@@ -2,12 +2,14 @@ package no.nav.familie.baks.mottak.søknad
 
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
+import no.nav.familie.baks.mottak.util.isEqualOrAfter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.Duration
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 @Service
 class SøknadStatusService(
@@ -43,7 +45,7 @@ class SøknadStatusService(
     ) {
         if (erDagtid() && !erHelg()) {
             when {
-                tidSidenSisteSøknad.toHours() >= 3 -> logger.error("Status baks-mottak: Det er ${tidSidenSisteSøknad.toHours()} timer siden vi sist mottok en søknad om ${søknadstype.name.lowercase()}")
+                tidSidenSisteSøknad.toHours() >= 3 && LocalTime.now().isEqualOrAfter(LocalTime.of(10, 30)) -> logger.error("Status baks-mottak: Det er ${tidSidenSisteSøknad.toHours()} timer siden vi sist mottok en søknad om ${søknadstype.name.lowercase()}")
                 tidSidenSisteSøknad.toMinutes() >= 20 -> logger.warn("Status baks-mottak: Det er ${tidSidenSisteSøknad.toMinutes()} minutter siden vi sist mottok en søknad om ${søknadstype.name.lowercase()}")
                 else -> logger.info("Status baks-mottak: Det er ${tidSidenSisteSøknad.toMinutes()} minutter siden vi sist mottok en søknad om ${søknadstype.name.lowercase()}")
             }
