@@ -2,7 +2,6 @@ package no.nav.familie.baks.mottak.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.familie.http.sts.StsRestClient
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
