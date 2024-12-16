@@ -39,6 +39,7 @@ class EnsligForsørgerVedtakHendelseConsumer(
         topics = ["teamfamilie.$TOPIC_EF_VEDTAK"],
         containerFactory = "kafkaAivenHendelseListenerContainerFactory",
         idIsGroup = false,
+        clientIdPrefix = "ef-sak",
     )
     @Transactional
     fun listen(
