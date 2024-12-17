@@ -17,19 +17,19 @@ class SøknadStatusService(
     val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
 ) {
     @Scheduled(cron = "0 0/30 * * * ?")
-    private fun sjekkStatusForBarnetrygdOgKontantstøtte() {
+    private fun loggHvisLiteAktivitetForBarnetrygdOgKontantstøtte() {
         val isLeader = LeaderClient.isLeader()
-        if (isLeader != null && isLeader) {
-            logger.info("Sjekker status for barnetrygd og kontantstøtte")
-
-            val sistBarnetrygdSøknad = barnetrygdSøknadRepository.finnSisteLagredeSøknad()
-            val tidSidenSisteBarnetrygdSøknad = Duration.between(sistBarnetrygdSøknad.opprettetTid, LocalDateTime.now())
-            loggHvisLiteAktivitet(tidSidenSisteBarnetrygdSøknad, Søknadstype.BARNETRYGD)
-
-            val sistKontantstøtteSøknad = kontantstøtteSøknadRepository.finnSisteLagredeSøknad()
-            val tidSidenSisteKontantstøtteSøknad = Duration.between(sistKontantstøtteSøknad.opprettetTid, LocalDateTime.now())
-            loggHvisLiteAktivitet(tidSidenSisteKontantstøtteSøknad, Søknadstype.KONTANTSTØTTE)
+        if (isLeader == null || !isLeader) {
+            return
         }
+
+        val sistBarnetrygdSøknad = barnetrygdSøknadRepository.finnSisteLagredeSøknad()
+        val tidSidenSisteBarnetrygdSøknad = Duration.between(sistBarnetrygdSøknad.opprettetTid, LocalDateTime.now())
+        loggHvisLiteAktivitet(tidSidenSisteBarnetrygdSøknad, Søknadstype.BARNETRYGD)
+
+        val sistKontantstøtteSøknad = kontantstøtteSøknadRepository.finnSisteLagredeSøknad()
+        val tidSidenSisteKontantstøtteSøknad = Duration.between(sistKontantstøtteSøknad.opprettetTid, LocalDateTime.now())
+        loggHvisLiteAktivitet(tidSidenSisteKontantstøtteSøknad, Søknadstype.KONTANTSTØTTE)
     }
 
     fun statusBarnetrygd(): StatusDto {
