@@ -359,8 +359,8 @@ class EnhetsnummerServiceTest {
         every {
             mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(any(), any())
         } returns
-                no.nav.familie.kontrakter.felles.arbeidsfordeling
-                    .Enhet(enhetId = "789", "Hønefoss")
+            no.nav.familie.kontrakter.felles.arbeidsfordeling
+                .Enhet(enhetId = "789", "Hønefoss")
         // Act
         val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
 
