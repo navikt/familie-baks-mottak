@@ -28,7 +28,8 @@ class EnhetsnummerService(
             logger.error("Journalpost tema er null for journalpost ${journalpost.journalpostId}.")
             throw IllegalStateException("Tema er null")
         }
-        
+
+        // Kan ikke utlede enhet dersom bruker er null.
         val journalpostBruker = journalpost.bruker ?: return null
 
         val tema = Tema.valueOf(journalpostTema)
