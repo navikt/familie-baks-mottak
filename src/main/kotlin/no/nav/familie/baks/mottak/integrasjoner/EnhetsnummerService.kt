@@ -29,13 +29,8 @@ class EnhetsnummerService(
             throw IllegalStateException("Tema er null")
         }
 
-        val journalpostBruker = journalpost.bruker
-
-        if (journalpostBruker == null) {
-            logger.error("Bruker for journalpost ${journalpost.journalpostId} er null. Usikker på hvordan dette burde håndteres. Se SecureLogs.")
-            secureLogger.error("Bruker for journalpost $journalpost er null. Usikker på hvordan dette burde håndteres.")
-            throw IllegalStateException("Bruker for journalpost ${journalpost.journalpostId} er null. Usikker på hvordan dette burde håndteres.")
-        }
+        // Kan ikke utlede enhet dersom bruker er null.
+        val journalpostBruker = journalpost.bruker ?: return null
 
         val tema = Tema.valueOf(journalpostTema)
 

@@ -303,7 +303,7 @@ class EnhetsnummerServiceTest {
     }
 
     @Test
-    fun `skal kaste exception hvis journalpost bruker er null`() {
+    fun `skal returnere null hvis journalpost bruker er null`() {
         // Arrange
         val journalpostId = "123"
 
@@ -320,12 +320,9 @@ class EnhetsnummerServiceTest {
             )
 
         // Act & Assert
-        val exception =
-            assertThrows<IllegalStateException> {
-                enhetsnummerService.hentEnhetsnummer(journalpost)
-            }
+        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
 
-        assertThat(exception.message).isEqualTo("Bruker for journalpost $journalpostId er null. Usikker på hvordan dette burde håndteres.")
+        assertThat(enhetsnummer).isNull()
     }
 
     @ParameterizedTest
