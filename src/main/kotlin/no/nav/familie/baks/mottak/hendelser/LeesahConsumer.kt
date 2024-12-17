@@ -36,6 +36,7 @@ class LeesahConsumer(
         idIsGroup = false,
         containerFactory = "kafkaAivenHendelseListenerAvroEarliestContainerFactory",
         autoStartup = "true",
+        clientIdPrefix = "leesah",
     )
     @Transactional
     fun listen(

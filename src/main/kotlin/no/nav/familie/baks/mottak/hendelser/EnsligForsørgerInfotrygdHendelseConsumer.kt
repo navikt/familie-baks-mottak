@@ -65,6 +65,7 @@ class EnsligForsørgerInfotrygdHendelseConsumer(
         topics = ["teamfamilie.$TOPIC_INFOTRYGD_VEDTAK"],
         containerFactory = "kafkaAivenHendelseListenerContainerFactory",
         idIsGroup = false,
+        clientIdPrefix = "ef-infotrygd",
     )
     @Transactional
     fun listen(
