@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.5</version>
+        <version>3.4.0</version>
     </parent>
 
     <properties>
@@ -23,10 +23,10 @@
         <kotlin.version>2.1.0</kotlin.version>
         <mockk.version>1.13.13</mockk.version>
         <confluent.version>7.8.0</confluent.version>
-        <prosessering.version>2.20241205111631_afe703f</prosessering.version>
+        <prosessering.version>2.20241212142143_6cd44ac</prosessering.version>
 
         <felles.version>3.20241127123724_adfc561</felles.version>
-        <kontrakter.version>3.0_20241125142330_0a07b16</kontrakter.version>
+        <kontrakter.version>3.0_20241213120323_06b68cf</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
         <spring.cloud.version>4.2.0</spring.cloud.version>

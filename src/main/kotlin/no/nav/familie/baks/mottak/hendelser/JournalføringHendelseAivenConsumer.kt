@@ -30,6 +30,7 @@ class JournalføringHendelseAivenConsumer(
         topics = ["\${JOURNALFOERINGHENDELSE_V1_TOPIC_AIVEN_URL}"],
         containerFactory = "kafkaAivenHendelseListenerAvroLatestContainerFactory",
         idIsGroup = false,
+        clientIdPrefix = "jfr",
     )
     @Transactional
     fun listen(
