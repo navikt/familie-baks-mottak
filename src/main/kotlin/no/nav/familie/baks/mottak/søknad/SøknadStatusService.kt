@@ -2,12 +2,14 @@ package no.nav.familie.baks.mottak.søknad
 
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
+import no.nav.familie.leader.LeaderClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.Duration
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 @Service
 class SøknadStatusService(
@@ -15,17 +17,25 @@ class SøknadStatusService(
     val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
 ) {
     @Scheduled(cron = "0 0/30 * * * ?")
-    private fun sjekkStatusForBarnetrygdOgKontantstøtte() {
-        logger.info("Sjekker status for barnetrygd og kontantstøtte")
-        statusBarnetrygd()
-        statusKontantstøtte()
+    private fun loggHvisLiteAktivitetForBarnetrygdOgKontantstøtte() {
+        val isLeader = LeaderClient.isLeader()
+        if (isLeader == null || !isLeader) {
+            return
+        }
+
+        val sistBarnetrygdSøknad = barnetrygdSøknadRepository.finnSisteLagredeSøknad()
+        val tidSidenSisteBarnetrygdSøknad = Duration.between(sistBarnetrygdSøknad.opprettetTid, LocalDateTime.now())
+        loggHvisLiteAktivitet(tidSidenSisteBarnetrygdSøknad, Søknadstype.BARNETRYGD)
+
+        val sistKontantstøtteSøknad = kontantstøtteSøknadRepository.finnSisteLagredeSøknad()
+        val tidSidenSisteKontantstøtteSøknad = Duration.between(sistKontantstøtteSøknad.opprettetTid, LocalDateTime.now())
+        loggHvisLiteAktivitet(tidSidenSisteKontantstøtteSøknad, Søknadstype.KONTANTSTØTTE)
     }
 
     fun statusBarnetrygd(): StatusDto {
         logger.info("Sjekker status på barnetrygd søknad.")
         val sistBarnetrygdSøknad = barnetrygdSøknadRepository.finnSisteLagredeSøknad()
         val tidSidenSisteBarnetrygdSøknad = Duration.between(sistBarnetrygdSøknad.opprettetTid, LocalDateTime.now())
-        loggHvisLiteAktivitet(tidSidenSisteBarnetrygdSøknad, Søknadstype.BARNETRYGD)
         return lagStatusDto(tidSidenSisteBarnetrygdSøknad, Søknadstype.BARNETRYGD)
     }
 
@@ -33,7 +43,6 @@ class SøknadStatusService(
         logger.info("Sjekker status på kontantstøtte søknad.")
         val sistKontantstøtteSøknad = kontantstøtteSøknadRepository.finnSisteLagredeSøknad()
         val tidSidenSisteKontantstøtteSøknad = Duration.between(sistKontantstøtteSøknad.opprettetTid, LocalDateTime.now())
-        loggHvisLiteAktivitet(tidSidenSisteKontantstøtteSøknad, Søknadstype.KONTANTSTØTTE)
         return lagStatusDto(tidSidenSisteKontantstøtteSøknad, Søknadstype.KONTANTSTØTTE)
     }
 
@@ -43,8 +52,7 @@ class SøknadStatusService(
     ) {
         if (erDagtid() && !erHelg()) {
             when {
-                tidSidenSisteSøknad.toHours() >= 3 -> logger.error("Status baks-mottak: Det er ${tidSidenSisteSøknad.toHours()} timer siden vi sist mottok en søknad om ${søknadstype.name.lowercase()}")
-                tidSidenSisteSøknad.toMinutes() >= 20 -> logger.warn("Status baks-mottak: Det er ${tidSidenSisteSøknad.toMinutes()} minutter siden vi sist mottok en søknad om ${søknadstype.name.lowercase()}")
+                tidSidenSisteSøknad.toHours() >= 3 && LocalTime.now().isAfter(LocalTime.of(10, 30)) -> logger.error("Status baks-mottak: Det er ${tidSidenSisteSøknad.toHours()} timer siden vi sist mottok en søknad om ${søknadstype.name.lowercase()}")
                 else -> logger.info("Status baks-mottak: Det er ${tidSidenSisteSøknad.toMinutes()} minutter siden vi sist mottok en søknad om ${søknadstype.name.lowercase()}")
             }
         }
