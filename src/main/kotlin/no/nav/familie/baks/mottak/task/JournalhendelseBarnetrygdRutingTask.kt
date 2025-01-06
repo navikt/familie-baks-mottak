@@ -82,6 +82,8 @@ class JournalhendelseBarnetrygdRutingTask(
 
         val fagsakId = baSakClient.hentFagsaknummerPåPersonident(personIdent)
 
+        Thread.sleep(1000L)
+
         val (baSak, infotrygdSak) = brukersIdent?.run { søkEtterSakIBaSakOgInfotrygd(this) } ?: Pair(null, null)
         val brukerHarFagsakIBaSak = baSak.finnes()
         val brukerHarSakIInfotrygd = infotrygdSak.finnes()
