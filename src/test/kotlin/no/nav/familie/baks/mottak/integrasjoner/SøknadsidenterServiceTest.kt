@@ -3,109 +3,83 @@ package no.nav.familie.baks.mottak.integrasjoner
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.baks.mottak.søknad.SøknadTestData
-import no.nav.familie.baks.mottak.søknad.SøknadTestData.barnetrygdSøknad
-import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadService
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadService
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadTestData.kontantstøtteSøknad
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadTestData.lagBarn
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadTestData.lagSøker
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
-import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadTestData
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class SøknadsidenterServiceTest {
-    private val mockedBarnetrygdSøknadService: BarnetrygdSøknadService = mockk()
-    private val mockedKontantstøtteSøknadService: KontantstøtteSøknadService = mockk()
-    private val søknadsidenterService: SøknadsidenterService =
-        SøknadsidenterService(
-            mockedBarnetrygdSøknadService,
-            mockedKontantstøtteSøknadService,
-        )
-
-    private val søkersFødselsnummer: String = "123"
+    private val baksVersjonertSøknadClient: BaksVersjonertSøknadClient = mockk()
+    private val søknadsidenterService: SøknadsidenterService = SøknadsidenterService(baksVersjonertSøknadClient)
 
     @Nested
-    inner class HentIdenterForKontantstøtteViaJournalpostTest {
+    inner class HentIdenterFraSøknad {
         @Test
-        fun `skal hente identer for barna`() {
+        fun `hentIdenterFraBarnetrygdSøknad returnerer liste med identer fra klient`() {
             // Arrange
             val journalpostId = "1"
+            val søkerIdent = "123"
+            val førsteBarnIdent = "456"
+            val andreBarneIdent = "789"
 
-            val kontantstøtteSøknad =
-                kontantstøtteSøknad(
-                    søker =
-                        lagSøker(
-                            søkersFødselsnummer,
+            val versjonertSøknad =
+                VersjonertBarnetrygdSøknadV9(
+                    barnetrygdSøknad =
+                        SøknadTestData.barnetrygdSøknad(
+                            søker = SøknadTestData.lagSøker(søkerIdent),
+                            barn =
+                                listOf(
+                                    SøknadTestData.lagBarn(førsteBarnIdent),
+                                    SøknadTestData.lagBarn(andreBarneIdent),
+                                ),
                         ),
-                    barn =
-                        listOf(
-                            lagBarn("815"),
-                            lagBarn("493"),
-                            lagBarn("00"),
-                        ),
-                )
-
-            val dbKontantstøtteSøknad =
-                DBKontantstøtteSøknad(
-                    søknadJson = objectMapper.writeValueAsString(kontantstøtteSøknad),
-                    fnr = søkersFødselsnummer,
-                    journalpostId = journalpostId,
                 )
 
             every {
-                mockedKontantstøtteSøknadService.hentDBKontantstøtteSøknadForJournalpost(journalpostId)
-            } returns dbKontantstøtteSøknad
+                baksVersjonertSøknadClient.hentVersjonertBarnetrygdSøknad(journalpostId)
+            } returns versjonertSøknad
 
             // Act
-            val identer = søknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpostId)
+            val identer = søknadsidenterService.hentIdenterFraBarnetrygdSøknad(journalpostId)
 
             // Assert
-            assertThat(identer.first).isEqualTo(søkersFødselsnummer)
-            assertThat(identer.second).isEqualTo(listOf("815", "493", "00"))
+            val expectedIdenter = listOf(søkerIdent, førsteBarnIdent, andreBarneIdent)
+            assertThat(identer).isEqualTo(expectedIdenter)
         }
-    }
 
-    @Nested
-    inner class HentIdenterForBarnetrygdViaJournalpostTest {
         @Test
-        fun `skal hente identer for barna`() {
+        fun `hentIdenterFraKontantstøtteSøknad returnerer liste med identer fra klient`() {
             // Arrange
             val journalpostId = "1"
+            val søkerIdent = "123"
+            val førsteBarnIdent = "456"
+            val andreBarneIdent = "789"
 
             val kontantstøtteSøknad =
-                barnetrygdSøknad(
-                    søker =
-                        SøknadTestData.lagSøker(
-                            søkersFødselsnummer,
+                VersjonertKontantstøtteSøknadV5(
+                    kontantstøtteSøknad =
+                        KontantstøtteSøknadTestData.kontantstøtteSøknad(
+                            søker = KontantstøtteSøknadTestData.lagSøker(søkerIdent),
+                            barn =
+                                listOf(
+                                    KontantstøtteSøknadTestData.lagBarn(førsteBarnIdent),
+                                    KontantstøtteSøknadTestData.lagBarn(andreBarneIdent),
+                                ),
                         ),
-                    barn =
-                        listOf(
-                            SøknadTestData.lagBarn("815"),
-                            SøknadTestData.lagBarn("493"),
-                            SøknadTestData.lagBarn("00"),
-                        ),
-                )
-
-            val dbBarnetrygdSøknad =
-                DBBarnetrygdSøknad(
-                    søknadJson = objectMapper.writeValueAsString(kontantstøtteSøknad),
-                    fnr = søkersFødselsnummer,
-                    journalpostId = journalpostId,
                 )
 
             every {
-                mockedBarnetrygdSøknadService.hentDBSøknadFraJournalpost(journalpostId)
-            } returns dbBarnetrygdSøknad
+                baksVersjonertSøknadClient.hentVersjonertKontantstøtteSøknad(journalpostId)
+            } returns kontantstøtteSøknad
 
             // Act
-            val identer = søknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpostId)
+            val identer = søknadsidenterService.hentIdenterFraKontantstøtteSøknad(journalpostId)
 
             // Assert
-            assertThat(identer.first).isEqualTo(søkersFødselsnummer)
-            assertThat(identer.second).isEqualTo(listOf("815", "493", "00"))
+            val expectedIdenter = listOf(søkerIdent, førsteBarnIdent, andreBarneIdent)
+            assertThat(identer).isEqualTo(expectedIdenter)
         }
     }
 }

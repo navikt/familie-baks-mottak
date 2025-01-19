@@ -107,16 +107,16 @@ class AdressebeskyttelesesgraderingServiceTest {
             )
 
         every {
-            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(
+            mockedSøknadsidenterService.hentIdenterFraKontantstøtteSøknad(
                 journalpostId = journalpost.journalpostId,
             )
-        } returns Pair("123456789", emptyList())
+        } returns listOf("123456789")
 
         every {
-            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(
+            mockedSøknadsidenterService.hentIdenterFraBarnetrygdSøknad(
                 journalpostId = journalpost.journalpostId,
             )
-        } returns Pair("123456789", emptyList())
+        } returns listOf("123456789")
 
         every {
             mockedPdlClient.hentPerson(
@@ -222,16 +222,16 @@ class AdressebeskyttelesesgraderingServiceTest {
             )
 
         every {
-            mockedSøknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(
+            mockedSøknadsidenterService.hentIdenterFraKontantstøtteSøknad(
                 journalpostId = journalpost.journalpostId,
             )
-        } returns Pair("123456789", emptyList())
+        } returns listOf("123456789")
 
         every {
-            mockedSøknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(
+            mockedSøknadsidenterService.hentIdenterFraBarnetrygdSøknad(
                 journalpostId = journalpost.journalpostId,
             )
-        } returns Pair("123456789", emptyList())
+        } returns listOf("123456789")
 
         every {
             mockedPdlClient.hentPerson(
