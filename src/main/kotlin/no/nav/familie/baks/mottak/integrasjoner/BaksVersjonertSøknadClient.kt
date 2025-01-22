@@ -1,9 +1,9 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
 import no.nav.familie.http.client.AbstractRestClient
-import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknad
 import no.nav.familie.kontrakter.felles.Ressurs
-import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknad
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -27,12 +27,12 @@ class BaksVersjonertSøknadClient
         @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
         fun hentVersjonertBarnetrygdSøknad(
             journalpostId: String,
-        ): VersjonertBarnetrygdSøknadV9 {
+        ): VersjonertBarnetrygdSøknad {
             val uri = URI.create("$integrasjonerServiceUri/baks/versjonertsoknad/ba/$journalpostId")
             logger.debug("henter søknad for barnetrygd med journalpostId: $journalpostId")
 
             return runCatching {
-                getForEntity<Ressurs<VersjonertBarnetrygdSøknadV9>>(uri)
+                getForEntity<Ressurs<VersjonertBarnetrygdSøknad>>(uri)
             }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, uri = uri) },
                 onFailure = { throw IntegrasjonException("Henting av søknad for barnetrygd feilet. journalpostId: $journalpostId", it, uri) },
@@ -42,12 +42,12 @@ class BaksVersjonertSøknadClient
         @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
         fun hentVersjonertKontantstøtteSøknad(
             journalpostId: String,
-        ): VersjonertKontantstøtteSøknadV5 {
+        ): VersjonertKontantstøtteSøknad {
             val uri = URI.create("$integrasjonerServiceUri/baks/versjonertsoknad/ks/$journalpostId")
             logger.debug("henter søknad for kontantstøtte med journalpostId: $journalpostId")
 
             return runCatching {
-                getForEntity<Ressurs<VersjonertKontantstøtteSøknadV5>>(uri)
+                getForEntity<Ressurs<VersjonertKontantstøtteSøknad>>(uri)
             }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, uri = uri) },
                 onFailure = { throw IntegrasjonException("Henting av søknad for kontantstøtte feilet. journalpostId: $journalpostId.", it, uri) },
