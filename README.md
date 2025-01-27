@@ -106,3 +106,6 @@ end
 - JournalhendelseRutingTask for KS --> JournalhendelseKontantstøtteRutingTask
 
 [1]: https://github.com/navikt/navkafka-docker-compose
+
+### Kode generert av GitHub Copilot
+Dette repoet bruker GitHub Copilot til å generere kode.
