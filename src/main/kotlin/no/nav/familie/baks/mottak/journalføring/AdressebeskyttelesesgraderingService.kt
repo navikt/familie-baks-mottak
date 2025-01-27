@@ -17,13 +17,9 @@ class AdressebeskyttelesesgraderingService(
         tema: Tema,
         journalpost: Journalpost,
     ): Boolean {
-        val journalpostBruker = journalpost.bruker
+        val journalpostBruker = journalpost.bruker ?: throw IllegalStateException("Bruker på journalpost ${journalpost.journalpostId} kan ikke være null")
 
-        if (journalpostBruker == null) {
-            throw IllegalStateException("Bruker på journalpost ${journalpost.journalpostId} kan ikke være null")
-        }
-
-        val (søkersIdent, barnasIdenter) =
+        val alleIdenter =
             when (tema) {
                 Tema.BAR -> finnIdenterForBarnetrygd(tema, journalpostBruker, journalpost.journalpostId, journalpost.harDigitalSøknad(tema))
                 Tema.KON -> finnIdenterForKontantstøtte(tema, journalpostBruker, journalpost.journalpostId, journalpost.harDigitalSøknad(tema))
@@ -33,8 +29,6 @@ class AdressebeskyttelesesgraderingService(
                     throw IllegalStateException("Støtter ikke tema $tema")
                 }
             }
-
-        val alleIdenter = barnasIdenter + søkersIdent
 
         return alleIdenter
             .map { pdlClient.hentPerson(it, "hentperson-med-adressebeskyttelse", tema) }
@@ -47,16 +41,15 @@ class AdressebeskyttelesesgraderingService(
         bruker: Bruker,
         journalpostId: String,
         erDigitalSøknad: Boolean,
-    ): Pair<String, List<String>> =
+    ): List<String> =
         if (erDigitalSøknad) {
-            søknadsidenterService.hentIdenterForKontantstøtteViaJournalpost(journalpostId)
+            søknadsidenterService.hentIdenterFraKontantstøtteSøknad(journalpostId)
         } else {
-            Pair(
+            listOf(
                 journalpostBrukerService.tilPersonIdent(
                     bruker,
                     tema,
                 ),
-                emptyList(),
             )
         }
 
@@ -65,16 +58,15 @@ class AdressebeskyttelesesgraderingService(
         bruker: Bruker,
         journalpostId: String,
         erDigitalSøknad: Boolean,
-    ): Pair<String, List<String>> =
+    ): List<String> =
         if (erDigitalSøknad) {
-            søknadsidenterService.hentIdenterForBarnetrygdViaJournalpost(journalpostId)
+            søknadsidenterService.hentIdenterFraBarnetrygdSøknad(journalpostId)
         } else {
-            Pair(
+            listOf(
                 journalpostBrukerService.tilPersonIdent(
                     bruker,
                     tema,
                 ),
-                emptyList(),
             )
         }
 }
