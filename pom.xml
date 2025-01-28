@@ -20,7 +20,7 @@
         <changelist>-SNAPSHOT</changelist>
         <java.version>21</java.version>
         <jvmTarget>21</jvmTarget>
-        <kotlin.version>2.1.0</kotlin.version>
+        <kotlin.version>2.1.10</kotlin.version>
         <mockk.version>1.13.16</mockk.version>
         <confluent.version>7.8.0</confluent.version>
         <prosessering.version>2.20250114104710_d9ad759</prosessering.version>
@@ -30,7 +30,7 @@
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
         <spring.cloud.version>4.2.0</spring.cloud.version>
-        <token-validation-spring.version>5.0.14</token-validation-spring.version>
+        <token-validation-spring.version>5.0.15</token-validation-spring.version>
         <avro.version>1.12.0</avro.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
@@ -166,7 +166,7 @@
         <dependency>
             <groupId>no.nav.familie</groupId>
             <artifactId>baks-dokgen</artifactId>
-            <version>1.0_20241107101249_eae0c3c</version>
+            <version>1.0_20250120095833_94569db</version>
         </dependency>
         <!-- Kafka -->
         <dependency>
