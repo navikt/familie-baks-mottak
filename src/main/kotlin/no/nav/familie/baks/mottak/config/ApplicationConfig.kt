@@ -1,6 +1,7 @@
 package no.nav.familie.baks.mottak.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import no.nav.familie.log.NavSystemtype
 import no.nav.familie.log.filter.LogFilter
 import no.nav.familie.prosessering.config.ProsesseringInfoProvider
 import no.nav.security.token.support.client.core.http.OAuth2HttpClient
@@ -48,7 +49,7 @@ class ApplicationConfig {
     @Bean
     fun logFilter(): FilterRegistrationBean<LogFilter> {
         val filterRegistration = FilterRegistrationBean<LogFilter>()
-        filterRegistration.filter = LogFilter()
+        filterRegistration.filter = LogFilter(NavSystemtype.NAV_INTEGRASJON)
         filterRegistration.order = 1
         return filterRegistration
     }
