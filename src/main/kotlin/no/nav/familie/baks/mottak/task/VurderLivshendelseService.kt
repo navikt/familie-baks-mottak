@@ -234,8 +234,8 @@ class VurderLivshendelseService(
             )
             return true
         } else {
-            log.info("Fant åpen oppgave på aktørId=$aktørIdForOppgave oppgaveId=${åpenOppgave.id}")
-            secureLog.info("Fant åpen oppgave: $åpenOppgave")
+            log.info("Fant åpen oppgave med oppgaveId=${åpenOppgave.id}")
+            secureLog.info("Fant åpen oppgave for $aktørIdForOppgave: $åpenOppgave")
             val beskrivelse =
                 leggTilNyPersonIBeskrivelse(
                     beskrivelse = åpenOppgave.beskrivelse!!,
@@ -350,7 +350,7 @@ class VurderLivshendelseService(
         behandlingstema: Behandlingstema?,
         behandlingstype: Behandlingstype? = null,
     ): OppgaveResponse {
-        log.info("Oppretter oppgave for aktørId=$aktørId")
+        secureLog.info("Oppretter oppgave for aktørId=$aktørId")
 
         return oppgaveClient.opprettVurderLivshendelseOppgave(
             OppgaveVurderLivshendelseDto(
