@@ -6,6 +6,7 @@ import no.nav.familie.baks.mottak.domene.HendelseConsumer
 import no.nav.familie.baks.mottak.domene.Hendelseslogg
 import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
 import no.nav.familie.baks.mottak.domene.hendelser.PdlHendelse
+import no.nav.familie.baks.mottak.hendelser.LeesahConsumer.Companion.SECURE_LOGGER
 import no.nav.familie.baks.mottak.integrasjoner.RestAnnullerFødsel
 import no.nav.familie.baks.mottak.task.MottaAnnullerFødselTask
 import no.nav.familie.baks.mottak.task.MottaFødselshendelseTask
@@ -66,10 +67,10 @@ class LeesahService(
             leesahDuplikatCounter.increment()
             return
         }
-        logHendelse(pdlHendelse, "dødsdato: ${pdlHendelse.dødsdato}")
 
         when (pdlHendelse.endringstype) {
             OPPRETTET -> {
+                SECURE_LOGGER.info("Mottatt behandleDødsfallHendelse $pdlHendelse")
                 if (pdlHendelse.dødsdato == null) {
                     log.error("Mangler dødsdato. Ignorerer hendelse ${pdlHendelse.hendelseId}")
                     dødsfallIgnorertCounter.increment()
@@ -80,8 +81,7 @@ class LeesahService(
             }
 
             else -> {
-                logHendelse(pdlHendelse)
-                logHendelse(pdlHendelse, "Ikke av type OPPRETTET. Dødsdato: ${pdlHendelse.dødsdato}")
+                log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}")
             }
         }
         oppdaterHendelseslogg(pdlHendelse)
@@ -94,7 +94,7 @@ class LeesahService(
         }
         when (pdlHendelse.endringstype) {
             OPPRETTET, KORRIGERT -> {
-                logHendelse(pdlHendelse, "fødselsdato: ${pdlHendelse.fødselsdato}")
+                SECURE_LOGGER.info("Mottatt behandleFødselsdatoHendelse $pdlHendelse")
 
                 val fødselsdato = pdlHendelse.fødselsdato
                 if (fødselsdato == null) {
@@ -129,6 +129,7 @@ class LeesahService(
             ANNULLERT -> {
                 fødselAnnullertCounter.increment()
                 if (pdlHendelse.tidligereHendelseId != null) {
+                    SECURE_LOGGER.info("Mottatt annulert behandleFødselsdatoHendelse $pdlHendelse")
                     val task =
                         Task(
                             type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
@@ -153,7 +154,7 @@ class LeesahService(
             }
 
             else -> {
-                logHendelse(pdlHendelse)
+                log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}")
             }
         }
         oppdaterHendelseslogg(pdlHendelse)
@@ -167,7 +168,7 @@ class LeesahService(
 
         when (pdlHendelse.endringstype) {
             OPPRETTET -> {
-                logHendelse(pdlHendelse, "utflyttingsdato: ${pdlHendelse.utflyttingsdato}")
+                SECURE_LOGGER.info("Mottatt behandleUtflyttingHendelse $pdlHendelse")
                 utflyttingOpprettetCounter.increment()
 
                 opprettVurderBarnetrygdLivshendelseTaskForHendelse(VurderLivshendelseType.UTFLYTTING, pdlHendelse)
@@ -175,7 +176,7 @@ class LeesahService(
             }
 
             else -> {
-                logHendelse(pdlHendelse, "Ikke av type OPPRETTET.")
+                log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}")
                 when (pdlHendelse.endringstype) {
                     ANNULLERT -> utflyttingAnnullertCounter.increment()
                     KORRIGERT -> utflyttingKorrigertCounter.increment()
@@ -193,14 +194,14 @@ class LeesahService(
 
         when (pdlHendelse.endringstype) {
             OPPRETTET -> {
-                logHendelse(pdlHendelse, "sivilstandDato: ${pdlHendelse.sivilstandDato}")
+                SECURE_LOGGER.info("Mottatt behandleSivilstandHendelse $pdlHendelse")
                 sivilstandOpprettetCounter.increment()
 
                 opprettTaskHvisSivilstandErGift(pdlHendelse)
             }
 
             else -> {
-                logHendelse(pdlHendelse, "Ikke av type OPPRETTET.")
+                log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}")
                 when (pdlHendelse.endringstype) {
                     ANNULLERT -> sivilstandOpprettetCounter.increment()
                     KORRIGERT -> sivilstandOpprettetCounter.increment()
@@ -216,20 +217,6 @@ class LeesahService(
         } else {
             sivilstandIgnorertCounter.increment()
         }
-    }
-
-    private fun logHendelse(
-        pdlHendelse: PdlHendelse,
-        ekstraInfo: String = "",
-    ) {
-        log.info(
-            "person-pdl-leesah melding mottatt: " +
-                "hendelseId: ${pdlHendelse.hendelseId} " +
-                "offset: ${pdlHendelse.offset}, " +
-                "opplysningstype: ${pdlHendelse.opplysningstype}, " +
-                "aktørid: ${pdlHendelse.gjeldendeAktørId}, " +
-                "endringstype: ${pdlHendelse.endringstype}, $ekstraInfo",
-        )
     }
 
     private fun oppdaterHendelseslogg(pdlHendelse: PdlHendelse) {

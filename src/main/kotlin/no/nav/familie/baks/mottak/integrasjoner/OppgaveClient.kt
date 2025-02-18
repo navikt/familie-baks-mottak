@@ -158,7 +158,7 @@ class OppgaveClient
             oppgavetype: Oppgavetype,
             tema: Tema,
         ): List<Oppgave> {
-            logger.info("Søker etter aktive oppgaver med tema $tema for aktørId $aktørId")
+            secureLogger.info("Søker etter aktive oppgaver med tema $tema for aktørId $aktørId")
             val uri = URI.create("$integrasjonUri/oppgave/v4")
             val request =
                 FinnOppgaveRequest(
