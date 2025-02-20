@@ -16,7 +16,7 @@ updates:
     groups:
       familie-felles:
         patterns:
-          - "@navikt/familie*"
+          - "no.nav.familie:*"
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
