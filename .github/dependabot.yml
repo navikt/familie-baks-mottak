@@ -20,8 +20,8 @@ updates:
       test:
         dependency-type: development
         ignore:
-          - patterns:
-              - "no.nav.security*"
+          dependency-name:
+            - "no.nav.security:token-validation-spring-test"
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
