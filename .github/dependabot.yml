@@ -13,8 +13,13 @@ updates:
       interval: daily
     open-pull-requests-limit: 10
     registries: "*"
+    groups:
+      familie-felles:
+        patterns:
+          - "@navikt/familie*"
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
       interval: daily
     open-pull-requests-limit: 10
+
