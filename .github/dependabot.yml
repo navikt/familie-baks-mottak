@@ -19,7 +19,8 @@ updates:
           - "no.nav.familie*"
       test:
         dependency-type: development
-        exclude-patterns: "no.nav.*"
+        exclude-patterns:
+          - "no.nav.*"
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
