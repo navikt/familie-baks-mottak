@@ -17,6 +17,8 @@ updates:
       familie-felles:
         patterns:
           - "no.nav.familie*"
+      test:
+        dependency-type: development
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
