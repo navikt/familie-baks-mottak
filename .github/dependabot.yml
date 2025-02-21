@@ -17,14 +17,19 @@ updates:
       familie-felles:
         patterns:
           - "no.nav.familie*"
-      test:
-        dependency-type: development
-        exclude-patterns:
-          - "no.nav.security*"
-      spring:
+      spring-med-avhengigheter:
         patterns:
           - "org.springframework*"
           - "no.nav.security*"
+      utvikler-avhengigheter:
+        dependency-type: development
+        exclude-patterns:
+          - "no.nav.security*"
+      prod-avhengigheter:
+        dependency-type: production
+        exclude-patterns:
+          - "no.nav.security*"
+
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
