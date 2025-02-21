@@ -20,7 +20,11 @@ updates:
       test:
         dependency-type: development
         exclude-patterns:
-          - "no.nav.*"
+          - "no.nav.security.*"
+      spring:
+        patterns:
+          - "org.springframework.*"
+          - "no.nav.security.*"
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
