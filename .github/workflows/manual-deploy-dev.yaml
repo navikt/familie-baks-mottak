@@ -13,7 +13,6 @@ jobs:
     name: Build
     permissions:
       contents: read
-      packages: write
       id-token: write
     uses: navikt/familie-baks-gha-workflows/.github/workflows/build-maven-app.yaml@main
     with:
