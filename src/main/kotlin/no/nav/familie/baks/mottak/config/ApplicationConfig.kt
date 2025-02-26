@@ -36,7 +36,7 @@ import java.time.temporal.ChronoUnit
     "no.nav.familie.baks.mottak",
     "no.nav.familie.unleash",
 )
-@EntityScan("no.nav.familie.prosessering", "no.nav.familie")
+@EntityScan("no.nav.familie.prosessering", "no.nav.familie.baks.mottak")
 @ConfigurationPropertiesScan("no.nav.familie")
 @EnableScheduling
 @EnableJwtTokenValidation(ignore = ["org.springframework"])
