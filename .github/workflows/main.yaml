@@ -15,7 +15,7 @@ on:
 jobs:
   build:
     name: Build
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' # Only deploy to prod from main branch
     permissions:
       contents: read
       id-token: write

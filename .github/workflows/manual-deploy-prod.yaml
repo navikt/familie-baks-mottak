@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     name: Build
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' # Only deploy to prod from main branch
     permissions:
       contents: read
       id-token: write
@@ -23,7 +23,6 @@ jobs:
     secrets: inherit
   deploy-with-new-image:
     name: Deploy with new image
-    if: github.ref == 'refs/heads/main'
     permissions:
       id-token: write
     needs: [ build ]
