@@ -2,7 +2,6 @@ package no.nav.familie.baks.mottak.config
 
 import no.nav.familie.http.interceptor.ConsumerIdClientInterceptor
 import no.nav.familie.http.interceptor.MdcValuesPropagatingClientInterceptor
-import no.nav.familie.http.interceptor.StsBearerTokenClientInterceptor
 import no.nav.familie.kontrakter.felles.objectMapper
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
@@ -21,7 +20,6 @@ import java.nio.charset.StandardCharsets
 @Import(
     ConsumerIdClientInterceptor::class,
     MdcValuesPropagatingClientInterceptor::class,
-    StsBearerTokenClientInterceptor::class,
 )
 class RestTemplateConfig {
     @Bean
@@ -52,16 +50,4 @@ class RestTemplateConfig {
         mdcInterceptor: MdcValuesPropagatingClientInterceptor,
         consumerIdClientInterceptor: ConsumerIdClientInterceptor,
     ): RestOperations = restTemplateBuilder.interceptors(mdcInterceptor, consumerIdClientInterceptor).build()
-
-    @Bean("sts")
-    fun restTemplateSts(
-        stsBearerTokenClientInterceptor: StsBearerTokenClientInterceptor,
-        consumerIdClientInterceptor: ConsumerIdClientInterceptor,
-    ): RestOperations =
-        RestTemplateBuilder()
-            .interceptors(
-                consumerIdClientInterceptor,
-                stsBearerTokenClientInterceptor,
-                MdcValuesPropagatingClientInterceptor(),
-            ).build()
 }

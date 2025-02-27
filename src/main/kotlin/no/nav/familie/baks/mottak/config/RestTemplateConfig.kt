@@ -1,6 +1,5 @@
 package no.nav.familie.baks.mottak.config
 
-import no.nav.familie.http.config.RestTemplateSts
 import no.nav.familie.http.interceptor.BearerTokenClientInterceptor
 import no.nav.familie.http.interceptor.ConsumerIdClientInterceptor
 import no.nav.familie.http.interceptor.MdcValuesPropagatingClientInterceptor
@@ -17,7 +16,7 @@ import org.springframework.web.client.RestOperations
 @Import(
     BearerTokenClientInterceptor::class,
     MdcValuesPropagatingClientInterceptor::class,
-    RestTemplateSts::class,
+    ConsumerIdClientInterceptor::class,
 )
 class RestTemplateConfig {
     @Profile("!dev || !postgres")
