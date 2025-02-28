@@ -1,8 +1,7 @@
-name: Build-Deploy-Preprod
+name: Pull request
 on:
   pull_request:
     types: [ opened, synchronize, reopened, ready_for_review ]
-  workflow_dispatch:
   merge_group:
 
 jobs:
@@ -70,32 +69,3 @@ jobs:
           min-coverage-overall: 70
           min-coverage-changed-files: 70
           title: Code Coverage
-
-      - uses: nais/docker-build-push@v0
-        id: docker-push
-        if: (github.event.pull_request.user.login != 'dependabot[bot]' && github.event_name != 'merge_group')
-        with:
-          team: teamfamilie
-          push_image: true
-          dockerfile: Dockerfile
-          docker_context: .
-          byosbom: target/classes/META-INF/sbom/application.cdx.json
-    outputs:
-      image: ${{ steps.docker-push.outputs.image }}
-  deploy-dev:
-    if: github.event.pull_request.draft == false
-    name: Deploy to dev-gcp
-    needs: [build-dev]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: "write"
-    steps:
-      - uses: actions/checkout@v4
-      - name: Deploy til dev-gcp team namespace
-        if: (github.event.pull_request.user.login != 'dependabot[bot]' && github.event_name != 'merge_group')
-        uses: nais/deploy/actions/deploy@v2
-        env:
-          CLUSTER: dev-gcp
-          RESOURCE: .deploy/nais/app-preprod.yaml
-          VAR: image=${{ needs.build-dev.outputs.image }}
