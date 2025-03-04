@@ -46,7 +46,7 @@ class OppgaveMapperTest(
             enhetsnummerService = mockEnhetsnummerService,
             pdlClient = mockPdlClient,
             søknadRepository = barnetrygdSøknadRepository,
-            unleashService = unleashService
+            unleashService = unleashService,
         )
 
     private val kontantstøtteOppgaveMapper: IOppgaveMapper =
@@ -54,7 +54,7 @@ class OppgaveMapperTest(
             enhetsnummerService = mockEnhetsnummerService,
             pdlClient = mockPdlClient,
             kontantstøtteSøknadRepository = kontantstøtteSøknadRepository,
-            unleashService = unleashService
+            unleashService = unleashService,
         )
 
     @BeforeEach

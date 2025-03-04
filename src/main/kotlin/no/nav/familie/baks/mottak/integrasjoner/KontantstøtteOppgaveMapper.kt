@@ -17,9 +17,9 @@ class KontantstøtteOppgaveMapper(
     val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
     private val unleashService: UnleashNextMedContextService,
 ) : AbstractOppgaveMapper(
-    enhetsnummerService = enhetsnummerService,
-    pdlClient = pdlClient,
-) {
+        enhetsnummerService = enhetsnummerService,
+        pdlClient = pdlClient,
+    ) {
     override val tema: Tema = Tema.KON
 
     override fun hentBehandlingstema(journalpost: Journalpost): Behandlingstema? = null

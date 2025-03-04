@@ -22,18 +22,18 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 class BarnetrygdOppgaveMapperTest {
-
     private val enhetsnummerService: EnhetsnummerService = mockk()
     private val pdlClient: PdlClient = mockk()
     private val søknadRepository: SøknadRepository = mockk()
     private val unleashService: UnleashNextMedContextService = mockk()
 
-    private val barnetrygdOppgaveMapper = BarnetrygdOppgaveMapper(
-        enhetsnummerService = enhetsnummerService,
-        pdlClient = pdlClient,
-        søknadRepository = søknadRepository,
-        unleashService = unleashService
-    )
+    private val barnetrygdOppgaveMapper =
+        BarnetrygdOppgaveMapper(
+            enhetsnummerService = enhetsnummerService,
+            pdlClient = pdlClient,
+            søknadRepository = søknadRepository,
+            unleashService = unleashService,
+        )
 
     @BeforeEach
     fun oppsett() {
@@ -51,16 +51,17 @@ class BarnetrygdOppgaveMapperTest {
                     journalposttype = Journalposttype.I,
                     journalstatus = Journalstatus.MOTTATT,
                     kanal = "NAV_NO",
-                    dokumenter = listOf(
-                        DokumentInfo(
-                            dokumentInfoId = "321",
-                            brevkode = Brevkoder.BARNETRYGD_ORDINÆR_SØKNAD,
+                    dokumenter =
+                        listOf(
+                            DokumentInfo(
+                                dokumentInfoId = "321",
+                                brevkode = Brevkoder.BARNETRYGD_ORDINÆR_SØKNAD,
+                            ),
+                            DokumentInfo(
+                                dokumentInfoId = "132",
+                                brevkode = Brevkoder.KLAGE,
+                            ),
                         ),
-                        DokumentInfo(
-                            dokumentInfoId = "132",
-                            brevkode = Brevkoder.KLAGE,
-                        ),
-                    )
                 )
 
             // Act
@@ -78,12 +79,13 @@ class BarnetrygdOppgaveMapperTest {
                     journalpostId = "123",
                     journalposttype = Journalposttype.I,
                     journalstatus = Journalstatus.MOTTATT,
-                    dokumenter = listOf(
-                        DokumentInfo(
-                            dokumentInfoId = "321",
-                            brevkode = Brevkoder.KLAGE,
+                    dokumenter =
+                        listOf(
+                            DokumentInfo(
+                                dokumentInfoId = "321",
+                                brevkode = Brevkoder.KLAGE,
+                            ),
                         ),
-                    )
                 )
 
             // Act
@@ -103,12 +105,13 @@ class BarnetrygdOppgaveMapperTest {
                     journalpostId = "123",
                     journalposttype = Journalposttype.I,
                     journalstatus = Journalstatus.MOTTATT,
-                    dokumenter = listOf(
-                        DokumentInfo(
-                            dokumentInfoId = "321",
-                            brevkode = Brevkoder.KLAGE,
+                    dokumenter =
+                        listOf(
+                            DokumentInfo(
+                                dokumentInfoId = "321",
+                                brevkode = Brevkoder.KLAGE,
+                            ),
                         ),
-                    )
                 )
 
             // Act
@@ -130,24 +133,26 @@ class BarnetrygdOppgaveMapperTest {
                     journalposttype = Journalposttype.I,
                     journalstatus = Journalstatus.MOTTATT,
                     kanal = "NAV_NO",
-                    dokumenter = listOf(
-                        DokumentInfo(
-                            dokumentInfoId = "321",
-                            brevkode = Brevkoder.BARNETRYGD_ORDINÆR_SØKNAD,
+                    dokumenter =
+                        listOf(
+                            DokumentInfo(
+                                dokumentInfoId = "321",
+                                brevkode = Brevkoder.BARNETRYGD_ORDINÆR_SØKNAD,
+                            ),
+                            DokumentInfo(
+                                dokumentInfoId = "132",
+                                brevkode = Brevkoder.KLAGE,
+                            ),
                         ),
-                        DokumentInfo(
-                            dokumentInfoId = "132",
-                            brevkode = Brevkoder.KLAGE,
-                        ),
-                    )
                 )
 
-            every { søknadRepository.getByJournalpostId(journalpost.journalpostId) } returns DBBarnetrygdSøknad(
-                id = 0,
-                objectMapper.writeValueAsString(SøknadTestData.barnetrygdSøknad()),
-                "12345678093",
-                LocalDateTime.now(),
-            )
+            every { søknadRepository.getByJournalpostId(journalpost.journalpostId) } returns
+                DBBarnetrygdSøknad(
+                    id = 0,
+                    objectMapper.writeValueAsString(SøknadTestData.barnetrygdSøknad()),
+                    "12345678093",
+                    LocalDateTime.now(),
+                )
 
             // Act
             val behandlingstype = barnetrygdOppgaveMapper.hentBehandlingstype(journalpost)
@@ -164,12 +169,13 @@ class BarnetrygdOppgaveMapperTest {
                     journalpostId = "123",
                     journalposttype = Journalposttype.I,
                     journalstatus = Journalstatus.MOTTATT,
-                    dokumenter = listOf(
-                        DokumentInfo(
-                            dokumentInfoId = "321",
-                            brevkode = Brevkoder.KLAGE,
+                    dokumenter =
+                        listOf(
+                            DokumentInfo(
+                                dokumentInfoId = "321",
+                                brevkode = Brevkoder.KLAGE,
+                            ),
                         ),
-                    )
                 )
 
             // Act
@@ -189,12 +195,13 @@ class BarnetrygdOppgaveMapperTest {
                     journalpostId = "123",
                     journalposttype = Journalposttype.I,
                     journalstatus = Journalstatus.MOTTATT,
-                    dokumenter = listOf(
-                        DokumentInfo(
-                            dokumentInfoId = "321",
-                            brevkode = Brevkoder.KLAGE,
+                    dokumenter =
+                        listOf(
+                            DokumentInfo(
+                                dokumentInfoId = "321",
+                                brevkode = Brevkoder.KLAGE,
+                            ),
                         ),
-                    )
                 )
 
             // Act
