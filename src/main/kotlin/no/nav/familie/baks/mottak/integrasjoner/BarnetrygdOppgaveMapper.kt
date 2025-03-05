@@ -1,5 +1,7 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
+import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.harEøsSteg
 import no.nav.familie.kontrakter.felles.Behandlingstema
@@ -13,6 +15,7 @@ class BarnetrygdOppgaveMapper(
     enhetsnummerService: EnhetsnummerService,
     pdlClient: PdlClient,
     val søknadRepository: SøknadRepository,
+    private val unleashService: UnleashNextMedContextService,
 ) : AbstractOppgaveMapper(
         enhetsnummerService = enhetsnummerService,
         pdlClient = pdlClient,
@@ -31,6 +34,7 @@ class BarnetrygdOppgaveMapper(
 
             erDnummerPåJournalpost(journalpost) -> Behandlingstema.BarnetrygdEØS
             hoveddokumentErÅrligDifferanseutbetalingAvBarnetrygd(journalpost) -> null
+            journalpost.harKlage() && unleashService.isEnabled(FeatureToggleConfig.SETT_BEHANDLINGSTEMA_OG_BEHANDLINGSTYPE_FOR_KLAGE, false) -> null
             else -> Behandlingstema.OrdinærBarnetrygd
         }
 
@@ -46,6 +50,7 @@ class BarnetrygdOppgaveMapper(
                 }
 
             hoveddokumentErÅrligDifferanseutbetalingAvBarnetrygd(journalpost) -> Behandlingstype.Utland
+            journalpost.harKlage() && unleashService.isEnabled(FeatureToggleConfig.SETT_BEHANDLINGSTEMA_OG_BEHANDLINGSTYPE_FOR_KLAGE, false) -> Behandlingstype.Klage
             else -> null
         }
 
