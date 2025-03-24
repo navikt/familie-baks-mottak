@@ -15,13 +15,6 @@
       "numPartitions": 1
     },
     {
-      "topicName": "teamfamilie.aapen-ef-overgangstonad-v1",
-      "members": [
-        {"member":"srvc01", "role":"CONSUMER"}
-      ],
-      "numPartitions": 1
-    },
-    {
       "topicName": "teamfamilie.aapen-ensligforsorger-iverksatt-vedtak",
       "members": [
         {"member":"srvc01", "role":"CONSUMER"}
