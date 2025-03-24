@@ -23,9 +23,9 @@
         <kotlin.version>2.1.10</kotlin.version>
         <mockk.version>1.13.17</mockk.version>
         <confluent.version>7.9.0</confluent.version>
-        <prosessering.version>2.20250311132904_6ee7728</prosessering.version>
+        <prosessering.version>2.20250317161652_fe22655</prosessering.version>
 
-        <felles.version>3.20250312114810_5371990</felles.version>
+        <felles.version>3.20250320122046_7ca9dae</felles.version>
         <kontrakter.version>3.0_20250312084645_ae52997</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
