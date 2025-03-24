@@ -1,5 +1,8 @@
 package no.nav.familie.baks.mottak.task
 
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
+import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
+import no.nav.familie.baks.mottak.søknad.FamiliePdfService
 import no.nav.familie.baks.mottak.søknad.JournalføringService
 import no.nav.familie.baks.mottak.søknad.PdfService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
@@ -21,6 +24,8 @@ class JournalførSøknadTask(
     private val pdfService: PdfService,
     private val journalføringService: JournalføringService,
     private val søknadRepository: SøknadRepository,
+    private val familiePdfService: FamiliePdfService,
+    private val unleashService: UnleashNextMedContextService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
         try {
@@ -36,12 +41,18 @@ class JournalførSøknadTask(
                     is VersjonertBarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
                 }
             log.info("Generer pdf og journalfør søknad om ${søknadstype.name.lowercase()} barnetrygd")
+
             val bokmålPdf =
-                pdfService.lagBarnetrygdPdf(
-                    versjonertBarnetrygdSøknad = versjonertBarnetrygdSøknad,
-                    dbBarnetrygdSøknad = dbBarnetrygdSøknad,
-                    språk = "nb",
-                )
+                if (unleashService.isEnabled(FeatureToggleConfig.NY_FAMILIE_PDF_KVITTERING, false)) {
+                    pdfService.lagBarnetrygdPdf(
+                        versjonertBarnetrygdSøknad = versjonertBarnetrygdSøknad,
+                        dbBarnetrygdSøknad = dbBarnetrygdSøknad,
+                        språk = "nb",
+                    )
+                } else {
+                    familiePdfService.lagPdfKvittering(dbBarnetrygdSøknad, "nb")
+                }
+
             log.info("Generert pdf med størrelse ${bokmålPdf.size}")
 
             val orginalspråk =
