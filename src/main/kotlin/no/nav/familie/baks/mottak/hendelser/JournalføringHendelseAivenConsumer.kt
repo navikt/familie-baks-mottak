@@ -50,7 +50,7 @@ class JournalføringHendelseAivenConsumer(
     }
 
     companion object {
-        private val logger: Logger = LoggerFactory.getLogger(EnsligForsørgerInfotrygdHendelseConsumer::class.java)
+        private val logger: Logger = LoggerFactory.getLogger(JournalføringHendelseAivenConsumer::class.java)
         private val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
     }
 }
