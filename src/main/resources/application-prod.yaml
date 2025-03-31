@@ -99,5 +99,5 @@ FAMILIE_INTEGRASJONER_API_URL: https://familie-integrasjoner.prod-fss-pub.nais.i
 FAMILIE_INTEGRASJONER_SCOPE: api://prod-fss.teamfamilie.familie-integrasjoner/.default
 PDL_URL: https://pdl-api.prod-fss-pub.nais.io
 PDL_SCOPE: api://prod-fss.pdl.pdl-api/.default
-FAMILIE_PDF_URL: http://familie-pdf/api
+FAMILIE_PDF_URL: http://familie-pdf/
 FAMILIE_PDF_SCOPE: api://prod-gcp.teamfamilie.familie-pdf/.default
