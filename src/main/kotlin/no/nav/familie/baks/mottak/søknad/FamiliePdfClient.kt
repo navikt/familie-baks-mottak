@@ -5,6 +5,7 @@ import no.nav.familie.http.client.AbstractPingableRestClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
 import org.springframework.web.util.UriComponentsBuilder
@@ -31,12 +32,18 @@ class FamiliePdfClient(
                 .pathSegment("api/v1/pdf/opprett-pdf")
                 .build()
                 .toUri()
-        return postForEntity(uri, feltMap, HttpHeaders().medContentTypeJsonUTF8())
+        return postForEntity(
+            uri,
+            feltMap,
+            HttpHeaders().apply {
+                contentType = MediaType.APPLICATION_JSON
+            },
+        )
     }
 }
 
-private fun HttpHeaders.medContentTypeJsonUTF8(): HttpHeaders {
-    this.add("Content-Type", "application/json;charset=UTF-8")
-    this.acceptCharset = listOf(Charsets.UTF_8)
-    return this
-}
+// private fun HttpHeaders.medContentTypeJsonUTF8(): HttpHeaders {
+//    this.add("Content-Type", "application/json;charset=UTF-8")
+// //    this.acceptCharset = listOf(Charsets.UTF_8)
+//    return this
+// }
