@@ -11,6 +11,6 @@ class FeatureToggleConfig {
         const val SETT_BEHANDLINGSTEMA_OG_BEHANDLINGSTYPE_FOR_KLAGE = "familie-baks-mottak.sett-behandlingstema-og-behandlingstype-for-klage"
 
         // Ny pdf kvittering
-        const val NY_FAMILIE_PDF_KVITTERING = "familie-baks-mottak.ny-pdf"
+        const val NY_FAMILIE_PDF_KVITTERING = "familie-ba-soknad.ny-pdf"
     }
 }

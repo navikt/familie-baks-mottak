@@ -44,13 +44,13 @@ class JournalførSøknadTask(
 
             val bokmålPdf =
                 if (unleashService.isEnabled(FeatureToggleConfig.NY_FAMILIE_PDF_KVITTERING, false)) {
+                    familiePdfService.lagPdfKvittering(dbBarnetrygdSøknad, "nb")
+                } else {
                     pdfService.lagBarnetrygdPdf(
                         versjonertBarnetrygdSøknad = versjonertBarnetrygdSøknad,
                         dbBarnetrygdSøknad = dbBarnetrygdSøknad,
                         språk = "nb",
                     )
-                } else {
-                    familiePdfService.lagPdfKvittering(dbBarnetrygdSøknad, "nb")
                 }
 
             log.info("Generert pdf med størrelse ${bokmålPdf.size}")
