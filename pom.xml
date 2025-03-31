@@ -23,14 +23,14 @@
         <kotlin.version>2.1.20</kotlin.version>
         <mockk.version>1.13.17</mockk.version>
         <confluent.version>7.9.0</confluent.version>
-        <prosessering.version>2.20250317161652_fe22655</prosessering.version>
+        <prosessering.version>2.20250324083707_24007c5</prosessering.version>
 
         <felles.version>3.20250320122046_7ca9dae</felles.version>
-        <kontrakter.version>3.0_20250312084645_ae52997</kontrakter.version>
+        <kontrakter.version>3.0_20250324172417_684edfe</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
         <spring.cloud.version>4.2.1</spring.cloud.version>
-        <token-validation-spring.version>5.0.20</token-validation-spring.version>
+        <token-validation-spring.version>5.0.21</token-validation-spring.version>
         <avro.version>1.12.0</avro.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
@@ -306,7 +306,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>5.0.0.4389</version>
+                    <version>5.1.0.4751</version>
                 </plugin>
             </plugins>
         </pluginManagement>

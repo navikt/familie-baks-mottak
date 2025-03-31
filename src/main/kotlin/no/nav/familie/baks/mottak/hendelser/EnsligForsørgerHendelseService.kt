@@ -7,7 +7,6 @@ import no.nav.familie.baks.mottak.domene.Hendelseslogg
 import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
-import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.ef.EnsligForsørgerVedtakhendelse
 import no.nav.familie.kontrakter.felles.ef.StønadType
 import org.slf4j.Logger
@@ -23,8 +22,6 @@ class EnsligForsørgerHendelseService(
     val ensligForsørgerVedtakhendelseOvergangstønadCounter: Counter =
         Metrics.counter("ef.hendelse.vedtak", "type", "overgangstønad")
     val ensligForsørgerVedtakhendelseAnnetCounter: Counter = Metrics.counter("ef.hendelse.vedtak", "type", "annet")
-    val ensligForsørgerInfotrygdVedtakhendelseOvergangstønadCounter: Counter =
-        Metrics.counter("ef.hendelse.infotrygd.vedtak", "type", "overgangstønad")
 
     fun prosesserEfVedtakHendelse(
         offset: Long,
@@ -60,43 +57,6 @@ class EnsligForsørgerHendelseService(
                 logger.info("Ignorerer vedtak av type ${ensligForsørgerVedtakhendelse.stønadType} for behandlingId=${ensligForsørgerVedtakhendelse.behandlingId}")
                 ensligForsørgerVedtakhendelseAnnetCounter.increment()
             }
-        }
-    }
-
-    fun prosesserEfInfotrygdHendelse(
-        offset: Long,
-        hendelse: InfotrygdHendelse,
-    ) {
-        if (hendelse.typeYtelse.trim() != "EF") {
-            logger.info("Ignorerer infotrygdhendelse for hendelseId=${hendelse.hendelseId} fordi ytelsen ikke er EF")
-            return
-        }
-
-        if (!hendelsesloggRepository.existsByHendelseIdAndConsumer(
-                hendelse.hendelseId,
-                HendelseConsumer.EF_VEDTAK_INFOTRYGD_V1,
-            )
-        ) {
-            secureLogger.info("Mottatt infotrygdvedtak om overgangsstønad: $hendelse")
-
-            val personIdent = pdlClient.hentPersonident(hendelse.aktørId.toString(), Tema.BAR)
-
-            baSakClient.sendVedtakOmOvergangsstønadHendelseTilBaSak(personIdent)
-
-            hendelsesloggRepository.save(
-                Hendelseslogg(
-                    offset,
-                    hendelse.hendelseId,
-                    HendelseConsumer.EF_VEDTAK_INFOTRYGD_V1,
-                    mapOf(
-                        "personIdent" to personIdent,
-                        "hendelseId" to hendelse.hendelseId,
-                        "sats" to hendelse.sats.toString(),
-                    ).toProperties(),
-                    ident = personIdent,
-                ),
-            )
-            ensligForsørgerInfotrygdVedtakhendelseOvergangstønadCounter.increment()
         }
     }
 

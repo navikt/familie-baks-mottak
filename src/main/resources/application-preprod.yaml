@@ -67,7 +67,7 @@ no.nav.security.jwt:
         well-known-url: ${TOKEN_X_WELL_KNOWN_URL}
         token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
         grant-type: client_credentials
-        scope: api://dev-gcp.teamfamilie.familie-pdf/.default
+        scope: ${FAMILIE_PDF_SCOPE}
         authentication:
           client-id: ${AZURE_APP_CLIENT_ID}
           client-secret: ${AZURE_APP_CLIENT_SECRET}
@@ -102,3 +102,6 @@ KS_SAK_SCOPE: api://dev-gcp.teamfamilie.familie-ks-sak/.default
 
 NORG2_API_URL: https://norg2.dev-fss-pub.nais.io/norg2
 FAMILIE_DOKUMENT_API_URL: http://familie-dokument/familie/dokument
+
+FAMILIE_PDF_URL: http://familie-pdf/api
+FAMILIE_PDF_SCOPE: api://dev-gcp.teamfamilie.familie-pdf/.default
