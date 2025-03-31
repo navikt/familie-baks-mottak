@@ -19,7 +19,7 @@ import java.util.Properties
 
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(initializers = [DbContainerInitializer::class])
-@ActiveProfiles("postgres", "mock-dokarkiv-conflict", "mock-dokgen")
+@ActiveProfiles("postgres", "mock-dokarkiv-conflict", "mock-dokgen", "mock-familie-pdf")
 @Tag("integration")
 @SpringBootTest(classes = [DevLauncherPostgres::class])
 class EksternReferanseIdTest(
