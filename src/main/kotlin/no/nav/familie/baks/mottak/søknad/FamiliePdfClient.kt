@@ -32,7 +32,7 @@ class FamiliePdfClient(
         val uri =
             UriComponentsBuilder
                 .fromUri(uri)
-                .pathSegment("api/v1/pdf/opprett-pdf")
+                .pathSegment("api/v1/pdf/opprett-pdf/som-json")
                 .build()
                 .toUri()
 
