@@ -88,4 +88,36 @@ object SøknadTestData {
             teksterUtenomSpørsmål = mapOf(),
             finnesPersonMedAdressebeskyttelse = false,
         )
+
+    fun barnetrygdSøknad2(
+        søker: SøkerV8 = lagSøker(),
+        barn: List<BarnV8> = listOf(lagBarn()),
+    ): BarnetrygdSøknad =
+        BarnetrygdSøknad(
+            antallEøsSteg = 3,
+            kontraktVersjon = 9,
+            søknadstype = Søknadstype.ORDINÆR,
+            søker = søker,
+            barn = barn,
+            spørsmål = mapOf(),
+            dokumentasjon =
+                listOf(
+                    Søknaddokumentasjon(
+                        dokumentasjonsbehov = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON,
+                        harSendtInn = false,
+                        opplastedeVedlegg =
+                            listOf(
+                                Søknadsvedlegg(
+                                    dokumentId = "en-slags-uuid",
+                                    navn = "IMG 1337.png",
+                                    tittel = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON,
+                                ),
+                            ),
+                        dokumentasjonSpråkTittel = mapOf("nb" to "Bekreftelse fra barnevernet"),
+                    ),
+                ),
+            originalSpråk = "nb",
+            teksterUtenomSpørsmål = mapOf(),
+            finnesPersonMedAdressebeskyttelse = false,
+        )
 }
