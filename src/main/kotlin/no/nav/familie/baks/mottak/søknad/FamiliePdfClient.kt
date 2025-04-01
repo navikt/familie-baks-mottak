@@ -10,6 +10,10 @@ import org.springframework.web.client.RestOperations
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 
+data class PdfResponse(
+    val pdf: ByteArray,
+)
+
 @Service
 class FamiliePdfClient(
     @Value("\${FAMILIE_PDF_URL}")
@@ -31,7 +35,10 @@ class FamiliePdfClient(
                 .pathSegment("api/v1/pdf/opprett-pdf")
                 .build()
                 .toUri()
-        return postForEntity(uri, feltMap, HttpHeaders().medContentTypeJsonUTF8())
+
+        val response: PdfResponse = postForEntity(uri, feltMap, HttpHeaders().medContentTypeJsonUTF8())
+
+        return response.pdf
     }
 }
 
