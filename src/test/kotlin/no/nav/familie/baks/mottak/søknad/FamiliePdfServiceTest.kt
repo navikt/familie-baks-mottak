@@ -9,7 +9,8 @@ import java.io.File
 
 internal class FamiliePdfServiceTest {
     private val pdfClient: FamiliePdfClient = mockk()
-    private val familiePdfService = FamiliePdfService(pdfClient)
+    private val søknadSpråkvelgerService: SøknadSpråkvelgerService = SøknadSpråkvelgerService()
+    private val familiePdfService = FamiliePdfService(pdfClient, søknadSpråkvelgerService)
 
     @BeforeEach
     fun setup() {
@@ -19,7 +20,7 @@ internal class FamiliePdfServiceTest {
     @Test
     fun `Lag feltmaptest`() {
         val barnetrygdSøknadSomString =
-            File("./src/test/kotlin/no/nav/familie/baks/mottak/søknad/testdata/testdata1.json")
+            File("./src/test/resources/testdata/versjonertBarnetrygdSøknadV9.json")
                 .readText(Charsets.UTF_8)
         val dbBarnetrygdSøknad =
             DBBarnetrygdSøknad(
@@ -28,8 +29,12 @@ internal class FamiliePdfServiceTest {
                 fnr = "1234123412",
             )
 
-        val feltmap = familiePdfService.lagBarnetrygdPdfKvittering(dbBarnetrygdSøknad, "nb")
+//        println(barnetrygdSøknadSomString)
 
-        println("feltmap $feltmap")
+        val versjonert = dbBarnetrygdSøknad.hentVersjonertBarnetrygdSøknad()
+
+        val feltmap = familiePdfService.lagBarnetrygdPdfKvittering(versjonert, dbBarnetrygdSøknad, "nb")
+
+//        println("feltmap $feltmap")
     }
 }

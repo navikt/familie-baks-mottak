@@ -44,7 +44,7 @@ class JournalførSøknadTask(
 
             val bokmålPdf =
                 if (unleashService.isEnabled(FeatureToggleConfig.NY_FAMILIE_PDF_KVITTERING, false)) {
-                    familiePdfService.lagBarnetrygdPdfKvittering(dbBarnetrygdSøknad, "nb")
+                    familiePdfService.lagBarnetrygdPdfKvittering(versjonertBarnetrygdSøknad, dbBarnetrygdSøknad, "nb")
                 } else {
                     pdfService.lagBarnetrygdPdf(
                         versjonertBarnetrygdSøknad = versjonertBarnetrygdSøknad,

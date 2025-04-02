@@ -4,29 +4,38 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.baks.mottak.domene.FeltMap
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
-import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt
+import no.nav.familie.kontrakter.ba.søknad.StøttetVersjonertBarnetrygdSøknad
 import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad
 import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.kontrakter.felles.søknad.Søknadsfelt
 import org.springframework.stereotype.Service
 
 @Service
 class FamiliePdfService(
     private val familiePdfClient: FamiliePdfClient,
+    private val søknadSpråkvelgerService: SøknadSpråkvelgerService,
 ) {
     fun lagBarnetrygdPdfKvittering(
+        versjonertBarnetrygdSøknad: StøttetVersjonertBarnetrygdSøknad,
         søknad: DBBarnetrygdSøknad,
         språk: String,
     ): ByteArray {
         // TODO mangler vedleggstitler?
-        val feltmap = lagBarnetrygdFeltMap(søknad)
+        val feltmap = lagBarnetrygdFeltMap(versjonertBarnetrygdSøknad, søknad)
 
         return familiePdfClient.opprettPdf(feltmap)
     }
 
-    private fun lagBarnetrygdFeltMap(søknad: DBBarnetrygdSøknad): FeltMap {
-        val test = objectMapper.readValue<BarnetrygdSøknad>(søknad.søknadJson)
+    private fun lagBarnetrygdFeltMap(
+        versjonertBarnetrygdSøknad: StøttetVersjonertBarnetrygdSøknad,
+        søknad: DBBarnetrygdSøknad,
+    ): FeltMap {
+        val barnetrygdSøknad = objectMapper.readValue<BarnetrygdSøknad>(søknad.søknadJson)
 
-//        println(mapTilBarnetrygd(test))
+        val ææ = mapTilBarnetrygd(barnetrygdSøknad)
+
+        println(søknadSpråkvelgerService.konverterBarnetrygdSøknadTilMapForSpråk(versjonertBarnetrygdSøknad, "nb"))
+//        println(ææ)
 
         // Placeholderkode v
         val feltmap = FeltMap("", emptyList())
@@ -35,7 +44,7 @@ class FamiliePdfService(
 
     fun mapTilBarnetrygd(søknad: BarnetrygdSøknad): StrukturertBarnetrygdSøknad = StrukturertBarnetrygdSøknad(søker = mapTilSøkerSeksjon(søknad))
 
-    fun mapTilSøkerSeksjon(søknad: BarnetrygdSøknad): SøkerSeksjon = SøkerSeksjon(navn = søknad.spørsmål["erAsylsøker"])
+    fun mapTilSøkerSeksjon(søknad: BarnetrygdSøknad): SøkerSeksjon = SøkerSeksjon(navn = søknad.søker.spørsmål["erAsylsøker"] as Søknadsfelt<String>)
 
     data class StrukturertBarnetrygdSøknad(
         val søker: SøkerSeksjon,
@@ -50,7 +59,7 @@ class FamiliePdfService(
     )
 
     data class SøkerSeksjon(
-        val navn: Søknadsfelt<Any>? = null,
+        val navn: Søknadsfelt<String>? = null,
     )
 
     fun lagKontantstøttePdfKvittering(
