@@ -103,5 +103,6 @@ KS_SAK_SCOPE: api://dev-gcp.teamfamilie.familie-ks-sak/.default
 NORG2_API_URL: https://norg2.dev-fss-pub.nais.io/norg2
 FAMILIE_DOKUMENT_API_URL: http://familie-dokument/familie/dokument
 
+
 FAMILIE_PDF_URL: http://familie-pdf/
 FAMILIE_PDF_SCOPE: api://dev-gcp.teamfamilie.familie-pdf/.default
