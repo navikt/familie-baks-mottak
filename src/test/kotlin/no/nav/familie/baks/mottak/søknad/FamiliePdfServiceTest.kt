@@ -33,7 +33,7 @@ internal class FamiliePdfServiceTest {
 
         val versjonert = dbBarnetrygdSøknad.hentVersjonertBarnetrygdSøknad()
 
-        val feltmap = familiePdfService.lagBarnetrygdPdfKvittering(versjonert, dbBarnetrygdSøknad, "nb")
+        val feltmap = familiePdfService.lagBarnetrygdPdfKvittering(dbBarnetrygdSøknad, "nb")
 
 //        println("feltmap $feltmap")
     }
