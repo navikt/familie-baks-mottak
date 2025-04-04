@@ -81,17 +81,21 @@ class FamiliePdfService(
                 .flatten()
                 .toList()
 
-        return listOf(VerdilisteElement(label = ""))
+        // print("listeeeeeee1" + list + " listeeeeeee2")
+
+        /*if (entitet is LabelVerdiPar<*>) {
+            return listOf(VerdilisteElement(label = ""))
+        }*/
     }
 
-    private fun mapTilVerdiListeElement(
+   /* private fun mapTilVerdiListeElement(
         entitet: Søknadsfelt<*>,
         språk: String,
     ) = VerdilisteElement(
         entitet.label,
         verdi = mapVerdi(entitet.verdi!!, språk),
         alternativer = entitet.alternativer?.joinToString(" / "),
-    )
+    )*/
 
     private fun konstruktørparametere(entity: Any) = entity::class.primaryConstructor?.parameters ?: emptyList()
 
@@ -148,6 +152,27 @@ class FamiliePdfService(
         val label: String?,
         val verdi: SøknadAdresse?,
     )
+
+/*  Generisk type som kan brukes for de forksjellige labelverdiparene. Litt usikker på om det funker så bra.
+  sealed class LabelVerdiPar<T>(
+        open val label: String?,
+        open val verdi: T?,
+    )
+
+    data class LabelVerdiParString(
+        override val label: String?,
+        override val verdi: String?,
+    ) : LabelVerdiPar<String>(label, verdi)
+
+    data class LabelVerdiParListe(
+        override val label: String?,
+        override val verdi: List<String>?,
+    ) : LabelVerdiPar<List<String>>(label, verdi)
+
+    data class LabelVerdiParAdresse(
+        override val label: String?,
+        override val verdi: SøknadAdresse?,
+    ) : LabelVerdiPar<SøknadAdresse>(label, verdi)*/
 
     fun lagKontantstøttePdfKvittering(
         søknad: DBKontantstøtteSøknad,
