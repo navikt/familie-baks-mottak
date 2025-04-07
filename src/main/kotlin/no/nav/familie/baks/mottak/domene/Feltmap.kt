@@ -25,3 +25,8 @@ data class PdfConfig(
     val harInnholdsfortegnelse: Boolean,
     val språk: String,
 )
+
+class LabelVerdiPar<T>(
+    val label: String,
+    val verdi: T,
+)

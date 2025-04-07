@@ -29,12 +29,8 @@ internal class FamiliePdfServiceTest {
                 fnr = "1234123412",
             )
 
-//        println(barnetrygdSøknadSomString)
-
         val versjonert = dbBarnetrygdSøknad.hentVersjonertBarnetrygdSøknad()
 
         val feltmap = familiePdfService.lagBarnetrygdPdfKvittering(dbBarnetrygdSøknad, "nb")
-
-//        println("feltmap $feltmap")
     }
 }
