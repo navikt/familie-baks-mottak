@@ -9,6 +9,8 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Brevkoder
+import no.nav.familie.kontrakter.felles.BrukerIdType
+import no.nav.familie.kontrakter.felles.journalpost.Bruker
 import no.nav.familie.kontrakter.felles.journalpost.DokumentInfo
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import no.nav.familie.kontrakter.felles.journalpost.Journalposttype
@@ -159,6 +161,36 @@ class BarnetrygdOppgaveMapperTest {
 
             // Assert
             assertThat(behandlingstype).isEqualTo(Behandlingstype.EØS)
+        }
+
+        @Test
+        fun `skal returnere behandlingstype null når brukeren har et dnummer og det ikke er en digital kanal`() {
+            // Arrange
+            val journalpost =
+                Journalpost(
+                    journalpostId = "123",
+                    journalposttype = Journalposttype.I,
+                    journalstatus = Journalstatus.MOTTATT,
+                    kanal = null,
+                    dokumenter =
+                        listOf(
+                            DokumentInfo(
+                                dokumentInfoId = "321",
+                                brevkode = Brevkoder.BARNETRYGD_ORDINÆR_SØKNAD,
+                            ),
+                        ),
+                    bruker =
+                        Bruker(
+                            id = "41018512345",
+                            type = BrukerIdType.FNR,
+                        ),
+                )
+
+            // Act
+            val behandlingstype = barnetrygdOppgaveMapper.hentBehandlingstype(journalpost)
+
+            // Assert
+            assertThat(behandlingstype).isNull()
         }
 
         @Test

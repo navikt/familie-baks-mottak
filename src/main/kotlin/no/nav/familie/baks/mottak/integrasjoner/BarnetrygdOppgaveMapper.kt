@@ -49,6 +49,7 @@ class BarnetrygdOppgaveMapper(
                     Behandlingstype.NASJONAL
                 }
 
+            erDnummerPåJournalpost(journalpost) -> null
             hoveddokumentErÅrligDifferanseutbetalingAvBarnetrygd(journalpost) -> Behandlingstype.Utland
             journalpost.harKlage() && unleashService.isEnabled(FeatureToggleConfig.SETT_BEHANDLINGSTEMA_OG_BEHANDLINGSTYPE_FOR_KLAGE, false) -> Behandlingstype.Klage
             else -> null
