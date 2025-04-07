@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:filename")
+
 package no.nav.familie.baks.mottak.søknad.barnetrygd.mapper
 
 import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad
