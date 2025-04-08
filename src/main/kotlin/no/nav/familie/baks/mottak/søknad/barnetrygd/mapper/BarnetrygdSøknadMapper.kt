@@ -2,10 +2,11 @@
 
 package no.nav.familie.baks.mottak.søknad.barnetrygd.mapper
 
+import no.nav.familie.baks.mottak.domene.LabelVerdiPar
 import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad
 
 data class StrukturertBarnetrygdSøknad(
-    val omDeg: OmDegSeksjon? = null,
+    val omDeg: LabelVerdiPar<OmDegSeksjon>,
 )
 
 fun mapTilBarnetrygd(

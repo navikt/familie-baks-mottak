@@ -66,7 +66,7 @@ fun finnFelter(entitet: Any): List<VerdilisteElement> {
         return listOf(VerdilisteElement(label = entitet.label, verdiliste = list))
     }
 
-    println("hei" + list)
+//    println("hei" + list)
     return list
 }
 

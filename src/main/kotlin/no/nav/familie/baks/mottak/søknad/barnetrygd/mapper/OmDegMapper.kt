@@ -15,10 +15,14 @@ data class OmDegSeksjon(
 fun mapTilOmDegSeksjon(
     søker: Søker,
     språk: String,
-): OmDegSeksjon =
-    OmDegSeksjon(
-        ident = oversettOgFormaterTilUtskriftsformat(søker.ident, språk),
-        statsborgerskap = oversettOgFormaterTilUtskriftsformat(søker.statsborgerskap, språk),
-        sivilstatus = oversettOgFormaterTilUtskriftsformat(søker.sivilstand, språk),
-        adresse = oversettOgFormaterTilUtskriftsformat(søker.adresse, språk),
+): LabelVerdiPar<OmDegSeksjon> =
+    LabelVerdiPar(
+        label = "Om deg",
+        verdi =
+            OmDegSeksjon(
+                ident = oversettOgFormaterTilUtskriftsformat(søker.ident, språk),
+                statsborgerskap = oversettOgFormaterTilUtskriftsformat(søker.statsborgerskap, språk),
+                sivilstatus = oversettOgFormaterTilUtskriftsformat(søker.sivilstand, språk),
+                adresse = oversettOgFormaterTilUtskriftsformat(søker.adresse, språk),
+            ),
     )
