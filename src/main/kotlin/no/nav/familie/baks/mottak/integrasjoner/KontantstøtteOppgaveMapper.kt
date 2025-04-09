@@ -15,7 +15,6 @@ class KontantstøtteOppgaveMapper(
     enhetsnummerService: EnhetsnummerService,
     pdlClient: PdlClient,
     val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
-    private val unleashService: UnleashNextMedContextService,
 ) : AbstractOppgaveMapper(
         enhetsnummerService = enhetsnummerService,
         pdlClient = pdlClient,
@@ -38,7 +37,7 @@ class KontantstøtteOppgaveMapper(
                 }
 
             erDnummerPåJournalpost(journalpost) -> Behandlingstype.EØS
-            journalpost.harKlage() && unleashService.isEnabled(FeatureToggleConfig.SETT_BEHANDLINGSTEMA_OG_BEHANDLINGSTYPE_FOR_KLAGE, false) -> Behandlingstype.Klage
+            journalpost.harKlage() -> Behandlingstype.Klage
             else -> Behandlingstype.NASJONAL
         }
 

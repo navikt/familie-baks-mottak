@@ -15,11 +15,10 @@ class BarnetrygdOppgaveMapper(
     enhetsnummerService: EnhetsnummerService,
     pdlClient: PdlClient,
     val søknadRepository: SøknadRepository,
-    private val unleashService: UnleashNextMedContextService,
 ) : AbstractOppgaveMapper(
-        enhetsnummerService = enhetsnummerService,
-        pdlClient = pdlClient,
-    ) {
+    enhetsnummerService = enhetsnummerService,
+    pdlClient = pdlClient,
+) {
     override val tema: Tema = Tema.BAR
 
     // Behandlingstema og behandlingstype settes basert på regelsettet som er dokumentert nederst her: https://confluence.adeo.no/display/TFA/Mottak+av+dokumenter
@@ -32,9 +31,9 @@ class BarnetrygdOppgaveMapper(
                     Behandlingstema.OrdinærBarnetrygd
                 }
 
-            erDnummerPåJournalpost(journalpost) -> Behandlingstema.BarnetrygdEØS
+            !journalpost.harKlage() && erDnummerPåJournalpost(journalpost) -> Behandlingstema.BarnetrygdEØS
             hoveddokumentErÅrligDifferanseutbetalingAvBarnetrygd(journalpost) -> null
-            journalpost.harKlage() && unleashService.isEnabled(FeatureToggleConfig.SETT_BEHANDLINGSTEMA_OG_BEHANDLINGSTYPE_FOR_KLAGE, false) -> null
+            journalpost.harKlage() -> null
             else -> Behandlingstema.OrdinærBarnetrygd
         }
 
@@ -50,7 +49,7 @@ class BarnetrygdOppgaveMapper(
                 }
 
             hoveddokumentErÅrligDifferanseutbetalingAvBarnetrygd(journalpost) -> Behandlingstype.Utland
-            journalpost.harKlage() && unleashService.isEnabled(FeatureToggleConfig.SETT_BEHANDLINGSTEMA_OG_BEHANDLINGSTYPE_FOR_KLAGE, false) -> Behandlingstype.Klage
+            journalpost.harKlage() -> Behandlingstype.Klage
             else -> null
         }
 

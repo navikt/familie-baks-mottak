@@ -46,7 +46,6 @@ class OppgaveMapperTest(
             enhetsnummerService = mockEnhetsnummerService,
             pdlClient = mockPdlClient,
             søknadRepository = barnetrygdSøknadRepository,
-            unleashService = unleashService,
         )
 
     private val kontantstøtteOppgaveMapper: IOppgaveMapper =
@@ -54,13 +53,11 @@ class OppgaveMapperTest(
             enhetsnummerService = mockEnhetsnummerService,
             pdlClient = mockPdlClient,
             kontantstøtteSøknadRepository = kontantstøtteSøknadRepository,
-            unleashService = unleashService,
         )
 
     @BeforeEach
     fun beforeEach() {
         every { mockEnhetsnummerService.hentEnhetsnummer(any()) } returns "1234"
-        every { unleashService.isEnabled(FeatureToggleConfig.SETT_BEHANDLINGSTEMA_OG_BEHANDLINGSTYPE_FOR_KLAGE, false) } returns true
     }
 
     @Test
