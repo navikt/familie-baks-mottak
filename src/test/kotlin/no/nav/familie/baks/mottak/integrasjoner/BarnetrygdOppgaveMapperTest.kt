@@ -111,7 +111,7 @@ class BarnetrygdOppgaveMapperTest {
             val behandlingstema = barnetrygdOppgaveMapper.hentBehandlingstema(journalpost)
 
             // Assert
-            assertThat(behandlingstema).isEqualTo(null)
+            assertThat(behandlingstema).isNull()
         }
 
         @Test
