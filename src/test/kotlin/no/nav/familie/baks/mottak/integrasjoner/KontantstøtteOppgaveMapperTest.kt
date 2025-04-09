@@ -130,6 +130,33 @@ class KontantstøtteOppgaveMapperTest {
         }
 
         @Test
+        fun `skal returnere behandlingstype klage hvis man har dokumenter for klage og journalpost inneholder dnummer`() {
+            // Arrange
+            val dnummer = "41018512345"
+
+            val journalpost =
+                Journalpost(
+                    journalpostId = "123",
+                    journalposttype = Journalposttype.I,
+                    journalstatus = Journalstatus.MOTTATT,
+                    bruker = Bruker(id = dnummer, type = BrukerIdType.FNR),
+                    dokumenter =
+                        listOf(
+                            DokumentInfo(
+                                dokumentInfoId = "321",
+                                brevkode = Brevkoder.KLAGE,
+                            ),
+                        ),
+                )
+
+            // Act
+            val behandlingstype = kontantstøtteOppgaveMapper.hentBehandlingstype(journalpost)
+
+            // Assert
+            assertThat(behandlingstype).isEqualTo(Behandlingstype.Klage)
+        }
+
+        @Test
         fun `skal returnere behandlingstype klage hvis man har dokumenter for klage`() {
             // Arrange
             val journalpost =

@@ -36,7 +36,7 @@ class KontantstøtteOppgaveMapper(
                     Behandlingstype.NASJONAL
                 }
 
-            erDnummerPåJournalpost(journalpost) -> Behandlingstype.EØS
+            !journalpost.harKlage() && erDnummerPåJournalpost(journalpost) -> Behandlingstype.EØS
             journalpost.harKlage() -> Behandlingstype.Klage
             else -> Behandlingstype.NASJONAL
         }
