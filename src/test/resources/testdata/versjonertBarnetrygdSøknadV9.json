@@ -1,4 +1,5 @@
 {
+  "data": {
     "kontraktVersjon": 9,
     "søker": {
       "ident": {
@@ -711,7 +712,8 @@
         "nb": "Skjermet adresse"
       }
     },
-    "originalSpråk": "nb",
+    "originalSpråk": "nb"
+  },
   "status": "SUKSESS",
   "melding": "OK",
   "frontendFeilmelding": null,
