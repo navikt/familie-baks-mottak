@@ -6,11 +6,11 @@ import no.nav.familie.kontrakter.ba.søknad.v1.SøknadAdresse
 import no.nav.familie.kontrakter.felles.søknad.Søknadsfelt
 
 fun oversettOgFormaterTilUtskriftsformat(
-    søknadsfelt: Søknadsfelt<*>,
+    søknadsfelt: Søknadsfelt<*>?,
     språk: String,
 ): LabelVerdiPar<String> {
-    val label = søknadsfelt.label[språk] ?: ""
-    val verdi = mapVerdiToString(søknadsfelt.verdi[språk])
+    val label = søknadsfelt?.label?.get(språk) ?: ""
+    val verdi = mapVerdiToString(søknadsfelt?.verdi?.get(språk))
     return LabelVerdiPar(label, verdi)
 }
 
@@ -54,3 +54,10 @@ fun <T> hentSpørsmålOversettOgFormatertilUtskrift(
             ?: Søknadsfelt(label = mapOf(språk to nøkkel), verdi = mapOf(språk to ""))
     return oversettOgFormaterTilUtskriftsformat(felt, språk)
 }
+
+fun hentTekst(
+    tekster: Map<String, Map<String, String>>,
+    nøkkel: String,
+    locale: String,
+    default: String = "",
+): String = tekster[nøkkel]?.get(locale) ?: default

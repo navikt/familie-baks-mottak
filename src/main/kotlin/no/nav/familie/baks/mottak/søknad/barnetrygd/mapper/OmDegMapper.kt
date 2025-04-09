@@ -16,10 +16,11 @@ data class OmDegSeksjon(
 
 fun mapTilOmDegSeksjon(
     søker: Søker,
+    teksterUtenomSpørsmål: Map<String, Map<String, String>>,
     språk: String,
 ): LabelVerdiPar<OmDegSeksjon> =
     LabelVerdiPar(
-        label = "Om deg",
+        label = hentTekst(teksterUtenomSpørsmål, "pdf.omdeg.seksjonstittel", språk),
         verdi =
             OmDegSeksjon(
                 ident = oversettOgFormaterTilUtskriftsformat(søker.ident, språk),
