@@ -3,7 +3,6 @@ package no.nav.familie.baks.mottak.integrasjoner
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.baks.mottak.DevLauncher
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
@@ -46,7 +45,6 @@ class OppgaveMapperTest(
             enhetsnummerService = mockEnhetsnummerService,
             pdlClient = mockPdlClient,
             søknadRepository = barnetrygdSøknadRepository,
-            unleashService = unleashService,
         )
 
     private val kontantstøtteOppgaveMapper: IOppgaveMapper =
@@ -54,13 +52,11 @@ class OppgaveMapperTest(
             enhetsnummerService = mockEnhetsnummerService,
             pdlClient = mockPdlClient,
             kontantstøtteSøknadRepository = kontantstøtteSøknadRepository,
-            unleashService = unleashService,
         )
 
     @BeforeEach
     fun beforeEach() {
         every { mockEnhetsnummerService.hentEnhetsnummer(any()) } returns "1234"
-        every { unleashService.isEnabled(FeatureToggleConfig.SETT_BEHANDLINGSTEMA_OG_BEHANDLINGSTYPE_FOR_KLAGE, false) } returns true
     }
 
     @Test

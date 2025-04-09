@@ -1,7 +1,5 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
-import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.harEøsSteg
 import no.nav.familie.kontrakter.felles.Behandlingstema
@@ -15,7 +13,6 @@ class KontantstøtteOppgaveMapper(
     enhetsnummerService: EnhetsnummerService,
     pdlClient: PdlClient,
     val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
-    private val unleashService: UnleashNextMedContextService,
 ) : AbstractOppgaveMapper(
         enhetsnummerService = enhetsnummerService,
         pdlClient = pdlClient,
@@ -37,8 +34,8 @@ class KontantstøtteOppgaveMapper(
                     Behandlingstype.NASJONAL
                 }
 
-            erDnummerPåJournalpost(journalpost) -> Behandlingstype.EØS
-            journalpost.harKlage() && unleashService.isEnabled(FeatureToggleConfig.SETT_BEHANDLINGSTEMA_OG_BEHANDLINGSTYPE_FOR_KLAGE, false) -> Behandlingstype.Klage
+            !journalpost.harKlage() && erDnummerPåJournalpost(journalpost) -> Behandlingstype.EØS
+            journalpost.harKlage() -> Behandlingstype.Klage
             else -> Behandlingstype.NASJONAL
         }
 
