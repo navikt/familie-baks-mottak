@@ -7,6 +7,7 @@ import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad
 
 data class StrukturertBarnetrygdSøknad(
     val omDeg: LabelVerdiPar<OmDegSeksjon>,
+    val livssituasjonenDin: LabelVerdiPar<LivssituasjonenDinSeksjon>,
 )
 
 fun mapTilBarnetrygd(
@@ -15,4 +16,5 @@ fun mapTilBarnetrygd(
 ): StrukturertBarnetrygdSøknad =
     StrukturertBarnetrygdSøknad(
         omDeg = mapTilOmDegSeksjon(søknad.søker, språk),
+        livssituasjonenDin = mapTilLivssituasjonenDinSeksjon(søknad.søker, språk),
     )

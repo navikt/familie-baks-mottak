@@ -32,7 +32,7 @@ class FamiliePdfService(
     ): FeltMap {
         val barnetrygdSøknad = objectMapper.readValue<BarnetrygdSøknad>(søknad.søknadJson)
         val barnetrygdSøknadRiktigSpråk = mapTilBarnetrygd(barnetrygdSøknad, språk)
-        val verdiliste = finnFelter(barnetrygdSøknadRiktigSpråk) // Husk at dette er en egen seksjon så d er litt fucked
+        val verdiliste = finnFelter(barnetrygdSøknadRiktigSpråk)
         val feltmap = FeltMap(label = "Søknad om barnetrygd", verdiliste = verdiliste, pdfConfig = PdfConfig(true, språk))
         println("feltmap: " + feltmap)
         return feltmap

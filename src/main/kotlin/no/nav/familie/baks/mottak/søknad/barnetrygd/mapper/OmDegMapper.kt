@@ -10,6 +10,8 @@ data class OmDegSeksjon(
     val statsborgerskap: LabelVerdiPar<String>,
     val sivilstatus: LabelVerdiPar<String>,
     val adresse: LabelVerdiPar<String>,
+    val borPåRegistrertAdresse: LabelVerdiPar<String>,
+    val værtINorgeITolvMåneder: LabelVerdiPar<String>,
 )
 
 fun mapTilOmDegSeksjon(
@@ -24,5 +26,7 @@ fun mapTilOmDegSeksjon(
                 statsborgerskap = oversettOgFormaterTilUtskriftsformat(søker.statsborgerskap, språk),
                 sivilstatus = oversettOgFormaterTilUtskriftsformat(søker.sivilstand, språk),
                 adresse = oversettOgFormaterTilUtskriftsformat(søker.adresse, språk),
+                borPåRegistrertAdresse = hentSpørsmålOversettOgFormatertilUtskrift<String>(søker.spørsmål, "borPåRegistrertAdresse", språk),
+                værtINorgeITolvMåneder = hentSpørsmålOversettOgFormatertilUtskrift<String>(søker.spørsmål, "værtINorgeITolvMåneder", språk),
             ),
     )
