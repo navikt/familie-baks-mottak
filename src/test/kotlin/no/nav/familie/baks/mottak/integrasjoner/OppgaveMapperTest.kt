@@ -3,7 +3,6 @@ package no.nav.familie.baks.mottak.integrasjoner
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.baks.mottak.DevLauncher
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository

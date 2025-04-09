@@ -2,8 +2,6 @@ package no.nav.familie.baks.mottak.integrasjoner
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
-import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.søknad.SøknadTestData
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
@@ -18,7 +16,6 @@ import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -167,12 +164,12 @@ class BarnetrygdOppgaveMapperTest {
                 )
 
             every { søknadRepository.getByJournalpostId(journalpost.journalpostId) } returns
-                    DBBarnetrygdSøknad(
-                        id = 0,
-                        objectMapper.writeValueAsString(SøknadTestData.barnetrygdSøknad()),
-                        "12345678093",
-                        LocalDateTime.now(),
-                    )
+                DBBarnetrygdSøknad(
+                    id = 0,
+                    søknadJson = objectMapper.writeValueAsString(SøknadTestData.barnetrygdSøknad()),
+                    fnr = "12345678093",
+                    opprettetTid = LocalDateTime.now(),
+                )
 
             // Act
             val behandlingstype = barnetrygdOppgaveMapper.hentBehandlingstype(journalpost)

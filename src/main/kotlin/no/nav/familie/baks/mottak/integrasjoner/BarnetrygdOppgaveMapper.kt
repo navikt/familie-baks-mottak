@@ -14,9 +14,9 @@ class BarnetrygdOppgaveMapper(
     pdlClient: PdlClient,
     val søknadRepository: SøknadRepository,
 ) : AbstractOppgaveMapper(
-    enhetsnummerService = enhetsnummerService,
-    pdlClient = pdlClient,
-) {
+        enhetsnummerService = enhetsnummerService,
+        pdlClient = pdlClient,
+    ) {
     override val tema: Tema = Tema.BAR
 
     // Behandlingstema og behandlingstype settes basert på regelsettet som er dokumentert nederst her: https://confluence.adeo.no/display/TFA/Mottak+av+dokumenter

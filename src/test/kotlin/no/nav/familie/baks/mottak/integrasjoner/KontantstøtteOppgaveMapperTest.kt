@@ -2,8 +2,6 @@ package no.nav.familie.baks.mottak.integrasjoner
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
-import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadTestData
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
@@ -17,7 +15,6 @@ import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -79,12 +76,12 @@ class KontantstøtteOppgaveMapperTest {
                 )
 
             every { kontantstøtteSøknadRepository.getByJournalpostId(journalpost.journalpostId) } returns
-                    DBKontantstøtteSøknad(
-                        id = 0,
-                        søknadJson = objectMapper.writeValueAsString(KontantstøtteSøknadTestData.kontantstøtteSøknad()),
-                        fnr = "12345678093",
-                        opprettetTid = LocalDateTime.now(),
-                    )
+                DBKontantstøtteSøknad(
+                    id = 0,
+                    søknadJson = objectMapper.writeValueAsString(KontantstøtteSøknadTestData.kontantstøtteSøknad()),
+                    fnr = "12345678093",
+                    opprettetTid = LocalDateTime.now(),
+                )
 
             // Act
             val behandlingstype = kontantstøtteOppgaveMapper.hentBehandlingstype(journalpost)
@@ -115,12 +112,12 @@ class KontantstøtteOppgaveMapperTest {
                 )
 
             every { kontantstøtteSøknadRepository.getByJournalpostId(journalpost.journalpostId) } returns
-                    DBKontantstøtteSøknad(
-                        id = 0,
-                        søknadJson = objectMapper.writeValueAsString(KontantstøtteSøknadTestData.kontantstøtteSøknad()),
-                        fnr = dnummer,
-                        opprettetTid = LocalDateTime.now(),
-                    )
+                DBKontantstøtteSøknad(
+                    id = 0,
+                    søknadJson = objectMapper.writeValueAsString(KontantstøtteSøknadTestData.kontantstøtteSøknad()),
+                    fnr = dnummer,
+                    opprettetTid = LocalDateTime.now(),
+                )
 
             // Act
             val behandlingstype = kontantstøtteOppgaveMapper.hentBehandlingstype(journalpost)
