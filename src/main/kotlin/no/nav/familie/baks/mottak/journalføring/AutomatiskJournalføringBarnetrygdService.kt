@@ -4,6 +4,7 @@ import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
+import no.nav.familie.kontrakter.felles.BrukerIdType
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import no.nav.familie.unleash.UnleashService
@@ -24,7 +25,6 @@ class AutomatiskJournalføringBarnetrygdService(
     fun skalAutomatiskJournalføres(
         journalpost: Journalpost,
         brukerHarSakIInfotrygd: Boolean,
-        fagsakId: Long,
     ): Boolean {
         if (!unleashService.isEnabled(toggleId = toggleId, defaultValue = false)) {
             return false
@@ -46,16 +46,23 @@ class AutomatiskJournalføringBarnetrygdService(
             return false
         }
 
-        val personIdent = journalpostBrukerService.tilPersonIdent(journalpost.bruker!!, tema)
+        val bruker = journalpost.bruker!!
+
+        if (bruker.type == BrukerIdType.ORGNR) {
+            return false
+        }
+
+        val personIdent = journalpostBrukerService.tilPersonIdent(bruker, tema)
         val enhetId = arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdent, tema).enhetId
 
         if (enhetId in enheterSomIkkeSkalHaAutomatiskJournalføring) {
             return false
         }
 
-        val minialFagsak = baSakClient.hentMinimalRestFagsak(fagsakId)
+        val fagsakId = baSakClient.hentFagsaknummerPåPersonident(personIdent)
+        val minimalFagsak = baSakClient.hentMinimalRestFagsak(fagsakId)
 
-        if (minialFagsak.finnesÅpenBehandlingPåFagsak()) {
+        if (minimalFagsak.finnesÅpenBehandlingPåFagsak()) {
             return false
         }
 

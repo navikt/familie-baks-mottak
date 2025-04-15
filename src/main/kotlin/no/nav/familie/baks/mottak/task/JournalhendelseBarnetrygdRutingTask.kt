@@ -80,8 +80,6 @@ class JournalhendelseBarnetrygdRutingTask(
                 return
             }
 
-        val fagsakId = baSakClient.hentFagsaknummerPåPersonident(personIdent)
-
         Thread.sleep(1000L)
 
         val (baSak, infotrygdSak) = brukersIdent?.run { søkEtterSakIBaSakOgInfotrygd(this) } ?: Pair(null, null)
@@ -93,10 +91,11 @@ class JournalhendelseBarnetrygdRutingTask(
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
                 brukerHarSakIInfotrygd,
-                fagsakId,
             )
 
         if (skalAutomatiskJournalføreJournalpost) {
+            val fagsakId = baSakClient.hentFagsaknummerPåPersonident(personIdent)
+
             log.info("Oppretter OppdaterOgFerdigstillJournalpostTask for journalpost med id ${journalpost.journalpostId}")
 
             Task(

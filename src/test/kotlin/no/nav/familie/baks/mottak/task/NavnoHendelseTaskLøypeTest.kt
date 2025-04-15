@@ -124,7 +124,7 @@ class NavnoHendelseTaskLøypeTest {
 
         every { mockSakClient.hentFagsaknummerPåPersonident(any()) } returns FAGSAK_ID
 
-        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any()) } returns false
+        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any()) } returns false
 
         // Act
         kjørRutingTaskOgReturnerNesteTask().run {
@@ -150,7 +150,7 @@ class NavnoHendelseTaskLøypeTest {
 
         every { mockSakClient.hentFagsaknummerPåPersonident(any()) } returns FAGSAK_ID
 
-        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any()) } returns false
+        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any()) } returns false
 
         // Act
         kjørRutingTaskOgReturnerNesteTask().run {
@@ -180,7 +180,7 @@ class NavnoHendelseTaskLøypeTest {
             mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
         } returns InfotrygdSøkResponse(listOf(StønadDto()), listOf(StønadDto()))
 
-        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any()) } returns false
+        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any()) } returns false
 
         // Act
         kjørRutingTaskOgReturnerNesteTask().run { journalføringSteg.doTask(this) }
@@ -199,7 +199,7 @@ class NavnoHendelseTaskLøypeTest {
         // Arrange
         every { mockSakClient.hentFagsaknummerPåPersonident(any()) } returns FAGSAK_ID
 
-        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any()) } returns false
+        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any()) } returns false
 
         // Act
         kjørRutingTaskOgReturnerNesteTask().run { journalføringSteg.doTask(this) }
@@ -233,7 +233,7 @@ class NavnoHendelseTaskLøypeTest {
                 emptyList(),
             )
 
-        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any()) } returns false
+        every { mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any()) } returns false
 
         // Act
         kjørRutingTaskOgReturnerNesteTask().run { journalføringSteg.doTask(this) }

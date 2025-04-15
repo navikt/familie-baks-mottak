@@ -5,6 +5,7 @@ import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextServ
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
+import no.nav.familie.kontrakter.felles.BrukerIdType
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import org.springframework.stereotype.Service
@@ -23,7 +24,6 @@ class AutomatiskJournalføringKontantstøtteService(
 
     fun skalAutomatiskJournalføres(
         journalpost: Journalpost,
-        fagsakId: Long,
     ): Boolean {
         if (!unleashService.isEnabled(toggleId = toggleId, defaultValue = false)) {
             return false
@@ -41,16 +41,23 @@ class AutomatiskJournalføringKontantstøtteService(
             return false
         }
 
-        val personIdent = journalpostBrukerService.tilPersonIdent(journalpost.bruker!!, tema)
+        val bruker = journalpost.bruker!!
+
+        if (bruker.type == BrukerIdType.ORGNR) {
+            return false
+        }
+
+        val personIdent = journalpostBrukerService.tilPersonIdent(bruker, tema)
         val enhetId = arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdent, tema).enhetId
 
         if (enhetId in enheterSomIkkeSkalHaAutomatiskJournalføring) {
             return false
         }
 
-        val minialFagsak = ksSakClient.hentMinimalRestFagsak(fagsakId)
+        val fagsakId = ksSakClient.hentFagsaknummerPåPersonident(personIdent)
+        val minimalFagsak = ksSakClient.hentMinimalRestFagsak(fagsakId)
 
-        if (minialFagsak.finnesÅpenBehandlingPåFagsak()) {
+        if (minimalFagsak.finnesÅpenBehandlingPåFagsak()) {
             return false
         }
 

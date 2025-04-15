@@ -74,7 +74,7 @@ class JournalhendelseKontantstøtteRutingTaskTest {
         every { taskService.save(capture(taskSlot)) } returns mockk()
 
         every {
-            automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(any(), any())
+            automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(any())
         } returns false
 
         // Act
@@ -117,7 +117,7 @@ class JournalhendelseKontantstøtteRutingTaskTest {
             )
 
         every {
-            automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(any(), any())
+            automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(any())
         } returns false
 
         // Act

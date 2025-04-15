@@ -82,7 +82,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
                 false,
-                fagsakId,
             )
 
         // Assert
@@ -121,7 +120,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
                 false,
-                1L,
             )
 
         // Assert
@@ -160,7 +158,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
                 true,
-                1L,
             )
 
         // Assert
@@ -200,7 +197,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
                 false,
-                1L,
             )
 
         // Assert
@@ -273,7 +269,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
                 false,
-                fagsakId,
             )
 
         // Assert
@@ -323,6 +318,8 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             )
         } returns identifikator
 
+        every { mockedBaSakClient.hentFagsaknummerPåPersonident(any()) } returns fagsakId
+
         every {
             mockedBaSakClient.hentMinimalRestFagsak(
                 fagsakId = fagsakId,
@@ -368,7 +365,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
                 false,
-                fagsakId,
             )
 
         // Assert
@@ -404,7 +400,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
                 false,
-                1L,
             )
 
         // Assert
@@ -459,7 +454,91 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
                 false,
-                fagsakId,
+            )
+
+        // Assert
+        assertThat(skalAutomatiskJournalføres).isFalse()
+    }
+
+    @Test
+    fun `skal ikke automatisk journalføre journalpost hvis det er orgnummer`() {
+        // Arrange
+        val identifikator = "123"
+        val fagsakId = 1L
+
+        val journalpost =
+            Journalpost(
+                journalpostId = "1",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker =
+                    Bruker(
+                        id = identifikator,
+                        type = BrukerIdType.ORGNR,
+                    ),
+                kanal = "NAV_NO",
+                dokumenter =
+                    listOf(
+                        DokumentInfo(
+                            brevkode = "NAV 33-00.07",
+                            tittel = "Søknad",
+                            dokumentstatus = Dokumentstatus.FERDIGSTILT,
+                            dokumentvarianter = emptyList(),
+                            dokumentInfoId = "id",
+                        ),
+                    ),
+            )
+
+        every {
+            mockedUnleashService.isEnabled(
+                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_BARNETRYGD_SØKNADER,
+                defaultValue = false,
+            )
+        } returns true
+
+        every {
+            mockedJournalpostBrukerService.tilPersonIdent(
+                bruker = journalpost.bruker!!,
+                tema = Tema.BAR,
+            )
+        } returns identifikator
+
+        every { mockedBaSakClient.hentFagsaknummerPåPersonident(any()) } returns fagsakId
+
+        every {
+            mockedBaSakClient.hentMinimalRestFagsak(
+                fagsakId = fagsakId,
+            )
+        } returns
+            RestMinimalFagsak(
+                id = fagsakId,
+                behandlinger = listOf(),
+                status = FagsakStatus.LØPENDE,
+            )
+
+        every {
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
+                tema = Tema.BAR,
+                journalpost = journalpost,
+            )
+        } returns false
+
+        every {
+            mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
+                personIdent = identifikator,
+                tema = Tema.BAR,
+            )
+        } returns
+            Enhet(
+                enhetId = "enhetId",
+                enhetNavn = "enhetNavn",
+            )
+
+        // Act
+        val skalAutomatiskJournalføres =
+            automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
+                journalpost,
+                false,
             )
 
         // Assert
@@ -509,6 +588,8 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             )
         } returns identifikator
 
+        every { mockedBaSakClient.hentFagsaknummerPåPersonident(any()) } returns fagsakId
+
         every {
             mockedBaSakClient.hentMinimalRestFagsak(
                 fagsakId = fagsakId,
@@ -543,7 +624,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
                 false,
-                fagsakId,
             )
 
         // Assert
