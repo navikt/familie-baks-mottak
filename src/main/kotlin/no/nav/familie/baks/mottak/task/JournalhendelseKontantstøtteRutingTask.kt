@@ -52,15 +52,14 @@ class JournalhendelseKontantstøtteRutingTask(
                 return
             }
 
-        val fagsakId = ksSakClient.hentFagsaknummerPåPersonident(brukersIdent)
-
         val skalAutomatiskJournalføreJournalpost =
             automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(
                 journalpost,
-                fagsakId,
             )
 
         if (skalAutomatiskJournalføreJournalpost) {
+            val fagsakId = ksSakClient.hentFagsaknummerPåPersonident(brukersIdent)
+
             log.info("Oppretter OppdaterOgFerdigstillJournalpostTask for journalpost med id ${journalpost.journalpostId}")
 
             Task(

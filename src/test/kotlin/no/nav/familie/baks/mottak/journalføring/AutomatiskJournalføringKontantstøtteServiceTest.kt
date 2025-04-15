@@ -85,6 +85,8 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
             )
         } returns identifikator
 
+        every { mockedKsSakClient.hentFagsaknummerPåPersonident(any()) } returns fagsakId
+
         every {
             mockedKsSakClient.hentMinimalRestFagsak(
                 fagsakId = fagsakId,
@@ -115,17 +117,97 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
             )
 
         // Act
-        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, fagsakId)
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost)
 
         // Assert
         assertThat(skalAutomatiskJournalføres).isTrue()
     }
 
     @Test
-    fun `skal ikke automatisk journalføre journalposten hvis feature toggle er skrudd av`() {
+    fun `skal ikke automatisk journalføre journalposten hvis det er orgnummer`() {
         // Arrange
         val identifikator = "123"
         val fagsakId = 1L
+
+        val journalpost =
+            Journalpost(
+                journalpostId = "1",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker =
+                    Bruker(
+                        id = identifikator,
+                        type = BrukerIdType.ORGNR,
+                    ),
+                kanal = "NAV_NO",
+                dokumenter =
+                    listOf(
+                        DokumentInfo(
+                            brevkode = "NAV 34-00.08",
+                            tittel = "Søknad",
+                            dokumentstatus = Dokumentstatus.FERDIGSTILT,
+                            dokumentvarianter = emptyList(),
+                            dokumentInfoId = "id",
+                        ),
+                    ),
+            )
+
+        every {
+            mockedUnleashService.isEnabled(
+                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER,
+                defaultValue = false,
+            )
+        } returns true
+
+        every {
+            mockedJournalpostBrukerService.tilPersonIdent(
+                bruker = journalpost.bruker!!,
+                tema = Tema.KON,
+            )
+        } returns identifikator
+
+        every { mockedKsSakClient.hentFagsaknummerPåPersonident(any()) } returns fagsakId
+
+        every {
+            mockedKsSakClient.hentMinimalRestFagsak(
+                fagsakId = fagsakId,
+            )
+        } returns
+            RestMinimalFagsak(
+                id = fagsakId,
+                behandlinger = listOf(),
+                status = FagsakStatus.LØPENDE,
+            )
+
+        every {
+            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
+                tema = Tema.KON,
+                journalpost = journalpost,
+            )
+        } returns false
+
+        every {
+            mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
+                personIdent = identifikator,
+                tema = Tema.KON,
+            )
+        } returns
+            Enhet(
+                enhetId = "enhetId",
+                enhetNavn = "enhetNavn",
+            )
+
+        // Act
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost)
+
+        // Assert
+        assertThat(skalAutomatiskJournalføres).isFalse()
+    }
+
+    @Test
+    fun `skal ikke automatisk journalføre journalposten hvis feature toggle er skrudd av`() {
+        // Arrange
+        val identifikator = "123"
 
         val journalpost =
             Journalpost(
@@ -165,7 +247,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
         } returns false
 
         // Act
-        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, fagsakId)
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost)
 
         // Assert
         assertThat(skalAutomatiskJournalføres).isFalse()
@@ -175,7 +257,6 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
     fun `skal ikke automatisk journalføre journalposten om journalposten ikke er kontanstøtte søknad`() {
         // Arrange
         val identifikator = "123"
-        val fagsakId = 1L
 
         val journalpost =
             Journalpost(
@@ -215,7 +296,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
         } returns false
 
         // Act
-        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, fagsakId)
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost)
 
         // Assert
         assertThat(skalAutomatiskJournalføres).isFalse()
@@ -225,7 +306,6 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
     fun `skal ikke automatisk journalføre journalposten hvis søknad ikke er sendt inn digitalt`() {
         // Arrange
         val identifikator = "123"
-        val fagsakId = 1L
 
         val journalpost =
             Journalpost(
@@ -265,7 +345,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
         } returns false
 
         // Act
-        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, fagsakId)
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost)
 
         // Assert
         assertThat(skalAutomatiskJournalføres).isFalse()
@@ -275,7 +355,6 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
     fun `skal ikke automatisk journalføre journalposten hvis geografisk behandlende enhet er i listen over eksluderte enheter`() {
         // Arrange
         val identifikator = "123"
-        val fagsakId = 1L
 
         val journalpost =
             Journalpost(
@@ -333,7 +412,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
         } returns identifikator
 
         // Act
-        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, fagsakId)
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost)
 
         // Assert
         assertThat(skalAutomatiskJournalføres).isFalse()
@@ -343,7 +422,6 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
     fun `skal ikke automatisk journalføre journalposten hvis en av personene i søknaden har adressebeskyttelsegradering strengt fortrolig`() {
         // Arrange
         val identifikator = "123"
-        val fagsakId = 1L
 
         val journalpost =
             Journalpost(
@@ -383,7 +461,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
         } returns true
 
         // Act
-        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, fagsakId)
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost)
 
         // Assert
         assertThat(skalAutomatiskJournalføres).isFalse()
@@ -432,6 +510,8 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
             )
         } returns identifikator
 
+        every { mockedKsSakClient.hentFagsaknummerPåPersonident(any()) } returns fagsakId
+
         every {
             mockedKsSakClient.hentMinimalRestFagsak(
                 fagsakId = fagsakId,
@@ -473,7 +553,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
             )
 
         // Act
-        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost, fagsakId)
+        val skalAutomatiskJournalføres = automatiskJournalføringKontantstøtteService.skalAutomatiskJournalføres(journalpost)
 
         // Assert
         assertThat(skalAutomatiskJournalføres).isFalse()

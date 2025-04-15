@@ -133,7 +133,7 @@ class SkanHendelseTaskLøypeTest {
         } returns 1L
 
         every {
-            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any())
+            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any())
         } returns false
 
         // Act
@@ -158,7 +158,7 @@ class SkanHendelseTaskLøypeTest {
         } returns listOf(RestFagsakDeltager("12345678910", BARN, 1L, LØPENDE))
 
         every {
-            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any())
+            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any())
         } returns false
 
         every {
@@ -187,7 +187,7 @@ class SkanHendelseTaskLøypeTest {
         } returns InfotrygdSøkResponse(listOf(StønadDto()), listOf(StønadDto()))
 
         every {
-            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any())
+            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any())
         } returns false
 
         every {
@@ -216,7 +216,7 @@ class SkanHendelseTaskLøypeTest {
         } returns InfotrygdSøkResponse(emptyList(), listOf(SakDto(status = "UB")))
 
         every {
-            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any())
+            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any())
         } returns false
 
         every {
@@ -240,7 +240,7 @@ class SkanHendelseTaskLøypeTest {
         } returns OppgaveResponse(1)
 
         every {
-            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any())
+            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any())
         } returns false
 
         every {
@@ -266,7 +266,7 @@ class SkanHendelseTaskLøypeTest {
         } returns OppgaveResponse(1)
 
         every {
-            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any(), any())
+            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any())
         } returns false
 
         every {
