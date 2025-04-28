@@ -23,7 +23,7 @@
         <kotlin.version>2.1.20</kotlin.version>
         <mockk.version>1.14.0</mockk.version>
         <confluent.version>7.9.0</confluent.version>
-        <prosessering.version>2.20250409144459_df36248</prosessering.version>
+        <prosessering.version>2.20250428110730_a741d1c</prosessering.version>
 
         <felles.version>3.20250422130733_4d831f9</felles.version>
         <kontrakter.version>3.0_20250424145650_af8cea0</kontrakter.version>
@@ -166,7 +166,7 @@
         <dependency>
             <groupId>no.nav.familie</groupId>
             <artifactId>baks-dokgen</artifactId>
-            <version>1.0_20250425112640_a6f94d4</version>
+            <version>1.0_20250428132100_722370f</version>
         </dependency>
         <!-- Kafka -->
         <dependency>
