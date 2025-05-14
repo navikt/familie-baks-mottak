@@ -2,7 +2,6 @@ package no.nav.familie.baks.mottak.journalføring
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
@@ -42,53 +41,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
         )
 
     @Test
-    fun `skal ikke automatisk journalføre journalpost om toggle er av`() {
-        // Arrange
-        val identifikator = "123"
-        val fagsakId = 1L
-
-        val journalpost =
-            Journalpost(
-                journalpostId = "1",
-                journalposttype = Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                bruker =
-                    Bruker(
-                        id = identifikator,
-                        type = BrukerIdType.FNR,
-                    ),
-                kanal = "NAV_NO",
-                dokumenter =
-                    listOf(
-                        DokumentInfo(
-                            brevkode = "NAV 33-00.07",
-                            tittel = "Søknad",
-                            dokumentstatus = Dokumentstatus.FERDIGSTILT,
-                            dokumentvarianter = emptyList(),
-                            dokumentInfoId = "id",
-                        ),
-                    ),
-            )
-
-        every {
-            mockedUnleashService.isEnabled(
-                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_BARNETRYGD_SØKNADER,
-                defaultValue = false,
-            )
-        } returns false
-
-        // Act
-        val skalAutomatiskJournalføres =
-            automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
-                journalpost,
-                false,
-            )
-
-        // Assert
-        assertThat(skalAutomatiskJournalføres).isFalse()
-    }
-
-    @Test
     fun `skal ikke automatisk journalføre journalpost om journalposten ikke er barnetrygd`() {
         // Arrange
         val journalpost =
@@ -107,13 +59,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
                         ),
                     ),
             )
-
-        every {
-            mockedUnleashService.isEnabled(
-                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_BARNETRYGD_SØKNADER,
-                defaultValue = false,
-            )
-        } returns true
 
         // Act
         val skalAutomatiskJournalføres =
@@ -146,13 +91,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
                     ),
             )
 
-        every {
-            mockedUnleashService.isEnabled(
-                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_BARNETRYGD_SØKNADER,
-                defaultValue = false,
-            )
-        } returns true
-
         // Act
         val skalAutomatiskJournalføres =
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
@@ -184,13 +122,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
                         ),
                     ),
             )
-
-        every {
-            mockedUnleashService.isEnabled(
-                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_BARNETRYGD_SØKNADER,
-                defaultValue = false,
-            )
-        } returns true
 
         // Act
         val skalAutomatiskJournalføres =
@@ -231,13 +162,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
                         ),
                     ),
             )
-
-        every {
-            mockedUnleashService.isEnabled(
-                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_BARNETRYGD_SØKNADER,
-                defaultValue = false,
-            )
-        } returns true
 
         every {
             mockedJournalpostBrukerService.tilPersonIdent(
@@ -303,13 +227,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
                         ),
                     ),
             )
-
-        every {
-            mockedUnleashService.isEnabled(
-                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_BARNETRYGD_SØKNADER,
-                defaultValue = false,
-            )
-        } returns true
 
         every {
             mockedJournalpostBrukerService.tilPersonIdent(
@@ -382,13 +299,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             )
 
         every {
-            mockedUnleashService.isEnabled(
-                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_BARNETRYGD_SØKNADER,
-                defaultValue = false,
-            )
-        } returns true
-
-        every {
             mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                 tema = Tema.BAR,
                 journalpost = journalpost,
@@ -436,13 +346,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             )
 
         every {
-            mockedUnleashService.isEnabled(
-                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_BARNETRYGD_SØKNADER,
-                defaultValue = false,
-            )
-        } returns true
-
-        every {
             mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
                 tema = Tema.BAR,
                 journalpost = journalpost,
@@ -488,13 +391,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
                         ),
                     ),
             )
-
-        every {
-            mockedUnleashService.isEnabled(
-                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_BARNETRYGD_SØKNADER,
-                defaultValue = false,
-            )
-        } returns true
 
         every {
             mockedJournalpostBrukerService.tilPersonIdent(
@@ -573,13 +469,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
                         ),
                     ),
             )
-
-        every {
-            mockedUnleashService.isEnabled(
-                toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_BARNETRYGD_SØKNADER,
-                defaultValue = false,
-            )
-        } returns true
 
         every {
             mockedJournalpostBrukerService.tilPersonIdent(

@@ -1,6 +1,5 @@
 package no.nav.familie.baks.mottak.journalføring
 
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
@@ -18,17 +17,12 @@ class AutomatiskJournalføringKontantstøtteService(
     private val adressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService,
     private val journalpostBrukerService: JournalpostBrukerService,
 ) {
-    private val toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER
     private val tema = Tema.KON
     private val enheterSomIkkeSkalHaAutomatiskJournalføring = listOf("4863")
 
     fun skalAutomatiskJournalføres(
         journalpost: Journalpost,
     ): Boolean {
-        if (!unleashService.isEnabled(toggleId = toggleId, defaultValue = false)) {
-            return false
-        }
-
         if (!journalpost.harKontantstøtteSøknad()) {
             return false
         }

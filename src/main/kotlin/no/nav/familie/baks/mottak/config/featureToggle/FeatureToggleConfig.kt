@@ -5,10 +5,6 @@ class FeatureToggleConfig {
         // Operasjonelle
         const val HOPP_OVER_INFOTRYGD_SJEKK = "familie-ba-sak.hopp-over-infotrygd-sjekk"
 
-        // Release
-        const val AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER = "familie-baks-mottak.automatisk-journalforing-av-ks-soknad"
-        const val AUTOMATISK_JOURNALFØRING_AV_BARNETRYGD_SØKNADER = "familie-baks-mottak.automatisk-journalforing-av-ba-soknad"
-
         // Ny pdf kvittering
         const val NY_FAMILIE_PDF_KVITTERING = "familie-ba-soknad.ny-pdf"
     }

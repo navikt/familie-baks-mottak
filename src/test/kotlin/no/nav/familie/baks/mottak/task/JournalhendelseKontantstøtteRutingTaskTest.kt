@@ -4,7 +4,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.domene.personopplysning.Person
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus
@@ -62,7 +61,6 @@ class JournalhendelseKontantstøtteRutingTaskTest {
         setupKsSakClientMocks()
         every { journalpostBrukerService.tilPersonIdent(any(), any()) } returns "TEST"
 
-        every { unleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER, false) } returns false
         every { journalpostClient.hentJournalpost("1") } returns
             Journalpost(
                 journalpostId = "1",
@@ -103,8 +101,6 @@ class JournalhendelseKontantstøtteRutingTaskTest {
         setupPDLMocks()
         setupKsSakClientMocks()
         every { journalpostBrukerService.tilPersonIdent(any(), any()) } returns "TEST"
-
-        every { unleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_KONTANTSTØTTE_SØKNADER, false) } returns false
 
         every { taskService.save(capture(taskSlot)) } returns mockk()
 
