@@ -1,6 +1,5 @@
 package no.nav.familie.baks.mottak.journalføring
 
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
@@ -18,7 +17,6 @@ class AutomatiskJournalføringBarnetrygdService(
     private val adressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService,
     private val journalpostBrukerService: JournalpostBrukerService,
 ) {
-    private val toggleId = FeatureToggleConfig.AUTOMATISK_JOURNALFØRING_AV_BARNETRYGD_SØKNADER
     private val tema = Tema.BAR
     private val enheterSomIkkeSkalHaAutomatiskJournalføring = listOf("4863", "2103")
 
@@ -26,10 +24,6 @@ class AutomatiskJournalføringBarnetrygdService(
         journalpost: Journalpost,
         brukerHarSakIInfotrygd: Boolean,
     ): Boolean {
-        if (!unleashService.isEnabled(toggleId = toggleId, defaultValue = false)) {
-            return false
-        }
-
         if (!journalpost.harBarnetrygdSøknad()) {
             return false
         }
