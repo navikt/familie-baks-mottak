@@ -1,5 +1,6 @@
 package no.nav.familie.baks.mottak.journalføring
 
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
@@ -18,12 +19,20 @@ class AutomatiskJournalføringBarnetrygdService(
     private val journalpostBrukerService: JournalpostBrukerService,
 ) {
     private val tema = Tema.BAR
-    private val enheterSomIkkeSkalHaAutomatiskJournalføring = listOf("4863", "2103")
 
     fun skalAutomatiskJournalføres(
         journalpost: Journalpost,
         brukerHarSakIInfotrygd: Boolean,
     ): Boolean {
+        val kode6Og19ToggleErPå = unleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false)
+
+        val enheterSomIkkeSkalHaAutomatiskJournalføring =
+            if (kode6Og19ToggleErPå) {
+                listOf("4863")
+            } else {
+                listOf("4863", "2103")
+            }
+
         if (!journalpost.harBarnetrygdSøknad()) {
             return false
         }
@@ -36,7 +45,9 @@ class AutomatiskJournalføringBarnetrygdService(
             return false
         }
 
-        if (adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(tema, journalpost)) {
+        if (!kode6Og19ToggleErPå &&
+            adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(tema, journalpost)
+        ) {
             return false
         }
 
