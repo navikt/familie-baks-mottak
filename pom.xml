@@ -20,13 +20,13 @@
         <changelist>-SNAPSHOT</changelist>
         <java.version>21</java.version>
         <jvmTarget>21</jvmTarget>
-        <kotlin.version>2.1.20</kotlin.version>
+        <kotlin.version>2.1.21</kotlin.version>
         <mockk.version>1.14.2</mockk.version>
-        <confluent.version>7.9.0</confluent.version>
-        <prosessering.version>2.20250505123518_aa76fed</prosessering.version>
+        <confluent.version>7.9.1</confluent.version>
+        <prosessering.version>2.20250512065737_a9c3191</prosessering.version>
 
         <felles.version>3.20250505101905_835431d</felles.version>
-        <kontrakter.version>3.0_20250506155949_2619dac</kontrakter.version>
+        <kontrakter.version>3.0_20250513140227_11db730</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
         <spring.cloud.version>4.2.1</spring.cloud.version>
