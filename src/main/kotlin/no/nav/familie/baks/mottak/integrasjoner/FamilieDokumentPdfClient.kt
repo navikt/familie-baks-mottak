@@ -1,12 +1,15 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
 import no.nav.familie.baks.dokgen.DokGen
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
 class FamilieDokumentPdfClient(
     private val familieDokumentClient: FamilieDokumentClient,
 ) : PdfClient {
+    private val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
     private val dokGen = DokGen()
 
     override fun lagPdf(
@@ -18,6 +21,8 @@ class FamilieDokumentPdfClient(
                 templateNavn,
                 inputData,
             )
+
+        secureLogger.info("html: $html")
         return familieDokumentClient.lagPdf(html)
     }
 }
