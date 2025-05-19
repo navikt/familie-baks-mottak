@@ -58,19 +58,11 @@ data class RestFagsakId(
 )
 
 data class RestUtvidetBehandling(
-    val aktiv: Boolean,
-    val arbeidsfordelingPåBehandling: RestArbeidsfordelingPåBehandling?,
     val behandlingId: Long,
-    val kategori: BehandlingKategori,
     val opprettetTidspunkt: LocalDateTime,
     val resultat: String,
     val steg: String?,
     val type: String,
-    val underkategori: BehandlingUnderkategori,
-)
-
-data class RestArbeidsfordelingPåBehandling(
-    val behandlendeEnhetId: String,
 )
 
 enum class BehandlingKategori {
