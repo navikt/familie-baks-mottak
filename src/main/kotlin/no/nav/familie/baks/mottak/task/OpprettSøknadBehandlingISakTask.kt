@@ -73,7 +73,7 @@ class OpprettSøknadBehandlingISakTask(
                     val behandlingType = utledBehandlingstype(fagsak)
                     val kategori = barnetrygdOppgaveMapper.utledBehandlingKategoriFraSøknad(journalpost)
                     val underkategori = barnetrygdOppgaveMapper.utledBehandlingUnderkategoriFraSøknad(journalpost)
-                    val brevkode = journalpost.dokumenter?.firstOrNull{ it.brevkode != null}?.brevkode
+                    val brevkode = journalpost.dokumenter?.firstOrNull { it.brevkode != null }?.brevkode
 
                     log.info("Oppretter ny $kategori $behandlingType behandling i ba-sak")
 

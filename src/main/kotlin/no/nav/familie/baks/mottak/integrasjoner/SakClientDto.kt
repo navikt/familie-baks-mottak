@@ -21,7 +21,7 @@ data class RestOpprettBehandlingBarnetrygdRequest(
     val søknadsinfo: Søknadsinfo,
 )
 
-data class Søknadsinfo (
+data class Søknadsinfo(
     val journalpostId: String,
     val brevkode: String? = null,
     val erDigital: Boolean,
