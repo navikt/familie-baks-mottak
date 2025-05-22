@@ -8,6 +8,7 @@ import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.KontantstøtteOppgaveMapper
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
+import no.nav.familie.baks.mottak.integrasjoner.Søknadsinfo
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.prosessering.AsyncTaskStep
@@ -72,6 +73,7 @@ class OpprettSøknadBehandlingISakTask(
                     val behandlingType = utledBehandlingstype(fagsak)
                     val kategori = barnetrygdOppgaveMapper.utledBehandlingKategoriFraSøknad(journalpost)
                     val underkategori = barnetrygdOppgaveMapper.utledBehandlingUnderkategoriFraSøknad(journalpost)
+                    val brevkode = journalpost.dokumenter?.firstOrNull { it.brevkode != null }?.brevkode
 
                     log.info("Oppretter ny $kategori $behandlingType behandling i ba-sak")
 
@@ -83,6 +85,7 @@ class OpprettSøknadBehandlingISakTask(
                         søknadMottattDato = journalpost.datoMottatt ?: LocalDateTime.now(),
                         behandlingType = behandlingType,
                         fagsakId = fagsakId.toLong(),
+                        søknadsinfo = Søknadsinfo(journalpostId = journalpost.journalpostId, brevkode = brevkode, erDigital = journalpost.erDigitalKanal()),
                     )
                 }
             }

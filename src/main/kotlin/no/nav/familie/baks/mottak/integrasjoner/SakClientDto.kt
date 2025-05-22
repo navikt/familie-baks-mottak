@@ -18,6 +18,13 @@ data class RestOpprettBehandlingBarnetrygdRequest(
     val søknadMottattDato: LocalDateTime,
     val behandlingType: BehandlingType,
     val fagsakId: Long,
+    val søknadsinfo: Søknadsinfo,
+)
+
+data class Søknadsinfo(
+    val journalpostId: String,
+    val brevkode: String? = null,
+    val erDigital: Boolean,
 )
 
 data class RestPersonIdent(

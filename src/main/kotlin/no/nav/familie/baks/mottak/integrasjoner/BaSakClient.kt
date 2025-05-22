@@ -138,6 +138,7 @@ class BaSakClient
             søknadMottattDato: LocalDateTime,
             behandlingType: BehandlingType,
             fagsakId: Long,
+            søknadsinfo: Søknadsinfo,
         ) {
             val uri = URI.create("$sakServiceUri/behandlinger")
             kotlin
@@ -152,6 +153,7 @@ class BaSakClient
                             søknadMottattDato = søknadMottattDato,
                             behandlingType = behandlingType,
                             fagsakId = fagsakId,
+                            søknadsinfo = søknadsinfo,
                         ),
                     )
                 }.onFailure {
