@@ -55,6 +55,8 @@ spec:
           cluster: prod-gcp
         - application: statuspoll
           namespace: navdig
+        - application: logging
+          namespace: nais-system
     outbound:
       rules:
         - application: familie-ba-sak
