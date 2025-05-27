@@ -55,8 +55,6 @@ spec:
           cluster: dev-gcp
         - application: statuspoll
           namespace: navdig
-        - application: logging
-          namespace: nais-system
     outbound:
       rules:
         - application: familie-ba-sak
@@ -67,6 +65,8 @@ spec:
           cluster: dev-gcp
         - application: familie-pdf
           cluster: dev-gcp
+        - application: logging
+          namespace: nais-system
       external:
         - host: kafka-schema-registry.nais-q.adeo.no
         - host: pdl-api.dev-fss-pub.nais.io
