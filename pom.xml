@@ -23,10 +23,10 @@
         <kotlin.version>2.1.21</kotlin.version>
         <mockk.version>1.14.2</mockk.version>
         <confluent.version>7.9.1</confluent.version>
-        <prosessering.version>2.20250519094842_e8bd711</prosessering.version>
+        <prosessering.version>2.20250526085951_e212049</prosessering.version>
 
         <felles.version>3.20250505101905_835431d</felles.version>
-        <kontrakter.version>3.0_20250520105353_6584047</kontrakter.version>
+        <kontrakter.version>3.0_20250530161722_14f12e3</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
         <spring.cloud.version>4.2.1</spring.cloud.version>
@@ -207,7 +207,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.5</version>
+            <version>42.7.6</version>
         </dependency>
         <dependency>
             <groupId>com.papertrailapp</groupId>
