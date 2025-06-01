@@ -45,9 +45,15 @@ class AutomatiskJournalføringBarnetrygdService(
             return false
         }
 
-        if (!kode6Og19ToggleErPå &&
-            adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(tema, journalpost)
-        ) {
+        val noenHarKode6Eller19 = adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(tema, journalpost)
+
+        if (kode6Og19ToggleErPå) {
+            val søkerHarKode6Eller19 = adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpostBruker(tema, journalpost)
+
+            if (!søkerHarKode6Eller19 && noenHarKode6Eller19) {
+                return false
+            }
+        } else if (noenHarKode6Eller19) {
             return false
         }
 

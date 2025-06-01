@@ -36,6 +36,16 @@ class AdressebeskyttelesesgraderingService(
             .any { it.gradering.erStrengtFortrolig() }
     }
 
+    fun finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpostBruker(
+        tema: Tema,
+        journalpost: Journalpost,
+    ): Boolean {
+        val journalpostBruker = journalpost.bruker ?: throw IllegalStateException("Bruker på journalpost ${journalpost.journalpostId} kan ikke være null")
+        val journalpostBrukerIdent = journalpostBrukerService.tilPersonIdent(journalpostBruker, tema)
+
+        return pdlClient.hentPerson(journalpostBrukerIdent, "hentperson-med-adressebeskyttelse", tema).adressebeskyttelse.any { it.gradering.erStrengtFortrolig() }
+    }
+
     private fun finnIdenterForKontantstøtte(
         tema: Tema,
         bruker: Bruker,
