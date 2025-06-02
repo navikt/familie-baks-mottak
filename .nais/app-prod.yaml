@@ -65,6 +65,8 @@ spec:
           cluster: prod-gcp
         - application: familie-pdf
           cluster: prod-gcp
+        - application: logging
+          namespace: nais-system
       external:
         - host: kafka-schema-registry.nais.adeo.no
         - host: pdl-api.prod-fss-pub.nais.io
@@ -104,3 +106,7 @@ spec:
     autoInstrumentation:
       enabled: true
       runtime: java
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
