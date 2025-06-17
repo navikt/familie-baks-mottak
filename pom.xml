@@ -25,7 +25,7 @@
         <confluent.version>8.0.0</confluent.version>
         <prosessering.version>2.20250526085951_e212049</prosessering.version>
 
-        <felles.version>3.20250602160953_48db326</felles.version>
+        <felles.version>3.20250616113100_41d23f2</felles.version>
         <kontrakter.version>3.0_20250602111633_e3dbc75</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
@@ -166,7 +166,7 @@
         <dependency>
             <groupId>no.nav.familie</groupId>
             <artifactId>baks-dokgen</artifactId>
-            <version>1.0_20250605172501_f74cd12</version>
+            <version>1.0_20250616112103_e374c98</version>
         </dependency>
         <!-- Kafka -->
         <dependency>
