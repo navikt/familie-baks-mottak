@@ -58,6 +58,8 @@ class LeesahService(
             OPPLYSNINGSTYPE_FØDSELSDATO -> behandleFødselsdatoHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_UTFLYTTING -> behandleUtflyttingHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_SIVILSTAND -> behandleSivilstandHendelse(pdlHendelse)
+            OPPLYSNINGSTYPE_ADRESSEBESKYTTELSE_V1 -> SECURE_LOGGER.info("Mottatt adressebeskyttelsehendelse $pdlHendelse")
+            OPPLYSNINGSTYPE_BOSTEDSADRESSE -> SECURE_LOGGER.info("Mottatt bostedsadressehendelse $pdlHendelse")
         }
     }
 
@@ -302,5 +304,7 @@ class LeesahService(
         const val OPPLYSNINGSTYPE_FØDSELSDATO = "FOEDSELSDATO_V1"
         const val OPPLYSNINGSTYPE_UTFLYTTING = "UTFLYTTING_FRA_NORGE"
         const val OPPLYSNINGSTYPE_SIVILSTAND = "SIVILSTAND_V1"
+        const val OPPLYSNINGSTYPE_BOSTEDSADRESSE = "BOSTEDSADRESSE_V1"
+        const val OPPLYSNINGSTYPE_ADRESSEBESKYTTELSE_V1 = "ADRESSEBESKYTTELSE_V1"
     }
 }

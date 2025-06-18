@@ -43,6 +43,7 @@ class LeesahConsumer(
         cr: ConsumerRecord<String, Personhendelse>,
         ack: Acknowledgment,
     ) {
+        SECURE_LOGGER.info("Leser leesah-hendelse med offset: $cr")
         val pdlHendelse =
             PdlHendelse(
                 cr.value().hentHendelseId(),
