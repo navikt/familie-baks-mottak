@@ -24,8 +24,8 @@ class FinnmarkstilleggTask(
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
         val ident = task.payload
-        val adresser = pdlClient.hentBostedsadresser(ident, Tema.BAR)
-        if (adresser.isNullOrEmpty()) {
+        val adresser = pdlClient.hentPerson(ident, "hentperson-med-bostedsadresse", Tema.BAR).bostedsadresse.filterNotNull()
+        if (adresser.isEmpty()) {
             secureLogger.info("Fant ingen bostedsadresser for ident $ident")
             return
         }
