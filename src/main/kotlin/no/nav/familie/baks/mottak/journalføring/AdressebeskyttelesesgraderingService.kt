@@ -25,6 +25,7 @@ class AdressebeskyttelesesgraderingService(
                 Tema.KON -> finnIdenterForKontantstøtte(tema, journalpostBruker, journalpost.journalpostId, journalpost.harDigitalSøknad(tema))
                 Tema.ENF,
                 Tema.OPP,
+                Tema.TSO,
                 -> {
                     throw IllegalStateException("Støtter ikke tema $tema")
                 }
