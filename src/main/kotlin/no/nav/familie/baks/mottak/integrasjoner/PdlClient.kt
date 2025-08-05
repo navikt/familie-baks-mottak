@@ -188,6 +188,45 @@ class PdlClient(
         return response.data.person!!
     }
 
+    fun hentBostedsadresser(
+        personIdent: String,
+        tema: Tema,
+    ): List<Bostedsadresse>? {
+        val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery("hentperson-med-bostedsadresse"))
+
+        val response =
+            try {
+                postForEntity<PdlHentPersonResponse>(
+                    pdlUri,
+                    pdlPersonRequest,
+                    httpHeaders(tema),
+                )
+            } catch (e: Exception) {
+                when (e) {
+                    is IntegrasjonException -> throw e
+                    else -> throw IntegrasjonException(
+                        msg = "Feil ved oppslag på hentPerson mot PDL. Gav feil: ${e.message}",
+                        uri = pdlUri,
+                        ident = personIdent,
+                    )
+                }
+            }
+
+        if (response.harFeil()) {
+            throw IntegrasjonException(
+                msg = "Feil ved oppslag på hentPerson mot PDL: ${response.errorMessages()}",
+                uri = pdlUri,
+                ident = personIdent,
+            )
+        } else if (response.harAdvarsel()) {
+            log.warn("Advarsel ved oppslag på hentPerson mot PDL. Se securelogs for detaljer.")
+            secureLogger.warn("Advarsel ved oppslag på hentPerson mot PDL: ${response.extensions?.warnings}")
+        }
+        return response.data.person
+            ?.bostedsadresse
+            ?.filterNotNull()
+    }
+
     private fun mapTilPdlPersonRequest(
         personIdent: String,
         personInfoQuery: String,
