@@ -34,8 +34,10 @@ class FinnmarkstilleggTask(
         val sisteBostedsadresse = sorterteAdresser.firstOrNull()
         val nestSisteBostedsadresse = sorterteAdresser.drop(1).firstOrNull()
         val harFlyttetInnEllerUtAvFinnmarkEllerNordTroms =
-            sisteBostedsadresse.erIFinnmarkEllerNordTroms() && (nestSisteBostedsadresse == null || !nestSisteBostedsadresse.erIFinnmarkEllerNordTroms()) ||
-                !sisteBostedsadresse.erIFinnmarkEllerNordTroms() && nestSisteBostedsadresse.erIFinnmarkEllerNordTroms()
+            sisteBostedsadresse.erIFinnmarkEllerNordTroms() &&
+                (nestSisteBostedsadresse == null || !nestSisteBostedsadresse.erIFinnmarkEllerNordTroms()) ||
+                !sisteBostedsadresse.erIFinnmarkEllerNordTroms() &&
+                nestSisteBostedsadresse.erIFinnmarkEllerNordTroms()
 
         task.metadata["harFlyttet"] = if (harFlyttetInnEllerUtAvFinnmarkEllerNordTroms) "Ja" else "Nei"
         taskService.save(task)
