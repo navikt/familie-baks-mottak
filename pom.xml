@@ -23,10 +23,10 @@
         <kotlin.version>2.2.0</kotlin.version>
         <mockk.version>1.14.5</mockk.version>
         <confluent.version>8.0.0</confluent.version>
-        <prosessering.version>2.20250630085333_3794bb5</prosessering.version>
+        <prosessering.version>2.20250804113739_6d49ef6</prosessering.version>
 
-        <felles.version>3.20250616113100_41d23f2</felles.version>
-        <kontrakter.version>3.0_20250626112510_ca46bd8</kontrakter.version>
+        <felles.version>3.20250804101327_a0f5fad</felles.version>
+        <kontrakter.version>3.0_20250805142725_8942276</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
         <spring.cloud.version>4.3.0</spring.cloud.version>
@@ -448,7 +448,7 @@
                     <dependency>
                         <groupId>com.pinterest.ktlint</groupId>
                         <artifactId>ktlint-cli</artifactId>
-                        <version>1.6.0</version>
+                        <version>1.7.1</version>
                     </dependency>
                     <!-- additional 3rd party ruleset(s) can be specified here -->
                 </dependencies>
