@@ -7,7 +7,6 @@ import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service
 )
 class FinnmarkstilleggTask(
     private val pdlClient: PdlClient,
-    private val taskService: TaskService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
         val ident = task.payload
@@ -40,7 +38,6 @@ class FinnmarkstilleggTask(
                 nestSisteBostedsadresse.erIFinnmarkEllerNordTroms()
 
         task.metadata["harFlyttet"] = if (harFlyttetInnEllerUtAvFinnmarkEllerNordTroms) "Ja" else "Nei"
-        taskService.save(task)
     }
 
     companion object {
