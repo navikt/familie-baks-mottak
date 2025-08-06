@@ -17,7 +17,6 @@ import no.nav.familie.baks.mottak.integrasjoner.PdlForeldreBarnRelasjon
 import no.nav.familie.baks.mottak.integrasjoner.PdlHentPersonResponse
 import no.nav.familie.baks.mottak.integrasjoner.PdlPerson
 import no.nav.familie.baks.mottak.integrasjoner.PdlPersonData
-import no.nav.familie.baks.mottak.util.DbContainerInitializer
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
@@ -38,7 +37,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.data.domain.Pageable
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -47,8 +45,7 @@ import java.util.UUID
     classes = [DevLauncherPostgres::class],
     properties = ["PDL_URL=http://localhost:28085/api", "FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api"],
 )
-@ContextConfiguration(initializers = [DbContainerInitializer::class])
-@ActiveProfiles("postgres", "mock-oauth", "mock-sts")
+@ActiveProfiles("postgres", "mock-oauth", "mock-sts", "testcontainers")
 @AutoConfigureWireMock(port = 28085)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MottaFødselshendelseTaskTest {
