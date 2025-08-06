@@ -8,6 +8,7 @@ import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
 import no.nav.familie.baks.mottak.domene.hendelser.PdlHendelse
 import no.nav.familie.baks.mottak.hendelser.LeesahConsumer.Companion.SECURE_LOGGER
 import no.nav.familie.baks.mottak.integrasjoner.RestAnnullerFødsel
+import no.nav.familie.baks.mottak.task.FinnmarkstilleggTask
 import no.nav.familie.baks.mottak.task.MottaAnnullerFødselTask
 import no.nav.familie.baks.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseTask
@@ -58,6 +59,7 @@ class LeesahService(
             OPPLYSNINGSTYPE_FØDSELSDATO -> behandleFødselsdatoHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_UTFLYTTING -> behandleUtflyttingHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_SIVILSTAND -> behandleSivilstandHendelse(pdlHendelse)
+            OPPLYSNINGSTYPE_BOSTEDSADRESSE -> behandleBostedsadresseHendelse(pdlHendelse)
         }
     }
 
@@ -211,12 +213,46 @@ class LeesahService(
         oppdaterHendelseslogg(pdlHendelse)
     }
 
+    private fun behandleBostedsadresseHendelse(pdlHendelse: PdlHendelse) {
+        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
+            leesahDuplikatCounter.increment()
+            return
+        }
+
+        when (pdlHendelse.endringstype) {
+            OPPRETTET -> {
+                SECURE_LOGGER.info("Mottatt behandleBostedsadresseHendelse $pdlHendelse")
+                opprettTaskForBostedsadresseHendelse(pdlHendelse)
+            }
+
+            else -> {
+                log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}: ${pdlHendelse.endringstype}")
+            }
+        }
+        oppdaterHendelseslogg(pdlHendelse)
+    }
+
     private fun opprettTaskHvisSivilstandErGift(pdlHendelse: PdlHendelse) {
         if (pdlHendelse.sivilstand == GIFT.name) {
             opprettVurderBarnetrygdLivshendelseTaskForHendelse(SIVILSTAND, pdlHendelse)
         } else {
             sivilstandIgnorertCounter.increment()
         }
+    }
+
+    private fun opprettTaskForBostedsadresseHendelse(pdlHendelse: PdlHendelse) {
+        Task(
+            type = FinnmarkstilleggTask.TASK_STEP_TYPE,
+            payload = pdlHendelse.hentPersonident(),
+            properties =
+                Properties().apply {
+                    this["ident"] = pdlHendelse.hentPersonident()
+                    this["callId"] = pdlHendelse.hendelseId
+                },
+        ).medTriggerTid(LocalDateTime.now().run { if (environment.activeProfiles.contains("prod")) this.plusHours(1) else this })
+            .also {
+                taskService.save(it)
+            }
     }
 
     private fun oppdaterHendelseslogg(pdlHendelse: PdlHendelse) {
@@ -302,5 +338,6 @@ class LeesahService(
         const val OPPLYSNINGSTYPE_FØDSELSDATO = "FOEDSELSDATO_V1"
         const val OPPLYSNINGSTYPE_UTFLYTTING = "UTFLYTTING_FRA_NORGE"
         const val OPPLYSNINGSTYPE_SIVILSTAND = "SIVILSTAND_V1"
+        const val OPPLYSNINGSTYPE_BOSTEDSADRESSE = "BOSTEDSADRESSE_V1"
     }
 }
