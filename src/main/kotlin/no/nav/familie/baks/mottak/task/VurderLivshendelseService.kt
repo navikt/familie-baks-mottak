@@ -33,7 +33,6 @@ import no.nav.familie.prosessering.error.RekjørSenereException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.lang.RuntimeException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
@@ -169,7 +168,7 @@ class VurderLivshendelseService(
         when (tema) {
             Tema.BAR -> oppgaveBarnetrygdOpprettetUtflyttingCounter.increment()
             Tema.KON -> oppgaveKontantstøtteOpprettetUtflyttingCounter.increment()
-            Tema.ENF, Tema.OPP -> throw RuntimeException("Tema $tema er ikke støttet ")
+            Tema.ENF, Tema.OPP, Tema.TSO -> throw RuntimeException("Tema $tema er ikke støttet ")
         }
     }
 
@@ -177,7 +176,7 @@ class VurderLivshendelseService(
         when (tema) {
             Tema.BAR -> oppgaveBarnetrygdOpprettetDødsfallCounter.increment()
             Tema.KON -> oppgaveKontantstøtteOpprettetDødsfallCounter.increment()
-            Tema.ENF, Tema.OPP -> throw RuntimeException("Tema $tema er ikke støttet ")
+            Tema.ENF, Tema.OPP, Tema.TSO -> throw RuntimeException("Tema $tema er ikke støttet ")
         }
     }
 
@@ -260,7 +259,7 @@ class VurderLivshendelseService(
         Tema.BAR -> tilBarnetrygdBehandlingstema(restBehandling)
         // behandlingstema brukes ikke i kombinasjon med behandlingstype for kontantstøtte
         Tema.KON -> null
-        Tema.ENF, Tema.OPP -> throw RuntimeException("Tema $tema er ikke støttet")
+        Tema.ENF, Tema.OPP, Tema.TSO -> throw RuntimeException("Tema $tema er ikke støttet")
     }
 
     private fun hentBehandlingstype(
@@ -271,7 +270,7 @@ class VurderLivshendelseService(
         // Setter behandlingstype i stedet fore behandlingstema i KS. Siden behandlingstema for KS EØS
         // ikke finnes i oppgave, og det er slik man gjør det i KS
         Tema.KON -> tilKontanstøtteBehandlingstype(restBehandling)
-        Tema.ENF, Tema.OPP -> throw RuntimeException("Tema $tema er ikke støttet")
+        Tema.ENF, Tema.OPP, Tema.TSO -> throw RuntimeException("Tema $tema er ikke støttet")
     }
 
     private fun søkEtterÅpenOppgavePåAktør(
@@ -328,7 +327,7 @@ class VurderLivshendelseService(
         when (tema) {
             Tema.BAR -> baSakClient.hentMinimalRestFagsak(fagsakId)
             Tema.KON -> ksSakClient.hentMinimalRestFagsak(fagsakId)
-            Tema.ENF, Tema.OPP -> throw RuntimeException("Tema $tema er ikke støttet")
+            Tema.ENF, Tema.OPP, Tema.TSO -> throw RuntimeException("Tema $tema er ikke støttet")
         }.also {
             secureLog.info("Hentet rest fagsak: $it, tema: $tema")
         }
@@ -382,7 +381,7 @@ class VurderLivshendelseService(
             when (tema) {
                 Tema.BAR -> baSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(personIdent)
                 Tema.KON -> ksSakClient.hentFagsakerHvorPersonErSøkerEllerMottarKontantstøtte(personIdent)
-                Tema.ENF, Tema.OPP -> throw RuntimeException("Tema $tema er ikke støttet")
+                Tema.ENF, Tema.OPP, Tema.TSO -> throw RuntimeException("Tema $tema er ikke støttet")
             }
 
         secureLog.info("Aktører og fagsaker berørt av hendelse for personIdent=$personIdent: ${listeMedFagsakIdOgTilknyttetAktør.map { "(aktørId=${it.aktørId}, fagsakId=${it.fagsakId})," }}, tema: $tema")
