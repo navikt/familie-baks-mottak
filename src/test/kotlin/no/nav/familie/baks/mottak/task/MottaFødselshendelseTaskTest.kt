@@ -6,7 +6,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import io.mockk.clearAllMocks
-import no.nav.familie.baks.mottak.DevLauncherPostgres
+import no.nav.familie.baks.mottak.AbstractWiremockTest
 import no.nav.familie.baks.mottak.domene.NyBehandling
 import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelse
 import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelsesgradering
@@ -33,22 +33,15 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.data.domain.Pageable
 import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
-@SpringBootTest(
-    classes = [DevLauncherPostgres::class],
-    properties = ["PDL_URL=http://localhost:28085/api", "FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api"],
-)
 @ActiveProfiles("postgres", "mock-oauth", "mock-sts", "testcontainers")
-@AutoConfigureWireMock(port = 28085)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MottaFødselshendelseTaskTest {
+class MottaFødselshendelseTaskTest : AbstractWiremockTest() {
     @Autowired
     lateinit var taskService: TaskService
 
