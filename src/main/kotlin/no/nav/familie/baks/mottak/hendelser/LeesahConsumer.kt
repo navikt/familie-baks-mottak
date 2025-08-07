@@ -62,6 +62,7 @@ class LeesahConsumer(
 
         try {
             MDC.put(MDCConstants.MDC_CALL_ID, pdlHendelse.hendelseId)
+            SECURE_LOGGER.info("LeeasahConsumer har mottatt leesah-hendelse $cr") // TODO: Fjern denne når vi er ferdig med Finnmarkstillegg
             leesahService.prosesserNyHendelse(pdlHendelse)
         } catch (e: RuntimeException) {
             leesahFeiletCounter.increment()
