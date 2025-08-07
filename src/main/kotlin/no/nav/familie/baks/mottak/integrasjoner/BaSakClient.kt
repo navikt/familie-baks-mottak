@@ -49,6 +49,19 @@ class BaSakClient
             }
         }
 
+        fun sendFinnmarkstilleggTilBaSak(personIdent: String) {
+            val uri = URI.create("$sakServiceUri/finnmarkstillegg/vurder-finnmarkstillegg")
+            try {
+                val response = postForEntity<Ressurs<String>>(uri, PersonIdent(ident = personIdent))
+                logger.info("Ident for Finnmarkstillegg sendt til sak. Status=${response.status}")
+            } catch (e: RestClientResponseException) {
+                logger.warn("Send finnmarkstillegg til sak feilet. Responskode: ${e.statusCode}, body: ${e.responseBodyAsString}")
+                throw IllegalStateException("Send finnmarkstillegg sak feilet. Status: ${e.statusCode}, body: ${e.responseBodyAsString}", e)
+            } catch (e: RestClientException) {
+                throw IllegalStateException("Send finnmarkstillegg sak feilet.", e)
+            }
+        }
+
         fun hentFagsaknummerPåPersonident(personIdent: String): Long {
             val uri = URI.create("$sakServiceUri/fagsaker")
             return runCatching {
