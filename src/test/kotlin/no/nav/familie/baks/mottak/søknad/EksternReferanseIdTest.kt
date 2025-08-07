@@ -4,7 +4,6 @@ import no.nav.familie.baks.mottak.DevLauncherPostgres
 import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
 import no.nav.familie.baks.mottak.task.JournalførSøknadTask
-import no.nav.familie.baks.mottak.util.DbContainerInitializer
 import no.nav.familie.prosessering.domene.Task
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -13,13 +12,11 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.util.Properties
 
 @ExtendWith(SpringExtension::class)
-@ContextConfiguration(initializers = [DbContainerInitializer::class])
-@ActiveProfiles("postgres", "mock-dokarkiv-conflict", "mock-dokgen", "mock-familie-pdf")
+@ActiveProfiles("postgres", "mock-dokarkiv-conflict", "mock-dokgen", "mock-familie-pdf", "testcontainers")
 @Tag("integration")
 @SpringBootTest(classes = [DevLauncherPostgres::class])
 class EksternReferanseIdTest(

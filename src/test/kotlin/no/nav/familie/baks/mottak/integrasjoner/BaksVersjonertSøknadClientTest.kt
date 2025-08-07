@@ -4,7 +4,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
-import no.nav.familie.baks.mottak.DevLauncher
+import no.nav.familie.baks.mottak.AbstractWiremockTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -12,8 +12,6 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.core.io.ClassPathResource
 import org.springframework.test.context.ActiveProfiles
 import java.io.IOException
@@ -22,11 +20,9 @@ import java.nio.file.Files
 import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad as VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ks.søknad.v5.KontantstøtteSøknad as VersjonertKontantstøtteSøknadV5
 
-@SpringBootTest(classes = [DevLauncher::class], properties = ["FAMILIE_INTEGRASJONER_API_URL=http://localhost:28085/api"])
 @ActiveProfiles("dev", "mock-oauth")
-@AutoConfigureWireMock(port = 28085)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class BaksVersjonertSøknadClientTest {
+class BaksVersjonertSøknadClientTest : AbstractWiremockTest() {
     @Autowired
     lateinit var baksVersjonertSøknadClient: BaksVersjonertSøknadClient
 
