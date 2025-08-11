@@ -7,7 +7,10 @@ import io.mockk.verify
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.kontrakter.ba.finnmarkstillegg.KommunerIFinnmarkOgNordTroms
+import no.nav.familie.kontrakter.ba.finnmarkstillegg.KommunerIFinnmarkOgNordTroms.ALTA
+import no.nav.familie.kontrakter.ba.finnmarkstillegg.KommunerIFinnmarkOgNordTroms.BERLEVÅG
 import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import no.nav.familie.prosessering.domene.Task
 import org.junit.jupiter.params.ParameterizedTest
@@ -19,103 +22,150 @@ class FinnmarkstilleggTaskTest {
     private val mockBaSakClient: BaSakClient = mockk()
     private val mockPdlClient: PdlClient = mockk()
     private val finnmarkstilleggTask = FinnmarkstilleggTask(mockPdlClient, mockBaSakClient)
+    private val personIdent = "123"
+    private val osloKommunenummer = "0301"
 
     @Test
-    fun `ikke send melding om Finnmarkstillegg hvis person ikke har noen løpende saker`() {
-        every { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd("123") } returns emptyList()
+    fun `ikke send melding om Finnmarkstillegg hvis bostedskommune fra hendelse er null`() {
+        // Arrange
+        val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, null, LocalDate.now())
+        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
 
-        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, "123")
+        // Act
         finnmarkstilleggTask.doTask(task)
 
-        verify(exactly = 1) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(any()) }
+        // Assert
+        verify(exactly = 0) { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR) }
+        verify(exactly = 0) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(any()) }
         verify(exactly = 0) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
-        verify(exactly = 0) { mockPdlClient.hentPerson("123", "hentperson-med-bostedsadresse", Tema.BAR) }
+    }
+
+    @Test
+    fun `ikke send melding om Finnmarkstillegg hvis bostedskommuneFomDato fra hendelse er null`() {
+        // Arrange
+        val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, ALTA.kommunenummer, null)
+        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
+
+        // Act
+        finnmarkstilleggTask.doTask(task)
+
+        // Assert
+        verify(exactly = 0) { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR) }
+        verify(exactly = 0) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(any()) }
+        verify(exactly = 0) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
     }
 
     @Test
     fun `ìkke send melding om Finnmarkstillegg hvis person ikke har bostedsadresse`() {
-        every { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd("123") } returns listOf(mockk())
-        every { mockPdlClient.hentPerson("123", "hentperson-med-bostedsadresse", Tema.BAR).bostedsadresse } returns emptyList()
+        // Arrange
+        every { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR).bostedsadresse } returns emptyList()
 
-        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, "123")
+        val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, ALTA.kommunenummer, LocalDate.now())
+        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
+
+        // Act
         finnmarkstilleggTask.doTask(task)
 
-        verify(exactly = 1) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(any()) }
-        verify(exactly = 1) { mockPdlClient.hentPerson("123", "hentperson-med-bostedsadresse", Tema.BAR) }
+        // Assert
+        verify(exactly = 1) { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR) }
+        verify(exactly = 0) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(any()) }
+        verify(exactly = 0) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
+    }
+
+    @Test
+    fun `ikke send melding til ba-sak hvis person flytter fra en kommune som skal ha Finnmarkstillegg til en annen kommune som har Finnmarkstillegg`() {
+        // Arrange
+        every { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR).bostedsadresse } returns
+            listOf(Bostedsadresse(gyldigFraOgMed = LocalDate.parse("2022-01-01"), vegadresse = mockk { every { kommunenummer } returns ALTA.kommunenummer }))
+
+        val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, BERLEVÅG.kommunenummer, LocalDate.now())
+        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
+
+        // Act
+        finnmarkstilleggTask.doTask(task)
+
+        // Assert
+        verify(exactly = 1) { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR) }
+        verify(exactly = 0) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(any()) }
+        verify(exactly = 0) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
+    }
+
+    @Test
+    fun `ikke send melding til ba-sak hvis person flytter fra en av kommune som ikke skal ha Finnmarkstillegg til en annen kommune som ikke har Finnmarkstillegg`() {
+        // Arrange
+        every { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR).bostedsadresse } returns
+            listOf(Bostedsadresse(gyldigFraOgMed = LocalDate.parse("2022-01-01"), vegadresse = mockk { every { kommunenummer } returns osloKommunenummer }))
+
+        val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, osloKommunenummer, LocalDate.now())
+        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
+
+        // Act
+        finnmarkstilleggTask.doTask(task)
+
+        // Assert
+        verify(exactly = 1) { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR) }
+        verify(exactly = 0) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(any()) }
+        verify(exactly = 0) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
+    }
+
+    @Test
+    fun `ikke send melding om Finnmarkstillegg hvis person ikke har noen løpende saker`() {
+        // Arrange
+        every { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR).bostedsadresse } returns
+            listOf(Bostedsadresse(gyldigFraOgMed = LocalDate.parse("2022-01-01"), vegadresse = mockk { every { kommunenummer } returns osloKommunenummer }))
+        every { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(personIdent) } returns emptyList()
+
+        val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, ALTA.kommunenummer, LocalDate.now())
+        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
+
+        // Act
+        finnmarkstilleggTask.doTask(task)
+
+        // Assert
+        verify(exactly = 1) { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR) }
+        verify(exactly = 1) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(personIdent) }
         verify(exactly = 0) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
     }
 
     @ParameterizedTest
     @EnumSource(KommunerIFinnmarkOgNordTroms::class)
     fun `send melding til ba-sak hvis person flytter fra en kommune som ikke har Finnmarkstillleg til en av kommune som skal ha Finnmarkstillegg`(input: KommunerIFinnmarkOgNordTroms) {
-        every { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd("123") } returns listOf(mockk())
-        every { mockPdlClient.hentPerson("123", "hentperson-med-bostedsadresse", Tema.BAR).bostedsadresse } returns
-            listOf(
-                Bostedsadresse(gyldigFraOgMed = LocalDate.parse("2023-01-01"), vegadresse = mockk { every { kommunenummer } returns input.kommunenummer }),
-                Bostedsadresse(gyldigFraOgMed = LocalDate.parse("2022-01-01"), vegadresse = mockk { every { kommunenummer } returns "0301" }),
-            )
-        justRun { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
+        // Arrange
+        every { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR).bostedsadresse } returns
+            listOf(Bostedsadresse(gyldigFraOgMed = LocalDate.parse("2022-01-01"), vegadresse = mockk { every { kommunenummer } returns osloKommunenummer }))
+        every { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(personIdent) } returns listOf(mockk())
+        justRun { mockBaSakClient.sendFinnmarkstilleggTilBaSak(personIdent) }
 
-        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, "123")
+        val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, input.kommunenummer, LocalDate.now())
+        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
+
+        // Act
         finnmarkstilleggTask.doTask(task)
 
-        verify(exactly = 1) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(any()) }
-        verify(exactly = 1) { mockPdlClient.hentPerson("123", "hentperson-med-bostedsadresse", Tema.BAR) }
-        verify(exactly = 1) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
+        // Assert
+        verify(exactly = 1) { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR) }
+        verify(exactly = 1) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(personIdent) }
+        verify(exactly = 1) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(personIdent) }
     }
 
     @ParameterizedTest
     @EnumSource(KommunerIFinnmarkOgNordTroms::class)
     fun `send melding til ba-sak hvis person flytter fra en av kommune som skal ha Finnmarkstillegg til en kommune som ikke har Finnmarkstillegg`(input: KommunerIFinnmarkOgNordTroms) {
-        every { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd("123") } returns listOf(mockk())
-        every { mockPdlClient.hentPerson("123", "hentperson-med-bostedsadresse", Tema.BAR).bostedsadresse } returns
-            listOf(
-                Bostedsadresse(gyldigFraOgMed = LocalDate.parse("2023-01-01"), vegadresse = mockk { every { kommunenummer } returns "0301" }),
-                Bostedsadresse(gyldigFraOgMed = LocalDate.parse("2022-01-01"), vegadresse = mockk { every { kommunenummer } returns input.kommunenummer }),
-            )
-        justRun { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
+        // Arrange
+        every { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR).bostedsadresse } returns
+            listOf(Bostedsadresse(gyldigFraOgMed = LocalDate.parse("2022-01-01"), vegadresse = mockk { every { kommunenummer } returns input.kommunenummer }))
+        every { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(personIdent) } returns listOf(mockk())
+        justRun { mockBaSakClient.sendFinnmarkstilleggTilBaSak(personIdent) }
 
-        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, "123")
+        val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, osloKommunenummer, LocalDate.now())
+        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
+
+        // Act
         finnmarkstilleggTask.doTask(task)
 
-        verify(exactly = 1) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(any()) }
-        verify(exactly = 1) { mockPdlClient.hentPerson("123", "hentperson-med-bostedsadresse", Tema.BAR) }
-        verify(exactly = 1) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
-    }
-
-    @Test
-    fun `ikke send melding til ba-sak hvis person flytter fra en av kommune som skal ha Finnmarkstillegg til en anne kommune som har Finnmarkstillegg`() {
-        every { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd("123") } returns listOf(mockk())
-        every { mockPdlClient.hentPerson("123", "hentperson-med-bostedsadresse", Tema.BAR).bostedsadresse } returns
-            listOf(
-                Bostedsadresse(gyldigFraOgMed = LocalDate.parse("2023-01-01"), vegadresse = mockk { every { kommunenummer } returns KommunerIFinnmarkOgNordTroms.BERLEVÅG.kommunenummer }),
-                Bostedsadresse(gyldigFraOgMed = LocalDate.parse("2022-01-01"), vegadresse = mockk { every { kommunenummer } returns KommunerIFinnmarkOgNordTroms.ALTA.kommunenummer }),
-            )
-        justRun { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
-
-        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, "123")
-        finnmarkstilleggTask.doTask(task)
-
-        verify(exactly = 1) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(any()) }
-        verify(exactly = 1) { mockPdlClient.hentPerson("123", "hentperson-med-bostedsadresse", Tema.BAR) }
-        verify(exactly = 0) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
-    }
-
-    @Test
-    fun `ikke send melding til ba-sak hvis person flytter fra en av kommune som ikke skal ha Finnmarkstillegg til en anne kommune som ikke har Finnmarkstillegg`() {
-        every { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd("123") } returns listOf(mockk())
-        every { mockPdlClient.hentPerson("123", "hentperson-med-bostedsadresse", Tema.BAR).bostedsadresse } returns
-            listOf(
-                Bostedsadresse(gyldigFraOgMed = LocalDate.parse("2023-01-01"), vegadresse = mockk { every { kommunenummer } returns "0301" }),
-                Bostedsadresse(gyldigFraOgMed = LocalDate.parse("2022-01-01"), vegadresse = mockk { every { kommunenummer } returns "0301" }),
-            )
-        justRun { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
-
-        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, "123")
-        finnmarkstilleggTask.doTask(task)
-
-        verify(exactly = 1) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(any()) }
-        verify(exactly = 1) { mockPdlClient.hentPerson("123", "hentperson-med-bostedsadresse", Tema.BAR) }
-        verify(exactly = 0) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
+        // Assert
+        verify(exactly = 1) { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR) }
+        verify(exactly = 1) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(personIdent) }
+        verify(exactly = 1) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(personIdent) }
     }
 }

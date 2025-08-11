@@ -4,12 +4,14 @@ import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.kontrakter.ba.finnmarkstillegg.kommuneErIFinnmarkEllerNordTroms
 import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 @TaskStepBeskrivelse(
@@ -23,12 +25,15 @@ class FinnmarkstilleggTask(
     private val baSakClient: BaSakClient,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
-        val ident = task.payload
+        val payload = objectMapper.readValue(task.payload, VurderFinnmarkstillleggTaskDTO::class.java)
 
-        val harIkkeLøpendeBarnetrygd = baSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(ident).isEmpty()
-        if (harIkkeLøpendeBarnetrygd) {
-            secureLogger.info("Fant ingen løpende barnetrygd for ident $ident, hopper ut av FinnmarkstilleggTask")
-            task.metadata["resultat"] = "INGEN_LØPENDE_BARNETRYGD"
+        val ident = payload.ident
+        val bostedskommune = payload.bostedskommune
+        val bostedskommuneFomDato = payload.bostedskommuneFomDato
+
+        if (bostedskommune == null || bostedskommuneFomDato == null) {
+            secureLogger.info("Bostedskommune eller fom-dato er ikke satt for ident $ident, hopper ut av FinnmarkstilleggTask")
+            task.metadata["resultat"] = "BOSTEDSKOMMUNE_ELLER_FOM_DATO_IKKE_SATT"
             return
         }
 
@@ -40,26 +45,34 @@ class FinnmarkstilleggTask(
         }
 
         val sorterteAdresser = adresser.sortedByDescending { it.gyldigFraOgMed }
-        val sisteBostedsadresse = sorterteAdresser.firstOrNull()
-        val nestSisteBostedsadresse = sorterteAdresser.drop(1).firstOrNull()
-        val harFlyttetInnEllerUtAvFinnmarkEllerNordTroms =
-            sisteBostedsadresse.erIFinnmarkEllerNordTroms() &&
-                (nestSisteBostedsadresse == null || !nestSisteBostedsadresse.erIFinnmarkEllerNordTroms()) ||
-                !sisteBostedsadresse.erIFinnmarkEllerNordTroms() &&
-                nestSisteBostedsadresse.erIFinnmarkEllerNordTroms()
+        val sisteBostedsadresseFørHendelse = sorterteAdresser.firstOrNull { it.gyldigFraOgMed != null && it.gyldigFraOgMed!!.isBefore(bostedskommuneFomDato) }
 
-        if (harFlyttetInnEllerUtAvFinnmarkEllerNordTroms) {
+        val forrigeBostedskommuneErIFinnmarkEllerNordTroms = sisteBostedsadresseFørHendelse?.erIFinnmarkEllerNordTroms() ?: false
+        val nyBostedskommuneErIFinnmarkEllerNordTroms = kommuneErIFinnmarkEllerNordTroms(bostedskommune)
+
+        if (forrigeBostedskommuneErIFinnmarkEllerNordTroms == nyBostedskommuneErIFinnmarkEllerNordTroms) {
             secureLogger.info(
-                "Person med ident $ident har flyttet inn eller ut av Finnmark eller Nord-Troms. " +
-                    "Siste adresse: ${sisteBostedsadresse?.vegadresse?.kommunenummer ?: sisteBostedsadresse?.ukjentBosted?.bostedskommune} " +
-                    "Nest siste adresse: ${nestSisteBostedsadresse?.vegadresse?.kommunenummer ?: nestSisteBostedsadresse?.ukjentBosted?.bostedskommune}",
+                "Person med ident $ident har ikke flyttet inn eller ut av Finnmark eller Nord-Troms. " +
+                    "Forrige bostedskommune: $sisteBostedsadresseFørHendelse, nåværende bostedskommune: $bostedskommune",
             )
-            baSakClient.sendFinnmarkstilleggTilBaSak(ident)
-            task.metadata["resultat"] = "HAR_FLYTTETT_INN_ELLER_UT"
-        } else {
-            secureLogger.info("Person med ident $ident har ikke flyttet inn eller ut av Finnmark eller Nord-Troms.")
             task.metadata["resultat"] = "HAR_IKKE_FLYTTETT_INN_ELLER_UT"
+            return
         }
+
+        val harIkkeLøpendeBarnetrygd = baSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(ident).isEmpty()
+        if (harIkkeLøpendeBarnetrygd) {
+            secureLogger.info("Fant ingen løpende barnetrygd for ident $ident, hopper ut av FinnmarkstilleggTask")
+            task.metadata["resultat"] = "INGEN_LØPENDE_BARNETRYGD"
+            return
+        }
+
+        secureLogger.info(
+            "Person med ident $ident har flyttet inn eller ut av Finnmark eller Nord-Troms. " +
+                "Gammel adresse: $forrigeBostedskommuneErIFinnmarkEllerNordTroms " +
+                "Ny adresse: $nyBostedskommuneErIFinnmarkEllerNordTroms",
+        )
+        baSakClient.sendFinnmarkstilleggTilBaSak(ident)
+        task.metadata["resultat"] = "HAR_FLYTTETT_INN_ELLER_UT"
     }
 
     companion object {
@@ -74,3 +87,9 @@ private fun Bostedsadresse?.erIFinnmarkEllerNordTroms(): Boolean =
             ?: matrikkeladresse?.kommunenummer?.let { kommuneErIFinnmarkEllerNordTroms(it) }
             ?: ukjentBosted?.bostedskommune?.let { kommuneErIFinnmarkEllerNordTroms(it) }
             ?: false
+
+data class VurderFinnmarkstillleggTaskDTO(
+    val ident: String,
+    val bostedskommune: String?,
+    val bostedskommuneFomDato: LocalDate?,
+)
