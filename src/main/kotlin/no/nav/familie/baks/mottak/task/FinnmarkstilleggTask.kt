@@ -1,5 +1,7 @@
 package no.nav.familie.baks.mottak.task
 
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
+import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.kontrakter.ba.finnmarkstillegg.kommuneErIFinnmarkEllerNordTroms
@@ -23,6 +25,7 @@ import java.time.LocalDate
 class FinnmarkstilleggTask(
     private val pdlClient: PdlClient,
     private val baSakClient: BaSakClient,
+    private val unleashNextMedContextService: UnleashNextMedContextService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
         val payload = objectMapper.readValue(task.payload, VurderFinnmarkstillleggTaskDTO::class.java)
@@ -44,8 +47,10 @@ class FinnmarkstilleggTask(
             return
         }
 
-        val sorterteAdresser = adresser.sortedByDescending { it.gyldigFraOgMed }
-        val sisteBostedsadresseFørHendelse = sorterteAdresser.firstOrNull { it.gyldigFraOgMed != null && it.gyldigFraOgMed!!.isBefore(bostedskommuneFomDato) }
+        val sisteBostedsadresseFørHendelse =
+            adresser
+                .sortedByDescending { it.gyldigFraOgMed }
+                .firstOrNull { it.gyldigFraOgMed != null && it.gyldigFraOgMed!!.isBefore(bostedskommuneFomDato) }
 
         val forrigeBostedskommuneErIFinnmarkEllerNordTroms = sisteBostedsadresseFørHendelse?.erIFinnmarkEllerNordTroms() ?: false
         val nyBostedskommuneErIFinnmarkEllerNordTroms = kommuneErIFinnmarkEllerNordTroms(bostedskommune)
@@ -71,7 +76,9 @@ class FinnmarkstilleggTask(
                 "Gammel adresse: $forrigeBostedskommuneErIFinnmarkEllerNordTroms " +
                 "Ny adresse: $nyBostedskommuneErIFinnmarkEllerNordTroms",
         )
-        baSakClient.sendFinnmarkstilleggTilBaSak(ident)
+        if (unleashNextMedContextService.isEnabled(FeatureToggleConfig.SEND_BOSTEDSADRESSE_HENDELSER_TIL_BA_SAK)) {
+            baSakClient.sendFinnmarkstilleggTilBaSak(ident)
+        }
         task.metadata["resultat"] = "HAR_FLYTTETT_INN_ELLER_UT"
     }
 
