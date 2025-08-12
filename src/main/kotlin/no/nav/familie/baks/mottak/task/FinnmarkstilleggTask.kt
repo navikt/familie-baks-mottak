@@ -28,7 +28,12 @@ class FinnmarkstilleggTask(
     private val unleashNextMedContextService: UnleashNextMedContextService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
-        val payload = objectMapper.readValue(task.payload, VurderFinnmarkstillleggTaskDTO::class.java)
+        val payload =
+            try {
+                objectMapper.readValue(task.payload, VurderFinnmarkstillleggTaskDTO::class.java)
+            } catch (_: Exception) {
+                return
+            }
 
         val ident = payload.ident
         val bostedskommune = payload.bostedskommune
