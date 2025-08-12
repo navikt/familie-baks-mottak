@@ -110,7 +110,9 @@ class LeesahConsumer(
             ?: ((get("bostedsadresse") as GenericRecord?)?.get("matrikkeladresse") as GenericRecord?)?.get("kommunenummer")?.toString()
             ?: ((get("bostedsadresse") as GenericRecord?)?.get("ukjentBosted") as GenericRecord?)?.get("bostedskommune")?.toString()
 
-    private fun GenericRecord.hentBostedskommuneFomDato(): LocalDate? = deserialiserDatofeltFraSubrecord("bostedsadresse", "gyldigFraOgMed")
+    private fun GenericRecord.hentBostedskommuneFomDato(): LocalDate? =
+        deserialiserDatofeltFraSubrecord("bostedsadresse", "gyldigFraOgMed")
+            ?: deserialiserDatofeltFraSubrecord("bostedsadresse", "angittFlyttedato")
 
     private fun GenericRecord.deserialiserDatofeltFraSubrecord(
         subrecord: String,
