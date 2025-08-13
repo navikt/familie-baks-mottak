@@ -45,7 +45,7 @@ class FinnmarkstilleggTaskTest {
 
         // Assert
         verify(exactly = 0) { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR) }
-        verify(exactly = 0) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(any()) }
+        verify(exactly = 0) { mockBaSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(any()) }
         verify(exactly = 0) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
     }
 
@@ -60,7 +60,7 @@ class FinnmarkstilleggTaskTest {
 
         // Assert
         verify(exactly = 0) { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR) }
-        verify(exactly = 0) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(any()) }
+        verify(exactly = 0) { mockBaSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(any()) }
         verify(exactly = 0) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
     }
 
@@ -77,7 +77,7 @@ class FinnmarkstilleggTaskTest {
 
         // Assert
         verify(exactly = 1) { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR) }
-        verify(exactly = 0) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(any()) }
+        verify(exactly = 0) { mockBaSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(any()) }
         verify(exactly = 0) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
     }
 
@@ -95,7 +95,7 @@ class FinnmarkstilleggTaskTest {
 
         // Assert
         verify(exactly = 1) { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR) }
-        verify(exactly = 0) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(any()) }
+        verify(exactly = 0) { mockBaSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(any()) }
         verify(exactly = 0) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
     }
 
@@ -113,7 +113,7 @@ class FinnmarkstilleggTaskTest {
 
         // Assert
         verify(exactly = 1) { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR) }
-        verify(exactly = 0) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(any()) }
+        verify(exactly = 0) { mockBaSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(any()) }
         verify(exactly = 0) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
     }
 
@@ -122,7 +122,7 @@ class FinnmarkstilleggTaskTest {
         // Arrange
         every { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR).bostedsadresse } returns
             listOf(Bostedsadresse(gyldigFraOgMed = LocalDate.parse("2022-01-01"), vegadresse = mockk { every { kommunenummer } returns osloKommunenummer }))
-        every { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(personIdent) } returns emptyList()
+        every { mockBaSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(personIdent) } returns emptyList()
 
         val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, ALTA.kommunenummer, LocalDate.now())
         val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
@@ -132,7 +132,7 @@ class FinnmarkstilleggTaskTest {
 
         // Assert
         verify(exactly = 1) { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR) }
-        verify(exactly = 1) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(personIdent) }
+        verify(exactly = 1) { mockBaSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(personIdent) }
         verify(exactly = 0) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
     }
 
@@ -141,7 +141,7 @@ class FinnmarkstilleggTaskTest {
         // Arrange
         every { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR).bostedsadresse } returns
             listOf(Bostedsadresse(gyldigFraOgMed = LocalDate.parse("2022-01-01"), vegadresse = mockk { every { kommunenummer } returns osloKommunenummer }))
-        every { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(personIdent) } returns listOf(mockk())
+        every { mockBaSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(personIdent) } returns listOf(mockk())
         every { mockUnleashNextMedContextService.isEnabled(FeatureToggleConfig.SEND_BOSTEDSADRESSE_HENDELSER_TIL_BA_SAK) } returns false
 
         val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, ALTA.kommunenummer, LocalDate.now())
@@ -152,7 +152,7 @@ class FinnmarkstilleggTaskTest {
 
         // Assert
         verify(exactly = 1) { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR) }
-        verify(exactly = 1) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(personIdent) }
+        verify(exactly = 1) { mockBaSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(personIdent) }
         verify(exactly = 1) { mockUnleashNextMedContextService.isEnabled(FeatureToggleConfig.SEND_BOSTEDSADRESSE_HENDELSER_TIL_BA_SAK) }
         verify(exactly = 0) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(any()) }
     }
@@ -163,7 +163,7 @@ class FinnmarkstilleggTaskTest {
         // Arrange
         every { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR).bostedsadresse } returns
             listOf(Bostedsadresse(gyldigFraOgMed = LocalDate.parse("2022-01-01"), vegadresse = mockk { every { kommunenummer } returns osloKommunenummer }))
-        every { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(personIdent) } returns listOf(mockk())
+        every { mockBaSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(personIdent) } returns listOf(mockk())
         justRun { mockBaSakClient.sendFinnmarkstilleggTilBaSak(personIdent) }
 
         val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, input.kommunenummer, LocalDate.now())
@@ -174,7 +174,7 @@ class FinnmarkstilleggTaskTest {
 
         // Assert
         verify(exactly = 1) { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR) }
-        verify(exactly = 1) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(personIdent) }
+        verify(exactly = 1) { mockBaSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(personIdent) }
         verify(exactly = 1) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(personIdent) }
     }
 
@@ -184,7 +184,7 @@ class FinnmarkstilleggTaskTest {
         // Arrange
         every { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR).bostedsadresse } returns
             listOf(Bostedsadresse(gyldigFraOgMed = LocalDate.parse("2022-01-01"), vegadresse = mockk { every { kommunenummer } returns input.kommunenummer }))
-        every { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(personIdent) } returns listOf(mockk())
+        every { mockBaSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(personIdent) } returns listOf(mockk())
         justRun { mockBaSakClient.sendFinnmarkstilleggTilBaSak(personIdent) }
 
         val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, osloKommunenummer, LocalDate.now())
@@ -195,7 +195,7 @@ class FinnmarkstilleggTaskTest {
 
         // Assert
         verify(exactly = 1) { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR) }
-        verify(exactly = 1) { mockBaSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(personIdent) }
+        verify(exactly = 1) { mockBaSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(personIdent) }
         verify(exactly = 1) { mockBaSakClient.sendFinnmarkstilleggTilBaSak(personIdent) }
     }
 }
