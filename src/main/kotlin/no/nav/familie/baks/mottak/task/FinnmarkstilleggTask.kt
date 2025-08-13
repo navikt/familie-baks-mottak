@@ -69,9 +69,9 @@ class FinnmarkstilleggTask(
             return
         }
 
-        val harIkkeLøpendeBarnetrygd = baSakClient.hentFagsakerHvorPersonMottarLøpendeUtvidetEllerOrdinærBarnetrygd(ident).isEmpty()
-        if (harIkkeLøpendeBarnetrygd) {
-            secureLogger.info("Fant ingen løpende barnetrygd for ident $ident, hopper ut av FinnmarkstilleggTask")
+        val erIkkeSøkerOgHarIkkeLøpendeBarnetrygd = baSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(ident).isEmpty()
+        if (erIkkeSøkerOgHarIkkeLøpendeBarnetrygd) {
+            secureLogger.info("Fant ingen fagsaker der ident $ident er søker eller har løpende barnetrygd, hopper ut av FinnmarkstilleggTask")
             task.metadata["resultat"] = "INGEN_LØPENDE_BARNETRYGD"
             return
         }
