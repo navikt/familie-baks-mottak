@@ -45,19 +45,21 @@ class LeesahConsumer(
     ) {
         val pdlHendelse =
             PdlHendelse(
-                cr.value().hentHendelseId(),
-                cr.key().substring(6),
-                cr.offset(),
-                cr.value().hentOpplysningstype(),
-                cr.value().hentEndringstype(),
-                cr.value().hentPersonidenter(),
-                cr.value().hentDødsdato(),
-                cr.value().hentFødselsdato(),
-                cr.value().hentFødeland(),
-                cr.value().hentUtflyttingsdato(),
-                cr.value().hentTidligereHendelseId(),
-                cr.value().hentSivilstandType(),
-                cr.value().hentSivilstandDato(),
+                hendelseId = cr.value().hentHendelseId(),
+                gjeldendeAktørId = cr.key().substring(6),
+                offset = cr.offset(),
+                opplysningstype = cr.value().hentOpplysningstype(),
+                endringstype = cr.value().hentEndringstype(),
+                personIdenter = cr.value().hentPersonidenter(),
+                dødsdato = cr.value().hentDødsdato(),
+                fødselsdato = cr.value().hentFødselsdato(),
+                fødeland = cr.value().hentFødeland(),
+                utflyttingsdato = cr.value().hentUtflyttingsdato(),
+                tidligereHendelseId = cr.value().hentTidligereHendelseId(),
+                sivilstand = cr.value().hentSivilstandType(),
+                sivilstandDato = cr.value().hentSivilstandDato(),
+                bostedskommune = cr.value().hentBostedskommune(),
+                bostedskommuneFomDato = cr.value().hentBostedskommuneFomDato(),
             )
 
         try {
@@ -102,6 +104,15 @@ class LeesahConsumer(
             ?: deserialiserDatofeltFraSubrecord("sivilstand", "bekreftelsesdato")
         // Fra pdldocs: bekreftelsesdato kun tilgjengelig når gyldighetsdato er ukjent.
     }
+
+    private fun GenericRecord.hentBostedskommune(): String? =
+        ((get("bostedsadresse") as GenericRecord?)?.get("vegadresse") as GenericRecord?)?.get("kommunenummer")?.toString()
+            ?: ((get("bostedsadresse") as GenericRecord?)?.get("matrikkeladresse") as GenericRecord?)?.get("kommunenummer")?.toString()
+            ?: ((get("bostedsadresse") as GenericRecord?)?.get("ukjentBosted") as GenericRecord?)?.get("bostedskommune")?.toString()
+
+    private fun GenericRecord.hentBostedskommuneFomDato(): LocalDate? =
+        deserialiserDatofeltFraSubrecord("bostedsadresse", "gyldigFraOgMed")
+            ?: deserialiserDatofeltFraSubrecord("bostedsadresse", "angittFlyttedato")
 
     private fun GenericRecord.deserialiserDatofeltFraSubrecord(
         subrecord: String,

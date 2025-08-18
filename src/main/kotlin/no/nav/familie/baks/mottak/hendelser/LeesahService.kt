@@ -12,6 +12,7 @@ import no.nav.familie.baks.mottak.task.FinnmarkstilleggTask
 import no.nav.familie.baks.mottak.task.MottaAnnullerFødselTask
 import no.nav.familie.baks.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseTask
+import no.nav.familie.baks.mottak.task.VurderFinnmarkstillleggTaskDTO
 import no.nav.familie.baks.mottak.task.VurderKontantstøtteLivshendelseTask
 import no.nav.familie.baks.mottak.task.VurderLivshendelseTaskDTO
 import no.nav.familie.baks.mottak.task.VurderLivshendelseType
@@ -243,7 +244,14 @@ class LeesahService(
     private fun opprettTaskForBostedsadresseHendelse(pdlHendelse: PdlHendelse) {
         Task(
             type = FinnmarkstilleggTask.TASK_STEP_TYPE,
-            payload = pdlHendelse.hentPersonident(),
+            payload =
+                objectMapper.writeValueAsString(
+                    VurderFinnmarkstillleggTaskDTO(
+                        ident = pdlHendelse.hentPersonident(),
+                        bostedskommune = pdlHendelse.bostedskommune,
+                        bostedskommuneFomDato = pdlHendelse.bostedskommuneFomDato,
+                    ),
+                ),
             properties =
                 Properties().apply {
                     this["ident"] = pdlHendelse.hentPersonident()
