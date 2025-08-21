@@ -2,6 +2,7 @@ package no.nav.familie.baks.mottak.søknad.barnetrygd
 
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.kontrakter.ba.søknad.StøttetVersjonertBarnetrygdSøknad
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV10
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV8
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
@@ -41,12 +42,14 @@ class BarnetrygdSøknadMetrikkService {
             when (versjonertBarnetrygdSøknad) {
                 is VersjonertBarnetrygdSøknadV8 -> Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype, versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon)
                 is VersjonertBarnetrygdSøknadV9 -> Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype, versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon)
+                is VersjonertBarnetrygdSøknadV10 -> Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype, versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon)
             }
 
         val harEøsSteg =
             when (versjonertBarnetrygdSøknad) {
                 is VersjonertBarnetrygdSøknadV8 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.antallEøsSteg > 0
                 is VersjonertBarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.antallEøsSteg > 0
+                is VersjonertBarnetrygdSøknadV10 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.antallEøsSteg > 0
             }
 
         val erUtvidet = søknadstype == Søknadstype.UTVIDET
@@ -60,6 +63,7 @@ class BarnetrygdSøknadMetrikkService {
             when (versjonertBarnetrygdSøknad) {
                 is VersjonertBarnetrygdSøknadV8 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
                 is VersjonertBarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
+                is VersjonertBarnetrygdSøknadV10 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
             }
         if (søknadstype == Søknadstype.UTVIDET) søknadUtvidetMottattFeil.increment() else søknadMottattFeil.increment()
     }

@@ -10,6 +10,7 @@ import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
 import no.nav.familie.http.client.RessursException
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV8
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV10
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -39,6 +40,7 @@ class JournalførSøknadTask(
                 when (versjonertBarnetrygdSøknad) {
                     is VersjonertBarnetrygdSøknadV8 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
                     is VersjonertBarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
+                    is VersjonertBarnetrygdSøknadV10 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
                 }
             log.info("Generer pdf og journalfør søknad om ${søknadstype.name.lowercase()} barnetrygd")
 
@@ -59,6 +61,7 @@ class JournalførSøknadTask(
                 when (versjonertBarnetrygdSøknad) {
                     is VersjonertBarnetrygdSøknadV8 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.originalSpråk
                     is VersjonertBarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.originalSpråk
+                    is VersjonertBarnetrygdSøknadV10 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.originalSpråk
                 }
 
             val orginalspråkPdf: ByteArray =

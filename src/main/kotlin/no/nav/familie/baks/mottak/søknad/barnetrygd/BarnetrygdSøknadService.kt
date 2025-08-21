@@ -12,6 +12,7 @@ import no.nav.familie.baks.mottak.task.JournalførSøknadTask
 import no.nav.familie.kontrakter.ba.søknad.StøttetVersjonertBarnetrygdSøknad
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV8
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV10
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
@@ -36,6 +37,10 @@ class BarnetrygdSøknadService(
                 }
 
                 is VersjonertBarnetrygdSøknadV9 -> {
+                    Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.tilDBSøknad(), versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon)
+                }
+
+                is VersjonertBarnetrygdSøknadV10 -> {
                     Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.tilDBSøknad(), versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon)
                 }
             }

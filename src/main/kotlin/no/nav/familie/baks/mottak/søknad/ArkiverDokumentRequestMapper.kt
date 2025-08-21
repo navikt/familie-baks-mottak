@@ -8,6 +8,7 @@ import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteV
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.StøttetVersjonertBarnetrygdSøknad
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV10
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV8
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
@@ -40,6 +41,12 @@ object ArkiverDokumentRequestMapper {
                     )
 
                 is VersjonertBarnetrygdSøknadV9 ->
+                    Pair(
+                        versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype,
+                        versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon.map { BarnetrygdSøknaddokumentasjon(it) },
+                    )
+
+                is VersjonertBarnetrygdSøknadV10 ->
                     Pair(
                         versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype,
                         versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon.map { BarnetrygdSøknaddokumentasjon(it) },
