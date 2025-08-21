@@ -104,6 +104,18 @@
             "en": "JA"
           }
         },
+        "borPåSvalbard": {
+          "label": {
+            "en": "Do you live in Svalbard?",
+            "nb": "Bor du på Svalbard?",
+            "nn": "Bur du på Svalbard?"
+          },
+          "verdi": {
+            "nb": null,
+            "nn": null,
+            "en": null
+          }
+        },
         "værtINorgeITolvMåneder": {
           "label": {
             "en": "Have you stayed continuously in Norway for the last twelve months?",
@@ -155,6 +167,7 @@
       },
       "nåværendeSamboer": null,
       "tidligereSamboere": [],
+      "svalbardOppholdPerioder": [],
       "utenlandsperioder": [],
       "andreUtbetalingsperioder": [],
       "arbeidsperioderUtland": [],
