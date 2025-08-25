@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.convertValue
 import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadObjectMapperModule
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteObjectMapperModule
 import no.nav.familie.kontrakter.ba.søknad.StøttetVersjonertBarnetrygdSøknad
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV10
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV8
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ks.søknad.StøttetVersjonertKontantstøtteSøknad
@@ -26,12 +27,14 @@ class SøknadSpråkvelgerService {
                 when (versjonertBarnetrygdSøknad) {
                     is VersjonertBarnetrygdSøknadV8 -> versjonertBarnetrygdSøknad.barnetrygdSøknad
                     is VersjonertBarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad
+                    is VersjonertBarnetrygdSøknadV10 -> versjonertBarnetrygdSøknad.barnetrygdSøknad
                 },
             )
         barnetrygdSøknadMapForSpråk["teksterUtenomSpørsmål"] =
             when (versjonertBarnetrygdSøknad) {
                 is VersjonertBarnetrygdSøknadV8 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.teksterUtenomSpørsmål
                 is VersjonertBarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.teksterUtenomSpørsmål
+                is VersjonertBarnetrygdSøknadV10 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.teksterUtenomSpørsmål
             }.mapValues { it.value[språk] }
 
         return barnetrygdSøknadMapForSpråk

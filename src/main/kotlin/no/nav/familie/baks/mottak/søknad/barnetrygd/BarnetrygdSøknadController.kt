@@ -3,10 +3,10 @@ package no.nav.familie.baks.mottak.søknad.barnetrygd
 import no.nav.familie.baks.mottak.søknad.Kvittering
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.FødselsnummerErNullException
 import no.nav.familie.kontrakter.ba.søknad.StøttetVersjonertBarnetrygdSøknad
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV10
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV8
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ba.søknad.v8.Søknad
-import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
+import no.nav.familie.kontrakter.ba.søknad.v10.BarnetrygdSøknad as BarnetrygdSøknadV10
+import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad as BarnetrygdSøknadV9
 
 @RestController
 @RequestMapping(path = ["/api"], produces = [APPLICATION_JSON_VALUE])
@@ -36,10 +38,18 @@ class BarnetrygdSøknadController(
 
     @PostMapping(value = ["/soknad/v9"], consumes = [MULTIPART_FORM_DATA_VALUE])
     fun taImotSøknad(
-        @RequestPart("søknad") søknad: BarnetrygdSøknad,
+        @RequestPart("søknad") søknad: BarnetrygdSøknadV9,
     ): ResponseEntity<Ressurs<Kvittering>> =
         mottaVersjonertSøknadOgSendMetrikker(
             versjonertBarnetrygdSøknad = VersjonertBarnetrygdSøknadV9(barnetrygdSøknad = søknad),
+        )
+
+    @PostMapping(value = ["/soknad/v10"], consumes = [MULTIPART_FORM_DATA_VALUE])
+    fun taImotSøknad(
+        @RequestPart("søknad") søknad: BarnetrygdSøknadV10,
+    ): ResponseEntity<Ressurs<Kvittering>> =
+        mottaVersjonertSøknadOgSendMetrikker(
+            versjonertBarnetrygdSøknad = VersjonertBarnetrygdSøknadV10(barnetrygdSøknad = søknad),
         )
 
     fun mottaVersjonertSøknadOgSendMetrikker(versjonertBarnetrygdSøknad: StøttetVersjonertBarnetrygdSøknad): ResponseEntity<Ressurs<Kvittering>> =
