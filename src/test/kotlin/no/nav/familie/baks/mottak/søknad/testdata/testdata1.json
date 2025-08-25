@@ -1,6 +1,6 @@
 {
   "søknadstype": "ORDINÆR",
-  "kontraktVersjon": 9,
+  "kontraktVersjon": 10,
   "antallEøsSteg": 2,
   "søker": {
     "harEøsSteg": true,

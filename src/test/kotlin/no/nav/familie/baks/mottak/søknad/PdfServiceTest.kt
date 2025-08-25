@@ -10,8 +10,8 @@ import io.mockk.slot
 import no.nav.familie.baks.mottak.integrasjoner.PdfClient
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
-import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
-import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV10
+import no.nav.familie.kontrakter.ba.søknad.v10.BarnetrygdSøknad
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -38,12 +38,12 @@ internal class PdfServiceTest {
                 .readText(Charsets.UTF_8)
         val barnetrygdSøknad: BarnetrygdSøknad = mapper.readValue(jsonString)
         val dbBarnetrygdSøknad: DBBarnetrygdSøknad = barnetrygdSøknad.tilDBSøknad()
-        pdfService.lagBarnetrygdPdf(VersjonertBarnetrygdSøknadV9(barnetrygdSøknad = barnetrygdSøknad), dbBarnetrygdSøknad, språk = "nb")
+        pdfService.lagBarnetrygdPdf(VersjonertBarnetrygdSøknadV10(barnetrygdSøknad = barnetrygdSøknad), dbBarnetrygdSøknad, språk = "nb")
 
         // Kommenter inn dette for å logge generert json til console
         // val jsonToDokgen: String = mapper.writeValueAsString(jsonSlot)
         // println(jsonToDokgen)
 
-        assertThat(jsonSlot.captured["kontraktVersjon"]).isEqualTo(9)
+        assertThat(jsonSlot.captured["kontraktVersjon"]).isEqualTo(10)
     }
 }
