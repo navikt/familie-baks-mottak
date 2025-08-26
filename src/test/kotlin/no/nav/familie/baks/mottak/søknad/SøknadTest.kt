@@ -4,7 +4,6 @@ import no.nav.familie.baks.mottak.DevLauncherPostgres
 import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
-import no.nav.familie.baks.mottak.util.DbContainerInitializer
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.felles.objectMapper
 import org.assertj.core.api.Assertions.assertThat
@@ -14,13 +13,11 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import kotlin.test.assertEquals
 
 @ExtendWith(SpringExtension::class)
-@ContextConfiguration(initializers = [DbContainerInitializer::class])
-@ActiveProfiles("postgres")
+@ActiveProfiles("postgres", "testcontainers")
 @Tag("integration")
 @SpringBootTest(classes = [DevLauncherPostgres::class])
 class SøknadTest(
