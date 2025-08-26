@@ -23,7 +23,7 @@
         <kotlin.version>2.2.10</kotlin.version>
         <mockk.version>1.14.5</mockk.version>
         <confluent.version>8.0.0</confluent.version>
-        <prosessering.version>2.20250811124757_fc5ad10</prosessering.version>
+        <prosessering.version>2.20250825143618_c0302c9</prosessering.version>
 
         <felles.version>3.20250804101327_a0f5fad</felles.version>
         <kontrakter.version>3.0_20250822084705_acb7066</kontrakter.version>
