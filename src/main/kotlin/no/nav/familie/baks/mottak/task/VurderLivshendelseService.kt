@@ -142,8 +142,8 @@ class VurderLivshendelseService(
                         secureLog.info("Ignorerer sivilstandhendelse for $personIdent uten dato: $pdlPersonData")
                         return
                     }
-                if (sivilstand.type != SIVILSTANDTYPE.GIFT) {
-                    secureLog.info("Endringen til sivilstand GIFT for $personIdent er korrigert/annulert: $pdlPersonData")
+                if (listOf(SIVILSTANDTYPE.GIFT, SIVILSTANDTYPE.REGISTRERT_PARTNER).contains(sivilstand.type)) {
+                    secureLog.info("Endringen til sivilstand GIFT/REGISTRERT_PARTNER for $personIdent er korrigert/annulert: $pdlPersonData")
                     return
                 }
                 finnBaBrukereBerørtAvSivilstandHendelseForIdent(personIdent).forEach {
@@ -471,7 +471,7 @@ class VurderLivshendelseService(
             is Oppgave -> {
                 log.info("Fant åpen oppgave på aktørId=$aktørIdForOppgave oppgaveId=${oppgave.id}")
                 secureLog.info("Fant åpen oppgave: $oppgave")
-                oppdaterOppgaveMedNyBeskrivelse(oppgave = oppgave, beskrivelse = "${VurderLivshendelseType.SIVILSTAND.beskrivelse}: Bruker eller barn er registrert som gift")
+                oppdaterOppgaveMedNyBeskrivelse(oppgave = oppgave, beskrivelse = "${VurderLivshendelseType.SIVILSTAND.beskrivelse}: Bruker eller barn er registrert som gift/registrert partner")
                 task.metadata["oppgaveId"] = oppgave.id.toString()
                 task.metadata["info"] = "Fant åpen oppgave"
             }

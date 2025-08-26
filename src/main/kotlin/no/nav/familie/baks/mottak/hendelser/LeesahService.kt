@@ -20,6 +20,7 @@ import no.nav.familie.baks.mottak.task.VurderLivshendelseType.SIVILSTAND
 import no.nav.familie.baks.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE.GIFT
+import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE.REGISTRERT_PARTNER
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
@@ -234,7 +235,7 @@ class LeesahService(
     }
 
     private fun opprettTaskHvisSivilstandErGift(pdlHendelse: PdlHendelse) {
-        if (pdlHendelse.sivilstand == GIFT.name) {
+        if (pdlHendelse.sivilstand in listOf(GIFT.name, REGISTRERT_PARTNER.name)) {
             opprettVurderBarnetrygdLivshendelseTaskForHendelse(SIVILSTAND, pdlHendelse)
         } else {
             sivilstandIgnorertCounter.increment()
