@@ -1,6 +1,6 @@
 {
   "søknadstype": "ORDINÆR",
-  "kontraktVersjon": 9,
+  "kontraktVersjon": 10,
   "antallEøsSteg": 2,
   "søker": {
     "harEøsSteg": true,
@@ -358,6 +358,18 @@
           "en": "NEI"
         }
       },
+      "borPåSvalbard": {
+        "label": {
+          "en": "Do you live in Svalbard?",
+          "nb": "Bor du på Svalbard?",
+          "nn": "Bur du på Svalbard?"
+        },
+        "verdi": {
+          "nb": "JA",
+          "nn": "JA",
+          "en": "JA"
+        }
+      },
       "værtINorgeITolvMåneder": {
         "label": {
           "en": "Have you stayed continuously in Norway for the last twelve months?",
@@ -480,6 +492,95 @@
       }
     },
     "tidligereSamboere": [],
+    "svalbardOppholdPerioder": [
+      {
+        "label": {
+          "en": "Stay in Svalbard 1",
+          "nb": "Opphold på Svalbard 1",
+          "nn": "Opphald på Svalbard 1"
+        },
+        "verdi": {
+          "nb": {
+            "fraDatoSvalbardOpphold": {
+              "label": {
+                "en": "When did the stay start?",
+                "nb": "Når startet oppholdet?",
+                "nn": "Når starta opphaldet?"
+              },
+              "verdi": {
+                "en": "2022-06-01",
+                "nb": "2022-06-01",
+                "nn": "2022-06-01"
+              }
+            },
+            "tilDatoSvalbardOpphold": {
+              "label": {
+                "en": "When is the stay ending?",
+                "nb": "Når avsluttes oppholdet?",
+                "nn": "Når skal opphaldet avsluttast?"
+              },
+              "verdi": {
+                "nb": "Jeg vet ikke når oppholdet avsluttes",
+                "nn": "Eg veit ikkje når opphaldet skal avsluttast",
+                "en": "I do not know when the stay is ending"
+              }
+            }
+          },
+          "nn": {
+            "fraDatoSvalbardOpphold": {
+              "label": {
+                "en": "When did the stay start?",
+                "nb": "Når startet oppholdet?",
+                "nn": "Når starta opphaldet?"
+              },
+              "verdi": {
+                "en": "2022-06-01",
+                "nb": "2022-06-01",
+                "nn": "2022-06-01"
+              }
+            },
+            "tilDatoSvalbardOpphold": {
+              "label": {
+                "en": "When is the stay ending?",
+                "nb": "Når avsluttes oppholdet?",
+                "nn": "Når skal opphaldet avsluttast?"
+              },
+              "verdi": {
+                "nb": "Jeg vet ikke når oppholdet avsluttes",
+                "nn": "Eg veit ikkje når opphaldet skal avsluttast",
+                "en": "I do not know when the stay is ending"
+              }
+            }
+          },
+          "en": {
+            "fraDatoSvalbardOpphold": {
+              "label": {
+                "en": "When did the stay start?",
+                "nb": "Når startet oppholdet?",
+                "nn": "Når starta opphaldet?"
+              },
+              "verdi": {
+                "en": "2022-06-01",
+                "nb": "2022-06-01",
+                "nn": "2022-06-01"
+              }
+            },
+            "tilDatoSvalbardOpphold": {
+              "label": {
+                "en": "When is the stay ending?",
+                "nb": "Når avsluttes oppholdet?",
+                "nn": "Når skal opphaldet avsluttast?"
+              },
+              "verdi": {
+                "nb": "Jeg vet ikke når oppholdet avsluttes",
+                "nn": "Eg veit ikkje når opphaldet skal avsluttast",
+                "en": "I do not know when the stay is ending"
+              }
+            }
+          }
+        }
+      }
+    ],
     "nåværendeSamboer": {
       "label": {
         "en": "Cohabitant",

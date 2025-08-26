@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.4</version>
+        <version>3.5.5</version>
     </parent>
 
     <properties>
@@ -20,13 +20,13 @@
         <changelist>-SNAPSHOT</changelist>
         <java.version>21</java.version>
         <jvmTarget>21</jvmTarget>
-        <kotlin.version>2.2.0</kotlin.version>
+        <kotlin.version>2.2.10</kotlin.version>
         <mockk.version>1.14.5</mockk.version>
         <confluent.version>8.0.0</confluent.version>
-        <prosessering.version>2.20250804113739_6d49ef6</prosessering.version>
+        <prosessering.version>2.20250811124757_fc5ad10</prosessering.version>
 
         <felles.version>3.20250804101327_a0f5fad</felles.version>
-        <kontrakter.version>3.0_20250805142725_8942276</kontrakter.version>
+        <kontrakter.version>3.0_20250822084705_acb7066</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
         <spring.cloud.version>4.3.0</spring.cloud.version>
@@ -166,7 +166,7 @@
         <dependency>
             <groupId>no.nav.familie</groupId>
             <artifactId>baks-dokgen</artifactId>
-            <version>1.0_20250616112103_e374c98</version>
+            <version>1.0_20250819114939_b2381de</version>
         </dependency>
         <!-- Kafka -->
         <dependency>
