@@ -142,7 +142,8 @@ class VurderLivshendelseService(
                         secureLog.info("Ignorerer sivilstandhendelse for $personIdent uten dato: $pdlPersonData")
                         return
                     }
-                if (listOf(SIVILSTANDTYPE.GIFT, SIVILSTANDTYPE.REGISTRERT_PARTNER).contains(sivilstand.type)) {
+
+                if (!listOf(SIVILSTANDTYPE.GIFT, SIVILSTANDTYPE.REGISTRERT_PARTNER).contains(sivilstand.type)) {
                     secureLog.info("Endringen til sivilstand GIFT/REGISTRERT_PARTNER for $personIdent er korrigert/annulert: $pdlPersonData")
                     return
                 }
