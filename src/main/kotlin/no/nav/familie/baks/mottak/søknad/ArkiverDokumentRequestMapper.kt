@@ -8,14 +8,11 @@ import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteV
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.StøttetVersjonertBarnetrygdSøknad
-import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV10
-import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV8
-import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
-import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.felles.dokarkiv.Dokumenttype
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.ArkiverDokumentRequest
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.Dokument
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.Filtype
+import no.nav.familie.kontrakter.felles.søknad.BaFellesSøknadstype
 import no.nav.familie.kontrakter.ks.søknad.StøttetVersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
@@ -32,32 +29,18 @@ object ArkiverDokumentRequestMapper {
         vedleggMap: Map<String, DBVedlegg>,
         pdfOriginalSpråk: ByteArray,
     ): ArkiverDokumentRequest {
-        val (søknadstype, dokumentasjon) =
-            when (versjonertBarnetrygdSøknad) {
-                is VersjonertBarnetrygdSøknadV8 ->
-                    Pair(
-                        versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype,
-                        versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon.map { BarnetrygdSøknaddokumentasjon(it) },
-                    )
-
-                is VersjonertBarnetrygdSøknadV9 ->
-                    Pair(
-                        versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype,
-                        versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon.map { BarnetrygdSøknaddokumentasjon(it) },
-                    )
-
-                is VersjonertBarnetrygdSøknadV10 ->
-                    Pair(
-                        versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype,
-                        versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon.map { BarnetrygdSøknaddokumentasjon(it) },
-                    )
+        val dokumentasjon: List<BarnetrygdSøknaddokumentasjon> =
+            versjonertBarnetrygdSøknad.barnetrygdSøknad.dokumentasjon.map {
+                BarnetrygdSøknaddokumentasjon(it)
             }
+        val søknadstype: BaFellesSøknadstype = versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype.tilFellesSøknadstype()
 
         val dokumenttype =
             when (søknadstype) {
-                Søknadstype.ORDINÆR -> Dokumenttype.BARNETRYGD_ORDINÆR
-                Søknadstype.UTVIDET -> Dokumenttype.BARNETRYGD_UTVIDET
-                Søknadstype.IKKE_SATT -> Dokumenttype.BARNETRYGD_ORDINÆR
+                BaFellesSøknadstype.Ordinær -> Dokumenttype.BARNETRYGD_ORDINÆR
+                BaFellesSøknadstype.Utvidet -> Dokumenttype.BARNETRYGD_UTVIDET
+                BaFellesSøknadstype.IkkeSatt -> Dokumenttype.BARNETRYGD_ORDINÆR
+                is BaFellesSøknadstype.UkjentSøknadstype -> throw IllegalStateException("Ukjent søknadtype: $søknadstype. Oppdater BaFellesSøknadstype med ny søknadstype")
             }
 
         val søknadsdokumentJson =

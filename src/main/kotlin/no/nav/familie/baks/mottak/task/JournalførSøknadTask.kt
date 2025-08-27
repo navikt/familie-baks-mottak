@@ -36,13 +36,9 @@ class JournalførSøknadTask(
                 søknadRepository.hentDBSøknad(id.toLong()) ?: error("Kunne ikke finne søknad ($id) i database")
             val versjonertBarnetrygdSøknad = dbBarnetrygdSøknad.hentVersjonertBarnetrygdSøknad()
 
-            val søknadstype =
-                when (versjonertBarnetrygdSøknad) {
-                    is VersjonertBarnetrygdSøknadV8 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
-                    is VersjonertBarnetrygdSøknadV9 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
-                    is VersjonertBarnetrygdSøknadV10 -> versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype
-                }
-            log.info("Generer pdf og journalfør søknad om ${søknadstype.name.lowercase()} barnetrygd")
+            val søknadstype = versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype.tilFellesSøknadstype()
+
+            log.info("Generer pdf og journalfør søknad om ${søknadstype.toString().lowercase()} barnetrygd")
 
             val bokmålPdf =
                 if (unleashService.isEnabled(FeatureToggleConfig.NY_FAMILIE_PDF_KVITTERING, false)) {

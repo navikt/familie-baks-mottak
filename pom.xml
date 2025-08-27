@@ -26,7 +26,7 @@
         <prosessering.version>2.20250825143618_c0302c9</prosessering.version>
 
         <felles.version>3.20250804101327_a0f5fad</felles.version>
-        <kontrakter.version>3.0_20250826121939_ee97111</kontrakter.version>
+        <kontrakter.version>3.0_20250827102332_9f8b01f</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
         <spring.cloud.version>4.3.0</spring.cloud.version>
@@ -166,7 +166,7 @@
         <dependency>
             <groupId>no.nav.familie</groupId>
             <artifactId>baks-dokgen</artifactId>
-            <version>1.0_20250826121929_b9cb93b</version>
+            <version>1.0_20250819114939_b2381de</version>
         </dependency>
         <!-- Kafka -->
         <dependency>

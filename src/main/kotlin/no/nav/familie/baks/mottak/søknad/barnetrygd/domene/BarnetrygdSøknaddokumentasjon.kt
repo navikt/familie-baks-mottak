@@ -2,29 +2,30 @@ package no.nav.familie.baks.mottak.søknad.barnetrygd.domene
 
 import no.nav.familie.baks.mottak.søknad.ISøknaddokumentasjon
 import no.nav.familie.baks.mottak.søknad.Søknadsvedlegg
-import no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov
-import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
+import no.nav.familie.kontrakter.felles.søknad.BaFellesDokumentasjonsbehov
+import no.nav.familie.kontrakter.felles.søknad.BaSøknaddokumentasjon
 
 data class BarnetrygdSøknaddokumentasjon(
-    val søknaddokumentasjon: Søknaddokumentasjon,
+    val søknaddokumentasjon: BaSøknaddokumentasjon,
 ) : ISøknaddokumentasjon {
     override val opplastedeVedlegg: List<Søknadsvedlegg> =
         søknaddokumentasjon.opplastedeVedlegg.map {
             Søknadsvedlegg(
                 it.dokumentId,
-                dokumentasjonsbehovTilTittel(it.tittel),
+                dokumentasjonsbehovTilTittel(it.tittel.tilFellesDokumentasjonsbehov()),
             )
         }
 
-    private fun dokumentasjonsbehovTilTittel(dokumentasjonsbehov: Dokumentasjonsbehov): String =
+    private fun dokumentasjonsbehovTilTittel(dokumentasjonsbehov: BaFellesDokumentasjonsbehov): String =
         when (dokumentasjonsbehov) {
-            Dokumentasjonsbehov.ADOPSJON_DATO -> "Adopsjonsdato"
-            Dokumentasjonsbehov.AVTALE_DELT_BOSTED -> "Avtale om delt bosted"
-            Dokumentasjonsbehov.VEDTAK_OPPHOLDSTILLATELSE -> "Vedtak om oppholdstillatelse"
-            Dokumentasjonsbehov.BEKREFTELSE_FRA_BARNEVERN -> "Bekreftelse fra barnevern"
-            Dokumentasjonsbehov.BOR_FAST_MED_SØKER -> "Bor fast med søker"
-            Dokumentasjonsbehov.SEPARERT_SKILT_ENKE -> "Dokumentasjon på separasjon, skilsmisse eller dødsfall"
-            Dokumentasjonsbehov.MEKLINGSATTEST -> "Meklingsattest"
-            Dokumentasjonsbehov.ANNEN_DOKUMENTASJON -> "" // Random dokumentasjon skal saksbehandler sette tittel på
+            BaFellesDokumentasjonsbehov.AdopsjonDato -> "Adopsjonsdato"
+            BaFellesDokumentasjonsbehov.AvtaleDeltBosted -> "Avtale om delt bosted"
+            BaFellesDokumentasjonsbehov.VedtakOppholdstillatelse -> "Vedtak om oppholdstillatelse"
+            BaFellesDokumentasjonsbehov.BekreftelseFraBarnevern -> "Bekreftelse fra barnevern"
+            BaFellesDokumentasjonsbehov.BorFastMedSøker -> "Bor fast med søker"
+            BaFellesDokumentasjonsbehov.SeparertSkiltEnke -> "Dokumentasjon på separasjon, skilsmisse eller dødsfall"
+            BaFellesDokumentasjonsbehov.Meklingsattest -> "Meklingsattest"
+            BaFellesDokumentasjonsbehov.AnnenDokumentasjon -> "" // Random dokumentasjon skal saksbehandler sette tittel på
+            is BaFellesDokumentasjonsbehov.UkjentDokumentasjonsbehov -> "Ukjent dokumentasjonsbehov: ${dokumentasjonsbehov.ukjentDokumentasjonsbehov}"
         }
 }
