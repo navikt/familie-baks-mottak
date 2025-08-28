@@ -26,6 +26,5 @@ data class BarnetrygdSøknaddokumentasjon(
             BaFellesDokumentasjonsbehov.SeparertSkiltEnke -> "Dokumentasjon på separasjon, skilsmisse eller dødsfall"
             BaFellesDokumentasjonsbehov.Meklingsattest -> "Meklingsattest"
             BaFellesDokumentasjonsbehov.AnnenDokumentasjon -> "" // Random dokumentasjon skal saksbehandler sette tittel på
-            is BaFellesDokumentasjonsbehov.UkjentDokumentasjonsbehov -> "Ukjent dokumentasjonsbehov: ${dokumentasjonsbehov.ukjentDokumentasjonsbehov}"
         }
 }
