@@ -20,6 +20,8 @@ import no.nav.familie.baks.mottak.task.VurderLivshendelseType.SIVILSTAND
 import no.nav.familie.baks.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE.GIFT
+import no.nav.familie.prosessering.domene.Status.KLAR_TIL_PLUKK
+import no.nav.familie.prosessering.domene.Status.UBEHANDLET
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
@@ -214,6 +216,14 @@ class LeesahService(
         oppdaterHendelseslogg(pdlHendelse)
     }
 
+    private fun opprettTaskHvisSivilstandErGift(pdlHendelse: PdlHendelse) {
+        if (pdlHendelse.sivilstand == GIFT.name) {
+            opprettVurderBarnetrygdLivshendelseTaskForHendelse(SIVILSTAND, pdlHendelse)
+        } else {
+            sivilstandIgnorertCounter.increment()
+        }
+    }
+
     private fun behandleBostedsadresseHendelse(pdlHendelse: PdlHendelse) {
         if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
             leesahDuplikatCounter.increment()
@@ -221,9 +231,11 @@ class LeesahService(
         }
 
         when (pdlHendelse.endringstype) {
-            OPPRETTET -> {
+            OPPRETTET,
+            KORRIGERT,
+            -> {
                 SECURE_LOGGER.info("Mottatt behandleBostedsadresseHendelse $pdlHendelse")
-                opprettTaskForBostedsadresseHendelse(pdlHendelse)
+                opprettFinnmarkstilleggTask(pdlHendelse)
             }
 
             else -> {
@@ -233,35 +245,67 @@ class LeesahService(
         oppdaterHendelseslogg(pdlHendelse)
     }
 
-    private fun opprettTaskHvisSivilstandErGift(pdlHendelse: PdlHendelse) {
-        if (pdlHendelse.sivilstand == GIFT.name) {
-            opprettVurderBarnetrygdLivshendelseTaskForHendelse(SIVILSTAND, pdlHendelse)
-        } else {
-            sivilstandIgnorertCounter.increment()
-        }
+    private fun opprettFinnmarkstilleggTask(pdlHendelse: PdlHendelse) {
+        val eksisterendeTask =
+            pdlHendelse.tidligereHendelseId?.let { tidligereHendelseId ->
+                taskService
+                    .finnAlleTasksMedCallId(tidligereHendelseId)
+                    .firstOrNull {
+                        it.type == FinnmarkstilleggTask.TASK_STEP_TYPE &&
+                            it.status in setOf(UBEHANDLET, KLAR_TIL_PLUKK)
+                    }
+            }
+
+        val nyPayload = lagFinnmarkstilleggTaskPayload(pdlHendelse)
+
+        val nyTask =
+            if (eksisterendeTask == null) {
+                opprettNyFinnmarkstilleggTask(pdlHendelse)
+            } else if (nyPayload != eksisterendeTask.payload) {
+                oppdaterEksisterendeFinnmarkstilleggTask(eksisterendeTask, pdlHendelse)
+            } else {
+                log.info("FinnmarkstilleggTask for hendelse ${pdlHendelse.hendelseId} finnes allerede med samme payload, oppretter ikke på nytt")
+                return
+            }
+
+        taskService.save(nyTask.medTriggerTid(plussEnTimeIProd()))
     }
 
-    private fun opprettTaskForBostedsadresseHendelse(pdlHendelse: PdlHendelse) {
+    private fun oppdaterEksisterendeFinnmarkstilleggTask(
+        eksisterendeTask: Task,
+        pdlHendelse: PdlHendelse,
+    ) = eksisterendeTask
+        .copy(
+            payload = lagFinnmarkstilleggTaskPayload(pdlHendelse),
+            metadataWrapper =
+                eksisterendeTask.metadataWrapper.apply {
+                    properties["ident"] = pdlHendelse.hentPersonident()
+                    properties["callId"] = pdlHendelse.hendelseId
+                },
+        )
+
+    private fun opprettNyFinnmarkstilleggTask(pdlHendelse: PdlHendelse) =
         Task(
             type = FinnmarkstilleggTask.TASK_STEP_TYPE,
-            payload =
-                objectMapper.writeValueAsString(
-                    VurderFinnmarkstillleggTaskDTO(
-                        ident = pdlHendelse.hentPersonident(),
-                        bostedskommune = pdlHendelse.bostedskommune,
-                        bostedskommuneFomDato = pdlHendelse.bostedskommuneFomDato,
-                    ),
-                ),
-            properties =
-                Properties().apply {
-                    this["ident"] = pdlHendelse.hentPersonident()
-                    this["callId"] = pdlHendelse.hendelseId
-                },
-        ).medTriggerTid(LocalDateTime.now().run { if (environment.activeProfiles.contains("prod")) this.plusHours(1) else this })
-            .also {
-                taskService.save(it)
-            }
-    }
+            payload = lagFinnmarkstilleggTaskPayload(pdlHendelse),
+        ).apply {
+            metadata["callId"] = pdlHendelse.hendelseId
+            metadata["ident"] = pdlHendelse.hentPersonident()
+        }
+
+    private fun lagFinnmarkstilleggTaskPayload(pdlHendelse: PdlHendelse): String =
+        objectMapper.writeValueAsString(
+            VurderFinnmarkstillleggTaskDTO(
+                ident = pdlHendelse.hentPersonident(),
+                bostedskommune = pdlHendelse.bostedskommune,
+                bostedskommuneFomDato = pdlHendelse.bostedskommuneFomDato,
+            ),
+        )
+
+    private fun plussEnTimeIProd(): LocalDateTime =
+        LocalDateTime.now().run {
+            if (environment.activeProfiles.contains("prod")) this.plusHours(1) else this
+        }
 
     private fun oppdaterHendelseslogg(pdlHendelse: PdlHendelse) {
         val metadata =
