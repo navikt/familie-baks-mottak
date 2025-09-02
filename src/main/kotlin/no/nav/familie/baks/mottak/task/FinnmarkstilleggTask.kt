@@ -65,7 +65,7 @@ class FinnmarkstilleggTask(
                 "Person med ident $ident har ikke flyttet inn eller ut av Finnmark eller Nord-Troms, hopper ut av FinnmarkstilleggTask. " +
                     "Forrige bostedskommune: $sisteBostedsadresseFørHendelse, nåværende bostedskommune: $bostedskommune",
             )
-            task.metadata["resultat"] = "HAR_IKKE_FLYTTETT_INN_ELLER_UT"
+            task.metadata["resultat"] = "HAR_IKKE_FLYTTET_INN_ELLER_UT"
             return
         }
 
