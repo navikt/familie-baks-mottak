@@ -26,7 +26,7 @@
         <prosessering.version>2.20250825143618_c0302c9</prosessering.version>
 
         <felles.version>3.20250804101327_a0f5fad</felles.version>
-        <kontrakter.version>3.0_20250828110046_0cd2211</kontrakter.version>
+        <kontrakter.version>3.0_20250902143555_da31aa4</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
         <spring.cloud.version>4.3.0</spring.cloud.version>
@@ -231,7 +231,7 @@
         <dependency> <!-- Overstyrer versjon default i spring pga sikkerhetshull https://security.snyk.io/package/maven/org.yaml:snakeyaml -->
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
-            <version>2.4</version>
+            <version>2.5</version>
         </dependency>
 
 
@@ -306,7 +306,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>5.1.0.4751</version>
+                    <version>5.2.0.4988</version>
                 </plugin>
             </plugins>
         </pluginManagement>
