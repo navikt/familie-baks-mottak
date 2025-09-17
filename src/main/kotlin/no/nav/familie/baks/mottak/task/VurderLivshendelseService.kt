@@ -142,10 +142,11 @@ class VurderLivshendelseService(
                         secureLog.info("Ignorerer sivilstandhendelse for $personIdent uten dato: $pdlPersonData")
                         return
                     }
-                if (sivilstand.type != SIVILSTANDTYPE.GIFT) {
-                    secureLog.info("Endringen til sivilstand GIFT for $personIdent er korrigert/annulert: $pdlPersonData")
+                if (sivilstand.type != SIVILSTANDTYPE.GIFT && sivilstand.type != SIVILSTANDTYPE.REGISTRERT_PARTNER) {
+                    secureLog.info("Endringen til sivilstand GIFT/REGISTRERT_PARTNER for $personIdent er korrigert/annulert: $pdlPersonData")
                     return
                 }
+
                 finnBaBrukereBerørtAvSivilstandHendelseForIdent(personIdent).forEach {
                     if (sjekkOmDatoErEtterEldsteVedtaksdato(dato = sivilstand.dato!!, aktivFaksak = hentRestFagsak(it.fagsakId, tema), personIdent = personIdent, tema = tema)) { // Trenger denne sjekken for å unngå "gamle" hendelser som feks kan skyldes innflytting
                         opprettEllerOppdaterEndringISivilstandOppgave(
@@ -471,7 +472,7 @@ class VurderLivshendelseService(
             is Oppgave -> {
                 log.info("Fant åpen oppgave på aktørId=$aktørIdForOppgave oppgaveId=${oppgave.id}")
                 secureLog.info("Fant åpen oppgave: $oppgave")
-                oppdaterOppgaveMedNyBeskrivelse(oppgave = oppgave, beskrivelse = "${VurderLivshendelseType.SIVILSTAND.beskrivelse}: Bruker eller barn er registrert som gift")
+                oppdaterOppgaveMedNyBeskrivelse(oppgave = oppgave, beskrivelse = "${VurderLivshendelseType.SIVILSTAND.beskrivelse}: Bruker eller barn er registrert som gift/registrert partner")
                 task.metadata["oppgaveId"] = oppgave.id.toString()
                 task.metadata["info"] = "Fant åpen oppgave"
             }
