@@ -226,6 +226,17 @@ class VurderLivshendelseServiceTest {
         Assertions.assertThat(oppgaveDto.captured.behandlingstema).isEqualTo(Behandlingstema.UtvidetBarnetrygd.value)
         Assertions.assertThat(oppgaveDto.captured.behandlesAvApplikasjon).isNull()
         Assertions.assertThat(oppgaveDto.captured.tema).isEqualTo(Tema.BAR)
+        when (livshendelseType) {
+            VurderLivshendelseType.SIVILSTAND -> {
+                Assertions.assertThat(oppgaveDto.captured.beskrivelse).isEqualTo("Endring i sivilstand: bruker er registrert som gift fra 18.09.2025")
+            }
+            VurderLivshendelseType.DØDSFALL -> {
+                Assertions.assertThat(oppgaveDto.captured.beskrivelse).isEqualTo("Dødsfall: bruker")
+            }
+            VurderLivshendelseType.UTFLYTTING -> {
+                Assertions.assertThat(oppgaveDto.captured.beskrivelse).isEqualTo("Utflytting: bruker")
+            }
+        }
     }
 
     @ParameterizedTest

@@ -142,10 +142,11 @@ class VurderLivshendelseService(
                         secureLog.info("Ignorerer sivilstandhendelse for $personIdent uten dato: $pdlPersonData")
                         return
                     }
-                if (sivilstand.type != SIVILSTANDTYPE.GIFT) {
-                    secureLog.info("Endringen til sivilstand GIFT for $personIdent er korrigert/annulert: $pdlPersonData")
+                if (sivilstand.type != SIVILSTANDTYPE.GIFT && sivilstand.type != SIVILSTANDTYPE.REGISTRERT_PARTNER) {
+                    secureLog.info("Endringen til sivilstand GIFT/REGISTRERT_PARTNER for $personIdent er korrigert/annulert: $pdlPersonData")
                     return
                 }
+
                 finnBaBrukereBerørtAvSivilstandHendelseForIdent(personIdent).forEach {
                     if (sjekkOmDatoErEtterEldsteVedtaksdato(dato = sivilstand.dato!!, aktivFaksak = hentRestFagsak(it.fagsakId, tema), personIdent = personIdent, tema = tema)) { // Trenger denne sjekken for å unngå "gamle" hendelser som feks kan skyldes innflytting
                         opprettEllerOppdaterEndringISivilstandOppgave(
@@ -155,6 +156,7 @@ class VurderLivshendelseService(
                             personIdent = personIdent,
                             task = task,
                             tema = tema,
+                            sivilstandType = sivilstand.type,
                         )
                     }
                 }
@@ -409,17 +411,17 @@ class VurderLivshendelseService(
         personIdent: String,
         tema: Tema,
     ): Boolean {
-        val tidligsteVedtakIBaSak =
+        val tidligsteInnvilgetVedtakIBaSak =
             aktivFaksak.behandlinger
-                .filter { it.resultat == RESULTAT_INNVILGET && it.status == BehandlingStatus.AVSLUTTET }
+                .filter { it.resultat?.contains(RESULTAT_INNVILGET) == true && it.status == BehandlingStatus.AVSLUTTET }
                 .minByOrNull { it.opprettetTidspunkt } ?: return false
 
-        if (dato.isAfter(tidligsteVedtakIBaSak.opprettetTidspunkt.toLocalDate())) {
+        if (dato.isAfter(tidligsteInnvilgetVedtakIBaSak.opprettetTidspunkt.toLocalDate())) {
             return true
         }
 
         val erEtterTidligsteInfotrygdVedtak =
-            if (tidligsteVedtakIBaSak.type == BehandlingType.MIGRERING_FRA_INFOTRYGD) {
+            if (tidligsteInnvilgetVedtakIBaSak.type == BehandlingType.MIGRERING_FRA_INFOTRYGD) {
                 hentTidligsteVedtaksdatoFraInfotrygd(personIdent, tema)?.isBefore(dato) ?: false
             } else {
                 false
@@ -435,6 +437,7 @@ class VurderLivshendelseService(
         personIdent: String,
         task: Task,
         tema: Tema,
+        sivilstandType: SIVILSTANDTYPE,
     ) {
         val formatertDato =
             endringsdato.format(
@@ -446,6 +449,7 @@ class VurderLivshendelseService(
                 personErBruker = pdlClient.hentAktørId(personIdent, tema) == aktørIdForOppgave,
                 formatertDato = formatertDato,
                 personIdent = personIdent,
+                erGift = (sivilstandType == SIVILSTANDTYPE.GIFT),
             )
 
         val oppgave =
@@ -471,7 +475,7 @@ class VurderLivshendelseService(
             is Oppgave -> {
                 log.info("Fant åpen oppgave på aktørId=$aktørIdForOppgave oppgaveId=${oppgave.id}")
                 secureLog.info("Fant åpen oppgave: $oppgave")
-                oppdaterOppgaveMedNyBeskrivelse(oppgave = oppgave, beskrivelse = "${VurderLivshendelseType.SIVILSTAND.beskrivelse}: Bruker eller barn er registrert som gift")
+                oppdaterOppgaveMedNyBeskrivelse(oppgave = oppgave, beskrivelse = "${VurderLivshendelseType.SIVILSTAND.beskrivelse}: Bruker eller barn er registrert som ${if (sivilstandType == SIVILSTANDTYPE.GIFT) "gift" else "registrert partner"}")
                 task.metadata["oppgaveId"] = oppgave.id.toString()
                 task.metadata["info"] = "Fant åpen oppgave"
             }
@@ -502,7 +506,8 @@ class VurderLivshendelseService(
         personErBruker: Boolean,
         formatertDato: String,
         personIdent: String,
-    ): String = "${VurderLivshendelseType.SIVILSTAND.beskrivelse}: ${if (personErBruker) "bruker" else "barn $personIdent"} er registrert som gift fra $formatertDato"
+        erGift: Boolean,
+    ): String = "${VurderLivshendelseType.SIVILSTAND.beskrivelse}: ${if (personErBruker) "bruker" else "barn $personIdent"} er registrert som ${if (erGift) "gift" else "registrert partner"} fra $formatertDato"
 
     companion object {
         const val RESULTAT_INNVILGET = "INNVILGET"
@@ -519,6 +524,5 @@ enum class VurderLivshendelseType(
 ) {
     DØDSFALL("Dødsfall"),
     SIVILSTAND("Endring i sivilstand"),
-    ADDRESSE("Addresse"),
     UTFLYTTING("Utflytting"),
 }

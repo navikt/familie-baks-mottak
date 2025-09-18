@@ -34,10 +34,11 @@ logging:
 retry.backoff.delay: 5000
 
 prosessering:
-  queue:
-    capacity: 10
-  pool:
-    size: 2
+  continuousRunning.enabled: true
+  maxantall: 50
+  fixedDelayString:
+    in:
+      milliseconds: 5000
 
 management:
   endpoint.health.show-details: always
