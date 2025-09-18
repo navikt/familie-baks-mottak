@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.5</version>
+        <version>3.5.6</version>
     </parent>
 
     <properties>
@@ -166,7 +166,7 @@
         <dependency>
             <groupId>no.nav.familie</groupId>
             <artifactId>baks-dokgen</artifactId>
-            <version>1.0_20250909153221_f4dc6ea</version>
+            <version>1.0_20250917090849_aa54e98</version>
         </dependency>
         <!-- Kafka -->
         <dependency>
@@ -207,7 +207,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.7</version>
+            <version>42.7.8</version>
         </dependency>
         <dependency>
             <groupId>com.papertrailapp</groupId>
