@@ -411,17 +411,17 @@ class VurderLivshendelseService(
         personIdent: String,
         tema: Tema,
     ): Boolean {
-        val tidligsteVedtakIBaSak =
+        val tidligsteInnvilgetVedtakIBaSak =
             aktivFaksak.behandlinger
-                .filter { it.resultat == RESULTAT_INNVILGET && it.status == BehandlingStatus.AVSLUTTET }
+                .filter { it.resultat?.contains(RESULTAT_INNVILGET) == true && it.status == BehandlingStatus.AVSLUTTET }
                 .minByOrNull { it.opprettetTidspunkt } ?: return false
 
-        if (dato.isAfter(tidligsteVedtakIBaSak.opprettetTidspunkt.toLocalDate())) {
+        if (dato.isAfter(tidligsteInnvilgetVedtakIBaSak.opprettetTidspunkt.toLocalDate())) {
             return true
         }
 
         val erEtterTidligsteInfotrygdVedtak =
-            if (tidligsteVedtakIBaSak.type == BehandlingType.MIGRERING_FRA_INFOTRYGD) {
+            if (tidligsteInnvilgetVedtakIBaSak.type == BehandlingType.MIGRERING_FRA_INFOTRYGD) {
                 hentTidligsteVedtaksdatoFraInfotrygd(personIdent, tema)?.isBefore(dato) ?: false
             } else {
                 false
