@@ -33,7 +33,7 @@ logging:
 
 retry.backoff.delay: 5000
 
-pprosessering:
+prosessering:
   continuousRunning.enabled: true
   maxantall: 50
   fixedDelayString:
