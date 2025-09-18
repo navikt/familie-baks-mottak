@@ -503,7 +503,7 @@ class VurderLivshendelseService(
         personErBruker: Boolean,
         formatertDato: String,
         personIdent: String,
-    ): String = "${VurderLivshendelseType.SIVILSTAND.beskrivelse}: ${if (personErBruker) "bruker" else "barn $personIdent"} er registrert som gift fra $formatertDato"
+    ): String = "${VurderLivshendelseType.SIVILSTAND.beskrivelse}: ${if (personErBruker) "bruker" else "barn $personIdent"} er registrert som gift/registrert partner fra $formatertDato"
 
     companion object {
         const val RESULTAT_INNVILGET = "INNVILGET"
