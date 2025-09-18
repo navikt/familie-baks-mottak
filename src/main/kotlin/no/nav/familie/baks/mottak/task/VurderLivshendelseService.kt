@@ -156,6 +156,7 @@ class VurderLivshendelseService(
                             personIdent = personIdent,
                             task = task,
                             tema = tema,
+                            sivilstandType = sivilstand.type,
                         )
                     }
                 }
@@ -436,6 +437,7 @@ class VurderLivshendelseService(
         personIdent: String,
         task: Task,
         tema: Tema,
+        sivilstandType: SIVILSTANDTYPE,
     ) {
         val formatertDato =
             endringsdato.format(
@@ -447,6 +449,7 @@ class VurderLivshendelseService(
                 personErBruker = pdlClient.hentAktørId(personIdent, tema) == aktørIdForOppgave,
                 formatertDato = formatertDato,
                 personIdent = personIdent,
+                erGift = (sivilstandType == SIVILSTANDTYPE.GIFT),
             )
 
         val oppgave =
@@ -472,7 +475,7 @@ class VurderLivshendelseService(
             is Oppgave -> {
                 log.info("Fant åpen oppgave på aktørId=$aktørIdForOppgave oppgaveId=${oppgave.id}")
                 secureLog.info("Fant åpen oppgave: $oppgave")
-                oppdaterOppgaveMedNyBeskrivelse(oppgave = oppgave, beskrivelse = "${VurderLivshendelseType.SIVILSTAND.beskrivelse}: Bruker eller barn er registrert som gift/registrert partner")
+                oppdaterOppgaveMedNyBeskrivelse(oppgave = oppgave, beskrivelse = "${VurderLivshendelseType.SIVILSTAND.beskrivelse}: Bruker eller barn er registrert som ${if (sivilstandType == SIVILSTANDTYPE.GIFT) "gift" else "registrert partner"}")
                 task.metadata["oppgaveId"] = oppgave.id.toString()
                 task.metadata["info"] = "Fant åpen oppgave"
             }
@@ -503,7 +506,8 @@ class VurderLivshendelseService(
         personErBruker: Boolean,
         formatertDato: String,
         personIdent: String,
-    ): String = "${VurderLivshendelseType.SIVILSTAND.beskrivelse}: ${if (personErBruker) "bruker" else "barn $personIdent"} er registrert som gift/registrert partner fra $formatertDato"
+        erGift: Boolean,
+    ): String = "${VurderLivshendelseType.SIVILSTAND.beskrivelse}: ${if (personErBruker) "bruker" else "barn $personIdent"} er registrert som ${if (erGift) "gift" else "registrert partner"} fra $formatertDato"
 
     companion object {
         const val RESULTAT_INNVILGET = "INNVILGET"
@@ -520,6 +524,5 @@ enum class VurderLivshendelseType(
 ) {
     DØDSFALL("Dødsfall"),
     SIVILSTAND("Endring i sivilstand"),
-    ADDRESSE("Addresse"),
     UTFLYTTING("Utflytting"),
 }
