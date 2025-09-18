@@ -15,7 +15,6 @@ import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.RestOperations
 import java.net.URI
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 private val logger = LoggerFactory.getLogger(BaSakClient::class.java)
@@ -175,10 +174,3 @@ class BaSakClient
                 }
         }
     }
-
-fun main() {
-    val date1 = LocalDate.now()
-    val date2 = LocalDate.now().plusDays(1)
-    val date3 = LocalDate.now().plusDays(2)
-    listOf(date1, date2, date3).maxByOrNull { it }?.let { println(it) }
-}
