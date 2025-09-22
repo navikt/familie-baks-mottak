@@ -9,6 +9,7 @@ import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.kontrakter.felles.personopplysning.ForelderBarnRelasjon
+import no.nav.familie.kontrakter.felles.personopplysning.Oppholdsadresse
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Qualifier
@@ -288,6 +289,7 @@ data class PdlPersonData(
     @JsonProperty(value = "foedselsdato") val fødsel: List<Fødsel> = emptyList(),
     val sivilstand: List<Sivilstand> = emptyList(),
     @JsonProperty(value = "foedested") val fødested: List<Fødested> = emptyList(),
+    val oppholdsadresse: List<Oppholdsadresse> = emptyList(),
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
