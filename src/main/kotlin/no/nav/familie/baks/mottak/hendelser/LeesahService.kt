@@ -11,6 +11,7 @@ import no.nav.familie.baks.mottak.integrasjoner.RestAnnullerFødsel
 import no.nav.familie.baks.mottak.task.FinnmarkstilleggTask
 import no.nav.familie.baks.mottak.task.MottaAnnullerFødselTask
 import no.nav.familie.baks.mottak.task.MottaFødselshendelseTask
+import no.nav.familie.baks.mottak.task.SvalbardtilleggTask
 import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseTask
 import no.nav.familie.baks.mottak.task.VurderFinnmarkstillleggTaskDTO
 import no.nav.familie.baks.mottak.task.VurderKontantstøtteLivshendelseTask
@@ -64,6 +65,7 @@ class LeesahService(
             OPPLYSNINGSTYPE_UTFLYTTING -> behandleUtflyttingHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_SIVILSTAND -> behandleSivilstandHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_BOSTEDSADRESSE -> behandleBostedsadresseHendelse(pdlHendelse)
+            OPPLYSNINGSTYPE_OPPHOLDSADRESSE -> behandleOppholdsadresseHendelse(pdlHendelse)
         }
     }
 
@@ -303,6 +305,36 @@ class LeesahService(
             ),
         )
 
+    private fun behandleOppholdsadresseHendelse(pdlHendelse: PdlHendelse) {
+        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
+            leesahDuplikatCounter.increment()
+            return
+        }
+
+        when (pdlHendelse.endringstype) {
+            OPPRETTET,
+            -> {
+                SECURE_LOGGER.info("Mottatt behandleOppholdsadresseHendelse $pdlHendelse")
+                opprettSvalbardtilleggTask(pdlHendelse)
+            }
+
+            else -> log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}: ${pdlHendelse.endringstype}")
+        }
+        oppdaterHendelseslogg(pdlHendelse)
+    }
+
+    private fun opprettSvalbardtilleggTask(pdlHendelse: PdlHendelse) =
+        Task(
+            type = SvalbardtilleggTask.TASK_STEP_TYPE,
+            payload = pdlHendelse.hentPersonident(),
+            properties =
+                Properties().apply {
+                    this["ident"] = pdlHendelse.hentPersonident()
+                    this["callId"] = pdlHendelse.hendelseId
+                },
+        ).medTriggerTid(plussEnTimeIProd())
+            .also { taskService.save(it) }
+
     private fun plussEnTimeIProd(): LocalDateTime =
         LocalDateTime.now().run {
             if (environment.activeProfiles.contains("prod")) this.plusHours(1) else this
@@ -392,5 +424,6 @@ class LeesahService(
         const val OPPLYSNINGSTYPE_UTFLYTTING = "UTFLYTTING_FRA_NORGE"
         const val OPPLYSNINGSTYPE_SIVILSTAND = "SIVILSTAND_V1"
         const val OPPLYSNINGSTYPE_BOSTEDSADRESSE = "BOSTEDSADRESSE_V1"
+        const val OPPLYSNINGSTYPE_OPPHOLDSADRESSE = "OPPHOLDSADRESSE_V1"
     }
 }
