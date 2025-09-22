@@ -28,12 +28,7 @@ class FinnmarkstilleggTask(
     private val unleashNextMedContextService: UnleashNextMedContextService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
-        val payload =
-            try {
-                objectMapper.readValue(task.payload, VurderFinnmarkstillleggTaskDTO::class.java)
-            } catch (_: Exception) {
-                return
-            }
+        val payload = objectMapper.readValue(task.payload, VurderFinnmarkstillleggTaskDTO::class.java)
 
         val ident = payload.ident
         val bostedskommune = payload.bostedskommune
@@ -84,7 +79,7 @@ class FinnmarkstilleggTask(
         if (unleashNextMedContextService.isEnabled(FeatureToggleConfig.SEND_BOSTEDSADRESSE_HENDELSER_TIL_BA_SAK)) {
             baSakClient.sendFinnmarkstilleggTilBaSak(ident)
         }
-        task.metadata["resultat"] = "HAR_FLYTTETT_INN_ELLER_UT"
+        task.metadata["resultat"] = "HAR_FLYTTET_INN_ELLER_UT"
     }
 
     companion object {
