@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.5</version>
+        <version>3.5.6</version>
     </parent>
 
     <properties>
@@ -23,10 +23,10 @@
         <kotlin.version>2.2.20</kotlin.version>
         <mockk.version>1.14.5</mockk.version>
         <confluent.version>8.0.0</confluent.version>
-        <prosessering.version>2.20250915083819_745c62b</prosessering.version>
+        <prosessering.version>2.20250922094930_4bb329c</prosessering.version>
 
         <felles.version>3.20250915092837_153983f</felles.version>
-        <kontrakter.version>3.0_20250916123655_5035eb9</kontrakter.version>
+        <kontrakter.version>3.0_20250922092627_acbfa8f</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
         <spring.cloud.version>4.3.0</spring.cloud.version>
@@ -207,7 +207,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.7</version>
+            <version>42.7.8</version>
         </dependency>
         <dependency>
             <groupId>com.papertrailapp</groupId>
