@@ -271,7 +271,7 @@ class LeesahService(
                 return
             }
 
-        taskService.save(nyTask.medTriggerTid(plussEnTimeIProd()))
+        taskService.save(nyTask.medTriggerTid(finnTriggerTidSvalbardOgFinnmarkstilleggTask()))
     }
 
     private fun oppdaterEksisterendeFinnmarkstilleggTask(
@@ -332,13 +332,19 @@ class LeesahService(
                     this["ident"] = pdlHendelse.hentPersonident()
                     this["callId"] = pdlHendelse.hendelseId
                 },
-        ).medTriggerTid(plussEnTimeIProd())
+        ).medTriggerTid(finnTriggerTidSvalbardOgFinnmarkstilleggTask())
             .also { taskService.save(it) }
 
-    private fun plussEnTimeIProd(): LocalDateTime =
-        LocalDateTime.now().run {
-            if (environment.activeProfiles.contains("prod")) this.plusHours(1) else this
+    private fun finnTriggerTidSvalbardOgFinnmarkstilleggTask(): LocalDateTime {
+        val nåværendeTidspunkt = LocalDateTime.now()
+        val tidligsteTriggerTid = LocalDateTime.of(2025, 11, 1, 0, 0)
+
+        return if (!environment.activeProfiles.contains("prod")) {
+            return nåværendeTidspunkt
+        } else {
+            maxOf(nåværendeTidspunkt.plusHours(1), tidligsteTriggerTid)
         }
+    }
 
     private fun oppdaterHendelseslogg(pdlHendelse: PdlHendelse) {
         val metadata =
