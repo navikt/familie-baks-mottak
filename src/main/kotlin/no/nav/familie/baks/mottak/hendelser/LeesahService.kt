@@ -340,7 +340,7 @@ class LeesahService(
         val tidligsteTriggerTid = LocalDateTime.of(2025, 11, 1, 0, 0)
 
         return if (!environment.activeProfiles.contains("prod")) {
-            return nåværendeTidspunkt
+            nåværendeTidspunkt
         } else {
             maxOf(nåværendeTidspunkt.plusHours(1), tidligsteTriggerTid)
         }
