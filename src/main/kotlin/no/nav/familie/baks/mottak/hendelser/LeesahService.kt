@@ -11,6 +11,7 @@ import no.nav.familie.baks.mottak.integrasjoner.RestAnnullerFødsel
 import no.nav.familie.baks.mottak.task.FinnmarkstilleggTask
 import no.nav.familie.baks.mottak.task.MottaAnnullerFødselTask
 import no.nav.familie.baks.mottak.task.MottaFødselshendelseTask
+import no.nav.familie.baks.mottak.task.SvalbardtilleggTask
 import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseTask
 import no.nav.familie.baks.mottak.task.VurderFinnmarkstillleggTaskDTO
 import no.nav.familie.baks.mottak.task.VurderKontantstøtteLivshendelseTask
@@ -20,6 +21,7 @@ import no.nav.familie.baks.mottak.task.VurderLivshendelseType.SIVILSTAND
 import no.nav.familie.baks.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE.GIFT
+import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE.REGISTRERT_PARTNER
 import no.nav.familie.prosessering.domene.Status.KLAR_TIL_PLUKK
 import no.nav.familie.prosessering.domene.Status.UBEHANDLET
 import no.nav.familie.prosessering.domene.Task
@@ -63,6 +65,7 @@ class LeesahService(
             OPPLYSNINGSTYPE_UTFLYTTING -> behandleUtflyttingHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_SIVILSTAND -> behandleSivilstandHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_BOSTEDSADRESSE -> behandleBostedsadresseHendelse(pdlHendelse)
+            OPPLYSNINGSTYPE_OPPHOLDSADRESSE -> behandleOppholdsadresseHendelse(pdlHendelse)
         }
     }
 
@@ -217,7 +220,7 @@ class LeesahService(
     }
 
     private fun opprettTaskHvisSivilstandErGift(pdlHendelse: PdlHendelse) {
-        if (pdlHendelse.sivilstand == GIFT.name) {
+        if (pdlHendelse.sivilstand in listOf(GIFT.name, REGISTRERT_PARTNER.name)) {
             opprettVurderBarnetrygdLivshendelseTaskForHendelse(SIVILSTAND, pdlHendelse)
         } else {
             sivilstandIgnorertCounter.increment()
@@ -268,7 +271,7 @@ class LeesahService(
                 return
             }
 
-        taskService.save(nyTask.medTriggerTid(plussEnTimeIProd()))
+        taskService.save(nyTask.medTriggerTid(finnTriggerTidSvalbardOgFinnmarkstilleggTask()))
     }
 
     private fun oppdaterEksisterendeFinnmarkstilleggTask(
@@ -302,10 +305,46 @@ class LeesahService(
             ),
         )
 
-    private fun plussEnTimeIProd(): LocalDateTime =
-        LocalDateTime.now().run {
-            if (environment.activeProfiles.contains("prod")) this.plusHours(1) else this
+    private fun behandleOppholdsadresseHendelse(pdlHendelse: PdlHendelse) {
+        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
+            leesahDuplikatCounter.increment()
+            return
         }
+
+        when (pdlHendelse.endringstype) {
+            OPPRETTET,
+            -> {
+                SECURE_LOGGER.info("Mottatt behandleOppholdsadresseHendelse $pdlHendelse")
+                opprettSvalbardtilleggTask(pdlHendelse)
+            }
+
+            else -> log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}: ${pdlHendelse.endringstype}")
+        }
+        oppdaterHendelseslogg(pdlHendelse)
+    }
+
+    private fun opprettSvalbardtilleggTask(pdlHendelse: PdlHendelse) =
+        Task(
+            type = SvalbardtilleggTask.TASK_STEP_TYPE,
+            payload = pdlHendelse.hentPersonident(),
+            properties =
+                Properties().apply {
+                    this["ident"] = pdlHendelse.hentPersonident()
+                    this["callId"] = pdlHendelse.hendelseId
+                },
+        ).medTriggerTid(finnTriggerTidSvalbardOgFinnmarkstilleggTask())
+            .also { taskService.save(it) }
+
+    private fun finnTriggerTidSvalbardOgFinnmarkstilleggTask(): LocalDateTime {
+        val nåværendeTidspunkt = LocalDateTime.now()
+        val tidligsteTriggerTid = LocalDateTime.of(2025, 11, 1, 0, 0)
+
+        return if (!environment.activeProfiles.contains("prod")) {
+            nåværendeTidspunkt
+        } else {
+            maxOf(nåværendeTidspunkt.plusHours(1), tidligsteTriggerTid)
+        }
+    }
 
     private fun oppdaterHendelseslogg(pdlHendelse: PdlHendelse) {
         val metadata =
@@ -391,5 +430,6 @@ class LeesahService(
         const val OPPLYSNINGSTYPE_UTFLYTTING = "UTFLYTTING_FRA_NORGE"
         const val OPPLYSNINGSTYPE_SIVILSTAND = "SIVILSTAND_V1"
         const val OPPLYSNINGSTYPE_BOSTEDSADRESSE = "BOSTEDSADRESSE_V1"
+        const val OPPLYSNINGSTYPE_OPPHOLDSADRESSE = "OPPHOLDSADRESSE_V1"
     }
 }

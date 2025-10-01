@@ -12,5 +12,7 @@ class FeatureToggleConfig {
         const val NY_FAMILIE_PDF_KVITTERING = "familie-ba-soknad.ny-pdf"
 
         const val SEND_BOSTEDSADRESSE_HENDELSER_TIL_BA_SAK = "familie-baks-mottak.send-bostedsadresse-hendelser-til-ba-sak"
+
+        const val SEND_OPPHOLDSADRESSE_HENDELSER_TIL_BA_SAK = "familie-baks-mottak.send-oppholdsadresse-hendelser-til-ba-sak"
     }
 }
