@@ -1,7 +1,5 @@
 package no.nav.familie.baks.mottak.task
 
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
-import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.kontrakter.ba.finnmarkstillegg.kommuneErIFinnmarkEllerNordTroms
@@ -10,22 +8,29 @@ import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
+import no.nav.familie.prosessering.domene.Status.KLAR_TIL_PLUKK
+import no.nav.familie.prosessering.domene.Status.UBEHANDLET
 import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.LoggerFactory
+import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.Properties
 
 @Service
 @TaskStepBeskrivelse(
     taskStepType = FinnmarkstilleggTask.TASK_STEP_TYPE,
-    beskrivelse = "Sjekker om en adressehendelse skal trigge Finnmarkstillegg autovedtak av Finnmarkstillegg",
+    beskrivelse = "Sjekker om en adressehendelse skal trigge finnmarkstilleggbehandling i ba-sak",
     maxAntallFeil = 3,
     triggerTidVedFeilISekunder = 60,
 )
 class FinnmarkstilleggTask(
     private val pdlClient: PdlClient,
     private val baSakClient: BaSakClient,
-    private val unleashNextMedContextService: UnleashNextMedContextService,
+    private val taskService: TaskService,
+    private val environment: Environment,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
         val payload = objectMapper.readValue(task.payload, VurderFinnmarkstillleggTaskDTO::class.java)
@@ -37,6 +42,17 @@ class FinnmarkstilleggTask(
         if (bostedskommune == null || bostedskommuneFomDato == null) {
             secureLogger.info("Bostedskommune eller fom-dato er ikke satt for ident $ident, hopper ut av FinnmarkstilleggTask")
             task.metadata["resultat"] = "BOSTEDSKOMMUNE_ELLER_FOM_DATO_IKKE_SATT"
+            return
+        }
+
+        val eksistererUkjørtTaskForIdent =
+            taskService
+                .finnTaskMedPayloadOgType(ident, TriggFinnmarkstilleggbehandlingIBaSakTask.TASK_STEP_TYPE)
+                ?.status in setOf(UBEHANDLET, KLAR_TIL_PLUKK)
+
+        if (eksistererUkjørtTaskForIdent) {
+            secureLogger.info("Det finnes allerede en ukjørt TriggFinnmarkstilleggbehandlingIBaSakTask for ident $ident, hopper ut av FinnmarkstilleggTask")
+            task.metadata["resultat"] = "EKSISTERER_UKJØRT_TASK"
             return
         }
 
@@ -76,11 +92,28 @@ class FinnmarkstilleggTask(
                 "Gammel adresse: $forrigeBostedskommuneErIFinnmarkEllerNordTroms " +
                 "Ny adresse: $nyBostedskommuneErIFinnmarkEllerNordTroms",
         )
-        if (unleashNextMedContextService.isEnabled(FeatureToggleConfig.SEND_BOSTEDSADRESSE_HENDELSER_TIL_BA_SAK)) {
-            baSakClient.sendFinnmarkstilleggTilBaSak(ident)
-        }
         task.metadata["resultat"] = "HAR_FLYTTET_INN_ELLER_UT"
+        taskService.save(
+            Task(
+                type = TriggFinnmarkstilleggbehandlingIBaSakTask.TASK_STEP_TYPE,
+                payload = ident,
+                properties =
+                    Properties().apply {
+                        this["ident"] = ident
+                    },
+            ).medTriggerTid(finnTriggertidForÅSendeIdentTilBaSak()),
+        )
     }
+
+    private fun finnTriggertidForÅSendeIdentTilBaSak(): LocalDateTime =
+        LocalDateTime.now().run {
+            if (environment.activeProfiles.contains("prod")) {
+                val tidligsteTriggerTid = LocalDateTime.of(2025, 11, 1, 0, 0)
+                plusHours(1).coerceAtLeast(tidligsteTriggerTid)
+            } else {
+                this
+            }
+        }
 
     companion object {
         const val TASK_STEP_TYPE = "finnmarkstilleggTask"
