@@ -7,24 +7,18 @@ import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
 import no.nav.familie.baks.mottak.domene.hendelser.PdlHendelse
-import no.nav.familie.baks.mottak.task.FinnmarkstilleggTask
 import no.nav.familie.baks.mottak.task.MottaAnnullerFødselTask
 import no.nav.familie.baks.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseTask
 import no.nav.familie.baks.mottak.task.VurderFinnmarkstillleggTaskDTO
 import no.nav.familie.baks.mottak.task.VurderKontantstøtteLivshendelseTask
 import no.nav.familie.kontrakter.felles.objectMapper
-import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
-import org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE
 import org.springframework.core.env.Environment
 import java.time.LocalDate
 import java.util.UUID
@@ -212,236 +206,69 @@ class LeesahServiceTest {
         }
     }
 
-    @Nested
-    inner class FinnmarkstilleggTaskTest {
-        private val ident = "12345678910"
-        private val bostedskommune = "0301"
-        private val bostedskommuneFomDato = LocalDate.of(2025, 1, 1)
+    @Test
+    fun `Skal opprette FinnmarkstilleggTask for OPPLYSNINGSTYPE_BOSTEDSADRESSE`() {
+        // Arrange
+        val ident = "12345678910"
+        val bostedskommune = "0301"
+        val bostedskommuneFomDato = LocalDate.of(2025, 1, 1)
+        val hendelseId = UUID.randomUUID().toString()
 
-        private val hendelseId = UUID.randomUUID().toString()
-        private val tidligereHendelseId = UUID.randomUUID().toString()
+        val pdlHendelse =
+            PdlHendelse(
+                offset = Random.nextLong(),
+                gjeldendeAktørId = ident,
+                hendelseId = hendelseId,
+                personIdenter = listOf(ident),
+                endringstype = LeesahService.OPPRETTET,
+                opplysningstype = LeesahService.OPPLYSNINGSTYPE_BOSTEDSADRESSE,
+                bostedskommune = bostedskommune,
+                bostedskommuneFomDato = bostedskommuneFomDato,
+            )
 
-        @Test
-        fun `Skal opprette ny FinnmarkstilleggTask når tidligereHendelseId er null`() {
-            // Arrange
-            val pdlHendelse =
-                PdlHendelse(
-                    offset = Random.nextLong(),
-                    gjeldendeAktørId = ident,
-                    hendelseId = hendelseId,
-                    personIdenter = listOf(ident),
-                    endringstype = LeesahService.OPPRETTET,
-                    opplysningstype = LeesahService.OPPLYSNINGSTYPE_BOSTEDSADRESSE,
-                    bostedskommune = bostedskommune,
-                    bostedskommuneFomDato = bostedskommuneFomDato,
-                    tidligereHendelseId = null,
-                )
+        // Act
+        service.prosesserNyHendelse(pdlHendelse)
 
-            // Act
-            service.prosesserNyHendelse(pdlHendelse)
+        // Assert
+        val taskSlot = slot<Task>()
+        verify(exactly = 1) { mockTaskService.save(capture(taskSlot)) }
 
-            // Assert
-            val taskSlot = slot<Task>()
-            verify { mockTaskService.save(capture(taskSlot)) }
+        val payload = objectMapper.readValue(taskSlot.captured.payload, VurderFinnmarkstillleggTaskDTO::class.java)
+        assertThat(taskSlot.captured.id).isEqualTo(0L)
+        assertThat(payload.ident).isEqualTo(ident)
+        assertThat(payload.bostedskommune).isEqualTo(bostedskommune)
+        assertThat(payload.bostedskommuneFomDato).isEqualTo(bostedskommuneFomDato)
+        assertThat(taskSlot.captured.metadata["callId"]).isEqualTo(hendelseId)
+        assertThat(taskSlot.captured.metadata["ident"]).isEqualTo(ident)
+    }
 
-            assertFinnmarkstilleggTask(task = taskSlot.captured)
-        }
+    @Test
+    fun `Skal opprette SvalbardtilleggTask for OPPLYSNINGSTYPE_OPPHOLDSADRESSE`() {
+        // Arrange
+        val ident = "12345678910"
+        val hendelseId = UUID.randomUUID().toString()
 
-        @Test
-        fun `Skal opprette ny FinnmarkstilleggTask når tidligereHendelseId finnes, men ingen task med matchende callId`() {
-            // Arrange
-            every { mockTaskService.finnAlleTasksMedCallId(tidligereHendelseId) } returns emptyList()
+        val pdlHendelse =
+            PdlHendelse(
+                offset = Random.nextLong(),
+                gjeldendeAktørId = ident,
+                hendelseId = hendelseId,
+                personIdenter = listOf(ident),
+                endringstype = LeesahService.OPPRETTET,
+                opplysningstype = LeesahService.OPPLYSNINGSTYPE_OPPHOLDSADRESSE,
+            )
 
-            val pdlHendelse =
-                PdlHendelse(
-                    offset = Random.nextLong(),
-                    gjeldendeAktørId = ident,
-                    hendelseId = hendelseId,
-                    personIdenter = listOf(ident),
-                    endringstype = LeesahService.KORRIGERT,
-                    opplysningstype = LeesahService.OPPLYSNINGSTYPE_BOSTEDSADRESSE,
-                    bostedskommune = bostedskommune,
-                    bostedskommuneFomDato = bostedskommuneFomDato,
-                    tidligereHendelseId = tidligereHendelseId,
-                )
+        // Act
+        service.prosesserNyHendelse(pdlHendelse)
 
-            // Act
-            service.prosesserNyHendelse(pdlHendelse)
+        // Assert
+        val taskSlot = slot<Task>()
+        verify(exactly = 1) { mockTaskService.save(capture(taskSlot)) }
 
-            // Assert
-            val taskSlot = slot<Task>()
-            verify { mockTaskService.save(capture(taskSlot)) }
-
-            assertFinnmarkstilleggTask(task = taskSlot.captured)
-        }
-
-        @ParameterizedTest
-        @EnumSource(value = Status::class, names = ["KLAR_TIL_PLUKK", "UBEHANDLET"], mode = EXCLUDE)
-        fun `Skal opprette ny FinnmarkstilleggTask når eksisterende task har feil status`(
-            status: Status,
-        ) {
-            // Arrange
-            val tidligereHendelse =
-                Task(
-                    id = 1L,
-                    type = FinnmarkstilleggTask.TASK_STEP_TYPE,
-                    payload = "{\"ident\":\"$ident\",\"bostedskommune\":\"$bostedskommune\",\"bostedskommuneFomDato\":\"$bostedskommuneFomDato\"}",
-                    status = status,
-                ).apply {
-                    metadata.setProperty("ident", ident)
-                    metadata.setProperty("callId", tidligereHendelseId)
-                }
-
-            every { mockTaskService.finnAlleTasksMedCallId(tidligereHendelseId) } returns listOf(tidligereHendelse)
-
-            val nyBostedskommune = "0302"
-            val pdlHendelse =
-                PdlHendelse(
-                    offset = Random.nextLong(),
-                    gjeldendeAktørId = ident,
-                    hendelseId = hendelseId,
-                    personIdenter = listOf(ident),
-                    endringstype = LeesahService.OPPRETTET,
-                    opplysningstype = LeesahService.OPPLYSNINGSTYPE_BOSTEDSADRESSE,
-                    bostedskommune = nyBostedskommune,
-                    bostedskommuneFomDato = bostedskommuneFomDato,
-                    tidligereHendelseId = null,
-                )
-
-            // Act
-            service.prosesserNyHendelse(pdlHendelse)
-
-            // Assert
-            val taskSlot = slot<Task>()
-            verify { mockTaskService.save(capture(taskSlot)) }
-
-            assertFinnmarkstilleggTask(task = taskSlot.captured, forventetBostedskommune = nyBostedskommune)
-        }
-
-        @Test
-        fun `Skal filtrere bort tidligere tasks som ikke er FinnmarkstilleggTask type`() {
-            // Arrange
-            val annenTypeTask =
-                Task(
-                    id = 1L,
-                    type = "annenTaskType",
-                    payload = "payload",
-                )
-
-            every { mockTaskService.finnAlleTasksMedCallId(tidligereHendelseId) } returns listOf(annenTypeTask)
-
-            val pdlHendelse =
-                PdlHendelse(
-                    offset = Random.nextLong(),
-                    gjeldendeAktørId = ident,
-                    hendelseId = hendelseId,
-                    personIdenter = listOf(ident),
-                    endringstype = LeesahService.KORRIGERT,
-                    opplysningstype = LeesahService.OPPLYSNINGSTYPE_BOSTEDSADRESSE,
-                    bostedskommune = bostedskommune,
-                    bostedskommuneFomDato = bostedskommuneFomDato,
-                    tidligereHendelseId = tidligereHendelseId,
-                )
-
-            // Act
-            service.prosesserNyHendelse(pdlHendelse)
-
-            // Assert
-            val taskSlot = slot<Task>()
-            verify { mockTaskService.save(capture(taskSlot)) }
-
-            assertFinnmarkstilleggTask(taskSlot.captured)
-        }
-
-        @Test
-        fun `Skal oppdatere eksisterende FinnmarkstilleggTask når eksisterende task har ulik payload`() {
-            // Arrange
-            val eksisterendeTask =
-                Task(
-                    id = 1L,
-                    type = FinnmarkstilleggTask.TASK_STEP_TYPE,
-                    payload = "{\"ident\":\"$ident\",\"bostedskommune\":\"$bostedskommune\",\"bostedskommuneFomDato\":\"$bostedskommuneFomDato\"}",
-                ).apply {
-                    metadata.setProperty("ident", ident)
-                    metadata.setProperty("callId", tidligereHendelseId)
-                }
-
-            every { mockTaskService.finnAlleTasksMedCallId(tidligereHendelseId) } returns listOf(eksisterendeTask)
-
-            val nyBostedskommune = "0302"
-
-            val pdlHendelse =
-                PdlHendelse(
-                    offset = Random.nextLong(),
-                    gjeldendeAktørId = ident,
-                    hendelseId = hendelseId,
-                    personIdenter = listOf(ident),
-                    endringstype = LeesahService.KORRIGERT,
-                    opplysningstype = LeesahService.OPPLYSNINGSTYPE_BOSTEDSADRESSE,
-                    bostedskommune = nyBostedskommune,
-                    bostedskommuneFomDato = bostedskommuneFomDato,
-                    tidligereHendelseId = tidligereHendelseId,
-                )
-
-            // Act
-            service.prosesserNyHendelse(pdlHendelse)
-
-            // Assert
-            val taskSlot = slot<Task>()
-            verify { mockTaskService.save(capture(taskSlot)) }
-
-            assertFinnmarkstilleggTask(task = taskSlot.captured, forventetTaskId = 1L, forventetBostedskommune = nyBostedskommune)
-        }
-
-        @Test
-        fun `Skal ikke opprette eller oppdatere FinnmarkstilleggTask når eksisterende task har samme payload`() {
-            // Arrange
-            val eksisterendeTask =
-                Task(
-                    type = "finnmarkstilleggTask",
-                    payload = "{\"ident\":\"$ident\",\"bostedskommune\":\"$bostedskommune\",\"bostedskommuneFomDato\":\"$bostedskommuneFomDato\"}",
-                ).apply {
-                    metadata.setProperty("ident", ident)
-                    metadata.setProperty("callId", tidligereHendelseId)
-                }
-
-            every { mockTaskService.finnAlleTasksMedCallId(tidligereHendelseId) } returns listOf(eksisterendeTask)
-
-            val pdlHendelse =
-                PdlHendelse(
-                    offset = Random.nextLong(),
-                    gjeldendeAktørId = ident,
-                    hendelseId = hendelseId,
-                    personIdenter = listOf(ident),
-                    endringstype = LeesahService.KORRIGERT,
-                    opplysningstype = LeesahService.OPPLYSNINGSTYPE_BOSTEDSADRESSE,
-                    bostedskommune = bostedskommune,
-                    bostedskommuneFomDato = bostedskommuneFomDato,
-                    tidligereHendelseId = tidligereHendelseId,
-                )
-
-            // Act
-            service.prosesserNyHendelse(pdlHendelse)
-
-            // Assert
-            verify(exactly = 0) { mockTaskService.save(any()) }
-        }
-
-        private fun assertFinnmarkstilleggTask(
-            task: Task,
-            forventetTaskId: Long = 0L,
-            forventetIdent: String = ident,
-            forventetBostedskommune: String? = bostedskommune,
-            forventetBostedskommuneFomDato: LocalDate? = bostedskommuneFomDato,
-            forventetCallId: String? = hendelseId,
-        ) {
-            val payload = objectMapper.readValue(task.payload, VurderFinnmarkstillleggTaskDTO::class.java)
-            assertThat(task.id).isEqualTo(forventetTaskId)
-            assertThat(payload.ident).isEqualTo(forventetIdent)
-            assertThat(payload.bostedskommune).isEqualTo(forventetBostedskommune)
-            assertThat(payload.bostedskommuneFomDato).isEqualTo(forventetBostedskommuneFomDato)
-            assertThat(task.metadata["callId"]).isEqualTo(forventetCallId)
-            assertThat(task.metadata["ident"]).isEqualTo(forventetIdent)
-        }
+        val payload = taskSlot.captured.payload
+        assertThat(taskSlot.captured.id).isEqualTo(0L)
+        assertThat(payload).isEqualTo(ident)
+        assertThat(taskSlot.captured.metadata["callId"]).isEqualTo(hendelseId)
+        assertThat(taskSlot.captured.metadata["ident"]).isEqualTo(ident)
     }
 }
