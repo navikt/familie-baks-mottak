@@ -1,5 +1,5 @@
 {
-  "kontraktVersjon": 9,
+  "kontraktVersjon": 10,
   "antallEøsSteg": 2,
   "søknadstype": "ORDINÆR",
   "søker": {
@@ -14,10 +14,7 @@
     },
     "statsborgerskap": {
       "label": "Statsborgerskap",
-      "verdi": [
-        "Norge",
-        "Afghanistan"
-      ]
+      "verdi": ["Norge", "Afghanistan"]
     },
     "adresse": {
       "label": "Adresse",
@@ -362,6 +359,10 @@
         "adresse": {
           "label": "Hvor bor Barn Barnessen III i perioden det søkes om barnetrygd?",
           "verdi": ""
+        },
+        "harBoddPåSvalbard": {
+          "label": "Hvem av barna har bodd på Svalbard sammen med deg?",
+          "verdi": "JA"
         }
       },
       "utenlandsperioder": [
@@ -625,6 +626,21 @@
             }
           }
         }
+      ],
+      "svalbardOppholdPerioder": [
+        {
+          "label": "Opphold på Svalbard 1",
+          "verdi": {
+            "fraDatoSvalbardOpphold": {
+              "label": "Når startet oppholdet?",
+              "verdi": "2022-06-01"
+            },
+            "tilDatoSvalbardOpphold": {
+              "label": "Når avsluttes oppholdet?",
+              "verdi": "Jeg vet ikke når oppholdet avsluttes"
+            }
+          }
+        }
       ]
     }
   ],
@@ -660,6 +676,10 @@
     "lestOgForståttBekreftelse": {
       "label": "Jeg er klar over at jeg kan miste retten til barnetrygd dersom jeg gir feil opplysninger. Jeg er også klar over at jeg må betale tilbake dersom jeg får penger jeg ikke har rett til hvis jeg lar være å informere eller gir feil opplysninger.",
       "verdi": "Jeg bekrefter at jeg har lest og forstått."
+    },
+    "harNoenAvBarnaBoddPåSvalbard": {
+      "label": "Har noen av barna oppholdt seg på Svalbard?",
+      "verdi": "JA"
     }
   },
   "dokumentasjon": [
@@ -682,6 +702,18 @@
       "dokumentasjonSpråkTittel": "Bekreftelse på dato du overtok omsorgen ved adopsjon"
     },
     {
+      "dokumentasjonsbehov": "OPPHOLD_SVALBARD",
+      "harSendtInn": true,
+      "opplastedeVedlegg": [
+        {
+          "dokumentId": "",
+          "navn": "navn.pdf",
+          "tittel": "OPPHOLD_SVALBARD"
+        }
+      ],
+      "dokumentasjonSpråkTittel": "Bekreftelse på opphold på Svalbard"
+    },
+    {
       "dokumentasjonsbehov": "ANNEN_DOKUMENTASJON",
       "harSendtInn": false,
       "opplastedeVedlegg": [],
@@ -689,45 +721,46 @@
     }
   ],
   "teksterUtenomSpørsmål": {
-    "hvilkebarn.barn.bosted.adressesperre": "Barnet er registrert med adressesperre.",
-    "ombarnet.fosterbarn": "Du har opplyst at {navn} er fosterbarn",
-    "ombarnet.institusjon": "Du har opplyst at {navn} er i institusjon",
-    "ombarnet.opplystatbarnutlandopphold.info": "Du har opplyst at {navn} har oppholdt seg utenfor Norge i løpet av de siste tolv månedene",
-    "ombarnet.barnetrygd-eøs": "Du har opplyst at du får eller har søkt om barnetrygd for {navn} fra et annet EØS land.",
-    "omdeg.annensamboer.spm": "Har du hatt samboer tidligere i perioden du søker barnetrygd for?",
-    "omdeg.personopplysninger.adressesperre.alert": "Du er registrert med adressesperre",
-    "omdeg.personopplysninger.ikke-registrert.alert": "Du er ikke registrert med bostedsadresse i Norge",
-    "pdf.andreforelder.seksjonstittel": "Barnets andre forelder",
-    "pdf.hvilkebarn.seksjonstittel": "Hvilke barn søker du for?",
-    "pdf.hvilkebarn.registrert-på-adresse": "Registrert på søkers adresse",
-    "pdf.hvilkebarn.ikke-registrert-på-adresse": "Ikke registrert på søkers adresse",
-    "pdf.ombarnet.seksjonstittel": "Om {navn}",
-    "pdf.omdeg.seksjonstittel": "Om deg",
-    "pdf.bosted.seksjonstittel": "Bosted",
-    "pdf.ombarna.seksjonstittel": "Om barna dine",
-    "pdf.søker-for-tidsrom.seksjonstittel": "Søker du barnetrygd for et spesielt tidsrom for {navn}?",
-    "pdf.søker.seksjonstittel": "Søker",
-    "pdf.vedlegg.seksjonstittel": "Liste over vedlegg",
-    "pdf.vedlegg.lastet-opp-antall": "Lastet opp {antall} vedlegg",
-    "pdf.vedlegg.nummerering": "Vedlegg {x} av {total}",
-    "dokumentasjon.har-sendt-inn.spm": "Jeg har sendt inn denne dokumentasjonen til NAV tidligere",
-    "dinlivssituasjon.sidetittel": "Livssituasjonen din",
-    "pdf.dinlivssituasjon.tidligeresamboer.seksjonstittel": "Tidligere samboer {x}",
-    "eøs-om-deg.sidetittel": "Barnetrygd etter EØS-reglene - Om deg",
-    "eøs-om-barn.sidetittel": "Barnetrygd etter EØS-reglene - Om {barn}",
-    "felles.sivilstatus.kode.GIFT": "Gift",
-    "felles.sivilstatus.kode.ENKE_ELLER_ENKEMANN": "Enke/Enkemann",
-    "felles.sivilstatus.kode.SKILT": "Skilt",
-    "felles.sivilstatus.kode.SEPARERT": "Separert",
-    "felles.sivilstatus.kode.REGISTRERT_PARTNER": "Registrert partner",
-    "felles.sivilstatus.kode.SEPARERT_PARTNER": "Separert partner",
-    "felles.sivilstatus.kode.SKILT_PARTNER": "Skilt partner",
-    "felles.sivilstatus.kode.GJENLEVENDE_PARTNER": "Gjenlevende partner",
-    "felles.sivilstatus.kode.UGIFT": "Ugift",
-    "felles.sivilstatus.kode.UOPPGITT": "Ikke oppgitt",
-    "felles.svaralternativ.ja": "Ja",
-    "felles.svaralternativ.nei": "Nei",
-    "felles.svaralternativ.vetikke": "Jeg vet ikke"
+    "registrertMedAdressesperre": "Barnet er registrert med adressesperre.",
+    "opplystFosterbarn": "Du har opplyst at {navn} er fosterbarn",
+    "opplystInstitusjon": "Du har opplyst at {navn} er i institusjon",
+    "opplystBarnOppholdUtenforNorge": "Du har opplyst at {navn} har oppholdt seg utenfor Norge i løpet av de siste tolv månedene",
+    "opplystFaarHarFaattEllerSoektYtelse": "Du har opplyst at du får eller har søkt om barnetrygd for {navn} fra et annet EØS land.",
+    "opplystBoddPaaSvalbard": "Du har opplyst at {navn} har oppholdt seg på Svalbard sammen med deg",
+    "naarBoddPaaSvalbardSpm": "Når bodde {navn} på Svalbard?",
+    "hattAnnenSamboerForSoektPeriode.sporsmal": "Har du hatt samboer tidligere i perioden du søker barnetrygd for?",
+    "soekerAdressesperre": "Du er registrert med adressesperre",
+    "ikkeRegistrertAdresse": "Du er ikke registrert med bostedsadresse i Norge",
+    "barnetsAndreForelder": "Barnets andre forelder",
+    "velgBarnTittel": "Hvilke barn søker du for?",
+    "registrertPaaAdressenDin": "Registrert på søkers adresse",
+    "ikkeRegistrertPaaAdressenDin": "Ikke registrert på søkers adresse",
+    "omBarnetTittel": "Om {navn}",
+    "omDegTittel": "Om deg",
+    "bosted": "Bosted",
+    "omBarnaTittel": "Om barna dine",
+    "soeker": "Søker",
+    "listeOverVedlegg": "Liste over vedlegg",
+    "lastetOppAntall": "Lastet opp {antall} vedlegg",
+    "vedleggXavY": "Vedlegg {antall} av {totalAntall}",
+    "sendtInnTidligere": "Jeg har sendt inn denne dokumentasjonen til NAV tidligere",
+    "dinLivssituasjonTittel": "Livssituasjonen din",
+    "oppsummeringstittel": "Tidligere samboer {antall}",
+    "eoesForSoekerTittel": "Barnetrygd etter EØS-reglene - Om deg",
+    "eoesForBarnTittel": "Barnetrygd etter EØS-reglene - Om {navn}",
+    "sivilstandGift": "Gift",
+    "sivilstandEnkeEnkemann": "Enke/Enkemann",
+    "sivilstandSkilt": "Skilt",
+    "sivilstandSeparert": "Separert",
+    "sivilstandRegistrertPartner": "Registrert partner",
+    "sivilstandSeparertPartner": "Separert partner",
+    "sivilstandSkiltPartner": "Skilt partner",
+    "sivilstandGjenlevendePartner": "Gjenlevende partner",
+    "sivilstandUgift": "Ugift",
+    "sivilstandUoppgitt": "Ikke oppgitt",
+    "ja": "Ja",
+    "nei": "Nei",
+    "jegVetIkke": "Jeg vet ikke"
   },
   "originalSpråk": "nb",
   "dokumentDato": "15.05.2024",
