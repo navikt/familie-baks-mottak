@@ -22,8 +22,6 @@ import no.nav.familie.baks.mottak.util.nesteGyldigeTriggertidFødselshendelser
 import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE.GIFT
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE.REGISTRERT_PARTNER
-import no.nav.familie.prosessering.domene.Status.KLAR_TIL_PLUKK
-import no.nav.familie.prosessering.domene.Status.UBEHANDLET
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
@@ -248,53 +246,14 @@ class LeesahService(
         oppdaterHendelseslogg(pdlHendelse)
     }
 
-    private fun opprettFinnmarkstilleggTask(pdlHendelse: PdlHendelse) {
-        val eksisterendeTask =
-            pdlHendelse.tidligereHendelseId?.let { tidligereHendelseId ->
-                taskService
-                    .finnAlleTasksMedCallId(tidligereHendelseId)
-                    .firstOrNull {
-                        it.type == FinnmarkstilleggTask.TASK_STEP_TYPE &&
-                            it.status in setOf(UBEHANDLET, KLAR_TIL_PLUKK)
-                    }
-            }
-
-        val nyPayload = lagFinnmarkstilleggTaskPayload(pdlHendelse)
-
-        val nyTask =
-            if (eksisterendeTask == null) {
-                opprettNyFinnmarkstilleggTask(pdlHendelse)
-            } else if (nyPayload != eksisterendeTask.payload) {
-                oppdaterEksisterendeFinnmarkstilleggTask(eksisterendeTask, pdlHendelse)
-            } else {
-                log.info("FinnmarkstilleggTask for hendelse ${pdlHendelse.hendelseId} finnes allerede med samme payload, oppretter ikke på nytt")
-                return
-            }
-
-        taskService.save(nyTask.medTriggerTid(finnTriggerTidSvalbardOgFinnmarkstilleggTask()))
-    }
-
-    private fun oppdaterEksisterendeFinnmarkstilleggTask(
-        eksisterendeTask: Task,
-        pdlHendelse: PdlHendelse,
-    ) = eksisterendeTask
-        .copy(
-            payload = lagFinnmarkstilleggTaskPayload(pdlHendelse),
-            metadataWrapper =
-                eksisterendeTask.metadataWrapper.apply {
-                    properties["ident"] = pdlHendelse.hentPersonident()
-                    properties["callId"] = pdlHendelse.hendelseId
-                },
-        )
-
-    private fun opprettNyFinnmarkstilleggTask(pdlHendelse: PdlHendelse) =
+    private fun opprettFinnmarkstilleggTask(pdlHendelse: PdlHendelse) =
         Task(
             type = FinnmarkstilleggTask.TASK_STEP_TYPE,
             payload = lagFinnmarkstilleggTaskPayload(pdlHendelse),
         ).apply {
             metadata["callId"] = pdlHendelse.hendelseId
             metadata["ident"] = pdlHendelse.hentPersonident()
-        }
+        }.also { taskService.save(it) }
 
     private fun lagFinnmarkstilleggTaskPayload(pdlHendelse: PdlHendelse): String =
         objectMapper.writeValueAsString(
@@ -327,13 +286,10 @@ class LeesahService(
         Task(
             type = SvalbardtilleggTask.TASK_STEP_TYPE,
             payload = pdlHendelse.hentPersonident(),
-            properties =
-                Properties().apply {
-                    this["ident"] = pdlHendelse.hentPersonident()
-                    this["callId"] = pdlHendelse.hendelseId
-                },
-        ).medTriggerTid(finnTriggerTidSvalbardOgFinnmarkstilleggTask())
-            .also { taskService.save(it) }
+        ).apply {
+            metadata["callId"] = pdlHendelse.hendelseId
+            metadata["ident"] = pdlHendelse.hentPersonident()
+        }.also { taskService.save(it) }
 
     private fun finnTriggerTidSvalbardOgFinnmarkstilleggTask(): LocalDateTime {
         val nåværendeTidspunkt = LocalDateTime.now()
