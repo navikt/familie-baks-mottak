@@ -22,11 +22,11 @@
         <jvmTarget>21</jvmTarget>
         <kotlin.version>2.2.20</kotlin.version>
         <mockk.version>1.14.5</mockk.version>
-        <confluent.version>8.0.0</confluent.version>
+        <confluent.version>8.0.1</confluent.version>
         <prosessering.version>2.20250922094930_4bb329c</prosessering.version>
 
         <felles.version>3.20250915092837_153983f</felles.version>
-        <kontrakter.version>3.0_20250922092627_acbfa8f</kontrakter.version>
+        <kontrakter.version>3.0_20251006172851_473d55c</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
         <spring.cloud.version>4.3.0</spring.cloud.version>
