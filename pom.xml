@@ -22,16 +22,16 @@
         <jvmTarget>21</jvmTarget>
         <kotlin.version>2.2.20</kotlin.version>
         <mockk.version>1.14.5</mockk.version>
-        <confluent.version>8.0.0</confluent.version>
+        <confluent.version>8.1.0</confluent.version>
         <prosessering.version>2.20250922094930_4bb329c</prosessering.version>
 
-        <felles.version>3.20250915092837_153983f</felles.version>
-        <kontrakter.version>3.0_20250922092627_acbfa8f</kontrakter.version>
+        <felles.version>3.20251016094046_66c869d</felles.version>
+        <kontrakter.version>3.0_20251020145843_3354592</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
         <spring.cloud.version>4.3.0</spring.cloud.version>
         <token-validation-spring.version>5.0.37</token-validation-spring.version>
-        <avro.version>1.12.0</avro.version>
+        <avro.version>1.12.1</avro.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
@@ -408,7 +408,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>ktlint</id>
@@ -469,7 +469,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.13</version>
+                <version>0.8.14</version>
                 <configuration>
                     <excludes>
                         <exclude>**/*config.*</exclude>
