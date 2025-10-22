@@ -85,7 +85,7 @@ spec:
         tier: db-custom-1-3840
         name: familie-baks-mottak
         autoBackupHour: 2
-        pointInTimeRecovery: true
+        pointInTimeRecovery: false
         diskAutoresize: true
         highAvailability: true
         databases:
