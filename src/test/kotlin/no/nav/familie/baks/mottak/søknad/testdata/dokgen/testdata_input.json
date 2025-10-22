@@ -37,10 +37,6 @@
         "label": "Bor du på denne adressen?",
         "verdi": "NEI"
       },
-      "borPåSvalbard": {
-        "label": "Bor du på Svalbard?",
-        "verdi": "JA"
-      },
       "værtINorgeITolvMåneder": {
         "label": "Har du oppholdt deg sammenhengende i Norge de siste tolv månedene?",
         "verdi": "NEI"
@@ -104,21 +100,6 @@
       }
     },
     "tidligereSamboere": [],
-    "svalbardOppholdPerioder": [
-      {
-        "label": "Opphold på Svalbard 1",
-        "verdi": {
-          "fraDatoSvalbardOpphold": {
-            "label": "Når startet oppholdet?",
-            "verdi": "2022-06-01"
-          },
-          "tilDatoSvalbardOpphold": {
-            "label": "Når avsluttes oppholdet?",
-            "verdi": "Jeg vet ikke når oppholdet avsluttes"
-          }
-        }
-      }
-    ],
     "utenlandsperioder": [
       {
         "label": "Utenlandsopphold 1",
@@ -359,10 +340,6 @@
         "adresse": {
           "label": "Hvor bor Barn Barnessen III i perioden det søkes om barnetrygd?",
           "verdi": ""
-        },
-        "harBoddPåSvalbard": {
-          "label": "Hvem av barna har bodd på Svalbard sammen med deg?",
-          "verdi": "JA"
         }
       },
       "utenlandsperioder": [
@@ -626,21 +603,6 @@
             }
           }
         }
-      ],
-      "svalbardOppholdPerioder": [
-        {
-          "label": "Opphold på Svalbard 1",
-          "verdi": {
-            "fraDatoSvalbardOpphold": {
-              "label": "Når startet oppholdet?",
-              "verdi": "2022-06-01"
-            },
-            "tilDatoSvalbardOpphold": {
-              "label": "Når avsluttes oppholdet?",
-              "verdi": "Jeg vet ikke når oppholdet avsluttes"
-            }
-          }
-        }
       ]
     }
   ],
@@ -676,10 +638,6 @@
     "lestOgForståttBekreftelse": {
       "label": "Jeg er klar over at jeg kan miste retten til barnetrygd dersom jeg gir feil opplysninger. Jeg er også klar over at jeg må betale tilbake dersom jeg får penger jeg ikke har rett til hvis jeg lar være å informere eller gir feil opplysninger.",
       "verdi": "Jeg bekrefter at jeg har lest og forstått."
-    },
-    "harNoenAvBarnaBoddPåSvalbard": {
-      "label": "Har noen av barna oppholdt seg på Svalbard?",
-      "verdi": "JA"
     }
   },
   "dokumentasjon": [
@@ -702,18 +660,6 @@
       "dokumentasjonSpråkTittel": "Bekreftelse på dato du overtok omsorgen ved adopsjon"
     },
     {
-      "dokumentasjonsbehov": "OPPHOLD_SVALBARD",
-      "harSendtInn": true,
-      "opplastedeVedlegg": [
-        {
-          "dokumentId": "",
-          "navn": "navn.pdf",
-          "tittel": "OPPHOLD_SVALBARD"
-        }
-      ],
-      "dokumentasjonSpråkTittel": "Bekreftelse på opphold på Svalbard"
-    },
-    {
       "dokumentasjonsbehov": "ANNEN_DOKUMENTASJON",
       "harSendtInn": false,
       "opplastedeVedlegg": [],
@@ -726,8 +672,6 @@
     "opplystInstitusjon": "Du har opplyst at {navn} er i institusjon",
     "opplystBarnOppholdUtenforNorge": "Du har opplyst at {navn} har oppholdt seg utenfor Norge i løpet av de siste tolv månedene",
     "opplystFaarHarFaattEllerSoektYtelse": "Du har opplyst at du får eller har søkt om barnetrygd for {navn} fra et annet EØS land.",
-    "opplystBoddPaaSvalbard": "Du har opplyst at {navn} har oppholdt seg på Svalbard sammen med deg",
-    "naarBoddPaaSvalbardSpm": "Når bodde {navn} på Svalbard?",
     "hattAnnenSamboerForSoektPeriode.sporsmal": "Har du hatt samboer tidligere i perioden du søker barnetrygd for?",
     "soekerAdressesperre": "Du er registrert med adressesperre",
     "ikkeRegistrertAdresse": "Du er ikke registrert med bostedsadresse i Norge",
