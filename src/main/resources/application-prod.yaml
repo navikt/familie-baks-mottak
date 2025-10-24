@@ -74,12 +74,9 @@ no.nav.security.jwt:
           client-secret: ${AZURE_APP_CLIENT_SECRET}
           client-auth-method: client_secret_basic
 
-
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/familie-baks-mottak
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${DB_JDBC_URL}
 
 prosessering.rolle: "87190cf3-b278-457d-8ab7-1a5c55a9edd7"
 
