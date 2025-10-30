@@ -87,7 +87,7 @@ spec:
         autoBackupHour: 2
         pointInTimeRecovery: false
         diskAutoresize: true
-        highAvailability: true
+        highAvailability: false
         databases:
           - name: familie-baks-mottak
             envVarPrefix: DB
