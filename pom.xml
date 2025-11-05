@@ -33,6 +33,10 @@
         <token-validation-spring.version>5.0.37</token-validation-spring.version>
         <avro.version>1.12.1</avro.version>
 
+
+        <!-- Http Client - nyeste versjon fra httpclient(5.5.1) skaper problemer med Spring Boot 3.5.7. Issue: HTTPCLIENT-2405. Skal være fikset i 3.5.8, men bør testes -->
+        <httpclient5.version>5.5</httpclient5.version>
+
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
         <sonar.organization>navit</sonar.organization>
