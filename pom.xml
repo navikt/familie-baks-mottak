@@ -23,15 +23,19 @@
         <kotlin.version>2.2.21</kotlin.version>
         <mockk.version>1.14.6</mockk.version>
         <confluent.version>8.1.0</confluent.version>
-        <prosessering.version>2.20251028124032_3493c2f</prosessering.version>
+        <prosessering.version>2.20251103090009_f7d38c7</prosessering.version>
 
-        <felles.version>3.20251021101955_e5e7dd1</felles.version>
-        <kontrakter.version>3.0_20251027084742_f54d77b</kontrakter.version>
+        <felles.version>3.20251105085627_d96d39b</felles.version>
+        <kontrakter.version>3.0_20251030120445_40c2cd0</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
         <spring.cloud.version>4.3.0</spring.cloud.version>
         <token-validation-spring.version>5.0.37</token-validation-spring.version>
         <avro.version>1.12.1</avro.version>
+
+
+        <!-- Http Client - nyeste versjon fra httpclient(5.5.1) skaper problemer med Spring Boot 3.5.7. Issue: HTTPCLIENT-2405. Skal være fikset i 3.5.8, men bør testes -->
+        <httpclient5.version>5.5</httpclient5.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
@@ -166,7 +170,7 @@
         <dependency>
             <groupId>no.nav.familie</groupId>
             <artifactId>baks-dokgen</artifactId>
-            <version>1.0_20251022090740_b4711a5</version>
+            <version>1.0_20251104175442_0c84ed5</version>
         </dependency>
         <!-- Kafka -->
         <dependency>
