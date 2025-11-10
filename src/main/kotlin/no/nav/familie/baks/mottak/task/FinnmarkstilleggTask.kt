@@ -108,8 +108,7 @@ class FinnmarkstilleggTask(
     private fun finnTriggertidForÅSendeIdentTilBaSak(): LocalDateTime =
         LocalDateTime.now().run {
             if (environment.activeProfiles.contains("prod")) {
-                val tidligsteTriggerTid = LocalDateTime.of(2025, 11, 1, 0, 0)
-                plusHours(1).coerceAtLeast(tidligsteTriggerTid)
+                plusHours(1).coerceAtLeast(tidligsteTriggerTidForÅSendeFinnmarkstilleggTilBaSak)
             } else {
                 this
             }
@@ -117,6 +116,7 @@ class FinnmarkstilleggTask(
 
     companion object {
         const val TASK_STEP_TYPE = "finnmarkstilleggTask"
+        val tidligsteTriggerTidForÅSendeFinnmarkstilleggTilBaSak = LocalDateTime.of(2025, 12, 1, 0, 0)
         private val secureLogger = LoggerFactory.getLogger("secureLogger")
     }
 }

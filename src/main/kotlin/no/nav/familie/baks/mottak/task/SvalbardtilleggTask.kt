@@ -77,8 +77,7 @@ class SvalbardtilleggTask(
     private fun finnTriggertidForÅSendeIdentTilBaSak(): LocalDateTime =
         LocalDateTime.now().run {
             if (environment.activeProfiles.contains("prod")) {
-                val tidligsteTriggerTid = LocalDateTime.of(2025, 11, 1, 0, 0)
-                plusHours(1).coerceAtLeast(tidligsteTriggerTid)
+                plusHours(1).coerceAtLeast(tidligsteTriggerTidForÅSendeSvalbardtilleggTilBaSak)
             } else {
                 this
             }
@@ -86,6 +85,7 @@ class SvalbardtilleggTask(
 
     companion object {
         const val TASK_STEP_TYPE = "svalbardtilleggTask"
+        val tidligsteTriggerTidForÅSendeSvalbardtilleggTilBaSak = LocalDateTime.of(2025, 12, 1, 0, 0)
         private val secureLogger = LoggerFactory.getLogger("secureLogger")
     }
 }
