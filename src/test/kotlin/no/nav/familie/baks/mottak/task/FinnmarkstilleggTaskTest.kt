@@ -6,6 +6,7 @@ import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.task.FinnmarkstilleggTask.Companion.tidligsteTriggerTidForÅSendeFinnmarkstilleggTilBaSak
 import no.nav.familie.kontrakter.ba.finnmarkstillegg.KommunerIFinnmarkOgNordTroms
 import no.nav.familie.kontrakter.ba.finnmarkstillegg.KommunerIFinnmarkOgNordTroms.ALTA
 import no.nav.familie.kontrakter.ba.finnmarkstillegg.KommunerIFinnmarkOgNordTroms.BERLEVÅG
@@ -17,7 +18,6 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.byLessThan
-import org.assertj.core.api.Assertions.within
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -26,7 +26,7 @@ import org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE
 import org.springframework.core.env.Environment
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
+import java.time.temporal.ChronoUnit.MINUTES
 import kotlin.test.Test
 
 class FinnmarkstilleggTaskTest {
@@ -269,6 +269,7 @@ class FinnmarkstilleggTaskTest {
 
         assertThat(taskSlot.captured.payload).isEqualTo(personIdent)
         assertThat(taskSlot.captured.type).isEqualTo(TriggFinnmarkstilleggbehandlingIBaSakTask.TASK_STEP_TYPE)
-        assertThat(taskSlot.captured.triggerTid).isCloseTo(LocalDateTime.now().plusHours(1), byLessThan(1, ChronoUnit.MINUTES))
+        val forventetTriggerTid = LocalDateTime.now().plusHours(1).coerceAtLeast(tidligsteTriggerTidForÅSendeFinnmarkstilleggTilBaSak)
+        assertThat(taskSlot.captured.triggerTid).isCloseTo(forventetTriggerTid, byLessThan(1, MINUTES))
     }
 }
