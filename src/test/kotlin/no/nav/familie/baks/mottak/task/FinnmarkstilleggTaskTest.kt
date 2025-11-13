@@ -6,7 +6,6 @@ import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
-import no.nav.familie.baks.mottak.task.FinnmarkstilleggTask.Companion.tidligsteTriggerTidForÅSendeFinnmarkstilleggTilBaSak
 import no.nav.familie.kontrakter.ba.finnmarkstillegg.KommunerIFinnmarkOgNordTroms
 import no.nav.familie.kontrakter.ba.finnmarkstillegg.KommunerIFinnmarkOgNordTroms.ALTA
 import no.nav.familie.kontrakter.ba.finnmarkstillegg.KommunerIFinnmarkOgNordTroms.BERLEVÅG
@@ -269,7 +268,6 @@ class FinnmarkstilleggTaskTest {
 
         assertThat(taskSlot.captured.payload).isEqualTo(personIdent)
         assertThat(taskSlot.captured.type).isEqualTo(TriggFinnmarkstilleggbehandlingIBaSakTask.TASK_STEP_TYPE)
-        val forventetTriggerTid = LocalDateTime.now().plusHours(1).coerceAtLeast(tidligsteTriggerTidForÅSendeFinnmarkstilleggTilBaSak)
-        assertThat(taskSlot.captured.triggerTid).isCloseTo(forventetTriggerTid, byLessThan(1, MINUTES))
+        assertThat(taskSlot.captured.triggerTid).isCloseTo(LocalDateTime.now().plusHours(1), byLessThan(1, MINUTES))
     }
 }
