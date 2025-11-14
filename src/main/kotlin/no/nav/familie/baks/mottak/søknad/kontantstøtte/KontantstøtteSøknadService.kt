@@ -12,6 +12,7 @@ import no.nav.familie.baks.mottak.task.JournalførKontantstøtteSøknadTask
 import no.nav.familie.kontrakter.ks.søknad.StøttetVersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV6
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
@@ -39,6 +40,13 @@ class KontantstøtteSøknadService(
                 }
 
                 is VersjonertKontantstøtteSøknadV5 -> {
+                    Pair(
+                        versjonertKontantstøtteSøknad.kontantstøtteSøknad.tilDBKontantstøtteSøknad(),
+                        versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon,
+                    )
+                }
+
+                is VersjonertKontantstøtteSøknadV6 -> {
                     Pair(
                         versjonertKontantstøtteSøknad.kontantstøtteSøknad.tilDBKontantstøtteSøknad(),
                         versjonertKontantstøtteSøknad.kontantstøtteSøknad.dokumentasjon,

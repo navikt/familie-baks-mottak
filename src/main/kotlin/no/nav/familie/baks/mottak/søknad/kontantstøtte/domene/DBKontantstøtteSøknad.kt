@@ -13,10 +13,12 @@ import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.ks.søknad.StøttetVersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV6
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsvedlegg
 import java.time.LocalDateTime
 import no.nav.familie.kontrakter.ks.søknad.v4.KontantstøtteSøknad as KontantstøtteSøknadV4
 import no.nav.familie.kontrakter.ks.søknad.v5.KontantstøtteSøknad as KontantstøtteSøknadV5
+import no.nav.familie.kontrakter.ks.søknad.v6.KontantstøtteSøknad as KontantstøtteSøknadV6
 
 @Entity(name = "kontantstotte_soknad")
 @Table(name = "kontantstotte_soknad")
@@ -46,6 +48,7 @@ fun DBKontantstøtteSøknad.harEøsSteg(): Boolean {
     return when (versjonertSøknad) {
         is VersjonertKontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.søker.harEøsSteg
         is VersjonertKontantstøtteSøknadV5 -> versjonertSøknad.kontantstøtteSøknad.søker.harEøsSteg
+        is VersjonertKontantstøtteSøknadV6 -> versjonertSøknad.kontantstøtteSøknad.søker.harEøsSteg
     }
 }
 
@@ -74,6 +77,19 @@ fun KontantstøtteSøknadV4.tilDBKontantstøtteSøknad(): DBKontantstøtteSøkna
 }
 
 fun KontantstøtteSøknadV5.tilDBKontantstøtteSøknad(): DBKontantstøtteSøknad {
+    try {
+        return DBKontantstøtteSøknad(
+            søknadJson = objectMapper.writeValueAsString(this),
+            fnr =
+                this.søker.ident.verdi
+                    .getValue("nb"),
+        )
+    } catch (e: KotlinNullPointerException) {
+        throw FødselsnummerErNullException()
+    }
+}
+
+fun KontantstøtteSøknadV6.tilDBKontantstøtteSøknad(): DBKontantstøtteSøknad {
     try {
         return DBKontantstøtteSøknad(
             søknadJson = objectMapper.writeValueAsString(this),

@@ -5,7 +5,7 @@ import io.mockk.mockk
 import no.nav.familie.baks.mottak.søknad.SøknadTestData
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadTestData
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
-import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV6
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -58,7 +58,7 @@ class SøknadsidenterServiceTest {
             val andreBarneIdent = "789"
 
             val kontantstøtteSøknad =
-                VersjonertKontantstøtteSøknadV5(
+                VersjonertKontantstøtteSøknadV6(
                     kontantstøtteSøknad =
                         KontantstøtteSøknadTestData.kontantstøtteSøknad(
                             søker = KontantstøtteSøknadTestData.lagSøker(søkerIdent),

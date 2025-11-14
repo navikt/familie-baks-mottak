@@ -6,6 +6,7 @@ import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.ks.søknad.StøttetVersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV6
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import no.nav.familie.kontrakter.ks.søknad.v4.KontantstøtteSøknad as KontantstøtteSøknadKontraktV4
 import no.nav.familie.kontrakter.ks.søknad.v5.KontantstøtteSøknad as KontantstøtteSøknadKontraktV5
+import no.nav.familie.kontrakter.ks.søknad.v6.KontantstøtteSøknad as KontantstøtteSøknadKontraktV6
 
 @RestController
 @RequestMapping(path = ["/api/kontantstotte/"], produces = [APPLICATION_JSON_VALUE])
@@ -35,6 +37,11 @@ class KontantstøtteSøknadController(
     fun taImotSøknad(
         @RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV5,
     ): ResponseEntity<Ressurs<Kvittering>> = mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = VersjonertKontantstøtteSøknadV5(kontantstøtteSøknad = søknad))
+
+    @PostMapping(value = ["/soknad/v6"], consumes = [MULTIPART_FORM_DATA_VALUE])
+    fun taImotSøknad(
+        @RequestPart("søknad") søknad: KontantstøtteSøknadKontraktV6,
+    ): ResponseEntity<Ressurs<Kvittering>> = mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad = VersjonertKontantstøtteSøknadV6(kontantstøtteSøknad = søknad))
 
     fun mottaVersjonertSøknadOgSendMetrikker(versjonertKontantstøtteSøknad: StøttetVersjonertKontantstøtteSøknad): ResponseEntity<Ressurs<Kvittering>> =
         try {

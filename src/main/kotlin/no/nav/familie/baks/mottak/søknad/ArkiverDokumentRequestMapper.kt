@@ -16,6 +16,7 @@ import no.nav.familie.kontrakter.felles.søknad.BaFellesSøknadstype
 import no.nav.familie.kontrakter.ks.søknad.StøttetVersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV6
 
 object ArkiverDokumentRequestMapper {
     private val KONTANTSTØTTE_ID_POSTFIX = "NAV_34-00.08"
@@ -93,8 +94,9 @@ object ArkiverDokumentRequestMapper {
             when (versjonertSøknad) {
                 is VersjonertKontantstøtteSøknadV4 ->
                     versjonertSøknad.kontantstøtteSøknad.dokumentasjon.map { KontantstøtteSøknaddokumentasjon(it) }
-
                 is VersjonertKontantstøtteSøknadV5 ->
+                    versjonertSøknad.kontantstøtteSøknad.dokumentasjon.map { KontantstøtteSøknaddokumentasjon(it) }
+                is VersjonertKontantstøtteSøknadV6 ->
                     versjonertSøknad.kontantstøtteSøknad.dokumentasjon.map { KontantstøtteSøknaddokumentasjon(it) }
             }
 

@@ -9,6 +9,7 @@ import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteS�
 import no.nav.familie.http.client.RessursException
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV6
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -57,6 +58,7 @@ class JournalførKontantstøtteSøknadTask(
                 when (versjonertSøknad) {
                     is VersjonertKontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.originalSpråk
                     is VersjonertKontantstøtteSøknadV5 -> versjonertSøknad.kontantstøtteSøknad.originalSpråk
+                    is VersjonertKontantstøtteSøknadV6 -> versjonertSøknad.kontantstøtteSøknad.originalSpråk
                 }
 
             val orginalspråkPdf: ByteArray =
