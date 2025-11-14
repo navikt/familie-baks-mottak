@@ -11,6 +11,7 @@ import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ks.søknad.StøttetVersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV6
 import org.springframework.stereotype.Service
 import no.nav.familie.kontrakter.felles.objectMapper as getObjectMapper
 
@@ -51,6 +52,7 @@ class SøknadSpråkvelgerService {
                 when (versjonertSøknad) {
                     is VersjonertKontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad
                     is VersjonertKontantstøtteSøknadV5 -> versjonertSøknad.kontantstøtteSøknad
+                    is VersjonertKontantstøtteSøknadV6 -> versjonertSøknad.kontantstøtteSøknad
                 },
             )
         return kontantstøtteSøknadMapForSpråk

@@ -12,7 +12,7 @@ import no.nav.familie.kontrakter.ba.søknad.v4.Søknadstype
 import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad
 import no.nav.familie.kontrakter.felles.dokarkiv.Dokumenttype
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.Filtype
-import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV6
 import no.nav.familie.kontrakter.ks.søknad.v1.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ks.søknad.v1.TekstPåSpråkMap
@@ -57,7 +57,7 @@ class ArkiverDokumentRequestMapperTest {
         val arkiverDokumentRequest =
             ArkiverDokumentRequestMapper.toDto(
                 dbKontantstøtteSøknad,
-                VersjonertKontantstøtteSøknadV5(kontantstøtteSøknad = kontantstøtteSøknad),
+                VersjonertKontantstøtteSøknadV6(kontantstøtteSøknad = kontantstøtteSøknad),
                 ByteArray(0),
                 vedleggMap,
                 ByteArray(0),
