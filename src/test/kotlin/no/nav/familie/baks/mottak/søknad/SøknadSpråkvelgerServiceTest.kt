@@ -9,7 +9,7 @@ import no.nav.familie.kontrakter.felles.søknad.Søknadsfelt
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV6
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ks.søknad.v1.TekstPåSpråkMap
-import no.nav.familie.kontrakter.ks.søknad.v4.Barn
+import no.nav.familie.kontrakter.ks.søknad.v6.Barn
 import no.nav.familie.kontrakter.ks.søknad.v6.KontantstøtteSøknad
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
