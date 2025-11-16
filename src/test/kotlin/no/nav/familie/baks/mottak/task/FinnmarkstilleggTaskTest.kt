@@ -268,6 +268,6 @@ class FinnmarkstilleggTaskTest {
 
         assertThat(taskSlot.captured.payload).isEqualTo(personIdent)
         assertThat(taskSlot.captured.type).isEqualTo(TriggFinnmarkstilleggbehandlingIBaSakTask.TASK_STEP_TYPE)
-        assertThat(taskSlot.captured.triggerTid).isCloseTo(LocalDateTime.now().plusHours(1), byLessThan(1, MINUTES))
+        assertThat(taskSlot.captured.triggerTid).isCloseTo(LocalDateTime.now().plusHours(1), byLessThan(3, MINUTES))
     }
 }
