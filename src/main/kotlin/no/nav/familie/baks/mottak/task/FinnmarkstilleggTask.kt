@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Properties
+import kotlin.random.Random.Default.nextLong
 
 @Service
 @TaskStepBeskrivelse(
@@ -108,7 +109,9 @@ class FinnmarkstilleggTask(
     private fun finnTriggertidForÅSendeIdentTilBaSak(): LocalDateTime =
         LocalDateTime.now().run {
             if (environment.activeProfiles.contains("prod")) {
-                plusHours(1)
+                // Legger på tilfeldig delay på inntil 3 minutter for å
+                // unngå at flere kall gjøres samtidig til ba-sak
+                plusHours(1).plusSeconds(nextLong(0, 180))
             } else {
                 this
             }

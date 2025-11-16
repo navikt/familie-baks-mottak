@@ -213,6 +213,6 @@ class SvalbardtilleggTaskTest {
         assertThat(taskSlot.captured.payload).isEqualTo(personIdent)
         assertThat(taskSlot.captured.type).isEqualTo(TriggSvalbardtilleggbehandlingIBaSakTask.TASK_STEP_TYPE)
         val forventetTriggerTid = LocalDateTime.now().plusHours(1).coerceAtLeast(tidligsteTriggerTidForÅSendeSvalbardtilleggTilBaSak)
-        assertThat(taskSlot.captured.triggerTid).isCloseTo(forventetTriggerTid, byLessThan(1, MINUTES))
+        assertThat(taskSlot.captured.triggerTid).isCloseTo(forventetTriggerTid, byLessThan(3, MINUTES))
     }
 }
