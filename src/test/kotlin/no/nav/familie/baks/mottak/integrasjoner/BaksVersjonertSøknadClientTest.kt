@@ -90,7 +90,7 @@ class BaksVersjonertSøknadClientTest : AbstractWiremockTest() {
 
         // Assert
         assertThat(versjonertKontantStøtte).isNotNull
-        assertThat(versjonertKontantStøtte.kontantstøtteSøknad.kontraktVersjon).isEqualTo(5)
+        assertThat(versjonertKontantStøtte.kontantstøtteSøknad.kontraktVersjon).isEqualTo(6)
         assertThat(versjonertKontantStøtte.kontantstøtteSøknad).isInstanceOf(VersjonertKontantstøtteSøknadV6::class.java)
 
         assertDoesNotThrow { versjonertKontantStøtte.kontantstøtteSøknad as VersjonertKontantstøtteSøknadV6 }
