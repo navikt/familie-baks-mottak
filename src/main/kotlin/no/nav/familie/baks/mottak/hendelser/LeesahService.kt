@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Properties
+import kotlin.random.Random.Default.nextLong
 
 @Service
 class LeesahService(
@@ -250,10 +251,11 @@ class LeesahService(
         Task(
             type = FinnmarkstilleggTask.TASK_STEP_TYPE,
             payload = lagFinnmarkstilleggTaskPayload(pdlHendelse),
-        ).apply {
-            metadata["callId"] = pdlHendelse.hendelseId
-            metadata["ident"] = pdlHendelse.hentPersonident()
-        }.also { taskService.save(it) }
+        ).medTriggerTid(finnTriggerTidSvalbardOgFinnmarkstilleggTask())
+            .apply {
+                metadata["callId"] = pdlHendelse.hendelseId
+                metadata["ident"] = pdlHendelse.hentPersonident()
+            }.also { taskService.save(it) }
 
     private fun lagFinnmarkstilleggTaskPayload(pdlHendelse: PdlHendelse): String =
         objectMapper.writeValueAsString(
@@ -286,21 +288,22 @@ class LeesahService(
         Task(
             type = SvalbardtilleggTask.TASK_STEP_TYPE,
             payload = pdlHendelse.hentPersonident(),
-        ).apply {
-            metadata["callId"] = pdlHendelse.hendelseId
-            metadata["ident"] = pdlHendelse.hentPersonident()
-        }.also { taskService.save(it) }
+        ).medTriggerTid(finnTriggerTidSvalbardOgFinnmarkstilleggTask())
+            .apply {
+                metadata["callId"] = pdlHendelse.hendelseId
+                metadata["ident"] = pdlHendelse.hentPersonident()
+            }.also { taskService.save(it) }
 
-    private fun finnTriggerTidSvalbardOgFinnmarkstilleggTask(): LocalDateTime {
-        val nåværendeTidspunkt = LocalDateTime.now()
-        val tidligsteTriggerTid = LocalDateTime.of(2025, 11, 1, 0, 0)
-
-        return if (!environment.activeProfiles.contains("prod")) {
-            nåværendeTidspunkt
-        } else {
-            maxOf(nåværendeTidspunkt.plusHours(1), tidligsteTriggerTid)
+    private fun finnTriggerTidSvalbardOgFinnmarkstilleggTask(): LocalDateTime =
+        LocalDateTime.now().run {
+            if (environment.activeProfiles.contains("prod")) {
+                // Legger på tilfeldig delay på inntil 3 minutter for å
+                // unngå at flere kall gjøres samtidig til ba-sak
+                plusSeconds(nextLong(0, 180))
+            } else {
+                this
+            }
         }
-    }
 
     private fun oppdaterHendelseslogg(pdlHendelse: PdlHendelse) {
         val metadata =
