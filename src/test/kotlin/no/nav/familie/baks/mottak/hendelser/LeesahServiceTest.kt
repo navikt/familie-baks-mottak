@@ -16,11 +16,14 @@ import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.byLessThan
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.core.env.Environment
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit.MINUTES
 import java.util.UUID
 import kotlin.random.Random
 import kotlin.random.nextUInt
@@ -226,6 +229,8 @@ class LeesahServiceTest {
                 bostedskommuneFomDato = bostedskommuneFomDato,
             )
 
+        every { mockenv.activeProfiles } returns arrayOf("prod")
+
         // Act
         service.prosesserNyHendelse(pdlHendelse)
 
@@ -233,13 +238,16 @@ class LeesahServiceTest {
         val taskSlot = slot<Task>()
         verify(exactly = 1) { mockTaskService.save(capture(taskSlot)) }
 
+        val task = taskSlot.captured
+        assertThat(task.id).isEqualTo(0L)
+        assertThat(task.metadata["callId"]).isEqualTo(hendelseId)
+        assertThat(task.metadata["ident"]).isEqualTo(ident)
+        assertThat(task.triggerTid).isCloseTo(LocalDateTime.now(), byLessThan(3, MINUTES))
+
         val payload = objectMapper.readValue(taskSlot.captured.payload, VurderFinnmarkstillleggTaskDTO::class.java)
-        assertThat(taskSlot.captured.id).isEqualTo(0L)
         assertThat(payload.ident).isEqualTo(ident)
         assertThat(payload.bostedskommune).isEqualTo(bostedskommune)
         assertThat(payload.bostedskommuneFomDato).isEqualTo(bostedskommuneFomDato)
-        assertThat(taskSlot.captured.metadata["callId"]).isEqualTo(hendelseId)
-        assertThat(taskSlot.captured.metadata["ident"]).isEqualTo(ident)
     }
 
     @Test
@@ -258,6 +266,8 @@ class LeesahServiceTest {
                 opplysningstype = LeesahService.OPPLYSNINGSTYPE_OPPHOLDSADRESSE,
             )
 
+        every { mockenv.activeProfiles } returns arrayOf("prod")
+
         // Act
         service.prosesserNyHendelse(pdlHendelse)
 
@@ -265,10 +275,11 @@ class LeesahServiceTest {
         val taskSlot = slot<Task>()
         verify(exactly = 1) { mockTaskService.save(capture(taskSlot)) }
 
-        val payload = taskSlot.captured.payload
-        assertThat(taskSlot.captured.id).isEqualTo(0L)
-        assertThat(payload).isEqualTo(ident)
-        assertThat(taskSlot.captured.metadata["callId"]).isEqualTo(hendelseId)
-        assertThat(taskSlot.captured.metadata["ident"]).isEqualTo(ident)
+        val task = taskSlot.captured
+        assertThat(task.id).isEqualTo(0L)
+        assertThat(task.metadata["callId"]).isEqualTo(hendelseId)
+        assertThat(task.metadata["ident"]).isEqualTo(ident)
+        assertThat(task.triggerTid).isCloseTo(LocalDateTime.now(), byLessThan(3, MINUTES))
+        assertThat(task.payload).isEqualTo(ident)
     }
 }
