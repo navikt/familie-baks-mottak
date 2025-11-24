@@ -41,7 +41,10 @@ class SøknadTest(
         val dbSøknadFraMapper = barnetrygdSøknad.tilDBSøknad()
         val versjon: Int? =
             when (val versjonertSøknad = dbSøknadFraMapper.hentVersjonertBarnetrygdSøknad()) {
-                is VersjonertBarnetrygdSøknadV9 -> versjonertSøknad.barnetrygdSøknad.kontraktVersjon
+                is VersjonertBarnetrygdSøknadV9 -> {
+                    versjonertSøknad.barnetrygdSøknad.kontraktVersjon
+                }
+
                 else -> {
                     null
                 }

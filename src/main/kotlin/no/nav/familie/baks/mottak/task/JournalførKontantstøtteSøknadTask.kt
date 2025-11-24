@@ -81,7 +81,9 @@ class JournalførKontantstøtteSøknadTask(
                     )
                 }
 
-                else -> throw e
+                else -> {
+                    throw e
+                }
             }
         } catch (e: Exception) {
             logger.error("Uventet feil ved journalføring av kontantstøtte-søknad. taskId=${task.id}. Se task eller securelog")

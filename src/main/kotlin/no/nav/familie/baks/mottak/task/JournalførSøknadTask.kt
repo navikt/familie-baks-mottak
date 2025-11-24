@@ -78,7 +78,9 @@ class JournalførSøknadTask(
                     )
                 }
 
-                else -> throw e
+                else -> {
+                    throw e
+                }
             }
         } catch (e: Exception) {
             log.error("Uventet feil ved journalføring av søknad. taskId=${task.id}. Se task eller securelog")

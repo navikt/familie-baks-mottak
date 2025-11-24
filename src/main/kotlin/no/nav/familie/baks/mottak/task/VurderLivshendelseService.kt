@@ -162,7 +162,9 @@ class VurderLivshendelseService(
                 }
             }
 
-            else -> log.debug("Behandlinger enda ikke livshendelse av type ${payload.type}")
+            else -> {
+                log.debug("Behandlinger enda ikke livshendelse av type ${payload.type}")
+            }
         }
     }
 
@@ -259,8 +261,10 @@ class VurderLivshendelseService(
         restBehandling: RestVisningBehandling,
     ) = when (tema) {
         Tema.BAR -> tilBarnetrygdBehandlingstema(restBehandling)
+
         // behandlingstema brukes ikke i kombinasjon med behandlingstype for kontantstøtte
         Tema.KON -> null
+
         Tema.ENF, Tema.OPP, Tema.TSO -> throw RuntimeException("Tema $tema er ikke støttet")
     }
 
@@ -269,9 +273,11 @@ class VurderLivshendelseService(
         restBehandling: RestVisningBehandling,
     ) = when (tema) {
         Tema.BAR -> null
+
         // Setter behandlingstype i stedet fore behandlingstema i KS. Siden behandlingstema for KS EØS
         // ikke finnes i oppgave, og det er slik man gjør det i KS
         Tema.KON -> tilKontanstøtteBehandlingstype(restBehandling)
+
         Tema.ENF, Tema.OPP, Tema.TSO -> throw RuntimeException("Tema $tema er ikke støttet")
     }
 

@@ -91,11 +91,13 @@ object ArkiverDokumentRequestMapper {
 
         val dokumentasjon =
             when (versjonertSøknad) {
-                is VersjonertKontantstøtteSøknadV4 ->
+                is VersjonertKontantstøtteSøknadV4 -> {
                     versjonertSøknad.kontantstøtteSøknad.dokumentasjon.map { KontantstøtteSøknaddokumentasjon(it) }
+                }
 
-                is VersjonertKontantstøtteSøknadV5 ->
+                is VersjonertKontantstøtteSøknadV5 -> {
                     versjonertSøknad.kontantstøtteSøknad.dokumentasjon.map { KontantstøtteSøknaddokumentasjon(it) }
+                }
             }
 
         val søknadsdokumentJson =

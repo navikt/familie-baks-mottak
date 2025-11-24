@@ -70,32 +70,39 @@ class SøknadStatusService(
         tidSidenSisteSøknad: Duration,
         søknadstype: Søknadstype,
     ) = when {
-        tidSidenSisteSøknad.toHours() >= 12 ->
+        tidSidenSisteSøknad.toHours() >= 12 -> {
             StatusDto(
                 status = Plattformstatus.DOWN,
                 description = "Det er over 12 timer siden sist vi mottok en søknad om ${søknadstype.name.lowercase()}",
             )
+        }
 
-        else -> StatusDto(status = Plattformstatus.OK, description = "Alt er OK", logLink = null)
+        else -> {
+            StatusDto(status = Plattformstatus.OK, description = "Alt er OK", logLink = null)
+        }
     }
 
     private fun lagNattStatus(
         tidSidenSisteSøknad: Duration,
         søknadstype: Søknadstype,
     ) = when {
-        tidSidenSisteSøknad.toHours() >= 24 ->
+        tidSidenSisteSøknad.toHours() >= 24 -> {
             StatusDto(
                 status = Plattformstatus.DOWN,
                 description = "Det er over 24 timer siden sist vi mottok en søknad om ${søknadstype.name.lowercase()}",
             )
+        }
 
-        tidSidenSisteSøknad.toHours() >= 12 ->
+        tidSidenSisteSøknad.toHours() >= 12 -> {
             StatusDto(
                 status = Plattformstatus.ISSUE,
                 description = "Det er over 12 timer siden sist vi mottok en søknad om ${søknadstype.name.lowercase()}",
             )
+        }
 
-        else -> StatusDto(status = Plattformstatus.OK, description = "Alt er OK", logLink = null)
+        else -> {
+            StatusDto(status = Plattformstatus.OK, description = "Alt er OK", logLink = null)
+        }
     }
 
     private fun erHelg() = LocalDateTime.now().dayOfWeek.value in 6..7

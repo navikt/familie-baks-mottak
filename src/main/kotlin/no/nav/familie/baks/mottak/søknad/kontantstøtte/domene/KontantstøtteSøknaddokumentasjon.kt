@@ -19,10 +19,16 @@ data class KontantstøtteSøknaddokumentasjon(
     private fun dokumentasjonsbehovTilTittel(dokumentasjonsbehov: Dokumentasjonsbehov): String =
         when (dokumentasjonsbehov) {
             Dokumentasjonsbehov.AVTALE_DELT_BOSTED -> "Avtale om delt bosted"
+
             Dokumentasjonsbehov.VEDTAK_OPPHOLDSTILLATELSE -> "Vedtak om oppholdstillatelse"
+
             Dokumentasjonsbehov.ADOPSJON_DATO -> "Adopsjonsdato"
+
             Dokumentasjonsbehov.BOR_FAST_MED_SØKER -> "Bor fast med søker"
-            Dokumentasjonsbehov.ANNEN_DOKUMENTASJON -> "" // Random dokumentasjon skal saksbehandler sette tittel på
+
+            Dokumentasjonsbehov.ANNEN_DOKUMENTASJON -> ""
+
+            // Random dokumentasjon skal saksbehandler sette tittel på
             Dokumentasjonsbehov.BEKREFTELESE_PÅ_BARNEHAGEPLASS -> "Bekreftelse på barnehageplass"
         }
 }

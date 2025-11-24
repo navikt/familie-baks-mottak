@@ -142,6 +142,7 @@ class PdlClient(
         } catch (e: Exception) {
             when (e) {
                 is IntegrasjonException -> throw e
+
                 else -> throw IntegrasjonException(
                     msg = "Feil ved oppslag på person. Gav feil: ${e.message}",
                     uri = pdlUri,
@@ -168,6 +169,7 @@ class PdlClient(
             } catch (e: Exception) {
                 when (e) {
                     is IntegrasjonException -> throw e
+
                     else -> throw IntegrasjonException(
                         msg = "Feil ved oppslag på hentPerson mot PDL. Gav feil: ${e.message}",
                         uri = pdlUri,

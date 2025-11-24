@@ -13,8 +13,14 @@ fun fristFerdigstillelse(daysToAdd: Long = 0): LocalDate {
     }
 
     when (date.dayOfWeek) {
-        DayOfWeek.SATURDAY -> date = date.plusDays(2)
-        DayOfWeek.SUNDAY -> date = date.plusDays(1)
+        DayOfWeek.SATURDAY -> {
+            date = date.plusDays(2)
+        }
+
+        DayOfWeek.SUNDAY -> {
+            date = date.plusDays(1)
+        }
+
         else -> {
             // NOP
         }
@@ -29,8 +35,14 @@ fun fristFerdigstillelse(daysToAdd: Long = 0): LocalDate {
     }
 
     when (date.dayOfWeek) {
-        DayOfWeek.SATURDAY -> date = date.plusDays(2)
-        DayOfWeek.SUNDAY -> date = date.plusDays(1)
+        DayOfWeek.SATURDAY -> {
+            date = date.plusDays(2)
+        }
+
+        DayOfWeek.SUNDAY -> {
+            date = date.plusDays(1)
+        }
+
         else -> {
             // NOP
         }
