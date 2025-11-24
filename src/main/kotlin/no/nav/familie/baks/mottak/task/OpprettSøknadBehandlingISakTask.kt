@@ -90,7 +90,9 @@ class OpprettSøknadBehandlingISakTask(
                 }
             }
 
-            else -> throw IllegalStateException("$tema ikke støttet")
+            else -> {
+                throw IllegalStateException("$tema ikke støttet")
+            }
         }
     }
 

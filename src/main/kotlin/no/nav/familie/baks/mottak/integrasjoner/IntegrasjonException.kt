@@ -34,7 +34,9 @@ open class IntegrasjonException(
         ): String? =
             when (e) {
                 is RestClientResponseException,
-                -> "Error mot $uri status=${e.statusCode} body=${e.responseBodyAsString}" else
+                -> "Error mot $uri status=${e.statusCode} body=${e.responseBodyAsString}"
+
+                else
                 -> null
             }
     }

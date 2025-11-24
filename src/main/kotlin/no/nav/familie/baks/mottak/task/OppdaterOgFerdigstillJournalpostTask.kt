@@ -79,13 +79,16 @@ class OppdaterOgFerdigstillJournalpostTask(
                 )
             }
 
-            Journalstatus.JOURNALFOERT ->
+            Journalstatus.JOURNALFOERT -> {
                 log.info(
                     "Skipper oppdatering og ferdigstilling av " +
                         "journalpost ${journalpost.journalpostId} som alt er ferdig journalført",
                 )
+            }
 
-            else -> error("Uventet journalstatus ${journalpost.journalstatus} for journalpost ${journalpost.journalpostId}")
+            else -> {
+                error("Uventet journalstatus ${journalpost.journalstatus} for journalpost ${journalpost.journalpostId}")
+            }
         }
     }
 

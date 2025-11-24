@@ -33,14 +33,17 @@ class PdfService(
 
         val (søknadstype, navn) =
             when (versjonertBarnetrygdSøknad) {
-                is VersjonertBarnetrygdSøknadV8 ->
+                is VersjonertBarnetrygdSøknadV8 -> {
                     Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype, versjonertBarnetrygdSøknad.barnetrygdSøknad.søker.navn)
+                }
 
-                is VersjonertBarnetrygdSøknadV9 ->
+                is VersjonertBarnetrygdSøknadV9 -> {
                     Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype, versjonertBarnetrygdSøknad.barnetrygdSøknad.søker.navn)
+                }
 
-                is VersjonertBarnetrygdSøknadV10 ->
+                is VersjonertBarnetrygdSøknadV10 -> {
                     Pair(versjonertBarnetrygdSøknad.barnetrygdSøknad.søknadstype, versjonertBarnetrygdSøknad.barnetrygdSøknad.søker.navn)
+                }
             }
 
         val path: String = søknadstypeTilPath(søknadstype)

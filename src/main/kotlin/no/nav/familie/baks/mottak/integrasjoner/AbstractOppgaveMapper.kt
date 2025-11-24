@@ -55,8 +55,14 @@ abstract class AbstractOppgaveMapper(
 
         if (journalpostBruker == null) {
             when (oppgavetype) {
-                Oppgavetype.BehandleSak -> error("Journalpost ${journalpost.journalpostId} mangler bruker")
-                Oppgavetype.Journalføring -> return null
+                Oppgavetype.BehandleSak -> {
+                    error("Journalpost ${journalpost.journalpostId} mangler bruker")
+                }
+
+                Oppgavetype.Journalføring -> {
+                    return null
+                }
+
                 else -> {
                     // NOP
                 }
@@ -88,8 +94,13 @@ abstract class AbstractOppgaveMapper(
                 }
             }
 
-            BrukerIdType.AKTOERID -> OppgaveIdentV2(ident = journalpostBruker.id.trim(), gruppe = IdentGruppe.AKTOERID)
-            else -> null
+            BrukerIdType.AKTOERID -> {
+                OppgaveIdentV2(ident = journalpostBruker.id.trim(), gruppe = IdentGruppe.AKTOERID)
+            }
+
+            else -> {
+                null
+            }
         }
     }
 

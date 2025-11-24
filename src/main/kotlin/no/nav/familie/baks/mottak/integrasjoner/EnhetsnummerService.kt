@@ -43,13 +43,36 @@ class EnhetsnummerService(
         val journalførendeEnhet = journalpost.journalforendeEnhet
 
         return when {
-            erEnAvPersoneneStrengtFortrolig -> "2103"
-            journalførendeEnhet == "2101" -> "4806" // Enhet 2101 er nedlagt. Rutes til 4806
-            journalførendeEnhet == "4847" -> "4817" // Enhet 4847 skal legges ned. Rutes til 4817
-            journalpost.harDigitalSøknad(tema) -> arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(journalpostBrukerService.tilPersonIdent(journalpostBruker, tema), tema).enhetId
-            journalførendeEnhet.isNullOrBlank() -> null
-            hentEnhetClient.hentEnhet(journalførendeEnhet).status.uppercase(Locale.getDefault()) == "NEDLAGT" -> null
-            hentEnhetClient.hentEnhet(journalførendeEnhet).oppgavebehandler -> journalførendeEnhet
+            erEnAvPersoneneStrengtFortrolig -> {
+                "2103"
+            }
+
+            journalførendeEnhet == "2101" -> {
+                "4806"
+            }
+
+            // Enhet 2101 er nedlagt. Rutes til 4806
+            journalførendeEnhet == "4847" -> {
+                "4817"
+            }
+
+            // Enhet 4847 skal legges ned. Rutes til 4817
+            journalpost.harDigitalSøknad(tema) -> {
+                arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(journalpostBrukerService.tilPersonIdent(journalpostBruker, tema), tema).enhetId
+            }
+
+            journalførendeEnhet.isNullOrBlank() -> {
+                null
+            }
+
+            hentEnhetClient.hentEnhet(journalførendeEnhet).status.uppercase(Locale.getDefault()) == "NEDLAGT" -> {
+                null
+            }
+
+            hentEnhetClient.hentEnhet(journalførendeEnhet).oppgavebehandler -> {
+                journalførendeEnhet
+            }
+
             else -> {
                 logger.warn("Enhet $journalførendeEnhet kan ikke ta i mot oppgaver")
                 null

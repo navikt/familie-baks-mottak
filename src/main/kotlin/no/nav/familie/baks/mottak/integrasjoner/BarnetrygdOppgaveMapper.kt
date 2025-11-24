@@ -22,33 +22,54 @@ class BarnetrygdOppgaveMapper(
     // Behandlingstema og behandlingstype settes basert på regelsettet som er dokumentert nederst her: https://confluence.adeo.no/display/TFA/Mottak+av+dokumenter
     override fun hentBehandlingstema(journalpost: Journalpost): Behandlingstema? =
         when {
-            journalpost.harBarnetrygdSøknad() && journalpost.erDigitalKanal() ->
+            journalpost.harBarnetrygdSøknad() && journalpost.erDigitalKanal() -> {
                 if (utledBehandlingUnderkategoriFraSøknad(journalpost) == BehandlingUnderkategori.UTVIDET) {
                     Behandlingstema.UtvidetBarnetrygd
                 } else {
                     Behandlingstema.OrdinærBarnetrygd
                 }
+            }
 
-            !journalpost.harKlage() && erDnummerPåJournalpost(journalpost) -> Behandlingstema.BarnetrygdEØS
-            hoveddokumentErÅrligDifferanseutbetalingAvBarnetrygd(journalpost) -> null
-            journalpost.harKlage() -> null
-            else -> Behandlingstema.OrdinærBarnetrygd
+            !journalpost.harKlage() && erDnummerPåJournalpost(journalpost) -> {
+                Behandlingstema.BarnetrygdEØS
+            }
+
+            hoveddokumentErÅrligDifferanseutbetalingAvBarnetrygd(journalpost) -> {
+                null
+            }
+
+            journalpost.harKlage() -> {
+                null
+            }
+
+            else -> {
+                Behandlingstema.OrdinærBarnetrygd
+            }
         }
 
     override fun hentBehandlingstemaVerdi(journalpost: Journalpost) = hentBehandlingstema(journalpost)?.value
 
     override fun hentBehandlingstype(journalpost: Journalpost): Behandlingstype? =
         when {
-            journalpost.harBarnetrygdSøknad() && journalpost.erDigitalKanal() ->
+            journalpost.harBarnetrygdSøknad() && journalpost.erDigitalKanal() -> {
                 if (utledBehandlingKategoriFraSøknad(journalpost) == BehandlingKategori.EØS) {
                     Behandlingstype.EØS
                 } else {
                     Behandlingstype.NASJONAL
                 }
+            }
 
-            hoveddokumentErÅrligDifferanseutbetalingAvBarnetrygd(journalpost) -> Behandlingstype.Utland
-            journalpost.harKlage() -> Behandlingstype.Klage
-            else -> null
+            hoveddokumentErÅrligDifferanseutbetalingAvBarnetrygd(journalpost) -> {
+                Behandlingstype.Utland
+            }
+
+            journalpost.harKlage() -> {
+                Behandlingstype.Klage
+            }
+
+            else -> {
+                null
+            }
         }
 
     override fun hentBehandlingstypeVerdi(journalpost: Journalpost): String? = hentBehandlingstype(journalpost)?.value

@@ -53,6 +53,7 @@ class EnsligForsørgerHendelseService(
                     ensligForsørgerVedtakhendelseOvergangstønadCounter.increment()
                 }
             }
+
             else -> {
                 logger.info("Ignorerer vedtak av type ${ensligForsørgerVedtakhendelse.stønadType} for behandlingId=${ensligForsørgerVedtakhendelse.behandlingId}")
                 ensligForsørgerVedtakhendelseAnnetCounter.increment()

@@ -279,7 +279,9 @@ class LeesahService(
                 opprettSvalbardtilleggTask(pdlHendelse)
             }
 
-            else -> log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}: ${pdlHendelse.endringstype}")
+            else -> {
+                log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}: ${pdlHendelse.endringstype}")
+            }
         }
         oppdaterHendelseslogg(pdlHendelse)
     }

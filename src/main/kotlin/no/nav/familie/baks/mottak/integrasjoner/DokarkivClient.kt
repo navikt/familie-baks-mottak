@@ -89,7 +89,6 @@ class DokarkivClient(
             ressurs == null -> error("Finner ikke ressurs")
             ressurs.data == null -> error("Ressurs mangler data")
             ressurs.status != Ressurs.Status.SUKSESS -> error("Ressurs returnerer 2xx men har ressurs status failure")
-
             else -> ressurs.data!!
         }
 

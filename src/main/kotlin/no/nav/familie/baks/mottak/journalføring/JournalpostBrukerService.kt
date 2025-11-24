@@ -16,6 +16,7 @@ class JournalpostBrukerService(
     ): String =
         when (bruker.type) {
             BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema)
+
             BrukerIdType.FNR,
             BrukerIdType.ORGNR,
             -> bruker.id
