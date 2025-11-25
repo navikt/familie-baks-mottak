@@ -6,7 +6,6 @@ import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
-import no.nav.familie.baks.mottak.task.SvalbardtilleggTask.Companion.tidligsteTriggerTidForÅSendeSvalbardtilleggTilBaSak
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.OppholdAnnetSted
 import no.nav.familie.kontrakter.felles.personopplysning.Oppholdsadresse
@@ -212,7 +211,6 @@ class SvalbardtilleggTaskTest {
 
         assertThat(taskSlot.captured.payload).isEqualTo(personIdent)
         assertThat(taskSlot.captured.type).isEqualTo(TriggSvalbardtilleggbehandlingIBaSakTask.TASK_STEP_TYPE)
-        val forventetTriggerTid = LocalDateTime.now().plusHours(1).coerceAtLeast(tidligsteTriggerTidForÅSendeSvalbardtilleggTilBaSak)
-        assertThat(taskSlot.captured.triggerTid).isCloseTo(forventetTriggerTid, byLessThan(1, MINUTES))
+        assertThat(taskSlot.captured.triggerTid).isCloseTo(LocalDateTime.now().plusHours(1), byLessThan(1, MINUTES))
     }
 }
