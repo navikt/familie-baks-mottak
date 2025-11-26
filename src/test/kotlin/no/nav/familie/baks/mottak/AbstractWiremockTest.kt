@@ -1,7 +1,7 @@
 package no.nav.familie.baks.mottak
 
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
+import org.wiremock.spring.EnableWireMock
 
 @SpringBootTest(
     classes = [DevLauncher::class],
@@ -14,5 +14,5 @@ import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
         "FAMILIE_KS_SAK_API_URL=http://localhost:\${wiremock.server.port}/api",
     ],
 )
-@AutoConfigureWireMock
+@EnableWireMock
 abstract class AbstractWiremockTest

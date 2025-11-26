@@ -29,7 +29,6 @@
         <kontrakter.version>3.0_20251030120445_40c2cd0</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
-        <spring.cloud.version>4.3.0</spring.cloud.version>
         <token-validation-spring.version>5.0.39</token-validation-spring.version>
         <avro.version>1.12.1</avro.version>
 
@@ -270,9 +269,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-contract-wiremock</artifactId>
-            <version>${spring.cloud.version}</version>
+            <groupId>org.wiremock.integrations</groupId>
+            <artifactId>wiremock-spring-boot</artifactId>
+            <version>4.0.8</version>
             <scope>test</scope>
         </dependency>
         <dependency>
