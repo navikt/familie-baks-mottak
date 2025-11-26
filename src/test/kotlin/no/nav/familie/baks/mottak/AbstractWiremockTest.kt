@@ -1,7 +1,10 @@
 package no.nav.familie.baks.mottak
 
 import org.springframework.boot.test.context.SpringBootTest
+<<<<<<< HEAD
 import org.wiremock.spring.EnableWireMock
+=======
+>>>>>>> fba9b4e (Fikser en del kompileringsfeil)
 
 @SpringBootTest(
     classes = [DevLauncher::class],
