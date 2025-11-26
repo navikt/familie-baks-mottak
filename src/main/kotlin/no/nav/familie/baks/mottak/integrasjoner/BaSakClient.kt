@@ -8,8 +8,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.retry.annotation.Backoff
-import org.springframework.retry.annotation.Retryable
+import org.springframework.resilience.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
@@ -28,8 +27,8 @@ class BaSakClient
     ) : AbstractRestClient(restOperations, "integrasjon") {
         @Retryable(
             value = [RuntimeException::class],
-            maxAttempts = 3,
-            backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
+            maxRetries = 3,
+            delayString = "\${retry.backoff.delay:5000}",
         )
         fun sendTilSak(nyBehandling: NyBehandling) {
             val uri = URI.create("$sakServiceUri/behandlinger")

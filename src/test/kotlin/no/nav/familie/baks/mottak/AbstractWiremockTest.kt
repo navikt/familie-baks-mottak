@@ -1,7 +1,6 @@
 package no.nav.familie.baks.mottak
 
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 
 @SpringBootTest(
     classes = [DevLauncher::class],
