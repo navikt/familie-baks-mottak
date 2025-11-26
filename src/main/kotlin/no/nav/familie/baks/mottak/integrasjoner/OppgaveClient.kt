@@ -19,8 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.NestedExceptionUtils
-import org.springframework.retry.annotation.Backoff
-import org.springframework.retry.annotation.Retryable
+import org.springframework.resilience.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestOperations
 import java.net.URI
@@ -56,8 +55,8 @@ class OppgaveClient
 
         @Retryable(
             value = [RuntimeException::class],
-            maxAttempts = 3,
-            backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
+            maxRetries = 3,
+            delayString = "\${retry.backoff.delay:5000}",
         )
         fun opprettVurderLivshendelseOppgave(dto: OppgaveVurderLivshendelseDto): OppgaveResponse {
             logger.info("Oppretter \"Vurder livshendelse\"-oppgave")
@@ -85,8 +84,8 @@ class OppgaveClient
 
         @Retryable(
             value = [RuntimeException::class],
-            maxAttempts = 3,
-            backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
+            maxRetries = 3,
+            delayString = "\${retry.backoff.delay:5000}",
         )
         fun oppdaterOppgaveBeskrivelse(
             patchOppgave: Oppgave,
@@ -112,8 +111,8 @@ class OppgaveClient
 
         @Retryable(
             value = [RuntimeException::class],
-            maxAttempts = 3,
-            backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
+            maxRetries = 3,
+            delayString = "\${retry.backoff.delay:5000}",
         )
         fun finnOppgaver(
             journalpostId: String,
@@ -150,8 +149,8 @@ class OppgaveClient
 
         @Retryable(
             value = [RuntimeException::class],
-            maxAttempts = 3,
-            backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
+            maxRetries = 3,
+            delayString = "\${retry.backoff.delay:5000}",
         )
         fun finnOppgaverPåAktørId(
             aktørId: String,

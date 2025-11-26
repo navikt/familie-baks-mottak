@@ -21,6 +21,7 @@ import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
@@ -61,7 +62,7 @@ class ClientMocks {
         } answers {
             throw RessursException(
                 Ressurs(status = Ressurs.Status.FEILET, data = null, melding = "", stacktrace = ""),
-                HttpClientErrorException.Conflict.create(HttpStatus.CONFLICT, null, null, null, null),
+                HttpClientErrorException.Conflict.create(HttpStatus.CONFLICT, "", HttpHeaders(), null, null),
                 HttpStatus.CONFLICT,
             )
         }

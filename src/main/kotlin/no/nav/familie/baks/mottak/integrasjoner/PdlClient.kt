@@ -17,8 +17,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.retry.annotation.Backoff
-import org.springframework.retry.annotation.Retryable
+import org.springframework.resilience.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
 import java.net.URI
@@ -31,7 +30,7 @@ class PdlClient(
 ) : AbstractRestClient(restTemplate, "pdl.personinfo") {
     private val pdlUri = UriUtil.uri(pdlBaseUrl, PATH_GRAPHQL)
 
-    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
+    @Retryable(value = [RuntimeException::class], maxRetries = 3, delayString = ("\${retry.backoff.delay:5000}"))
     @Cacheable("hentIdenter", cacheManager = "hourlyCacheManager")
     fun hentIdenter(
         personIdent: String,
