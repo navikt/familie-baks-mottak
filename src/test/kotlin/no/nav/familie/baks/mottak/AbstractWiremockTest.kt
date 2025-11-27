@@ -1,11 +1,7 @@
 package no.nav.familie.baks.mottak
 
 import org.springframework.boot.test.context.SpringBootTest
-<<<<<<< HEAD
-=======
 import org.wiremock.spring.EnableWireMock
->>>>>>> 16d3c41 (Bytter til wiremock-spring-boot i stedet for cloud (#1473))
-
 @SpringBootTest(
     classes = [DevLauncher::class],
     properties = [
