@@ -2,6 +2,7 @@ package no.nav.familie.baks.mottak.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.familie.http.client.RetryOAuth2HttpClient
+import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.log.NavSystemtype
 import no.nav.familie.log.filter.LogFilter
 import no.nav.familie.prosessering.config.ProsesseringInfoProvider
@@ -59,7 +60,7 @@ class ApplicationConfig {
      */
     @Bean
     @Primary
-    fun restTemplateBuilder(objectMapper: ObjectMapper): RestTemplateBuilder {
+    fun restTemplateBuilder(): RestTemplateBuilder {
         val jackson2HttpMessageConverter = MappingJackson2HttpMessageConverter(objectMapper)
         return RestTemplateBuilder()
             .connectTimeout(Duration.of(2, ChronoUnit.SECONDS))
