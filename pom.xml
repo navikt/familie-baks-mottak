@@ -25,7 +25,7 @@
         <confluent.version>8.1.0</confluent.version>
         <prosessering.version>2.20251117095517_cc54714</prosessering.version>
 
-        <felles.version>3.20251105152539_b03ed80</felles.version>
+        <felles.version>4.20251125150711_2fff585</felles.version>
         <kontrakter.version>3.0_20251113093018_87a80f3</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
@@ -63,6 +63,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-flyway</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
