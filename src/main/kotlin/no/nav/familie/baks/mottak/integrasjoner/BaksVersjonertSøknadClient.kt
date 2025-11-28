@@ -7,8 +7,7 @@ import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknad
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.retry.annotation.Backoff
-import org.springframework.retry.annotation.Retryable
+import org.springframework.resilience.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestOperations
 import java.net.URI
@@ -21,7 +20,11 @@ class BaksVersjonertSøknadClient(
     private val integrasjonerServiceUri: URI,
     @Qualifier("clientCredentials") restOperations: RestOperations,
 ) : AbstractRestClient(restOperations, "integrasjon") {
-    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
+    @Retryable(
+        value = [RuntimeException::class],
+        maxRetries = 3,
+        delayString = "\${retry.backoff.delay:5000}",
+    )
     fun hentVersjonertBarnetrygdSøknad(
         journalpostId: String,
     ): VersjonertBarnetrygdSøknad {
@@ -36,7 +39,11 @@ class BaksVersjonertSøknadClient(
         )
     }
 
-    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
+    @Retryable(
+        value = [RuntimeException::class],
+        maxRetries = 3,
+        delayString = "\${retry.backoff.delay:5000}",
+    )
     fun hentVersjonertKontantstøtteSøknad(
         journalpostId: String,
     ): VersjonertKontantstøtteSøknad {
