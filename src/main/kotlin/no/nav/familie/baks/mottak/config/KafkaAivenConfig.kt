@@ -29,8 +29,8 @@ class KafkaAivenConfig(
     fun kafkaAivenHendelseListenerContainerFactory(kafkaRestartingErrorHandler: KafkaRestartingErrorHandler): ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
-        factory.containerProperties.authExceptionRetryInterval = Duration.ofSeconds(2)
-        factory.consumerFactory = DefaultKafkaConsumerFactory(consumerConfigs())
+        factory.containerProperties.setAuthExceptionRetryInterval(Duration.ofSeconds(2))
+        factory.setConsumerFactory(DefaultKafkaConsumerFactory(consumerConfigs()))
         factory.setCommonErrorHandler(kafkaRestartingErrorHandler)
         return factory
     }
@@ -39,8 +39,8 @@ class KafkaAivenConfig(
     fun kafkaAivenHendelseListenerAvroLatestContainerFactory(kafkaRestartingErrorHandler: KafkaRestartingErrorHandler): ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
-        factory.containerProperties.authExceptionRetryInterval = Duration.ofSeconds(2)
-        factory.consumerFactory = DefaultKafkaConsumerFactory(consumerConfigsLatestAvro())
+        factory.containerProperties.setAuthExceptionRetryInterval(Duration.ofSeconds(2))
+        factory.setConsumerFactory(DefaultKafkaConsumerFactory(consumerConfigsLatestAvro()))
         factory.setCommonErrorHandler(kafkaRestartingErrorHandler)
         return factory
     }
@@ -49,8 +49,8 @@ class KafkaAivenConfig(
     fun kafkaAivenHendelseListenerAvroEarliestContainerFactory(kafkaRestartingErrorHandler: KafkaRestartingErrorHandler): ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
-        factory.containerProperties.authExceptionRetryInterval = Duration.ofSeconds(2)
-        factory.consumerFactory = DefaultKafkaConsumerFactory(consumerConfigsEarliestAvro())
+        factory.containerProperties.setAuthExceptionRetryInterval(Duration.ofSeconds(2))
+        factory.setConsumerFactory(DefaultKafkaConsumerFactory(consumerConfigsEarliestAvro()))
         factory.setCommonErrorHandler(kafkaRestartingErrorHandler)
         return factory
     }

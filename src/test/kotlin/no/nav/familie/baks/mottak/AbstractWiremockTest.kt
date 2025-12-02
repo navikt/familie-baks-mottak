@@ -2,7 +2,6 @@ package no.nav.familie.baks.mottak
 
 import org.springframework.boot.test.context.SpringBootTest
 import org.wiremock.spring.EnableWireMock
-
 @SpringBootTest(
     classes = [DevLauncher::class],
     properties = [
