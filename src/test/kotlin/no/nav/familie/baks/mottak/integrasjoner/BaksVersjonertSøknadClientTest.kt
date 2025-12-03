@@ -18,7 +18,7 @@ import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad as VersjonertBarnetrygdSøknadV9
-import no.nav.familie.kontrakter.ks.søknad.v5.KontantstøtteSøknad as VersjonertKontantstøtteSøknadV5
+import no.nav.familie.kontrakter.ks.søknad.v6.KontantstøtteSøknad as VersjonertKontantstøtteSøknadV6
 
 @ActiveProfiles("dev", "mock-oauth")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -81,7 +81,7 @@ class BaksVersjonertSøknadClientTest : AbstractWiremockTest() {
                     aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(hentResponsFraFil("versjonertKontantstøtteSøknadV5.json")),
+                        .withBody(hentResponsFraFil("versjonertKontantstøtteSøknadV6.json")),
                 ),
         )
 
@@ -90,10 +90,10 @@ class BaksVersjonertSøknadClientTest : AbstractWiremockTest() {
 
         // Assert
         assertThat(versjonertKontantStøtte).isNotNull
-        assertThat(versjonertKontantStøtte.kontantstøtteSøknad.kontraktVersjon).isEqualTo(5)
-        assertThat(versjonertKontantStøtte.kontantstøtteSøknad).isInstanceOf(VersjonertKontantstøtteSøknadV5::class.java)
+        assertThat(versjonertKontantStøtte.kontantstøtteSøknad.kontraktVersjon).isEqualTo(6)
+        assertThat(versjonertKontantStøtte.kontantstøtteSøknad).isInstanceOf(VersjonertKontantstøtteSøknadV6::class.java)
 
-        assertDoesNotThrow { versjonertKontantStøtte.kontantstøtteSøknad as VersjonertKontantstøtteSøknadV5 }
+        assertDoesNotThrow { versjonertKontantStøtte.kontantstøtteSøknad as VersjonertKontantstøtteSøknadV6 }
     }
 
     @Test

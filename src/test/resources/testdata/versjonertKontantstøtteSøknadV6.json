@@ -1,6 +1,6 @@
 {
   "data": {
-    "kontraktVersjon": 5,
+    "kontraktVersjon": 6,
     "søker": {
       "harEøsSteg": false,
       "ident": {
@@ -429,11 +429,23 @@
                 },
                 "barnehageplassLand": null,
                 "offentligStøtte": null,
+                "harHeltidDeltidBarnehageplass": {
+                  "label": {
+                    "en": "Does the child have full-time or part-time kindergarten?",
+                    "nn": "Har barnet heiltid eller deltid i barnehagen?",
+                    "nb": "Har barnet heltid eller deltid i barnehagen?"
+                  },
+                  "verdi": {
+                    "nb": "Full-time (33 hours or more per week)",
+                    "nn": "Heiltidsplass (33 timar eller meir per veke)",
+                    "en": "Heltidsplass (33 timer eller mer per uke)"
+                  }
+                },
                 "antallTimer": {
                   "label": {
-                    "en": "How many hours per week has the child been allotted to attend the kindergarten?",
-                    "nn": "Kor mange timar i uka har barnet fått tildelt barnehageplass?",
-                    "nb": "Hvor mange timer i uken har barnet fått tildelt barnehageplass?"
+                    "en": "Enter the allocated hours:",
+                    "nn": "Antal tildelte timar på deltidsplass:",
+                    "nb": "Antall tildelte timer på deltidsplass:"
                   },
                   "verdi": {
                     "nb": "40",
@@ -493,11 +505,23 @@
                 },
                 "barnehageplassLand": null,
                 "offentligStøtte": null,
+                "harHeltidDeltidBarnehageplass": {
+                  "label": {
+                    "en": "Does the child have full-time or part-time kindergarten?",
+                    "nn": "Har barnet heiltid eller deltid i barnehagen?",
+                    "nb": "Har barnet heltid eller deltid i barnehagen?"
+                  },
+                  "verdi": {
+                    "nb": "Full-time (33 hours or more per week)",
+                    "nn": "Heiltidsplass (33 timar eller meir per veke)",
+                    "en": "Heltidsplass (33 timer eller mer per uke)"
+                  }
+                },
                 "antallTimer": {
                   "label": {
-                    "en": "How many hours per week has the child been allotted to attend the kindergarten?",
-                    "nn": "Kor mange timar i uka har barnet fått tildelt barnehageplass?",
-                    "nb": "Hvor mange timer i uken har barnet fått tildelt barnehageplass?"
+                    "en": "Enter the allocated hours:",
+                    "nn": "Antal tildelte timar på deltidsplass:",
+                    "nb": "Antall tildelte timer på deltidsplass:"
                   },
                   "verdi": {
                     "nb": "40",
@@ -557,11 +581,23 @@
                 },
                 "barnehageplassLand": null,
                 "offentligStøtte": null,
+                "harHeltidDeltidBarnehageplass": {
+                  "label": {
+                    "en": "Does the child have full-time or part-time kindergarten?",
+                    "nn": "Har barnet heiltid eller deltid i barnehagen?",
+                    "nb": "Har barnet heltid eller deltid i barnehagen?"
+                  },
+                  "verdi": {
+                    "nb": "Full-time (33 hours or more per week)",
+                    "nn": "Heiltidsplass (33 timar eller meir per veke)",
+                    "en": "Heltidsplass (33 timer eller mer per uke)"
+                  }
+                },
                 "antallTimer": {
                   "label": {
-                    "en": "How many hours per week has the child been allotted to attend the kindergarten?",
-                    "nn": "Kor mange timar i uka har barnet fått tildelt barnehageplass?",
-                    "nb": "Hvor mange timer i uken har barnet fått tildelt barnehageplass?"
+                    "en": "Enter the allocated hours:",
+                    "nn": "Antal tildelte timar på deltidsplass:",
+                    "nb": "Antall tildelte timer på deltidsplass:"
                   },
                   "verdi": {
                     "nb": "40",
