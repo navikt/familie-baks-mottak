@@ -32,6 +32,7 @@ updates:
       prod-avhengigheter:
         dependency-type: production
         exclude-patterns:
+          - "org.springframework*"
           - "no.nav.security*"
 
   - package-ecosystem: github-actions
