@@ -22,11 +22,11 @@
         <jvmTarget>21</jvmTarget>
         <kotlin.version>2.2.21</kotlin.version>
         <mockk.version>1.14.6</mockk.version>
-        <confluent.version>8.1.0</confluent.version>
-        <prosessering.version>2.20251117095517_cc54714</prosessering.version>
+        <confluent.version>8.1.1</confluent.version>
+        <prosessering.version>2.20251205101334_e75fc2d</prosessering.version>
 
-        <felles.version>3.20251105152539_b03ed80</felles.version>
-        <kontrakter.version>3.0_20251113093018_87a80f3</kontrakter.version>
+        <felles.version>4.20251203153147_ca40cc5</felles.version>
+        <kontrakter.version>3.0_20251208150204_158920b</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
         <token-validation-spring.version>5.0.39</token-validation-spring.version>
@@ -169,7 +169,7 @@
         <dependency>
             <groupId>no.nav.familie</groupId>
             <artifactId>baks-dokgen</artifactId>
-            <version>1.0_20251106154635_dc10b67</version>
+            <version>1.0_20251128085513_422146c</version>
         </dependency>
         <!-- Kafka -->
         <dependency>
@@ -309,7 +309,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>5.3.0.6276</version>
+                    <version>5.4.0.6343</version>
                 </plugin>
             </plugins>
         </pluginManagement>
