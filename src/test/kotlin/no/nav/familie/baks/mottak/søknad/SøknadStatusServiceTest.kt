@@ -48,6 +48,26 @@ class SøknadStatusServiceTest {
     }
 
     @Test
+    fun `skal gi status OK dersom det har kommet inn noen søknader på 12 timer for kontantstøtte`() {
+        // Arrange
+        every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 10, 0)
+        every { kontantstøtteSøknadRepository.finnSisteLagredeSøknad() } returns
+            DBKontantstøtteSøknad(
+                søknadJson = "",
+                opprettetTid = LocalDateTime.of(2024, 8, 2, 8, 59),
+                fnr = "",
+            )
+
+        // Act
+        val statusKontantstøtte = søknadStatusService.statusKontantstøtte()
+
+        // Assert
+        assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.OK)
+        assertThat(statusKontantstøtte.description).isEqualTo("Alt er OK")
+        assertThat(statusKontantstøtte.logLink).isNull()
+    }
+
+    @Test
     fun `skal gi status DOWN dersom det ikke har kommet inn noen søknader på 12 timer for barnetrygd`() {
         // Arrange
         every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 10, 0)
@@ -63,6 +83,26 @@ class SøknadStatusServiceTest {
 
         // Assert
         assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.DOWN)
+    }
+
+    @Test
+    fun `skal gi status OK dersom det har kommet inn noen søknader på 12 timer for barnetrygd`() {
+        // Arrange
+        every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 10, 0)
+        every { søknadRepository.finnSisteLagredeSøknad() } returns
+            DBBarnetrygdSøknad(
+                søknadJson = "",
+                opprettetTid = LocalDateTime.of(2024, 8, 2, 8, 59),
+                fnr = "",
+            )
+
+        // Act
+        val statusBarnetrygd = søknadStatusService.statusBarnetrygd()
+
+        // Assert
+        assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.OK)
+        assertThat(statusBarnetrygd.description).isEqualTo("Alt er OK")
+        assertThat(statusBarnetrygd.logLink).isNull()
     }
 
     @Test
@@ -84,6 +124,27 @@ class SøknadStatusServiceTest {
     }
 
     @Test
+    fun `skal gi status OK dersom det er natt og det har kommet inn noen søknader på 12 timer for kontantstøtte`() {
+        // Arrange
+        every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 2, 0)
+        every { kontantstøtteSøknadRepository.finnSisteLagredeSøknad() } returns
+            DBKontantstøtteSøknad(
+                søknadJson = "",
+                opprettetTid = LocalDateTime.of(2024, 8, 1, 14, 59),
+                fnr = "",
+            )
+
+        // Act
+        val statusKontantstøtte = søknadStatusService.statusKontantstøtte()
+        println(statusKontantstøtte)
+
+        // Assert
+        assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.OK)
+        assertThat(statusKontantstøtte.description).isEqualTo("Alt er OK")
+        assertThat(statusKontantstøtte.logLink).isNull()
+    }
+
+    @Test
     fun `skal gi status DOWN dersom det er natt og det ikke har kommet inn noen søknader på 24 timer for barnetrygd`() {
         // Arrange
         every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 2, 0)
@@ -99,6 +160,26 @@ class SøknadStatusServiceTest {
 
         // Assert
         assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.DOWN)
+    }
+
+    @Test
+    fun `skal gi status OK dersom det er natt og det ikke har kommet inn noen søknader på 24 timer for barnetrygd`() {
+        // Arrange
+        every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 2, 0)
+        every { søknadRepository.finnSisteLagredeSøknad() } returns
+            DBBarnetrygdSøknad(
+                søknadJson = "",
+                opprettetTid = LocalDateTime.of(2024, 8, 1, 14, 59),
+                fnr = "",
+            )
+
+        // Act
+        val statusBarnetrygd = søknadStatusService.statusBarnetrygd()
+
+        // Assert
+        assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.OK)
+        assertThat(statusBarnetrygd.description).isEqualTo("Alt er OK")
+        assertThat(statusBarnetrygd.logLink).isNull()
     }
 
     @Test
