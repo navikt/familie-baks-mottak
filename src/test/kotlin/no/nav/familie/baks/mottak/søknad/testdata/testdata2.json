@@ -1,0 +1,979 @@
+{
+    "kontraktVersjon": 6,
+    "søker": {
+      "harEøsSteg": false,
+      "ident": {
+        "label": {
+          "en": "Norwegian National identity number or D number",
+          "nn": "Fødselsnummer eller d-nummer",
+          "nb": "Fødselsnummer eller d-nummer"
+        },
+        "verdi": {
+          "nb": "12345678900",
+          "nn": "12345678900",
+          "en": "12345678900"
+        }
+      },
+      "navn": {
+        "label": {
+          "en": "Name",
+          "nn": "Namn",
+          "nb": "Navn"
+        },
+        "verdi": {
+          "nb": "KULTURELL HELDIGGRIS",
+          "nn": "KULTURELL HELDIGGRIS",
+          "en": "KULTURELL HELDIGGRIS"
+        }
+      },
+      "statsborgerskap": {
+        "label": {
+          "en": "Nationality",
+          "nn": "Statsborgarskap",
+          "nb": "Statsborgerskap"
+        },
+        "verdi": {
+          "nb": [
+            "Norge"
+          ],
+          "nn": [
+            "Noreg"
+          ],
+          "en": [
+            "Norway"
+          ]
+        }
+      },
+      "adresse": {
+        "label": {
+          "en": "Address",
+          "nn": "Adresse",
+          "nb": "Adresse"
+        },
+        "verdi": {
+          "nb": {
+            "adressenavn": "Testveien",
+            "postnummer": "5003",
+            "husbokstav": null,
+            "bruksenhetsnummer": null,
+            "husnummer": "1",
+            "poststed": "OSLO"
+          },
+          "nn": {
+            "adressenavn": "Testveien",
+            "postnummer": "5003",
+            "husbokstav": null,
+            "bruksenhetsnummer": null,
+            "husnummer": "1",
+            "poststed": "OSLO"
+          },
+          "en": {
+            "adressenavn": "Testveien",
+            "postnummer": "5003",
+            "husbokstav": null,
+            "bruksenhetsnummer": null,
+            "husnummer": "1",
+            "poststed": "OSLO"
+          }
+        }
+      },
+      "adressebeskyttelse": false,
+      "sivilstand": {
+        "label": {
+          "en": "Marital status",
+          "nn": "Sivilstatus",
+          "nb": "Sivilstatus"
+        },
+        "verdi": {
+          "nb": "UGIFT",
+          "nn": "UGIFT",
+          "en": "UGIFT"
+        }
+      },
+      "borPåRegistrertAdresse": {
+        "label": {
+          "en": "Do you live at this address?",
+          "nn": "Bur du på denne adressa?",
+          "nb": "Bor du på denne adressen?"
+        },
+        "verdi": {
+          "nb": "JA",
+          "nn": "JA",
+          "en": "JA"
+        }
+      },
+      "værtINorgeITolvMåneder": {
+        "label": {
+          "en": "Have you stayed continuously in Norway for the last twelve months?",
+          "nn": "Har du opphalde deg samanhengande i Noreg dei siste tolv månadane?",
+          "nb": "Har du oppholdt deg sammenhengende i Norge de siste tolv månedene?"
+        },
+        "verdi": {
+          "nb": "JA",
+          "nn": "JA",
+          "en": "JA"
+        }
+      },
+      "planleggerÅBoINorgeTolvMnd": {
+        "label": {
+          "en": "Are you planning to live in Norway continuously for more than 12 months?",
+          "nn": "Planlegg du å bu samanhengande i Noreg i meir enn tolv månader?",
+          "nb": "Planlegger du å bo sammenhengende i Norge i mer enn tolv måneder?"
+        },
+        "verdi": {
+          "nb": "JA",
+          "nn": "JA",
+          "en": "JA"
+        }
+      },
+      "yrkesaktivFemÅr": {
+        "label": {
+          "en": "Have you lived or been employed in Norway or another EEA country for at least five years?",
+          "nn": "Har du budd eller vore yrkesaktiv i Noreg eller eit anna EØS-land i minst fem år?",
+          "nb": "Har du bodd eller vært yrkesaktiv i Norge eller et annet EØS-land i minst fem år?"
+        },
+        "verdi": {
+          "nb": "JA",
+          "nn": "JA",
+          "en": "JA"
+        }
+      },
+      "erAsylsøker": {
+        "label": {
+          "en": "Are you an asylum seeker?",
+          "nn": "Er du asylsøkar?",
+          "nb": "Er du asylsøker?"
+        },
+        "verdi": {
+          "nb": "NEI",
+          "nn": "NEI",
+          "en": "NEI"
+        }
+      },
+      "utenlandsoppholdUtenArbeid": {
+        "label": {
+          "en": "Are you staying or have you stayed outside of Norway without working?",
+          "nn": "Oppheld du deg, eller har du opphalde deg utanfor Noreg utan å arbeide?",
+          "nb": "Oppholder du deg, eller har du oppholdt deg, utenfor Norge uten å arbeide?"
+        },
+        "verdi": {
+          "nb": "NEI",
+          "nn": "NEI",
+          "en": "NEI"
+        }
+      },
+      "utenlandsperioder": [],
+      "arbeidIUtlandet": {
+        "label": {
+          "en": "Do you work or have you worked outside of Norway, on a foreign ship or on another country's continental shelf?",
+          "nn": "Arbeider eller har du arbeidt utanfor Noreg, på utanlandsk skip eller på utanlandsk kontinentalsokkel?",
+          "nb": "Arbeider eller har du arbeidet utenfor Norge, på utenlandsk skip eller på utenlandsk kontinentalsokkel?"
+        },
+        "verdi": {
+          "nb": "NEI",
+          "nn": "NEI",
+          "en": "NEI"
+        }
+      },
+      "arbeidsperioderUtland": [],
+      "mottarUtenlandspensjon": {
+        "label": {
+          "en": "Do you receive or have you received a pension from abroad?",
+          "nn": "Får eller har du fått pensjon frå utlandet?",
+          "nb": "Får eller har du fått pensjon fra utlandet?"
+        },
+        "verdi": {
+          "nb": "NEI",
+          "nn": "NEI",
+          "en": "NEI"
+        }
+      },
+      "pensjonsperioderUtland": [],
+      "arbeidINorge": null,
+      "arbeidsperioderNorge": [],
+      "pensjonNorge": null,
+      "pensjonsperioderNorge": [],
+      "andreUtbetalingsperioder": [],
+      "idNummer": [],
+      "andreUtbetalinger": null,
+      "adresseISøkeperiode": null
+    },
+    "barn": [
+      {
+        "harEøsSteg": false,
+        "ident": {
+          "label": {
+            "en": "Norwegian National identity number",
+            "nn": "Fødselsnummer",
+            "nb": "Fødselsnummer"
+          },
+          "verdi": {
+            "nb": "12345678901",
+            "nn": "12345678901",
+            "en": "12345678901"
+          }
+        },
+        "navn": {
+          "label": {
+            "en": "The child's name",
+            "nn": "Barnet sitt namn",
+            "nb": "Barnets navn"
+          },
+          "verdi": {
+            "nb": "TROVERDIG DETALJ",
+            "nn": "TROVERDIG DETALJ",
+            "en": "TROVERDIG DETALJ"
+          }
+        },
+        "registrertBostedType": {
+          "label": {
+            "en": "Registered place of residence",
+            "nn": "Registrert bustad",
+            "nb": "Registrert bosted"
+          },
+          "verdi": {
+            "nb": "REGISTRERT_SOKERS_ADRESSE",
+            "nn": "REGISTRERT_SOKERS_ADRESSE",
+            "en": "REGISTRERT_SOKERS_ADRESSE"
+          }
+        },
+        "alder": {
+          "label": {
+            "en": "Age",
+            "nn": "Alder",
+            "nb": "Alder"
+          },
+          "verdi": {
+            "nb": "1",
+            "nn": "1",
+            "en": "1"
+          }
+        },
+        "teksterTilPdf": {
+          "opplystAdoptert": {
+            "nn": "Du har opplyst at TROVERDIG DETALJ er adoptert.",
+            "nb": "Du har opplyst at TROVERDIG DETALJ er adoptert.",
+            "en": "You have stated that TROVERDIG DETALJ is adopted. "
+          },
+          "opplystBarnOppholdUtenforNorge": {
+            "nn": "Du har opplyst at TROVERDIG DETALJ har oppheldt seg utanfor Noreg i løpet av dei siste tolv månadene",
+            "nb": "Du har opplyst at TROVERDIG DETALJ har oppholdt seg utenfor Norge i løpet av de siste tolv månedene",
+            "en": "You have stated that TROVERDIG DETALJ has stayed outside of Norway during the last twelve months"
+          },
+          "opplystFaarHarFaattEllerSoektYtelse": {
+            "nn": "Du har opplyst at du får, har fått eller har søkt om kontantstøtte\nfor TROVERDIG DETALJ frå eit anna EØS-land.",
+            "nb": "Du har opplyst at du får, har fått eller har søkt om kontantstøtte\nfor TROVERDIG DETALJ fra et annet EØS-land.",
+            "en": "You have stated that you are receiving, have received or have applied for cash-for-care benefit for TROVERDIG DETALJ from another EEA country."
+          },
+          "opplystBarnehageplass": {
+            "nn": "Du har opplyst at TROVERDIG DETALJ har barnehageplass no, har hatt plass tidlegare, eller har blitt tildelt barnehageplass i framtida",
+            "nb": "Du har opplyst at TROVERDIG DETALJ har barnehageplass nå, har hatt plass tidligere, eller har fått tildelt en barnehageplass i framtiden",
+            "en": "You have stated that TROVERDIG DETALJ is attending kindergarten now, has previously attended kindergarten or will start attending kindergarten later"
+          },
+          "barnetsAndreForelder": {
+            "nn": "Barnet sin andre forelder",
+            "nb": "Barnets andre forelder",
+            "en": "The child's other parent"
+          },
+          "omBarnetTittel": {
+            "nn": "Om TROVERDIG DETALJ",
+            "nb": "Om TROVERDIG DETALJ",
+            "en": "About TROVERDIG DETALJ"
+          },
+          "bosted": {
+            "nn": "Bustad",
+            "nb": "Bosted",
+            "en": "Place of residence"
+          },
+          "eoesForBarnTittel": {
+            "nn": "kontantstøtte etter EØS-reglane - Om TROVERDIG DETALJ",
+            "nb": "kontantstøtte etter EØS-reglene - Om TROVERDIG DETALJ",
+            "en": "cash-for-care by the EEA-regulations - About TROVERDIG DETALJ"
+          }
+        },
+        "erFosterbarn": {
+          "label": {
+            "en": "Which of the children are foster children?",
+            "nn": "Kven av barna er fosterbarn?",
+            "nb": "Hvem av barna er fosterbarn?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "oppholderSegIInstitusjon": {
+          "label": {
+            "en": "Which of the children are in an institution?",
+            "nn": "Kven av barna er seg i institusjon?",
+            "nb": "Hvem av barna er i institusjon?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "erAdoptert": {
+          "label": {
+            "en": "Which of the children are adopted?",
+            "nn": "Kven av barna er adoptert?",
+            "nb": "Hvem av barna er adoptert?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "erAsylsøker": {
+          "label": {
+            "en": "For which of the children has an application for asylum been submitted?",
+            "nn": "Kven av barna er det søkt om asyl for?",
+            "nb": "Hvem av barna er det søkt om asyl for?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "boddMindreEnn12MndINorge": {
+          "label": {
+            "en": "Which of the children have stayed outside of Norway during the last twelve months?",
+            "nn": "Kven av barna har oppheldt seg utanfor Noreg i løpet av dei siste tolv månadene?",
+            "nb": "Hvem av barna har oppholdt seg utenfor Norge i løpet av de siste tolv månedene?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "kontantstøtteFraAnnetEøsland": {
+          "label": {
+            "en": "For which of the children are you receiving, have received or have applied for cash-for-care?",
+            "nn": "Kven av barna får du, har du fått eller har du søkt om kontantstøtte for?",
+            "nb": "Hvem av barna får du, har du fått eller har du søkt om kontantstøtte for?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "harBarnehageplass": {
+          "label": {
+            "en": "Which of the children are attending kindergarten now, have previously attended kindergarten or will start attending kindergarten later?",
+            "nn": "Kven av barna har barnehageplass no, har hatt plass tidlegare, eller har blitt tildelt barnehageplass i framtida",
+            "nb": "Hvem av barna har barnehageplass nå, har hatt plass tidligere, eller har fått tildelt en barnehageplass i framtiden?"
+          },
+          "verdi": {
+            "nb": "JA",
+            "nn": "JA",
+            "en": "JA"
+          }
+        },
+        "andreForelderErDød": {
+          "label": {
+            "en": "Which of the children is your previous spouse the parent of?",
+            "nn": "Kven av barna er din tidlegare ektefelle forelder til?",
+            "nb": "Hvem av barna er din tidligere ektefelle forelder til?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "utbetaltForeldrepengerEllerEngangsstønad": null,
+        "mottarEllerMottokEøsKontantstøtte": null,
+        "pågåendeSøknadFraAnnetEøsLand": null,
+        "pågåendeSøknadHvilketLand": null,
+        "planleggerÅBoINorge12Mnd": null,
+        "eøsKontantstøttePerioder": [],
+        "barnehageplassPerioder": [
+          {
+            "label": {
+              "en": "Period of attending kindergarten 1",
+              "nn": "Periode med barnehageplass 1",
+              "nb": "Periode med barnehageplass 1"
+            },
+            "verdi": {
+              "nb": {
+                "barnehageplassPeriodeBeskrivelse": {
+                  "label": {
+                    "en": "What best describes the period the child has attended kindergarten?",
+                    "nn": "Kva beskriv perioden barnet har hatt barnehageplass best?",
+                    "nb": "Hva beskriver perioden barnet har hatt barnehageplass best?"
+                  },
+                  "verdi": {
+                    "en": "The child will start attending kindergarten later",
+                    "nn": "Barnet har fått tildelt barnehageplass med oppstart seinare",
+                    "nb": "Barnet har fått tildelt barnehageplass med oppstart senere"
+                  }
+                },
+                "barnehageplassUtlandet": {
+                  "label": {
+                    "en": "Is the kindergarten outside of Norway?",
+                    "nn": "Er barnehagen utanfor Noreg?",
+                    "nb": "Er barnehagen utenfor Norge?"
+                  },
+                  "verdi": {
+                    "nb": "NEI",
+                    "nn": "NEI",
+                    "en": "NEI"
+                  }
+                },
+                "barnehageplassLand": null,
+                "offentligStøtte": null,
+                "harHeltidDeltidBarnehageplass": {
+                  "label": {
+                    "en": "Does the child have full-time or part-time kindergarten?",
+                    "nn": "Har barnet heiltid eller deltid i barnehagen?",
+                    "nb": "Har barnet heltid eller deltid i barnehagen?"
+                  },
+                  "verdi": {
+                    "nb": "Full-time (33 hours or more per week)",
+                    "nn": "Heiltidsplass (33 timar eller meir per veke)",
+                    "en": "Heltidsplass (33 timer eller mer per uke)"
+                  }
+                },
+                "antallTimer": {
+                  "label": {
+                    "en": "Enter the allocated hours:",
+                    "nn": "Antal tildelte timar på deltidsplass:",
+                    "nb": "Antall tildelte timer på deltidsplass:"
+                  },
+                  "verdi": {
+                    "nb": "40",
+                    "nn": "40",
+                    "en": "40"
+                  }
+                },
+                "startetIBarnehagen": {
+                  "label": {
+                    "en": "When will the child start attending kindergarten?",
+                    "nn": "Når har barnet fått tildelt barnehageplass frå?",
+                    "nb": "Når har barnet fått tildelt barnehageplass fra?"
+                  },
+                  "verdi": {
+                    "nb": "2025-02-17",
+                    "nn": "2025-02-17",
+                    "en": "2025-02-17"
+                  }
+                },
+                "slutterIBarnehagen": {
+                  "label": {
+                    "en": "When will the child stop attending kindergarten?",
+                    "nn": "Når sluttar barnet i barnehagen?",
+                    "nb": "Når slutter barnet i barnehagen?"
+                  },
+                  "verdi": {
+                    "en": "It is not agreed when the child will stop attending kindergarten",
+                    "nn": "Det er ikkje avtalt når barnet skal slutte i barnehagen",
+                    "nb": "Det er ikke avtalt når barnet skal slutte i barnehagen"
+                  }
+                }
+              },
+              "nn": {
+                "barnehageplassPeriodeBeskrivelse": {
+                  "label": {
+                    "en": "What best describes the period the child has attended kindergarten?",
+                    "nn": "Kva beskriv perioden barnet har hatt barnehageplass best?",
+                    "nb": "Hva beskriver perioden barnet har hatt barnehageplass best?"
+                  },
+                  "verdi": {
+                    "en": "The child will start attending kindergarten later",
+                    "nn": "Barnet har fått tildelt barnehageplass med oppstart seinare",
+                    "nb": "Barnet har fått tildelt barnehageplass med oppstart senere"
+                  }
+                },
+                "barnehageplassUtlandet": {
+                  "label": {
+                    "en": "Is the kindergarten outside of Norway?",
+                    "nn": "Er barnehagen utanfor Noreg?",
+                    "nb": "Er barnehagen utenfor Norge?"
+                  },
+                  "verdi": {
+                    "nb": "NEI",
+                    "nn": "NEI",
+                    "en": "NEI"
+                  }
+                },
+                "barnehageplassLand": null,
+                "offentligStøtte": null,
+                "harHeltidDeltidBarnehageplass": {
+                  "label": {
+                    "en": "Does the child have full-time or part-time kindergarten?",
+                    "nn": "Har barnet heiltid eller deltid i barnehagen?",
+                    "nb": "Har barnet heltid eller deltid i barnehagen?"
+                  },
+                  "verdi": {
+                    "nb": "Full-time (33 hours or more per week)",
+                    "nn": "Heiltidsplass (33 timar eller meir per veke)",
+                    "en": "Heltidsplass (33 timer eller mer per uke)"
+                  }
+                },
+                "antallTimer": {
+                  "label": {
+                    "en": "Enter the allocated hours:",
+                    "nn": "Antal tildelte timar på deltidsplass:",
+                    "nb": "Antall tildelte timer på deltidsplass:"
+                  },
+                  "verdi": {
+                    "nb": "40",
+                    "nn": "40",
+                    "en": "40"
+                  }
+                },
+                "startetIBarnehagen": {
+                  "label": {
+                    "en": "When will the child start attending kindergarten?",
+                    "nn": "Når har barnet fått tildelt barnehageplass frå?",
+                    "nb": "Når har barnet fått tildelt barnehageplass fra?"
+                  },
+                  "verdi": {
+                    "nb": "2025-02-17",
+                    "nn": "2025-02-17",
+                    "en": "2025-02-17"
+                  }
+                },
+                "slutterIBarnehagen": {
+                  "label": {
+                    "en": "When will the child stop attending kindergarten?",
+                    "nn": "Når sluttar barnet i barnehagen?",
+                    "nb": "Når slutter barnet i barnehagen?"
+                  },
+                  "verdi": {
+                    "en": "It is not agreed when the child will stop attending kindergarten",
+                    "nn": "Det er ikkje avtalt når barnet skal slutte i barnehagen",
+                    "nb": "Det er ikke avtalt når barnet skal slutte i barnehagen"
+                  }
+                }
+              },
+              "en": {
+                "barnehageplassPeriodeBeskrivelse": {
+                  "label": {
+                    "en": "What best describes the period the child has attended kindergarten?",
+                    "nn": "Kva beskriv perioden barnet har hatt barnehageplass best?",
+                    "nb": "Hva beskriver perioden barnet har hatt barnehageplass best?"
+                  },
+                  "verdi": {
+                    "en": "The child will start attending kindergarten later",
+                    "nn": "Barnet har fått tildelt barnehageplass med oppstart seinare",
+                    "nb": "Barnet har fått tildelt barnehageplass med oppstart senere"
+                  }
+                },
+                "barnehageplassUtlandet": {
+                  "label": {
+                    "en": "Is the kindergarten outside of Norway?",
+                    "nn": "Er barnehagen utanfor Noreg?",
+                    "nb": "Er barnehagen utenfor Norge?"
+                  },
+                  "verdi": {
+                    "nb": "NEI",
+                    "nn": "NEI",
+                    "en": "NEI"
+                  }
+                },
+                "barnehageplassLand": null,
+                "offentligStøtte": null,
+                "harHeltidDeltidBarnehageplass": {
+                  "label": {
+                    "en": "Does the child have full-time or part-time kindergarten?",
+                    "nn": "Har barnet heiltid eller deltid i barnehagen?",
+                    "nb": "Har barnet heltid eller deltid i barnehagen?"
+                  },
+                  "verdi": {
+                    "nb": "Full-time (33 hours or more per week)",
+                    "nn": "Heiltidsplass (33 timar eller meir per veke)",
+                    "en": "Heltidsplass (33 timer eller mer per uke)"
+                  }
+                },
+                "antallTimer": {
+                  "label": {
+                    "en": "Enter the allocated hours:",
+                    "nn": "Antal tildelte timar på deltidsplass:",
+                    "nb": "Antall tildelte timer på deltidsplass:"
+                  },
+                  "verdi": {
+                    "nb": "40",
+                    "nn": "40",
+                    "en": "40"
+                  }
+                },
+                "startetIBarnehagen": {
+                  "label": {
+                    "en": "When will the child start attending kindergarten?",
+                    "nn": "Når har barnet fått tildelt barnehageplass frå?",
+                    "nb": "Når har barnet fått tildelt barnehageplass fra?"
+                  },
+                  "verdi": {
+                    "nb": "2025-02-17",
+                    "nn": "2025-02-17",
+                    "en": "2025-02-17"
+                  }
+                },
+                "slutterIBarnehagen": {
+                  "label": {
+                    "en": "When will the child stop attending kindergarten?",
+                    "nn": "Når sluttar barnet i barnehagen?",
+                    "nb": "Når slutter barnet i barnehagen?"
+                  },
+                  "verdi": {
+                    "en": "It is not agreed when the child will stop attending kindergarten",
+                    "nn": "Det er ikkje avtalt når barnet skal slutte i barnehagen",
+                    "nb": "Det er ikke avtalt når barnet skal slutte i barnehagen"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "borFastMedSøker": {
+          "label": {
+            "en": "Does TROVERDIG DETALJ live with you on a permanent basis?",
+            "nn": "Bur TROVERDIG DETALJ fast saman med deg?",
+            "nb": "Bor TROVERDIG DETALJ fast sammen med deg?"
+          },
+          "verdi": {
+            "nb": "JA",
+            "nn": "JA",
+            "en": "JA"
+          }
+        },
+        "foreldreBorSammen": {
+          "label": {
+            "en": "Do you live with TROVERDIG DETALJ's other parent?",
+            "nn": "Bur du saman med den andre forelderen til TROVERDIG DETALJ?",
+            "nb": "Bor du sammen med den andre forelderen til TROVERDIG DETALJ?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "søkerDeltKontantstøtte": {
+          "label": {
+            "en": "Do you want to apply for a splitted cash-for-care benefit?",
+            "nn": "Søker du om delt kontantstøtte for TROVERDIG DETALJ?",
+            "nb": "Søker du om delt kontantstøtte for TROVERDIG DETALJ?"
+          },
+          "verdi": {
+            "nb": "NEI",
+            "nn": "NEI",
+            "en": "NEI"
+          }
+        },
+        "andreForelder": {
+          "kanIkkeGiOpplysninger": {
+            "label": {
+              "en": "I am unable to provide information about the other parent",
+              "nn": "Eg kan ikkje gje opplysningar om den andre forelderen",
+              "nb": "Jeg kan ikke gi opplysninger om den andre forelderen"
+            },
+            "verdi": {
+              "nb": "JA",
+              "nn": "JA",
+              "en": "JA"
+            }
+          },
+          "navn": null,
+          "fnr": null,
+          "fødselsdato": null,
+          "yrkesaktivFemÅr": null,
+          "arbeidUtlandet": null,
+          "arbeidsperioderUtland": [],
+          "utenlandsoppholdUtenArbeid": null,
+          "utenlandsperioder": [],
+          "pensjonUtland": null,
+          "pensjonsperioderUtland": [],
+          "idNummer": [],
+          "adresse": null,
+          "arbeidNorge": null,
+          "arbeidsperioderNorge": [],
+          "pensjonNorge": null,
+          "pensjonsperioderNorge": [],
+          "andreUtbetalinger": null,
+          "andreUtbetalingsperioder": [],
+          "pågåendeSøknadFraAnnetEøsLand": null,
+          "pågåendeSøknadHvilketLand": null,
+          "kontantstøtteFraEøs": null,
+          "eøsKontantstøttePerioder": []
+        },
+        "utenlandsperioder": [],
+        "søkersSlektsforhold": null,
+        "søkersSlektsforholdSpesifisering": null,
+        "borMedAndreForelder": null,
+        "borMedOmsorgsperson": null,
+        "adresse": null,
+        "omsorgsperson": null,
+        "idNummer": []
+      }
+    ],
+    "antallEøsSteg": 0,
+    "dokumentasjon": [
+      {
+        "dokumentasjonsbehov": "BEKREFTELESE_PÅ_BARNEHAGEPLASS",
+        "harSendtInn": false,
+        "opplastedeVedlegg": [],
+        "dokumentasjonSpråkTittel": {
+          "nn": "Stadfesting på barnehageplass",
+          "nb": "Bekreftelse på barnehageplass",
+          "en": "Confirmation of allocated kindergarten (place in kindergarten)"
+        }
+      },
+      {
+        "dokumentasjonsbehov": "ANNEN_DOKUMENTASJON",
+        "harSendtInn": false,
+        "opplastedeVedlegg": [],
+        "dokumentasjonSpråkTittel": {
+          "nn": "Anna dokumentasjon",
+          "nb": "Annen dokumentasjon",
+          "en": "Other documentation"
+        }
+      }
+    ],
+    "teksterTilPdf": {
+      "sivilstandGift": {
+        "nn": "Gift",
+        "nb": "Gift",
+        "en": "Married"
+      },
+      "sivilstandEnkeEnkemann": {
+        "nn": "Enke/enkemann",
+        "nb": "Enke/enkemann",
+        "en": "Widow(er)"
+      },
+      "sivilstandSkilt": {
+        "nn": "Skilt",
+        "nb": "Skilt",
+        "en": "Divorced"
+      },
+      "sivilstandSeparert": {
+        "nn": "Separert",
+        "nb": "Separert",
+        "en": "Separated"
+      },
+      "sivilstandRegistrertPartner": {
+        "nn": "Registrert partner",
+        "nb": "Registrert partner",
+        "en": "Registered partner"
+      },
+      "sivilstandSeparertPartner": {
+        "nn": "Separert partner",
+        "nb": "Separert partner",
+        "en": "Separated partner"
+      },
+      "sivilstandSkiltPartner": {
+        "nn": "Skilt partner",
+        "nb": "Skilt partner",
+        "en": "Divorced partner"
+      },
+      "sivilstandGjenlevendePartner": {
+        "nn": "Attlevande partner",
+        "nb": "Gjenlevende partner",
+        "en": "Surviving partner"
+      },
+      "sivilstandUgift": {
+        "nn": "Ugift",
+        "nb": "Ugift",
+        "en": "Unmarried"
+      },
+      "sivilstandUoppgitt": {
+        "nn": "Ikkje oppgitt",
+        "nb": "Ikke oppgitt",
+        "en": "Not specified"
+      },
+      "bekreftelsesboksBroedtekst": {
+        "nn": "Det er viktig at du gir oss riktige opplysningar slik at vi kan behandla saka di. Les meir om viktigheita av å gi riktige opplysningar (blir opna i nytt vindauge).",
+        "nb": "Det er viktig at du gir oss riktige opplysninger slik at vi kan behandle saken din. Les mer om viktigheten av å gi riktige opplysninger (åpnes i nytt vindu).",
+        "en": "It’s important that you give us accurate information so we can handle your case correctly. You can read more about why providing the right information matters (opens in a new window)."
+      },
+      "bekreftelsesboksErklaering": {
+        "nn": "Eg stadfestar at eg vil svara så godt eg kan på spørsmåla i søknaden.",
+        "nb": "Jeg vil svare så godt jeg kan på spørsmålene i søknaden.",
+        "en": "I will do my best to answer all the questions in the application truthfully."
+      },
+      "soekerAdressesperre": {
+        "nn": "Du er registrert med adressesperre",
+        "nb": "Du er registrert med adressesperre",
+        "en": "You are registered with a blocked address"
+      },
+      "ikkeRegistrertAdresse": {
+        "nn": "Du er ikkje registrert med bustadsadresse i Noreg",
+        "nb": "Du er ikke registrert med bostedsadresse i Norge",
+        "en": "You are not registered with a residential address in Norway"
+      },
+      "skjermetAdresse": {
+        "nn": "Skjerma adresse",
+        "nb": "Skjermet adresse",
+        "en": "Blocked address"
+      },
+      "omDegTittel": {
+        "nn": "Om deg",
+        "nb": "Om deg",
+        "en": "About you"
+      },
+      "dinLivssituasjonTittel": {
+        "nn": "Livssituasjonen din",
+        "nb": "Livssituasjonen din",
+        "en": "Your life situation"
+      },
+      "registrertMedAdressesperre": {
+        "nn": "Barnet er registrert med adressesperre.",
+        "nb": "Barnet er registrert med adressesperre.",
+        "en": "The child is registered with a blocked address."
+      },
+      "velgBarnTittel": {
+        "nn": "Kva barn søker du for?",
+        "nb": "Hvilke barn søker du for?",
+        "en": "Which children are you applying for benefit for?"
+      },
+      "registrertPaaAdressenDin": {
+        "nn": "Registrert på adressa di",
+        "nb": "Registrert på adressen din",
+        "en": "Registered as living at your address"
+      },
+      "ikkeRegistrertPaaAdressenDin": {
+        "nn": "Ikkje registrert på adressa di",
+        "nb": "Ikke registrert på adressen din",
+        "en": "Not registered as living at your address"
+      },
+      "omBarnaTittel": {
+        "nn": "Om barna dine",
+        "nb": "Om barna dine",
+        "en": "About your children"
+      },
+      "eoesForSoekerTittel": {
+        "nn": "kontantstøtte etter EØS-reglane - Om deg",
+        "nb": "kontantstøtte etter EØS-reglene - Om deg",
+        "en": "cash-for-care by the EEA-regulations - About you"
+      },
+      "vedlegg": {
+        "nn": "Vedlegg",
+        "nb": "Vedlegg",
+        "en": "Attachment"
+      },
+      "av": {
+        "nn": "av",
+        "nb": "av",
+        "en": "of"
+      },
+      "soeker": {
+        "nn": "Søkar",
+        "nb": "Søker",
+        "en": "Applicant"
+      },
+      "sendtInnTidligere": {
+        "nn": "Eg har sendt inn denne dokumentasjonen til NAV tidlegare",
+        "nb": "Jeg har sendt inn denne dokumentasjonen til NAV tidligere",
+        "en": "I have already submitted this documentation to NAV in the past"
+      },
+      "ja": {
+        "nn": "Ja",
+        "nb": "Ja",
+        "en": "Yes"
+      },
+      "nei": {
+        "nn": "Nei",
+        "nb": "Nei",
+        "en": "No"
+      },
+      "jegVetIkke": {
+        "nn": "Eg veit ikkje",
+        "nb": "Jeg vet ikke",
+        "en": "I don't know"
+      }
+    },
+    "originalSpråk": "nb",
+    "finnesPersonMedAdressebeskyttelse": false,
+    "erNoenAvBarnaFosterbarn": {
+      "label": {
+        "en": "Are any of the children foster children?",
+        "nn": "Er nokre av barna fosterbarn?",
+        "nb": "Er noen av barna fosterbarn?"
+      },
+      "verdi": {
+        "nb": "NEI",
+        "nn": "NEI",
+        "en": "NEI"
+      }
+    },
+    "søktAsylForBarn": {
+      "label": {
+        "en": "Has an application for asylum been submitted for any of the children?",
+        "nn": "Er det søkt om asyl i Noreg for nokre av barna?",
+        "nb": "Er det søkt om asyl i Norge for noen av barna?"
+      },
+      "verdi": {
+        "nb": "NEI",
+        "nn": "NEI",
+        "en": "NEI"
+      }
+    },
+    "oppholderBarnSegIInstitusjon": {
+      "label": {
+        "en": "Are any of the children in a child welfare institution?",
+        "nn": "Er nokre av barna i barneverninstitusjon?",
+        "nb": "Er noen av barna i barnverninstitusjon?"
+      },
+      "verdi": {
+        "nb": "NEI",
+        "nn": "NEI",
+        "en": "NEI"
+      }
+    },
+    "barnOppholdtSegTolvMndSammenhengendeINorge": {
+      "label": {
+        "en": "Have the children stayed continuously in Norway during the last twelve months?",
+        "nn": "Har barna oppheldt seg samanhengande i Noreg dei siste tolv månadane?",
+        "nb": "Har barna oppholdt seg sammenhengende i Norge de siste tolv månedene?"
+      },
+      "verdi": {
+        "nb": "JA",
+        "nn": "JA",
+        "en": "JA"
+      }
+    },
+    "erBarnAdoptert": {
+      "label": {
+        "en": "Are any of the children adopted?",
+        "nn": "Er nokre av barna adoptert?",
+        "nb": "Er noen av barna adoptert?"
+      },
+      "verdi": {
+        "nb": "NEI",
+        "nn": "NEI",
+        "en": "NEI"
+      }
+    },
+    "mottarKontantstøtteForBarnFraAnnetEøsland": {
+      "label": {
+        "en": "Are you receiving, have you received or have you applied for cash-for-care for some of the children from another EEA country?",
+        "nn": "Får du, har du fått eller har du søkt om kontantstøtte for nokre av barna frå eit anna EØS-land?",
+        "nb": "Får du, har du fått eller har du søkt om kontantstøtte for noen av barna fra et annet EØS-land?"
+      },
+      "verdi": {
+        "nb": "NEI",
+        "nn": "NEI",
+        "en": "NEI"
+      }
+    },
+    "harEllerTildeltBarnehageplass": {
+      "label": {
+        "en": "Are any of the children attending kindergarten now, have they previously attended kindergarten or will they start attending kindergarten later?",
+        "nn": "Har nokre av barna barnehageplass no, har dei hatt plass tidlegare, eller har dei blitt tildelt barnehageplass i framtida",
+        "nb": "Har noen av barna barnehageplass nå, har de hatt plass tidligere, eller har de fått tildelt en barnehageplass i framtiden?"
+      },
+      "verdi": {
+        "nb": "JA",
+        "nn": "JA",
+        "en": "JA"
+      }
+    },
+    "erAvdødPartnerForelder": null
+  }
