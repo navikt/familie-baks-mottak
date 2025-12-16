@@ -21,7 +21,7 @@ import kotlin.test.assertEquals
 @Tag("integration")
 @SpringBootTest(classes = [DevLauncherPostgres::class])
 @MockKExtension.KeepMocks
-class JournalføringTest(
+class JournalføringServiceTest(
     @Autowired
     val journalføringService: JournalføringService,
     @Autowired
@@ -34,6 +34,7 @@ class JournalføringTest(
     val kontantstøtteSøknad = KontantstøtteSøknadTestData.kontantstøtteSøknad()
     val dbKontantstøtteSøknad = kontantstøtteSøknad.tilDBKontantstøtteSøknad()
     val testPDF = "test123".toByteArray()
+
 
     @Test
     fun `arkiverSøknad returnerer riktig journalpostId for barnetrygdsøknad`() {
