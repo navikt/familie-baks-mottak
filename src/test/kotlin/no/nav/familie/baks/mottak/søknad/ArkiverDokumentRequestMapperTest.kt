@@ -152,4 +152,115 @@ class ArkiverDokumentRequestMapperTest {
             arkiverDokumentRequest.vedleggsdokumenter.filter { it.tittel == "Avtale om delt bosted" }.size,
         )
     }
+
+    @Test
+    fun `toDto - skal opprette ArkiverDokumentRequest basert på utvidet BarnetrygdSøknad`() {
+        val barnetrygdSøknad: BarnetrygdSøknad = mockk()
+        val dokumentasjon =
+            no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon(
+                no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov.AVTALE_DELT_BOSTED,
+                true,
+                listOf(
+                    no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg(
+                        "123",
+                        "navn",
+                        no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov.AVTALE_DELT_BOSTED,
+                    ),
+                ),
+                TekstPåSpråkMap(
+                    mapOf(
+                        "nb" to "Norge",
+                        "nn" to "Noreg",
+                        "en" to "Norway",
+                    ),
+                ),
+            )
+        every { barnetrygdSøknad.dokumentasjon } returns
+            listOf(
+                dokumentasjon,
+            )
+        every { barnetrygdSøknad.søknadstype } returns Søknadstype.UTVIDET
+
+        val dbBarnetrygdSøknad = DBBarnetrygdSøknad(søknadJson = "{}", fnr = "12345678910")
+        val vedleggMap =
+            mapOf(
+                "123" to DBVedlegg(dokumentId = "123", søknadId = 0, data = ByteArray(0)),
+            )
+        val arkiverDokumentRequest =
+            ArkiverDokumentRequestMapper.toDto(
+                dbBarnetrygdSøknad,
+                VersjonertBarnetrygdSøknadV9(barnetrygdSøknad),
+                ByteArray(0),
+                vedleggMap,
+                ByteArray(1),
+            )
+
+        assertEquals(
+            true,
+            arkiverDokumentRequest.hoveddokumentvarianter.all {
+                it.filtype in
+                    listOf(
+                        Filtype.PDFA,
+                        Filtype.JSON,
+                    ) &&
+                    it.dokumenttype == Dokumenttype.BARNETRYGD_UTVIDET
+            },
+        )
+        assertEquals(2, arkiverDokumentRequest.vedleggsdokumenter.size)
+    }
+
+    @Test
+    fun `toDto - skal opprette ArkiverDokumentRequest basert på ikke satt søknadstype BarnetrygdSøknad`() {
+        val barnetrygdSøknad: BarnetrygdSøknad = mockk()
+        val dokumentasjon =
+            no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon(
+                no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov.AVTALE_DELT_BOSTED,
+                true,
+                listOf(
+                    no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg(
+                        "123",
+                        "navn",
+                        no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov.AVTALE_DELT_BOSTED,
+                    ),
+                ),
+                TekstPåSpråkMap(
+                    mapOf(
+                        "nb" to "Norge",
+                        "nn" to "Noreg",
+                        "en" to "Norway",
+                    ),
+                ),
+            )
+        every { barnetrygdSøknad.dokumentasjon } returns
+            listOf(
+                dokumentasjon,
+            )
+        every { barnetrygdSøknad.søknadstype } returns Søknadstype.IKKE_SATT
+
+        val dbBarnetrygdSøknad = DBBarnetrygdSøknad(søknadJson = "{}", fnr = "12345678910")
+        val vedleggMap =
+            mapOf(
+                "123" to DBVedlegg(dokumentId = "123", søknadId = 0, data = ByteArray(0)),
+            )
+        val arkiverDokumentRequest =
+            ArkiverDokumentRequestMapper.toDto(
+                dbBarnetrygdSøknad,
+                VersjonertBarnetrygdSøknadV9(barnetrygdSøknad),
+                ByteArray(0),
+                vedleggMap,
+                ByteArray(0),
+            )
+
+        assertEquals(
+            true,
+            arkiverDokumentRequest.hoveddokumentvarianter.all {
+                it.filtype in
+                    listOf(
+                        Filtype.PDFA,
+                        Filtype.JSON,
+                    ) &&
+                    it.dokumenttype == Dokumenttype.BARNETRYGD_ORDINÆR
+            },
+        )
+    }
 }

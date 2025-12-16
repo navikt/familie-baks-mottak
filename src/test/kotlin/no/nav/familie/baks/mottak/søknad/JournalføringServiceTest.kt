@@ -35,7 +35,6 @@ class JournalføringServiceTest(
     val dbKontantstøtteSøknad = kontantstøtteSøknad.tilDBKontantstøtteSøknad()
     val testPDF = "test123".toByteArray()
 
-
     @Test
     fun `arkiverSøknad returnerer riktig journalpostId for barnetrygdsøknad`() {
         val arkiverDokumentRequest =
