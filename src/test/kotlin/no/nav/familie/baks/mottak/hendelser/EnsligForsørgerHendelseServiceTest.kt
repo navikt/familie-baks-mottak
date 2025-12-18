@@ -57,4 +57,20 @@ class EnsligForsørgerHendelseServiceTest {
             mockHendelsesloggRepository.save(any())
         }
     }
+
+    @Test
+    fun `Skal ikke gjøre kall mot ba-sak hvis det ikke er en overgangstønad`() {
+        service.prosesserEfVedtakHendelse(42, EnsligForsørgerVedtakhendelse(100, "01020300110", StønadType.BARNETILSYN))
+
+        verify(exactly = 0) {
+            mockSakClient.sendVedtakOmOvergangsstønadHendelseTilBaSak("01020300110")
+        }
+
+        verify(exactly = 0) {
+            mockHendelsesloggRepository.save(any())
+        }
+        verify(exactly = 0) {
+            mockHendelsesloggRepository.save(any())
+        }
+    }
 }
