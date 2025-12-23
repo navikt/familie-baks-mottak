@@ -16,6 +16,7 @@ jobs:
       id-token: write
     uses: navikt/familie-baks-gha-workflows/.github/workflows/build-maven-app.yaml@main # ratchet:exclude
     with:
+      java-version: 25
       skip-tests: ${{ inputs.skip-tests }}
       build-image: true
       push-image: true
