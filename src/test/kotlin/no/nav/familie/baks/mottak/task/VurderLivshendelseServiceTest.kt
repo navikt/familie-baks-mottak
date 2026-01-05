@@ -216,7 +216,7 @@ class VurderLivshendelseServiceTest {
         }
 
         when (livshendelseType) {
-            VurderLivshendelseType.SIVILSTAND -> Assertions.assertThat(oppgaveDto.captured.beskrivelse).contains(VurderLivshendelseType.SIVILSTAND.beskrivelse, "${Year.now()}")
+            VurderLivshendelseType.SIVILSTAND -> Assertions.assertThat(oppgaveDto.captured.beskrivelse).contains(VurderLivshendelseType.SIVILSTAND.beskrivelse, "2025")
             else -> Assertions.assertThat(oppgaveDto.captured.beskrivelse).isEqualTo(livshendelseType.beskrivelse + ": bruker")
         }
 
