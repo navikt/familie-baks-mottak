@@ -5,11 +5,14 @@ import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import no.nav.familie.baks.mottak.AbstractWiremockTest
+import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.objectMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ActiveProfiles
 
@@ -21,7 +24,7 @@ class ArbeidsfordelingClientTest : AbstractWiremockTest() {
 
     @Test
     @Tag("integration")
-    fun `hentBehandlendeEnhetPåIdent skal returnere enhet på person`() {
+    fun `hentBehandlendeEnheterPåIdent skal returnere enhet på person`() {
         stubFor(
             WireMock.post(urlEqualTo("/api/arbeidsfordeling/enhet/KON")).withRequestBody(WireMock.equalToJson("""{"ident":"123"}""")).willReturn(
                 aResponse().withHeader("Content-Type", "application/json").withBody(
@@ -39,12 +42,115 @@ class ArbeidsfordelingClientTest : AbstractWiremockTest() {
         assertThat(response.single().enhetNavn).isEqualTo("NAV Familie- og pensjonsytelser midlertidig enhet")
     }
 
+    @Test
+    @Tag("integration")
+    fun `hentBehandlendeEnhetPåIdent skal returnere enhet på person`() {
+        stubFor(
+            WireMock.post(urlEqualTo("/api/arbeidsfordeling/enhet/KON")).withRequestBody(WireMock.equalToJson("""{"ident":"123"}""")).willReturn(
+                aResponse().withHeader("Content-Type", "application/json").withBody(
+                    gyldigEnhetResponse(),
+                ),
+            ),
+        )
+
+        val response =
+            arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
+                personIdent = "123",
+                tema = Tema.KON,
+            )
+        assertThat(response.enhetId).isEqualTo("4863")
+        assertThat(response.enhetNavn).isEqualTo("NAV Familie- og pensjonsytelser midlertidig enhet")
+    }
+
+    @Test
+    @Tag("integration")
+    fun `hentBehandlendeEnheterPåIdent skal ikke returnere enhet på person`() {
+        stubFor(
+            WireMock.post(urlEqualTo("/api/arbeidsfordeling/enhet/KON")).withRequestBody(WireMock.equalToJson("""{"ident":"123"}""")).willReturn(
+                aResponse().withStatus(500).withBody(
+                    objectMapper.writeValueAsString(Ressurs.failure<String>("test")),
+                ),
+            ),
+        )
+
+        val response =
+            assertThrows<IntegrasjonException> {
+                arbeidsfordelingClient.hentBehandlendeEnheterPåIdent(
+                    personIdent = "123",
+                    tema = Tema.KON,
+                )
+            }
+        assertThat(response.message).isEqualTo("Feil ved henting av behandlende enheter på ident m/ tema ${Tema.KON}")
+    }
+
+    @Test
+    @Tag("integration")
+    fun `hentBehandlendeEnhetPåIdent skal ikke returnere enhet på person`() {
+        stubFor(
+            WireMock.post(urlEqualTo("/api/arbeidsfordeling/enhet/KON")).withRequestBody(WireMock.equalToJson("""{"ident":"123"}""")).willReturn(
+                aResponse().withStatus(500).withBody(
+                    objectMapper.writeValueAsString(Ressurs.failure<String>("test")),
+                ),
+            ),
+        )
+
+        val response =
+            assertThrows<IntegrasjonException> {
+                arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
+                    personIdent = "123",
+                    tema = Tema.KON,
+                )
+            }
+        assertThat(response.message).isEqualTo("Feil ved henting av behandlende enheter på ident m/ tema ${Tema.KON}")
+    }
+
+    @Test
+    @Tag("integration")
+    fun `hentBehandlendeEnhetPåIdent skal kaste feil ved returnere flere enhet på person`() {
+        stubFor(
+            WireMock.post(urlEqualTo("/api/arbeidsfordeling/enhet/KON")).withRequestBody(WireMock.equalToJson("""{"ident":"123"}""")).willReturn(
+                aResponse().withHeader("Content-Type", "application/json").withBody(
+                    flereGyldigEnhetResponse(),
+                ),
+            ),
+        )
+
+        val response =
+            assertThrows<IllegalStateException> {
+                arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
+                    personIdent = "123",
+                    tema = Tema.KON,
+                )
+            }
+        assertThat(response.message).isEqualTo("Forventet bare 1 enhet på ident men fantes flere")
+    }
+
     private fun gyldigEnhetResponse() =
         """
 {
   "data": [
     {
       "enhetId": "4863",
+      "enhetNavn": "NAV Familie- og pensjonsytelser midlertidig enhet"
+    }
+  ],
+  "status": "SUKSESS",
+  "melding": "Innhenting av data var vellykket",
+  "frontendFeilmelding": null,
+  "stacktrace": null
+}                              
+        """
+
+    private fun flereGyldigEnhetResponse() =
+        """
+{
+  "data": [
+    {
+      "enhetId": "4863",
+      "enhetNavn": "NAV Familie- og pensjonsytelser midlertidig enhet"
+    },
+    {
+      "enhetId": "5432",
       "enhetNavn": "NAV Familie- og pensjonsytelser midlertidig enhet"
     }
   ],

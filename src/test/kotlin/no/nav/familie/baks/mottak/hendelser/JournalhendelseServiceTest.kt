@@ -44,7 +44,7 @@ import org.slf4j.MDC
 import org.springframework.kafka.support.Acknowledgment
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class JournalføringHendelseServiceTest {
+class JournalhendelseServiceTest {
     @MockK
     lateinit var mockJournalpostClient: JournalpostClient
 

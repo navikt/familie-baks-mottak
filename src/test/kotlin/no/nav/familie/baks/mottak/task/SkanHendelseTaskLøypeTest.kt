@@ -6,7 +6,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
-import no.nav.familie.baks.mottak.hendelser.JournalføringHendelseServiceTest
+import no.nav.familie.baks.mottak.hendelser.JournalhendelseServiceTest
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.BARN
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
@@ -73,7 +73,7 @@ class SkanHendelseTaskLøypeTest {
             mockJournalpostClient.hentJournalpost(any())
         } returns
             Journalpost(
-                journalpostId = JournalføringHendelseServiceTest.JOURNALPOST_PAPIRSØKNAD,
+                journalpostId = JournalhendelseServiceTest.JOURNALPOST_PAPIRSØKNAD,
                 journalposttype = Journalposttype.I,
                 journalstatus = Journalstatus.MOTTATT,
                 bruker = Bruker("123456789012", BrukerIdType.AKTOERID),

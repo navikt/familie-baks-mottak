@@ -34,6 +34,7 @@ class JournalføringService(
                 )
             val journalpostId: String = arkiverSøknad(arkiverDokumentRequest)
             val dbSøknadMedJournalpostId = dbBarnetrygdSøknad.copy(journalpostId = journalpostId)
+
             barnetrygdSøknadService.lagreDBSøknad(dbSøknadMedJournalpostId)
             log.info("Søknaden er journalført og lagret til database")
 
