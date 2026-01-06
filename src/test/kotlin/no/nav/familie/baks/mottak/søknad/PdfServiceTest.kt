@@ -38,7 +38,7 @@ internal class PdfServiceTest {
         mapper.registerModule(JavaTimeModule())
 
         val jsonString: String =
-            File("./src/test/kotlin/no/nav/familie/baks/mottak/søknad/testdata/testdata1.json")
+            File("./src/test/kotlin/no/nav/familie/baks/mottak/søknad/testdata/barnetrygd-søknad.json")
                 .readText(Charsets.UTF_8)
         val barnetrygdSøknad: BarnetrygdSøknad = mapper.readValue(jsonString)
         val dbBarnetrygdSøknad: DBBarnetrygdSøknad = barnetrygdSøknad.tilDBSøknad()
@@ -61,7 +61,7 @@ internal class PdfServiceTest {
         mapper.registerModule(JavaTimeModule())
 
         val jsonString: String =
-            File("./src/test/kotlin/no/nav/familie/baks/mottak/søknad/testdata/testdata2.json")
+            File("./src/test/kotlin/no/nav/familie/baks/mottak/søknad/testdata/kontantstøtte-søknad.json")
                 .readText(Charsets.UTF_8)
         val kontantstøtteSøknad: KontantstøtteSøknad = mapper.readValue(jsonString)
         val dbKontantstøtteSøknad: DBKontantstøtteSøknad = kontantstøtteSøknad.tilDBKontantstøtteSøknad()
