@@ -1,9 +1,9 @@
 package no.nav.familie.baks.mottak.config
 
-import no.nav.familie.http.interceptor.BearerTokenClientInterceptor
-import no.nav.familie.http.interceptor.ConsumerIdClientInterceptor
-import no.nav.familie.http.interceptor.MdcValuesPropagatingClientInterceptor
 import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.restklient.interceptor.BearerTokenClientInterceptor
+import no.nav.familie.restklient.interceptor.ConsumerIdClientInterceptor
+import no.nav.familie.restklient.interceptor.MdcValuesPropagatingClientInterceptor
 import org.springframework.boot.restclient.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

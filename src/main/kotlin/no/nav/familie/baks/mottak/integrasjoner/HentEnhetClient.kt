@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
-import no.nav.familie.http.client.AbstractRestClient
+import no.nav.familie.restklient.client.AbstractRestClient
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
