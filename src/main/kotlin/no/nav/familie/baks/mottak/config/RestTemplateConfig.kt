@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.config
 
-import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.restklient.config.jsonMapper
 import no.nav.familie.restklient.interceptor.BearerTokenClientInterceptor
 import no.nav.familie.restklient.interceptor.ConsumerIdClientInterceptor
 import no.nav.familie.restklient.interceptor.MdcValuesPropagatingClientInterceptor
@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Profile
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter
 import org.springframework.web.client.RestOperations
 
 @Configuration
@@ -30,7 +30,7 @@ class RestTemplateConfig {
                 consumerIdClientInterceptor,
                 bearerTokenClientInterceptor,
                 MdcValuesPropagatingClientInterceptor(),
-            ).additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
+            ).additionalMessageConverters(JacksonJsonHttpMessageConverter(jsonMapper))
             .build()
 
     @Bean("restTemplateUnsecured")

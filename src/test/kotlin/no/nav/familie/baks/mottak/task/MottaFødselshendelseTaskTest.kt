@@ -17,7 +17,6 @@ import no.nav.familie.baks.mottak.integrasjoner.PdlForeldreBarnRelasjon
 import no.nav.familie.baks.mottak.integrasjoner.PdlHentPersonResponse
 import no.nav.familie.baks.mottak.integrasjoner.PdlPerson
 import no.nav.familie.baks.mottak.integrasjoner.PdlPersonData
-import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.kontrakter.felles.personopplysning.Matrikkeladresse
@@ -25,6 +24,7 @@ import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.familie.restklient.config.jsonMapper
 import org.apache.commons.lang3.StringUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -78,7 +78,7 @@ class MottaFødselshendelseTaskTest : AbstractWiremockTest() {
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).hasSize(1).extracting("type").containsOnly(SendTilBaSakTask.TASK_STEP_TYPE)
-        assertThat(objectMapper.readValue(taskerMedCallId.first().payload, NyBehandling::class.java))
+        assertThat(jsonMapper.readValue(taskerMedCallId.first().payload, NyBehandling::class.java))
             .hasFieldOrPropertyWithValue("morsIdent", "20107678901")
             .hasFieldOrPropertyWithValue("barnasIdenter", arrayOf(fnrBarn))
     }
@@ -130,7 +130,7 @@ class MottaFødselshendelseTaskTest : AbstractWiremockTest() {
                 .filter { it.callId == MDC.get(MDCConstants.MDC_CALL_ID) }
 
         assertThat(taskerMedCallId).hasSize(1).extracting("type").containsOnly(SendTilBaSakTask.TASK_STEP_TYPE)
-        assertThat(objectMapper.readValue(taskerMedCallId.first().payload, NyBehandling::class.java))
+        assertThat(jsonMapper.readValue(taskerMedCallId.first().payload, NyBehandling::class.java))
             .hasFieldOrPropertyWithValue("morsIdent", "20107678901")
             .hasFieldOrPropertyWithValue("barnasIdenter", arrayOf(fnrBarn))
     }
@@ -318,7 +318,7 @@ class MottaFødselshendelseTaskTest : AbstractWiremockTest() {
                     .willReturn(
                         aResponse()
                             .withHeader("Content-Type", "application/json")
-                            .withBody(objectMapper.writeValueAsString(mockResponse)),
+                            .withBody(jsonMapper.writeValueAsString(mockResponse)),
                     ),
             )
         }

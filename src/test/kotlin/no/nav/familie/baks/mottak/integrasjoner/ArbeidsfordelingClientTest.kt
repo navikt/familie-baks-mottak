@@ -7,7 +7,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import no.nav.familie.baks.mottak.AbstractWiremockTest
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Tema
-import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.restklient.config.jsonMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -68,7 +68,7 @@ class ArbeidsfordelingClientTest : AbstractWiremockTest() {
         stubFor(
             WireMock.post(urlEqualTo("/api/arbeidsfordeling/enhet/KON")).withRequestBody(WireMock.equalToJson("""{"ident":"123"}""")).willReturn(
                 aResponse().withStatus(500).withBody(
-                    objectMapper.writeValueAsString(Ressurs.failure<String>("test")),
+                    jsonMapper.writeValueAsString(Ressurs.failure<String>("test")),
                 ),
             ),
         )
@@ -89,7 +89,7 @@ class ArbeidsfordelingClientTest : AbstractWiremockTest() {
         stubFor(
             WireMock.post(urlEqualTo("/api/arbeidsfordeling/enhet/KON")).withRequestBody(WireMock.equalToJson("""{"ident":"123"}""")).willReturn(
                 aResponse().withStatus(500).withBody(
-                    objectMapper.writeValueAsString(Ressurs.failure<String>("test")),
+                    jsonMapper.writeValueAsString(Ressurs.failure<String>("test")),
                 ),
             ),
         )

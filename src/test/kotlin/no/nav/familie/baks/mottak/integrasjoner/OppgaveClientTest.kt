@@ -26,13 +26,13 @@ import no.nav.familie.kontrakter.felles.journalpost.DokumentInfo
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import no.nav.familie.kontrakter.felles.journalpost.Journalposttype
 import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
-import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.FinnOppgaveResponseDto
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.log.NavHttpHeaders
 import no.nav.familie.restklient.client.RessursException
+import no.nav.familie.restklient.config.jsonMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
@@ -61,7 +61,7 @@ class OppgaveClientTest : AbstractWiremockTest() {
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(Enhet("9999", "enhetNavn", true, "Aktiv"))),
+                        .withBody(jsonMapper.writeValueAsString(Enhet("9999", "enhetNavn", true, "Aktiv"))),
                 ),
         )
         stubFor(
@@ -101,7 +101,7 @@ class OppgaveClientTest : AbstractWiremockTest() {
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
-                            objectMapper.writeValueAsString(success(OppgaveResponse(oppgaveId = 1234))),
+                            jsonMapper.writeValueAsString(success(OppgaveResponse(oppgaveId = 1234))),
                         ),
                 ),
         )
@@ -139,7 +139,7 @@ class OppgaveClientTest : AbstractWiremockTest() {
                 .willReturn(
                     aResponse()
                         .withStatus(500)
-                        .withBody(objectMapper.writeValueAsString(Ressurs.failure<String>("test"))),
+                        .withBody(jsonMapper.writeValueAsString(Ressurs.failure<String>("test"))),
                 ),
         )
         assertThatThrownBy {
@@ -168,7 +168,7 @@ class OppgaveClientTest : AbstractWiremockTest() {
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
-                            objectMapper.writeValueAsString(
+                            jsonMapper.writeValueAsString(
                                 success(
                                     FinnOppgaveResponseDto(
                                         antallTreffTotalt = 1,
@@ -195,7 +195,7 @@ class OppgaveClientTest : AbstractWiremockTest() {
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
-                            objectMapper.writeValueAsString(
+                            jsonMapper.writeValueAsString(
                                 success(
                                     FinnOppgaveResponseDto(
                                         antallTreffTotalt = 0,

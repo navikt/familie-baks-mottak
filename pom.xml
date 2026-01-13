@@ -26,7 +26,7 @@
         <prosessering.version>2.20251117095517_cc54714</prosessering.version>
 
         <felles.version>4.20260107095404_1a56161</felles.version>
-        <kontrakter.version>3.0_20251113093018_87a80f3</kontrakter.version>
+        <kontrakter.version>4.100-SNAPSHOT</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
 
@@ -380,7 +380,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <fork>true</fork>
                     <mainClass>${main-class}</mainClass>
                 </configuration>
                 <executions>
@@ -497,6 +496,10 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

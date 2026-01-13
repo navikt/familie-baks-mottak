@@ -1,18 +1,18 @@
 package no.nav.familie.baks.mottak.søknad
 
-import com.fasterxml.jackson.databind.JsonNode
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
-import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.søknad.Søknadsfelt
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV6
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ks.søknad.v1.TekstPåSpråkMap
 import no.nav.familie.kontrakter.ks.søknad.v6.Barn
 import no.nav.familie.kontrakter.ks.søknad.v6.KontantstøtteSøknad
+import no.nav.familie.restklient.config.jsonMapper
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import tools.jackson.databind.JsonNode
 import kotlin.test.assertEquals
 
 @ExtendWith(MockKExtension::class)
@@ -21,9 +21,9 @@ class SøknadSpråkvelgerServiceTest {
 
     @Test
     fun `konverterKontantstøtteSøknadTilMapForSpråk - skal konvertere KontantstøtteSøknad til et Map med tekster på spesifisert språk`() {
-        val kontantstøtteSøknad: KontantstøtteSøknad = mockk()
-        val barn: Barn = mockk()
-        val dokumentasjon: Søknaddokumentasjon = mockk()
+        val kontantstøtteSøknad: KontantstøtteSøknad = mockk(relaxed = true)
+        val barn: Barn = mockk(relaxed = true)
+        val dokumentasjon: Søknaddokumentasjon = mockk(relaxed = true)
         val tekstPåSpråk =
             mapOf(
                 "nb" to "Norge",
@@ -59,52 +59,53 @@ class SøknadSpråkvelgerServiceTest {
         // Bokmål
         var kontantstøtteMapForSpråk =
             søknadSpråkvelgerService.konverterKontantstøtteSøknadTilMapForSpråk(versjonertKontantstøtteSøknad, "nb")
-        var kontantstøtteSøknadJsonNode: JsonNode = objectMapper.valueToTree(kontantstøtteMapForSpråk)
+        var kontantstøtteSøknadJsonNode: JsonNode = jsonMapper.valueToTree(kontantstøtteMapForSpråk)
 
         // Tester TekstPåSpråkMapSerializer
-        assertEquals("Norge", kontantstøtteSøknadJsonNode["teksterTilPdf"]["testApiNavn"].textValue())
-        assertEquals("Norge", kontantstøtteSøknadJsonNode["barn"][0]["teksterTilPdf"]["testApiNavn"].textValue())
+        assertEquals("Norge", kontantstøtteSøknadJsonNode["teksterTilPdf"]["testApiNavn"].asString())
+        assertEquals("Norge", kontantstøtteSøknadJsonNode["barn"][0]["teksterTilPdf"]["testApiNavn"].asString())
         assertEquals(
             "Norge",
-            kontantstøtteSøknadJsonNode["dokumentasjon"][0]["dokumentasjonSpråkTittel"].textValue(),
+            kontantstøtteSøknadJsonNode["dokumentasjon"][0]["dokumentasjonSpråkTittel"].asString(),
         )
 
         // Tester SøknadsfeltSerializer
-        assertEquals("Norge", kontantstøtteSøknadJsonNode["erBarnAdoptert"]["label"].textValue())
-        assertEquals("Norge", kontantstøtteSøknadJsonNode["erBarnAdoptert"]["verdi"].textValue())
+        assertEquals("Norge", kontantstøtteSøknadJsonNode["erBarnAdoptert"]["label"].asString())
+        assertEquals("Norge", kontantstøtteSøknadJsonNode["erBarnAdoptert"]["verdi"].asString())
 
         // Nynorsk
-        kontantstøtteMapForSpråk =
+
+        val kontantstøtteMapForSpråkNN =
             søknadSpråkvelgerService.konverterKontantstøtteSøknadTilMapForSpråk(versjonertKontantstøtteSøknad, "nn")
-        kontantstøtteSøknadJsonNode = objectMapper.valueToTree(kontantstøtteMapForSpråk)
+        kontantstøtteSøknadJsonNode = jsonMapper.valueToTree(kontantstøtteMapForSpråkNN)
 
         // Tester TekstPåSpråkMapSerializer
-        assertEquals("Noreg", kontantstøtteSøknadJsonNode["teksterTilPdf"]["testApiNavn"].textValue())
-        assertEquals("Noreg", kontantstøtteSøknadJsonNode["barn"][0]["teksterTilPdf"]["testApiNavn"].textValue())
+        assertEquals("Noreg", kontantstøtteSøknadJsonNode["teksterTilPdf"]["testApiNavn"].asString())
+        assertEquals("Noreg", kontantstøtteSøknadJsonNode["barn"][0]["teksterTilPdf"]["testApiNavn"].asString())
         assertEquals(
             "Noreg",
-            kontantstøtteSøknadJsonNode["dokumentasjon"][0]["dokumentasjonSpråkTittel"].textValue(),
+            kontantstøtteSøknadJsonNode["dokumentasjon"][0]["dokumentasjonSpråkTittel"].asString(),
         )
 
         // Tester SøknadsfeltSerializer
-        assertEquals("Noreg", kontantstøtteSøknadJsonNode["erBarnAdoptert"]["label"].textValue())
-        assertEquals("Noreg", kontantstøtteSøknadJsonNode["erBarnAdoptert"]["verdi"].textValue())
+        assertEquals("Noreg", kontantstøtteSøknadJsonNode["erBarnAdoptert"]["label"].asString())
+        assertEquals("Noreg", kontantstøtteSøknadJsonNode["erBarnAdoptert"]["verdi"].asString())
 
         // Engelsk
         kontantstøtteMapForSpråk =
             søknadSpråkvelgerService.konverterKontantstøtteSøknadTilMapForSpråk(versjonertKontantstøtteSøknad, "en")
-        kontantstøtteSøknadJsonNode = objectMapper.valueToTree(kontantstøtteMapForSpråk)
+        kontantstøtteSøknadJsonNode = jsonMapper.valueToTree(kontantstøtteMapForSpråk)
 
         // Tester TekstPåSpråkMapSerializer
-        assertEquals("Norway", kontantstøtteSøknadJsonNode["teksterTilPdf"]["testApiNavn"].textValue())
-        assertEquals("Norway", kontantstøtteSøknadJsonNode["barn"][0]["teksterTilPdf"]["testApiNavn"].textValue())
+        assertEquals("Norway", kontantstøtteSøknadJsonNode["teksterTilPdf"]["testApiNavn"].asString())
+        assertEquals("Norway", kontantstøtteSøknadJsonNode["barn"][0]["teksterTilPdf"]["testApiNavn"].asString())
         assertEquals(
             "Norway",
-            kontantstøtteSøknadJsonNode["dokumentasjon"][0]["dokumentasjonSpråkTittel"].textValue(),
+            kontantstøtteSøknadJsonNode["dokumentasjon"][0]["dokumentasjonSpråkTittel"].asString(),
         )
 
         // Tester SøknadsfeltSerializer
-        assertEquals("Norway", kontantstøtteSøknadJsonNode["erBarnAdoptert"]["label"].textValue())
-        assertEquals("Norway", kontantstøtteSøknadJsonNode["erBarnAdoptert"]["verdi"].textValue())
+        assertEquals("Norway", kontantstøtteSøknadJsonNode["erBarnAdoptert"]["label"].asString())
+        assertEquals("Norway", kontantstøtteSøknadJsonNode["erBarnAdoptert"]["verdi"].asString())
     }
 }

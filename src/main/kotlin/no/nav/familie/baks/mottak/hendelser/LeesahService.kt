@@ -19,11 +19,11 @@ import no.nav.familie.baks.mottak.task.VurderLivshendelseTaskDTO
 import no.nav.familie.baks.mottak.task.VurderLivshendelseType
 import no.nav.familie.baks.mottak.task.VurderLivshendelseType.SIVILSTAND
 import no.nav.familie.baks.mottak.util.nesteGyldigeTriggertidFødselshendelser
-import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE.GIFT
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE.REGISTRERT_PARTNER
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.familie.restklient.config.jsonMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -141,7 +141,7 @@ class LeesahService(
                         Task(
                             type = MottaAnnullerFødselTask.TASK_STEP_TYPE,
                             payload =
-                                objectMapper.writeValueAsString(
+                                jsonMapper.writeValueAsString(
                                     RestAnnullerFødsel(
                                         barnasIdenter = pdlHendelse.hentPersonidenter(),
                                         tidligereHendelseId = pdlHendelse.tidligereHendelseId,
@@ -258,7 +258,7 @@ class LeesahService(
             }.also { taskService.save(it) }
 
     private fun lagFinnmarkstilleggTaskPayload(pdlHendelse: PdlHendelse): String =
-        objectMapper.writeValueAsString(
+        jsonMapper.writeValueAsString(
             VurderFinnmarkstillleggTaskDTO(
                 ident = pdlHendelse.hentPersonident(),
                 bostedskommune = pdlHendelse.bostedskommune,
@@ -337,7 +337,7 @@ class LeesahService(
         log.info("opprett VurderBarnetrygdLivshendelseTask for pdlHendelse (id= ${pdlHendelse.hendelseId})")
         Task(
             type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
-            payload = objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type)),
+            payload = jsonMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type)),
             properties =
                 Properties().apply {
                     this["ident"] = pdlHendelse.hentPersonident()
@@ -357,7 +357,7 @@ class LeesahService(
         log.info("opprett VurderKontantstøtteLivshendelseTask for pdlHendelse (id= ${pdlHendelse.hendelseId})")
         Task(
             type = VurderKontantstøtteLivshendelseTask.TASK_STEP_TYPE,
-            payload = objectMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type)),
+            payload = jsonMapper.writeValueAsString(VurderLivshendelseTaskDTO(pdlHendelse.hentPersonident(), type)),
             properties =
                 Properties().apply {
                     this["ident"] = pdlHendelse.hentPersonident()

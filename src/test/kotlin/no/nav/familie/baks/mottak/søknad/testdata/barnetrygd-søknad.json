@@ -2,6 +2,7 @@
   "søknadstype": "ORDINÆR",
   "kontraktVersjon": 10,
   "antallEøsSteg": 2,
+  "finnesPersonMedAdressebeskyttelse": false,
   "søker": {
     "harEøsSteg": true,
     "navn": {

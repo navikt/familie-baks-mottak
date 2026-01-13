@@ -1,6 +1,5 @@
 package no.nav.familie.baks.mottak.søknad.barnetrygd.domene
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -13,7 +12,7 @@ import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV10
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV8
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg
-import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.restklient.config.jsonMapper
 import java.time.LocalDateTime
 import no.nav.familie.kontrakter.ba.søknad.v10.BarnetrygdSøknad as BarnetrygdSøknadV10
 import no.nav.familie.kontrakter.ba.søknad.v8.Søknad as BarnetrygdSøknadV8
@@ -34,7 +33,7 @@ data class DBBarnetrygdSøknad(
     @Column(name = "journalpost_id")
     val journalpostId: String? = null,
 ) {
-    fun hentVersjonertBarnetrygdSøknad(): StøttetVersjonertBarnetrygdSøknad = objectMapper.readValue<StøttetVersjonertBarnetrygdSøknad>(søknadJson)
+    fun hentVersjonertBarnetrygdSøknad(): StøttetVersjonertBarnetrygdSøknad = jsonMapper.readValue(søknadJson, StøttetVersjonertBarnetrygdSøknad::class.java)
 }
 
 @Entity(name = "SoknadVedlegg")
@@ -57,7 +56,7 @@ interface Vedlegg {
 fun BarnetrygdSøknadV8.tilDBSøknad(): DBBarnetrygdSøknad {
     try {
         return DBBarnetrygdSøknad(
-            søknadJson = objectMapper.writeValueAsString(this),
+            søknadJson = jsonMapper.writeValueAsString(this),
             fnr =
                 this.søker.ident.verdi
                     .getValue("nb"),
@@ -70,7 +69,7 @@ fun BarnetrygdSøknadV8.tilDBSøknad(): DBBarnetrygdSøknad {
 fun BarnetrygdSøknadV9.tilDBSøknad(): DBBarnetrygdSøknad {
     try {
         return DBBarnetrygdSøknad(
-            søknadJson = objectMapper.writeValueAsString(this),
+            søknadJson = jsonMapper.writeValueAsString(this),
             fnr =
                 this.søker.ident.verdi
                     .getValue("nb"),
@@ -83,7 +82,7 @@ fun BarnetrygdSøknadV9.tilDBSøknad(): DBBarnetrygdSøknad {
 fun BarnetrygdSøknadV10.tilDBSøknad(): DBBarnetrygdSøknad {
     try {
         return DBBarnetrygdSøknad(
-            søknadJson = objectMapper.writeValueAsString(this),
+            søknadJson = jsonMapper.writeValueAsString(this),
             fnr =
                 this.søker.ident.verdi
                     .getValue("nb"),

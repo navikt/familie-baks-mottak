@@ -19,8 +19,8 @@ import no.nav.familie.kontrakter.felles.journalpost.Bruker
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import no.nav.familie.kontrakter.felles.journalpost.Journalposttype
 import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
-import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.restklient.client.RessursException
+import no.nav.familie.restklient.config.jsonMapper
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -64,7 +64,7 @@ class DokarkivClientTest : AbstractWiremockTest() {
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withStatus(200)
-                        .withBody(objectMapper.writeValueAsString(Ressurs.success(ArkiverDokumentResponse("123456", false)))),
+                        .withBody(jsonMapper.writeValueAsString(Ressurs.success(ArkiverDokumentResponse("123456", false)))),
                 ),
         )
         dokarkivClient.arkiver(ArkiverDokumentRequest(jp.bruker!!.id, false, hoveddokumentvarianter))
@@ -95,7 +95,7 @@ class DokarkivClientTest : AbstractWiremockTest() {
                 .willReturn(
                     aResponse()
                         .withStatus(500)
-                        .withBody(objectMapper.writeValueAsString(Ressurs.failure<String>("test"))),
+                        .withBody(jsonMapper.writeValueAsString(Ressurs.failure<String>("test"))),
                 ),
         )
 
@@ -121,7 +121,7 @@ class DokarkivClientTest : AbstractWiremockTest() {
             "}"
 
     companion object {
-        private val response = objectMapper.writeValueAsString(Ressurs.success(mapOf("journalpostId" to "12345678"), "test"))
+        private val response = jsonMapper.writeValueAsString(Ressurs.success(mapOf("journalpostId" to "12345678"), "test"))
         private val jp =
             Journalpost(
                 journalpostId = "12345678",

@@ -10,11 +10,11 @@ import no.nav.familie.kontrakter.ba.finnmarkstillegg.KommunerIFinnmarkOgNordTrom
 import no.nav.familie.kontrakter.ba.finnmarkstillegg.KommunerIFinnmarkOgNordTroms.ALTA
 import no.nav.familie.kontrakter.ba.finnmarkstillegg.KommunerIFinnmarkOgNordTroms.BERLEVÅG
 import no.nav.familie.kontrakter.felles.Tema
-import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.familie.restklient.config.jsonMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.byLessThan
 import org.junit.jupiter.api.BeforeEach
@@ -47,7 +47,7 @@ class FinnmarkstilleggTaskTest {
     fun `ikke opprett TriggFinnmarkstilleggbehandlingIBaSakTask hvis bostedskommune fra hendelse er null`() {
         // Arrange
         val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, null, LocalDate.now())
-        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
+        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, jsonMapper.writeValueAsString(taskDto))
 
         // Act
         finnmarkstilleggTask.doTask(task)
@@ -62,7 +62,7 @@ class FinnmarkstilleggTaskTest {
     fun `ikke opprett TriggFinnmarkstilleggbehandlingIBaSakTask hvis bostedskommuneFomDato fra hendelse er null`() {
         // Arrange
         val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, ALTA.kommunenummer, null)
-        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
+        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, jsonMapper.writeValueAsString(taskDto))
 
         // Act
         finnmarkstilleggTask.doTask(task)
@@ -87,7 +87,7 @@ class FinnmarkstilleggTaskTest {
             )
 
         val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, ALTA.kommunenummer, LocalDate.now())
-        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
+        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, jsonMapper.writeValueAsString(taskDto))
 
         // Act
         finnmarkstilleggTask.doTask(task)
@@ -114,7 +114,7 @@ class FinnmarkstilleggTaskTest {
             )
 
         val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, ALTA.kommunenummer, LocalDate.now())
-        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
+        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, jsonMapper.writeValueAsString(taskDto))
 
         // Act
         finnmarkstilleggTask.doTask(task)
@@ -132,7 +132,7 @@ class FinnmarkstilleggTaskTest {
         every { mockPdlClient.hentPerson(personIdent, "hentperson-med-bostedsadresse", Tema.BAR).bostedsadresse } returns emptyList()
 
         val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, ALTA.kommunenummer, LocalDate.now())
-        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
+        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, jsonMapper.writeValueAsString(taskDto))
 
         // Act
         finnmarkstilleggTask.doTask(task)
@@ -150,7 +150,7 @@ class FinnmarkstilleggTaskTest {
             listOf(Bostedsadresse(gyldigFraOgMed = LocalDate.parse("2022-01-01"), vegadresse = mockk { every { kommunenummer } returns ALTA.kommunenummer }))
 
         val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, BERLEVÅG.kommunenummer, LocalDate.now())
-        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
+        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, jsonMapper.writeValueAsString(taskDto))
 
         // Act
         finnmarkstilleggTask.doTask(task)
@@ -168,7 +168,7 @@ class FinnmarkstilleggTaskTest {
             listOf(Bostedsadresse(gyldigFraOgMed = LocalDate.parse("2022-01-01"), vegadresse = mockk { every { kommunenummer } returns osloKommunenummer }))
 
         val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, osloKommunenummer, LocalDate.now())
-        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
+        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, jsonMapper.writeValueAsString(taskDto))
 
         // Act
         finnmarkstilleggTask.doTask(task)
@@ -187,7 +187,7 @@ class FinnmarkstilleggTaskTest {
         every { mockBaSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(personIdent) } returns emptyList()
 
         val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, ALTA.kommunenummer, LocalDate.now())
-        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
+        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, jsonMapper.writeValueAsString(taskDto))
 
         // Act
         finnmarkstilleggTask.doTask(task)
@@ -207,7 +207,7 @@ class FinnmarkstilleggTaskTest {
         every { mockBaSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(personIdent) } returns listOf(mockk())
 
         val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, input.kommunenummer, LocalDate.now())
-        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
+        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, jsonMapper.writeValueAsString(taskDto))
 
         // Act
         finnmarkstilleggTask.doTask(task)
@@ -231,7 +231,7 @@ class FinnmarkstilleggTaskTest {
         every { mockBaSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(personIdent) } returns listOf(mockk())
 
         val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, osloKommunenummer, LocalDate.now())
-        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
+        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, jsonMapper.writeValueAsString(taskDto))
 
         // Act
         finnmarkstilleggTask.doTask(task)
@@ -255,7 +255,7 @@ class FinnmarkstilleggTaskTest {
         every { mockEnvironment.activeProfiles } returns arrayOf("prod")
 
         val taskDto = VurderFinnmarkstillleggTaskDTO(personIdent, osloKommunenummer, LocalDate.now())
-        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, objectMapper.writeValueAsString(taskDto))
+        val task = Task(FinnmarkstilleggTask.TASK_STEP_TYPE, jsonMapper.writeValueAsString(taskDto))
 
         // Act
         finnmarkstilleggTask.doTask(task)
