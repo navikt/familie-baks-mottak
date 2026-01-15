@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 @Service
 class KontantstøtteOppgaveMapper(
     enhetsnummerService: EnhetsnummerService,
-    pdlClient: PdlClient,
+    pdlClient: PdlClientService,
     val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
 ) : AbstractOppgaveMapper(
         enhetsnummerService = enhetsnummerService,

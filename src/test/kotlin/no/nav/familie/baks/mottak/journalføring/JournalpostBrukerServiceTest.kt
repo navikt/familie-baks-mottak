@@ -2,7 +2,7 @@ package no.nav.familie.baks.mottak.journalføring
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.kontrakter.felles.BrukerIdType
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.journalpost.Bruker
@@ -10,7 +10,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class JournalpostBrukerServiceTest {
-    private val mockedPdlClient: PdlClient = mockk()
+    private val mockedPdlClient: PdlClientService = mockk()
     private val journalpostBrukerService: JournalpostBrukerService =
         JournalpostBrukerService(
             pdlClient = mockedPdlClient,

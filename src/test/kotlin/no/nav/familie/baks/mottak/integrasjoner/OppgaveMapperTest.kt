@@ -31,7 +31,7 @@ class OppgaveMapperTest(
     @Autowired
     private val journalpostClient: JournalpostClient,
     @Autowired
-    private val mockPdlClient: PdlClient,
+    private val mockPdlClient: PdlClientService,
     @Autowired
     private val barnetrygdSøknadRepository: SøknadRepository,
     @Autowired

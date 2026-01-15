@@ -4,7 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelse
 import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelsesgradering
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.integrasjoner.PdlPersonData
 import no.nav.familie.baks.mottak.integrasjoner.SøknadsidenterService
 import no.nav.familie.kontrakter.felles.BrukerIdType
@@ -22,7 +22,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 
 class AdressebeskyttelesesgraderingServiceTest {
-    private val mockedPdlClient: PdlClient = mockk()
+    private val mockedPdlClient: PdlClientService = mockk()
     private val mockedSøknadsidenterService: SøknadsidenterService = mockk()
     private val mockedJournalpostBrukerService: JournalpostBrukerService = mockk()
 

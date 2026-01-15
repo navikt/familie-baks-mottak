@@ -17,9 +17,10 @@ import no.nav.familie.baks.mottak.integrasjoner.Fødsel
 import no.nav.familie.baks.mottak.integrasjoner.IdentInformasjon
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
-import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
+import no.nav.familie.baks.mottak.integrasjoner.OppgaveClientService
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveVurderLivshendelseDto
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.integrasjoner.PdlForeldreBarnRelasjon
 import no.nav.familie.baks.mottak.integrasjoner.PdlNotFoundException
 import no.nav.familie.baks.mottak.integrasjoner.PdlPersonData
@@ -54,10 +55,10 @@ import java.time.YearMonth
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VurderLivshendelseServiceTest {
-    private val mockOppgaveClient: OppgaveClient = mockk()
+    private val mockOppgaveClient: OppgaveClientService = mockk()
     private val mockBaSakClient: BaSakClient = mockk()
     private val mockKsSakClient: KsSakClient = mockk()
-    private val mockPdlClient: PdlClient = mockk(relaxed = true)
+    private val mockPdlClient: PdlClientService = mockk(relaxed = true)
     private val mockInfotrygdClient: InfotrygdBarnetrygdClient = mockk()
 
     private val vurderLivshendelseService =

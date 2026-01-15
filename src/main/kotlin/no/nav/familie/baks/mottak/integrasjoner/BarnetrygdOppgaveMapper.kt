@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 @Service
 class BarnetrygdOppgaveMapper(
     enhetsnummerService: EnhetsnummerService,
-    pdlClient: PdlClient,
+    pdlClient: PdlClientService,
     val søknadRepository: SøknadRepository,
 ) : AbstractOppgaveMapper(
         enhetsnummerService = enhetsnummerService,

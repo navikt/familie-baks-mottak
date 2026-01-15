@@ -7,7 +7,7 @@ import no.nav.familie.baks.mottak.domene.personopplysning.Person
 import no.nav.familie.baks.mottak.domene.personopplysning.PersonIdent
 import no.nav.familie.baks.mottak.domene.personopplysning.harAdresseGradering
 import no.nav.familie.baks.mottak.domene.personopplysning.harBostedsadresse
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.integrasjoner.erUtenforNorge
 import no.nav.familie.baks.mottak.util.erBostNummer
 import no.nav.familie.baks.mottak.util.erDnummer
@@ -32,7 +32,7 @@ import tools.jackson.module.kotlin.jacksonObjectMapper
 )
 class MottaFødselshendelseTask(
     private val taskService: TaskService,
-    private val pdlClient: PdlClient,
+    private val pdlClient: PdlClientService,
 ) : AsyncTaskStep {
     val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
     val barnHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.barn.har.dnr.eller.fdatnr")

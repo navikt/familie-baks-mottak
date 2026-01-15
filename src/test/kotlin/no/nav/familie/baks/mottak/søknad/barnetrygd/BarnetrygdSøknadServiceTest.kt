@@ -2,7 +2,7 @@ package no.nav.familie.baks.mottak.søknad.barnetrygd
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClient
+import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClientService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBVedlegg
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
@@ -12,13 +12,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import kotlin.collections.mapOf
 
 class BarnetrygdSøknadServiceTest {
     private val mockSøknadRepository: SøknadRepository = mockk()
     private val mockVedleggRepository: SøknadVedleggRepository = mockk()
     private val mockTaskService: TaskService = mockk()
-    private val mockVedleggClient: FamilieDokumentClient = mockk()
+    private val mockVedleggClient: FamilieDokumentClientService = mockk()
 
     private val barnetrygdSøknadService: BarnetrygdSøknadService =
         BarnetrygdSøknadService(

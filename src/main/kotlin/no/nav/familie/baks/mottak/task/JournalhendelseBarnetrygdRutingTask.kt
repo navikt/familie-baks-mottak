@@ -16,6 +16,7 @@ import no.nav.familie.baks.mottak.integrasjoner.IntegrasjonException
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.Opphørsgrunn
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.integrasjoner.PdlNotFoundException
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsak
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
@@ -41,7 +42,7 @@ import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
     beskrivelse = "Håndterer ruting og markering av sakssystem",
 )
 class JournalhendelseBarnetrygdRutingTask(
-    private val pdlClient: PdlClient,
+    private val pdlClient: PdlClientService,
     private val baSakClient: BaSakClient,
     private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,
     private val taskService: TaskService,

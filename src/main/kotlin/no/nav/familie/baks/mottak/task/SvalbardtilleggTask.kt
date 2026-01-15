@@ -2,6 +2,7 @@ package no.nav.familie.baks.mottak.task
 
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.OppholdAnnetSted
 import no.nav.familie.kontrakter.felles.personopplysning.Oppholdsadresse
@@ -26,7 +27,7 @@ import java.util.Properties
     triggerTidVedFeilISekunder = 60,
 )
 class SvalbardtilleggTask(
-    private val pdlClient: PdlClient,
+    private val pdlClient: PdlClientService,
     private val baSakClient: BaSakClient,
     private val taskService: TaskService,
     private val environment: Environment,

@@ -5,7 +5,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.kontrakter.ba.finnmarkstillegg.KommunerIFinnmarkOgNordTroms
 import no.nav.familie.kontrakter.ba.finnmarkstillegg.KommunerIFinnmarkOgNordTroms.ALTA
 import no.nav.familie.kontrakter.ba.finnmarkstillegg.KommunerIFinnmarkOgNordTroms.BERLEVÅG
@@ -30,7 +30,7 @@ import kotlin.test.Test
 
 class FinnmarkstilleggTaskTest {
     private val mockBaSakClient: BaSakClient = mockk()
-    private val mockPdlClient: PdlClient = mockk()
+    private val mockPdlClient: PdlClientService = mockk()
     private val mockTaskService: TaskService = mockk()
     private val mockEnvironment: Environment = mockk(relaxed = true)
     private val finnmarkstilleggTask = FinnmarkstilleggTask(mockPdlClient, mockBaSakClient, mockTaskService, mockEnvironment)

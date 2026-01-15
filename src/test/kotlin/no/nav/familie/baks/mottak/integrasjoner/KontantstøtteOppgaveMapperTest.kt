@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 
 class KontantstøtteOppgaveMapperTest {
     private val enhetsnummerService: EnhetsnummerService = mockk()
-    private val pdlClient: PdlClient = mockk()
+    private val pdlClient: PdlClientService = mockk()
     private val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository = mockk()
 
     private val kontantstøtteOppgaveMapper =

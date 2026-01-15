@@ -14,8 +14,8 @@ import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus.LØPENDE
 import no.nav.familie.baks.mottak.integrasjoner.IdentInformasjon
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
-import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.OppgaveClientService
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringBarnetrygdService
 import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
@@ -38,10 +38,10 @@ import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SkanHendelseTaskLøypeTest {
     private val mockJournalpostClient: JournalpostClient = mockk()
-    private val mockOppgaveClient: OppgaveClient = mockk()
+    private val mockOppgaveClient: OppgaveClientService = mockk()
     private val mockSakClient: BaSakClient = mockk()
     private val mockTaskService: TaskService = mockk(relaxed = true)
-    private val mockPdlClient: PdlClient = mockk(relaxed = true)
+    private val mockPdlClient: PdlClientService = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
     private val mockFeatureToggleService: FeatureToggleService = mockk()
     private val mockAutomatiskJournalføringBarnetrygdService: AutomatiskJournalføringBarnetrygdService = mockk()

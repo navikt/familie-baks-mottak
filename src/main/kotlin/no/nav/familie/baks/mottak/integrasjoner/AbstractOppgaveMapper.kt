@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service
 
 abstract class AbstractOppgaveMapper(
     private val enhetsnummerService: EnhetsnummerService,
-    private val pdlClient: PdlClient,
+    private val pdlClient: PdlClientService,
 ) : IOppgaveMapper {
     override fun tilOpprettOppgaveRequest(
         oppgavetype: Oppgavetype,

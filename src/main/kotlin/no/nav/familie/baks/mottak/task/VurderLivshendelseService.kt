@@ -10,9 +10,9 @@ import no.nav.familie.baks.mottak.integrasjoner.BehandlingUnderkategori
 import no.nav.familie.baks.mottak.integrasjoner.Identgruppe
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
-import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
+import no.nav.familie.baks.mottak.integrasjoner.OppgaveClientService
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveVurderLivshendelseDto
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.integrasjoner.PdlNotFoundException
 import no.nav.familie.baks.mottak.integrasjoner.PdlPersonData
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakIdOgTilknyttetAktørId
@@ -42,8 +42,8 @@ import java.util.Locale
 
 @Service
 class VurderLivshendelseService(
-    private val oppgaveClient: OppgaveClient,
-    private val pdlClient: PdlClient,
+    private val oppgaveClient: OppgaveClientService,
+    private val pdlClient: PdlClientService,
     private val baSakClient: BaSakClient,
     private val ksSakClient: KsSakClient,
     private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,

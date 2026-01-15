@@ -3,7 +3,7 @@ package no.nav.familie.baks.mottak.task
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
-import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
+import no.nav.familie.baks.mottak.integrasjoner.OppgaveClientService
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service
 )
 class OpprettJournalføringOppgaveTask(
     private val journalpostClient: JournalpostClient,
-    private val oppgaveClient: OppgaveClient,
+    private val oppgaveClient: OppgaveClientService,
 ) : AsyncTaskStep {
     val log: Logger = LoggerFactory.getLogger(OpprettJournalføringOppgaveTask::class.java)
     val barnetrygdOppgaverOpprettetCounter: Counter = Metrics.counter("barnetrygd.ruting.oppgave.opprettet")

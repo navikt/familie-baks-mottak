@@ -5,7 +5,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.OppholdAnnetSted
 import no.nav.familie.kontrakter.felles.personopplysning.Oppholdsadresse
@@ -27,7 +27,7 @@ import kotlin.test.Test
 
 class SvalbardtilleggTaskTest {
     private val mockBaSakClient: BaSakClient = mockk()
-    private val mockPdlClient: PdlClient = mockk()
+    private val mockPdlClient: PdlClientService = mockk()
     private val mockTaskService: TaskService = mockk()
     private val mockEnvironment: Environment = mockk(relaxed = true)
     private val svalbardtilleggTask = SvalbardtilleggTask(mockPdlClient, mockBaSakClient, mockTaskService, mockEnvironment)

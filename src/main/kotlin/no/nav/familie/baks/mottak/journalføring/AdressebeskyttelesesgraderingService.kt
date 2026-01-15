@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.journalføring
 
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.integrasjoner.SøknadsidenterService
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.journalpost.Bruker
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class AdressebeskyttelesesgraderingService(
-    private val pdlClient: PdlClient,
+    private val pdlClient: PdlClientService,
     private val søknadsidenterService: SøknadsidenterService,
     private val journalpostBrukerService: JournalpostBrukerService,
 ) {

@@ -18,7 +18,7 @@ import org.springframework.test.context.ActiveProfiles
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class HentEnhetClientTest : AbstractWiremockTest() {
     @Autowired
-    lateinit var client: HentEnhetClient
+    lateinit var client: HentEnhetClientService
 
     @Test
     @Tag("integration")

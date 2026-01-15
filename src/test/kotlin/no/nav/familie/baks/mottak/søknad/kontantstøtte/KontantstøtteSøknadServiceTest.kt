@@ -2,7 +2,7 @@ package no.nav.familie.baks.mottak.søknad.kontantstøtte
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClient
+import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClientService
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteVedleggRepository
@@ -16,7 +16,7 @@ class KontantstøtteSøknadServiceTest {
     private val mockKontantstøtteSøknadRepository: KontantstøtteSøknadRepository = mockk()
     private val mockKontantstøtteVedleggRepository: KontantstøtteVedleggRepository = mockk()
     private val mockTaskService: TaskService = mockk()
-    private val mockVedleggClient: FamilieDokumentClient = mockk()
+    private val mockVedleggClient: FamilieDokumentClientService = mockk()
 
     private val kontantstøtteSøknadService: KontantstøtteSøknadService =
         KontantstøtteSøknadService(

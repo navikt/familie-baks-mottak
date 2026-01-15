@@ -22,7 +22,7 @@ import java.time.LocalDateTime
 
 class BarnetrygdOppgaveMapperTest {
     private val enhetsnummerService: EnhetsnummerService = mockk()
-    private val pdlClient: PdlClient = mockk()
+    private val pdlClient: PdlClientService = mockk()
     private val søknadRepository: SøknadRepository = mockk()
 
     private val barnetrygdOppgaveMapper =

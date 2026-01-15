@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.NestedExceptionUtils
-import org.springframework.resilience.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestOperations
 import java.net.URI
@@ -53,11 +52,6 @@ class OppgaveClient
             return responseFraOpprettOppgave(uri, request)
         }
 
-        @Retryable(
-            value = [RuntimeException::class],
-            maxRetries = 3,
-            delayString = "\${retry.backoff.delay:5000}",
-        )
         fun opprettVurderLivshendelseOppgave(dto: OppgaveVurderLivshendelseDto): OppgaveResponse {
             logger.info("Oppretter \"Vurder livshendelse\"-oppgave")
 
@@ -82,11 +76,6 @@ class OppgaveClient
             return responseFraOpprettOppgave(uri, request)
         }
 
-        @Retryable(
-            value = [RuntimeException::class],
-            maxRetries = 3,
-            delayString = "\${retry.backoff.delay:5000}",
-        )
         fun oppdaterOppgaveBeskrivelse(
             patchOppgave: Oppgave,
             beskrivelse: String,
@@ -109,11 +98,6 @@ class OppgaveClient
                 )
         }
 
-        @Retryable(
-            value = [RuntimeException::class],
-            maxRetries = 3,
-            delayString = "\${retry.backoff.delay:5000}",
-        )
         fun finnOppgaver(
             journalpostId: String,
             oppgavetype: Oppgavetype?,
@@ -147,11 +131,6 @@ class OppgaveClient
                 )
         }
 
-        @Retryable(
-            value = [RuntimeException::class],
-            maxRetries = 3,
-            delayString = "\${retry.backoff.delay:5000}",
-        )
         fun finnOppgaverPåAktørId(
             aktørId: String,
             oppgavetype: Oppgavetype,

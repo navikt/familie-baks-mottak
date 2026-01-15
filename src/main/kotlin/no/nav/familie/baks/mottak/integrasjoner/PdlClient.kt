@@ -14,10 +14,8 @@ import no.nav.familie.restklient.util.UriUtil
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.resilience.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
 import java.net.URI
@@ -30,8 +28,6 @@ class PdlClient(
 ) : AbstractRestClient(restTemplate, "pdl.personinfo") {
     private val pdlUri = UriUtil.uri(pdlBaseUrl, PATH_GRAPHQL)
 
-    @Retryable(value = [RuntimeException::class], maxRetries = 3, delayString = ("\${retry.backoff.delay:5000}"))
-    @Cacheable("hentIdenter", cacheManager = "hourlyCacheManager")
     fun hentIdenter(
         personIdent: String,
         tema: Tema,
