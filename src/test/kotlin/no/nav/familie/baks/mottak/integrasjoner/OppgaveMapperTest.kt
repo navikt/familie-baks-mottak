@@ -31,7 +31,7 @@ class OppgaveMapperTest(
     @Autowired
     private val journalpostClient: JournalpostClient,
     @Autowired
-    private val mockPdlClient: PdlClientService,
+    private val mockPdlClientService: PdlClientService,
     @Autowired
     private val barnetrygdSøknadRepository: SøknadRepository,
     @Autowired
@@ -43,14 +43,14 @@ class OppgaveMapperTest(
     private val barnetrygdOppgaveMapper: IOppgaveMapper =
         BarnetrygdOppgaveMapper(
             enhetsnummerService = mockEnhetsnummerService,
-            pdlClient = mockPdlClient,
+            pdlClientService = mockPdlClientService,
             søknadRepository = barnetrygdSøknadRepository,
         )
 
     private val kontantstøtteOppgaveMapper: IOppgaveMapper =
         KontantstøtteOppgaveMapper(
             enhetsnummerService = mockEnhetsnummerService,
-            pdlClient = mockPdlClient,
+            pdlClientService = mockPdlClientService,
             kontantstøtteSøknadRepository = kontantstøtteSøknadRepository,
         )
 
@@ -97,7 +97,7 @@ class OppgaveMapperTest(
 
     @Test
     fun `skal sette brukerid til null dersom bruker ikke finnes i PDL når oppgavetype er Journalføring`() {
-        every { mockPdlClient.hentIdenter(any(), any()) } throws IntegrasjonException("Fant ikke person")
+        every { mockPdlClientService.hentIdenter(any(), any()) } throws IntegrasjonException("Fant ikke person")
 
         val oppgave =
             barnetrygdOppgaveMapper.tilOpprettOppgaveRequest(

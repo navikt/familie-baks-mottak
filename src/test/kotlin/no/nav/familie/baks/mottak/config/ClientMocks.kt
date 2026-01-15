@@ -6,7 +6,7 @@ import no.nav.familie.baks.mottak.integrasjoner.DokarkivClient
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.baks.mottak.integrasjoner.PdfClient
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.søknad.FamiliePdfClient
 import no.nav.familie.kontrakter.felles.BrukerIdType
 import no.nav.familie.kontrakter.felles.Ressurs
@@ -130,10 +130,7 @@ class ClientMocks {
 
     @Bean
     @Profile("mock-pdl")
-    fun mockPdlClient(): PdlClient {
-        val mockPdlClient = mockk<PdlClient>(relaxed = true)
-        return mockPdlClient
-    }
+    fun mockPdlClientService(): PdlClientService = mockk<PdlClientService>(relaxed = true)
 
     @Bean
     @Primary

@@ -43,7 +43,7 @@ import java.util.Locale
 @Service
 class VurderLivshendelseService(
     private val oppgaveClient: OppgaveClientService,
-    private val pdlClient: PdlClientService,
+    private val pdlClientService: PdlClientService,
     private val baSakClient: BaSakClient,
     private val ksSakClient: KsSakClient,
     private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,
@@ -67,7 +67,7 @@ class VurderLivshendelseService(
         val type = payload.type
 
         try {
-            val identer = pdlClient.hentIdenter(personIdent = personIdent, tema)
+            val identer = pdlClientService.hentIdenter(personIdent = personIdent, tema)
             if (identer.firstOrNull { it.ident == personIdent }?.gruppe != Identgruppe.FOLKEREGISTERIDENT.name) {
                 log.warn("Hendelse ignoreres siden ident ikke er av gruppe FOLKEREGISTERIDENT")
                 secureLog.warn("Hendelse ignoreres siden ident ikke er av gruppe FOLKEREGISTERIDENT $identer")
@@ -82,7 +82,7 @@ class VurderLivshendelseService(
         when (type) {
             VurderLivshendelseType.DØDSFALL -> {
                 secureLog.info("Har mottatt dødsfallshendelse for person $personIdent")
-                val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-dødsfall", tema)
+                val pdlPersonData = pdlClientService.hentPerson(personIdent, "hentperson-relasjon-dødsfall", tema)
                 secureLog.info("dødsfallshendelse person fødselsdato = ${pdlPersonData.fødsel.firstOrNull()}")
 
                 val berørteBrukere = finnBrukereBerørtAvDødsfallEllerUtflyttingHendelseForIdent(personIdent, tema)
@@ -136,7 +136,7 @@ class VurderLivshendelseService(
                     throw RuntimeException("Det er bare tema ${Tema.BAR} som støtter sivilstand hendelser")
                 }
 
-                val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-sivilstand", tema)
+                val pdlPersonData = pdlClientService.hentPerson(personIdent, "hentperson-sivilstand", tema)
                 val sivilstand =
                     finnNyesteSivilstandEndring(pdlPersonData) ?: run {
                         secureLog.info("Ignorerer sivilstandhendelse for $personIdent uten dato: $pdlPersonData")
@@ -212,7 +212,7 @@ class VurderLivshendelseService(
                 leggTilNyPersonIBeskrivelse(
                     beskrivelse = "${hendelseType.beskrivelse}:",
                     personIdent = personIdent,
-                    personErBruker = pdlClient.hentAktørId(personIdent, tema) == aktørIdForOppgave,
+                    personErBruker = pdlClientService.hentAktørId(personIdent, tema) == aktørIdForOppgave,
                 )
             val restFagsak = hentRestFagsak(fagsakIdForOppgave, tema)
             val restBehandling = hentSisteBehandlingSomErIverksatt(restFagsak) ?: hentAktivBehandling(restFagsak)
@@ -452,7 +452,7 @@ class VurderLivshendelseService(
 
         val initiellBeskrivelse =
             hentInitiellBeskrivelseForSivilstandOppgave(
-                personErBruker = pdlClient.hentAktørId(personIdent, tema) == aktørIdForOppgave,
+                personErBruker = pdlClientService.hentAktørId(personIdent, tema) == aktørIdForOppgave,
                 formatertDato = formatertDato,
                 personIdent = personIdent,
                 erGift = (sivilstandType == SIVILSTANDTYPE.GIFT),
@@ -493,7 +493,7 @@ class VurderLivshendelseService(
         tema: Tema,
     ): LocalDate? {
         val personIdenter =
-            pdlClient
+            pdlClientService
                 .hentIdenter(personIdent, tema)
                 .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
                 .map { it.ident }

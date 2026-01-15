@@ -8,14 +8,14 @@ import org.springframework.stereotype.Service
 
 @Service
 class JournalpostBrukerService(
-    private val pdlClient: PdlClientService,
+    private val pdlClientService: PdlClientService,
 ) {
     fun tilPersonIdent(
         bruker: Bruker,
         tema: Tema,
     ): String =
         when (bruker.type) {
-            BrukerIdType.AKTOERID -> pdlClient.hentPersonident(bruker.id, tema)
+            BrukerIdType.AKTOERID -> pdlClientService.hentPersonident(bruker.id, tema)
 
             BrukerIdType.FNR,
             BrukerIdType.ORGNR,

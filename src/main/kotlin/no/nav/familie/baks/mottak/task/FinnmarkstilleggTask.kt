@@ -27,7 +27,7 @@ import java.util.Properties
     triggerTidVedFeilISekunder = 60,
 )
 class FinnmarkstilleggTask(
-    private val pdlClient: PdlClientService,
+    private val pdlClientService: PdlClientService,
     private val baSakClient: BaSakClient,
     private val taskService: TaskService,
     private val environment: Environment,
@@ -56,7 +56,7 @@ class FinnmarkstilleggTask(
             return
         }
 
-        val adresser = pdlClient.hentPerson(ident, "hentperson-med-bostedsadresse", Tema.BAR).bostedsadresse.filterNotNull()
+        val adresser = pdlClientService.hentPerson(ident, "hentperson-med-bostedsadresse", Tema.BAR).bostedsadresse.filterNotNull()
         if (adresser.isEmpty()) {
             secureLogger.info("Fant ingen bostedsadresser for ident $ident, hopper ut av FinnmarkstilleggTask")
             task.metadata["resultat"] = "INGEN_BOSTEDSADRESSE"

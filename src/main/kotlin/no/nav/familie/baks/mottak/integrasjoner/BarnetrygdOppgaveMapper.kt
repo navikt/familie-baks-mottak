@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service
 @Service
 class BarnetrygdOppgaveMapper(
     enhetsnummerService: EnhetsnummerService,
-    pdlClient: PdlClientService,
+    pdlClientService: PdlClientService,
     val søknadRepository: SøknadRepository,
 ) : AbstractOppgaveMapper(
         enhetsnummerService = enhetsnummerService,
-        pdlClient = pdlClient,
+        pdlClientService = pdlClientService,
     ) {
     override val tema: Tema = Tema.BAR
 

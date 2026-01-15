@@ -27,7 +27,7 @@ class KontantstøtteOppgaveMapperTest {
     private val kontantstøtteOppgaveMapper =
         KontantstøtteOppgaveMapper(
             enhetsnummerService = enhetsnummerService,
-            pdlClient = pdlClient,
+            pdlClientService = pdlClient,
             kontantstøtteSøknadRepository = kontantstøtteSøknadRepository,
         )
 

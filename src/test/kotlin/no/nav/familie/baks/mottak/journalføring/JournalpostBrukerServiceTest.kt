@@ -10,10 +10,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class JournalpostBrukerServiceTest {
-    private val mockedPdlClient: PdlClientService = mockk()
+    private val mockedPdlClientService: PdlClientService = mockk()
     private val journalpostBrukerService: JournalpostBrukerService =
         JournalpostBrukerService(
-            pdlClient = mockedPdlClient,
+            pdlClientService = mockedPdlClientService,
         )
 
     @Test
@@ -26,7 +26,7 @@ class JournalpostBrukerServiceTest {
             )
 
         every {
-            mockedPdlClient.hentPersonident(
+            mockedPdlClientService.hentPersonident(
                 aktørId = bruker.id,
                 tema = Tema.BAR,
             )

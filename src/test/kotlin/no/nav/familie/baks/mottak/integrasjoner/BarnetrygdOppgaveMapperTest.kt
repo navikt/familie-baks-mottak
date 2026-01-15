@@ -28,7 +28,7 @@ class BarnetrygdOppgaveMapperTest {
     private val barnetrygdOppgaveMapper =
         BarnetrygdOppgaveMapper(
             enhetsnummerService = enhetsnummerService,
-            pdlClient = pdlClient,
+            pdlClientService = pdlClient,
             søknadRepository = søknadRepository,
         )
 

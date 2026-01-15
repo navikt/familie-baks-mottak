@@ -28,7 +28,7 @@ class AdressebeskyttelesesgraderingServiceTest {
 
     private val adressebeskyttelesesgraderingService =
         AdressebeskyttelesesgraderingService(
-            pdlClient = mockedPdlClient,
+            pdlClientService = mockedPdlClient,
             søknadsidenterService = mockedSøknadsidenterService,
             journalpostBrukerService = mockedJournalpostBrukerService,
         )

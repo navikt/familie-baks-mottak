@@ -49,7 +49,7 @@ class NavnoHendelseTaskLøypeTest {
 
     private val rutingSteg =
         JournalhendelseBarnetrygdRutingTask(
-            pdlClient = mockPdlClient,
+            pdlClientService = mockPdlClient,
             baSakClient = mockSakClient,
             infotrygdBarnetrygdClient = mockInfotrygdBarnetrygdClient,
             taskService = mockTaskService,

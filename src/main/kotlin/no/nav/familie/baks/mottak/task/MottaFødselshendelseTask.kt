@@ -32,7 +32,7 @@ import tools.jackson.module.kotlin.jacksonObjectMapper
 )
 class MottaFødselshendelseTask(
     private val taskService: TaskService,
-    private val pdlClient: PdlClientService,
+    private val pdlClientService: PdlClientService,
 ) : AsyncTaskStep {
     val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
     val barnHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.barn.har.dnr.eller.fdatnr")
@@ -49,7 +49,7 @@ class MottaFødselshendelseTask(
             return
         }
 
-        val pdlPersonData = pdlClient.hentPerson(barnetsId, "hentperson-fødested", Tema.BAR)
+        val pdlPersonData = pdlClientService.hentPerson(barnetsId, "hentperson-fødested", Tema.BAR)
         if (pdlPersonData.fødested.first().erUtenforNorge()) {
             log.info("Fødeland er ikke Norge. Ignorerer hendelse")
             fødselIgnorertFødelandCounter.increment()
@@ -57,7 +57,7 @@ class MottaFødselshendelseTask(
         }
 
         try {
-            val personMedRelasjoner = pdlClient.hentPersonMedRelasjoner(barnetsId, Tema.BAR)
+            val personMedRelasjoner = pdlClientService.hentPersonMedRelasjoner(barnetsId, Tema.BAR)
 
             val morsIdent = hentMor(personMedRelasjoner)
 

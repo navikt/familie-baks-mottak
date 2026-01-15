@@ -38,7 +38,7 @@ class JournalhendelseBarnetrygdRutingTaskTest {
 
     private val journalhendelseBarnetrygdRutingTask: JournalhendelseBarnetrygdRutingTask =
         JournalhendelseBarnetrygdRutingTask(
-            pdlClient = pdlClient,
+            pdlClientService = pdlClient,
             baSakClient = baSakClient,
             infotrygdBarnetrygdClient = infotrygdBarnetrygdClient,
             taskService = taskService,
