@@ -21,6 +21,7 @@ jobs:
       id-token: write
     uses: navikt/familie-baks-gha-workflows/.github/workflows/build-maven-app.yaml@main # ratchet:exclude
     with:
+      java-version: 25
       build-image: true
       push-image: true
       byosbom: target/classes/META-INF/sbom/application.cdx.json

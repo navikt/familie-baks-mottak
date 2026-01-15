@@ -18,9 +18,9 @@
         <revision>1.0</revision>
         <sha1/>
         <changelist>-SNAPSHOT</changelist>
-        <java.version>21</java.version>
-        <jvmTarget>21</jvmTarget>
-        <kotlin.version>2.2.21</kotlin.version>
+        <java.version>25</java.version>
+        <jvmTarget>25</jvmTarget>
+        <kotlin.version>2.3.0</kotlin.version>
         <mockk.version>1.14.6</mockk.version>
         <confluent.version>8.1.0</confluent.version>
         <prosessering.version>2.20251117095517_cc54714</prosessering.version>
@@ -347,7 +347,7 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <jvmTarget>21</jvmTarget>
+                    <jvmTarget>25</jvmTarget>
                     <compilerPlugins>
                         <plugin>spring</plugin>
                         <plugin>jpa</plugin>
