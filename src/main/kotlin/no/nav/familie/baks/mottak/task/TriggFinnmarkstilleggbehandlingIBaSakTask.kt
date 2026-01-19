@@ -1,7 +1,7 @@
 package no.nav.familie.baks.mottak.task
 
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig.Companion.SEND_BOSTEDSADRESSE_HENDELSER_TIL_BA_SAK
-import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -19,12 +19,12 @@ import java.time.LocalDateTime
 )
 class TriggFinnmarkstilleggbehandlingIBaSakTask(
     private val baSakClient: BaSakClient,
-    private val unleashNextMedContextService: UnleashNextMedContextService,
+    private val featureToggleService: FeatureToggleService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
         val ident = task.payload
 
-        if (unleashNextMedContextService.isEnabled(SEND_BOSTEDSADRESSE_HENDELSER_TIL_BA_SAK)) {
+        if (featureToggleService.isEnabled(SEND_BOSTEDSADRESSE_HENDELSER_TIL_BA_SAK)) {
             baSakClient.sendFinnmarkstilleggTilBaSak(ident)
         } else {
             throw RekjørSenereException(

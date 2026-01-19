@@ -1,7 +1,7 @@
 package no.nav.familie.baks.mottak.journalføring
 
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
-import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class AutomatiskJournalføringBarnetrygdService(
-    private val unleashService: UnleashNextMedContextService,
+    private val featureToggleService: FeatureToggleService,
     private val baSakClient: BaSakClient,
     private val arbeidsfordelingClient: ArbeidsfordelingClient,
     private val adressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService,
@@ -24,7 +24,7 @@ class AutomatiskJournalføringBarnetrygdService(
         journalpost: Journalpost,
         brukerHarSakIInfotrygd: Boolean,
     ): Boolean {
-        val kode6Og19ToggleErPå = unleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false)
+        val kode6Og19ToggleErPå = featureToggleService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false)
 
         val enheterSomIkkeSkalHaAutomatiskJournalføring =
             if (kode6Og19ToggleErPå) {

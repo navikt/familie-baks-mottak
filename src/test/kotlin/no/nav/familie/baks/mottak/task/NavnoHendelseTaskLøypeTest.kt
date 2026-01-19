@@ -5,7 +5,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus.LØPENDE
@@ -43,7 +43,7 @@ class NavnoHendelseTaskLøypeTest {
     private val mockTaskService: TaskService = mockk(relaxed = true)
     private val mockPdlClient: PdlClient = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
-    private val mockUnleashNextMedContextService: UnleashNextMedContextService = mockk()
+    private val mockFeatureToggleService: FeatureToggleService = mockk()
     private val mockAutomatiskJournalføringBarnetrygdService: AutomatiskJournalføringBarnetrygdService = mockk()
     private val mockJournalpostBrukerService: JournalpostBrukerService = mockk()
 
@@ -54,7 +54,7 @@ class NavnoHendelseTaskLøypeTest {
             infotrygdBarnetrygdClient = mockInfotrygdBarnetrygdClient,
             taskService = mockTaskService,
             journalpostClient = mockJournalpostClient,
-            unleashNextMedContextService = mockUnleashNextMedContextService,
+            featureToggleService = mockFeatureToggleService,
             automatiskJournalføringBarnetrygdService = mockAutomatiskJournalføringBarnetrygdService,
             journalpostBrukerService = mockJournalpostBrukerService,
         )
@@ -109,7 +109,7 @@ class NavnoHendelseTaskLøypeTest {
             mockPdlClient.hentIdenter(any(), any())
         } returns listOf(IdentInformasjon("12345678910", historisk = false, gruppe = "FOLKEREGISTERIDENT"))
         every {
-            mockUnleashNextMedContextService.isEnabled(any(), any())
+            mockFeatureToggleService.isEnabled(any(), any())
         } returns false
 
         every { mockJournalpostBrukerService.tilPersonIdent(any(), any()) } returns "12345678910"

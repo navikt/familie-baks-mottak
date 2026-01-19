@@ -3,7 +3,7 @@ package no.nav.familie.baks.mottak.integrasjoner
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.baks.mottak.DevLauncher
-import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
 import no.nav.familie.kontrakter.felles.Behandlingstema
@@ -38,7 +38,7 @@ class OppgaveMapperTest(
     private val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
 ) {
     private val mockEnhetsnummerService: EnhetsnummerService = mockk()
-    private val unleashService: UnleashNextMedContextService = mockk()
+    private val featureToggleService: FeatureToggleService = mockk()
 
     private val barnetrygdOppgaveMapper: IOppgaveMapper =
         BarnetrygdOppgaveMapper(

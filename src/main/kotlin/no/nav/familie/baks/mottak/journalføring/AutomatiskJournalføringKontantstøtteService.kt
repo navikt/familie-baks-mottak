@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.journalføring
 
-import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class AutomatiskJournalføringKontantstøtteService(
-    private val unleashService: UnleashNextMedContextService,
+    private val featureToggleService: FeatureToggleService,
     private val arbeidsfordelingClient: ArbeidsfordelingClient,
     private val ksSakClient: KsSakClient,
     private val adressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService,

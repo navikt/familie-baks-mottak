@@ -2,7 +2,7 @@ package no.nav.familie.baks.mottak.journalføring
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingStatus
@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 class AutomatiskJournalføringKontantstøtteServiceTest {
-    private val mockedUnleashService: UnleashNextMedContextService = mockk()
+    private val mockedFeatureToggleService: FeatureToggleService = mockk()
     private val mockedArbeidsfordelingClient: ArbeidsfordelingClient = mockk()
     private val mockedKsSakClient: KsSakClient = mockk()
     private val mockedAdressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService = mockk()
@@ -34,7 +34,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
 
     private val automatiskJournalføringKontantstøtteService: AutomatiskJournalføringKontantstøtteService =
         AutomatiskJournalføringKontantstøtteService(
-            unleashService = mockedUnleashService,
+            featureToggleService = mockedFeatureToggleService,
             arbeidsfordelingClient = mockedArbeidsfordelingClient,
             ksSakClient = mockedKsSakClient,
             adressebeskyttelesesgraderingService = mockedAdressebeskyttelesesgraderingService,

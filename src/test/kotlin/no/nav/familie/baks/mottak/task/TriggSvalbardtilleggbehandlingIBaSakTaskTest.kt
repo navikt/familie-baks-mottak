@@ -5,7 +5,7 @@ import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig.Companion.SEND_OPPHOLDSADRESSE_HENDELSER_TIL_BA_SAK
-import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.error.RekjørSenereException
@@ -16,11 +16,11 @@ import java.time.LocalDate
 
 class TriggSvalbardtilleggbehandlingIBaSakTaskTest {
     private val mockBaSakClient: BaSakClient = mockk()
-    private val mockUnleashService: UnleashNextMedContextService = mockk()
+    private val featureToggleService: FeatureToggleService = mockk()
     private val triggSvalbardtilleggbehandlingIBaSakTask =
         TriggSvalbardtilleggbehandlingIBaSakTask(
             baSakClient = mockBaSakClient,
-            unleashNextMedContextService = mockUnleashService,
+            featureToggleService = featureToggleService,
         )
 
     private val personIdent = "12345678910"
@@ -28,7 +28,7 @@ class TriggSvalbardtilleggbehandlingIBaSakTaskTest {
     @Test
     fun `skal sende svalbardtillegg til ba-sak når feature toggle er aktivert`() {
         // Arrange
-        every { mockUnleashService.isEnabled(SEND_OPPHOLDSADRESSE_HENDELSER_TIL_BA_SAK) } returns true
+        every { featureToggleService.isEnabled(SEND_OPPHOLDSADRESSE_HENDELSER_TIL_BA_SAK) } returns true
         justRun { mockBaSakClient.sendSvalbardtilleggTilBaSak(personIdent) }
 
         val task = Task(TriggSvalbardtilleggbehandlingIBaSakTask.TASK_STEP_TYPE, personIdent)
@@ -37,14 +37,14 @@ class TriggSvalbardtilleggbehandlingIBaSakTaskTest {
         triggSvalbardtilleggbehandlingIBaSakTask.doTask(task)
 
         // Assert
-        verify(exactly = 1) { mockUnleashService.isEnabled(SEND_OPPHOLDSADRESSE_HENDELSER_TIL_BA_SAK) }
+        verify(exactly = 1) { featureToggleService.isEnabled(SEND_OPPHOLDSADRESSE_HENDELSER_TIL_BA_SAK) }
         verify(exactly = 1) { mockBaSakClient.sendSvalbardtilleggTilBaSak(personIdent) }
     }
 
     @Test
     fun `skal kaste RekjørSenereException når feature toggle er deaktivert`() {
         // Arrange
-        every { mockUnleashService.isEnabled(SEND_OPPHOLDSADRESSE_HENDELSER_TIL_BA_SAK) } returns false
+        every { featureToggleService.isEnabled(SEND_OPPHOLDSADRESSE_HENDELSER_TIL_BA_SAK) } returns false
 
         val task = Task(TriggSvalbardtilleggbehandlingIBaSakTask.TASK_STEP_TYPE, personIdent)
         val omEnUke = LocalDate.now().plusWeeks(1)
@@ -58,7 +58,7 @@ class TriggSvalbardtilleggbehandlingIBaSakTaskTest {
         assertThat(exception.årsak).isEqualTo("Toggle er skrudd av, prøver igjen om 1 uke")
         assertThat(exception.triggerTid.toLocalDate()).isEqualTo(omEnUke)
 
-        verify(exactly = 1) { mockUnleashService.isEnabled(SEND_OPPHOLDSADRESSE_HENDELSER_TIL_BA_SAK) }
+        verify(exactly = 1) { featureToggleService.isEnabled(SEND_OPPHOLDSADRESSE_HENDELSER_TIL_BA_SAK) }
         verify(exactly = 0) { mockBaSakClient.sendSvalbardtilleggTilBaSak(any()) }
     }
 }

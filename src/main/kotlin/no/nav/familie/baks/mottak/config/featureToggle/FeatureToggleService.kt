@@ -4,13 +4,13 @@ import no.nav.familie.unleash.UnleashService
 import org.springframework.stereotype.Service
 
 @Service
-class UnleashNextMedContextService(
-    private val unleashNext: UnleashService,
+class FeatureToggleService(
+    private val unleashService: UnleashService,
 ) {
-    fun isEnabled(toggleId: String): Boolean = unleashNext.isEnabled(toggleId)
+    fun isEnabled(toggleId: String): Boolean = unleashService.isEnabled(toggleId)
 
     fun isEnabled(
         toggleId: String,
         defaultValue: Boolean,
-    ) = unleashNext.isEnabled(toggleId, defaultValue)
+    ) = unleashService.isEnabled(toggleId, defaultValue)
 }

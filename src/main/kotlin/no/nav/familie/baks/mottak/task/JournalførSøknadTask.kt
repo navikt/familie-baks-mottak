@@ -1,7 +1,7 @@
 package no.nav.familie.baks.mottak.task
 
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
-import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.søknad.FamiliePdfService
 import no.nav.familie.baks.mottak.søknad.JournalføringService
 import no.nav.familie.baks.mottak.søknad.PdfService
@@ -26,7 +26,7 @@ class JournalførSøknadTask(
     private val journalføringService: JournalføringService,
     private val søknadRepository: SøknadRepository,
     private val familiePdfService: FamiliePdfService,
-    private val unleashService: UnleashNextMedContextService,
+    private val featureToggleService: FeatureToggleService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
         try {
@@ -41,7 +41,7 @@ class JournalførSøknadTask(
             log.info("Generer pdf og journalfør søknad om ${søknadstype.toString().lowercase()} barnetrygd")
 
             val bokmålPdf =
-                if (unleashService.isEnabled(FeatureToggleConfig.NY_FAMILIE_PDF_KVITTERING, false)) {
+                if (featureToggleService.isEnabled(FeatureToggleConfig.NY_FAMILIE_PDF_KVITTERING, false)) {
                     familiePdfService.lagBarnetrygdPdfKvittering(dbBarnetrygdSøknad, "nb")
                 } else {
                     pdfService.lagBarnetrygdPdf(
