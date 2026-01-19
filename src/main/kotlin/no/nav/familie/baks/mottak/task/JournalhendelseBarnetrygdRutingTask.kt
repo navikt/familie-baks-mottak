@@ -2,7 +2,7 @@ package no.nav.familie.baks.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig.Companion.HOPP_OVER_INFOTRYGD_SJEKK
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle.HOPP_OVER_INFOTRYGD_SJEKK
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.BARN

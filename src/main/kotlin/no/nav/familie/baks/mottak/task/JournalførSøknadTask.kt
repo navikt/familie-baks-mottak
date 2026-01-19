@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.task
 
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.søknad.FamiliePdfService
 import no.nav.familie.baks.mottak.søknad.JournalføringService
@@ -41,7 +41,7 @@ class JournalførSøknadTask(
             log.info("Generer pdf og journalfør søknad om ${søknadstype.toString().lowercase()} barnetrygd")
 
             val bokmålPdf =
-                if (featureToggleService.isEnabled(FeatureToggleConfig.NY_FAMILIE_PDF_KVITTERING, false)) {
+                if (featureToggleService.isEnabled(FeatureToggle.NY_FAMILIE_PDF_KVITTERING, false)) {
                     familiePdfService.lagBarnetrygdPdfKvittering(dbBarnetrygdSøknad, "nb")
                 } else {
                     pdfService.lagBarnetrygdPdf(

@@ -4,7 +4,7 @@ import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig.Companion.SEND_OPPHOLDSADRESSE_HENDELSER_TIL_BA_SAK
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle.SEND_OPPHOLDSADRESSE_HENDELSER_TIL_BA_SAK
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.prosessering.domene.Task

@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.journalføring
 
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
@@ -24,7 +24,7 @@ class AutomatiskJournalføringBarnetrygdService(
         journalpost: Journalpost,
         brukerHarSakIInfotrygd: Boolean,
     ): Boolean {
-        val kode6Og19ToggleErPå = featureToggleService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false)
+        val kode6Og19ToggleErPå = featureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false)
 
         val enheterSomIkkeSkalHaAutomatiskJournalføring =
             if (kode6Og19ToggleErPå) {

@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.task
 
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig.Companion.SEND_BOSTEDSADRESSE_HENDELSER_TIL_BA_SAK
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle.SEND_BOSTEDSADRESSE_HENDELSER_TIL_BA_SAK
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.prosessering.AsyncTaskStep

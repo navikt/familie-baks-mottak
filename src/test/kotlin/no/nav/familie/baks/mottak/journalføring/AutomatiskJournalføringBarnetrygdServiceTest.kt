@@ -2,7 +2,7 @@ package no.nav.familie.baks.mottak.journalføring
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
@@ -44,7 +44,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
 
     @BeforeEach
     internal fun setUp() {
-        every { mockedFeatureToggleService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
+        every { mockedFeatureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
     }
 
     @Test
@@ -340,7 +340,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
     @Test
     fun `skal ikke automatisk journalføre journalpost hvis det finnes en tilknyttet strengt fortrolig person og toggle er ikke på`() {
         // Arrange
-        every { mockedFeatureToggleService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns false
+        every { mockedFeatureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns false
         val identifikator = "123"
 
         val journalpost =
@@ -386,7 +386,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
 
     @Test
     fun `skal automatisk journalføre journalpost hvis søker er en strengt fortrolig person og toggle er på`() {
-        every { mockedFeatureToggleService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
+        every { mockedFeatureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
 
         // Arrange
         val identifikator = "123"
@@ -473,7 +473,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
 
     @Test
     fun `skal ikke automatisk journalføre journalpost hvis søker ikke er en strengt fortrolig person men barna er og toggle er på`() {
-        every { mockedFeatureToggleService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
+        every { mockedFeatureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
 
         // Arrange
         val identifikator = "123"
@@ -646,7 +646,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
     @Test
     fun `skal ikke automatisk journalføre journalpost hvis enhet er 2103 og toggle er av`() {
         // Arrange
-        every { mockedFeatureToggleService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns false
+        every { mockedFeatureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns false
 
         val identifikator = "123"
         val fagsakId = 1L
@@ -726,7 +726,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
     @Test
     fun `skal automatisk journalføre journalpost hvis enhet er 2103 og toggle er på`() {
         // Arrange
-        every { mockedFeatureToggleService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
+        every { mockedFeatureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
 
         val identifikator = "123"
         val fagsakId = 1L
