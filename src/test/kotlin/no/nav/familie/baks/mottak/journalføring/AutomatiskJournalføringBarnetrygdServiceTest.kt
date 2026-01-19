@@ -3,6 +3,7 @@ package no.nav.familie.baks.mottak.journalføring
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
+import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
@@ -21,14 +22,13 @@ import no.nav.familie.kontrakter.felles.journalpost.Dokumentstatus
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import no.nav.familie.kontrakter.felles.journalpost.Journalposttype
 import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
-import no.nav.familie.unleash.UnleashService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 class AutomatiskJournalføringBarnetrygdServiceTest {
-    private val mockedUnleashService: UnleashService = mockk()
+    private val mockedUnleashService: UnleashNextMedContextService = mockk()
     private val mockedBaSakClient: BaSakClient = mockk()
     private val mockedArbeidsfordelingClient: ArbeidsfordelingClient = mockk()
     private val mockedAdressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService = mockk()
