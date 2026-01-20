@@ -11,8 +11,4 @@ enum class FeatureToggle(
 
     // Ny pdf kvittering
     NY_FAMILIE_PDF_KVITTERING("familie-ba-soknad.ny-pdf"),
-
-    SEND_BOSTEDSADRESSE_HENDELSER_TIL_BA_SAK("familie-baks-mottak.send-bostedsadresse-hendelser-til-ba-sak"),
-
-    SEND_OPPHOLDSADRESSE_HENDELSER_TIL_BA_SAK("familie-baks-mottak.send-oppholdsadresse-hendelser-til-ba-sak"),
 }
