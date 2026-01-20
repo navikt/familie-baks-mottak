@@ -1,6 +1,7 @@
 package no.nav.familie.baks.mottak.task
 
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.søknad.FamiliePdfService
 import no.nav.familie.baks.mottak.søknad.JournalføringService
 import no.nav.familie.baks.mottak.søknad.PdfService
@@ -13,7 +14,6 @@ import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV6
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.unleash.UnleashService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -28,7 +28,7 @@ class JournalførKontantstøtteSøknadTask(
     private val pdfService: PdfService,
     private val journalføringService: JournalføringService,
     private val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
-    private val unleashService: UnleashService,
+    private val featureToggleService: FeatureToggleService,
     private val familiePdfService: FamiliePdfService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
@@ -42,7 +42,7 @@ class JournalførKontantstøtteSøknadTask(
 
             logger.info("Generer pdf og journalfør søknad om kontantstøtte")
             val bokmålPdf =
-                if (unleashService.isEnabled(FeatureToggleConfig.NY_FAMILIE_PDF_KVITTERING, false)) {
+                if (featureToggleService.isEnabled(FeatureToggle.NY_FAMILIE_PDF_KVITTERING, false)) {
                     familiePdfService.lagKontantstøttePdfKvittering(dbKontantstøtteSøknad, "nb")
                 } else {
                     pdfService.lagKontantstøttePdf(

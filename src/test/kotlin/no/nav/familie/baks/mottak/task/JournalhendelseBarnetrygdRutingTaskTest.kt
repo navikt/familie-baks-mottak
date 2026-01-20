@@ -4,7 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
@@ -32,7 +32,7 @@ class JournalhendelseBarnetrygdRutingTaskTest {
     private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
     private val taskService: TaskService = mockk()
     private val journalpostClient: JournalpostClient = mockk()
-    private val unleashNextMedContextService: UnleashNextMedContextService = mockk()
+    private val featureToggleService: FeatureToggleService = mockk()
     private val automatiskJournalføringBarnetrygdService: AutomatiskJournalføringBarnetrygdService = mockk()
     private val journalpostBrukerService: JournalpostBrukerService = mockk()
 
@@ -43,7 +43,7 @@ class JournalhendelseBarnetrygdRutingTaskTest {
             infotrygdBarnetrygdClient = infotrygdBarnetrygdClient,
             taskService = taskService,
             journalpostClient = journalpostClient,
-            unleashNextMedContextService = unleashNextMedContextService,
+            featureToggleService = featureToggleService,
             automatiskJournalføringBarnetrygdService = automatiskJournalføringBarnetrygdService,
             journalpostBrukerService = journalpostBrukerService,
         )

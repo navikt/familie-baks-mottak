@@ -2,7 +2,8 @@ package no.nav.familie.baks.mottak.journalføring
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
@@ -21,21 +22,20 @@ import no.nav.familie.kontrakter.felles.journalpost.Dokumentstatus
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import no.nav.familie.kontrakter.felles.journalpost.Journalposttype
 import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
-import no.nav.familie.unleash.UnleashService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 class AutomatiskJournalføringBarnetrygdServiceTest {
-    private val mockedUnleashService: UnleashService = mockk()
+    private val mockedFeatureToggleService: FeatureToggleService = mockk()
     private val mockedBaSakClient: BaSakClient = mockk()
     private val mockedArbeidsfordelingClient: ArbeidsfordelingClient = mockk()
     private val mockedAdressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService = mockk()
     private val mockedJournalpostBrukerService: JournalpostBrukerService = mockk()
     private val automatiskJournalføringBarnetrygdService: AutomatiskJournalføringBarnetrygdService =
         AutomatiskJournalføringBarnetrygdService(
-            unleashService = mockedUnleashService,
+            featureToggleService = mockedFeatureToggleService,
             baSakClient = mockedBaSakClient,
             arbeidsfordelingClient = mockedArbeidsfordelingClient,
             adressebeskyttelesesgraderingService = mockedAdressebeskyttelesesgraderingService,
@@ -44,7 +44,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
 
     @BeforeEach
     internal fun setUp() {
-        every { mockedUnleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
+        every { mockedFeatureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
     }
 
     @Test
@@ -340,7 +340,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
     @Test
     fun `skal ikke automatisk journalføre journalpost hvis det finnes en tilknyttet strengt fortrolig person og toggle er ikke på`() {
         // Arrange
-        every { mockedUnleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns false
+        every { mockedFeatureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns false
         val identifikator = "123"
 
         val journalpost =
@@ -386,7 +386,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
 
     @Test
     fun `skal automatisk journalføre journalpost hvis søker er en strengt fortrolig person og toggle er på`() {
-        every { mockedUnleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
+        every { mockedFeatureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
 
         // Arrange
         val identifikator = "123"
@@ -473,7 +473,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
 
     @Test
     fun `skal ikke automatisk journalføre journalpost hvis søker ikke er en strengt fortrolig person men barna er og toggle er på`() {
-        every { mockedUnleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
+        every { mockedFeatureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
 
         // Arrange
         val identifikator = "123"
@@ -646,7 +646,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
     @Test
     fun `skal ikke automatisk journalføre journalpost hvis enhet er 2103 og toggle er av`() {
         // Arrange
-        every { mockedUnleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns false
+        every { mockedFeatureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns false
 
         val identifikator = "123"
         val fagsakId = 1L
@@ -726,7 +726,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
     @Test
     fun `skal automatisk journalføre journalpost hvis enhet er 2103 og toggle er på`() {
         // Arrange
-        every { mockedUnleashService.isEnabled(FeatureToggleConfig.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
+        every { mockedFeatureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
 
         val identifikator = "123"
         val fagsakId = 1L

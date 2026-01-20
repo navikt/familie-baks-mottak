@@ -2,8 +2,8 @@ package no.nav.familie.baks.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleConfig.Companion.HOPP_OVER_INFOTRYGD_SJEKK
-import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle.HOPP_OVER_INFOTRYGD_SJEKK
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.BARN
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
@@ -46,7 +46,7 @@ class JournalhendelseBarnetrygdRutingTask(
     private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,
     private val taskService: TaskService,
     private val journalpostClient: JournalpostClient,
-    private val unleashNextMedContextService: UnleashNextMedContextService,
+    private val featureToggleService: FeatureToggleService,
     private val automatiskJournalføringBarnetrygdService: AutomatiskJournalføringBarnetrygdService,
     private val journalpostBrukerService: JournalpostBrukerService,
 ) : AbstractJournalhendelseRutingTask(taskService) {
@@ -174,7 +174,7 @@ class JournalhendelseBarnetrygdRutingTask(
                 .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
                 .map { it.ident }
 
-        val hoppOverInfotrygdToggleErPå = unleashNextMedContextService.isEnabled(HOPP_OVER_INFOTRYGD_SJEKK, false)
+        val hoppOverInfotrygdToggleErPå = featureToggleService.isEnabled(HOPP_OVER_INFOTRYGD_SJEKK, false)
 
         val sakspart =
             if (hoppOverInfotrygdToggleErPå) {

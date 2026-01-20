@@ -4,7 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.familie.baks.mottak.config.featureToggle.UnleashNextMedContextService
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.domene.personopplysning.Person
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus
 import no.nav.familie.baks.mottak.integrasjoner.IdentInformasjon
@@ -37,7 +37,7 @@ class JournalhendelseKontantstøtteRutingTaskTest {
     private val taskService: TaskService = mockk()
     private val ksSakClient: KsSakClient = mockk()
     private val journalpostClient: JournalpostClient = mockk()
-    private val unleashService: UnleashNextMedContextService = mockk()
+    private val featureToggleService: FeatureToggleService = mockk()
     private val automatiskJournalføringKontantstøtteService: AutomatiskJournalføringKontantstøtteService = mockk()
     private val journalpostBrukerService: JournalpostBrukerService = mockk()
     private val journalhendelseKontantstøtteRutingTask: JournalhendelseKontantstøtteRutingTask =
