@@ -3,6 +3,10 @@ name: Deploy unleash api-token for dev og prod
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   deploy-dev:
     runs-on: ubuntu-latest
@@ -12,7 +16,6 @@ jobs:
       - name: deploy unleash api-token to dev
         uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: .nais/unleash/unleash-apitoken-dev.yaml
   deploy-prod:
@@ -23,6 +26,5 @@ jobs:
       - name: deploy unleash api-token to prod
         uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
           RESOURCE: .nais/unleash/unleash-apitoken-prod.yaml
