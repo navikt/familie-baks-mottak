@@ -37,8 +37,6 @@ spec:
       cpu: 200m
   ingresses:
     - https://familie-baks-mottak.intern.dev.nav.no
-  secureLogs:
-    enabled: true
   tokenx:
     enabled: true
   accessPolicy:
