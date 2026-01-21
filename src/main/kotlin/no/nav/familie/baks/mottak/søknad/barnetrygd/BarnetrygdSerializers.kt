@@ -43,9 +43,6 @@ class SøknadsfeltSerializer(
         jsonGenerator: JsonGenerator,
         serializerProvider: SerializationContext,
     ) {
-        if (søknadsFelt.label[språk] == "teksterTilPdf") {
-            println(søknadsFelt)
-        }
         jsonGenerator.writePOJO(
             mapOf(
                 "label" to søknadsFelt.label[språk],

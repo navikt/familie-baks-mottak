@@ -24,9 +24,6 @@ class SøknadsfeltSerializer(
         jsonGenerator: JsonGenerator,
         serializerProvider: SerializationContext,
     ) {
-        if (!søknadsFelt.label.isNullOrEmpty()) {
-            println(søknadsFelt)
-        }
         jsonGenerator.writePOJO(
             mapOf(
                 "label" to søknadsFelt.label[språk],
