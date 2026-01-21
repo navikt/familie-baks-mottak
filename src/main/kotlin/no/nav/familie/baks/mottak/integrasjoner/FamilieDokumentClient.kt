@@ -1,14 +1,12 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
-import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
+import no.nav.familie.restklient.client.AbstractRestClient
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.retry.annotation.Backoff
-import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestOperations
 import java.net.URI
@@ -23,10 +21,6 @@ class FamilieDokumentClient(
 ) : AbstractRestClient(restOperations, "integrasjon") {
     private val unauthenticated = object : AbstractRestClient(unsecuredRestOperations, "familie.dokument.pdf") {}
 
-    @Retryable(
-        value = [RuntimeException::class],
-        backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
-    )
     fun hentVedlegg(dokumentId: String): ByteArray {
         logger.info("Henter vedlegg med dokumentid $dokumentId")
         val uri = URI.create("$dokumentUri/api/mapper/ANYTHING/$dokumentId")

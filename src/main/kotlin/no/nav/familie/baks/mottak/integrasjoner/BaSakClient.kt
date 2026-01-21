@@ -1,15 +1,13 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
 import no.nav.familie.baks.mottak.domene.NyBehandling
-import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.PersonIdent
 import no.nav.familie.kontrakter.felles.Ressurs
+import no.nav.familie.restklient.client.AbstractRestClient
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.retry.annotation.Backoff
-import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
@@ -26,11 +24,6 @@ class BaSakClient
         @param:Value("\${FAMILIE_BA_SAK_API_URL}") private val sakServiceUri: String,
         @Qualifier("clientCredentials") restOperations: RestOperations,
     ) : AbstractRestClient(restOperations, "integrasjon") {
-        @Retryable(
-            value = [RuntimeException::class],
-            maxAttempts = 3,
-            backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
-        )
         fun sendTilSak(nyBehandling: NyBehandling) {
             val uri = URI.create("$sakServiceUri/behandlinger")
             logger.info("Sender søknad til {}", uri)

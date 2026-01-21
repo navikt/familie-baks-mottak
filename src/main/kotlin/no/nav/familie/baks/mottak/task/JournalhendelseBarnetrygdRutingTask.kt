@@ -15,7 +15,7 @@ import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.IntegrasjonException
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.Opphørsgrunn
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.integrasjoner.PdlNotFoundException
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsak
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
@@ -41,7 +41,7 @@ import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
     beskrivelse = "Håndterer ruting og markering av sakssystem",
 )
 class JournalhendelseBarnetrygdRutingTask(
-    private val pdlClient: PdlClient,
+    private val pdlClientService: PdlClientService,
     private val baSakClient: BaSakClient,
     private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,
     private val taskService: TaskService,
@@ -154,7 +154,7 @@ class JournalhendelseBarnetrygdRutingTask(
     private fun søkEtterSakIBaSakOgInfotrygd(brukersIdent: String): Pair<Sakspart?, Sakspart?> {
         val (brukersHistoriskeFnr, brukersFnr) =
             try {
-                pdlClient
+                pdlClientService
                     .hentIdenter(brukersIdent, tema)
                     .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
                     .partition { it.historisk }
@@ -163,14 +163,14 @@ class JournalhendelseBarnetrygdRutingTask(
             }
         val brukersIdenter = brukersFnr.plus(brukersHistoriskeFnr).map { it.ident }
         val barnasIdenter =
-            pdlClient
+            pdlClientService
                 .hentPersonMedRelasjoner(brukersIdent, tema)
                 .forelderBarnRelasjoner
                 .filter { it.relatertPersonsRolle == FORELDERBARNRELASJONROLLE.BARN }
                 .mapNotNull { it.relatertPersonsIdent }
         val alleBarnasIdenter =
             barnasIdenter
-                .flatMap { pdlClient.hentIdenter(it, tema) }
+                .flatMap { pdlClientService.hentIdenter(it, tema) }
                 .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
                 .map { it.ident }
 

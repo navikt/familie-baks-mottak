@@ -16,7 +16,7 @@ import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus.LØPENDE
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
-import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
+import no.nav.familie.baks.mottak.integrasjoner.OppgaveClientService
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.task.JournalhendelseBarnetrygdRutingTask
@@ -49,7 +49,7 @@ class JournalhendelseServiceTest {
     lateinit var mockJournalpostClient: JournalpostClient
 
     @MockK(relaxed = true)
-    lateinit var mockOppgaveClient: OppgaveClient
+    lateinit var mockOppgaveClient: OppgaveClientService
 
     @MockK
     lateinit var baSakClient: BaSakClient

@@ -1,9 +1,9 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import no.nav.familie.restklient.config.jsonMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -29,7 +29,7 @@ class FamilieDokumentPdfClientTest {
             File("./src/test/kotlin/no/nav/familie/baks/mottak/søknad/testdata/dokgen/testdata_input.json")
                 .readText()
                 .let {
-                    ObjectMapper().readValue(it, Map::class.java) as Map<String, Any>
+                    jsonMapper.readValue(it, Map::class.java) as Map<String, Any>
                 }
 
         val forventetResultat =

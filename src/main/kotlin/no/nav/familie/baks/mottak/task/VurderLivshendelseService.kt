@@ -10,9 +10,9 @@ import no.nav.familie.baks.mottak.integrasjoner.BehandlingUnderkategori
 import no.nav.familie.baks.mottak.integrasjoner.Identgruppe
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
-import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
+import no.nav.familie.baks.mottak.integrasjoner.OppgaveClientService
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveVurderLivshendelseDto
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.integrasjoner.PdlNotFoundException
 import no.nav.familie.baks.mottak.integrasjoner.PdlPersonData
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakIdOgTilknyttetAktørId
@@ -21,7 +21,6 @@ import no.nav.familie.baks.mottak.integrasjoner.RestVisningBehandling
 import no.nav.familie.baks.mottak.integrasjoner.Sivilstand
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
-import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
@@ -30,6 +29,7 @@ import no.nav.familie.kontrakter.felles.oppgave.StatusEnum
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.error.RekjørSenereException
+import no.nav.familie.restklient.config.jsonMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -42,8 +42,8 @@ import java.util.Locale
 
 @Service
 class VurderLivshendelseService(
-    private val oppgaveClient: OppgaveClient,
-    private val pdlClient: PdlClient,
+    private val oppgaveClient: OppgaveClientService,
+    private val pdlClientService: PdlClientService,
     private val baSakClient: BaSakClient,
     private val ksSakClient: KsSakClient,
     private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient,
@@ -62,12 +62,12 @@ class VurderLivshendelseService(
         task: Task,
         tema: Tema,
     ) {
-        val payload = objectMapper.readValue(task.payload, VurderLivshendelseTaskDTO::class.java)
+        val payload = jsonMapper.readValue(task.payload, VurderLivshendelseTaskDTO::class.java)
         val personIdent = payload.personIdent
         val type = payload.type
 
         try {
-            val identer = pdlClient.hentIdenter(personIdent = personIdent, tema)
+            val identer = pdlClientService.hentIdenter(personIdent = personIdent, tema)
             if (identer.firstOrNull { it.ident == personIdent }?.gruppe != Identgruppe.FOLKEREGISTERIDENT.name) {
                 log.warn("Hendelse ignoreres siden ident ikke er av gruppe FOLKEREGISTERIDENT")
                 secureLog.warn("Hendelse ignoreres siden ident ikke er av gruppe FOLKEREGISTERIDENT $identer")
@@ -82,7 +82,7 @@ class VurderLivshendelseService(
         when (type) {
             VurderLivshendelseType.DØDSFALL -> {
                 secureLog.info("Har mottatt dødsfallshendelse for person $personIdent")
-                val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-relasjon-dødsfall", tema)
+                val pdlPersonData = pdlClientService.hentPerson(personIdent, "hentperson-relasjon-dødsfall", tema)
                 secureLog.info("dødsfallshendelse person fødselsdato = ${pdlPersonData.fødsel.firstOrNull()}")
 
                 val berørteBrukere = finnBrukereBerørtAvDødsfallEllerUtflyttingHendelseForIdent(personIdent, tema)
@@ -136,7 +136,7 @@ class VurderLivshendelseService(
                     throw RuntimeException("Det er bare tema ${Tema.BAR} som støtter sivilstand hendelser")
                 }
 
-                val pdlPersonData = pdlClient.hentPerson(personIdent, "hentperson-sivilstand", tema)
+                val pdlPersonData = pdlClientService.hentPerson(personIdent, "hentperson-sivilstand", tema)
                 val sivilstand =
                     finnNyesteSivilstandEndring(pdlPersonData) ?: run {
                         secureLog.info("Ignorerer sivilstandhendelse for $personIdent uten dato: $pdlPersonData")
@@ -212,7 +212,7 @@ class VurderLivshendelseService(
                 leggTilNyPersonIBeskrivelse(
                     beskrivelse = "${hendelseType.beskrivelse}:",
                     personIdent = personIdent,
-                    personErBruker = pdlClient.hentAktørId(personIdent, tema) == aktørIdForOppgave,
+                    personErBruker = pdlClientService.hentAktørId(personIdent, tema) == aktørIdForOppgave,
                 )
             val restFagsak = hentRestFagsak(fagsakIdForOppgave, tema)
             val restBehandling = hentSisteBehandlingSomErIverksatt(restFagsak) ?: hentAktivBehandling(restFagsak)
@@ -452,7 +452,7 @@ class VurderLivshendelseService(
 
         val initiellBeskrivelse =
             hentInitiellBeskrivelseForSivilstandOppgave(
-                personErBruker = pdlClient.hentAktørId(personIdent, tema) == aktørIdForOppgave,
+                personErBruker = pdlClientService.hentAktørId(personIdent, tema) == aktørIdForOppgave,
                 formatertDato = formatertDato,
                 personIdent = personIdent,
                 erGift = (sivilstandType == SIVILSTANDTYPE.GIFT),
@@ -493,7 +493,7 @@ class VurderLivshendelseService(
         tema: Tema,
     ): LocalDate? {
         val personIdenter =
-            pdlClient
+            pdlClientService
                 .hentIdenter(personIdent, tema)
                 .filter { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }
                 .map { it.ident }

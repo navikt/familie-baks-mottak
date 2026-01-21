@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.søknad.barnetrygd
 
-import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClient
+import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClientService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBVedlegg
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.FødselsnummerErNullException
@@ -25,7 +25,7 @@ class BarnetrygdSøknadService(
     private val søknadRepository: SøknadRepository,
     private val vedleggRepository: SøknadVedleggRepository,
     private val taskService: TaskService,
-    private val vedleggClient: FamilieDokumentClient,
+    private val vedleggClient: FamilieDokumentClientService,
 ) {
     @Transactional
     @Throws(FødselsnummerErNullException::class)

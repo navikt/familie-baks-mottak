@@ -6,8 +6,8 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
 import no.nav.familie.kontrakter.felles.Tema
-import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.restklient.config.jsonMapper
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
@@ -24,7 +24,7 @@ class VurderKontantstøtteLivshendelseTaskTest {
             Task(
                 type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
                 payload =
-                    objectMapper.writeValueAsString(
+                    jsonMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
                             "123",
                             VurderLivshendelseType.DØDSFALL,

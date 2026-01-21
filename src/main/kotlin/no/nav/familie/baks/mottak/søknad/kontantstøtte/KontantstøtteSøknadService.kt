@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.søknad.kontantstøtte
 
-import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClient
+import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClientService
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteVedlegg
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.FødselsnummerErNullException
@@ -25,7 +25,7 @@ class KontantstøtteSøknadService(
     private val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
     private val kontantstøtteVedleggRepository: KontantstøtteVedleggRepository,
     private val taskService: TaskService,
-    private val vedleggClient: FamilieDokumentClient,
+    private val vedleggClient: FamilieDokumentClientService,
 ) {
     @Transactional
     @Throws(FødselsnummerErNullException::class)

@@ -12,7 +12,7 @@ class JdbcConfig(
     jdbcTemplate: JdbcTemplate,
 ) {
     init {
-        jdbcTemplate.dataSource.connection.use { conn ->
+        jdbcTemplate.dataSource!!.connection.use { conn ->
             ScriptUtils.executeSqlScript(conn, ClassPathResource("sql/prosessering_jdbc.sql"))
         }
     }

@@ -6,9 +6,8 @@ import no.nav.familie.baks.mottak.integrasjoner.DokarkivClient
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.baks.mottak.integrasjoner.PdfClient
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.søknad.FamiliePdfClient
-import no.nav.familie.http.client.RessursException
 import no.nav.familie.kontrakter.felles.BrukerIdType
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentResponse
@@ -18,9 +17,11 @@ import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import no.nav.familie.kontrakter.felles.journalpost.Journalposttype
 import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
+import no.nav.familie.restklient.client.RessursException
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
@@ -61,7 +62,7 @@ class ClientMocks {
         } answers {
             throw RessursException(
                 Ressurs(status = Ressurs.Status.FEILET, data = null, melding = "", stacktrace = ""),
-                HttpClientErrorException.Conflict.create(HttpStatus.CONFLICT, null, null, null, null),
+                HttpClientErrorException.Conflict.create(HttpStatus.CONFLICT, "", HttpHeaders(), null, null),
                 HttpStatus.CONFLICT,
             )
         }
@@ -129,10 +130,7 @@ class ClientMocks {
 
     @Bean
     @Profile("mock-pdl")
-    fun mockPdlClient(): PdlClient {
-        val mockPdlClient = mockk<PdlClient>(relaxed = true)
-        return mockPdlClient
-    }
+    fun mockPdlClientService(): PdlClientService = mockk<PdlClientService>(relaxed = true)
 
     @Bean
     @Primary

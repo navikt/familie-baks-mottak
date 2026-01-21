@@ -7,13 +7,13 @@ import no.nav.familie.baks.mottak.søknad.JournalføringService
 import no.nav.familie.baks.mottak.søknad.PdfService
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
-import no.nav.familie.http.client.RessursException
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV6
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.restklient.client.RessursException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service

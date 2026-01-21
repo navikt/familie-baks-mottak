@@ -12,9 +12,9 @@ import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus.LØPENDE
 import no.nav.familie.baks.mottak.integrasjoner.IdentInformasjon
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
-import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
+import no.nav.familie.baks.mottak.integrasjoner.OppgaveClientService
 import no.nav.familie.baks.mottak.integrasjoner.Opphørsgrunn.MIGRERT
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.integrasjoner.StatusKode
 import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringBarnetrygdService
@@ -39,9 +39,9 @@ import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 class NavnoHendelseTaskLøypeTest {
     private val mockJournalpostClient: JournalpostClient = mockk()
     private val mockSakClient: BaSakClient = mockk()
-    private val mockOppgaveClient: OppgaveClient = mockk(relaxed = true)
+    private val mockOppgaveClient: OppgaveClientService = mockk(relaxed = true)
     private val mockTaskService: TaskService = mockk(relaxed = true)
-    private val mockPdlClient: PdlClient = mockk(relaxed = true)
+    private val mockPdlClient: PdlClientService = mockk(relaxed = true)
     private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
     private val mockFeatureToggleService: FeatureToggleService = mockk()
     private val mockAutomatiskJournalføringBarnetrygdService: AutomatiskJournalføringBarnetrygdService = mockk()
@@ -49,7 +49,7 @@ class NavnoHendelseTaskLøypeTest {
 
     private val rutingSteg =
         JournalhendelseBarnetrygdRutingTask(
-            pdlClient = mockPdlClient,
+            pdlClientService = mockPdlClient,
             baSakClient = mockSakClient,
             infotrygdBarnetrygdClient = mockInfotrygdBarnetrygdClient,
             taskService = mockTaskService,

@@ -1,6 +1,5 @@
 package no.nav.familie.baks.mottak.task
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.domene.NyBehandling
@@ -8,7 +7,7 @@ import no.nav.familie.baks.mottak.domene.personopplysning.Person
 import no.nav.familie.baks.mottak.domene.personopplysning.PersonIdent
 import no.nav.familie.baks.mottak.domene.personopplysning.harAdresseGradering
 import no.nav.familie.baks.mottak.domene.personopplysning.harBostedsadresse
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.integrasjoner.erUtenforNorge
 import no.nav.familie.baks.mottak.util.erBostNummer
 import no.nav.familie.baks.mottak.util.erDnummer
@@ -23,6 +22,7 @@ import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import tools.jackson.module.kotlin.jacksonObjectMapper
 
 @Service
 @TaskStepBeskrivelse(
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Service
 )
 class MottaFødselshendelseTask(
     private val taskService: TaskService,
-    private val pdlClient: PdlClient,
+    private val pdlClientService: PdlClientService,
 ) : AsyncTaskStep {
     val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
     val barnHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.barn.har.dnr.eller.fdatnr")
@@ -49,7 +49,7 @@ class MottaFødselshendelseTask(
             return
         }
 
-        val pdlPersonData = pdlClient.hentPerson(barnetsId, "hentperson-fødested", Tema.BAR)
+        val pdlPersonData = pdlClientService.hentPerson(barnetsId, "hentperson-fødested", Tema.BAR)
         if (pdlPersonData.fødested.first().erUtenforNorge()) {
             log.info("Fødeland er ikke Norge. Ignorerer hendelse")
             fødselIgnorertFødelandCounter.increment()
@@ -57,7 +57,7 @@ class MottaFødselshendelseTask(
         }
 
         try {
-            val personMedRelasjoner = pdlClient.hentPersonMedRelasjoner(barnetsId, Tema.BAR)
+            val personMedRelasjoner = pdlClientService.hentPersonMedRelasjoner(barnetsId, Tema.BAR)
 
             val morsIdent = hentMor(personMedRelasjoner)
 

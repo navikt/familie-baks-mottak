@@ -10,7 +10,7 @@ import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus
 import no.nav.familie.baks.mottak.integrasjoner.IdentInformasjon
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.integrasjoner.PdlNotFoundException
 import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
 import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringKontantstøtteService
@@ -33,7 +33,7 @@ import java.util.Properties
 import kotlin.test.assertEquals
 
 class JournalhendelseKontantstøtteRutingTaskTest {
-    private val pdlClient: PdlClient = mockk()
+    private val pdlClient: PdlClientService = mockk()
     private val taskService: TaskService = mockk()
     private val ksSakClient: KsSakClient = mockk()
     private val journalpostClient: JournalpostClient = mockk()

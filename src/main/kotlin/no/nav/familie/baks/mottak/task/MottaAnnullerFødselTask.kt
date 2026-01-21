@@ -1,7 +1,6 @@
 package no.nav.familie.baks.mottak.task
 
 import no.nav.familie.baks.mottak.integrasjoner.RestAnnullerFødsel
-import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Avvikstype
@@ -9,6 +8,7 @@ import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.familie.prosessering.rest.RestTaskService
+import no.nav.familie.restklient.config.jsonMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Pageable
@@ -27,7 +27,7 @@ class MottaAnnullerFødselTask(
     val log: Logger = LoggerFactory.getLogger(MottaAnnullerFødselTask::class.java)
 
     override fun doTask(task: Task) {
-        val restAnnullerFødsel = objectMapper.readValue(task.payload, RestAnnullerFødsel::class.java)
+        val restAnnullerFødsel = jsonMapper.readValue(task.payload, RestAnnullerFødsel::class.java)
         val tidligereHendelseId = restAnnullerFødsel.tidligereHendelseId
 
         val tasker =

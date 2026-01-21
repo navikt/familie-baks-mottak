@@ -8,7 +8,7 @@ import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.integrasjoner.PdlNotFoundException
 import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringBarnetrygdService
 import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
@@ -27,7 +27,7 @@ import java.util.Properties
 import kotlin.test.assertEquals
 
 class JournalhendelseBarnetrygdRutingTaskTest {
-    private val pdlClient: PdlClient = mockk()
+    private val pdlClient: PdlClientService = mockk()
     private val baSakClient: BaSakClient = mockk()
     private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
     private val taskService: TaskService = mockk()
@@ -38,7 +38,7 @@ class JournalhendelseBarnetrygdRutingTaskTest {
 
     private val journalhendelseBarnetrygdRutingTask: JournalhendelseBarnetrygdRutingTask =
         JournalhendelseBarnetrygdRutingTask(
-            pdlClient = pdlClient,
+            pdlClientService = pdlClient,
             baSakClient = baSakClient,
             infotrygdBarnetrygdClient = infotrygdBarnetrygdClient,
             taskService = taskService,

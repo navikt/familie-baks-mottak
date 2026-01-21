@@ -1,6 +1,5 @@
 package no.nav.familie.baks.mottak.søknad.kontantstøtte.domene
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -9,12 +8,12 @@ import jakarta.persistence.Id
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.Vedlegg
-import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.ks.søknad.StøttetVersjonertKontantstøtteSøknad
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV6
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsvedlegg
+import no.nav.familie.restklient.config.jsonMapper
 import java.time.LocalDateTime
 import no.nav.familie.kontrakter.ks.søknad.v4.KontantstøtteSøknad as KontantstøtteSøknadV4
 import no.nav.familie.kontrakter.ks.søknad.v5.KontantstøtteSøknad as KontantstøtteSøknadV5
@@ -39,7 +38,7 @@ data class DBKontantstøtteSøknad(
     @Column(name = "journalpost_id")
     val journalpostId: String? = null,
 ) {
-    fun hentVersjonertKontantstøtteSøknad(): StøttetVersjonertKontantstøtteSøknad = objectMapper.readValue<StøttetVersjonertKontantstøtteSøknad>(søknadJson)
+    fun hentVersjonertKontantstøtteSøknad(): StøttetVersjonertKontantstøtteSøknad = jsonMapper.readValue(søknadJson, StøttetVersjonertKontantstøtteSøknad::class.java)
 }
 
 fun DBKontantstøtteSøknad.harEøsSteg(): Boolean {
@@ -66,7 +65,7 @@ data class DBKontantstotteVedlegg(
 fun KontantstøtteSøknadV4.tilDBKontantstøtteSøknad(): DBKontantstøtteSøknad {
     try {
         return DBKontantstøtteSøknad(
-            søknadJson = objectMapper.writeValueAsString(this),
+            søknadJson = jsonMapper.writeValueAsString(this),
             fnr =
                 this.søker.ident.verdi
                     .getValue("nb"),
@@ -79,7 +78,7 @@ fun KontantstøtteSøknadV4.tilDBKontantstøtteSøknad(): DBKontantstøtteSøkna
 fun KontantstøtteSøknadV5.tilDBKontantstøtteSøknad(): DBKontantstøtteSøknad {
     try {
         return DBKontantstøtteSøknad(
-            søknadJson = objectMapper.writeValueAsString(this),
+            søknadJson = jsonMapper.writeValueAsString(this),
             fnr =
                 this.søker.ident.verdi
                     .getValue("nb"),
@@ -92,7 +91,7 @@ fun KontantstøtteSøknadV5.tilDBKontantstøtteSøknad(): DBKontantstøtteSøkna
 fun KontantstøtteSøknadV6.tilDBKontantstøtteSøknad(): DBKontantstøtteSøknad {
     try {
         return DBKontantstøtteSøknad(
-            søknadJson = objectMapper.writeValueAsString(this),
+            søknadJson = jsonMapper.writeValueAsString(this),
             fnr =
                 this.søker.ident.verdi
                     .getValue("nb"),

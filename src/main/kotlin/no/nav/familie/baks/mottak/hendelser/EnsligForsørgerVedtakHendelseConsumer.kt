@@ -3,8 +3,8 @@ package no.nav.familie.baks.mottak.hendelser
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.kontrakter.felles.ef.EnsligForsørgerVedtakhendelse
-import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.log.mdc.MDCConstants
+import no.nav.familie.restklient.config.jsonMapper
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -50,7 +50,7 @@ class EnsligForsørgerVedtakHendelseConsumer(
             MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
             logger.info("$TOPIC_EF_VEDTAK melding mottatt. Offset: ${consumerRecord.offset()}")
             secureLogger.info("$TOPIC_EF_VEDTAK melding mottatt. Offset: ${consumerRecord.offset()} Key: ${consumerRecord.key()} Value: ${consumerRecord.value()}")
-            objectMapper
+            jsonMapper
                 .readValue(consumerRecord.value(), EnsligForsørgerVedtakhendelse::class.java)
                 .also {
                     vedtakOmOvergangsstønadService.prosesserEfVedtakHendelse(consumerRecord.offset(), it)

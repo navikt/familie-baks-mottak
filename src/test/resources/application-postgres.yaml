@@ -103,3 +103,5 @@ JOURNALFOERINGHENDELSE_V1_TOPIC_AIVEN_URL: teamdokumenthandtering.aapen-dok-jour
 # Disabler unleash her for å unngå feilmeldinger tilknyttet oppkobling når vi uansett mocker alle unleash-kall i testene.
 unleash:
   enabled: false
+
+retry.backoff.delay: 5

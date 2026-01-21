@@ -1,11 +1,11 @@
 package no.nav.familie.baks.mottak.søknad.barnetrygd
 
-import com.fasterxml.jackson.core.JsonGenerator
-import com.fasterxml.jackson.databind.JsonSerializer
-import com.fasterxml.jackson.databind.SerializerProvider
-import com.fasterxml.jackson.databind.module.SimpleModule
 import no.nav.familie.kontrakter.ba.søknad.v4.Søknadsfelt
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
+import tools.jackson.core.JsonGenerator
+import tools.jackson.databind.SerializationContext
+import tools.jackson.databind.ValueSerializer
+import tools.jackson.databind.module.SimpleModule
 
 class BarnetrygdSøknadObjectMapperModule(
     språk: String,
@@ -18,32 +18,36 @@ class BarnetrygdSøknadObjectMapperModule(
 
 class SøknaddokumentasjonSerializer(
     private val språk: String,
-) : JsonSerializer<Søknaddokumentasjon>() {
+) : ValueSerializer<Søknaddokumentasjon>() {
     override fun serialize(
         dokumentasjon: Søknaddokumentasjon,
         jsonGenerator: JsonGenerator,
-        serializerProvider: SerializerProvider,
-    ) = jsonGenerator.writeObject(
-        mapOf(
-            "dokumentasjonsbehov" to dokumentasjon.dokumentasjonsbehov,
-            "harSendtInn" to dokumentasjon.harSendtInn,
-            "opplastedeVedlegg" to dokumentasjon.opplastedeVedlegg,
-            "dokumentasjonSpråkTittel" to dokumentasjon.dokumentasjonSpråkTittel[språk],
-        ),
-    )
+        serializerProvider: SerializationContext,
+    ) {
+        jsonGenerator.writePOJO(
+            mapOf(
+                "dokumentasjonsbehov" to dokumentasjon.dokumentasjonsbehov,
+                "harSendtInn" to dokumentasjon.harSendtInn,
+                "opplastedeVedlegg" to dokumentasjon.opplastedeVedlegg,
+                "dokumentasjonSpråkTittel" to dokumentasjon.dokumentasjonSpråkTittel[språk],
+            ),
+        )
+    }
 }
 
 class SøknadsfeltSerializer(
     private val språk: String,
-) : JsonSerializer<Søknadsfelt<*>>() {
+) : ValueSerializer<Søknadsfelt<*>>() {
     override fun serialize(
         søknadsFelt: Søknadsfelt<*>,
         jsonGenerator: JsonGenerator,
-        serializerProvider: SerializerProvider,
-    ) = jsonGenerator.writeObject(
-        mapOf(
-            "label" to søknadsFelt.label[språk],
-            "verdi" to søknadsFelt.verdi[språk],
-        ),
-    )
+        serializerProvider: SerializationContext,
+    ) {
+        jsonGenerator.writePOJO(
+            mapOf(
+                "label" to søknadsFelt.label[språk],
+                "verdi" to søknadsFelt.verdi[språk],
+            ),
+        )
+    }
 }

@@ -1,11 +1,11 @@
 package no.nav.familie.baks.mottak.søknad.kontantstøtte
 
-import com.fasterxml.jackson.core.JsonGenerator
-import com.fasterxml.jackson.databind.JsonSerializer
-import com.fasterxml.jackson.databind.SerializerProvider
-import com.fasterxml.jackson.databind.module.SimpleModule
 import no.nav.familie.kontrakter.felles.søknad.Søknadsfelt
 import no.nav.familie.kontrakter.ks.søknad.v1.TekstPåSpråkMap
+import tools.jackson.core.JsonGenerator
+import tools.jackson.databind.SerializationContext
+import tools.jackson.databind.ValueSerializer
+import tools.jackson.databind.module.SimpleModule
 
 class KontantstøtteObjectMapperModule(
     språk: String,
@@ -18,27 +18,31 @@ class KontantstøtteObjectMapperModule(
 
 class SøknadsfeltSerializer(
     private val språk: String,
-) : JsonSerializer<Søknadsfelt<*>>() {
+) : ValueSerializer<Søknadsfelt<*>>() {
     override fun serialize(
         søknadsFelt: Søknadsfelt<*>,
         jsonGenerator: JsonGenerator,
-        serializerProvider: SerializerProvider,
-    ) = jsonGenerator.writeObject(
-        mapOf(
-            "label" to søknadsFelt.label[språk],
-            "verdi" to søknadsFelt.verdi[språk],
-        ),
-    )
+        serializerProvider: SerializationContext,
+    ) {
+        jsonGenerator.writePOJO(
+            mapOf(
+                "label" to søknadsFelt.label[språk],
+                "verdi" to søknadsFelt.verdi[språk],
+            ),
+        )
+    }
 }
 
 class TekstPåSpråkMapSerializer(
     private val språk: String,
-) : JsonSerializer<TekstPåSpråkMap>() {
+) : ValueSerializer<TekstPåSpråkMap>() {
     override fun serialize(
         tekstPåSpråkMap: TekstPåSpråkMap,
         jsonGenerator: JsonGenerator,
-        serializerProvider: SerializerProvider,
-    ) = jsonGenerator.writeObject(
-        tekstPåSpråkMap[språk],
-    )
+        serializerProvider: SerializationContext,
+    ) {
+        jsonGenerator.writePOJO(
+            tekstPåSpråkMap[språk],
+        )
+    }
 }

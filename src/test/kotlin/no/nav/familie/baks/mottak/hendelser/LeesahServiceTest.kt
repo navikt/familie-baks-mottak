@@ -12,9 +12,9 @@ import no.nav.familie.baks.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseTask
 import no.nav.familie.baks.mottak.task.VurderFinnmarkstillleggTaskDTO
 import no.nav.familie.baks.mottak.task.VurderKontantstøtteLivshendelseTask
-import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.familie.restklient.config.jsonMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.byLessThan
 import org.junit.jupiter.api.BeforeEach
@@ -244,7 +244,7 @@ class LeesahServiceTest {
         assertThat(task.metadata["ident"]).isEqualTo(ident)
         assertThat(task.triggerTid).isCloseTo(LocalDateTime.now(), byLessThan(3, MINUTES))
 
-        val payload = objectMapper.readValue(taskSlot.captured.payload, VurderFinnmarkstillleggTaskDTO::class.java)
+        val payload = jsonMapper.readValue(taskSlot.captured.payload, VurderFinnmarkstillleggTaskDTO::class.java)
         assertThat(payload.ident).isEqualTo(ident)
         assertThat(payload.bostedskommune).isEqualTo(bostedskommune)
         assertThat(payload.bostedskommuneFomDato).isEqualTo(bostedskommuneFomDato)

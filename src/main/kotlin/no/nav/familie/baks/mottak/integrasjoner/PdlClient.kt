@@ -3,22 +3,19 @@ package no.nav.familie.baks.mottak.integrasjoner
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.familie.baks.mottak.domene.personopplysning.Person
-import no.nav.familie.http.client.AbstractRestClient
-import no.nav.familie.http.util.UriUtil
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.kontrakter.felles.personopplysning.ForelderBarnRelasjon
 import no.nav.familie.kontrakter.felles.personopplysning.Oppholdsadresse
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE
+import no.nav.familie.restklient.client.AbstractRestClient
+import no.nav.familie.restklient.util.UriUtil
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.retry.annotation.Backoff
-import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
 import java.net.URI
@@ -31,8 +28,6 @@ class PdlClient(
 ) : AbstractRestClient(restTemplate, "pdl.personinfo") {
     private val pdlUri = UriUtil.uri(pdlBaseUrl, PATH_GRAPHQL)
 
-    @Retryable(value = [RuntimeException::class], maxAttempts = 3, backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"))
-    @Cacheable("hentIdenter", cacheManager = "hourlyCacheManager")
     fun hentIdenter(
         personIdent: String,
         tema: Tema,

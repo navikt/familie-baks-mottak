@@ -93,7 +93,7 @@ KAFKA_BROKERS: http://localhost:9092
 #Brukes til tilgangskontroll av familie-ks-mottak-frontend
 MOTTAK_ROLLE: group1
 NORG2_API_URL: #mockes ut i test
-PDL_URL: dummy
+PDL_URL: http://dummy
 CREDENTIAL_USERNAME: not-a-real-srvuser
 CREDENTIAL_PASSWORD: not-a-real-pw
 NAIS_APP_NAME: familie-baks-mottak
