@@ -4,6 +4,7 @@ import no.nav.familie.baks.mottak.journalføring.AdressebeskyttelesesgraderingSe
 import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
+import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -21,6 +22,7 @@ class EnhetsnummerService(
 
     fun hentEnhetsnummer(
         journalpost: Journalpost,
+        behandlingstype: Behandlingstype?,
     ): String? {
         val journalpostTema = journalpost.tema
 
@@ -47,18 +49,18 @@ class EnhetsnummerService(
                 "2103"
             }
 
+            // Enhet 2101 er nedlagt. Rutes til 4806
             journalførendeEnhet == "2101" -> {
                 "4806"
             }
 
-            // Enhet 2101 er nedlagt. Rutes til 4806
+            // Enhet 4847 skal legges ned. Rutes til 4817
             journalførendeEnhet == "4847" -> {
                 "4817"
             }
 
-            // Enhet 4847 skal legges ned. Rutes til 4817
             journalpost.harDigitalSøknad(tema) -> {
-                arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(journalpostBrukerService.tilPersonIdent(journalpostBruker, tema), tema).enhetId
+                arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(journalpostBrukerService.tilPersonIdent(journalpostBruker, tema), tema, behandlingstype).enhetId
             }
 
             journalførendeEnhet.isNullOrBlank() -> {

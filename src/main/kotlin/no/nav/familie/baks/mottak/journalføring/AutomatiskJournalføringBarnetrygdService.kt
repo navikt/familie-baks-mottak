@@ -4,6 +4,7 @@ import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
+import no.nav.familie.baks.mottak.integrasjoner.BarnetrygdOppgaveMapper
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
 import no.nav.familie.kontrakter.felles.BrukerIdType
 import no.nav.familie.kontrakter.felles.Tema
@@ -17,6 +18,7 @@ class AutomatiskJournalføringBarnetrygdService(
     private val arbeidsfordelingClient: ArbeidsfordelingClient,
     private val adressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService,
     private val journalpostBrukerService: JournalpostBrukerService,
+    private val barnetrygdOppgaveMapper: BarnetrygdOppgaveMapper,
 ) {
     private val tema = Tema.BAR
 
@@ -64,7 +66,8 @@ class AutomatiskJournalføringBarnetrygdService(
         }
 
         val personIdent = journalpostBrukerService.tilPersonIdent(bruker, tema)
-        val enhetId = arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdent, tema).enhetId
+        val behandlingstype = barnetrygdOppgaveMapper.hentBehandlingstype(journalpost)
+        val enhetId = arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdent, tema, behandlingstype).enhetId
 
         if (enhetId in enheterSomIkkeSkalHaAutomatiskJournalføring) {
             return false

@@ -11,4 +11,6 @@ enum class FeatureToggle(
 
     // Ny pdf kvittering
     NY_FAMILIE_PDF_KVITTERING("familie-ba-soknad.ny-pdf"),
+
+    HENT_ARBEIDSFORDELING_MED_BEHANDLINGSTYPE("familie-baks-mottak.hent-arbeidsfordeling-med-behandlingstype"),
 }
