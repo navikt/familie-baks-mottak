@@ -1,7 +1,7 @@
 package no.nav.familie.baks.mottak.journalføring
 
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
+import no.nav.familie.baks.mottak.integrasjoner.KontantstøtteOppgaveMapper
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
 import no.nav.familie.kontrakter.felles.BrukerIdType
@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service
 
 @Service
 class AutomatiskJournalføringKontantstøtteService(
-    private val featureToggleService: FeatureToggleService,
     private val arbeidsfordelingClient: ArbeidsfordelingClient,
     private val ksSakClient: KsSakClient,
     private val adressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService,
     private val journalpostBrukerService: JournalpostBrukerService,
+    private val kontantstøtteOppgaveMapper: KontantstøtteOppgaveMapper,
 ) {
     private val tema = Tema.KON
     private val enheterSomIkkeSkalHaAutomatiskJournalføring = listOf("4863")
@@ -42,7 +42,8 @@ class AutomatiskJournalføringKontantstøtteService(
         }
 
         val personIdent = journalpostBrukerService.tilPersonIdent(bruker, tema)
-        val enhetId = arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdent, tema).enhetId
+        val behandlingstype = kontantstøtteOppgaveMapper.hentBehandlingstype(journalpost)
+        val enhetId = arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdent, tema, behandlingstype).enhetId
 
         if (enhetId in enheterSomIkkeSkalHaAutomatiskJournalføring) {
             return false

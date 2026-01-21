@@ -56,7 +56,7 @@ class OppgaveMapperTest(
 
     @BeforeEach
     fun beforeEach() {
-        every { mockEnhetsnummerService.hentEnhetsnummer(any()) } returns "1234"
+        every { mockEnhetsnummerService.hentEnhetsnummer(any(), any()) } returns "1234"
     }
 
     @Test

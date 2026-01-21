@@ -6,6 +6,7 @@ import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
+import no.nav.familie.baks.mottak.integrasjoner.BarnetrygdOppgaveMapper
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingStatus
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingType
@@ -22,6 +23,7 @@ import no.nav.familie.kontrakter.felles.journalpost.Dokumentstatus
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import no.nav.familie.kontrakter.felles.journalpost.Journalposttype
 import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
+import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -33,6 +35,8 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
     private val mockedArbeidsfordelingClient: ArbeidsfordelingClient = mockk()
     private val mockedAdressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService = mockk()
     private val mockedJournalpostBrukerService: JournalpostBrukerService = mockk()
+    private val mockedBarnetrygdOppgaveMapper: BarnetrygdOppgaveMapper = mockk()
+
     private val automatiskJournalføringBarnetrygdService: AutomatiskJournalføringBarnetrygdService =
         AutomatiskJournalføringBarnetrygdService(
             featureToggleService = mockedFeatureToggleService,
@@ -40,11 +44,13 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             arbeidsfordelingClient = mockedArbeidsfordelingClient,
             adressebeskyttelesesgraderingService = mockedAdressebeskyttelesesgraderingService,
             journalpostBrukerService = mockedJournalpostBrukerService,
+            barnetrygdOppgaveMapper = mockedBarnetrygdOppgaveMapper,
         )
 
     @BeforeEach
     internal fun setUp() {
         every { mockedFeatureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
+        every { mockedBarnetrygdOppgaveMapper.hentBehandlingstype(any()) } returns Behandlingstype.NASJONAL
     }
 
     @Test
@@ -195,6 +201,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
                 personIdent = identifikator,
                 tema = Tema.BAR,
+                behandlingstype = any(),
             )
         } returns
             Enhet(
@@ -291,6 +298,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
                 personIdent = identifikator,
                 tema = Tema.BAR,
+                behandlingstype = any(),
             )
         } returns
             Enhet(
@@ -453,6 +461,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
                 personIdent = identifikator,
                 tema = Tema.BAR,
+                behandlingstype = any(),
             )
         } returns
             Enhet(
@@ -540,6 +549,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
                 personIdent = identifikator,
                 tema = Tema.BAR,
+                behandlingstype = any(),
             )
         } returns
             Enhet(
@@ -625,6 +635,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
                 personIdent = identifikator,
                 tema = Tema.BAR,
+                behandlingstype = any(),
             )
         } returns
             Enhet(
@@ -705,6 +716,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
                 personIdent = identifikator,
                 tema = Tema.BAR,
+                behandlingstype = any(),
             )
         } returns
             Enhet(
@@ -799,6 +811,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
                 personIdent = identifikator,
                 tema = Tema.BAR,
+                behandlingstype = any(),
             )
         } returns
             Enhet(
@@ -884,6 +897,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
             mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
                 personIdent = identifikator,
                 tema = Tema.BAR,
+                behandlingstype = any(),
             )
         } returns
             Enhet(
