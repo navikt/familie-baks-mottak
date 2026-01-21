@@ -5,9 +5,12 @@ import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import no.nav.familie.baks.mottak.AbstractWiremockTest
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle.HENT_ARBEIDSFORDELING_MED_BEHANDLINGSTYPE
+import no.nav.familie.baks.mottak.fake.FakeFeatureToggleService
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -22,9 +25,12 @@ class ArbeidsfordelingClientTest : AbstractWiremockTest() {
     @Autowired
     lateinit var arbeidsfordelingClient: ArbeidsfordelingClient
 
+    @Autowired
+    lateinit var featureToggleService: FakeFeatureToggleService
+
     @Test
     @Tag("integration")
-    fun `hentBehandlendeEnheterPåIdent skal returnere enhet på person`() {
+    fun `hentBehandlendeEnheterPåIdent skal returnere enhet på person uten behandlingstype-parameter`() {
         stubFor(
             WireMock.post(urlEqualTo("/api/arbeidsfordeling/enhet/KON")).withRequestBody(WireMock.equalToJson("""{"ident":"123"}""")).willReturn(
                 aResponse().withHeader("Content-Type", "application/json").withBody(
@@ -37,6 +43,30 @@ class ArbeidsfordelingClientTest : AbstractWiremockTest() {
             arbeidsfordelingClient.hentBehandlendeEnheterPåIdent(
                 personIdent = "123",
                 tema = Tema.KON,
+                behandlingstype = null,
+            )
+        assertThat(response.single().enhetId).isEqualTo("4863")
+        assertThat(response.single().enhetNavn).isEqualTo("NAV Familie- og pensjonsytelser midlertidig enhet")
+    }
+
+    @Test
+    @Tag("integration")
+    fun `hentBehandlendeEnheterPåIdent skal returnere enhet på person med behandlingstype-parameter`() {
+        featureToggleService.set(HENT_ARBEIDSFORDELING_MED_BEHANDLINGSTYPE, true)
+
+        stubFor(
+            WireMock.post(urlEqualTo("/api/arbeidsfordeling/enhet/KON?behandlingstype=E%C3%98S")).withRequestBody(WireMock.equalToJson("""{"ident":"123"}""")).willReturn(
+                aResponse().withHeader("Content-Type", "application/json").withBody(
+                    gyldigEnhetResponse(),
+                ),
+            ),
+        )
+
+        val response =
+            arbeidsfordelingClient.hentBehandlendeEnheterPåIdent(
+                personIdent = "123",
+                tema = Tema.KON,
+                behandlingstype = Behandlingstype.EØS,
             )
         assertThat(response.single().enhetId).isEqualTo("4863")
         assertThat(response.single().enhetNavn).isEqualTo("NAV Familie- og pensjonsytelser midlertidig enhet")
@@ -57,6 +87,7 @@ class ArbeidsfordelingClientTest : AbstractWiremockTest() {
             arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
                 personIdent = "123",
                 tema = Tema.KON,
+                behandlingstype = null,
             )
         assertThat(response.enhetId).isEqualTo("4863")
         assertThat(response.enhetNavn).isEqualTo("NAV Familie- og pensjonsytelser midlertidig enhet")
@@ -78,9 +109,10 @@ class ArbeidsfordelingClientTest : AbstractWiremockTest() {
                 arbeidsfordelingClient.hentBehandlendeEnheterPåIdent(
                     personIdent = "123",
                     tema = Tema.KON,
+                    behandlingstype = null,
                 )
             }
-        assertThat(response.message).isEqualTo("Feil ved henting av behandlende enheter på ident m/ tema ${Tema.KON}")
+        assertThat(response.message).isEqualTo("Feil ved henting av behandlende enheter på ident m/ tema ${Tema.KON} og behandlingstype null")
     }
 
     @Test
@@ -99,9 +131,10 @@ class ArbeidsfordelingClientTest : AbstractWiremockTest() {
                 arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
                     personIdent = "123",
                     tema = Tema.KON,
+                    behandlingstype = null,
                 )
             }
-        assertThat(response.message).isEqualTo("Feil ved henting av behandlende enheter på ident m/ tema ${Tema.KON}")
+        assertThat(response.message).isEqualTo("Feil ved henting av behandlende enheter på ident m/ tema ${Tema.KON} og behandlingstype null")
     }
 
     @Test
@@ -120,6 +153,7 @@ class ArbeidsfordelingClientTest : AbstractWiremockTest() {
                 arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
                     personIdent = "123",
                     tema = Tema.KON,
+                    behandlingstype = null,
                 )
             }
         assertThat(response.message).isEqualTo("Forventet bare 1 enhet på ident men fantes flere")
