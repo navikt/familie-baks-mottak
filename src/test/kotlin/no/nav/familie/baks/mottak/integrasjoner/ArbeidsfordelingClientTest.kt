@@ -9,8 +9,8 @@ import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle.HENT_ARBEID
 import no.nav.familie.baks.mottak.fake.FakeFeatureToggleService
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Tema
-import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
+import no.nav.familie.restklient.config.jsonMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -30,7 +30,7 @@ class ArbeidsfordelingClientTest : AbstractWiremockTest() {
 
     @Test
     @Tag("integration")
-    fun `hentBehandlendeEnheterPåIdent skal returnere enhet på person uten behandlingstype-parameter`() {
+    fun `hentBehandlendeEnheterPåIdent skal returnere enhet på person`() {
         stubFor(
             WireMock.post(urlEqualTo("/api/arbeidsfordeling/enhet/KON")).withRequestBody(WireMock.equalToJson("""{"ident":"123"}""")).willReturn(
                 aResponse().withHeader("Content-Type", "application/json").withBody(
@@ -99,7 +99,7 @@ class ArbeidsfordelingClientTest : AbstractWiremockTest() {
         stubFor(
             WireMock.post(urlEqualTo("/api/arbeidsfordeling/enhet/KON")).withRequestBody(WireMock.equalToJson("""{"ident":"123"}""")).willReturn(
                 aResponse().withStatus(500).withBody(
-                    objectMapper.writeValueAsString(Ressurs.failure<String>("test")),
+                    jsonMapper.writeValueAsString(Ressurs.failure<String>("test")),
                 ),
             ),
         )
@@ -121,7 +121,7 @@ class ArbeidsfordelingClientTest : AbstractWiremockTest() {
         stubFor(
             WireMock.post(urlEqualTo("/api/arbeidsfordeling/enhet/KON")).withRequestBody(WireMock.equalToJson("""{"ident":"123"}""")).willReturn(
                 aResponse().withStatus(500).withBody(
-                    objectMapper.writeValueAsString(Ressurs.failure<String>("test")),
+                    jsonMapper.writeValueAsString(Ressurs.failure<String>("test")),
                 ),
             ),
         )

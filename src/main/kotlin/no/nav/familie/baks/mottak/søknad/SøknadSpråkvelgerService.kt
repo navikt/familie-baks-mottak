@@ -1,7 +1,5 @@
 package no.nav.familie.baks.mottak.søknad
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.convertValue
 import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadObjectMapperModule
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteObjectMapperModule
 import no.nav.familie.kontrakter.ba.søknad.StøttetVersjonertBarnetrygdSøknad
@@ -13,7 +11,9 @@ import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV6
 import org.springframework.stereotype.Service
-import no.nav.familie.kontrakter.felles.objectMapper as getObjectMapper
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.convertValue
+import tools.jackson.module.kotlin.jsonMapper
 
 @Service
 class SøknadSpråkvelgerService {
@@ -58,9 +58,10 @@ class SøknadSpråkvelgerService {
         return kontantstøtteSøknadMapForSpråk
     }
 
-    fun hentObjectMapperForSpråk(språk: String): ObjectMapper =
-        getObjectMapper.registerModules(
-            BarnetrygdSøknadObjectMapperModule(språk),
-            KontantstøtteObjectMapperModule(språk),
-        )
+    fun hentObjectMapperForSpråk(språk: String): JsonMapper =
+
+        jsonMapper {
+            addModule(BarnetrygdSøknadObjectMapperModule(språk))
+            addModule(KontantstøtteObjectMapperModule(språk))
+        }
 }

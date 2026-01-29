@@ -12,7 +12,7 @@ import java.util.Locale
 
 @Service
 class EnhetsnummerService(
-    private val hentEnhetClient: HentEnhetClient,
+    private val hentEnhetClient: HentEnhetClientService,
     private val arbeidsfordelingClient: ArbeidsfordelingClient,
     private val adressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService,
     private val journalpostBrukerService: JournalpostBrukerService,

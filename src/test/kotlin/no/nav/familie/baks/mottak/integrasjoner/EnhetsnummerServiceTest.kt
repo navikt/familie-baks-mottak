@@ -20,7 +20,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 
 class EnhetsnummerServiceTest {
-    private val mockedHentEnhetClient: HentEnhetClient = mockk()
+    private val mockedHentEnhetClient: HentEnhetClientService = mockk()
     private val mockedArbeidsfordelingClient: ArbeidsfordelingClient = mockk()
     private val mockedAdressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService = mockk()
     private val mockedJournalpostBrukerService: JournalpostBrukerService = mockk()

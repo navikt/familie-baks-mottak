@@ -1,7 +1,6 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
 import no.nav.familie.baks.mottak.util.fristFerdigstillelse
-import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
@@ -13,14 +12,13 @@ import no.nav.familie.kontrakter.felles.oppgave.OppgaveIdentV2
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.kontrakter.felles.oppgave.OpprettOppgaveRequest
+import no.nav.familie.restklient.client.AbstractRestClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.NestedExceptionUtils
-import org.springframework.retry.annotation.Backoff
-import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestOperations
 import java.net.URI
@@ -54,11 +52,6 @@ class OppgaveClient
             return responseFraOpprettOppgave(uri, request)
         }
 
-        @Retryable(
-            value = [RuntimeException::class],
-            maxAttempts = 3,
-            backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
-        )
         fun opprettVurderLivshendelseOppgave(dto: OppgaveVurderLivshendelseDto): OppgaveResponse {
             logger.info("Oppretter \"Vurder livshendelse\"-oppgave")
 
@@ -83,11 +76,6 @@ class OppgaveClient
             return responseFraOpprettOppgave(uri, request)
         }
 
-        @Retryable(
-            value = [RuntimeException::class],
-            maxAttempts = 3,
-            backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
-        )
         fun oppdaterOppgaveBeskrivelse(
             patchOppgave: Oppgave,
             beskrivelse: String,
@@ -110,11 +98,6 @@ class OppgaveClient
                 )
         }
 
-        @Retryable(
-            value = [RuntimeException::class],
-            maxAttempts = 3,
-            backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
-        )
         fun finnOppgaver(
             journalpostId: String,
             oppgavetype: Oppgavetype?,
@@ -148,11 +131,6 @@ class OppgaveClient
                 )
         }
 
-        @Retryable(
-            value = [RuntimeException::class],
-            maxAttempts = 3,
-            backoff = Backoff(delayExpression = "\${retry.backoff.delay:5000}"),
-        )
         fun finnOppgaverPåAktørId(
             aktørId: String,
             oppgavetype: Oppgavetype,

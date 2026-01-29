@@ -13,8 +13,8 @@ import no.nav.familie.kontrakter.felles.journalpost.DokumentInfo
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import no.nav.familie.kontrakter.felles.journalpost.Journalposttype
 import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
-import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
+import no.nav.familie.restklient.config.jsonMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -22,13 +22,13 @@ import java.time.LocalDateTime
 
 class BarnetrygdOppgaveMapperTest {
     private val enhetsnummerService: EnhetsnummerService = mockk()
-    private val pdlClient: PdlClient = mockk()
+    private val pdlClient: PdlClientService = mockk()
     private val søknadRepository: SøknadRepository = mockk()
 
     private val barnetrygdOppgaveMapper =
         BarnetrygdOppgaveMapper(
             enhetsnummerService = enhetsnummerService,
-            pdlClient = pdlClient,
+            pdlClientService = pdlClient,
             søknadRepository = søknadRepository,
         )
 
@@ -166,7 +166,7 @@ class BarnetrygdOppgaveMapperTest {
             every { søknadRepository.getByJournalpostId(journalpost.journalpostId) } returns
                 DBBarnetrygdSøknad(
                     id = 0,
-                    søknadJson = objectMapper.writeValueAsString(SøknadTestData.barnetrygdSøknad()),
+                    søknadJson = jsonMapper.writeValueAsString(SøknadTestData.barnetrygdSøknad()),
                     fnr = "12345678093",
                     opprettetTid = LocalDateTime.now(),
                 )

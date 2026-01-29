@@ -1,13 +1,13 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle.HENT_ARBEIDSFORDELING_MED_BEHANDLINGSTYPE
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
-import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.PersonIdent
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.arbeidsfordeling.Enhet
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
+import no.nav.familie.restklient.client.AbstractRestClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -32,7 +32,7 @@ class ArbeidsfordelingClient(
                 .fromUri(integrasjonUri)
                 .pathSegment("arbeidsfordeling", "enhet", tema.toString())
                 .let {
-                    if (featureToggleService.isEnabled(HENT_ARBEIDSFORDELING_MED_BEHANDLINGSTYPE, false)) {
+                    if (featureToggleService.isEnabled(FeatureToggle.HENT_ARBEIDSFORDELING_MED_BEHANDLINGSTYPE, false)) {
                         it.queryParamIfPresent("behandlingstype", ofNullable(behandlingstype))
                     } else {
                         it

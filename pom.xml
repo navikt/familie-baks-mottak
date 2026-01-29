@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.8</version>
+        <version>4.0.1</version>
     </parent>
 
     <properties>
@@ -25,13 +25,13 @@
         <confluent.version>8.1.0</confluent.version>
         <prosessering.version>2.20251117095517_cc54714</prosessering.version>
 
-        <felles.version>3.20251105152539_b03ed80</felles.version>
-        <kontrakter.version>3.0_20251113093018_87a80f3</kontrakter.version>
+        <felles.version>4.20260107095404_1a56161</felles.version>
+        <kontrakter.version>4.0_20260114160523_30f07e4</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
-        <token-validation-spring.version>5.0.39</token-validation-spring.version>
-        <avro.version>1.12.1</avro.version>
 
+        <token-validation-spring.version>6.0.0</token-validation-spring.version>
+        <avro.version>1.12.1</avro.version>
 
         <!-- Http Client - nyeste versjon fra httpclient(5.5.1) skaper problemer med Spring Boot 3.5.7. Issue: HTTPCLIENT-2405. Skal være fikset i 3.5.8, men bør testes -->
         <httpclient5.version>5.5</httpclient5.version>
@@ -66,12 +66,16 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <artifactId>spring-boot-starter-kafka</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-flyway</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -82,14 +86,13 @@
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.retry</groupId>
-            <artifactId>spring-retry</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jackson</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aspects</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-restclient</artifactId>
         </dependency>
-
 
         <!-- Kotlin -->
         <dependency>
@@ -128,7 +131,7 @@
         </dependency>
         <dependency>
             <groupId>no.nav.familie.felles</groupId>
-            <artifactId>http-client</artifactId>
+            <artifactId>rest-klient</artifactId>
             <version>${felles.version}</version>
         </dependency>
         <dependency>
@@ -377,7 +380,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <fork>true</fork>
                     <mainClass>${main-class}</mainClass>
                 </configuration>
                 <executions>
@@ -494,6 +496,13 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <forkedProcessExitTimeoutInSeconds>10</forkedProcessExitTimeoutInSeconds>
+                </configuration>
             </plugin>
         </plugins>
     </build>

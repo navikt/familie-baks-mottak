@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class SøknadsidenterServiceTest {
-    private val baksVersjonertSøknadClient: BaksVersjonertSøknadClient = mockk()
+    private val baksVersjonertSøknadClient: BaksVersjonertSøknadClientService = mockk()
     private val søknadsidenterService: SøknadsidenterService = SøknadsidenterService(baksVersjonertSøknadClient)
 
     @Nested

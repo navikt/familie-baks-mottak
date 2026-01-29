@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service
 
 abstract class AbstractOppgaveMapper(
     private val enhetsnummerService: EnhetsnummerService,
-    private val pdlClient: PdlClient,
+    private val pdlClientService: PdlClientService,
 ) : IOppgaveMapper {
     override fun tilOpprettOppgaveRequest(
         oppgavetype: Oppgavetype,
@@ -124,7 +124,7 @@ abstract class AbstractOppgaveMapper(
         tema: Tema,
     ): String? =
         try {
-            pdlClient
+            pdlClientService
                 .hentIdenter(brukerId, tema)
                 .filter { it.gruppe == Identgruppe.AKTORID.name && !it.historisk }
                 .lastOrNull()
@@ -138,7 +138,7 @@ abstract class AbstractOppgaveMapper(
     ): Boolean {
         return when (journalpost.bruker?.type) {
             BrukerIdType.FNR -> erDnummer(journalpost.bruker!!.id)
-            BrukerIdType.AKTOERID -> erDnummer(pdlClient.hentPersonident(journalpost.bruker!!.id, tema).takeIf { it.isNotEmpty() } ?: return false)
+            BrukerIdType.AKTOERID -> erDnummer(pdlClientService.hentPersonident(journalpost.bruker!!.id, tema).takeIf { it.isNotEmpty() } ?: return false)
             else -> false
         }
     }

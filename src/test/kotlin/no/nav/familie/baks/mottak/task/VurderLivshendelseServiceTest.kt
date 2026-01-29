@@ -17,9 +17,10 @@ import no.nav.familie.baks.mottak.integrasjoner.Fødsel
 import no.nav.familie.baks.mottak.integrasjoner.IdentInformasjon
 import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
-import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
+import no.nav.familie.baks.mottak.integrasjoner.OppgaveClientService
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveVurderLivshendelseDto
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.integrasjoner.PdlForeldreBarnRelasjon
 import no.nav.familie.baks.mottak.integrasjoner.PdlNotFoundException
 import no.nav.familie.baks.mottak.integrasjoner.PdlPersonData
@@ -32,7 +33,6 @@ import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.kontrakter.ba.infotrygd.Stønad
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
-import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import no.nav.familie.kontrakter.felles.oppgave.IdentGruppe
 import no.nav.familie.kontrakter.felles.oppgave.Oppgave
@@ -40,6 +40,7 @@ import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE
 import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.restklient.config.jsonMapper
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -54,10 +55,10 @@ import java.time.YearMonth
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VurderLivshendelseServiceTest {
-    private val mockOppgaveClient: OppgaveClient = mockk()
+    private val mockOppgaveClient: OppgaveClientService = mockk()
     private val mockBaSakClient: BaSakClient = mockk()
     private val mockKsSakClient: KsSakClient = mockk()
-    private val mockPdlClient: PdlClient = mockk(relaxed = true)
+    private val mockPdlClient: PdlClientService = mockk(relaxed = true)
     private val mockInfotrygdClient: InfotrygdBarnetrygdClient = mockk()
 
     private val vurderLivshendelseService =
@@ -133,7 +134,7 @@ class VurderLivshendelseServiceTest {
             Task(
                 type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
                 payload =
-                    objectMapper.writeValueAsString(
+                    jsonMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
                             PERSONIDENT_BARN,
                             livshendelseType,
@@ -200,7 +201,7 @@ class VurderLivshendelseServiceTest {
             Task(
                 type = VurderBarnetrygdLivshendelseTask.TASK_STEP_TYPE,
                 payload =
-                    objectMapper.writeValueAsString(
+                    jsonMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
                             PERSONIDENT_MOR,
                             livshendelseType,
@@ -284,7 +285,7 @@ class VurderLivshendelseServiceTest {
             Task(
                 type = VurderKontantstøtteLivshendelseTask.TASK_STEP_TYPE,
                 payload =
-                    objectMapper.writeValueAsString(
+                    jsonMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
                             PERSONIDENT_MOR,
                             livshendelseType,
@@ -352,7 +353,7 @@ class VurderLivshendelseServiceTest {
             Task(
                 type = VurderKontantstøtteLivshendelseTask.TASK_STEP_TYPE,
                 payload =
-                    objectMapper.writeValueAsString(
+                    jsonMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
                             PERSONIDENT_BARN,
                             livshendelseType,
@@ -421,7 +422,7 @@ class VurderLivshendelseServiceTest {
             Task(
                 type = VurderKontantstøtteLivshendelseTask.TASK_STEP_TYPE,
                 payload =
-                    objectMapper.writeValueAsString(
+                    jsonMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
                             PERSONIDENT_BARN,
                             livshendelseType,
@@ -479,7 +480,7 @@ class VurderLivshendelseServiceTest {
             Task(
                 type = VurderKontantstøtteLivshendelseTask.TASK_STEP_TYPE,
                 payload =
-                    objectMapper.writeValueAsString(
+                    jsonMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
                             PERSONIDENT_MOR,
                             VurderLivshendelseType.SIVILSTAND,
@@ -521,7 +522,7 @@ class VurderLivshendelseServiceTest {
                 Task(
                     type = VurderKontantstøtteLivshendelseTask.TASK_STEP_TYPE,
                     payload =
-                        objectMapper.writeValueAsString(
+                        jsonMapper.writeValueAsString(
                             VurderLivshendelseTaskDTO(
                                 PERSONIDENT_MOR,
                                 VurderLivshendelseType.SIVILSTAND,
@@ -561,7 +562,7 @@ class VurderLivshendelseServiceTest {
             Task(
                 type = VurderKontantstøtteLivshendelseTask.TASK_STEP_TYPE,
                 payload =
-                    objectMapper.writeValueAsString(
+                    jsonMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
                             PERSONIDENT_MOR,
                             VurderLivshendelseType.DØDSFALL,
@@ -588,7 +589,7 @@ class VurderLivshendelseServiceTest {
             Task(
                 type = VurderKontantstøtteLivshendelseTask.TASK_STEP_TYPE,
                 payload =
-                    objectMapper.writeValueAsString(
+                    jsonMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
                             PERSONIDENT_BARN,
                             VurderLivshendelseType.DØDSFALL,
@@ -616,7 +617,7 @@ class VurderLivshendelseServiceTest {
             Task(
                 type = VurderKontantstøtteLivshendelseTask.TASK_STEP_TYPE,
                 payload =
-                    objectMapper.writeValueAsString(
+                    jsonMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
                             PERSONIDENT_BARN2,
                             VurderLivshendelseType.DØDSFALL,
@@ -636,7 +637,7 @@ class VurderLivshendelseServiceTest {
             Task(
                 type = VurderKontantstøtteLivshendelseTask.TASK_STEP_TYPE,
                 payload =
-                    objectMapper.writeValueAsString(
+                    jsonMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
                             UKJENT_PERSONIDENT,
                             VurderLivshendelseType.SIVILSTAND,
@@ -659,7 +660,7 @@ class VurderLivshendelseServiceTest {
             Task(
                 type = VurderKontantstøtteLivshendelseTask.TASK_STEP_TYPE,
                 payload =
-                    objectMapper.writeValueAsString(
+                    jsonMapper.writeValueAsString(
                         VurderLivshendelseTaskDTO(
                             UKJENT_PERSONIDENT,
                             VurderLivshendelseType.SIVILSTAND,

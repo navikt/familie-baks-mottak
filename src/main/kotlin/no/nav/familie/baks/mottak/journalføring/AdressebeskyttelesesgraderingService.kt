@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.journalføring
 
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.integrasjoner.SøknadsidenterService
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.journalpost.Bruker
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class AdressebeskyttelesesgraderingService(
-    private val pdlClient: PdlClient,
+    private val pdlClientService: PdlClientService,
     private val søknadsidenterService: SøknadsidenterService,
     private val journalpostBrukerService: JournalpostBrukerService,
 ) {
@@ -27,7 +27,7 @@ class AdressebeskyttelesesgraderingService(
             }
 
         return alleIdenter
-            .map { pdlClient.hentPerson(it, "hentperson-med-adressebeskyttelse", tema) }
+            .map { pdlClientService.hentPerson(it, "hentperson-med-adressebeskyttelse", tema) }
             .flatMap { it.adressebeskyttelse }
             .any { it.gradering.erStrengtFortrolig() }
     }
@@ -39,7 +39,7 @@ class AdressebeskyttelesesgraderingService(
         val journalpostBruker = journalpost.bruker ?: throw IllegalStateException("Bruker på journalpost ${journalpost.journalpostId} kan ikke være null")
         val journalpostBrukerIdent = journalpostBrukerService.tilPersonIdent(journalpostBruker, tema)
 
-        return pdlClient.hentPerson(journalpostBrukerIdent, "hentperson-med-adressebeskyttelse", tema).adressebeskyttelse.any { it.gradering.erStrengtFortrolig() }
+        return pdlClientService.hentPerson(journalpostBrukerIdent, "hentperson-med-adressebeskyttelse", tema).adressebeskyttelse.any { it.gradering.erStrengtFortrolig() }
     }
 
     private fun finnIdenterForKontantstøtte(

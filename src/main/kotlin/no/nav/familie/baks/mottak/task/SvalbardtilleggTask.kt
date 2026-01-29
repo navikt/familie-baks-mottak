@@ -1,7 +1,7 @@
 package no.nav.familie.baks.mottak.task
 
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.OppholdAnnetSted
 import no.nav.familie.kontrakter.felles.personopplysning.Oppholdsadresse
@@ -26,7 +26,7 @@ import java.util.Properties
     triggerTidVedFeilISekunder = 60,
 )
 class SvalbardtilleggTask(
-    private val pdlClient: PdlClient,
+    private val pdlClientService: PdlClientService,
     private val baSakClient: BaSakClient,
     private val taskService: TaskService,
     private val environment: Environment,
@@ -34,7 +34,7 @@ class SvalbardtilleggTask(
     override fun doTask(task: Task) {
         val ident = task.payload
 
-        val oppholdsadresser = pdlClient.hentPerson(ident, "hentperson-med-oppholdsadresse", Tema.BAR).oppholdsadresse
+        val oppholdsadresser = pdlClientService.hentPerson(ident, "hentperson-med-oppholdsadresse", Tema.BAR).oppholdsadresse
         val ingenOppholdsadressePåSvalbard = oppholdsadresser.none { it.erPåSvalbard() }
         if (ingenOppholdsadressePåSvalbard) {
             secureLogger.info("Det finnes ingen oppholdsadresse på Svalbard for ident $ident, hopper ut av SvalbardtilleggTask.")

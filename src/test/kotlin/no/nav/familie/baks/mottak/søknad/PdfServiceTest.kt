@@ -1,9 +1,5 @@
 package no.nav.familie.baks.mottak.søknad
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -16,6 +12,7 @@ import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV10
 import no.nav.familie.kontrakter.ba.søknad.v10.BarnetrygdSøknad
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV6
 import no.nav.familie.kontrakter.ks.søknad.v6.KontantstøtteSøknad
+import no.nav.familie.restklient.config.jsonMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -33,14 +30,10 @@ internal class PdfServiceTest {
         val jsonSlot = slot<Map<String, Any>>()
         every { mockFamilieDokumentPdfClient.lagPdf(any(), capture(jsonSlot)) } returns ByteArray(0)
 
-        val mapper = jacksonObjectMapper()
-        mapper.registerKotlinModule()
-        mapper.registerModule(JavaTimeModule())
-
         val jsonString: String =
             File("./src/test/kotlin/no/nav/familie/baks/mottak/søknad/testdata/barnetrygd-søknad.json")
                 .readText(Charsets.UTF_8)
-        val barnetrygdSøknad: BarnetrygdSøknad = mapper.readValue(jsonString)
+        val barnetrygdSøknad: BarnetrygdSøknad = jsonMapper.readValue(jsonString, BarnetrygdSøknad::class.java)
         val dbBarnetrygdSøknad: DBBarnetrygdSøknad = barnetrygdSøknad.tilDBSøknad()
         pdfService.lagBarnetrygdPdf(VersjonertBarnetrygdSøknadV10(barnetrygdSøknad = barnetrygdSøknad), dbBarnetrygdSøknad, språk = "nb")
 
@@ -56,14 +49,10 @@ internal class PdfServiceTest {
         val jsonSlot = slot<Map<String, Any>>()
         every { mockFamilieDokumentPdfClient.lagPdf(any(), capture(jsonSlot)) } returns ByteArray(0)
 
-        val mapper = jacksonObjectMapper()
-        mapper.registerKotlinModule()
-        mapper.registerModule(JavaTimeModule())
-
         val jsonString: String =
             File("./src/test/kotlin/no/nav/familie/baks/mottak/søknad/testdata/kontantstøtte-søknad.json")
                 .readText(Charsets.UTF_8)
-        val kontantstøtteSøknad: KontantstøtteSøknad = mapper.readValue(jsonString)
+        val kontantstøtteSøknad: KontantstøtteSøknad = jsonMapper.readValue(jsonString, KontantstøtteSøknad::class.java)
         val dbKontantstøtteSøknad: DBKontantstøtteSøknad = kontantstøtteSøknad.tilDBKontantstøtteSøknad()
         pdfService.lagKontantstøttePdf(VersjonertKontantstøtteSøknadV6(kontantstøtteSøknad = kontantstøtteSøknad), dbKontantstøtteSøknad, språk = "nb")
 

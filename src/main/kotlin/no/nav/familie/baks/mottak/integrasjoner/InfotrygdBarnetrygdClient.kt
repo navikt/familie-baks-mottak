@@ -1,8 +1,8 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
-import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkRequest
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
+import no.nav.familie.restklient.client.AbstractRestClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component

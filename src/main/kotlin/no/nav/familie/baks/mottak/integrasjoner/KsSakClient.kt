@@ -1,7 +1,7 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
-import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
+import no.nav.familie.restklient.client.AbstractRestClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value

@@ -5,7 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import no.nav.familie.baks.mottak.AbstractWiremockTest
-import no.nav.familie.kontrakter.felles.objectMapper
+import no.nav.familie.restklient.config.jsonMapper
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
@@ -18,7 +18,7 @@ import org.springframework.test.context.ActiveProfiles
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class HentEnhetClientTest : AbstractWiremockTest() {
     @Autowired
-    lateinit var client: HentEnhetClient
+    lateinit var client: HentEnhetClientService
 
     @Test
     @Tag("integration")
@@ -28,7 +28,7 @@ class HentEnhetClientTest : AbstractWiremockTest() {
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(Enhet("1234", "enhetNavn", true, "Aktiv"))),
+                        .withBody(jsonMapper.writeValueAsString(Enhet("1234", "enhetNavn", true, "Aktiv"))),
                 ),
         )
 
@@ -65,7 +65,7 @@ class HentEnhetClientTest : AbstractWiremockTest() {
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(Enhet("1234", "gammeltNavn", true, "Aktiv"))),
+                        .withBody(jsonMapper.writeValueAsString(Enhet("1234", "gammeltNavn", true, "Aktiv"))),
                 ),
         )
 
@@ -76,7 +76,7 @@ class HentEnhetClientTest : AbstractWiremockTest() {
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(Enhet("1234", "Nytt navn", true, "Aktiv"))),
+                        .withBody(jsonMapper.writeValueAsString(Enhet("1234", "Nytt navn", true, "Aktiv"))),
                 ),
         )
 

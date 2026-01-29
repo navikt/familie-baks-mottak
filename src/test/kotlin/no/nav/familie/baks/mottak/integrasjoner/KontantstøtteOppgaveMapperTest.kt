@@ -12,8 +12,8 @@ import no.nav.familie.kontrakter.felles.journalpost.DokumentInfo
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import no.nav.familie.kontrakter.felles.journalpost.Journalposttype
 import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
-import no.nav.familie.kontrakter.felles.objectMapper
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
+import no.nav.familie.restklient.config.jsonMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -21,13 +21,13 @@ import java.time.LocalDateTime
 
 class KontantstøtteOppgaveMapperTest {
     private val enhetsnummerService: EnhetsnummerService = mockk()
-    private val pdlClient: PdlClient = mockk()
+    private val pdlClient: PdlClientService = mockk()
     private val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository = mockk()
 
     private val kontantstøtteOppgaveMapper =
         KontantstøtteOppgaveMapper(
             enhetsnummerService = enhetsnummerService,
-            pdlClient = pdlClient,
+            pdlClientService = pdlClient,
             kontantstøtteSøknadRepository = kontantstøtteSøknadRepository,
         )
 
@@ -78,7 +78,7 @@ class KontantstøtteOppgaveMapperTest {
             every { kontantstøtteSøknadRepository.getByJournalpostId(journalpost.journalpostId) } returns
                 DBKontantstøtteSøknad(
                     id = 0,
-                    søknadJson = objectMapper.writeValueAsString(KontantstøtteSøknadTestData.kontantstøtteSøknad()),
+                    søknadJson = jsonMapper.writeValueAsString(KontantstøtteSøknadTestData.kontantstøtteSøknad()),
                     fnr = "12345678093",
                     opprettetTid = LocalDateTime.now(),
                 )
@@ -114,7 +114,7 @@ class KontantstøtteOppgaveMapperTest {
             every { kontantstøtteSøknadRepository.getByJournalpostId(journalpost.journalpostId) } returns
                 DBKontantstøtteSøknad(
                     id = 0,
-                    søknadJson = objectMapper.writeValueAsString(KontantstøtteSøknadTestData.kontantstøtteSøknad()),
+                    søknadJson = jsonMapper.writeValueAsString(KontantstøtteSøknadTestData.kontantstøtteSøknad()),
                     fnr = dnummer,
                     opprettetTid = LocalDateTime.now(),
                 )

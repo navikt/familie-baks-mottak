@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class SøknadsidenterService(
-    private val baksVersjonertSøknadClient: BaksVersjonertSøknadClient,
+    private val baksVersjonertSøknadClient: BaksVersjonertSøknadClientService,
 ) {
     fun hentIdenterFraBarnetrygdSøknad(
         journalpostId: String,
