@@ -2,13 +2,13 @@ package no.nav.familie.baks.mottak.journalføring
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingStatus
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingType
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingUnderkategori
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus
+import no.nav.familie.baks.mottak.integrasjoner.KontantstøtteOppgaveMapper
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
 import no.nav.familie.baks.mottak.integrasjoner.RestVisningBehandling
@@ -21,25 +21,32 @@ import no.nav.familie.kontrakter.felles.journalpost.Dokumentstatus
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import no.nav.familie.kontrakter.felles.journalpost.Journalposttype
 import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
+import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 class AutomatiskJournalføringKontantstøtteServiceTest {
-    private val mockedFeatureToggleService: FeatureToggleService = mockk()
     private val mockedArbeidsfordelingClient: ArbeidsfordelingClient = mockk()
     private val mockedKsSakClient: KsSakClient = mockk()
     private val mockedAdressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService = mockk()
     private val mockedJournalpostBrukerService: JournalpostBrukerService = mockk()
+    private val mockedKontantstøtteOppgaveMapper: KontantstøtteOppgaveMapper = mockk()
 
     private val automatiskJournalføringKontantstøtteService: AutomatiskJournalføringKontantstøtteService =
         AutomatiskJournalføringKontantstøtteService(
-            featureToggleService = mockedFeatureToggleService,
             arbeidsfordelingClient = mockedArbeidsfordelingClient,
             ksSakClient = mockedKsSakClient,
             adressebeskyttelesesgraderingService = mockedAdressebeskyttelesesgraderingService,
             journalpostBrukerService = mockedJournalpostBrukerService,
+            kontantstøtteOppgaveMapper = mockedKontantstøtteOppgaveMapper,
         )
+
+    @BeforeEach
+    internal fun setUp() {
+        every { mockedKontantstøtteOppgaveMapper.hentBehandlingstype(any()) } returns Behandlingstype.NASJONAL
+    }
 
     @Test
     fun `skal automatisk journalføre journalposten`() {
@@ -101,6 +108,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
             mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
                 personIdent = identifikator,
                 tema = Tema.KON,
+                behandlingstype = any(),
             )
         } returns
             Enhet(
@@ -175,6 +183,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
             mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
                 personIdent = identifikator,
                 tema = Tema.KON,
+                behandlingstype = any(),
             )
         } returns
             Enhet(
@@ -312,6 +321,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
             mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
                 personIdent = identifikator,
                 tema = Tema.KON,
+                behandlingstype = any(),
             )
         } returns
             Enhet(
@@ -446,6 +456,7 @@ class AutomatiskJournalføringKontantstøtteServiceTest {
             mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
                 personIdent = identifikator,
                 tema = Tema.KON,
+                behandlingstype = any(),
             )
         } returns
             Enhet(

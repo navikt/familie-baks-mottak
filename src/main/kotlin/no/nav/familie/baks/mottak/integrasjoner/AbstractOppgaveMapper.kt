@@ -25,6 +25,7 @@ abstract class AbstractOppgaveMapper(
     ): OpprettOppgaveRequest {
         validerJournalpost(journalpost)
         val ident = tilOppgaveIdent(journalpost, oppgavetype)
+        val behandlingstype = hentBehandlingstype(journalpost)
         return OpprettOppgaveRequest(
             ident = ident,
             saksId = journalpost.sak?.fagsakId,
@@ -33,9 +34,9 @@ abstract class AbstractOppgaveMapper(
             oppgavetype = oppgavetype,
             fristFerdigstillelse = fristFerdigstillelse(),
             beskrivelse = tilBeskrivelse(journalpost, beskrivelse),
-            enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost),
+            enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost, behandlingstype),
             behandlingstema = hentBehandlingstemaVerdi(journalpost),
-            behandlingstype = hentBehandlingstypeVerdi(journalpost),
+            behandlingstype = behandlingstype?.value,
         )
     }
 

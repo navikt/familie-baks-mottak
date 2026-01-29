@@ -6,6 +6,7 @@ import no.nav.familie.baks.mottak.journalføring.AdressebeskyttelesesgraderingSe
 import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
 import no.nav.familie.kontrakter.felles.BrukerIdType
 import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.arbeidsfordeling.Enhet
 import no.nav.familie.kontrakter.felles.journalpost.Bruker
 import no.nav.familie.kontrakter.felles.journalpost.DokumentInfo
 import no.nav.familie.kontrakter.felles.journalpost.Dokumentstatus
@@ -23,6 +24,7 @@ class EnhetsnummerServiceTest {
     private val mockedArbeidsfordelingClient: ArbeidsfordelingClient = mockk()
     private val mockedAdressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService = mockk()
     private val mockedJournalpostBrukerService: JournalpostBrukerService = mockk()
+
     private val enhetsnummerService: EnhetsnummerService =
         EnhetsnummerService(
             hentEnhetClient = mockedHentEnhetClient,
@@ -61,7 +63,7 @@ class EnhetsnummerServiceTest {
         } returns false
 
         // Act
-        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
+        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost, null)
 
         // Assert
         assertThat(enhetsnummer).isEqualTo("4806")
@@ -95,7 +97,7 @@ class EnhetsnummerServiceTest {
         } returns false
 
         // Act
-        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
+        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost, null)
 
         // Assert
         assertThat(enhetsnummer).isEqualTo("4817")
@@ -128,7 +130,7 @@ class EnhetsnummerServiceTest {
         } returns false
 
         // Act
-        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
+        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost, null)
 
         // Assert
         assertThat(enhetsnummer).isNull()
@@ -165,7 +167,7 @@ class EnhetsnummerServiceTest {
         } returns Enhet("1234", "enhetnavn", true, "Aktiv")
 
         // Act
-        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
+        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost, null)
 
         // Assert
         assertThat(enhetsnummer).isEqualTo("1234")
@@ -202,7 +204,7 @@ class EnhetsnummerServiceTest {
         } returns Enhet("1234", "enhetnavn", false, "Aktiv")
 
         // Act
-        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
+        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost, null)
 
         // Assert
         assertThat(enhetsnummer).isNull()
@@ -239,7 +241,7 @@ class EnhetsnummerServiceTest {
         } returns Enhet("1234", "enhetnavn", true, "Nedlagt")
 
         // Act
-        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
+        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost, null)
 
         // Assert
         assertThat(enhetsnummer).isNull()
@@ -273,7 +275,7 @@ class EnhetsnummerServiceTest {
         } returns true
 
         // Act
-        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
+        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost, null)
 
         // Assert
         assertThat(enhetsnummer).isEqualTo("2103")
@@ -296,7 +298,7 @@ class EnhetsnummerServiceTest {
         // Act & Assert
         val exception =
             assertThrows<IllegalStateException> {
-                enhetsnummerService.hentEnhetsnummer(journalpost)
+                enhetsnummerService.hentEnhetsnummer(journalpost, null)
             }
 
         assertThat(exception.message).isEqualTo("Tema er null")
@@ -320,7 +322,7 @@ class EnhetsnummerServiceTest {
             )
 
         // Act & Assert
-        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
+        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost, null)
 
         assertThat(enhetsnummer).isNull()
     }
@@ -357,12 +359,11 @@ class EnhetsnummerServiceTest {
         } returns "123456789"
 
         every {
-            mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(any(), any())
-        } returns
-            no.nav.familie.kontrakter.felles.arbeidsfordeling
-                .Enhet(enhetId = "789", "Hønefoss")
+            mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(any(), any(), any())
+        } returns Enhet(enhetId = "789", "Hønefoss")
+
         // Act
-        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost)
+        val enhetsnummer = enhetsnummerService.hentEnhetsnummer(journalpost, null)
 
         // Assert
         assertThat(enhetsnummer).isEqualTo("789")
