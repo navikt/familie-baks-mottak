@@ -18,14 +18,14 @@ class PdlClientService(
     ): List<IdentInformasjon> = pdlClient.hentIdenter(personIdent, tema)
 
     @Retryable(value = [RuntimeException::class], maxRetries = 3, delayString = ("\${retry.backoff.delay:5000}"), excludes = [PdlNotFoundException::class])
-    @Cacheable("hentIdenter", cacheManager = "hourlyCacheManager")
+    @Cacheable("hentPersonident", cacheManager = "hourlyCacheManager")
     fun hentPersonident(
         aktørId: String,
         tema: Tema,
     ): String = pdlClient.hentPersonident(aktørId, tema)
 
     @Retryable(value = [RuntimeException::class], maxRetries = 3, delayString = ("\${retry.backoff.delay:5000}"), excludes = [PdlNotFoundException::class])
-    @Cacheable("hentIdenter", cacheManager = "hourlyCacheManager")
+    @Cacheable("hentAktorId", cacheManager = "hourlyCacheManager")
     fun hentAktørId(
         personIdent: String,
         tema: Tema,
