@@ -26,7 +26,7 @@
         <prosessering.version>2.20251117095517_cc54714</prosessering.version>
 
         <felles.version>4.20260107095404_1a56161</felles.version>
-        <kontrakter.version>4.0_20260114160523_30f07e4</kontrakter.version>
+        <kontrakter.version>4.0_20260204122732_558ee1d</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
 
