@@ -6,8 +6,8 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
 import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.jsonMapper
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.restklient.config.jsonMapper
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 

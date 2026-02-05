@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.config
 
-import no.nav.familie.restklient.config.jsonMapper
+import no.nav.familie.kontrakter.felles.jsonMapper
 import no.nav.familie.restklient.interceptor.ConsumerIdClientInterceptor
 import no.nav.familie.restklient.interceptor.MdcValuesPropagatingClientInterceptor
 import org.springframework.boot.restclient.RestTemplateBuilder

@@ -2,10 +2,10 @@ package no.nav.familie.baks.mottak.task
 
 import no.nav.familie.baks.mottak.domene.NyBehandling
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClientService
+import no.nav.familie.kontrakter.felles.jsonMapper
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.restklient.config.jsonMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
