@@ -22,7 +22,7 @@
         <jvmTarget>25</jvmTarget>
         <kotlin.version>2.3.0</kotlin.version>
         <mockk.version>1.14.9</mockk.version>
-        <confluent.version>8.1.0</confluent.version>
+        <confluent.version>8.1.1</confluent.version>
         <prosessering.version>2.20251117095517_cc54714</prosessering.version>
 
         <felles.version>4.20260107095404_1a56161</felles.version>
@@ -213,7 +213,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.8</version>
+            <version>42.7.9</version>
         </dependency>
         <dependency>
             <groupId>com.papertrailapp</groupId>
