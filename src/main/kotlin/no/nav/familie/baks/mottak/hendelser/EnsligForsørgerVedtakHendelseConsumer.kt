@@ -3,8 +3,8 @@ package no.nav.familie.baks.mottak.hendelser
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.kontrakter.felles.ef.EnsligForsørgerVedtakhendelse
+import no.nav.familie.kontrakter.felles.jsonMapper
 import no.nav.familie.log.mdc.MDCConstants
-import no.nav.familie.restklient.config.jsonMapper
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

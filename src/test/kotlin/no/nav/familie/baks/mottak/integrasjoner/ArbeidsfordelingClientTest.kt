@@ -9,8 +9,8 @@ import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle.HENT_ARBEID
 import no.nav.familie.baks.mottak.fake.FakeFeatureToggleService
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Tema
+import no.nav.familie.kontrakter.felles.jsonMapper
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
-import no.nav.familie.restklient.config.jsonMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
