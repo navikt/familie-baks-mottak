@@ -116,7 +116,7 @@ class PdlClientTest : AbstractWiremockTest() {
     }
 
     @Test
-    fun hentPersonGraphqlReturnererFeilmeldingOgDetKastesEnIntegrajonsException() {
+    fun `hentPerson - kaster feilen PdlNotFoundException dersom personen ikke finnes i PDL`() {
         mockResponseForPdlQuery(
             pdlRequestBody = gyldigRequest("hentperson-relasjon-dødsfall.graphql", testIdent),
             mockResponse = readfile("mock-error-response.json"),
@@ -126,6 +126,19 @@ class PdlClientTest : AbstractWiremockTest() {
             pdlClient.hentPerson(testIdent, "hentperson-relasjon-dødsfall", Tema.BAR)
         }.isInstanceOf(PdlNotFoundException::class.java)
             .hasMessageContaining("Fant ingen person for ident")
+    }
+
+    @Test
+    fun `hentPerson - kaster feilen IntegrasjonException dersom vi mottar respons med feil og det ikke er not_found`() {
+        mockResponseForPdlQuery(
+            pdlRequestBody = gyldigRequest("hentperson-relasjon-dødsfall.graphql", testIdent),
+            mockResponse = readfile("mock-error-response-bad-request.json"),
+        )
+
+        assertThatThrownBy {
+            pdlClient.hentPerson(testIdent, "hentperson-relasjon-dødsfall", Tema.BAR)
+        }.isInstanceOf(IntegrasjonException::class.java)
+            .hasMessageContaining("Feil ved oppslag på hentPerson mot PDL: Fant ikke person")
     }
 
     @Test
