@@ -174,11 +174,16 @@ class PdlClient(
             }
 
         if (response.harFeil()) {
-            throw IntegrasjonException(
-                msg = "Feil ved oppslag på hentPerson mot PDL: ${response.errorMessages()}",
-                uri = pdlUri,
-                ident = personIdent,
-            )
+            if (response.errors?.any { it.extensions?.notFound() == true } == true) {
+                secureLogger.warn("Fant ikke person med ident: $personIdent i PDL")
+                throw PdlNotFoundException("Fant ingen person for ident", pdlUri, personIdent)
+            } else {
+                throw IntegrasjonException(
+                    msg = "Feil ved oppslag på hentPerson mot PDL: ${response.errorMessages()}",
+                    uri = pdlUri,
+                    ident = personIdent,
+                )
+            }
         } else if (response.harAdvarsel()) {
             log.warn("Advarsel ved oppslag på hentPerson mot PDL. Se securelogs for detaljer.")
             secureLogger.warn("Advarsel ved oppslag på hentPerson mot PDL: ${response.extensions?.warnings}")

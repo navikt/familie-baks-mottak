@@ -1,6 +1,7 @@
 package no.nav.familie.baks.mottak.journalføring
 
 import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
+import no.nav.familie.baks.mottak.integrasjoner.PdlNotFoundException
 import no.nav.familie.baks.mottak.integrasjoner.SøknadsidenterService
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.journalpost.Bruker
@@ -27,8 +28,14 @@ class AdressebeskyttelesesgraderingService(
             }
 
         return alleIdenter
-            .map { pdlClientService.hentPerson(it, "hentperson-med-adressebeskyttelse", tema) }
-            .flatMap { it.adressebeskyttelse }
+            .mapNotNull { ident ->
+                try {
+                    pdlClientService.hentPerson(ident, "hentperson-med-adressebeskyttelse", tema)
+                } catch (e: PdlNotFoundException) {
+                    // Ignorerer identer som ikke finnes i PDL, da det kan være tilfeller hvor ident er gyldig men ikke tilhører en person.
+                    null
+                }
+            }.flatMap { it.adressebeskyttelse }
             .any { it.gradering.erStrengtFortrolig() }
     }
 

@@ -1,0 +1,23 @@
+{
+  "errors": [
+    {
+      "message": "Fant ikke person",
+      "locations": [
+        {
+          "line": 1,
+          "column": 21
+        }
+      ],
+      "path": [
+        "person"
+      ],
+      "extensions": {
+        "code": "bad_request",
+        "classification": "ExecutionAborted"
+      }
+    }
+  ],
+  "data": {
+    "person": null
+  }
+}
