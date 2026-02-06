@@ -124,8 +124,8 @@ class PdlClientTest : AbstractWiremockTest() {
 
         assertThatThrownBy {
             pdlClient.hentPerson(testIdent, "hentperson-relasjon-dødsfall", Tema.BAR)
-        }.isInstanceOf(IntegrasjonException::class.java)
-            .hasMessageContaining("Feil ved oppslag på hentPerson mot PDL: Fant ikke person")
+        }.isInstanceOf(PdlNotFoundException::class.java)
+            .hasMessageContaining("Fant ingen person for ident")
     }
 
     @Test
