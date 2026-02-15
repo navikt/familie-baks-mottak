@@ -16,6 +16,8 @@ jobs:
     permissions:
       contents: read
     uses: navikt/familie-baks-gha-workflows/.github/workflows/ktlint.yaml@main # ratchet:exclude
+    with:
+      java-version: '25'
     secrets: inherit
 
   test:
@@ -24,6 +26,7 @@ jobs:
       contents: read
     uses: navikt/familie-baks-gha-workflows/.github/workflows/pull-request-maven.yaml@main # ratchet:exclude
     with:
+      java-version: '25'
       with-coverage: ${{ github.actor != 'dependabot[bot]' && github.event_name != 'merge_group' && true || false }}
       coverage-artifact-name: 'jacoco-coverage'
       coverage-artifact-path: 'target/coverage/jacoco.xml'
