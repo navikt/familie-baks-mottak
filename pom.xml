@@ -20,7 +20,7 @@
         <changelist>-SNAPSHOT</changelist>
         <java.version>25</java.version>
         <jvmTarget>25</jvmTarget>
-        <kotlin.version>2.3.0</kotlin.version>
+        <kotlin.version>2.3.10</kotlin.version>
         <mockk.version>1.14.9</mockk.version>
         <confluent.version>8.1.1</confluent.version>
         <prosessering.version>2.20260217151648_7114e56</prosessering.version>
@@ -213,7 +213,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.9</version>
+            <version>42.7.10</version>
         </dependency>
         <dependency>
             <groupId>com.papertrailapp</groupId>
