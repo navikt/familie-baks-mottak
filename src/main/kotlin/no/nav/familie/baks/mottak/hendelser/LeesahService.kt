@@ -58,6 +58,11 @@ class LeesahService(
     val leesahDuplikatCounter: Counter = Metrics.counter("hendelse.leesah.duplikat")
 
     fun prosesserNyHendelse(pdlHendelse: PdlHendelse) {
+        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
+            leesahDuplikatCounter.increment()
+            return
+        }
+
         when (pdlHendelse.opplysningstype) {
             OPPLYSNINGSTYPE_DØDSFALL -> behandleDødsfallHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_FØDSELSDATO -> behandleFødselsdatoHendelse(pdlHendelse)
@@ -66,14 +71,12 @@ class LeesahService(
             OPPLYSNINGSTYPE_BOSTEDSADRESSE -> behandleBostedsadresseHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_OPPHOLDSADRESSE -> behandleOppholdsadresseHendelse(pdlHendelse)
         }
+
+        oppdaterHendelseslogg(pdlHendelse)
     }
 
     private fun behandleDødsfallHendelse(pdlHendelse: PdlHendelse) {
         dødsfallCounter.increment()
-        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
-            leesahDuplikatCounter.increment()
-            return
-        }
 
         when (pdlHendelse.endringstype) {
             OPPRETTET -> {
@@ -91,14 +94,9 @@ class LeesahService(
                 log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}")
             }
         }
-        oppdaterHendelseslogg(pdlHendelse)
     }
 
     private fun behandleFødselsdatoHendelse(pdlHendelse: PdlHendelse) {
-        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
-            leesahDuplikatCounter.increment()
-            return
-        }
         when (pdlHendelse.endringstype) {
             OPPRETTET, KORRIGERT -> {
                 SECURE_LOGGER.info("Mottatt behandleFødselsdatoHendelse $pdlHendelse")
@@ -164,15 +162,9 @@ class LeesahService(
                 log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}")
             }
         }
-        oppdaterHendelseslogg(pdlHendelse)
     }
 
     private fun behandleUtflyttingHendelse(pdlHendelse: PdlHendelse) {
-        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
-            leesahDuplikatCounter.increment()
-            return
-        }
-
         when (pdlHendelse.endringstype) {
             OPPRETTET -> {
                 SECURE_LOGGER.info("Mottatt behandleUtflyttingHendelse $pdlHendelse")
@@ -190,15 +182,9 @@ class LeesahService(
                 }
             }
         }
-        oppdaterHendelseslogg(pdlHendelse)
     }
 
     private fun behandleSivilstandHendelse(pdlHendelse: PdlHendelse) {
-        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
-            leesahDuplikatCounter.increment()
-            return
-        }
-
         when (pdlHendelse.endringstype) {
             OPPRETTET -> {
                 SECURE_LOGGER.info("Mottatt behandleSivilstandHendelse $pdlHendelse")
@@ -215,7 +201,6 @@ class LeesahService(
                 }
             }
         }
-        oppdaterHendelseslogg(pdlHendelse)
     }
 
     private fun opprettTaskHvisSivilstandErGift(pdlHendelse: PdlHendelse) {
@@ -227,11 +212,6 @@ class LeesahService(
     }
 
     private fun behandleBostedsadresseHendelse(pdlHendelse: PdlHendelse) {
-        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
-            leesahDuplikatCounter.increment()
-            return
-        }
-
         when (pdlHendelse.endringstype) {
             OPPRETTET,
             KORRIGERT,
@@ -244,7 +224,6 @@ class LeesahService(
                 log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}: ${pdlHendelse.endringstype}")
             }
         }
-        oppdaterHendelseslogg(pdlHendelse)
     }
 
     private fun opprettFinnmarkstilleggTask(pdlHendelse: PdlHendelse) =
@@ -267,11 +246,6 @@ class LeesahService(
         )
 
     private fun behandleOppholdsadresseHendelse(pdlHendelse: PdlHendelse) {
-        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
-            leesahDuplikatCounter.increment()
-            return
-        }
-
         when (pdlHendelse.endringstype) {
             OPPRETTET,
             -> {
@@ -283,7 +257,6 @@ class LeesahService(
                 log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}: ${pdlHendelse.endringstype}")
             }
         }
-        oppdaterHendelseslogg(pdlHendelse)
     }
 
     private fun opprettSvalbardtilleggTask(pdlHendelse: PdlHendelse) =
