@@ -3,6 +3,7 @@ protocol PersonhendelseProto {
   import idl "adressebeskyttelse/Adressebeskyttelse.avdl";
   import idl "doedfoedtbarn/DoedfoedtBarn.avdl";
   import idl "doedsfall/Doedsfall.avdl";
+  import idl "falskidentitet/FalskIdentitet.avdl";
   import idl "foedsel/Foedsel.avdl";
   import idl "foedselsdato/Foedselsdato.avdl";
   import idl "familierelasjon/Familierelasjon.avdl";
@@ -40,6 +41,7 @@ protocol PersonhendelseProto {
     union { null, no.nav.person.pdl.leesah.adressebeskyttelse.Adressebeskyttelse } adressebeskyttelse = null;
     union { null, no.nav.person.pdl.leesah.doedfoedtbarn.DoedfoedtBarn } doedfoedtBarn = null;
     union { null, no.nav.person.pdl.leesah.doedsfall.Doedsfall } doedsfall = null;
+	union { null, no.nav.person.pdl.leesah.falskidentitet.FalskIdentitet } falskIdentitet = null;
     union { null, no.nav.person.pdl.leesah.foedsel.Foedsel } foedsel = null;
     union { null, no.nav.person.pdl.leesah.foedselsdato.Foedselsdato } foedselsdato = null;
     union { null, no.nav.person.pdl.leesah.forelderbarnrelasjon.ForelderBarnRelasjon } forelderBarnRelasjon = null;

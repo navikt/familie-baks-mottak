@@ -13,6 +13,7 @@ import no.nav.familie.baks.mottak.task.MottaAnnullerFødselTask
 import no.nav.familie.baks.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.baks.mottak.task.SvalbardtilleggTask
 import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseTask
+import no.nav.familie.baks.mottak.task.VurderFalskIdentitetTask
 import no.nav.familie.baks.mottak.task.VurderFinnmarkstillleggTaskDTO
 import no.nav.familie.baks.mottak.task.VurderKontantstøtteLivshendelseTask
 import no.nav.familie.baks.mottak.task.VurderLivshendelseTaskDTO
@@ -70,6 +71,7 @@ class LeesahService(
             OPPLYSNINGSTYPE_SIVILSTAND -> behandleSivilstandHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_BOSTEDSADRESSE -> behandleBostedsadresseHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_OPPHOLDSADRESSE -> behandleOppholdsadresseHendelse(pdlHendelse)
+            OPPLYSNIGSTYPE_FALSK_ID -> behandleFalskIdentitet(pdlHendelse)
         }
 
         oppdaterHendelseslogg(pdlHendelse)
@@ -93,6 +95,17 @@ class LeesahService(
             else -> {
                 log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}")
             }
+        }
+    }
+
+    private fun behandleFalskIdentitet(pdlHendelse: PdlHendelse) {
+        if (pdlHendelse.endringstype == OPPRETTET) {
+            taskService.save(
+                Task(
+                    type = VurderFalskIdentitetTask.TASK_STEP_TYPE,
+                    payload = pdlHendelse.gjeldendeAktørId,
+                ),
+            )
         }
     }
 
@@ -365,5 +378,6 @@ class LeesahService(
         const val OPPLYSNINGSTYPE_SIVILSTAND = "SIVILSTAND_V1"
         const val OPPLYSNINGSTYPE_BOSTEDSADRESSE = "BOSTEDSADRESSE_V1"
         const val OPPLYSNINGSTYPE_OPPHOLDSADRESSE = "OPPHOLDSADRESSE_V1"
+        const val OPPLYSNIGSTYPE_FALSK_ID = "FALSK_ID_V1"
     }
 }
