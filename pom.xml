@@ -36,6 +36,8 @@
         <!-- Http Client - nyeste versjon fra httpclient(5.5.1) skaper problemer med Spring Boot 3.5.7. Issue: HTTPCLIENT-2405. Skal være fikset i 3.5.8, men bør testes -->
         <httpclient5.version>5.5</httpclient5.version>
 
+        <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
+
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
         <sonar.organization>navit</sonar.organization>
@@ -472,32 +474,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.14</version>
-                <configuration>
-                    <excludes>
-                        <exclude>**/*config.*</exclude>
-                        <exclude>no.nav.joarkjournalfoeringhendelser.*</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
@@ -506,5 +482,60 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>coverage</id>
+            <properties>
+                <jacocoDirectory>coverage</jacocoDirectory>
+                <jacocoFileName>jacoco.exec</jacocoFileName>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${jacoco-maven-plugin.version}</version>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/*config.*</exclude>
+                                <exclude>no.nav.joarkjournalfoeringhendelser.*</exclude>
+                            </excludes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>prepare-agent</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <destFile>
+                                        ${project.build.directory}/${jacocoDirectory}/${jacocoFileName}
+                                    </destFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                                <configuration>
+                                    <dataFile>
+                                        ${project.build.directory}/${jacocoDirectory}/${jacocoFileName}
+                                    </dataFile>
+                                    <outputDirectory>
+                                        ${project.build.directory}/${jacocoDirectory}
+                                    </outputDirectory>
+                                    <formats>
+                                        <format>XML</format>
+                                    </formats>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
