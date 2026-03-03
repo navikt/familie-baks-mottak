@@ -71,7 +71,7 @@ class LeesahService(
             OPPLYSNINGSTYPE_SIVILSTAND -> behandleSivilstandHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_BOSTEDSADRESSE -> behandleBostedsadresseHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_OPPHOLDSADRESSE -> behandleOppholdsadresseHendelse(pdlHendelse)
-            OPPLYSNIGSTYPE_FALSK_ID -> behandleFalskIdentitet(pdlHendelse)
+            OPPLYSNINGSTYPE_FALSK_ID -> behandleFalskIdentitet(pdlHendelse)
         }
 
         oppdaterHendelseslogg(pdlHendelse)
@@ -378,6 +378,6 @@ class LeesahService(
         const val OPPLYSNINGSTYPE_SIVILSTAND = "SIVILSTAND_V1"
         const val OPPLYSNINGSTYPE_BOSTEDSADRESSE = "BOSTEDSADRESSE_V1"
         const val OPPLYSNINGSTYPE_OPPHOLDSADRESSE = "OPPHOLDSADRESSE_V1"
-        const val OPPLYSNIGSTYPE_FALSK_ID = "FALSK_ID_V1"
+        const val OPPLYSNINGSTYPE_FALSK_ID = "FALSK_ID_V1"
     }
 }
