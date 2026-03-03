@@ -17,7 +17,7 @@ import java.util.Properties
     taskStepType = VurderFalskIdentitetTask.TASK_STEP_TYPE,
     beskrivelse = "Settes til manuell oppfølging hvis den falske identiteten er knyttet til løpende fagsak",
     settTilManuellOppfølgning = true,
-    maxAntallFeil = 1,
+    maxAntallFeil = 3,
 )
 class VurderFalskIdentitetTask(
     private val baSakClient: BaSakClient,
