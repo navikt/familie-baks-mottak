@@ -72,6 +72,7 @@ class LeesahService(
             OPPLYSNINGSTYPE_BOSTEDSADRESSE -> behandleBostedsadresseHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_OPPHOLDSADRESSE -> behandleOppholdsadresseHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_FALSK_ID -> behandleFalskIdentitet(pdlHendelse)
+            else -> return
         }
 
         oppdaterHendelseslogg(pdlHendelse)
