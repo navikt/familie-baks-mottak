@@ -102,12 +102,10 @@ class LeesahService(
 
     private fun behandleFalskIdentitet(pdlHendelse: PdlHendelse) {
         if (pdlHendelse.endringstype == OPPRETTET) {
-            taskService.save(
-                Task(
-                    type = VurderFalskIdentitetTask.TASK_STEP_TYPE,
-                    payload = pdlHendelse.gjeldendeAktørId,
-                ).medTriggerTid(nåPlussEnTimeIProd(environment)),
-            )
+            VurderFalskIdentitetTask
+                .opprettTask(pdlHendelse)
+                .medTriggerTid(nåPlussEnTimeIProd(environment))
+                .also { taskService.save(it) }
         }
     }
 

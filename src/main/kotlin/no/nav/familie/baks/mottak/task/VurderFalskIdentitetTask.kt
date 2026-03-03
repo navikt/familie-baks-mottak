@@ -1,5 +1,6 @@
 package no.nav.familie.baks.mottak.task
 
+import no.nav.familie.baks.mottak.domene.hendelser.PdlHendelse
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
@@ -8,6 +9,7 @@ import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import org.springframework.stereotype.Service
+import java.util.Properties
 
 @Service
 @TaskStepBeskrivelse(
@@ -49,5 +51,16 @@ class VurderFalskIdentitetTask(
         ) : Exception(message, null, true, false) {
             override fun toString(): String = message!!
         }
+
+        fun opprettTask(pdlHendelse: PdlHendelse): Task =
+            Task(
+                type = TASK_STEP_TYPE,
+                payload = pdlHendelse.gjeldendeAktørId,
+                properties =
+                    Properties().apply {
+                        this["ident"] = pdlHendelse.hentPersonident()
+                        this["callId"] = pdlHendelse.hendelseId
+                    },
+            )
     }
 }
