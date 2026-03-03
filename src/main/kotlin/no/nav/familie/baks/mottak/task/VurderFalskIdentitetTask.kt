@@ -54,7 +54,7 @@ class VurderFalskIdentitetTask(
 
         private class FalskIdentitetException(
             message: String,
-        ) : Exception(message, null, true, false) {
+        ) : RuntimeException(message, null, true, false) {
             override fun toString(): String = message!!
         }
 
