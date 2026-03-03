@@ -20,6 +20,7 @@ import no.nav.familie.baks.mottak.task.VurderLivshendelseTaskDTO
 import no.nav.familie.baks.mottak.task.VurderLivshendelseType
 import no.nav.familie.baks.mottak.task.VurderLivshendelseType.SIVILSTAND
 import no.nav.familie.baks.mottak.util.nesteGyldigeTriggertidFødselshendelser
+import no.nav.familie.baks.mottak.util.nåPlussEnTimeIProd
 import no.nav.familie.kontrakter.felles.jsonMapper
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE.GIFT
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE.REGISTRERT_PARTNER
@@ -105,7 +106,7 @@ class LeesahService(
                 Task(
                     type = VurderFalskIdentitetTask.TASK_STEP_TYPE,
                     payload = pdlHendelse.gjeldendeAktørId,
-                ),
+                ).medTriggerTid(nåPlussEnTimeIProd(environment)),
             )
         }
     }
@@ -331,10 +332,8 @@ class LeesahService(
                     this["callId"] = pdlHendelse.hendelseId
                     this["type"] = type.name
                 },
-        ).medTriggerTid(LocalDateTime.now().run { if (environment.activeProfiles.contains("prod")) this.plusHours(1) else this })
-            .also {
-                taskService.save(it)
-            }
+        ).medTriggerTid(nåPlussEnTimeIProd(environment))
+            .also { taskService.save(it) }
     }
 
     private fun opprettVurderKontantstøtteLivshendelseTaskForHendelse(
@@ -351,10 +350,8 @@ class LeesahService(
                     this["callId"] = pdlHendelse.hendelseId
                     this["type"] = type.name
                 },
-        ).medTriggerTid(LocalDateTime.now().run { if (environment.activeProfiles.contains("prod")) this.plusHours(1) else this })
-            .also {
-                taskService.save(it)
-            }
+        ).medTriggerTid(nåPlussEnTimeIProd(environment))
+            .also { taskService.save(it) }
     }
 
     private fun erUnder18år(fødselsDato: LocalDate): Boolean = LocalDate.now().isBefore(fødselsDato.plusYears(18))

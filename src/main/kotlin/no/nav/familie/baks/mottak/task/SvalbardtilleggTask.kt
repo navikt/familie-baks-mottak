@@ -2,6 +2,7 @@ package no.nav.familie.baks.mottak.task
 
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
+import no.nav.familie.baks.mottak.util.nåPlussEnTimeIProd
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.OppholdAnnetSted
 import no.nav.familie.kontrakter.felles.personopplysning.Oppholdsadresse
@@ -15,7 +16,6 @@ import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.LoggerFactory
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 import java.util.Properties
 
 @Service
@@ -70,18 +70,9 @@ class SvalbardtilleggTask(
                     Properties().apply {
                         this["ident"] = ident
                     },
-            ).medTriggerTid(finnTriggertidForÅSendeIdentTilBaSak()),
+            ).medTriggerTid(nåPlussEnTimeIProd(environment)),
         )
     }
-
-    private fun finnTriggertidForÅSendeIdentTilBaSak(): LocalDateTime =
-        LocalDateTime.now().run {
-            if (environment.activeProfiles.contains("prod")) {
-                plusHours(1)
-            } else {
-                this
-            }
-        }
 
     companion object {
         const val TASK_STEP_TYPE = "svalbardtilleggTask"
