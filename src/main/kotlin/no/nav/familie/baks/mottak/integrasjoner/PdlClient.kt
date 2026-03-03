@@ -292,6 +292,7 @@ data class PdlPersonData(
     val sivilstand: List<Sivilstand> = emptyList(),
     @JsonProperty(value = "foedested") val fødested: List<Fødested> = emptyList(),
     val oppholdsadresse: List<Oppholdsadresse> = emptyList(),
+    val falskIdentitet: FalskIdentitet? = null,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -332,6 +333,11 @@ data class Sivilstand(
     val type: SIVILSTANDTYPE,
     val gyldigFraOgMed: LocalDate? = null,
     val bekreftelsesdato: LocalDate? = null,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class FalskIdentitet(
+    val erFalsk: Boolean? = null,
 )
 
 enum class Adressebeskyttelsesgradering {

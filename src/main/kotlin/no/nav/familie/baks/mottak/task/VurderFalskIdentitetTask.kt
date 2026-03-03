@@ -2,8 +2,9 @@ package no.nav.familie.baks.mottak.task
 
 import no.nav.familie.baks.mottak.domene.hendelser.PdlHendelse
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
+import no.nav.familie.baks.mottak.integrasjoner.Identgruppe
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -21,10 +22,15 @@ import java.util.Properties
 class VurderFalskIdentitetTask(
     private val baSakClient: BaSakClient,
     private val ksSakClient: KsSakClient,
-    private val pdlClient: PdlClient,
+    private val pdlClientService: PdlClientService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
-        val ident = pdlClient.hentIdenter(task.payload, Tema.BAR).first().ident
+        val erFalskIdentitet = pdlClientService.hentPerson(task.payload, "hent-falsk-identitet", Tema.BAR).falskIdentitet?.erFalsk == true
+        if (!erFalskIdentitet) {
+            return
+        }
+
+        val ident = pdlClientService.hentIdenter(task.payload, Tema.BAR).first { it.gruppe == Identgruppe.FOLKEREGISTERIDENT.name }.ident
         val løpendeFagsakerIBaSak = baSakClient.hentFagsakerHvorPersonErSøkerEllerMottarOrdinærBarnetrygd(ident)
         val løpendeFagsakerIKsSak = ksSakClient.hentFagsakerHvorPersonErSøkerEllerMottarKontantstøtte(ident)
 
