@@ -3,9 +3,12 @@ package no.nav.familie.baks.mottak.task
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
+import no.nav.familie.baks.mottak.integrasjoner.FalskIdentitet
 import no.nav.familie.baks.mottak.integrasjoner.IdentInformasjon
+import no.nav.familie.baks.mottak.integrasjoner.Identgruppe
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
-import no.nav.familie.baks.mottak.integrasjoner.PdlClient
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
+import no.nav.familie.baks.mottak.integrasjoner.PdlPersonData
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakIdOgTilknyttetAktørId
 import no.nav.familie.prosessering.domene.Task
 import org.assertj.core.api.Assertions.assertThat
@@ -15,13 +18,13 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 
 class VurderFalskIdentitetTaskTest {
-    private val pdlClient = mockk<PdlClient>()
+    private val pdlClientService = mockk<PdlClientService>()
     private val baSakClient = mockk<BaSakClient>()
     private val ksSakClient = mockk<KsSakClient>()
 
     private val vurderFalskIdentitetTask =
         VurderFalskIdentitetTask(
-            pdlClient = pdlClient,
+            pdlClientService = pdlClientService,
             baSakClient = baSakClient,
             ksSakClient = ksSakClient,
         )
@@ -34,7 +37,17 @@ class VurderFalskIdentitetTaskTest {
 
     @BeforeEach
     fun setup() {
-        every { pdlClient.hentIdenter(any(), any()) } answers { listOf(IdentInformasjon(ident = firstArg(), historisk = false, gruppe = "IDENT")) }
+        every { pdlClientService.hentPerson(any(), any(), any()) } answers { PdlPersonData(falskIdentitet = FalskIdentitet(erFalsk = true)) }
+        every { pdlClientService.hentIdenter(any(), any()) } answers { listOf(IdentInformasjon(ident = firstArg(), historisk = false, gruppe = Identgruppe.FOLKEREGISTERIDENT.name)) }
+    }
+
+    @Test
+    fun `skal ikke kaste feil hvis det ikke er falsk identitet`() {
+        // Arrange
+        every { pdlClientService.hentPerson(any(), any(), any()) } answers { PdlPersonData(falskIdentitet = null) }
+
+        // Act & Assert
+        assertDoesNotThrow { vurderFalskIdentitetTask.doTask(task) }
     }
 
     @Test
