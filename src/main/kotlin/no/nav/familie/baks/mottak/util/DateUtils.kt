@@ -1,9 +1,12 @@
 package no.nav.familie.baks.mottak.util
 
+import org.springframework.core.env.Environment
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Month
+
+fun nåPlussEnTimeIProd(environment: Environment): LocalDateTime = LocalDateTime.now().run { if (environment.activeProfiles.contains("prod")) this.plusHours(1) else this }
 
 fun fristFerdigstillelse(daysToAdd: Long = 0): LocalDate {
     var date = LocalDateTime.now().plusDays(daysToAdd)

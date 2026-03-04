@@ -13,12 +13,14 @@ import no.nav.familie.baks.mottak.task.MottaAnnullerFødselTask
 import no.nav.familie.baks.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.baks.mottak.task.SvalbardtilleggTask
 import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseTask
+import no.nav.familie.baks.mottak.task.VurderFalskIdentitetTask
 import no.nav.familie.baks.mottak.task.VurderFinnmarkstillleggTaskDTO
 import no.nav.familie.baks.mottak.task.VurderKontantstøtteLivshendelseTask
 import no.nav.familie.baks.mottak.task.VurderLivshendelseTaskDTO
 import no.nav.familie.baks.mottak.task.VurderLivshendelseType
 import no.nav.familie.baks.mottak.task.VurderLivshendelseType.SIVILSTAND
 import no.nav.familie.baks.mottak.util.nesteGyldigeTriggertidFødselshendelser
+import no.nav.familie.baks.mottak.util.nåPlussEnTimeIProd
 import no.nav.familie.kontrakter.felles.jsonMapper
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE.GIFT
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE.REGISTRERT_PARTNER
@@ -58,6 +60,11 @@ class LeesahService(
     val leesahDuplikatCounter: Counter = Metrics.counter("hendelse.leesah.duplikat")
 
     fun prosesserNyHendelse(pdlHendelse: PdlHendelse) {
+        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
+            leesahDuplikatCounter.increment()
+            return
+        }
+
         when (pdlHendelse.opplysningstype) {
             OPPLYSNINGSTYPE_DØDSFALL -> behandleDødsfallHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_FØDSELSDATO -> behandleFødselsdatoHendelse(pdlHendelse)
@@ -65,15 +72,15 @@ class LeesahService(
             OPPLYSNINGSTYPE_SIVILSTAND -> behandleSivilstandHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_BOSTEDSADRESSE -> behandleBostedsadresseHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_OPPHOLDSADRESSE -> behandleOppholdsadresseHendelse(pdlHendelse)
+            OPPLYSNINGSTYPE_FALSK_ID -> behandleFalskIdentitet(pdlHendelse)
+            else -> return
         }
+
+        oppdaterHendelseslogg(pdlHendelse)
     }
 
     private fun behandleDødsfallHendelse(pdlHendelse: PdlHendelse) {
         dødsfallCounter.increment()
-        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
-            leesahDuplikatCounter.increment()
-            return
-        }
 
         when (pdlHendelse.endringstype) {
             OPPRETTET -> {
@@ -91,14 +98,18 @@ class LeesahService(
                 log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}")
             }
         }
-        oppdaterHendelseslogg(pdlHendelse)
+    }
+
+    private fun behandleFalskIdentitet(pdlHendelse: PdlHendelse) {
+        if (pdlHendelse.endringstype == OPPRETTET) {
+            VurderFalskIdentitetTask
+                .opprettTask(pdlHendelse)
+                .medTriggerTid(nåPlussEnTimeIProd(environment))
+                .also { taskService.save(it) }
+        }
     }
 
     private fun behandleFødselsdatoHendelse(pdlHendelse: PdlHendelse) {
-        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
-            leesahDuplikatCounter.increment()
-            return
-        }
         when (pdlHendelse.endringstype) {
             OPPRETTET, KORRIGERT -> {
                 SECURE_LOGGER.info("Mottatt behandleFødselsdatoHendelse $pdlHendelse")
@@ -164,15 +175,9 @@ class LeesahService(
                 log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}")
             }
         }
-        oppdaterHendelseslogg(pdlHendelse)
     }
 
     private fun behandleUtflyttingHendelse(pdlHendelse: PdlHendelse) {
-        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
-            leesahDuplikatCounter.increment()
-            return
-        }
-
         when (pdlHendelse.endringstype) {
             OPPRETTET -> {
                 SECURE_LOGGER.info("Mottatt behandleUtflyttingHendelse $pdlHendelse")
@@ -190,15 +195,9 @@ class LeesahService(
                 }
             }
         }
-        oppdaterHendelseslogg(pdlHendelse)
     }
 
     private fun behandleSivilstandHendelse(pdlHendelse: PdlHendelse) {
-        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
-            leesahDuplikatCounter.increment()
-            return
-        }
-
         when (pdlHendelse.endringstype) {
             OPPRETTET -> {
                 SECURE_LOGGER.info("Mottatt behandleSivilstandHendelse $pdlHendelse")
@@ -215,7 +214,6 @@ class LeesahService(
                 }
             }
         }
-        oppdaterHendelseslogg(pdlHendelse)
     }
 
     private fun opprettTaskHvisSivilstandErGift(pdlHendelse: PdlHendelse) {
@@ -227,11 +225,6 @@ class LeesahService(
     }
 
     private fun behandleBostedsadresseHendelse(pdlHendelse: PdlHendelse) {
-        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
-            leesahDuplikatCounter.increment()
-            return
-        }
-
         when (pdlHendelse.endringstype) {
             OPPRETTET,
             KORRIGERT,
@@ -244,7 +237,6 @@ class LeesahService(
                 log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}: ${pdlHendelse.endringstype}")
             }
         }
-        oppdaterHendelseslogg(pdlHendelse)
     }
 
     private fun opprettFinnmarkstilleggTask(pdlHendelse: PdlHendelse) =
@@ -267,11 +259,6 @@ class LeesahService(
         )
 
     private fun behandleOppholdsadresseHendelse(pdlHendelse: PdlHendelse) {
-        if (hendelsesloggRepository.existsByHendelseIdAndConsumer(pdlHendelse.hendelseId, CONSUMER_PDL)) {
-            leesahDuplikatCounter.increment()
-            return
-        }
-
         when (pdlHendelse.endringstype) {
             OPPRETTET,
             -> {
@@ -283,7 +270,6 @@ class LeesahService(
                 log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}: ${pdlHendelse.endringstype}")
             }
         }
-        oppdaterHendelseslogg(pdlHendelse)
     }
 
     private fun opprettSvalbardtilleggTask(pdlHendelse: PdlHendelse) =
@@ -344,10 +330,8 @@ class LeesahService(
                     this["callId"] = pdlHendelse.hendelseId
                     this["type"] = type.name
                 },
-        ).medTriggerTid(LocalDateTime.now().run { if (environment.activeProfiles.contains("prod")) this.plusHours(1) else this })
-            .also {
-                taskService.save(it)
-            }
+        ).medTriggerTid(nåPlussEnTimeIProd(environment))
+            .also { taskService.save(it) }
     }
 
     private fun opprettVurderKontantstøtteLivshendelseTaskForHendelse(
@@ -364,10 +348,8 @@ class LeesahService(
                     this["callId"] = pdlHendelse.hendelseId
                     this["type"] = type.name
                 },
-        ).medTriggerTid(LocalDateTime.now().run { if (environment.activeProfiles.contains("prod")) this.plusHours(1) else this })
-            .also {
-                taskService.save(it)
-            }
+        ).medTriggerTid(nåPlussEnTimeIProd(environment))
+            .also { taskService.save(it) }
     }
 
     private fun erUnder18år(fødselsDato: LocalDate): Boolean = LocalDate.now().isBefore(fødselsDato.plusYears(18))
@@ -392,5 +374,6 @@ class LeesahService(
         const val OPPLYSNINGSTYPE_SIVILSTAND = "SIVILSTAND_V1"
         const val OPPLYSNINGSTYPE_BOSTEDSADRESSE = "BOSTEDSADRESSE_V1"
         const val OPPLYSNINGSTYPE_OPPHOLDSADRESSE = "OPPHOLDSADRESSE_V1"
+        const val OPPLYSNINGSTYPE_FALSK_ID = "FALSK_ID_V1"
     }
 }
