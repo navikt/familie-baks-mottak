@@ -34,6 +34,10 @@ funksjonsbrytere:
   kafka.enabled: true
 ```
 
+#### Test token i q2
+I q2 er det mulig å hente ut azure test tokens fra azure-token-generator:
+client credential: https://azure-token-generator.intern.dev.nav.no/api/m2m?aud=dev-gcp.teamfamilie.familie-baks-mottak
+
 ## Produksjonssetting
 Appen blir produksjonssatt ved push til main
 
