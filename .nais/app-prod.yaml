@@ -42,9 +42,6 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: familie-ba-soknad-api
-          namespace: teamfamilie
-          cluster: prod-gcp
         - application: familie-baks-soknad-api
           namespace: teamfamilie
           cluster: prod-gcp

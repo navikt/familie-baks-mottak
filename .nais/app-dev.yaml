@@ -42,9 +42,6 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: familie-ba-soknad-api
-          namespace: teamfamilie
-          cluster: dev-gcp
         - application: familie-baks-soknad-api
           namespace: teamfamilie
           cluster: dev-gcp
@@ -53,6 +50,12 @@ spec:
           cluster: dev-gcp
         - application: statuspoll
           namespace: navdig
+        - application: azure-token-generator
+          namespace: nais
+          cluster: dev-gcp
+        - application: tokenx-token-generator
+          namespace: nais
+          cluster: dev-gcp
     outbound:
       rules:
         - application: familie-ba-sak
