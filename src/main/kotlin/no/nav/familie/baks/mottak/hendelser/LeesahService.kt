@@ -12,6 +12,7 @@ import no.nav.familie.baks.mottak.task.FinnmarkstilleggTask
 import no.nav.familie.baks.mottak.task.MottaAnnullerFødselTask
 import no.nav.familie.baks.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.baks.mottak.task.SvalbardtilleggTask
+import no.nav.familie.baks.mottak.task.VurderAdressebeskyttelseHendelseTask
 import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseTask
 import no.nav.familie.baks.mottak.task.VurderFalskIdentitetTask
 import no.nav.familie.baks.mottak.task.VurderFinnmarkstillleggTaskDTO
@@ -73,6 +74,7 @@ class LeesahService(
             OPPLYSNINGSTYPE_BOSTEDSADRESSE -> behandleBostedsadresseHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_OPPHOLDSADRESSE -> behandleOppholdsadresseHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_FALSK_ID -> behandleFalskIdentitet(pdlHendelse)
+            ADRESSEBESKYTTELSE -> behandleAdressebeskyttelseHendelse(pdlHendelse)
             else -> return
         }
 
@@ -103,6 +105,15 @@ class LeesahService(
     private fun behandleFalskIdentitet(pdlHendelse: PdlHendelse) {
         if (pdlHendelse.endringstype == OPPRETTET) {
             VurderFalskIdentitetTask
+                .opprettTask(pdlHendelse)
+                .medTriggerTid(nåPlussEnTimeIProd(environment))
+                .also { taskService.save(it) }
+        }
+    }
+
+    private fun behandleAdressebeskyttelseHendelse(pdlHendelse: PdlHendelse) {
+        if (pdlHendelse.endringstype == OPPHOERT || pdlHendelse.endringstype == KORRIGERT) {
+            VurderAdressebeskyttelseHendelseTask
                 .opprettTask(pdlHendelse)
                 .medTriggerTid(nåPlussEnTimeIProd(environment))
                 .also { taskService.save(it) }
@@ -368,6 +379,7 @@ class LeesahService(
         const val OPPRETTET = "OPPRETTET"
         const val KORRIGERT = "KORRIGERT"
         const val ANNULLERT = "ANNULLERT"
+        const val OPPHOERT = "OPPHOERT"
         const val OPPLYSNINGSTYPE_DØDSFALL = "DOEDSFALL_V1"
         const val OPPLYSNINGSTYPE_FØDSELSDATO = "FOEDSELSDATO_V1"
         const val OPPLYSNINGSTYPE_UTFLYTTING = "UTFLYTTING_FRA_NORGE"
@@ -375,5 +387,6 @@ class LeesahService(
         const val OPPLYSNINGSTYPE_BOSTEDSADRESSE = "BOSTEDSADRESSE_V1"
         const val OPPLYSNINGSTYPE_OPPHOLDSADRESSE = "OPPHOLDSADRESSE_V1"
         const val OPPLYSNINGSTYPE_FALSK_ID = "FALSK_ID_V1"
+        const val ADRESSEBESKYTTELSE = "ADRESSEBESKYTTELSE_V1"
     }
 }
