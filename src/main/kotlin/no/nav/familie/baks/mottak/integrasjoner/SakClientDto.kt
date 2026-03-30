@@ -72,6 +72,16 @@ data class RestUtvidetBehandling(
     val type: String,
 )
 
+data class RestFagsakSkjermetBarn(
+    val id: Long,
+    val status: FagsakStatus,
+)
+
+data class RestHentFagsakerPåPersonRequest(
+    val personIdent: String,
+    val fagsakTyper: List<String>,
+)
+
 enum class BehandlingKategori {
     EØS,
     NASJONAL,

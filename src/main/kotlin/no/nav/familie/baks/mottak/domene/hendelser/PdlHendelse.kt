@@ -1,5 +1,6 @@
 package no.nav.familie.baks.mottak.domene.hendelser
 
+import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelse
 import java.time.LocalDate
 
 data class PdlHendelse(
@@ -18,6 +19,7 @@ data class PdlHendelse(
     val sivilstandDato: LocalDate? = null,
     val bostedskommune: String? = null,
     val bostedskommuneFomDato: LocalDate? = null,
+    val adressebeskyttelse: Adressebeskyttelse? = null,
 ) {
     // TODO: Skal gjøres tydeligere og mer robust.
     fun hentPersonident() = personIdenter.first { it.length == 11 }

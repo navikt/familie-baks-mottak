@@ -179,4 +179,20 @@ class BaSakClient
                     throw IntegrasjonException("Feil ved opprettelse av behandling i ba-sak.", it, uri)
                 }
         }
+
+        fun hentFagsakForSkjermetBarn(personIdent: String): List<RestFagsakSkjermetBarn> {
+            val uri = URI.create("$sakServiceUri/fagsaker/hent-fagsaker-paa-person")
+            return runCatching {
+                postForEntity<Ressurs<List<RestFagsakSkjermetBarn>>>(
+                    uri,
+                    RestHentFagsakerPåPersonRequest(
+                        personIdent,
+                        fagsakTyper = listOf("SKJERMET_BARN"),
+                    ),
+                )
+            }.fold(
+                onSuccess = { it.data ?: emptyList() },
+                onFailure = { throw IntegrasjonException("Feil ved henting av fagsak skjermet barn fra ba-sak.", it, uri) },
+            )
+        }
     }

@@ -151,8 +151,9 @@ class PdlClient(
         personIdent: String,
         graphqlfil: String,
         tema: Tema,
+        historikk: Boolean = false,
     ): PdlPersonData {
-        val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery(graphqlfil))
+        val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery(graphqlfil), historikk)
 
         val response =
             try {
@@ -194,8 +195,13 @@ class PdlClient(
     private fun mapTilPdlPersonRequest(
         personIdent: String,
         personInfoQuery: String,
+        historikk: Boolean = false,
     ) = mapOf(
-        "variables" to mapOf("ident" to personIdent),
+        "variables" to
+            buildMap {
+                put("ident", personIdent)
+                if (historikk) put("historikk", true)
+            },
         "query" to personInfoQuery,
     )
 
@@ -305,6 +311,12 @@ data class PdlForeldreBarnRelasjon(
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Adressebeskyttelse(
     val gradering: Adressebeskyttelsesgradering,
+    val metadata: PdlMetadata? = null,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class PdlMetadata(
+    val historisk: Boolean,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
