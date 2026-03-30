@@ -20,13 +20,13 @@
         <changelist>-SNAPSHOT</changelist>
         <java.version>25</java.version>
         <jvmTarget>25</jvmTarget>
-        <kotlin.version>2.3.10</kotlin.version>
+        <kotlin.version>2.3.20</kotlin.version>
         <mockk.version>1.14.9</mockk.version>
         <confluent.version>8.2.0</confluent.version>
         <prosessering.version>2.20260306133947_d473c40</prosessering.version>
 
-        <felles.version>4.20260315040337_2316c82</felles.version>
-        <kontrakter.version>4.0_20260316070955_5ff27c3</kontrakter.version>
+        <felles.version>4.20260315040340_f2acdc7</felles.version>
+        <kontrakter.version>4.0_20260326091316_bc0649b</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
 
