@@ -22,13 +22,13 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class VurderAdressebeskyttelseHendelseTaskTest {
+class VurderAdressebeskyttelsehendelseTaskTest {
     private val mockPdlClient: PdlClientService = mockk()
     private val mockBaSakClient: BaSakClient = mockk()
     private val mockOppgaveClient: OppgaveClientService = mockk()
 
     private val vurderAdressebeskyttelseHendelseTask =
-        VurderAdressebeskyttelseHendelseTask(
+        VurderAdressebeskyttelsehendelseTask(
             baSakClient = mockBaSakClient,
             pdlClientService = mockPdlClient,
             oppgaveClient = mockOppgaveClient,
@@ -38,7 +38,7 @@ class VurderAdressebeskyttelseHendelseTaskTest {
     private val personIdent = "12345678901"
     private val task =
         Task(
-            type = VurderAdressebeskyttelseHendelseTask.TASK_STEP_TYPE,
+            type = VurderAdressebeskyttelsehendelseTask.TASK_STEP_TYPE,
             payload = aktørId,
         )
 

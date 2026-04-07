@@ -12,7 +12,7 @@ import no.nav.familie.baks.mottak.task.FinnmarkstilleggTask
 import no.nav.familie.baks.mottak.task.MottaAnnullerFødselTask
 import no.nav.familie.baks.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.baks.mottak.task.SvalbardtilleggTask
-import no.nav.familie.baks.mottak.task.VurderAdressebeskyttelseHendelseTask
+import no.nav.familie.baks.mottak.task.VurderAdressebeskyttelsehendelseTask
 import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseTask
 import no.nav.familie.baks.mottak.task.VurderFalskIdentitetTask
 import no.nav.familie.baks.mottak.task.VurderFinnmarkstillleggTaskDTO
@@ -113,7 +113,7 @@ class LeesahService(
 
     private fun behandleAdressebeskyttelseHendelse(pdlHendelse: PdlHendelse) {
         if (pdlHendelse.endringstype == OPPHOERT || pdlHendelse.endringstype == KORRIGERT) {
-            VurderAdressebeskyttelseHendelseTask
+            VurderAdressebeskyttelsehendelseTask
                 .opprettTask(pdlHendelse)
                 .medTriggerTid(nåPlussEnTimeIProd(environment))
                 .also { taskService.save(it) }

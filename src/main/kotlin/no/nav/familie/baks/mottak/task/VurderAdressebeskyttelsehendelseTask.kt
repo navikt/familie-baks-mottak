@@ -16,12 +16,12 @@ import java.util.Properties
 
 @Service
 @TaskStepBeskrivelse(
-    taskStepType = VurderAdressebeskyttelseHendelseTask.TASK_STEP_TYPE,
+    taskStepType = VurderAdressebeskyttelsehendelseTask.TASK_STEP_TYPE,
     beskrivelse = "Oppretter vurder livshendelse oppgave om adressebeskyttelse er opphørt for skjermet barn med løpende fagsak",
     settTilManuellOppfølgning = true,
     maxAntallFeil = 3,
 )
-class VurderAdressebeskyttelseHendelseTask(
+class VurderAdressebeskyttelsehendelseTask(
     private val baSakClient: BaSakClient,
     private val pdlClientService: PdlClientService,
     private val oppgaveClient: OppgaveClientService,
@@ -51,17 +51,19 @@ class VurderAdressebeskyttelseHendelseTask(
         oppgaveClient.opprettVurderLivshendelseOppgave(
             OppgaveVurderLivshendelseDto(
                 aktørId = task.payload,
-                beskrivelse = "Adressebeskyttelse er opphørt for skjermet barn",
+                beskrivelse = "Adressebeskyttelse er opphevet",
                 saksId = løpendeFagsak.id.toString(),
                 tema = Tema.BAR,
                 behandlingstema = Behandlingstema.Barnetrygd.value,
-                enhetsId = "2103",
+                enhetsId = ENHETSNUMMER_VIKAFOSSEN,
             ),
         )
     }
 
     companion object {
-        const val TASK_STEP_TYPE = "vurderAdressehendelseTask"
+        const val TASK_STEP_TYPE = "vurderAdressebeskyttelsehendelseTask"
+
+        const val ENHETSNUMMER_VIKAFOSSEN = "2103"
 
         fun opprettTask(pdlHendelse: PdlHendelse): Task =
             Task(
