@@ -354,6 +354,7 @@ class LeesahService(
     }
 
     private fun behandleAdressebeskyttelseHendelse(pdlHendelse: PdlHendelse) {
+        // Logger  for å få innsikt i hvordan adressebeskyttelse-hendelser ser ut i praksis
         SECURE_LOGGER.info(
             "Mottatt ADRESSEBESKYTTELSE_v1-hendelse: " +
                 "hendelseId=${pdlHendelse.hendelseId}, " +
