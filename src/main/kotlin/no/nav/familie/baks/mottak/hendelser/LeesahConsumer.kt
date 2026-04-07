@@ -60,6 +60,7 @@ class LeesahConsumer(
                 sivilstandDato = cr.value().hentSivilstandDato(),
                 bostedskommune = cr.value().hentBostedskommune(),
                 bostedskommuneFomDato = cr.value().hentBostedskommuneFomDato(),
+                adressebeskyttelse = cr.value().hentAdressebeskyttelse(),
             )
 
         try {
@@ -112,6 +113,8 @@ class LeesahConsumer(
     private fun GenericRecord.hentBostedskommuneFomDato(): LocalDate? =
         deserialiserDatofeltFraSubrecord("bostedsadresse", "gyldigFraOgMed")
             ?: deserialiserDatofeltFraSubrecord("bostedsadresse", "angittFlyttedato")
+
+    private fun GenericRecord.hentAdressebeskyttelse(): String? = (get("adressebeskyttelse") as GenericRecord?)?.get("gradering")?.toString()
 
     private fun GenericRecord.deserialiserDatofeltFraSubrecord(
         subrecord: String,
