@@ -73,6 +73,7 @@ class LeesahService(
             OPPLYSNINGSTYPE_BOSTEDSADRESSE -> behandleBostedsadresseHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_OPPHOLDSADRESSE -> behandleOppholdsadresseHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_FALSK_ID -> behandleFalskIdentitet(pdlHendelse)
+            OPPLYSNINGSTYPE_ADRESSEBESKYTTELSE -> behandleAdressebeskyttelseHendelse(pdlHendelse)
             else -> return
         }
 
@@ -352,6 +353,17 @@ class LeesahService(
             .also { taskService.save(it) }
     }
 
+    private fun behandleAdressebeskyttelseHendelse(pdlHendelse: PdlHendelse) {
+        // Logger  for å få innsikt i hvordan adressebeskyttelse-hendelser ser ut i praksis
+        SECURE_LOGGER.info(
+            "Mottatt ADRESSEBESKYTTELSE_v1-hendelse: " +
+                "hendelseId=${pdlHendelse.hendelseId}, " +
+                "endringstype=${pdlHendelse.endringstype}, " +
+                "gradering=${pdlHendelse.adressebeskyttelse ?: "null"}, " +
+                "aktørId=${pdlHendelse.gjeldendeAktørId}",
+        )
+    }
+
     private fun erUnder18år(fødselsDato: LocalDate): Boolean = LocalDate.now().isBefore(fødselsDato.plusYears(18))
 
     private fun erUnder6mnd(fødselsDato: LocalDate): Boolean = LocalDate.now().isBefore(fødselsDato.plusMonths(6))
@@ -375,5 +387,6 @@ class LeesahService(
         const val OPPLYSNINGSTYPE_BOSTEDSADRESSE = "BOSTEDSADRESSE_V1"
         const val OPPLYSNINGSTYPE_OPPHOLDSADRESSE = "OPPHOLDSADRESSE_V1"
         const val OPPLYSNINGSTYPE_FALSK_ID = "FALSK_ID_V1"
+        const val OPPLYSNINGSTYPE_ADRESSEBESKYTTELSE = "ADRESSEBESKYTTELSE_V1"
     }
 }
