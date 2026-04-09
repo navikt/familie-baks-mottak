@@ -1,5 +1,7 @@
 package no.nav.familie.baks.mottak.task
 
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle.SEND_OPPGAVE_OM_ADRESSEBESKYTTELSE_ER_FJERNET
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.domene.hendelser.PdlHendelse
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus
@@ -25,39 +27,42 @@ class VurderAdressebeskyttelsehendelseTask(
     private val baSakClient: BaSakClient,
     private val pdlClientService: PdlClientService,
     private val oppgaveClient: OppgaveClientService,
+    private val featureToggleService: FeatureToggleService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
-        val personIdent = pdlClientService.hentPersonident(task.payload, Tema.BAR)
-        val adressebeskyttelse = pdlClientService.hentPerson(personIdent, "hentperson-med-adressebeskyttelse", Tema.BAR, historikk = true).adressebeskyttelse
+        if (featureToggleService.isEnabled(SEND_OPPGAVE_OM_ADRESSEBESKYTTELSE_ER_FJERNET)) {
+            val personIdent = pdlClientService.hentPersonident(task.payload, Tema.BAR)
+            val adressebeskyttelse = pdlClientService.hentPerson(personIdent, "hentperson-med-adressebeskyttelse", Tema.BAR, historikk = true).adressebeskyttelse
 
-        val harNåværendeAdressebeskyttelse =
-            adressebeskyttelse
-                .filter { it.metadata?.historisk != true }
-                .any { it.gradering.erFortrolig() || it.gradering.erStrengtFortrolig() }
+            val harNåværendeAdressebeskyttelse =
+                adressebeskyttelse
+                    .filter { it.metadata?.historisk != true }
+                    .any { it.gradering.erStrengtFortrolig() }
 
-        val haddeAdressebeskyttelse =
-            adressebeskyttelse
-                .filter { it.metadata?.historisk == true }
-                .any { it.gradering.erFortrolig() || it.gradering.erStrengtFortrolig() }
+            val haddeAdressebeskyttelse =
+                adressebeskyttelse
+                    .filter { it.metadata?.historisk == true }
+                    .any { it.gradering.erStrengtFortrolig() }
 
-        if (harNåværendeAdressebeskyttelse || !haddeAdressebeskyttelse) return
+            if (harNåværendeAdressebeskyttelse || !haddeAdressebeskyttelse) return
 
-        val løpendeFagsak =
-            baSakClient
-                .hentFagsakForSkjermetBarn(personIdent)
-                .firstOrNull { it.status == FagsakStatus.LØPENDE }
-                ?: return
+            val løpendeFagsak =
+                baSakClient
+                    .hentFagsakForSkjermetBarn(personIdent)
+                    .firstOrNull { it.status == FagsakStatus.LØPENDE }
+                    ?: return
 
-        oppgaveClient.opprettVurderLivshendelseOppgave(
-            OppgaveVurderLivshendelseDto(
-                aktørId = task.payload,
-                beskrivelse = "Adressebeskyttelse er opphevet",
-                saksId = løpendeFagsak.id.toString(),
-                tema = Tema.BAR,
-                behandlingstema = Behandlingstema.Barnetrygd.value,
-                enhetsId = ENHETSNUMMER_VIKAFOSSEN,
-            ),
-        )
+            oppgaveClient.opprettVurderLivshendelseOppgave(
+                OppgaveVurderLivshendelseDto(
+                    aktørId = task.payload,
+                    beskrivelse = "Adressebeskyttelse er opphevet",
+                    saksId = løpendeFagsak.id.toString(),
+                    tema = Tema.BAR,
+                    behandlingstema = Behandlingstema.Barnetrygd.value,
+                    enhetsId = ENHETSNUMMER_VIKAFOSSEN,
+                ),
+            )
+        }
     }
 
     companion object {

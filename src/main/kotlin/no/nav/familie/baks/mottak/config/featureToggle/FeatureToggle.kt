@@ -13,4 +13,6 @@ enum class FeatureToggle(
     NY_FAMILIE_PDF_KVITTERING("familie-ba-soknad.ny-pdf"),
 
     HENT_ARBEIDSFORDELING_MED_BEHANDLINGSTYPE("familie-baks-mottak.hent-arbeidsfordeling-med-behandlingstype"),
+
+    SEND_OPPGAVE_OM_ADRESSEBESKYTTELSE_ER_FJERNET("familie-baks-mottak.send-oppgave-om-adressebeskyttelse-er-fjernet"),
 }
