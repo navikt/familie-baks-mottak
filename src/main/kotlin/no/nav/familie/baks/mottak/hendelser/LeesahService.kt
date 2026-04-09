@@ -7,6 +7,7 @@ import no.nav.familie.baks.mottak.domene.Hendelseslogg
 import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
 import no.nav.familie.baks.mottak.domene.hendelser.PdlHendelse
 import no.nav.familie.baks.mottak.hendelser.LeesahConsumer.Companion.SECURE_LOGGER
+import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelsesgradering
 import no.nav.familie.baks.mottak.integrasjoner.RestAnnullerFødsel
 import no.nav.familie.baks.mottak.task.FinnmarkstilleggTask
 import no.nav.familie.baks.mottak.task.MottaAnnullerFødselTask
@@ -112,7 +113,11 @@ class LeesahService(
     }
 
     private fun behandleAdressebeskyttelseHendelse(pdlHendelse: PdlHendelse) {
-        if (pdlHendelse.endringstype == OPPHOERT || pdlHendelse.endringstype == KORRIGERT) {
+        if (pdlHendelse.endringstype == OPPHOERT ||
+            pdlHendelse.endringstype == KORRIGERT ||
+            pdlHendelse.endringstype == ANNULLERT ||
+            (pdlHendelse.endringstype == OPPRETTET && pdlHendelse.adressebeskyttelse?.gradering == Adressebeskyttelsesgradering.UGRADERT)
+        ) {
             VurderAdressebeskyttelsehendelseTask
                 .opprettTask(pdlHendelse)
                 .medTriggerTid(nåPlussEnTimeIProd(environment))
