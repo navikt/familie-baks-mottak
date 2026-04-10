@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.3</version>
+        <version>4.0.5</version>
     </parent>
 
     <properties>
@@ -25,12 +25,12 @@
         <confluent.version>8.2.0</confluent.version>
         <prosessering.version>2.20260306133947_d473c40</prosessering.version>
 
-        <felles.version>4.20260205114838_3a4c3dc</felles.version>
-        <kontrakter.version>4.0_20260204122732_558ee1d</kontrakter.version>
+        <felles.version>4.20260315040337_2316c82</felles.version>
+        <kontrakter.version>4.0_20260316070955_5ff27c3</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
 
-        <token-validation-spring.version>6.0.3</token-validation-spring.version>
+        <token-validation-spring.version>6.0.4</token-validation-spring.version>
         <avro.version>1.12.1</avro.version>
 
         <!-- Http Client - nyeste versjon fra httpclient(5.5.1) skaper problemer med Spring Boot 3.5.7. Issue: HTTPCLIENT-2405. Skal være fikset i 3.5.8, men bør testes -->
