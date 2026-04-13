@@ -20,7 +20,6 @@ import java.util.Properties
 @TaskStepBeskrivelse(
     taskStepType = VurderAdressebeskyttelsehendelseTask.TASK_STEP_TYPE,
     beskrivelse = "Oppretter vurder livshendelse oppgave om adressebeskyttelse er opphørt for skjermet barn med løpende fagsak",
-    settTilManuellOppfølgning = true,
     maxAntallFeil = 3,
 )
 class VurderAdressebeskyttelsehendelseTask(
@@ -32,15 +31,15 @@ class VurderAdressebeskyttelsehendelseTask(
     override fun doTask(task: Task) {
         if (featureToggleService.isEnabled(SEND_OPPGAVE_OM_ADRESSEBESKYTTELSE_ER_FJERNET)) {
             val personIdent = pdlClientService.hentPersonident(task.payload, Tema.BAR)
-            val adressebeskyttelse = pdlClientService.hentPerson(personIdent, "hentperson-med-adressebeskyttelse", Tema.BAR, historikk = true).adressebeskyttelse
+            val adressebeskyttelser = pdlClientService.hentPerson(personIdent, "hentperson-med-adressebeskyttelse", Tema.BAR, historikk = true).adressebeskyttelse
 
             val harNåværendeAdressebeskyttelse =
-                adressebeskyttelse
+                adressebeskyttelser
                     .filter { it.metadata?.historisk != true }
                     .any { it.gradering.erStrengtFortrolig() }
 
             val haddeAdressebeskyttelse =
-                adressebeskyttelse
+                adressebeskyttelser
                     .filter { it.metadata?.historisk == true }
                     .any { it.gradering.erStrengtFortrolig() }
 
