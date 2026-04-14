@@ -1,7 +1,10 @@
-query($ident: ID!) {
+query($ident: ID!,  $historikk: Boolean = false) {
     person: hentPerson(ident: $ident) {
-        adressebeskyttelse {
+        adressebeskyttelse(historikk: $historikk) {
             gradering
+            metadata {
+                historisk
+            }
         }
     }
 }

@@ -7,11 +7,13 @@ import no.nav.familie.baks.mottak.domene.Hendelseslogg
 import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
 import no.nav.familie.baks.mottak.domene.hendelser.PdlHendelse
 import no.nav.familie.baks.mottak.hendelser.LeesahConsumer.Companion.SECURE_LOGGER
+import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelsesgradering
 import no.nav.familie.baks.mottak.integrasjoner.RestAnnullerFødsel
 import no.nav.familie.baks.mottak.task.FinnmarkstilleggTask
 import no.nav.familie.baks.mottak.task.MottaAnnullerFødselTask
 import no.nav.familie.baks.mottak.task.MottaFødselshendelseTask
 import no.nav.familie.baks.mottak.task.SvalbardtilleggTask
+import no.nav.familie.baks.mottak.task.VurderAdressebeskyttelsehendelseTask
 import no.nav.familie.baks.mottak.task.VurderBarnetrygdLivshendelseTask
 import no.nav.familie.baks.mottak.task.VurderFalskIdentitetTask
 import no.nav.familie.baks.mottak.task.VurderFinnmarkstillleggTaskDTO
@@ -73,7 +75,7 @@ class LeesahService(
             OPPLYSNINGSTYPE_BOSTEDSADRESSE -> behandleBostedsadresseHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_OPPHOLDSADRESSE -> behandleOppholdsadresseHendelse(pdlHendelse)
             OPPLYSNINGSTYPE_FALSK_ID -> behandleFalskIdentitet(pdlHendelse)
-            OPPLYSNINGSTYPE_ADRESSEBESKYTTELSE -> behandleAdressebeskyttelseHendelse(pdlHendelse)
+            ADRESSEBESKYTTELSE -> behandleAdressebeskyttelseHendelse(pdlHendelse)
             else -> return
         }
 
@@ -104,6 +106,19 @@ class LeesahService(
     private fun behandleFalskIdentitet(pdlHendelse: PdlHendelse) {
         if (pdlHendelse.endringstype == OPPRETTET) {
             VurderFalskIdentitetTask
+                .opprettTask(pdlHendelse)
+                .medTriggerTid(nåPlussEnTimeIProd(environment))
+                .also { taskService.save(it) }
+        }
+    }
+
+    private fun behandleAdressebeskyttelseHendelse(pdlHendelse: PdlHendelse) {
+        if (pdlHendelse.endringstype == OPPHOERT ||
+            pdlHendelse.endringstype == KORRIGERT ||
+            pdlHendelse.endringstype == ANNULLERT ||
+            (pdlHendelse.endringstype == OPPRETTET && pdlHendelse.adressebeskyttelse?.gradering == Adressebeskyttelsesgradering.UGRADERT)
+        ) {
+            VurderAdressebeskyttelsehendelseTask
                 .opprettTask(pdlHendelse)
                 .medTriggerTid(nåPlussEnTimeIProd(environment))
                 .also { taskService.save(it) }
@@ -353,17 +368,6 @@ class LeesahService(
             .also { taskService.save(it) }
     }
 
-    private fun behandleAdressebeskyttelseHendelse(pdlHendelse: PdlHendelse) {
-        // Logger  for å få innsikt i hvordan adressebeskyttelse-hendelser ser ut i praksis
-        SECURE_LOGGER.info(
-            "Mottatt ADRESSEBESKYTTELSE_v1-hendelse: " +
-                "hendelseId=${pdlHendelse.hendelseId}, " +
-                "endringstype=${pdlHendelse.endringstype}, " +
-                "gradering=${pdlHendelse.adressebeskyttelse ?: "null"}, " +
-                "aktørId=${pdlHendelse.gjeldendeAktørId}",
-        )
-    }
-
     private fun erUnder18år(fødselsDato: LocalDate): Boolean = LocalDate.now().isBefore(fødselsDato.plusYears(18))
 
     private fun erUnder6mnd(fødselsDato: LocalDate): Boolean = LocalDate.now().isBefore(fødselsDato.plusMonths(6))
@@ -380,6 +384,7 @@ class LeesahService(
         const val OPPRETTET = "OPPRETTET"
         const val KORRIGERT = "KORRIGERT"
         const val ANNULLERT = "ANNULLERT"
+        const val OPPHOERT = "OPPHOERT"
         const val OPPLYSNINGSTYPE_DØDSFALL = "DOEDSFALL_V1"
         const val OPPLYSNINGSTYPE_FØDSELSDATO = "FOEDSELSDATO_V1"
         const val OPPLYSNINGSTYPE_UTFLYTTING = "UTFLYTTING_FRA_NORGE"
@@ -387,6 +392,6 @@ class LeesahService(
         const val OPPLYSNINGSTYPE_BOSTEDSADRESSE = "BOSTEDSADRESSE_V1"
         const val OPPLYSNINGSTYPE_OPPHOLDSADRESSE = "OPPHOLDSADRESSE_V1"
         const val OPPLYSNINGSTYPE_FALSK_ID = "FALSK_ID_V1"
-        const val OPPLYSNINGSTYPE_ADRESSEBESKYTTELSE = "ADRESSEBESKYTTELSE_V1"
+        const val ADRESSEBESKYTTELSE = "ADRESSEBESKYTTELSE_V1"
     }
 }

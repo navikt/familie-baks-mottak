@@ -40,5 +40,6 @@ class PdlClientService(
         personIdent: String,
         graphqlfil: String,
         tema: Tema,
-    ): PdlPersonData = pdlClient.hentPerson(personIdent, graphqlfil, tema)
+        historikk: Boolean = false,
+    ): PdlPersonData = pdlClient.hentPerson(personIdent, graphqlfil, tema, historikk)
 }

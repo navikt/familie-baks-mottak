@@ -3,6 +3,8 @@ package no.nav.familie.baks.mottak.hendelser
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.domene.hendelser.PdlHendelse
+import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelse
+import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelsesgradering
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.person.pdl.leesah.Personhendelse
 import org.apache.avro.generic.GenericData
@@ -114,7 +116,10 @@ class LeesahConsumer(
         deserialiserDatofeltFraSubrecord("bostedsadresse", "gyldigFraOgMed")
             ?: deserialiserDatofeltFraSubrecord("bostedsadresse", "angittFlyttedato")
 
-    private fun GenericRecord.hentAdressebeskyttelse(): String? = (get("adressebeskyttelse") as GenericRecord?)?.get("gradering")?.toString()
+    private fun GenericRecord.hentAdressebeskyttelse(): Adressebeskyttelse? =
+        (get("adressebeskyttelse") as GenericRecord?)?.let {
+            Adressebeskyttelse(gradering = Adressebeskyttelsesgradering.valueOf(it.get("gradering").toString()))
+        }
 
     private fun GenericRecord.deserialiserDatofeltFraSubrecord(
         subrecord: String,

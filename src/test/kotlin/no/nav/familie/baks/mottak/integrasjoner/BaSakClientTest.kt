@@ -4,10 +4,13 @@ import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.post
+import com.github.tomakehurst.wiremock.client.WireMock.removeAllMappings
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import no.nav.familie.baks.mottak.AbstractWiremockTest
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -119,5 +122,82 @@ class BaSakClientTest : AbstractWiremockTest() {
     companion object {
         private val personIdent = "12345678910"
         private val fagsakId = 1L
+        private val barnPersonIdent = "98765432100"
+        private val skjermetBarnFagsakId = 42L
+    }
+
+    @Nested
+    inner class HentFagsakForSkjermetBarn {
+        @BeforeEach
+        fun setUp() {
+            removeAllMappings()
+        }
+
+        @Test
+        @Tag("integration")
+        fun `hentFagsakForSkjermetBarn skal returnere liste med løpende fagsak`() {
+            stubFor(
+                post(urlEqualTo("/api/fagsaker/hent-fagsaker-paa-person"))
+                    .withRequestBody(
+                        equalToJson("""{ "personIdent": "$barnPersonIdent", "fagsakTyper": ["SKJERMET_BARN"] }"""),
+                    ).willReturn(
+                        aResponse()
+                            .withHeader("Content-Type", "application/json")
+                            .withBody(gyldigResponseSkjermetBarnLøpende()),
+                    ),
+            )
+
+            val response = baSakClient.hentFagsakForSkjermetBarn(barnPersonIdent)
+
+            assertThat(response).hasSize(1)
+            assertThat(response.first().id).isEqualTo(skjermetBarnFagsakId)
+            assertThat(response.first().status).isEqualTo(FagsakStatus.LØPENDE)
+        }
+
+        @Test
+        @Tag("integration")
+        fun `hentFagsakForSkjermetBarn skal returnere tom liste når ingen fagsak finnes`() {
+            stubFor(
+                post(urlEqualTo("/api/fagsaker/hent-fagsaker-paa-person"))
+                    .withRequestBody(
+                        equalToJson("""{ "personIdent": "$barnPersonIdent", "fagsakTyper": ["SKJERMET_BARN"] }"""),
+                    ).willReturn(
+                        aResponse()
+                            .withHeader("Content-Type", "application/json")
+                            .withBody(tomResponseSkjermetBarn()),
+                    ),
+            )
+
+            val response = baSakClient.hentFagsakForSkjermetBarn(barnPersonIdent)
+
+            assertThat(response).isEmpty()
+        }
+
+        private fun gyldigResponseSkjermetBarnLøpende(): String =
+            """
+            {
+              "data": [
+                {
+                  "id": $skjermetBarnFagsakId,
+                  "status": "LØPENDE"
+                }
+              ],
+              "status": "SUKSESS",
+              "melding": "Innhenting av data var vellykket",
+              "frontendFeilmelding": null,
+              "stacktrace": null
+            }
+            """.trimIndent()
+
+        private fun tomResponseSkjermetBarn(): String =
+            """
+            {
+              "data": [],
+              "status": "SUKSESS",
+              "melding": "Innhenting av data var vellykket",
+              "frontendFeilmelding": null,
+              "stacktrace": null
+            }
+            """.trimIndent()
     }
 }
