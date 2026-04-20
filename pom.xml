@@ -126,6 +126,11 @@
         </dependency>
         <dependency>
             <groupId>no.nav.familie</groupId>
+            <artifactId>prosessering-web-nav-token-support</artifactId>
+            <version>${prosessering.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.familie</groupId>
             <artifactId>prosessering-core</artifactId>
             <version>${prosessering.version}</version>
         </dependency>
