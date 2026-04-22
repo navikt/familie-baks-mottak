@@ -13,6 +13,8 @@ import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.Properties
 
@@ -28,29 +30,37 @@ class VurderAdressebeskyttelsehendelseTask(
     private val oppgaveClient: OppgaveClientService,
     private val featureToggleService: FeatureToggleService,
 ) : AsyncTaskStep {
+    val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
+
     override fun doTask(task: Task) {
+        val personIdent = pdlClientService.hentPersonident(task.payload, Tema.BAR)
+        val adressebeskyttelser = pdlClientService.hentPerson(personIdent, "hentperson-med-adressebeskyttelse", Tema.BAR, historikk = true).adressebeskyttelse
+
+        val harNåværendeAdressebeskyttelse =
+            adressebeskyttelser
+                .filter { it.metadata?.historisk != true }
+                .any { it.gradering.erStrengtFortrolig() }
+
+        val haddeAdressebeskyttelse =
+            adressebeskyttelser
+                .filter { it.metadata?.historisk == true }
+                .any { it.gradering.erStrengtFortrolig() }
+
+        secureLogger.info(
+            "Vurderer adressebeskyttelsehendelse harNåværendeAdressebeskyttelse=$harNåværendeAdressebeskyttelse, haddeAdressebeskyttelse=$haddeAdressebeskyttelse",
+        )
+        if (harNåværendeAdressebeskyttelse || !haddeAdressebeskyttelse) return
+
+        val løpendeFagsak =
+            baSakClient
+                .hentFagsakForSkjermetBarn(personIdent)
+                .firstOrNull { it.status == FagsakStatus.LØPENDE }
+                ?: run {
+                    secureLogger.info("Fant ingen løpende fagsak for adressebeskyttelse-hendelsen")
+                    return
+                }
+
         if (featureToggleService.isEnabled(SEND_OPPGAVE_OM_ADRESSEBESKYTTELSE_ER_FJERNET)) {
-            val personIdent = pdlClientService.hentPersonident(task.payload, Tema.BAR)
-            val adressebeskyttelser = pdlClientService.hentPerson(personIdent, "hentperson-med-adressebeskyttelse", Tema.BAR, historikk = true).adressebeskyttelse
-
-            val harNåværendeAdressebeskyttelse =
-                adressebeskyttelser
-                    .filter { it.metadata?.historisk != true }
-                    .any { it.gradering.erStrengtFortrolig() }
-
-            val haddeAdressebeskyttelse =
-                adressebeskyttelser
-                    .filter { it.metadata?.historisk == true }
-                    .any { it.gradering.erStrengtFortrolig() }
-
-            if (harNåværendeAdressebeskyttelse || !haddeAdressebeskyttelse) return
-
-            val løpendeFagsak =
-                baSakClient
-                    .hentFagsakForSkjermetBarn(personIdent)
-                    .firstOrNull { it.status == FagsakStatus.LØPENDE }
-                    ?: return
-
             oppgaveClient.opprettVurderLivshendelseOppgave(
                 OppgaveVurderLivshendelseDto(
                     aktørId = task.payload,
