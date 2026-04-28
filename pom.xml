@@ -20,7 +20,7 @@
         <changelist>-SNAPSHOT</changelist>
         <java.version>25</java.version>
         <jvmTarget>25</jvmTarget>
-        <kotlin.version>2.3.20</kotlin.version>
+        <kotlin.version>2.3.21</kotlin.version>
         <mockk.version>1.14.9</mockk.version>
         <confluent.version>8.2.0</confluent.version>
         <prosessering.version>2.20260420122910_8bfca04</prosessering.version>
@@ -322,7 +322,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>5.5.0.6356</version>
+                    <version>5.6.0.6792</version>
                 </plugin>
             </plugins>
         </pluginManagement>
