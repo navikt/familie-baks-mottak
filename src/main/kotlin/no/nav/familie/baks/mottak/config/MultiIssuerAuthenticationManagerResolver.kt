@@ -19,9 +19,15 @@ class MultiIssuerAuthenticationManagerResolver(
     @param:Value("\${AZURE_OPENID_CONFIG_ISSUER:}") private val azureIssuer: String,
     @param:Value("\${AZURE_APP_CLIENT_ID:}") private val azureClientId: String,
 ) {
+    companion object {
+        val LEVEL4 = "Level4"
+        val IDPORTEN_LOA_HIGH = "idporten-loa-high"
+    }
+
+
     fun resolver(): JwtIssuerAuthenticationManagerResolver =
         JwtIssuerAuthenticationManagerResolver { issuer ->
-            when (issuer) {
+            when (issuer.trimEnd('/')) {
                 tokenXIssuer -> tokenXAuthManager
                 azureIssuer -> azureAuthManager
                 else -> throw BadCredentialsException("Unknown issuer: $issuer")
@@ -35,7 +41,7 @@ class MultiIssuerAuthenticationManagerResolver(
                 JwtValidators.createDefaultWithIssuer(tokenXIssuer),
                 JwtClaimValidator<Collection<String>>("aud") { audiences -> tokenXClientId in audiences },
                 JwtClaimValidator<String>("acr") { acr ->
-                    acr == "Level4" || acr == "idporten-loa-high"
+                    acr == LEVEL4 || acr == IDPORTEN_LOA_HIGH
                 },
             ),
         )
