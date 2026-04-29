@@ -27,6 +27,7 @@
 
         <felles.version>4.20260428145828_c16a1d8</felles.version>
         <kontrakter.version>4.0_20260427083013_f53660d</kontrakter.version>
+        <nav-security.version>2.1.10</nav-security.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
 
@@ -304,7 +305,7 @@
         <dependency>
             <groupId>no.nav.security</groupId>
             <artifactId>mock-oauth2-server</artifactId>
-            <version>2.1.10</version>
+            <version>${nav-security.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

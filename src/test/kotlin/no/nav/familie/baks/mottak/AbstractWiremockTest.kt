@@ -1,8 +1,6 @@
 package no.nav.familie.baks.mottak
 
-import no.nav.familie.baks.mottak.config.MockOAuth2ServerInitializer
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ContextConfiguration
 import org.wiremock.spring.EnableWireMock
 
 @SpringBootTest(
@@ -16,6 +14,5 @@ import org.wiremock.spring.EnableWireMock
         "FAMILIE_KS_SAK_API_URL=http://localhost:\${wiremock.server.port}/api",
     ],
 )
-@ContextConfiguration(initializers = [MockOAuth2ServerInitializer::class])
 @EnableWireMock
 abstract class AbstractWiremockTest
