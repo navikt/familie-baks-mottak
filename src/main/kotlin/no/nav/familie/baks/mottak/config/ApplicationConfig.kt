@@ -5,6 +5,7 @@ import no.nav.familie.log.NavSystemtype
 import no.nav.familie.log.filter.LogFilter
 import no.nav.familie.prosessering.config.ProsesseringInfoProvider
 import no.nav.familie.restklient.client.RetryOAuth2HttpClient
+import no.nav.familie.sikkerhet.context.FamilieFellesNavTokenSupportKonfigurasjon
 import no.nav.security.token.support.client.core.http.OAuth2HttpClient
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
@@ -20,6 +21,7 @@ import org.springframework.boot.web.server.servlet.ServletWebServerFactory
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter
 import org.springframework.resilience.annotation.EnableResilientMethods
@@ -42,6 +44,7 @@ import java.time.temporal.ChronoUnit
 @EnableJwtTokenValidation(ignore = ["org.springframework"])
 @EnableOAuth2Client(cacheEnabled = true)
 @EnableResilientMethods
+@Import(FamilieFellesNavTokenSupportKonfigurasjon::class)
 class ApplicationConfig {
     @Bean
     fun servletWebServerFactory(): ServletWebServerFactory = JettyServletWebServerFactory()
