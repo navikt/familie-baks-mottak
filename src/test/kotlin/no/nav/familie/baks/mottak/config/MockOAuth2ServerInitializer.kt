@@ -8,7 +8,14 @@ import org.springframework.core.env.MapPropertySource
 class MockOAuth2ServerInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
     companion object {
         private val server: MockOAuth2Server by lazy {
-            MockOAuth2Server().also { it.start() }
+            MockOAuth2Server().also { server ->
+                server.start()
+                Runtime.getRuntime().addShutdownHook(
+                    Thread {
+                        server.shutdown()
+                    },
+                )
+            }
         }
     }
 
