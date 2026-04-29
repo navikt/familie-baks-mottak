@@ -1,12 +1,4 @@
 no.nav.security.jwt:
-  issuer:
-    selvbetjening:
-      discoveryurl: http://localhost:${mock-oauth2-server.port}/selvbetjening/.well-known/openid-configuration
-      accepted_audience: aud-localhost
-    # Kommenteres ut ved lokal testing av innsending av søknad
-  #    azuread:
-  #      discoveryurl: https://login.microsoftonline.com/navq.onmicrosoft.com/v2.0/.well-known/openid-configuration
-  #      accepted_audience: ${CLIENT_ID}
   client:
     registration:
       ba-sak-clientcredentials:
@@ -97,6 +89,8 @@ PDL_URL: http://dummy
 CREDENTIAL_USERNAME: not-a-real-srvuser
 CREDENTIAL_PASSWORD: not-a-real-pw
 NAIS_APP_NAME: familie-baks-mottak
+AZURE_OPENID_CONFIG_ISSUER: dummy
+AZURE_APP_CLIENT_ID: dummy
 
 # Kreves for at unleash mock skal fungere:
 UNLEASH_SERVER_API_URL: http://dummy/api/

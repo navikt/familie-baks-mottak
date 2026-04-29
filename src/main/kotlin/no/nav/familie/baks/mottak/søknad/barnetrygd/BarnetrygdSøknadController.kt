@@ -8,8 +8,6 @@ import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV8
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ba.søknad.v8.Søknad
 import no.nav.familie.kontrakter.felles.Ressurs
-import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.http.ResponseEntity
@@ -23,7 +21,6 @@ import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad as BarnetrygdS�
 
 @RestController
 @RequestMapping(path = ["/api"], produces = [APPLICATION_JSON_VALUE])
-@ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 class BarnetrygdSøknadController(
     private val barnetrygdSøknadService: BarnetrygdSøknadService,
     private val barnetrygdSøknadMetrikkService: BarnetrygdSøknadMetrikkService,
@@ -63,6 +60,5 @@ class BarnetrygdSøknadController(
         }
 
     @GetMapping(value = ["/ping"])
-    @Unprotected
     fun ping(): ResponseEntity<String> = ResponseEntity.ok().body("OK")
 }

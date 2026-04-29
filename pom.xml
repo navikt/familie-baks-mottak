@@ -126,7 +126,7 @@
         </dependency>
         <dependency>
             <groupId>no.nav.familie</groupId>
-            <artifactId>prosessering-web-nav-token-support</artifactId>
+            <artifactId>prosessering-web-spring-security</artifactId>
             <version>${prosessering.version}</version>
         </dependency>
         <dependency>
@@ -151,7 +151,12 @@
         </dependency>
         <dependency>
             <groupId>no.nav.familie.felles</groupId>
-            <artifactId>sikkerhet-token-support</artifactId>
+            <artifactId>sikkerhet</artifactId>
+            <version>${felles.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.familie.felles</groupId>
+            <artifactId>sikkerhet-spring-security</artifactId>
             <version>${felles.version}</version>
         </dependency>
         <dependency>
@@ -165,14 +170,12 @@
             <version>${token-validation-spring.version}</version>
         </dependency>
         <dependency>
-            <groupId>no.nav.security</groupId>
-            <artifactId>token-validation-core</artifactId>
-            <version>${token-validation-spring.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
-            <groupId>no.nav.security</groupId>
-            <artifactId>token-validation-spring</artifactId>
-            <version>${token-validation-spring.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.familie.kontrakter</groupId>
@@ -300,8 +303,8 @@
         </dependency>
         <dependency>
             <groupId>no.nav.security</groupId>
-            <artifactId>token-validation-spring-test</artifactId>
-            <version>${token-validation-spring.version}</version>
+            <artifactId>mock-oauth2-server</artifactId>
+            <version>2.1.10</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -98,6 +98,9 @@ NAIS_APP_NAME: familie-baks-mottak
 UNLEASH_SERVER_API_URL: http://dummy/api/
 UNLEASH_SERVER_API_TOKEN: dummy-token
 
+AZURE_OPENID_CONFIG_ISSUER: dummy
+AZURE_APP_CLIENT_ID: dummy
+
 JOURNALFOERINGHENDELSE_V1_TOPIC_AIVEN_URL: teamdokumenthandtering.aapen-dok-journalfoering
 
 # Disabler unleash her for å unngå feilmeldinger tilknyttet oppkobling når vi uansett mocker alle unleash-kall i testene.
