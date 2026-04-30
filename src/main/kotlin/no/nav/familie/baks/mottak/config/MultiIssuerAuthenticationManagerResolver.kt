@@ -24,7 +24,6 @@ class MultiIssuerAuthenticationManagerResolver(
         val IDPORTEN_LOA_HIGH = "idporten-loa-high"
     }
 
-
     fun resolver(): JwtIssuerAuthenticationManagerResolver =
         JwtIssuerAuthenticationManagerResolver { issuer ->
             when (issuer.trimEnd('/')) {
