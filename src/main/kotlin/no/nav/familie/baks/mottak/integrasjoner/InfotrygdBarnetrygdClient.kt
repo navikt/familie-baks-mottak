@@ -1,28 +1,38 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
+import no.nav.familie.baks.mottak.texas.TexasRestClientFactory
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkRequest
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
-import no.nav.familie.restklient.client.AbstractRestClient
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.ParameterizedTypeReference
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
-import org.springframework.web.client.RestOperations
 import java.net.URI
 import no.nav.familie.kontrakter.ba.infotrygd.Sak as SakDto
 import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 
 @Component
 class InfotrygdBarnetrygdClient(
-    @Value("\${FAMILIE_BA_INFOTRYGD_API_URL}/infotrygd/barnetrygd")
-    private val clientUri: URI,
-    @Qualifier("clientCredentials") restOperations: RestOperations,
-) : AbstractRestClient(restOperations, "familie-ba-infotrygd") {
+    @Value("\${FAMILIE_BA_INFOTRYGD_API_URL}/infotrygd/barnetrygd") private val clientUri: URI,
+    @Value("\${FAMILIE_BA_INFOTRYGD_SCOPE}") private val infotrygdScope: String,
+    texasRestClientFactory: TexasRestClientFactory,
+) {
+    private val restClient = texasRestClientFactory.lagMaskinRestKlient(infotrygdScope)
+
     fun hentLøpendeUtbetalinger(
         søkersIdenter: List<String>,
         barnasIdenter: List<String>,
     ): InfotrygdSøkResponse<StønadDto> =
         infotrygdResponseFra(
-            request = { postForEntity(uri("stonad"), InfotrygdSøkRequest(søkersIdenter, barnasIdenter)) },
+            request = {
+                restClient
+                    .post()
+                    .uri(uri("stonad"))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(InfotrygdSøkRequest(søkersIdenter, barnasIdenter))
+                    .retrieve()
+                    .body(object : ParameterizedTypeReference<InfotrygdSøkResponse<StønadDto>>() {})!!
+            },
             onFailure = { ex -> IntegrasjonException("Feil ved søk etter stønad i infotrygd.", ex, uri("stonad")) },
         )
 
@@ -31,13 +41,29 @@ class InfotrygdBarnetrygdClient(
         barnasIdenter: List<String>,
     ): InfotrygdSøkResponse<SakDto> =
         infotrygdResponseFra(
-            request = { postForEntity(uri("saker"), InfotrygdSøkRequest(søkersIdenter, barnasIdenter)) },
+            request = {
+                restClient
+                    .post()
+                    .uri(uri("saker"))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(InfotrygdSøkRequest(søkersIdenter, barnasIdenter))
+                    .retrieve()
+                    .body(object : ParameterizedTypeReference<InfotrygdSøkResponse<SakDto>>() {})!!
+            },
             onFailure = { ex -> IntegrasjonException("Feil ved uthenting av saker fra infotrygd.", ex, uri("saker")) },
         )
 
     fun hentVedtak(søkersIdenter: List<String>): InfotrygdSøkResponse<StønadDto> =
         infotrygdResponseFra(
-            request = { postForEntity(uri("stonad?historikk=true"), InfotrygdSøkRequest(søkersIdenter)) },
+            request = {
+                restClient
+                    .post()
+                    .uri(uri("stonad?historikk=true"))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(InfotrygdSøkRequest(søkersIdenter))
+                    .retrieve()
+                    .body(object : ParameterizedTypeReference<InfotrygdSøkResponse<StønadDto>>() {})!!
+            },
             onFailure = { ex -> IntegrasjonException("Feil ved uthenting av vedtak fra infotrygd", ex, uri("stonad?historikk=true")) },
         )
 

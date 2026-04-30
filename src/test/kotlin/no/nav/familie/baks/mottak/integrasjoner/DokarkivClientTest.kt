@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.web.client.HttpServerErrorException
 
 @ActiveProfiles("dev", "mock-oauth")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -103,7 +104,7 @@ class DokarkivClientTest : AbstractWiremockTest() {
             .assertThatThrownBy {
                 dokarkivClient.ferdigstillJournalpost("12345678")
             }.isInstanceOf(IntegrasjonException::class.java)
-            .hasCauseInstanceOf(RessursException::class.java)
+            .hasCauseInstanceOf(HttpServerErrorException::class.java)
             .hasMessageContaining("Ferdigstilling av journalpost 12345678 feilet")
     }
 

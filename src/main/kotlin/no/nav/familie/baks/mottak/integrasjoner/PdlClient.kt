@@ -3,29 +3,29 @@ package no.nav.familie.baks.mottak.integrasjoner
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.familie.baks.mottak.domene.personopplysning.Person
+import no.nav.familie.baks.mottak.texas.TexasRestClientFactory
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
 import no.nav.familie.kontrakter.felles.personopplysning.ForelderBarnRelasjon
 import no.nav.familie.kontrakter.felles.personopplysning.Oppholdsadresse
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE
-import no.nav.familie.restklient.client.AbstractRestClient
 import no.nav.familie.restklient.util.UriUtil
 import org.apache.commons.lang3.StringUtils
-import org.springframework.beans.factory.annotation.Qualifier
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
-import org.springframework.web.client.RestOperations
 import java.net.URI
 import java.time.LocalDate
 
 @Service
 class PdlClient(
     @Value("\${PDL_URL}") pdlBaseUrl: URI,
-    @Qualifier("clientCredentials") val restTemplate: RestOperations,
-) : AbstractRestClient(restTemplate, "pdl.personinfo") {
+    @Value("\${PDL_SCOPE}") private val pdlScope: String,
+    texasRestClientFactory: TexasRestClientFactory,
+) {
+    private val restClient = texasRestClientFactory.lagMaskinRestKlient(pdlScope)
     private val pdlUri = UriUtil.uri(pdlBaseUrl, PATH_GRAPHQL)
 
     fun hentIdenter(
@@ -33,7 +33,7 @@ class PdlClient(
         tema: Tema,
     ): List<IdentInformasjon> {
         val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery("hentIdenter"))
-        val response = postForEntity<PdlHentIdenterResponse>(pdlUri, pdlPersonRequest, httpHeaders(tema))
+        val response = post<PdlHentIdenterResponse>(pdlPersonRequest, tema)
 
         if (response.harFeil()) {
             secureLogger.info("Response mot PDL harFeil for ident=$personIdent response=$response")
@@ -44,7 +44,6 @@ class PdlClient(
                     ident = personIdent,
                 )
             }
-
             throw IntegrasjonException(
                 msg = "Fant ikke identer på person: ${response.errorMessages()}",
                 uri = pdlUri,
@@ -85,14 +84,8 @@ class PdlClient(
         tema: Tema,
     ): Person {
         val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery("hentperson-med-relasjoner"))
-
         try {
-            val response =
-                postForEntity<PdlHentPersonResponse>(
-                    pdlUri,
-                    pdlPersonRequest,
-                    httpHeaders(tema),
-                )
+            val response = post<PdlHentPersonResponse>(pdlPersonRequest, tema)
             if (response.harFeil()) {
                 throw IntegrasjonException(
                     msg = "Feil ved oppslag på person: ${response.errorMessages()}",
@@ -114,7 +107,6 @@ class PdlClient(
                                     relatertPersonsRolle = relasjon.relatertPersonsRolle,
                                 )
                             }.toSet()
-
                     response.data.person.let {
                         Person(
                             navn = null,
@@ -126,23 +118,13 @@ class PdlClient(
                 }.fold(
                     onSuccess = { it },
                     onFailure = {
-                        throw IntegrasjonException(
-                            "Fant ikke forespurte data på person.",
-                            it,
-                            pdlUri,
-                            personIdent,
-                        )
+                        throw IntegrasjonException("Fant ikke forespurte data på person.", it, pdlUri, personIdent)
                     },
                 )
         } catch (e: Exception) {
             when (e) {
                 is IntegrasjonException -> throw e
-
-                else -> throw IntegrasjonException(
-                    msg = "Feil ved oppslag på person. Gav feil: ${e.message}",
-                    uri = pdlUri,
-                    ident = personIdent,
-                )
+                else -> throw IntegrasjonException(msg = "Feil ved oppslag på person. Gav feil: ${e.message}", uri = pdlUri, ident = personIdent)
             }
         }
     }
@@ -154,23 +136,13 @@ class PdlClient(
         historikk: Boolean = false,
     ): PdlPersonData {
         val pdlPersonRequest = mapTilPdlPersonRequest(personIdent, hentGraphqlQuery(graphqlfil), historikk)
-
         val response =
             try {
-                postForEntity<PdlHentPersonResponse>(
-                    pdlUri,
-                    pdlPersonRequest,
-                    httpHeaders(tema),
-                )
+                post<PdlHentPersonResponse>(pdlPersonRequest, tema)
             } catch (e: Exception) {
                 when (e) {
                     is IntegrasjonException -> throw e
-
-                    else -> throw IntegrasjonException(
-                        msg = "Feil ved oppslag på hentPerson mot PDL. Gav feil: ${e.message}",
-                        uri = pdlUri,
-                        ident = personIdent,
-                    )
+                    else -> throw IntegrasjonException(msg = "Feil ved oppslag på hentPerson mot PDL. Gav feil: ${e.message}", uri = pdlUri, ident = personIdent)
                 }
             }
 
@@ -179,11 +151,7 @@ class PdlClient(
                 secureLogger.warn("Fant ikke person med ident: $personIdent i PDL")
                 throw PdlNotFoundException("Fant ingen person for ident", pdlUri, personIdent)
             } else {
-                throw IntegrasjonException(
-                    msg = "Feil ved oppslag på hentPerson mot PDL: ${response.errorMessages()}",
-                    uri = pdlUri,
-                    ident = personIdent,
-                )
+                throw IntegrasjonException(msg = "Feil ved oppslag på hentPerson mot PDL: ${response.errorMessages()}", uri = pdlUri, ident = personIdent)
             }
         } else if (response.harAdvarsel()) {
             log.warn("Advarsel ved oppslag på hentPerson mot PDL. Se securelogs for detaljer.")
@@ -191,6 +159,21 @@ class PdlClient(
         }
         return response.data.person!!
     }
+
+    private inline fun <reified T : Any> post(
+        body: Any,
+        tema: Tema,
+    ): T =
+        restClient
+            .post()
+            .uri(pdlUri)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .header("Tema", TEMA)
+            .header("behandlingsnummer", tema.behandlingsnummer)
+            .body(body)
+            .retrieve()
+            .body(T::class.java)!!
 
     private fun mapTilPdlPersonRequest(
         personIdent: String,
@@ -205,20 +188,14 @@ class PdlClient(
         "query" to personInfoQuery,
     )
 
-    protected fun httpHeaders(tema: Tema): HttpHeaders =
-        HttpHeaders().apply {
-            contentType = MediaType.APPLICATION_JSON
-            accept = listOf(MediaType.APPLICATION_JSON)
-            add("Tema", TEMA)
-            add("behandlingsnummer", tema.behandlingsnummer)
-        }
-
     private fun hentGraphqlQuery(pdlResource: String): String =
         this::class.java.getResource("/pdl/$pdlResource.graphql").readText().let {
             StringUtils.normalizeSpace(it.replace("\n", ""))
         }
 
     companion object {
+        private val log = LoggerFactory.getLogger(PdlClient::class.java)
+        private val secureLogger = LoggerFactory.getLogger("secureLogger")
         private const val PATH_GRAPHQL = "graphql"
         private const val TEMA = "BAR"
     }

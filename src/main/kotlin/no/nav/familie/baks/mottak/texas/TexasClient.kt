@@ -1,4 +1,4 @@
-package no.nav.familie.baks.mottak.integrasjoner
+package no.nav.familie.baks.mottak.texas
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
@@ -11,7 +11,7 @@ class TexasClient(
 ) {
     private val restClient = RestClient.create()
 
-    fun lagSystemToken(target: String): String {
+    fun hentMaskinToken(target: String): String {
         val body =
             mapOf(
                 "identity_provider" to "entra_id",
@@ -25,7 +25,7 @@ class TexasClient(
                 .body(body)
                 .retrieve()
                 .body(TexasTokenResponse::class.java)
-                ?: throw IllegalStateException("Fikk ikke svar fra Texas (NAIS_TOKEN_ENDPOINT)")
+                ?: throw IllegalStateException("Fikk ikke svar fra Texas")
         return response.accessToken
     }
 }

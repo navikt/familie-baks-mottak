@@ -93,6 +93,12 @@ CREDENTIAL_USERNAME: not-a-real-srvuser
 CREDENTIAL_PASSWORD: not-a-real-pw
 
 NAIS_APP_NAME: familie-baks-mottak
+NAIS_TOKEN_ENDPOINT: dummy
+PDL_SCOPE: dummy
+FAMILIE_INTEGRASJONER_SCOPE: dummy
+BA_SAK_SCOPE: dummy
+FAMILIE_BA_INFOTRYGD_SCOPE: dummy
+FAMILIE_PDF_SCOPE: dummy
 
 # Kreves for at unleash mock skal fungere:
 UNLEASH_SERVER_API_URL: http://dummy/api/

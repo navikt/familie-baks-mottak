@@ -92,6 +92,7 @@ BA_SAK_SCOPE: api://prod-gcp.teamfamilie.familie-ba-sak/.default
 FAMILIE_KS_SAK_API_URL: http://familie-ks-sak/api
 KS_SAK_SCOPE: api://prod-gcp.teamfamilie.familie-ks-sak/.default
 FAMILIE_BA_INFOTRYGD_API_URL: https://familie-ba-infotrygd.prod-fss-pub.nais.io
+FAMILIE_BA_INFOTRYGD_SCOPE: api://prod-fss.teamfamilie.familie-ba-infotrygd/.default
 FAMILIE_INTEGRASJONER_API_URL: https://familie-integrasjoner.prod-fss-pub.nais.io/api
 FAMILIE_INTEGRASJONER_SCOPE: api://prod-fss.teamfamilie.familie-integrasjoner/.default
 PDL_URL: https://pdl-api.prod-fss-pub.nais.io

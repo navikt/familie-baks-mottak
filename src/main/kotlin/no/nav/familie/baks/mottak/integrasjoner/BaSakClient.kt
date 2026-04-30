@@ -1,6 +1,7 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
 import no.nav.familie.baks.mottak.domene.NyBehandling
+import no.nav.familie.baks.mottak.texas.TexasRestClientFactory
 import no.nav.familie.kontrakter.felles.PersonIdent
 import no.nav.familie.kontrakter.felles.Ressurs
 import org.slf4j.LoggerFactory
@@ -24,7 +25,7 @@ class BaSakClient
         @param:Value("\${BA_SAK_SCOPE}") private val baSakScope: String,
         texasRestClientFactory: TexasRestClientFactory,
     ) {
-        private val restClient = texasRestClientFactory.create(baSakScope)
+        private val restClient = texasRestClientFactory.lagMaskinRestKlient(baSakScope)
 
         fun sendTilSak(nyBehandling: NyBehandling) {
             val uri = URI.create("$sakServiceUri/behandlinger")

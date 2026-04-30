@@ -1,4 +1,4 @@
-package no.nav.familie.baks.mottak.integrasjoner
+package no.nav.familie.baks.mottak.texas
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

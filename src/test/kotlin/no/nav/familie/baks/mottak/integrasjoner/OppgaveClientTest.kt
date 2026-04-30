@@ -44,6 +44,7 @@ import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.web.client.HttpServerErrorException
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -145,7 +146,7 @@ class OppgaveClientTest : AbstractWiremockTest() {
         assertThatThrownBy {
             oppgaveClient.opprettJournalføringsoppgave(journalPost)
         }.isInstanceOf(IntegrasjonException::class.java)
-            .hasCauseInstanceOf(RessursException::class.java)
+            .hasCauseInstanceOf(HttpServerErrorException::class.java)
             .hasMessageContaining("feilet ved opprettelse av oppgave")
     }
 

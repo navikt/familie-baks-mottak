@@ -7,12 +7,13 @@ import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentResponse
 import no.nav.familie.kontrakter.felles.dokarkiv.v2.ArkiverDokumentRequest
 import no.nav.familie.kontrakter.felles.getDataOrThrow
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
-import no.nav.familie.restklient.client.AbstractRestClient
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.ParameterizedTypeReference
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
-import org.springframework.web.client.RestOperations
+import org.springframework.web.client.RestClient
 import java.net.URI
 
 private val logger = LoggerFactory.getLogger(DokarkivClient::class.java)
@@ -20,8 +21,8 @@ private val logger = LoggerFactory.getLogger(DokarkivClient::class.java)
 @Component
 class DokarkivClient(
     @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonUri: URI,
-    @Qualifier("clientCredentials") restOperations: RestOperations,
-) : AbstractRestClient(restOperations, "integrasjon") {
+    @Qualifier("integrasjonerRestClient") private val restClient: RestClient,
+) {
     fun oppdaterJournalpostSak(
         jp: Journalpost,
         fagsakId: String,
@@ -29,23 +30,19 @@ class DokarkivClient(
     ) {
         logger.info("Oppdaterer journalpost ${jp.journalpostId} med fagsaktilknytning $fagsakId ")
         val uri = URI.create("$integrasjonUri/arkiv/v2/${jp.journalpostId}")
-
         val sak =
             when (tema) {
                 Tema.BAR -> Sak(fagsakId, Fagsystem.BA.name)
                 Tema.KON -> Sak(fagsakId, Fagsystem.KONT.name)
                 else -> throw IllegalArgumentException("Tema $tema støtter ikke oppdatering av journalpost sak")
             }
-
         val journalpostBruker = jp.bruker
-
         val request =
             TilknyttFagsakRequest(
                 bruker = Bruker(idType = IdType.valueOf(journalpostBruker!!.type.name), id = journalpostBruker.id),
                 tema = tema.name,
                 sak = sak,
             )
-
         when (val response = utførRequest(uri, request)) {
             is Throwable -> throw IntegrasjonException(
                 "Oppdatering av journalpost ${jp.journalpostId} med fagsak $fagsakId feilet",
@@ -59,14 +56,19 @@ class DokarkivClient(
     fun arkiver(arkiverDokumentRequest: ArkiverDokumentRequest): ArkiverDokumentResponse {
         val uri = URI.create("$integrasjonUri/arkiv/v4")
         val response =
-            postForEntity<Ressurs<ArkiverDokumentResponse>>(uri, arkiverDokumentRequest)
+            restClient
+                .post()
+                .uri(uri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(arkiverDokumentRequest)
+                .retrieve()
+                .body(object : ParameterizedTypeReference<Ressurs<ArkiverDokumentResponse>>() {})!!
         return response.getDataOrThrow()
     }
 
     fun ferdigstillJournalpost(journalpostId: String) {
         logger.info("Forsøker å ferdigstille journalpost $journalpostId")
         val uri = URI.create("$integrasjonUri/arkiv/v2/$journalpostId/ferdigstill?journalfoerendeEnhet=9999")
-
         when (val response = utførRequest(uri)) {
             is Throwable -> throw IntegrasjonException("Ferdigstilling av journalpost $journalpostId feilet", response, uri)
         }
@@ -78,13 +80,19 @@ class DokarkivClient(
     ): Any =
         Result
             .runCatching {
-                putForEntity<Ressurs<Any>>(uri, request)
+                restClient
+                    .put()
+                    .uri(uri)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .retrieve()
+                    .body(object : ParameterizedTypeReference<Ressurs<Any>>() {})!!
             }.fold(
                 onSuccess = { response -> assertGyldig(response) },
                 onFailure = { it },
             )
 
-    private inline fun <reified T : Any> assertGyldig(ressurs: Ressurs<T>?): T =
+    private fun <T : Any> assertGyldig(ressurs: Ressurs<T>?): T =
         when {
             ressurs == null -> error("Finner ikke ressurs")
             ressurs.data == null -> error("Ressurs mangler data")
