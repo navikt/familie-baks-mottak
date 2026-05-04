@@ -21,17 +21,8 @@ class TexasRestClientFactory(
     fun lagMaskinRestKlient(target: String): RestClient =
         RestClient
             .builder()
-            .requestInterceptors {
-                listOf(
-                    consumerIdClientInterceptor,
-                    mdcValuesPropagatingClientInterceptor,
-                    TexasMaskinTokenInterceptor(texasClient, target),
-                )
-            }
-//            .requestInterceptor { request, body, execution ->
-//                request.headers.setBearerAuth(texasClient.hentMaskinToken(target))
-//                execution.execute(request, body)
-//                MDC.get(MDCConstants.MDC_CALL_ID)?.let { request.headers["Nav-Call-Id"] = it }
-//            }
+            .requestInterceptor(consumerIdClientInterceptor)
+            .requestInterceptor(mdcValuesPropagatingClientInterceptor)
+            .requestInterceptor(TexasMaskinTokenInterceptor(texasClient, target))
             .build()
 }

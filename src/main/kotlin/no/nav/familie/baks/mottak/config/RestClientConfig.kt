@@ -28,10 +28,7 @@ class RestClientConfig(
     fun unauthenticatedRestClient(): RestClient =
         RestClient
             .builder()
-            .requestInterceptors {
-                listOf(
-                    consumerIdClientInterceptor,
-                    mdcValuesPropagatingClientInterceptor,
-                )
-            }.build()
+            .requestInterceptor(consumerIdClientInterceptor)
+            .requestInterceptor(mdcValuesPropagatingClientInterceptor)
+            .build()
 }

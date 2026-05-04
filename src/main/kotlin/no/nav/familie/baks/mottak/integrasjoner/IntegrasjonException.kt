@@ -15,13 +15,8 @@ open class IntegrasjonException(
 ) : RuntimeException(msg, throwable) {
     init {
         val detaljertMelding = responseFra(uri, throwable)
-        secureLogger.info(
-            "$msg. ident={} {} {}",
-            ident,
-            detaljertMelding ?: uri,
-            throwable,
-        )
-        logger.warn("$msg. {}", detaljertMelding ?: uri)
+        secureLogger.info("$msg. ident=$ident ${detaljertMelding ?: uri}", throwable)
+        logger.warn("$msg. ${detaljertMelding ?: uri}", detaljertMelding ?: uri)
     }
 
     companion object {
