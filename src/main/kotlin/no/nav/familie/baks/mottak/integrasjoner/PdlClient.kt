@@ -10,12 +10,12 @@ import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROL
 import no.nav.familie.kontrakter.felles.personopplysning.ForelderBarnRelasjon
 import no.nav.familie.kontrakter.felles.personopplysning.Oppholdsadresse
 import no.nav.familie.kontrakter.felles.personopplysning.SIVILSTANDTYPE
-import no.nav.familie.restklient.util.UriUtil
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
+import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 import java.time.LocalDate
 
@@ -26,7 +26,12 @@ class PdlClient(
     texasRestClientFactory: TexasRestClientFactory,
 ) {
     private val restClient = texasRestClientFactory.lagMaskinRestKlient(pdlScope)
-    private val pdlUri = UriUtil.uri(pdlBaseUrl, PATH_GRAPHQL)
+    private val pdlUri =
+        UriComponentsBuilder
+            .fromUri(pdlBaseUrl)
+            .pathSegment(PATH_GRAPHQL)
+            .build()
+            .toUri()
 
     fun hentIdenter(
         personIdent: String,

@@ -1,7 +1,7 @@
 package no.nav.familie.baks.mottak.texas
 
-import no.nav.familie.restklient.interceptor.ConsumerIdClientInterceptor
-import no.nav.familie.restklient.interceptor.MdcValuesPropagatingClientInterceptor
+import no.nav.familie.baks.mottak.config.interceptor.ConsumerIdClientInterceptor
+import no.nav.familie.baks.mottak.config.interceptor.MdcValuesPropagatingClientInterceptor
 import org.springframework.context.annotation.Import
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
