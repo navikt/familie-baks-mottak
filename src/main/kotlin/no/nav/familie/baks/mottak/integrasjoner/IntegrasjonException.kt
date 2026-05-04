@@ -12,7 +12,7 @@ open class IntegrasjonException(
     throwable: Throwable? = null,
     uri: URI? = null,
     ident: String? = null,
-) : RuntimeException(responseFra(uri, throwable) ?: msg, throwable) {
+) : RuntimeException(msg, throwable) {
     init {
         val detaljertMelding = responseFra(uri, throwable)
         secureLogger.info(
