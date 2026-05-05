@@ -11,11 +11,11 @@ class TexasClient(
 ) {
     private val restClient = RestClient.create()
 
-    fun hentMaskinToken(target: String): String {
+    fun hentMaskinToken(scope: String): String {
         val body =
             mapOf(
                 "identity_provider" to "entra_id",
-                "target" to target,
+                "target" to scope,
             )
         val response =
             restClient
