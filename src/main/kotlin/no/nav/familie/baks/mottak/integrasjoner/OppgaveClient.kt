@@ -122,7 +122,7 @@ class OppgaveClient
                     onSuccess = { response -> assertGyldig(response).oppgaver },
                     onFailure = {
                         secureLog.error("Finn oppgaver feilet mot $uri og request: $request", NestedExceptionUtils.getMostSpecificCause(it))
-                        throw IntegrasjonException("GET $uri feilet ved henting av oppgaver", it, uri, null)
+                        throw IntegrasjonException("Post-kall $uri feilet ved henting av oppgaver", it, uri, null)
                     },
                 )
         }
@@ -148,7 +148,7 @@ class OppgaveClient
                     onSuccess = { response -> assertGyldig(response).oppgaver },
                     onFailure = {
                         secureLog.error("Finn oppgave feilet for $aktørId og $oppgavetype", NestedExceptionUtils.getMostSpecificCause(it))
-                        throw IntegrasjonException("GET $uri feilet ved henting av oppgaver", it, uri, null)
+                        throw IntegrasjonException("Post-kall $uri feilet ved henting av oppgaver", it, uri, null)
                     },
                 )
         }
