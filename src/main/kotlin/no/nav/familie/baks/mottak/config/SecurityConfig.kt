@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
+import org.springframework.security.authorization.AuthorizationManager
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -16,6 +17,7 @@ import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher
 
@@ -24,10 +26,13 @@ import org.springframework.security.web.util.matcher.NegatedRequestMatcher
 @EnableMethodSecurity(prePostEnabled = true)
 @Import(FamilieFellesSpringSecurityKonfigurasjon::class)
 class SecurityConfig(
-    private val multiIssuerAuthenticationManagerResolver: MultiIssuerAuthenticationManagerResolver,
+    private val azureAuthManager: AzureAuthManager,
 ) {
     @Bean
-    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+    fun securityFilterChain(
+        http: HttpSecurity,
+        tokenXAuthorizationManager: AuthorizationManager<RequestAuthorizationContext>,
+    ): SecurityFilterChain {
         http {
             authorizeHttpRequests {
                 authorize("/internal/**", permitAll)
@@ -35,10 +40,17 @@ class SecurityConfig(
                 authorize("/api/ping", permitAll)
                 authorize("/api/kontantstotte/ping", permitAll)
                 authorize("/api/status/**", permitAll)
+
+                // Krev TokenX for kontantstøtte-søknader
+                authorize("/api/kontantstotte/soknad/**", tokenXAuthorizationManager)
+
+                // Krev TokenX for barnetrygd-søknader
+                authorize("/api/soknad/**", tokenXAuthorizationManager)
+
                 authorize(anyRequest, authenticated)
             }
             oauth2ResourceServer {
-                authenticationManagerResolver = multiIssuerAuthenticationManagerResolver.resolver()
+                jwt { authenticationManager = azureAuthManager }
             }
             csrf { disable() }
         }
@@ -46,6 +58,13 @@ class SecurityConfig(
         http.securityMatcher(NegatedRequestMatcher(PathPatternRequestMatcher.pathPattern("/api/task/**")))
         return http.build()
     }
+
+
+    @Bean
+    fun tokenXAuthorizationManager(
+        @Value("\${TOKEN_X_ISSUER:}") tokenXIssuer: String,
+    ): AuthorizationManager<RequestAuthorizationContext> = TokenXAuthorizationManager(tokenXIssuer)
+
 
     @Bean
     fun prosesseringInfoProvider(
