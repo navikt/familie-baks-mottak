@@ -26,7 +26,7 @@
         <prosessering.version>2.20260420122910_8bfca04</prosessering.version>
 
         <felles.version>4.20260428145828_c16a1d8</felles.version>
-        <kontrakter.version>4.0_20260427083013_f53660d</kontrakter.version>
+        <kontrakter.version>4.0_20260504163558_47138d7</kontrakter.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
 
@@ -228,7 +228,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.10</version>
+            <version>42.7.11</version>
         </dependency>
         <dependency>
             <groupId>com.papertrailapp</groupId>
