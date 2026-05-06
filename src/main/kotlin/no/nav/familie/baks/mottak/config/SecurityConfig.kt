@@ -9,7 +9,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.security.authorization.AuthorizationManager
+import org.springframework.core.Ordered.LOWEST_PRECEDENCE
+import org.springframework.core.annotation.Order
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -17,7 +18,6 @@ import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.access.intercept.RequestAuthorizationContext
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher
 
@@ -26,31 +26,47 @@ import org.springframework.security.web.util.matcher.NegatedRequestMatcher
 @EnableMethodSecurity(prePostEnabled = true)
 @Import(FamilieFellesSpringSecurityKonfigurasjon::class)
 class SecurityConfig(
-    private val azureAuthManager: AzureAuthManager,
+    private val azureDecoder: AzureDecoder,
+    private val tokenXDecoder: TokenXDecoder,
 ) {
     @Bean
-    fun securityFilterChain(
+    @Order(1)
+    fun søknadSecurityFilterChain(
         http: HttpSecurity,
-        tokenXAuthorizationManager: AuthorizationManager<RequestAuthorizationContext>,
+    ): SecurityFilterChain {
+        http {
+            securityMatcher("/api/soknad/**", "/api/kontantstotte/soknad/**")
+
+            authorizeHttpRequests {
+                authorize(anyRequest, authenticated)
+            }
+
+            oauth2ResourceServer {
+                jwt { jwtDecoder = tokenXDecoder }
+            }
+            csrf { disable() }
+        }
+
+        return http.build()
+    }
+
+    @Bean
+    @Order(LOWEST_PRECEDENCE)
+    fun defaultSecurityFilterChain(
+        http: HttpSecurity,
     ): SecurityFilterChain {
         http {
             authorizeHttpRequests {
                 authorize("/internal/**", permitAll)
-                authorize("/actuator/**", permitAll)
                 authorize("/api/ping", permitAll)
                 authorize("/api/kontantstotte/ping", permitAll)
-                authorize("/api/status/**", permitAll)
-
-                // Krev TokenX for kontantstøtte-søknader
-                authorize("/api/kontantstotte/soknad/**", tokenXAuthorizationManager)
-
-                // Krev TokenX for barnetrygd-søknader
-                authorize("/api/soknad/**", tokenXAuthorizationManager)
+                authorize("/api/status/barnetrygd", permitAll)
+                authorize("/api/status/kontantstotte", permitAll)
 
                 authorize(anyRequest, authenticated)
             }
             oauth2ResourceServer {
-                jwt { authenticationManager = azureAuthManager }
+                jwt { jwtDecoder = azureDecoder }
             }
             csrf { disable() }
         }
@@ -58,13 +74,6 @@ class SecurityConfig(
         http.securityMatcher(NegatedRequestMatcher(PathPatternRequestMatcher.pathPattern("/api/task/**")))
         return http.build()
     }
-
-
-    @Bean
-    fun tokenXAuthorizationManager(
-        @Value("\${TOKEN_X_ISSUER:}") tokenXIssuer: String,
-    ): AuthorizationManager<RequestAuthorizationContext> = TokenXAuthorizationManager(tokenXIssuer)
-
 
     @Bean
     fun prosesseringInfoProvider(
@@ -93,6 +102,7 @@ class SecurityConfig(
     fun tokenValidationContextHolder(): TokenValidationContextHolder = SpringSecurityTokenValidationContextHolder()
 }
 
+// TODO se på denne
 class SpringSecurityTokenValidationContextHolder : TokenValidationContextHolder {
     override fun getTokenValidationContext(): TokenValidationContext {
         val jwt = (SecurityContextHolder.getContext().authentication as? JwtAuthenticationToken)?.token
