@@ -97,20 +97,4 @@ class SecurityConfig(
 
         private fun hentJwt() = (SecurityContextHolder.getContext().authentication as? JwtAuthenticationToken)?.token
     }
-
-    @Bean
-    fun tokenValidationContextHolder(): TokenValidationContextHolder = SpringSecurityTokenValidationContextHolder()
-}
-
-// TODO se på denne
-class SpringSecurityTokenValidationContextHolder : TokenValidationContextHolder {
-    override fun getTokenValidationContext(): TokenValidationContext {
-        val jwt = (SecurityContextHolder.getContext().authentication as? JwtAuthenticationToken)?.token
-        val validatedTokens = jwt?.issuer?.let { mapOf(it.toString() to JwtToken(jwt.tokenValue)) } ?: emptyMap()
-        return TokenValidationContext(validatedTokens)
-    }
-
-    override fun setTokenValidationContext(tokenValidationContext: TokenValidationContext?) {
-        // No-op: Spring Security manages the token context
-    }
 }
