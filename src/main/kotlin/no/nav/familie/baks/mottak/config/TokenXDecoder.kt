@@ -16,9 +16,14 @@ import org.springframework.stereotype.Component
  */
 @Component
 class TokenXDecoder(
-    @param:Value("\${TOKEN_X_ISSUER:}") private val tokenXIssuer: String,
-    @param:Value("\${TOKEN_X_CLIENT_ID:}") private val tokenXClientId: String,
+    @param:Value("\${TOKEN_X_ISSUER}") private val tokenXIssuer: String,
+    @param:Value("\${TOKEN_X_CLIENT_ID}") private val tokenXClientId: String,
 ) : JwtDecoder {
+    companion object {
+        const val LEVEL4 = "Level4"
+        const val IDPORTEN_LOA_HIGH = "idporten-loa-high"
+    }
+
     private val delegate by lazy {
 
         val decoder = NimbusJwtDecoder.withIssuerLocation(tokenXIssuer).build()
@@ -26,7 +31,7 @@ class TokenXDecoder(
             DelegatingOAuth2TokenValidator(
                 JwtValidators.createDefaultWithIssuer(tokenXIssuer),
                 JwtClaimValidator<Collection<String>>("aud") { audiences -> tokenXClientId in audiences },
-                JwtClaimValidator<String>("acr") { acr -> acr == "Level4" || acr == "idporten-loa-high" },
+                JwtClaimValidator<String>("acr") { acr -> acr == LEVEL4 || acr == IDPORTEN_LOA_HIGH },
             ),
         )
         decoder

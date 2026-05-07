@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class AzureDecoder(
-    @param:Value("\${AZURE_OPENID_CONFIG_ISSUER:}") private val azureIssuer: String,
-    @param:Value("\${AZURE_APP_CLIENT_ID:}") private val azureClientId: String,
+    @param:Value("\${AZURE_OPENID_CONFIG_ISSUER}") private val azureIssuer: String,
+    @param:Value("\${AZURE_APP_CLIENT_ID}") private val azureClientId: String,
 ) : JwtDecoder {
     private val delegate by lazy {
         val decoder = NimbusJwtDecoder.withIssuerLocation(azureIssuer).build()
