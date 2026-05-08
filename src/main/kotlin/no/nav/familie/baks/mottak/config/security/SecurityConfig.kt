@@ -1,22 +1,17 @@
-package no.nav.familie.baks.mottak.config
+package no.nav.familie.baks.mottak.config.security
 
-import no.nav.familie.prosessering.config.ProsesseringInfoProvider
+import no.nav.familie.baks.mottak.config.security.AzureDecoder
+import no.nav.familie.baks.mottak.config.security.TokenXDecoder
 import no.nav.familie.sikkerhet.context.FamilieFellesSpringSecurityKonfigurasjon
-import no.nav.security.token.support.core.context.TokenValidationContext
-import no.nav.security.token.support.core.context.TokenValidationContextHolder
-import no.nav.security.token.support.core.jwt.JwtToken
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.core.Ordered.LOWEST_PRECEDENCE
+import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher
@@ -51,11 +46,14 @@ class SecurityConfig(
     }
 
     @Bean
-    @Order(LOWEST_PRECEDENCE)
+    @Order(Ordered.LOWEST_PRECEDENCE)
     fun defaultSecurityFilterChain(
         http: HttpSecurity,
     ): SecurityFilterChain {
         http {
+            // Ekskluder /api/task/** for å garantere at prosessering-web-spring-security håndterer det
+            http.securityMatcher(NegatedRequestMatcher(PathPatternRequestMatcher.pathPattern("/api/task/**")))
+
             authorizeHttpRequests {
                 authorize("/internal/**", permitAll)
                 authorize("/api/ping", permitAll)
@@ -70,31 +68,7 @@ class SecurityConfig(
             }
             csrf { disable() }
         }
-        // Ekskluder /api/task/** slik at prosessering-web-spring-security håndterer det
-        http.securityMatcher(NegatedRequestMatcher(PathPatternRequestMatcher.pathPattern("/api/task/**")))
+
         return http.build()
-    }
-
-    @Bean
-    fun prosesseringInfoProvider(
-        @Value("\${prosessering.rolle}") prosesseringRolle: String,
-    ) = object : ProsesseringInfoProvider {
-        override fun hentBrukernavn(): String =
-            try {
-                hentJwt()?.getClaimAsString("preferred_username") ?: "VL"
-            } catch (e: Exception) {
-                "VL"
-            }
-
-        override fun harTilgang(): Boolean = grupper().contains(prosesseringRolle)
-
-        private fun grupper(): List<String> =
-            try {
-                hentJwt()?.getClaimAsStringList("groups") ?: emptyList()
-            } catch (e: Exception) {
-                emptyList()
-            }
-
-        private fun hentJwt() = (SecurityContextHolder.getContext().authentication as? JwtAuthenticationToken)?.token
     }
 }

@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.config
 
-import io.mockk.mockk
+import no.nav.familie.baks.mottak.config.security.ProsesseringInfoConfig
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
@@ -17,10 +17,7 @@ import java.time.Instant
 class ProsesseringInfoProviderTest {
     private val prosesseringRolle = "test-prosessering-rolle"
     private val prosesseringInfoProvider =
-        SecurityConfig(
-            azureDecoder = mockk(),
-            tokenXDecoder = mockk(),
-        ).prosesseringInfoProvider(prosesseringRolle)
+        ProsesseringInfoConfig().prosesseringInfoProvider(prosesseringRolle)
 
     @AfterEach
     fun cleanup() {

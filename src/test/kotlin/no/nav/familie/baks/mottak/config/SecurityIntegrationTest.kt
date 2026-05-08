@@ -11,7 +11,7 @@ import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.servlet.client.RestTestClient
 import kotlin.test.assertFalse
 
 /**
@@ -31,12 +31,12 @@ class SecurityIntegrationTest {
     @Autowired
     private lateinit var mockOAuth2Server: MockOAuth2Server
 
-    private lateinit var webTestClient: WebTestClient
+    private lateinit var restTestClient: RestTestClient
 
     @BeforeEach
     fun setup() {
-        webTestClient =
-            WebTestClient
+        restTestClient =
+            RestTestClient
                 .bindToServer()
                 .baseUrl("http://localhost:$port")
                 .build()
@@ -46,7 +46,7 @@ class SecurityIntegrationTest {
     inner class OffentligeEndepunkter {
         @Test
         fun `skal tillate tilgang til internal-endepunkter uten token`() {
-            webTestClient
+            restTestClient
                 .get()
                 .uri("/internal/health")
                 .exchange()
@@ -56,7 +56,7 @@ class SecurityIntegrationTest {
 
         @Test
         fun `skal tillate tilgang til api ping uten token`() {
-            webTestClient
+            restTestClient
                 .get()
                 .uri("/api/ping")
                 .exchange()
@@ -66,7 +66,7 @@ class SecurityIntegrationTest {
 
         @Test
         fun `skal tillate tilgang til kontantstøtte ping uten token`() {
-            webTestClient
+            restTestClient
                 .get()
                 .uri("/api/kontantstotte/ping")
                 .exchange()
@@ -77,7 +77,7 @@ class SecurityIntegrationTest {
         @Test
         fun `skal tillate tilgang til status barnetrygd uten token`() {
             val status =
-                webTestClient
+                restTestClient
                     .get()
                     .uri("/api/status/barnetrygd")
                     .exchange()
@@ -89,7 +89,7 @@ class SecurityIntegrationTest {
         @Test
         fun `skal tillate tilgang til status kontantstøtte uten token`() {
             val status =
-                webTestClient
+                restTestClient
                     .get()
                     .uri("/api/status/kontantstotte")
                     .exchange()
@@ -103,7 +103,7 @@ class SecurityIntegrationTest {
     inner class TokenXSøknadsendepunkter {
         @Test
         fun `skal avvise søknad uten token`() {
-            webTestClient
+            restTestClient
                 .post()
                 .uri("/api/soknad/v10")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -114,7 +114,7 @@ class SecurityIntegrationTest {
 
         @Test
         fun `skal avvise kontantstøtte søknad uten token`() {
-            webTestClient
+            restTestClient
                 .post()
                 .uri("/api/kontantstotte/soknad/v6")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -128,7 +128,7 @@ class SecurityIntegrationTest {
             val token = JwtTokenTestUtil.lagTokenXToken(mockOAuth2Server, acr = "Level4")
 
             val status =
-                webTestClient
+                restTestClient
                     .post()
                     .uri("/api/soknad/v10")
                     .header("Authorization", "Bearer $token")
@@ -144,7 +144,7 @@ class SecurityIntegrationTest {
             val token = JwtTokenTestUtil.lagTokenXToken(mockOAuth2Server, acr = "idporten-loa-high")
 
             val status =
-                webTestClient
+                restTestClient
                     .post()
                     .uri("/api/soknad/v10")
                     .header("Authorization", "Bearer $token")
@@ -160,7 +160,7 @@ class SecurityIntegrationTest {
             val token = JwtTokenTestUtil.lagTokenXToken(mockOAuth2Server, acr = "Level4")
 
             val status =
-                webTestClient
+                restTestClient
                     .post()
                     .uri("/api/kontantstotte/soknad/v6")
                     .header("Authorization", "Bearer $token")
@@ -176,7 +176,7 @@ class SecurityIntegrationTest {
             val token = JwtTokenTestUtil.lagTokenXToken(mockOAuth2Server, acr = "idporten-loa-high")
 
             val status =
-                webTestClient
+                restTestClient
                     .post()
                     .uri("/api/kontantstotte/soknad/v6")
                     .header("Authorization", "Bearer $token")
@@ -194,7 +194,7 @@ class SecurityIntegrationTest {
         fun `skal avvise Azure AD-token på barnetrygd-søknad`() {
             val token = JwtTokenTestUtil.lagAzureAdToken(mockOAuth2Server)
 
-            webTestClient
+            restTestClient
                 .post()
                 .uri("/api/soknad/v10")
                 .header("Authorization", "Bearer $token")
@@ -208,7 +208,7 @@ class SecurityIntegrationTest {
         fun `skal avvise Azure AD-token på kontantstøtte-søknad v4`() {
             val token = JwtTokenTestUtil.lagAzureAdToken(mockOAuth2Server)
 
-            webTestClient
+            restTestClient
                 .post()
                 .uri("/api/kontantstotte/soknad/v4")
                 .header("Authorization", "Bearer $token")
@@ -222,7 +222,7 @@ class SecurityIntegrationTest {
         fun `skal avvise Azure AD-token på kontantstøtte-søknad v5`() {
             val token = JwtTokenTestUtil.lagAzureAdToken(mockOAuth2Server)
 
-            webTestClient
+            restTestClient
                 .post()
                 .uri("/api/kontantstotte/soknad/v5")
                 .header("Authorization", "Bearer $token")
@@ -236,7 +236,7 @@ class SecurityIntegrationTest {
         fun `skal avvise Azure AD-token på kontantstøtte-søknad v6`() {
             val token = JwtTokenTestUtil.lagAzureAdToken(mockOAuth2Server)
 
-            webTestClient
+            restTestClient
                 .post()
                 .uri("/api/kontantstotte/soknad/v6")
                 .header("Authorization", "Bearer $token")
@@ -257,7 +257,7 @@ class SecurityIntegrationTest {
                     JwtTokenTestUtil.UgyldigTokenÅrsak.FEIL_AUDIENCE,
                 )
 
-            webTestClient
+            restTestClient
                 .post()
                 .uri("/api/soknad/v10")
                 .header("Authorization", "Bearer $token")
@@ -275,7 +275,7 @@ class SecurityIntegrationTest {
                     JwtTokenTestUtil.UgyldigTokenÅrsak.FEIL_ACR,
                 )
 
-            webTestClient
+            restTestClient
                 .post()
                 .uri("/api/soknad/v10")
                 .header("Authorization", "Bearer $token")
@@ -293,7 +293,7 @@ class SecurityIntegrationTest {
                     JwtTokenTestUtil.UgyldigTokenÅrsak.UTGÅTT,
                 )
 
-            webTestClient
+            restTestClient
                 .post()
                 .uri("/api/soknad/v10")
                 .header("Authorization", "Bearer $token")
@@ -313,7 +313,7 @@ class SecurityIntegrationTest {
                     JwtTokenTestUtil.UgyldigTokenÅrsak.FEIL_ISSUER,
                 )
 
-            webTestClient
+            restTestClient
                 .post()
                 .uri("/api/soknad/v10")
                 .header("Authorization", "Bearer $token")
@@ -331,7 +331,7 @@ class SecurityIntegrationTest {
                     audience = "feil-audience",
                 )
 
-            webTestClient
+            restTestClient
                 .post()
                 .uri("/api/soknad/v10")
                 .header("Authorization", "Bearer $token")

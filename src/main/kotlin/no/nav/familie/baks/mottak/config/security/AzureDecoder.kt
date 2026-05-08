@@ -1,4 +1,4 @@
-package no.nav.familie.baks.mottak.config
+package no.nav.familie.baks.mottak.config.security
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
