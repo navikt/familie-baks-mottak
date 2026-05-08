@@ -6,9 +6,9 @@ import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknad
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
 import java.net.URI
 
 private val logger = LoggerFactory.getLogger(BaksVersjonertSøknadClient::class.java)
@@ -26,7 +26,7 @@ class BaksVersjonertSøknadClient(
                 .get()
                 .uri(uri)
                 .retrieve()
-                .body(object : ParameterizedTypeReference<Ressurs<VersjonertBarnetrygdSøknad>>() {})!!
+                .body<Ressurs<VersjonertBarnetrygdSøknad>>()!!
         }.fold(
             onSuccess = { it.data ?: throw IntegrasjonException(it.melding, uri = uri) },
             onFailure = { throw IntegrasjonException("Henting av søknad for barnetrygd feilet. journalpostId: $journalpostId", it, uri) },
@@ -41,7 +41,7 @@ class BaksVersjonertSøknadClient(
                 .get()
                 .uri(uri)
                 .retrieve()
-                .body(object : ParameterizedTypeReference<Ressurs<VersjonertKontantstøtteSøknad>>() {})!!
+                .body<Ressurs<VersjonertKontantstøtteSøknad>>()!!
         }.fold(
             onSuccess = { it.data ?: throw IntegrasjonException(it.melding, uri = uri) },
             onFailure = { throw IntegrasjonException("Henting av søknad for kontantstøtte feilet. journalpostId: $journalpostId.", it, uri) },

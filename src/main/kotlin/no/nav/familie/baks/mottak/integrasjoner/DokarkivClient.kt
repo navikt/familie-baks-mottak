@@ -10,10 +10,10 @@ import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
 import java.net.URI
 
 private val logger = LoggerFactory.getLogger(DokarkivClient::class.java)
@@ -62,7 +62,7 @@ class DokarkivClient(
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(arkiverDokumentRequest)
                 .retrieve()
-                .body(object : ParameterizedTypeReference<Ressurs<ArkiverDokumentResponse>>() {})!!
+                .body<Ressurs<ArkiverDokumentResponse>>()!!
         return response.getDataOrThrow()
     }
 
@@ -86,7 +86,7 @@ class DokarkivClient(
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
                     .retrieve()
-                    .body(object : ParameterizedTypeReference<Ressurs<Any>>() {})!!
+                    .body<Ressurs<Any>>()!!
             }.fold(
                 onSuccess = { response -> assertGyldig(response) },
                 onFailure = { it },

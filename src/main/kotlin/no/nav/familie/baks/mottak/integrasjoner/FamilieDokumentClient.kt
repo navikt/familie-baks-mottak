@@ -4,10 +4,10 @@ import no.nav.familie.kontrakter.felles.Ressurs
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
 import java.net.URI
 
 private val logger = LoggerFactory.getLogger(FamilieDokumentClient::class.java)
@@ -26,7 +26,7 @@ class FamilieDokumentClient(
                 .get()
                 .uri(uri)
                 .retrieve()
-                .body(object : ParameterizedTypeReference<Ressurs<ByteArray>>() {})!!
+                .body<Ressurs<ByteArray>>()!!
         return response.data!!
     }
 

@@ -9,10 +9,10 @@ import no.nav.familie.kontrakter.felles.arbeidsfordeling.Enhet
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 import java.util.Optional.ofNullable
@@ -49,7 +49,7 @@ class ArbeidsfordelingClient(
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(PersonIdent(personIdent))
                 .retrieve()
-                .body(object : ParameterizedTypeReference<Ressurs<List<Enhet>>>() {})!!
+                .body<Ressurs<List<Enhet>>>()!!
         }.fold(
             onSuccess = { it.data ?: throw IntegrasjonException(it.melding, uri = uri, ident = personIdent) },
             onFailure = { throw IntegrasjonException("Feil ved henting av behandlende enheter på ident m/ tema $tema og behandlingstype $behandlingstype", it, uri, personIdent) },

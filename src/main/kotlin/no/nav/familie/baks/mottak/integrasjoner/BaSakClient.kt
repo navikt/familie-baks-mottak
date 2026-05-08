@@ -7,11 +7,11 @@ import no.nav.familie.kontrakter.felles.Ressurs
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
+import org.springframework.web.client.body
 import java.net.URI
 import java.time.LocalDateTime
 
@@ -38,7 +38,7 @@ class BaSakClient
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(nyBehandling)
                         .retrieve()
-                        .body(object : ParameterizedTypeReference<Ressurs<String>>() {})!!
+                        .body<Ressurs<String>>()!!
                 logger.info("Søknad sendt til sak. Status=${response.status}")
             } catch (e: RestClientResponseException) {
                 logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.statusCode, e.responseBodyAsString)
@@ -62,7 +62,7 @@ class BaSakClient
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(PersonIdent(ident = personIdent))
                         .retrieve()
-                        .body(object : ParameterizedTypeReference<Ressurs<String>>() {})!!
+                        .body<Ressurs<String>>()!!
                 logger.info("Ident for svalbardtillegg sendt til sak. Status=${response.status}")
             } catch (e: RestClientResponseException) {
                 logger.warn("Send svalbardtillegg til sak feilet. Responskode: ${e.statusCode}, body: ${e.responseBodyAsString}")
@@ -82,7 +82,7 @@ class BaSakClient
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(PersonIdent(ident = personIdent))
                         .retrieve()
-                        .body(object : ParameterizedTypeReference<Ressurs<String>>() {})!!
+                        .body<Ressurs<String>>()!!
                 logger.info("Ident for finnmarkstillegg sendt til sak. Status=${response.status}")
             } catch (e: RestClientResponseException) {
                 logger.warn("Send finnmarkstillegg til sak feilet. Responskode: ${e.statusCode}, body: ${e.responseBodyAsString}")
@@ -101,7 +101,7 @@ class BaSakClient
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(mapOf("personIdent" to personIdent))
                     .retrieve()
-                    .body(object : ParameterizedTypeReference<Ressurs<RestFagsakId>>() {})!!
+                    .body<Ressurs<RestFagsakId>>()!!
             }.fold(
                 onSuccess = { it.data?.id ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av saksnummer fra ba-sak.", it, uri, personIdent) },
@@ -120,7 +120,7 @@ class BaSakClient
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(RestSøkParam(personIdent, barnasIdenter))
                     .retrieve()
-                    .body(object : ParameterizedTypeReference<Ressurs<List<RestFagsakDeltager>>>() {})!!
+                    .body<Ressurs<List<RestFagsakDeltager>>>()!!
             }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av fagsakdeltagere fra ba-sak.", it, uri, personIdent) },
@@ -138,7 +138,7 @@ class BaSakClient
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(RestPersonIdent(personIdent))
                     .retrieve()
-                    .body(object : ParameterizedTypeReference<Ressurs<List<RestFagsakIdOgTilknyttetAktørId>>>() {})!!
+                    .body<Ressurs<List<RestFagsakIdOgTilknyttetAktørId>>>()!!
             }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av fagsakId og aktørId fra ba-sak.", it, uri, personIdent) },
@@ -156,7 +156,7 @@ class BaSakClient
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(RestPersonIdent(personIdent))
                     .retrieve()
-                    .body(object : ParameterizedTypeReference<Ressurs<List<RestFagsakIdOgTilknyttetAktørId>>>() {})!!
+                    .body<Ressurs<List<RestFagsakIdOgTilknyttetAktørId>>>()!!
             }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av fagsakId og aktørId fra ba-sak.", it, uri, personIdent) },
@@ -170,7 +170,7 @@ class BaSakClient
                     .get()
                     .uri(uri)
                     .retrieve()
-                    .body(object : ParameterizedTypeReference<Ressurs<RestMinimalFagsak>>() {})!!
+                    .body<Ressurs<RestMinimalFagsak>>()!!
             }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ba-sak.", it, uri) },
@@ -184,7 +184,7 @@ class BaSakClient
                     .get()
                     .uri(uri)
                     .retrieve()
-                    .body(object : ParameterizedTypeReference<Ressurs<RestFagsak>>() {})!!
+                    .body<Ressurs<RestFagsak>>()!!
             }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ba-sak.", it, uri) },
@@ -202,7 +202,7 @@ class BaSakClient
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(PersonIdent(ident = personIdent))
                         .retrieve()
-                        .body(object : ParameterizedTypeReference<Ressurs<String>>() {})!!
+                        .body<Ressurs<String>>()!!
                 logger.info("Ident fra vedtak om overgangsstønad sendt til sak. Status=${response.status}")
             } catch (e: RestClientResponseException) {
                 logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.statusCode, e.responseBodyAsString)
@@ -241,7 +241,7 @@ class BaSakClient
                                 søknadsinfo = søknadsinfo,
                             ),
                         ).retrieve()
-                        .body(object : ParameterizedTypeReference<Ressurs<Any>>() {})
+                        .body<Ressurs<Any>>()
                 }.onFailure {
                     throw IntegrasjonException("Feil ved opprettelse av behandling i ba-sak.", it, uri)
                 }
@@ -260,7 +260,7 @@ class BaSakClient
                             fagsakTyper = listOf("SKJERMET_BARN"),
                         ),
                     ).retrieve()
-                    .body(object : ParameterizedTypeReference<Ressurs<List<RestFagsakSkjermetBarn>>>() {})!!
+                    .body<Ressurs<List<RestFagsakSkjermetBarn>>>()!!
             }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av fagsak skjermet barn fra ba-sak.", it, uri) },

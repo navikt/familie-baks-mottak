@@ -4,9 +4,9 @@ import no.nav.familie.baks.mottak.texas.TexasRestClientFactory
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkRequest
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
+import org.springframework.web.client.body
 import java.net.URI
 import no.nav.familie.kontrakter.ba.infotrygd.Sak as SakDto
 import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
@@ -31,7 +31,7 @@ class InfotrygdBarnetrygdClient(
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(InfotrygdSøkRequest(søkersIdenter, barnasIdenter))
                     .retrieve()
-                    .body(object : ParameterizedTypeReference<InfotrygdSøkResponse<StønadDto>>() {})!!
+                    .body<InfotrygdSøkResponse<StønadDto>>()!!
             },
             onFailure = { ex -> IntegrasjonException("Feil ved søk etter stønad i infotrygd.", ex, uri("stonad")) },
         )
@@ -48,7 +48,7 @@ class InfotrygdBarnetrygdClient(
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(InfotrygdSøkRequest(søkersIdenter, barnasIdenter))
                     .retrieve()
-                    .body(object : ParameterizedTypeReference<InfotrygdSøkResponse<SakDto>>() {})!!
+                    .body<InfotrygdSøkResponse<SakDto>>()!!
             },
             onFailure = { ex -> IntegrasjonException("Feil ved uthenting av saker fra infotrygd.", ex, uri("saker")) },
         )
@@ -62,7 +62,7 @@ class InfotrygdBarnetrygdClient(
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(InfotrygdSøkRequest(søkersIdenter))
                     .retrieve()
-                    .body(object : ParameterizedTypeReference<InfotrygdSøkResponse<StønadDto>>() {})!!
+                    .body<InfotrygdSøkResponse<StønadDto>>()!!
             },
             onFailure = { ex -> IntegrasjonException("Feil ved uthenting av vedtak fra infotrygd", ex, uri("stonad?historikk=true")) },
         )

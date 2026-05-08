@@ -4,9 +4,9 @@ import no.nav.familie.baks.mottak.texas.TexasRestClientFactory
 import no.nav.familie.kontrakter.felles.Ressurs
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
+import org.springframework.web.client.body
 import java.net.URI
 import java.time.LocalDateTime
 
@@ -29,7 +29,7 @@ class KsSakClient
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(mapOf("personIdent" to personIdent))
                     .retrieve()
-                    .body(object : ParameterizedTypeReference<Ressurs<RestFagsak>>() {})!!
+                    .body<Ressurs<RestFagsak>>()!!
             }.fold(
                 onSuccess = { it.data?.id ?: throw IntegrasjonException(it.melding, uri = uri, ident = personIdent) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av saksnummer fra ks-sak.", it, uri, personIdent) },
@@ -47,7 +47,7 @@ class KsSakClient
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(RestPersonIdent(personIdent))
                     .retrieve()
-                    .body(object : ParameterizedTypeReference<Ressurs<List<RestFagsakIdOgTilknyttetAktørId>>>() {})!!
+                    .body<Ressurs<List<RestFagsakIdOgTilknyttetAktørId>>>()!!
             }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, uri = uri, ident = personIdent) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av fagsakId og aktørId fra ks-sak.", it, uri, personIdent) },
@@ -61,7 +61,7 @@ class KsSakClient
                     .get()
                     .uri(uri)
                     .retrieve()
-                    .body(object : ParameterizedTypeReference<Ressurs<RestMinimalFagsak>>() {})!!
+                    .body<Ressurs<RestMinimalFagsak>>()!!
             }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, uri = uri) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ks-sak.", it, uri) },
@@ -91,7 +91,7 @@ class KsSakClient
                                 behandlingType = behandlingType,
                             ),
                         ).retrieve()
-                        .body(object : ParameterizedTypeReference<Ressurs<Any>>() {})
+                        .body<Ressurs<Any>>()
                 }.onFailure {
                     throw IntegrasjonException("Feil ved opprettelse av behandling i ks-sak.", it, uri)
                 }

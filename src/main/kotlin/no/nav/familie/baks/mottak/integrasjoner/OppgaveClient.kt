@@ -18,10 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.NestedExceptionUtils
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
 import java.net.URI
 
 private val logger = LoggerFactory.getLogger(OppgaveClient::class.java)
@@ -88,7 +88,7 @@ class OppgaveClient
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(patchOppgave.copy(beskrivelse = beskrivelse))
                         .retrieve()
-                        .body(object : ParameterizedTypeReference<Ressurs<OppgaveResponse>>() {})!!
+                        .body<Ressurs<OppgaveResponse>>()!!
                 }.fold(
                     onSuccess = { response -> assertGyldig(response) },
                     onFailure = {
@@ -117,7 +117,7 @@ class OppgaveClient
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(request)
                         .retrieve()
-                        .body(object : ParameterizedTypeReference<Ressurs<FinnOppgaveResponseDto>>() {})!!
+                        .body<Ressurs<FinnOppgaveResponseDto>>()!!
                 }.fold(
                     onSuccess = { response -> assertGyldig(response).oppgaver },
                     onFailure = {
@@ -143,7 +143,7 @@ class OppgaveClient
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(request)
                         .retrieve()
-                        .body(object : ParameterizedTypeReference<Ressurs<FinnOppgaveResponseDto>>() {})!!
+                        .body<Ressurs<FinnOppgaveResponseDto>>()!!
                 }.fold(
                     onSuccess = { response -> assertGyldig(response).oppgaver },
                     onFailure = {
@@ -166,7 +166,7 @@ class OppgaveClient
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(request)
                         .retrieve()
-                        .body(object : ParameterizedTypeReference<Ressurs<OppgaveResponse>>() {})!!
+                        .body<Ressurs<OppgaveResponse>>()!!
                 }.fold(
                     onSuccess = { response -> assertGyldig(response) },
                     onFailure = {

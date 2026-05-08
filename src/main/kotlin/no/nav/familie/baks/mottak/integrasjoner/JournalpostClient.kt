@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
+import org.springframework.web.client.body
 import java.net.URI
 
 private val logger = LoggerFactory.getLogger(JournalpostClient::class.java)
@@ -31,7 +31,7 @@ class JournalpostClient
                     .get()
                     .uri(uri)
                     .retrieve()
-                    .body(object : ParameterizedTypeReference<Ressurs<Journalpost>>() {})!!
+                    .body<Ressurs<Journalpost>>()!!
                     .getDataOrThrow()
             } catch (e: RestClientResponseException) {
                 logger.warn("Henting av journalpost feilet. Responskode: {}, body: {}", e.statusCode, e.responseBodyAsString)
