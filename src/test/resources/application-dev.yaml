@@ -103,6 +103,7 @@ FAMILIE_INTEGRASJONER_SCOPE: dummy
 BA_SAK_SCOPE: dummy
 FAMILIE_BA_INFOTRYGD_SCOPE: dummy
 FAMILIE_PDF_SCOPE: dummy
+FAMILIE_DOKUMENT_SCOPE: dummy
 
 # Kreves for at unleash mock skal fungere:
 UNLEASH_SERVER_API_URL: http://dummy/api/
