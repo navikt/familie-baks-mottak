@@ -22,7 +22,6 @@ class MockOAuth2ServerInitializer : ApplicationContextInitializer<ConfigurableAp
     override fun initialize(applicationContext: ConfigurableApplicationContext) {
         val properties =
             mapOf<String, Any>(
-                "mock-oauth2-server.port" to server.baseUrl().port.toString(),
                 "TOKEN_X_ISSUER" to server.issuerUrl("tokenx").toString(),
                 "TOKEN_X_CLIENT_ID" to "aud-localhost",
                 "AZURE_OPENID_CONFIG_ISSUER" to server.issuerUrl("azuread").toString(),

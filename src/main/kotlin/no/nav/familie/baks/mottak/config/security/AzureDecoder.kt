@@ -3,6 +3,7 @@ package no.nav.familie.baks.mottak.config.security
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
 import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.security.oauth2.jwt.JwtAudienceValidator
 import org.springframework.security.oauth2.jwt.JwtClaimValidator
 import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.JwtValidators
@@ -19,7 +20,7 @@ class AzureDecoder(
         decoder.setJwtValidator(
             DelegatingOAuth2TokenValidator(
                 JwtValidators.createDefaultWithIssuer(azureIssuer),
-                JwtClaimValidator<Collection<String>>("aud") { audiences -> azureClientId in audiences },
+                JwtAudienceValidator(azureClientId),
             ),
         )
 
