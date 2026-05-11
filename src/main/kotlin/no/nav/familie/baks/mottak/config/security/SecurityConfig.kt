@@ -52,7 +52,7 @@ class SecurityConfig(
     ): SecurityFilterChain {
         http {
             // Ekskluder /api/task/** for å garantere at prosessering-web-spring-security håndterer det
-            http.securityMatcher(NegatedRequestMatcher(PathPatternRequestMatcher.pathPattern("/api/task/**")))
+            securityMatcher(NegatedRequestMatcher(PathPatternRequestMatcher.pathPattern("/api/task/**")))
 
             authorizeHttpRequests {
                 authorize("/internal/**", permitAll)

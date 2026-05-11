@@ -24,7 +24,7 @@ class MockOAuth2ServerInitializer : ApplicationContextInitializer<ConfigurableAp
             mapOf<String, Any>(
                 "TOKEN_X_ISSUER" to server.issuerUrl("tokenx").toString(),
                 "TOKEN_X_CLIENT_ID" to "aud-localhost",
-                "AZURE_OPENID_CONFIG_ISSUER" to server.issuerUrl("azuread").toString(),
+                "AZURE_OPENID_CONFIG_JWKS_URI" to server.issuerUrl("azuread").toString(),
                 "AZURE_APP_CLIENT_ID" to "aud-localhost",
             )
 
