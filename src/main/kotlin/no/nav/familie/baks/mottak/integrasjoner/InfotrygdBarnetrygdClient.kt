@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
-import no.nav.familie.baks.mottak.texas.TexasRestClientFactory
+import no.nav.familie.felles.texas.TexasRestClientFactory
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkRequest
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import org.springframework.beans.factory.annotation.Value
@@ -17,7 +17,7 @@ class InfotrygdBarnetrygdClient(
     @Value("\${FAMILIE_BA_INFOTRYGD_SCOPE}") private val infotrygdScope: String,
     texasRestClientFactory: TexasRestClientFactory,
 ) {
-    private val restClient = texasRestClientFactory.lagMaskinRestKlient(infotrygdScope)
+    private val restClient = texasRestClientFactory.lagMaskinTilMaskinRestKlient(infotrygdScope)
 
     fun hentLøpendeUtbetalinger(
         søkersIdenter: List<String>,

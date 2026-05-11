@@ -1,8 +1,8 @@
 package no.nav.familie.baks.mottak.config
 
-import no.nav.familie.baks.mottak.config.interceptor.ConsumerIdClientInterceptor
-import no.nav.familie.baks.mottak.config.interceptor.MdcValuesPropagatingClientInterceptor
-import no.nav.familie.baks.mottak.texas.TexasRestClientFactory
+import no.nav.familie.felles.texas.TexasRestClientFactory
+import no.nav.familie.log.interceptor.ConsumerIdClientInterceptor
+import no.nav.familie.log.interceptor.MdcValuesPropagatingClientInterceptor
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -13,6 +13,7 @@ import org.springframework.web.client.RestClient
 @Import(
     ConsumerIdClientInterceptor::class,
     MdcValuesPropagatingClientInterceptor::class,
+    TexasRestClientFactory::class,
 )
 class RestClientConfig(
     private val texasRestClientFactory: TexasRestClientFactory,
@@ -22,7 +23,7 @@ class RestClientConfig(
     @Bean("integrasjonerRestClient")
     fun integrasjonerRestClient(
         @Value("\${FAMILIE_INTEGRASJONER_SCOPE}") scope: String,
-    ): RestClient = texasRestClientFactory.lagMaskinRestKlient(scope)
+    ): RestClient = texasRestClientFactory.lagMaskinTilMaskinRestKlient(scope)
 
     @Bean("unauthenticatedRestClient")
     fun unauthenticatedRestClient(): RestClient =

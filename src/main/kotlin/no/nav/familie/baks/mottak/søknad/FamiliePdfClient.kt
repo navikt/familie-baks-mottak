@@ -1,7 +1,7 @@
 package no.nav.familie.baks.mottak.søknad
 
 import no.nav.familie.baks.mottak.domene.FeltMap
-import no.nav.familie.baks.mottak.texas.TexasRestClientFactory
+import no.nav.familie.felles.texas.TexasRestClientFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
@@ -18,7 +18,7 @@ class FamiliePdfClient(
     @Value("\${FAMILIE_PDF_SCOPE}") private val familiePdfScope: String,
     texasRestClientFactory: TexasRestClientFactory,
 ) {
-    private val restClient = texasRestClientFactory.lagMaskinRestKlient(familiePdfScope)
+    private val restClient = texasRestClientFactory.lagMaskinTilMaskinRestKlient(familiePdfScope)
 
     fun opprettPdf(feltMap: FeltMap): ByteArray {
         val pdfUri =
