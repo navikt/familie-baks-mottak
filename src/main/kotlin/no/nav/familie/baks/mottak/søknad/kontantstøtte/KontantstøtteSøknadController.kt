@@ -7,8 +7,6 @@ import no.nav.familie.kontrakter.ks.søknad.StøttetVersjonertKontantstøtteSøk
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV6
-import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.http.ResponseEntity
@@ -23,7 +21,6 @@ import no.nav.familie.kontrakter.ks.søknad.v6.KontantstøtteSøknad as Kontants
 
 @RestController
 @RequestMapping(path = ["/api/kontantstotte/"], produces = [APPLICATION_JSON_VALUE])
-@ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 class KontantstøtteSøknadController(
     private val kontantstøtteSøknadService: KontantstøtteSøknadService,
     private val kontantstøtteSøknadMetrikkService: KontantstøtteSøknadMetrikkService,
@@ -62,6 +59,5 @@ class KontantstøtteSøknadController(
         }
 
     @GetMapping(value = ["/ping"])
-    @Unprotected
     fun ping(): ResponseEntity<String> = ResponseEntity.ok().body("OK")
 }

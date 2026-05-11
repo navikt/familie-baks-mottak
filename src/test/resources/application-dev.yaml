@@ -1,12 +1,4 @@
 no.nav.security.jwt:
-  issuer:
-    selvbetjening:
-      discoveryurl: http://localhost:${mock-oauth2-server.port}/selvbetjening/.well-known/openid-configuration
-      accepted_audience: aud-localhost
-    # Kommenteres ut ved lokal testing av innsending av søknad
-  #    azuread:
-  #      discoveryurl: https://login.microsoftonline.com/navq.onmicrosoft.com/v2.0/.well-known/openid-configuration
-  #      accepted_audience: ${CLIENT_ID}
   client:
     registration:
       ba-sak-clientcredentials:
@@ -104,6 +96,11 @@ BA_SAK_SCOPE: dummy
 FAMILIE_BA_INFOTRYGD_SCOPE: dummy
 FAMILIE_PDF_SCOPE: dummy
 FAMILIE_DOKUMENT_SCOPE: dummy
+AZURE_OPENID_CONFIG_JWKS_URI: dummy
+AZURE_OPENID_CONFIG_ISSUER: dummy
+AZURE_APP_CLIENT_ID: dummy
+TOKEN_X_ISSUER: dummy
+TOKEN_X_CLIENT_ID: dummy
 
 # Kreves for at unleash mock skal fungere:
 UNLEASH_SERVER_API_URL: http://dummy/api/
