@@ -27,7 +27,7 @@
 
         <felles.version>4.20260428145828_c16a1d8</felles.version>
         <kontrakter.version>4.0_20260427083013_f53660d</kontrakter.version>
-        <mock-oauth2-server.version>3.0.1</mock-oauth2-server.version>
+        <mock-oauth2-server.version>3.0.3</mock-oauth2-server.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
 
