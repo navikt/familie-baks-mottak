@@ -12,7 +12,7 @@ import tools.jackson.module.kotlin.readValue
 
 @Component
 class TokenxClient(
-    @param:Value("\${NAIS_TOKEN_INTROSPECTION_ENDPOINT}") private val tokenEndpoint: String,
+    @param:Value("\${NAIS_TOKEN_EXCHANGE_ENDPOINT}") private val tokenEndpoint: String,
 ) {
     private val restClient = RestClient.create()
 
