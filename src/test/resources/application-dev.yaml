@@ -90,7 +90,7 @@ CREDENTIAL_USERNAME: not-a-real-srvuser
 CREDENTIAL_PASSWORD: not-a-real-pw
 NAIS_APP_NAME: familie-baks-mottak
 NAIS_TOKEN_ENDPOINT: https://login.microsoftonline.com/navq.onmicrosoft.com/oauth2/v2.0/token
-NAIS_TOKEN_INTROSPECTION_ENDPOINT: dummy
+NAIS_TOKEN_EXCHANGE_ENDPOINT: dummy
 PDL_SCOPE: dummy
 FAMILIE_INTEGRASJONER_SCOPE: dummy
 BA_SAK_SCOPE: dummy
