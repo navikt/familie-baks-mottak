@@ -1,11 +1,14 @@
 package no.nav.familie.baks.mottak.texas
 
+import no.nav.familie.kontrakter.felles.jsonMapper
+import no.nav.familie.prosessering.internal.TaskScheduler.Companion.secureLog
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import tools.jackson.module.kotlin.readValue
 
 @Component
 class TokenxClient(
@@ -36,8 +39,12 @@ class TokenxClient(
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(body)
                 .retrieve()
-                .body(TexasTokenResponse::class.java)
+                .body(String::class.java)
                 ?: throw IllegalStateException("Fikk ikke svar fra Texas")
-        return response.accessToken
+        secureLog.error("Hentet token fra Texas for scope $scope, $token, $response, $tokenEndpoint")
+
+        val tokenResponse: TexasTokenResponse = jsonMapper.readValue(response)
+
+        return tokenResponse.accessToken
     }
 }
