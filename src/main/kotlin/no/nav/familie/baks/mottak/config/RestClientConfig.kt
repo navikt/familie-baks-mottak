@@ -1,8 +1,8 @@
 package no.nav.familie.baks.mottak.config
 
-import no.nav.familie.baks.mottak.config.interceptor.ConsumerIdClientInterceptor
-import no.nav.familie.baks.mottak.config.interceptor.MdcValuesPropagatingClientInterceptor
 import no.nav.familie.baks.mottak.texas.TexasRestClientFactory
+import no.nav.familie.log.interceptor.ConsumerIdClientInterceptor
+import no.nav.familie.log.interceptor.MdcValuesPropagatingClientInterceptor
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
