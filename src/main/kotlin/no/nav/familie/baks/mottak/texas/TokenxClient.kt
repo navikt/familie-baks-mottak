@@ -30,7 +30,7 @@ class TokenxClient(
             mapOf(
                 "identity_provider" to "tokenx",
                 "target" to scope,
-                "token" to token,
+                "user_token" to token,
             )
         val response =
             restClient
