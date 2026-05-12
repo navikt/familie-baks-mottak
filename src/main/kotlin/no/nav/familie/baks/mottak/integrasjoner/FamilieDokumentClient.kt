@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
-import no.nav.familie.baks.mottak.texas.TexasRestClientFactory
+import no.nav.familie.baks.mottak.texas.TokenxClient
 import no.nav.familie.kontrakter.felles.Ressurs
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
@@ -17,14 +17,20 @@ private val logger = LoggerFactory.getLogger(FamilieDokumentClient::class.java)
 class FamilieDokumentClient(
     @param:Value("\${FAMILIE_DOKUMENT_API_URL}") private val dokumentUri: URI,
     @param:Value("\${FAMILIE_DOKUMENT_SCOPE}") private val familieDokumentScope: String,
-    texasRestClientFactory: TexasRestClientFactory,
+    private val tokenxClient: TokenxClient,
     @Qualifier("unauthenticatedRestClient") private val unauthenticatedRestClient: RestClient,
 ) {
-    val restClient = texasRestClientFactory.lagMaskinRestKlient(familieDokumentScope)
-
     fun hentVedlegg(dokumentId: String): ByteArray {
         logger.info("Henter vedlegg med dokumentid $dokumentId")
+
+        val token =
+            tokenxClient
+                .hentToken(familieDokumentScope)
+
+        val restClient = RestClient.builder().defaultHeader("Authorization", "Bearer $token").build()
+
         val uri = URI.create("$dokumentUri/api/mapper/ANYTHING/$dokumentId")
+
         val response =
             restClient
                 .get()
