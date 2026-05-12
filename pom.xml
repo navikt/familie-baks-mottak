@@ -25,7 +25,7 @@
         <confluent.version>8.2.0</confluent.version>
         <prosessering.version>2.20260420122910_8bfca04</prosessering.version>
 
-        <felles.version>4.20260511103655_63a39c2</felles.version>
+        <felles.version>4.20260508110757_96596c8</felles.version>
         <kontrakter.version>4.0_20260427083013_f53660d</kontrakter.version>
         <mock-oauth2-server.version>3.0.1</mock-oauth2-server.version>
 
@@ -116,12 +116,6 @@
         <dependency>
             <groupId>no.nav.familie.felles</groupId>
             <artifactId>unleash</artifactId>
-            <version>${felles.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>no.nav.familie.felles</groupId>
-            <artifactId>texas</artifactId>
             <version>${felles.version}</version>
         </dependency>
 

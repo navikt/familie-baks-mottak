@@ -2,7 +2,7 @@ package no.nav.familie.baks.mottak.config
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.felles.texas.TexasClient
+import no.nav.familie.baks.mottak.texas.TexasClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
@@ -15,7 +15,7 @@ class TexasClientTestConfig {
     @Primary
     fun texasClientMock(): TexasClient {
         val mock = mockk<TexasClient>(relaxed = true)
-        every { mock.hentMaskinTilMaskinToken(any()) } returns "mock-texas-token"
+        every { mock.hentMaskinToken(any()) } returns "mock-texas-token"
         return mock
     }
 }

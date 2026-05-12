@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
-import no.nav.familie.felles.texas.TexasRestClientFactory
+import no.nav.familie.baks.mottak.texas.TexasRestClientFactory
 import no.nav.familie.kontrakter.felles.Ressurs
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
@@ -20,7 +20,7 @@ class FamilieDokumentClient(
     texasRestClientFactory: TexasRestClientFactory,
     @Qualifier("unauthenticatedRestClient") private val unauthenticatedRestClient: RestClient,
 ) {
-    val restClient = texasRestClientFactory.lagMaskinTilMaskinRestKlient(familieDokumentScope)
+    val restClient = texasRestClientFactory.lagMaskinRestKlient(familieDokumentScope)
 
     fun hentVedlegg(dokumentId: String): ByteArray {
         logger.info("Henter vedlegg med dokumentid $dokumentId")
