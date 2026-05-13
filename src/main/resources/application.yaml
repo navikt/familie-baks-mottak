@@ -8,8 +8,6 @@ server:
       charset: UTF-8
   port: 8090
 spring:
-  main:
-    allow-bean-definition-overriding: true
   autoconfigure.exclude: org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
   main.banner-mode: "off"
   datasource:
@@ -57,6 +55,5 @@ FAMILIE_INTEGRASJONER_API_URL: https://familie-integrasjoner.prod-fss-pub.nais.i
 FAMILIE_DOKUMENT_API_URL: http://familie-dokument
 FAMILIE_BA_INFOTRYGD_API_URL: http://familie-ba-infotrygd
 FAMILIE_PDF_URL: http://familie-pdf.teamfamilie
-STS_URL: http://security-token-service.default.svc.nais.local/rest/v1/sts/token
 PDL_URL: http://pdl-api.pdl
 ACCEPTEDAUDIENCE: dummy

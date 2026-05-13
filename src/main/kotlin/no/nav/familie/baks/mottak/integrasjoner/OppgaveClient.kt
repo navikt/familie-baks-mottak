@@ -12,15 +12,16 @@ import no.nav.familie.kontrakter.felles.oppgave.OppgaveIdentV2
 import no.nav.familie.kontrakter.felles.oppgave.OppgaveResponse
 import no.nav.familie.kontrakter.felles.oppgave.Oppgavetype
 import no.nav.familie.kontrakter.felles.oppgave.OpprettOppgaveRequest
-import no.nav.familie.restklient.client.AbstractRestClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.NestedExceptionUtils
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
-import org.springframework.web.client.RestOperations
+import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
 import java.net.URI
 
 private val logger = LoggerFactory.getLogger(OppgaveClient::class.java)
@@ -30,9 +31,9 @@ class OppgaveClient
     @Autowired
     constructor(
         @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonUri: URI,
-        @Qualifier("clientCredentials") restOperations: RestOperations,
+        @Qualifier("integrasjonerRestClient") private val restClient: RestClient,
         private val oppgaveMapperService: OppgaveMapperService,
-    ) : AbstractRestClient(restOperations, "integrasjon") {
+    ) {
         val secureLog: Logger = LoggerFactory.getLogger("secureLogger")
 
         fun opprettJournalføringsoppgave(
@@ -48,7 +49,6 @@ class OppgaveClient
                     beskrivelse,
                 )
             secureLog.info("Oppretter journalføringsoppgave for ${journalpost.journalpostId} ${request.beskrivelse}")
-
             return responseFraOpprettOppgave(uri, request)
         }
 
@@ -72,7 +72,6 @@ class OppgaveClient
                 )
 
             secureLog.info("Oppretter vurderLivshendlseOppgave $request")
-
             return responseFraOpprettOppgave(uri, request)
         }
 
@@ -81,10 +80,15 @@ class OppgaveClient
             beskrivelse: String,
         ): OppgaveResponse {
             val uri = URI.create("$integrasjonUri/oppgave/${patchOppgave.id}/oppdater")
-
             return Result
                 .runCatching {
-                    patchForEntity<Ressurs<OppgaveResponse>>(uri, patchOppgave.copy(beskrivelse = beskrivelse))
+                    restClient
+                        .patch()
+                        .uri(uri)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(patchOppgave.copy(beskrivelse = beskrivelse))
+                        .retrieve()
+                        .body<Ressurs<OppgaveResponse>>()!!
                 }.fold(
                     onSuccess = { response -> assertGyldig(response) },
                     onFailure = {
@@ -104,29 +108,21 @@ class OppgaveClient
         ): List<Oppgave> {
             logger.info("Søker etter aktive oppgaver for $journalpostId")
             val uri = URI.create("$integrasjonUri/oppgave/v4")
-            val request =
-                FinnOppgaveRequest(
-                    journalpostId = journalpostId,
-                    tema = Tema.BAR,
-                    oppgavetype = oppgavetype,
-                )
-
+            val request = FinnOppgaveRequest(journalpostId = journalpostId, tema = Tema.BAR, oppgavetype = oppgavetype)
             return Result
                 .runCatching {
-                    postForEntity<Ressurs<FinnOppgaveResponseDto>>(uri, request)
+                    restClient
+                        .post()
+                        .uri(uri)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(request)
+                        .retrieve()
+                        .body<Ressurs<FinnOppgaveResponseDto>>()!!
                 }.fold(
                     onSuccess = { response -> assertGyldig(response).oppgaver },
                     onFailure = {
-                        secureLogger.error(
-                            "Finn oppgaver feilet mot $uri og request: $request",
-                            NestedExceptionUtils.getMostSpecificCause(it),
-                        )
-                        throw IntegrasjonException(
-                            "GET $uri feilet ved henting av oppgaver",
-                            it,
-                            uri,
-                            null,
-                        )
+                        secureLog.error("Finn oppgaver feilet mot $uri og request: $request", NestedExceptionUtils.getMostSpecificCause(it))
+                        throw IntegrasjonException("Post-kall $uri feilet ved henting av oppgaver", it, uri, null)
                     },
                 )
         }
@@ -136,31 +132,23 @@ class OppgaveClient
             oppgavetype: Oppgavetype,
             tema: Tema,
         ): List<Oppgave> {
-            secureLogger.info("Søker etter aktive oppgaver med tema $tema for aktørId $aktørId")
+            secureLog.info("Søker etter aktive oppgaver med tema $tema for aktørId $aktørId")
             val uri = URI.create("$integrasjonUri/oppgave/v4")
-            val request =
-                FinnOppgaveRequest(
-                    aktørId = aktørId,
-                    tema = tema,
-                    oppgavetype = oppgavetype,
-                )
-
+            val request = FinnOppgaveRequest(aktørId = aktørId, tema = tema, oppgavetype = oppgavetype)
             return Result
                 .runCatching {
-                    postForEntity<Ressurs<FinnOppgaveResponseDto>>(uri, request)
+                    restClient
+                        .post()
+                        .uri(uri)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(request)
+                        .retrieve()
+                        .body<Ressurs<FinnOppgaveResponseDto>>()!!
                 }.fold(
                     onSuccess = { response -> assertGyldig(response).oppgaver },
                     onFailure = {
-                        secureLogger.error(
-                            "Finn oppgave feilet for $aktørId og $oppgavetype",
-                            NestedExceptionUtils.getMostSpecificCause(it),
-                        )
-                        throw IntegrasjonException(
-                            "GET $uri feilet ved henting av oppgaver",
-                            it,
-                            uri,
-                            null,
-                        )
+                        secureLog.error("Finn oppgave feilet for $aktørId og $oppgavetype", NestedExceptionUtils.getMostSpecificCause(it))
+                        throw IntegrasjonException("Post-kall $uri feilet ved henting av oppgaver", it, uri, null)
                     },
                 )
         }
@@ -172,21 +160,19 @@ class OppgaveClient
             Result
                 .runCatching {
                     secureLog.info("Sender OpprettOppgaveRequest $request")
-                    postForEntity<Ressurs<OppgaveResponse>>(uri, request)
+                    restClient
+                        .post()
+                        .uri(uri)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(request)
+                        .retrieve()
+                        .body<Ressurs<OppgaveResponse>>()!!
                 }.fold(
                     onSuccess = { response -> assertGyldig(response) },
                     onFailure = {
-                        secureLogger.error(
-                            "Opprett oppgave feilet mot $uri og request: $request",
-                            NestedExceptionUtils.getMostSpecificCause(it),
-                        )
-                        log.warn("Post-kall mot $uri feilet ved opprettelse av oppgave", it)
-                        throw IntegrasjonException(
-                            "Post-kall mot $uri feilet ved opprettelse av oppgave",
-                            it,
-                            uri,
-                            null,
-                        )
+                        secureLog.error("Opprett oppgave feilet mot $uri og request: $request", NestedExceptionUtils.getMostSpecificCause(it))
+                        logger.warn("Post-kall mot $uri feilet ved opprettelse av oppgave", it)
+                        throw IntegrasjonException("Post-kall mot $uri feilet ved opprettelse av oppgave", it, uri, null)
                     },
                 )
 

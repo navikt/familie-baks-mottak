@@ -1,13 +1,12 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
-import no.nav.familie.restklient.client.AbstractRestClient
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
-import org.springframework.web.client.RestOperations
 import java.net.URI
 
 private val logger = LoggerFactory.getLogger(HentEnhetClient::class.java)
@@ -15,13 +14,17 @@ private val logger = LoggerFactory.getLogger(HentEnhetClient::class.java)
 @Component
 class HentEnhetClient(
     @param:Value("\${NORG2_API_URL}") private val norg2Uri: URI,
-    @Qualifier("restTemplateUnsecured") restOperations: RestOperations,
-) : AbstractRestClient(restOperations, "norg2") {
+    @Qualifier("unauthenticatedRestClient") private val restClient: RestClient,
+) {
     fun hentEnhet(enhetId: String): Enhet {
         val uri = URI.create("$norg2Uri/api/v1/enhet/$enhetId")
         logger.info("henter enhet med id $enhetId")
         return try {
-            getForEntity(uri)
+            restClient
+                .get()
+                .uri(uri)
+                .retrieve()
+                .body(Enhet::class.java)!!
         } catch (e: RestClientException) {
             val responseBodyAsString = if (e is RestClientResponseException) e.responseBodyAsString else ""
             val statusCode = if (e is RestClientResponseException) e.statusCode.toString() else ""

@@ -1,17 +1,17 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
 import no.nav.familie.baks.mottak.domene.NyBehandling
+import no.nav.familie.felles.tokenklient.entraid.EntraIDRestClientFactory
 import no.nav.familie.kontrakter.felles.PersonIdent
 import no.nav.familie.kontrakter.felles.Ressurs
-import no.nav.familie.restklient.client.AbstractRestClient
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
-import org.springframework.web.client.RestOperations
+import org.springframework.web.client.body
 import java.net.URI
 import java.time.LocalDateTime
 
@@ -22,13 +22,23 @@ class BaSakClient
     @Autowired
     constructor(
         @param:Value("\${FAMILIE_BA_SAK_API_URL}") private val sakServiceUri: String,
-        @Qualifier("clientCredentials") restOperations: RestOperations,
-    ) : AbstractRestClient(restOperations, "integrasjon") {
+        @param:Value("\${BA_SAK_SCOPE}") private val baSakScope: String,
+        entraIDRestClientFactory: EntraIDRestClientFactory,
+    ) {
+        private val restClient = entraIDRestClientFactory.lagMaskinTilMaskinRestKlient(baSakScope)
+
         fun sendTilSak(nyBehandling: NyBehandling) {
             val uri = URI.create("$sakServiceUri/behandlinger")
             logger.info("Sender søknad til {}", uri)
             try {
-                val response = putForEntity<Ressurs<String>>(uri, nyBehandling)
+                val response =
+                    restClient
+                        .put()
+                        .uri(uri)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(nyBehandling)
+                        .retrieve()
+                        .body<Ressurs<String>>()!!
                 logger.info("Søknad sendt til sak. Status=${response.status}")
             } catch (e: RestClientResponseException) {
                 logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.statusCode, e.responseBodyAsString)
@@ -45,7 +55,14 @@ class BaSakClient
         fun sendSvalbardtilleggTilBaSak(personIdent: String) {
             val uri = URI.create("$sakServiceUri/svalbardtillegg/vurder-svalbardtillegg")
             try {
-                val response = postForEntity<Ressurs<String>>(uri, PersonIdent(ident = personIdent))
+                val response =
+                    restClient
+                        .post()
+                        .uri(uri)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(PersonIdent(ident = personIdent))
+                        .retrieve()
+                        .body<Ressurs<String>>()!!
                 logger.info("Ident for svalbardtillegg sendt til sak. Status=${response.status}")
             } catch (e: RestClientResponseException) {
                 logger.warn("Send svalbardtillegg til sak feilet. Responskode: ${e.statusCode}, body: ${e.responseBodyAsString}")
@@ -58,7 +75,14 @@ class BaSakClient
         fun sendFinnmarkstilleggTilBaSak(personIdent: String) {
             val uri = URI.create("$sakServiceUri/finnmarkstillegg/vurder-finnmarkstillegg")
             try {
-                val response = postForEntity<Ressurs<String>>(uri, PersonIdent(ident = personIdent))
+                val response =
+                    restClient
+                        .post()
+                        .uri(uri)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(PersonIdent(ident = personIdent))
+                        .retrieve()
+                        .body<Ressurs<String>>()!!
                 logger.info("Ident for finnmarkstillegg sendt til sak. Status=${response.status}")
             } catch (e: RestClientResponseException) {
                 logger.warn("Send finnmarkstillegg til sak feilet. Responskode: ${e.statusCode}, body: ${e.responseBodyAsString}")
@@ -71,7 +95,13 @@ class BaSakClient
         fun hentFagsaknummerPåPersonident(personIdent: String): Long {
             val uri = URI.create("$sakServiceUri/fagsaker")
             return runCatching {
-                postForEntity<Ressurs<RestFagsakId>>(uri, mapOf("personIdent" to personIdent))
+                restClient
+                    .post()
+                    .uri(uri)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(mapOf("personIdent" to personIdent))
+                    .retrieve()
+                    .body<Ressurs<RestFagsakId>>()!!
             }.fold(
                 onSuccess = { it.data?.id ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av saksnummer fra ba-sak.", it, uri, personIdent) },
@@ -84,7 +114,13 @@ class BaSakClient
         ): List<RestFagsakDeltager> {
             val uri = URI.create("$sakServiceUri/fagsaker/sok/fagsakdeltagere")
             return runCatching {
-                postForEntity<Ressurs<List<RestFagsakDeltager>>>(uri, RestSøkParam(personIdent, barnasIdenter))
+                restClient
+                    .post()
+                    .uri(uri)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(RestSøkParam(personIdent, barnasIdenter))
+                    .retrieve()
+                    .body<Ressurs<List<RestFagsakDeltager>>>()!!
             }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av fagsakdeltagere fra ba-sak.", it, uri, personIdent) },
@@ -96,7 +132,13 @@ class BaSakClient
         ): List<RestFagsakIdOgTilknyttetAktørId> {
             val uri = URI.create("$sakServiceUri/fagsaker/sok/fagsaker-hvor-person-er-deltaker")
             return runCatching {
-                postForEntity<Ressurs<List<RestFagsakIdOgTilknyttetAktørId>>>(uri, RestPersonIdent(personIdent))
+                restClient
+                    .post()
+                    .uri(uri)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(RestPersonIdent(personIdent))
+                    .retrieve()
+                    .body<Ressurs<List<RestFagsakIdOgTilknyttetAktørId>>>()!!
             }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av fagsakId og aktørId fra ba-sak.", it, uri, personIdent) },
@@ -108,7 +150,13 @@ class BaSakClient
         ): List<RestFagsakIdOgTilknyttetAktørId> {
             val uri = URI.create("$sakServiceUri/fagsaker/sok/fagsaker-hvor-person-mottar-lopende-ytelse")
             return runCatching {
-                postForEntity<Ressurs<List<RestFagsakIdOgTilknyttetAktørId>>>(uri, RestPersonIdent(personIdent))
+                restClient
+                    .post()
+                    .uri(uri)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(RestPersonIdent(personIdent))
+                    .retrieve()
+                    .body<Ressurs<List<RestFagsakIdOgTilknyttetAktørId>>>()!!
             }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri, personIdent) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av fagsakId og aktørId fra ba-sak.", it, uri, personIdent) },
@@ -118,7 +166,11 @@ class BaSakClient
         fun hentMinimalRestFagsak(fagsakId: Long): RestMinimalFagsak {
             val uri = URI.create("$sakServiceUri/fagsaker/minimal/$fagsakId")
             return runCatching {
-                getForEntity<Ressurs<RestMinimalFagsak>>(uri)
+                restClient
+                    .get()
+                    .uri(uri)
+                    .retrieve()
+                    .body<Ressurs<RestMinimalFagsak>>()!!
             }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ba-sak.", it, uri) },
@@ -128,7 +180,11 @@ class BaSakClient
         fun hentRestFagsak(fagsakId: Long): RestFagsak {
             val uri = URI.create("$sakServiceUri/fagsaker/$fagsakId")
             return runCatching {
-                getForEntity<Ressurs<RestFagsak>>(uri)
+                restClient
+                    .get()
+                    .uri(uri)
+                    .retrieve()
+                    .body<Ressurs<RestFagsak>>()!!
             }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av RestFagsak fra ba-sak.", it, uri) },
@@ -139,7 +195,14 @@ class BaSakClient
             val uri = URI.create("$sakServiceUri/overgangsstonad")
             logger.info("sender ident fra vedtak om overgangsstønad til {}", uri)
             try {
-                val response = postForEntity<Ressurs<String>>(uri, PersonIdent(ident = personIdent))
+                val response =
+                    restClient
+                        .post()
+                        .uri(uri)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(PersonIdent(ident = personIdent))
+                        .retrieve()
+                        .body<Ressurs<String>>()!!
                 logger.info("Ident fra vedtak om overgangsstønad sendt til sak. Status=${response.status}")
             } catch (e: RestClientResponseException) {
                 logger.warn("Innsending til sak feilet. Responskode: {}, body: {}", e.statusCode, e.responseBodyAsString)
@@ -162,19 +225,23 @@ class BaSakClient
             val uri = URI.create("$sakServiceUri/behandlinger")
             kotlin
                 .runCatching {
-                    postForEntity<Ressurs<Any>>(
-                        uri,
-                        RestOpprettBehandlingBarnetrygdRequest(
-                            kategori = kategori.name,
-                            underkategori = underkategori.name,
-                            søkersIdent = søkersIdent,
-                            behandlingÅrsak = behandlingÅrsak,
-                            søknadMottattDato = søknadMottattDato,
-                            behandlingType = behandlingType,
-                            fagsakId = fagsakId,
-                            søknadsinfo = søknadsinfo,
-                        ),
-                    )
+                    restClient
+                        .post()
+                        .uri(uri)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(
+                            RestOpprettBehandlingBarnetrygdRequest(
+                                kategori = kategori.name,
+                                underkategori = underkategori.name,
+                                søkersIdent = søkersIdent,
+                                behandlingÅrsak = behandlingÅrsak,
+                                søknadMottattDato = søknadMottattDato,
+                                behandlingType = behandlingType,
+                                fagsakId = fagsakId,
+                                søknadsinfo = søknadsinfo,
+                            ),
+                        ).retrieve()
+                        .body<Ressurs<Any>>()
                 }.onFailure {
                     throw IntegrasjonException("Feil ved opprettelse av behandling i ba-sak.", it, uri)
                 }
@@ -183,13 +250,17 @@ class BaSakClient
         fun hentFagsakForSkjermetBarn(personIdent: String): List<RestFagsakSkjermetBarn> {
             val uri = URI.create("$sakServiceUri/fagsaker/hent-fagsaker-paa-person")
             return runCatching {
-                postForEntity<Ressurs<List<RestFagsakSkjermetBarn>>>(
-                    uri,
-                    RestHentFagsakerPåPersonRequest(
-                        personIdent,
-                        fagsakTyper = listOf("SKJERMET_BARN"),
-                    ),
-                )
+                restClient
+                    .post()
+                    .uri(uri)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(
+                        RestHentFagsakerPåPersonRequest(
+                            personIdent,
+                            fagsakTyper = listOf("SKJERMET_BARN"),
+                        ),
+                    ).retrieve()
+                    .body<Ressurs<List<RestFagsakSkjermetBarn>>>()!!
             }.fold(
                 onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
                 onFailure = { throw IntegrasjonException("Feil ved henting av fagsak skjermet barn fra ba-sak.", it, uri) },

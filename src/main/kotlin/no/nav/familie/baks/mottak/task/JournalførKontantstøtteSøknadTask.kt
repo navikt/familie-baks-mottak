@@ -13,7 +13,6 @@ import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV6
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.restklient.client.RessursException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -72,21 +71,13 @@ class JournalførKontantstøtteSøknadTask(
                     ByteArray(0)
                 }
             journalføringService.journalførKontantstøtteSøknad(dbKontantstøtteSøknad, bokmålPdf, orginalspråkPdf)
-        } catch (e: RessursException) {
-            when (e.cause) {
-                is HttpClientErrorException.Conflict -> {
-                    // Dersom søknaden allerede er journalført får vi 409-Conflict. Vi ønsker ikke å feile tasken når dette skjer.
-                    logger.error("409 conflict for eksternReferanseId ved journalføring av kontantstøtte-søknad. taskId=${task.id}. Se task eller securelog")
-                    SECURE_LOGGER.error(
-                        "409 conflict for eksternReferanseId ved journalføring av kontantstøtte-søknad $task ${(e.cause as HttpClientErrorException.Conflict).responseBodyAsString}",
-                        e,
-                    )
-                }
-
-                else -> {
-                    throw e
-                }
-            }
+        } catch (e: HttpClientErrorException.Conflict) {
+            // Dersom søknaden allerede er journalført får vi 409-Conflict. Vi ønsker ikke å feile tasken når dette skjer.
+            logger.error("409 conflict for eksternReferanseId ved journalføring av kontantstøtte-søknad. taskId=${task.id}. Se task eller securelog")
+            SECURE_LOGGER.error(
+                "409 conflict for eksternReferanseId ved journalføring av kontantstøtte-søknad $task ${e.responseBodyAsString}",
+                e,
+            )
         } catch (e: Exception) {
             logger.error("Uventet feil ved journalføring av kontantstøtte-søknad. taskId=${task.id}. Se task eller securelog")
             SECURE_LOGGER.error("Uventet feil ved journalføring søknad $task", e)

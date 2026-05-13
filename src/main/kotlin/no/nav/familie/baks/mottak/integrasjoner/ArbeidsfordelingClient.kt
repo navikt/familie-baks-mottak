@@ -7,11 +7,12 @@ import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.arbeidsfordeling.Enhet
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
-import no.nav.familie.restklient.client.AbstractRestClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
-import org.springframework.web.client.RestOperations
+import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 import java.util.Optional.ofNullable
@@ -19,9 +20,9 @@ import java.util.Optional.ofNullable
 @Component
 class ArbeidsfordelingClient(
     @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonUri: URI,
-    @Qualifier("clientCredentials") restOperations: RestOperations,
+    @Qualifier("integrasjonerRestClient") private val restClient: RestClient,
     private val featureToggleService: FeatureToggleService,
-) : AbstractRestClient(restOperations, "integrasjon") {
+) {
     fun hentBehandlendeEnheterPåIdent(
         personIdent: String,
         tema: Tema,
@@ -42,7 +43,13 @@ class ArbeidsfordelingClient(
                 .toUri()
 
         return runCatching {
-            postForEntity<Ressurs<List<Enhet>>>(uri, PersonIdent(personIdent))
+            restClient
+                .post()
+                .uri(uri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(PersonIdent(personIdent))
+                .retrieve()
+                .body<Ressurs<List<Enhet>>>()!!
         }.fold(
             onSuccess = { it.data ?: throw IntegrasjonException(it.melding, uri = uri, ident = personIdent) },
             onFailure = { throw IntegrasjonException("Feil ved henting av behandlende enheter på ident m/ tema $tema og behandlingstype $behandlingstype", it, uri, personIdent) },
