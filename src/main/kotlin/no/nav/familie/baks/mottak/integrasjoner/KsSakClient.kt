@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
-import no.nav.familie.baks.mottak.texas.TexasRestClientFactory
+import no.nav.familie.felles.tokenklient.entraid.EntraIDRestClientFactory
 import no.nav.familie.kontrakter.felles.Ressurs
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -16,9 +16,9 @@ class KsSakClient
     constructor(
         @param:Value("\${FAMILIE_KS_SAK_API_URL}") private val ksSakServiceUri: String,
         @param:Value("\${KS_SAK_SCOPE}") private val ksSakScope: String,
-        texasRestClientFactory: TexasRestClientFactory,
+        entraIDRestClientFactory: EntraIDRestClientFactory,
     ) {
-        private val restClient = texasRestClientFactory.lagMaskinRestKlient(ksSakScope)
+        private val restClient = entraIDRestClientFactory.lagMaskinTilMaskinRestKlient(ksSakScope)
 
         fun hentFagsaknummerPåPersonident(personIdent: String): Long {
             val uri = URI.create("$ksSakServiceUri/fagsaker")

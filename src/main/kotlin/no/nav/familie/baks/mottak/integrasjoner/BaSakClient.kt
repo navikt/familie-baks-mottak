@@ -1,7 +1,7 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
 import no.nav.familie.baks.mottak.domene.NyBehandling
-import no.nav.familie.baks.mottak.texas.TexasRestClientFactory
+import no.nav.familie.felles.tokenklient.entraid.EntraIDRestClientFactory
 import no.nav.familie.kontrakter.felles.PersonIdent
 import no.nav.familie.kontrakter.felles.Ressurs
 import org.slf4j.LoggerFactory
@@ -23,9 +23,9 @@ class BaSakClient
     constructor(
         @param:Value("\${FAMILIE_BA_SAK_API_URL}") private val sakServiceUri: String,
         @param:Value("\${BA_SAK_SCOPE}") private val baSakScope: String,
-        texasRestClientFactory: TexasRestClientFactory,
+        entraIDRestClientFactory: EntraIDRestClientFactory,
     ) {
-        private val restClient = texasRestClientFactory.lagMaskinRestKlient(baSakScope)
+        private val restClient = entraIDRestClientFactory.lagMaskinTilMaskinRestKlient(baSakScope)
 
         fun sendTilSak(nyBehandling: NyBehandling) {
             val uri = URI.create("$sakServiceUri/behandlinger")

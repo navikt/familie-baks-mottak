@@ -3,7 +3,7 @@ package no.nav.familie.baks.mottak.integrasjoner
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.familie.baks.mottak.domene.personopplysning.Person
-import no.nav.familie.baks.mottak.texas.TexasRestClientFactory
+import no.nav.familie.felles.tokenklient.entraid.EntraIDRestClientFactory
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.personopplysning.Bostedsadresse
 import no.nav.familie.kontrakter.felles.personopplysning.FORELDERBARNRELASJONROLLE
@@ -23,9 +23,9 @@ import java.time.LocalDate
 class PdlClient(
     @Value("\${PDL_URL}") pdlBaseUrl: URI,
     @Value("\${PDL_SCOPE}") private val pdlScope: String,
-    texasRestClientFactory: TexasRestClientFactory,
+    entraIDRestClientFactory: EntraIDRestClientFactory,
 ) {
-    private val restClient = texasRestClientFactory.lagMaskinRestKlient(pdlScope)
+    private val restClient = entraIDRestClientFactory.lagMaskinTilMaskinRestKlient(pdlScope)
     private val pdlUri =
         UriComponentsBuilder
             .fromUri(pdlBaseUrl)

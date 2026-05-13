@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
-import no.nav.familie.baks.mottak.texas.TexasRestClientFactory
+import no.nav.familie.felles.tokenklient.entraid.EntraIDRestClientFactory
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkRequest
 import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import org.springframework.beans.factory.annotation.Value
@@ -15,9 +15,9 @@ import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 class InfotrygdBarnetrygdClient(
     @Value("\${FAMILIE_BA_INFOTRYGD_API_URL}/infotrygd/barnetrygd") private val clientUri: URI,
     @Value("\${FAMILIE_BA_INFOTRYGD_SCOPE}") private val infotrygdScope: String,
-    texasRestClientFactory: TexasRestClientFactory,
+    entraIDRestClientFactory: EntraIDRestClientFactory,
 ) {
-    private val restClient = texasRestClientFactory.lagMaskinRestKlient(infotrygdScope)
+    private val restClient = entraIDRestClientFactory.lagMaskinTilMaskinRestKlient(infotrygdScope)
 
     fun hentLøpendeUtbetalinger(
         søkersIdenter: List<String>,

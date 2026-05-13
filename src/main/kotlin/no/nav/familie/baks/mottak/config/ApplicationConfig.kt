@@ -19,6 +19,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
     "no.nav.familie.sikkerhet",
     "no.nav.familie.baks.mottak",
     "no.nav.familie.unleash",
+    "no.nav.familie.felles.tokenklient",
 )
 @EntityScan("no.nav.familie.prosessering", "no.nav.familie.baks.mottak")
 @ConfigurationPropertiesScan("no.nav.familie")

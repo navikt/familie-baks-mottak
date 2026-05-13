@@ -1,7 +1,8 @@
 package no.nav.familie.baks.mottak.søknad
 
+import no.nav.familie.baks.mottak.config.ApplicationConfig
 import no.nav.familie.baks.mottak.domene.FeltMap
-import no.nav.familie.baks.mottak.texas.TexasRestClientFactory
+import no.nav.familie.felles.tokenklient.entraid.EntraIDRestClientFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
@@ -16,9 +17,9 @@ data class PdfResponse(
 class FamiliePdfClient(
     @Value("\${FAMILIE_PDF_URL}") private val uri: URI,
     @Value("\${FAMILIE_PDF_SCOPE}") private val familiePdfScope: String,
-    texasRestClientFactory: TexasRestClientFactory,
+    entraIDRestClientFactory: EntraIDRestClientFactory,
 ) {
-    private val restClient = texasRestClientFactory.lagMaskinRestKlient(familiePdfScope)
+    private val restClient = entraIDRestClientFactory.lagMaskinTilMaskinRestKlient(familiePdfScope)
 
     fun opprettPdf(feltMap: FeltMap): ByteArray {
         val pdfUri =
