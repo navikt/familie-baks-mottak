@@ -22,11 +22,11 @@
         <jvmTarget>25</jvmTarget>
         <kotlin.version>2.3.21</kotlin.version>
         <mockk.version>1.14.9</mockk.version>
-        <confluent.version>8.2.0</confluent.version>
-        <prosessering.version>2.20260420122910_8bfca04</prosessering.version>
+        <confluent.version>8.2.1</confluent.version>
+        <prosessering.version>2.20260511102627_928cb38</prosessering.version>
 
         <felles.version>4.20260513094924_5cc59b4</felles.version>
-        <kontrakter.version>4.0_20260427083013_f53660d</kontrakter.version>
+        <kontrakter.version>4.0_20260505124916_025d466</kontrakter.version>
         <mock-oauth2-server.version>3.0.3</mock-oauth2-server.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
