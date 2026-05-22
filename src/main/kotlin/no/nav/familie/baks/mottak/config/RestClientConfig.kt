@@ -2,14 +2,14 @@ package no.nav.familie.baks.mottak.config
 
 import no.nav.familie.felles.tokenklient.entraid.EntraIDRestClientFactory
 import no.nav.familie.felles.tokenklient.tokenx.TokenXClient
+import no.nav.familie.felles.tokenklient.tokenx.TokenXInterceptor
 import no.nav.familie.log.interceptor.ConsumerIdClientInterceptor
 import no.nav.familie.log.interceptor.MdcValuesPropagatingClientInterceptor
+import no.nav.familie.sikkerhet.EksternBrukerUtils
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.client.RestClient
 
 @Configuration
@@ -42,12 +42,11 @@ class RestClientConfig(
     ): RestClient =
         RestClient
             .builder()
-            .requestInterceptor { request, body, execution ->
-                val auth = SecurityContextHolder.getContext().authentication as JwtAuthenticationToken
-                val token = tokenxClient.hentToken(scope, auth.token.tokenValue)
-                request.headers.setBearerAuth(token)
-                execution.execute(request, body)
-            }.requestInterceptor(consumerIdClientInterceptor)
+            .requestInterceptor(
+                TokenXInterceptor(tokenxClient, scope) {
+                    EksternBrukerUtils.getBearerTokenForLoggedInUser()
+                },
+            ).requestInterceptor(consumerIdClientInterceptor)
             .requestInterceptor(mdcValuesPropagatingClientInterceptor)
             .build()
 }
