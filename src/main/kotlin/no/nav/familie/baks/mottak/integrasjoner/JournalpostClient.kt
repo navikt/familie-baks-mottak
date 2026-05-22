@@ -21,7 +21,7 @@ class JournalpostClient
     @Autowired
     constructor(
         @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonerServiceUri: URI,
-        @Qualifier("integrasjonerRestClient") private val restClient: RestClient,
+        @param:Qualifier("integrasjonerRestClient") private val restClient: RestClient,
     ) {
         fun hentJournalpost(journalpostId: String): Journalpost {
             val uri = URI.create("$integrasjonerServiceUri/journalpost?journalpostId=$journalpostId")

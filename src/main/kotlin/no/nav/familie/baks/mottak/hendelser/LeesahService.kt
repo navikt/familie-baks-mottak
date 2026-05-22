@@ -42,7 +42,7 @@ import kotlin.random.Random.Default.nextLong
 class LeesahService(
     private val hendelsesloggRepository: HendelsesloggRepository,
     private val taskService: TaskService,
-    @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") private val triggerTidForTps: Long,
+    @param:Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") private val triggerTidForTps: Long,
     private val environment: Environment,
 ) {
     val dødsfallCounter: Counter = Metrics.counter("dodsfall")

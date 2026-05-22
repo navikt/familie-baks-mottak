@@ -21,16 +21,16 @@ import no.nav.familie.kontrakter.ba.søknad.v9.BarnetrygdSøknad as BarnetrygdS�
 @Entity(name = "Soknad")
 @Table(name = "Soknad")
 data class DBBarnetrygdSøknad(
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "soknad_seq_generator")
-    @SequenceGenerator(name = "soknad_seq_generator", sequenceName = "soknad_seq", allocationSize = 50)
+    @field:Id
+    @field:GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "soknad_seq_generator")
+    @field:SequenceGenerator(name = "soknad_seq_generator", sequenceName = "soknad_seq", allocationSize = 50)
     val id: Long = 0,
-    @Column(name = "soknad_json")
+    @field:Column(name = "soknad_json")
     val søknadJson: String,
     val fnr: String,
-    @Column(name = "opprettet_tid")
+    @field:Column(name = "opprettet_tid")
     val opprettetTid: LocalDateTime = LocalDateTime.now(),
-    @Column(name = "journalpost_id")
+    @field:Column(name = "journalpost_id")
     val journalpostId: String? = null,
 ) {
     fun hentVersjonertBarnetrygdSøknad(): StøttetVersjonertBarnetrygdSøknad = jsonMapper.readValue(søknadJson, StøttetVersjonertBarnetrygdSøknad::class.java)
@@ -39,10 +39,10 @@ data class DBBarnetrygdSøknad(
 @Entity(name = "SoknadVedlegg")
 @Table(name = "SoknadVedlegg")
 data class DBVedlegg(
-    @Id
-    @Column(name = "dokument_id")
+    @field:Id
+    @field:Column(name = "dokument_id")
     override val dokumentId: String,
-    @Column(name = "soknad_id")
+    @field:Column(name = "soknad_id")
     override val søknadId: Long,
     override val data: ByteArray,
 ) : Vedlegg

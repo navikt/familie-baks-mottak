@@ -22,20 +22,20 @@ import no.nav.familie.kontrakter.ks.søknad.v6.KontantstøtteSøknad as Kontants
 @Entity(name = "kontantstotte_soknad")
 @Table(name = "kontantstotte_soknad")
 data class DBKontantstøtteSøknad(
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "kontantstotte_soknad_seq_generator")
-    @SequenceGenerator(
+    @field:Id
+    @field:GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "kontantstotte_soknad_seq_generator")
+    @field:SequenceGenerator(
         name = "kontantstotte_soknad_seq_generator",
         sequenceName = "kontantstotte_soknad_seq",
         allocationSize = 50,
     )
     val id: Long = 0,
-    @Column(name = "soknad_json")
+    @field:Column(name = "soknad_json")
     val søknadJson: String,
     val fnr: String,
-    @Column(name = "opprettet_tid")
+    @field:Column(name = "opprettet_tid")
     val opprettetTid: LocalDateTime = LocalDateTime.now(),
-    @Column(name = "journalpost_id")
+    @field:Column(name = "journalpost_id")
     val journalpostId: String? = null,
 ) {
     fun hentVersjonertKontantstøtteSøknad(): StøttetVersjonertKontantstøtteSøknad = jsonMapper.readValue(søknadJson, StøttetVersjonertKontantstøtteSøknad::class.java)
@@ -54,10 +54,10 @@ fun DBKontantstøtteSøknad.harEøsSteg(): Boolean {
 @Entity(name = "kontantstotte_soknad_vedlegg")
 @Table(name = "kontantstotte_soknad_vedlegg")
 data class DBKontantstotteVedlegg(
-    @Id
-    @Column(name = "dokument_id")
+    @field:Id
+    @field:Column(name = "dokument_id")
     override val dokumentId: String,
-    @Column(name = "soknad_id")
+    @field:Column(name = "soknad_id")
     override val søknadId: Long,
     override val data: ByteArray,
 ) : Vedlegg

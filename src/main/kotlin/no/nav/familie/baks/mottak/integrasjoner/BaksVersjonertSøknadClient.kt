@@ -16,7 +16,7 @@ private val logger = LoggerFactory.getLogger(BaksVersjonertSøknadClient::class.
 @Component
 class BaksVersjonertSøknadClient(
     @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonerServiceUri: URI,
-    @Qualifier("integrasjonerRestClient") private val restClient: RestClient,
+    @param:Qualifier("integrasjonerRestClient") private val restClient: RestClient,
 ) {
     fun hentVersjonertBarnetrygdSøknad(journalpostId: String): VersjonertBarnetrygdSøknad {
         val uri = URI.create("$integrasjonerServiceUri/baks/versjonertsoknad/ba/$journalpostId")

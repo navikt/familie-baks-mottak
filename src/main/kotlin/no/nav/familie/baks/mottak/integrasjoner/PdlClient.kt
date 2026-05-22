@@ -21,8 +21,8 @@ import java.time.LocalDate
 
 @Service
 class PdlClient(
-    @Value("\${PDL_URL}") pdlBaseUrl: URI,
-    @Value("\${PDL_SCOPE}") private val pdlScope: String,
+    @param:Value("\${PDL_URL}") pdlBaseUrl: URI,
+    @param:Value("\${PDL_SCOPE}") private val pdlScope: String,
     entraIDRestClientFactory: EntraIDRestClientFactory,
 ) {
     private val restClient = entraIDRestClientFactory.lagMaskinTilMaskinRestKlient(pdlScope)
@@ -275,10 +275,10 @@ data class PdlPersonData(
     val forelderBarnRelasjon: List<PdlForeldreBarnRelasjon> = emptyList(),
     val adressebeskyttelse: List<Adressebeskyttelse> = emptyList(),
     val bostedsadresse: List<Bostedsadresse?> = emptyList(),
-    @JsonProperty(value = "doedsfall") val dødsfall: List<Dødsfall> = emptyList(),
-    @JsonProperty(value = "foedselsdato") val fødsel: List<Fødsel> = emptyList(),
+    @field:JsonProperty(value = "doedsfall") val dødsfall: List<Dødsfall> = emptyList(),
+    @field:JsonProperty(value = "foedselsdato") val fødsel: List<Fødsel> = emptyList(),
     val sivilstand: List<Sivilstand> = emptyList(),
-    @JsonProperty(value = "foedested") val fødested: List<Fødested> = emptyList(),
+    @field:JsonProperty(value = "foedested") val fødested: List<Fødested> = emptyList(),
     val oppholdsadresse: List<Oppholdsadresse> = emptyList(),
     val falskIdentitet: FalskIdentitet? = null,
 )
@@ -303,17 +303,17 @@ data class PdlMetadata(
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Dødsfall(
-    @JsonProperty(value = "doedsdato") val dødsdato: LocalDate,
+    @field:JsonProperty(value = "doedsdato") val dødsdato: LocalDate,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Fødsel(
-    @JsonProperty(value = "foedselsdato") val fødselsdato: LocalDate,
+    @field:JsonProperty(value = "foedselsdato") val fødselsdato: LocalDate,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Fødested(
-    @JsonProperty(value = "foedeland") val fødeland: String,
+    @field:JsonProperty(value = "foedeland") val fødeland: String,
 )
 
 fun Fødested.erUtenforNorge(): Boolean =
