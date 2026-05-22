@@ -15,8 +15,8 @@ private val logger = LoggerFactory.getLogger(FamilieDokumentClient::class.java)
 @Component
 class FamilieDokumentClient(
     @param:Value("\${FAMILIE_DOKUMENT_API_URL}") private val dokumentUri: URI,
-    @Qualifier("unauthenticatedRestClient") private val unauthenticatedRestClient: RestClient,
-    @Qualifier("familieTokenXRestClient") private val restClient: RestClient,
+    @param:Qualifier("unauthenticatedRestClient") private val unauthenticatedRestClient: RestClient,
+    @param:Qualifier("familieTokenXRestClient") private val restClient: RestClient,
 ) {
     fun hentVedlegg(dokumentId: String): ByteArray {
         logger.info("Henter vedlegg med dokumentid $dokumentId")

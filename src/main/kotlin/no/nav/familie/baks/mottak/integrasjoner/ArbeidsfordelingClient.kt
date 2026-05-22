@@ -20,7 +20,7 @@ import java.util.Optional.ofNullable
 @Component
 class ArbeidsfordelingClient(
     @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonUri: URI,
-    @Qualifier("integrasjonerRestClient") private val restClient: RestClient,
+    @param:Qualifier("integrasjonerRestClient") private val restClient: RestClient,
     private val featureToggleService: FeatureToggleService,
 ) {
     fun hentBehandlendeEnheterPåIdent(

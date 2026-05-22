@@ -15,8 +15,8 @@ data class PdfResponse(
 
 @Service
 class FamiliePdfClient(
-    @Value("\${FAMILIE_PDF_URL}") private val uri: URI,
-    @Value("\${FAMILIE_PDF_SCOPE}") private val familiePdfScope: String,
+    @param:Value("\${FAMILIE_PDF_URL}") private val uri: URI,
+    @param:Value("\${FAMILIE_PDF_SCOPE}") private val familiePdfScope: String,
     entraIDRestClientFactory: EntraIDRestClientFactory,
 ) {
     private val restClient = entraIDRestClientFactory.lagMaskinTilMaskinRestKlient(familiePdfScope)

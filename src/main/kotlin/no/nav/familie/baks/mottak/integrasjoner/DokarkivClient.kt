@@ -21,7 +21,7 @@ private val logger = LoggerFactory.getLogger(DokarkivClient::class.java)
 @Component
 class DokarkivClient(
     @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonUri: URI,
-    @Qualifier("integrasjonerRestClient") private val restClient: RestClient,
+    @param:Qualifier("integrasjonerRestClient") private val restClient: RestClient,
 ) {
     fun oppdaterJournalpostSak(
         jp: Journalpost,

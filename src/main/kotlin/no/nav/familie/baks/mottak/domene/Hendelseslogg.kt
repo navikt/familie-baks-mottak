@@ -17,23 +17,23 @@ import java.util.Properties
 @Entity
 @Table(name = "HENDELSESLOGG")
 data class Hendelseslogg(
-    @Column(name = "kafka_offset")
+    @field:Column(name = "kafka_offset")
     val offset: Long,
-    @Column(name = "hendelse_id")
+    @field:Column(name = "hendelse_id")
     val hendelseId: String,
-    @Enumerated(EnumType.STRING)
-    @Column(name = "consumer")
+    @field:Enumerated(EnumType.STRING)
+    @field:Column(name = "consumer")
     val consumer: HendelseConsumer,
-    @Convert(converter = PropertiesToStringConverter::class)
-    @Column(name = "metadata")
+    @field:Convert(converter = PropertiesToStringConverter::class)
+    @field:Column(name = "metadata")
     val metadata: Properties = Properties(),
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hendelseslogg_seq")
-    @SequenceGenerator(name = "hendelseslogg_seq")
+    @field:Id
+    @field:GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hendelseslogg_seq")
+    @field:SequenceGenerator(name = "hendelseslogg_seq")
     val id: Long? = null,
-    @Column(name = "opprettet_tid", nullable = false, updatable = false)
+    @field:Column(name = "opprettet_tid", nullable = false, updatable = false)
     val opprettetTidspunkt: LocalDateTime = LocalDateTime.now(),
-    @Column(name = "ident", nullable = true)
+    @field:Column(name = "ident", nullable = true)
     val ident: String? = null,
 )
 

@@ -13,8 +13,8 @@ import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 
 @Component
 class InfotrygdBarnetrygdClient(
-    @Value("\${FAMILIE_BA_INFOTRYGD_API_URL}/infotrygd/barnetrygd") private val clientUri: URI,
-    @Value("\${FAMILIE_BA_INFOTRYGD_SCOPE}") private val infotrygdScope: String,
+    @param:Value("\${FAMILIE_BA_INFOTRYGD_API_URL}/infotrygd/barnetrygd") private val clientUri: URI,
+    @param:Value("\${FAMILIE_BA_INFOTRYGD_SCOPE}") private val infotrygdScope: String,
     entraIDRestClientFactory: EntraIDRestClientFactory,
 ) {
     private val restClient = entraIDRestClientFactory.lagMaskinTilMaskinRestKlient(infotrygdScope)

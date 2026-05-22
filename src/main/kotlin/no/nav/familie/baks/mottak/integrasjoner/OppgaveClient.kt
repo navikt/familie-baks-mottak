@@ -31,7 +31,7 @@ class OppgaveClient
     @Autowired
     constructor(
         @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonUri: URI,
-        @Qualifier("integrasjonerRestClient") private val restClient: RestClient,
+        @param:Qualifier("integrasjonerRestClient") private val restClient: RestClient,
         private val oppgaveMapperService: OppgaveMapperService,
     ) {
         val secureLog: Logger = LoggerFactory.getLogger("secureLogger")

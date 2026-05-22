@@ -14,7 +14,7 @@ private val logger = LoggerFactory.getLogger(HentEnhetClient::class.java)
 @Component
 class HentEnhetClient(
     @param:Value("\${NORG2_API_URL}") private val norg2Uri: URI,
-    @Qualifier("unauthenticatedRestClient") private val restClient: RestClient,
+    @param:Qualifier("unauthenticatedRestClient") private val restClient: RestClient,
 ) {
     fun hentEnhet(enhetId: String): Enhet {
         val uri = URI.create("$norg2Uri/api/v1/enhet/$enhetId")
