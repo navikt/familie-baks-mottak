@@ -16,7 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.util.Properties
 
 @ExtendWith(SpringExtension::class)
-@ActiveProfiles("postgres", "mock-dokarkiv-conflict", "mock-dokgen", "mock-familie-pdf", "testcontainers")
+@ActiveProfiles("postgres", "mock-dokarkiv-conflict", "mock-dokgen", "testcontainers")
 @Tag("integration")
 @SpringBootTest(classes = [DevLauncherPostgres::class])
 class EksternReferanseIdTest(

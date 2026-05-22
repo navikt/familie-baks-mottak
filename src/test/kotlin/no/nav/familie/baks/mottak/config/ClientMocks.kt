@@ -7,7 +7,6 @@ import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveClient
 import no.nav.familie.baks.mottak.integrasjoner.PdfClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
-import no.nav.familie.baks.mottak.søknad.FamiliePdfClient
 import no.nav.familie.kontrakter.felles.BrukerIdType
 import no.nav.familie.kontrakter.felles.dokarkiv.ArkiverDokumentResponse
 import no.nav.familie.kontrakter.felles.journalpost.Bruker
@@ -137,17 +136,5 @@ class ClientMocks {
         } returns "abc".toByteArray()
 
         return mockPdfClient
-    }
-
-    @Bean
-    @Primary
-    @Profile("mock-familie-pdf")
-    fun mockFamiliePdfClient(): FamiliePdfClient {
-        val mockFamiliePdfClient = mockk<FamiliePdfClient>()
-        every {
-            mockFamiliePdfClient.opprettPdf(any())
-        } returns "abc".toByteArray()
-
-        return mockFamiliePdfClient
     }
 }
