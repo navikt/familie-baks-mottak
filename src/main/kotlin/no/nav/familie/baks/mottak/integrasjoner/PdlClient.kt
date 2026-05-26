@@ -275,10 +275,10 @@ data class PdlPersonData(
     val forelderBarnRelasjon: List<PdlForeldreBarnRelasjon> = emptyList(),
     val adressebeskyttelse: List<Adressebeskyttelse> = emptyList(),
     val bostedsadresse: List<Bostedsadresse?> = emptyList(),
-    @field:JsonProperty(value = "doedsfall") val dødsfall: List<Dødsfall> = emptyList(),
-    @field:JsonProperty(value = "foedselsdato") val fødsel: List<Fødsel> = emptyList(),
+    @param:JsonProperty(value = "doedsfall") val dødsfall: List<Dødsfall> = emptyList(),
+    @param:JsonProperty(value = "foedselsdato") val fødsel: List<Fødsel> = emptyList(),
     val sivilstand: List<Sivilstand> = emptyList(),
-    @field:JsonProperty(value = "foedested") val fødested: List<Fødested> = emptyList(),
+    @param:JsonProperty(value = "foedested") val fødested: List<Fødested> = emptyList(),
     val oppholdsadresse: List<Oppholdsadresse> = emptyList(),
     val falskIdentitet: FalskIdentitet? = null,
 )
@@ -303,17 +303,17 @@ data class PdlMetadata(
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Dødsfall(
-    @field:JsonProperty(value = "doedsdato") val dødsdato: LocalDate,
+    @param:JsonProperty(value = "doedsdato") val dødsdato: LocalDate,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Fødsel(
-    @field:JsonProperty(value = "foedselsdato") val fødselsdato: LocalDate,
+    @param:JsonProperty(value = "foedselsdato") val fødselsdato: LocalDate,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Fødested(
-    @field:JsonProperty(value = "foedeland") val fødeland: String,
+    @param:JsonProperty(value = "foedeland") val fødeland: String,
 )
 
 fun Fødested.erUtenforNorge(): Boolean =
