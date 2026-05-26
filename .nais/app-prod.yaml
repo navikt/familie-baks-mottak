@@ -58,8 +58,6 @@ spec:
           cluster: prod-gcp
         - application: familie-dokument
           cluster: prod-gcp
-        - application: familie-pdf
-          cluster: prod-gcp
         - application: logging
           namespace: nais-system
       external:
