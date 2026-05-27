@@ -182,7 +182,7 @@
         <dependency>
             <groupId>no.nav.familie</groupId>
             <artifactId>baks-dokgen</artifactId>
-            <version>1.0_20260520085228_a2aa3fc</version>
+            <version>1.0_20260120151314_5b02d37</version>
         </dependency>
         <!-- Kafka -->
         <dependency>
