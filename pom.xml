@@ -24,8 +24,8 @@
         <mockk.version>1.14.9</mockk.version>
         <confluent.version>8.2.1</confluent.version>
         <prosessering.version>2.20260526102747_ed05f71</prosessering.version>
-        <felles.version>4.20260522112150_d4b1f63</felles.version>
-        <kontrakter.version>4.0_20260525120347_db8fb90</kontrakter.version>
+        <felles.version>4.20260529121328_2754f7c</felles.version>
+        <kontrakter.version>4.0_20260527090809_893fcba</kontrakter.version>
         <mock-oauth2-server.version>4.0.0</mock-oauth2-server.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
@@ -181,7 +181,7 @@
         <dependency>
             <groupId>no.nav.familie</groupId>
             <artifactId>baks-dokgen</artifactId>
-            <version>1.0_20260120151314_5b02d37</version>
+            <version>1.0_20260520085228_a2aa3fc</version>
         </dependency>
         <!-- Kafka -->
         <dependency>
