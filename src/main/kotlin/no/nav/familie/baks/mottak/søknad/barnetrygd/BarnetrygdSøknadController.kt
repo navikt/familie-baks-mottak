@@ -53,10 +53,10 @@ class BarnetrygdSøknadController(
         try {
             val dbSøknad = barnetrygdSøknadService.motta(versjonertBarnetrygdSøknad = versjonertBarnetrygdSøknad)
             barnetrygdSøknadMetrikkService.sendMottakMetrikker(versjonertBarnetrygdSøknad)
-            ResponseEntity.ok(Ressurs.success(Kvittering("Søknad er mottatt", dbSøknad.opprettetTid)))
+            ResponseEntity.ok(Ressurs.success(Kvittering("Søknad om barnetrygd er mottatt", dbSøknad.opprettetTid)))
         } catch (e: FødselsnummerErNullException) {
             barnetrygdSøknadMetrikkService.sendMottakFeiletMetrikker(versjonertBarnetrygdSøknad)
-            ResponseEntity.status(500).body(Ressurs.failure("Lagring av søknad feilet"))
+            ResponseEntity.status(500).body(Ressurs.failure("Lagring av søknad om barnetrygd feilet"))
         }
 
     @GetMapping(value = ["/ping"])
