@@ -20,12 +20,12 @@
         <changelist>-SNAPSHOT</changelist>
         <java.version>25</java.version>
         <jvmTarget>25</jvmTarget>
-        <kotlin.version>2.3.21</kotlin.version>
+        <kotlin.version>2.4.0</kotlin.version>
         <mockk.version>1.14.11</mockk.version>
-        <confluent.version>8.2.1</confluent.version>
-        <prosessering.version>2.20260526102747_ed05f71</prosessering.version>
-        <felles.version>4.20260522112150_d4b1f63</felles.version>
-        <kontrakter.version>4.0_20260525120347_db8fb90</kontrakter.version>
+        <confluent.version>8.3.0</confluent.version>
+        <prosessering.version>2.20260622101837_623782e</prosessering.version>
+        <felles.version>4.20260622095330_affbfcf</felles.version>
+        <kontrakter.version>4.0_20260622103258_a3e0997</kontrakter.version>
         <mock-oauth2-server.version>4.0.0</mock-oauth2-server.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
@@ -181,7 +181,7 @@
         <dependency>
             <groupId>no.nav.familie</groupId>
             <artifactId>baks-dokgen</artifactId>
-            <version>1.0_20260120151314_5b02d37</version>
+            <version>1.0_20260520085228_a2aa3fc</version>
         </dependency>
         <!-- Kafka -->
         <dependency>
