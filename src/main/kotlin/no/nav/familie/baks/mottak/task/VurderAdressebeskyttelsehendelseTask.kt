@@ -4,11 +4,11 @@ import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle.SEND_OPPGAV
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.domene.hendelser.PdlHendelse
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
+import no.nav.familie.baks.mottak.integrasjoner.BehandlingStatus
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveClientService
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveVurderLivshendelseDto
 import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
-import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -23,6 +23,7 @@ import java.util.Properties
     taskStepType = VurderAdressebeskyttelsehendelseTask.TASK_STEP_TYPE,
     beskrivelse = "Oppretter vurder livshendelse oppgave om adressebeskyttelse er opphørt for skjermet barn med løpende fagsak",
     maxAntallFeil = 3,
+    triggerTidVedFeilISekunder = 60,
 )
 class VurderAdressebeskyttelsehendelseTask(
     private val baSakClient: BaSakClient,
@@ -61,13 +62,19 @@ class VurderAdressebeskyttelsehendelseTask(
                 }
 
         if (featureToggleService.isEnabled(SEND_OPPGAVE_OM_ADRESSEBESKYTTELSE_ER_FJERNET)) {
+            val restMinimalFagsak = baSakClient.hentMinimalRestFagsak(løpendeFagsak.id)
+            val sisteBehandling =
+                restMinimalFagsak.behandlinger
+                    .filter { it.status == BehandlingStatus.AVSLUTTET }
+                    .maxByOrNull { it.opprettetTidspunkt }
+
             oppgaveClient.opprettVurderLivshendelseOppgave(
                 OppgaveVurderLivshendelseDto(
                     aktørId = task.payload,
                     beskrivelse = "Adressebeskyttelse er opphevet",
                     saksId = løpendeFagsak.id.toString(),
                     tema = Tema.BAR,
-                    behandlingstema = Behandlingstema.Barnetrygd.value,
+                    behandlingstema = sisteBehandling.tilBarnetrygdBehandlingstema().value,
                     enhetsId = ENHETSNUMMER_VIKAFOSSEN,
                 ),
             )
