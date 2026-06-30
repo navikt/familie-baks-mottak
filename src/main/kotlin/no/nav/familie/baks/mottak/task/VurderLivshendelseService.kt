@@ -260,7 +260,7 @@ class VurderLivshendelseService(
         tema: Tema,
         restBehandling: RestVisningBehandling,
     ) = when (tema) {
-        Tema.BAR -> tilBarnetrygdBehandlingstema(restBehandling)
+        Tema.BAR -> restBehandling.tilBarnetrygdBehandlingstema()
 
         // behandlingstema brukes ikke i kombinasjon med behandlingstype for kontantstøtte
         Tema.KON -> null
@@ -396,15 +396,6 @@ class VurderLivshendelseService(
         return listeMedFagsakIdOgTilknyttetAktør
     }
 
-    private fun tilBarnetrygdBehandlingstema(restBehandling: RestVisningBehandling?): Behandlingstema =
-        when {
-            restBehandling == null -> Behandlingstema.Barnetrygd
-            restBehandling.kategori == BehandlingKategori.EØS -> Behandlingstema.BarnetrygdEØS
-            restBehandling.kategori == BehandlingKategori.NASJONAL && restBehandling.underkategori == BehandlingUnderkategori.ORDINÆR -> Behandlingstema.OrdinærBarnetrygd
-            restBehandling.kategori == BehandlingKategori.NASJONAL && restBehandling.underkategori == BehandlingUnderkategori.UTVIDET -> Behandlingstema.UtvidetBarnetrygd
-            else -> Behandlingstema.Barnetrygd
-        }
-
     private fun tilKontanstøtteBehandlingstype(restBehandling: RestVisningBehandling?): Behandlingstype =
         when {
             restBehandling?.kategori == BehandlingKategori.EØS -> Behandlingstype.EØS
@@ -532,3 +523,12 @@ enum class VurderLivshendelseType(
     SIVILSTAND("Endring i sivilstand"),
     UTFLYTTING("Utflytting"),
 }
+
+fun RestVisningBehandling?.tilBarnetrygdBehandlingstema(): Behandlingstema =
+    when {
+        this == null -> Behandlingstema.Barnetrygd
+        this.kategori == BehandlingKategori.EØS -> Behandlingstema.BarnetrygdEØS
+        this.kategori == BehandlingKategori.NASJONAL && this.underkategori == BehandlingUnderkategori.ORDINÆR -> Behandlingstema.OrdinærBarnetrygd
+        this.kategori == BehandlingKategori.NASJONAL && this.underkategori == BehandlingUnderkategori.UTVIDET -> Behandlingstema.UtvidetBarnetrygd
+        else -> Behandlingstema.Barnetrygd
+    }
