@@ -1,7 +1,5 @@
 package no.nav.familie.baks.mottak.task
 
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle.SEND_OPPGAVE_OM_ADRESSEBESKYTTELSE_ER_FJERNET
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.domene.hendelser.PdlHendelse
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingStatus
@@ -29,7 +27,6 @@ class VurderAdressebeskyttelsehendelseTask(
     private val baSakClient: BaSakClient,
     private val pdlClientService: PdlClientService,
     private val oppgaveClient: OppgaveClientService,
-    private val featureToggleService: FeatureToggleService,
 ) : AsyncTaskStep {
     val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
 
@@ -61,24 +58,22 @@ class VurderAdressebeskyttelsehendelseTask(
                     return
                 }
 
-        if (featureToggleService.isEnabled(SEND_OPPGAVE_OM_ADRESSEBESKYTTELSE_ER_FJERNET)) {
-            val restMinimalFagsak = baSakClient.hentMinimalRestFagsak(løpendeFagsak.id)
-            val sisteBehandling =
-                restMinimalFagsak.behandlinger
-                    .filter { it.status == BehandlingStatus.AVSLUTTET }
-                    .maxByOrNull { it.opprettetTidspunkt }
+        val restMinimalFagsak = baSakClient.hentMinimalRestFagsak(løpendeFagsak.id)
+        val sisteBehandling =
+            restMinimalFagsak.behandlinger
+                .filter { it.status == BehandlingStatus.AVSLUTTET }
+                .maxByOrNull { it.opprettetTidspunkt }
 
-            oppgaveClient.opprettVurderLivshendelseOppgave(
-                OppgaveVurderLivshendelseDto(
-                    aktørId = task.payload,
-                    beskrivelse = "Adressebeskyttelse er opphevet",
-                    saksId = løpendeFagsak.id.toString(),
-                    tema = Tema.BAR,
-                    behandlingstema = sisteBehandling.tilBarnetrygdBehandlingstema().value,
-                    enhetsId = ENHETSNUMMER_VIKAFOSSEN,
-                ),
-            )
-        }
+        oppgaveClient.opprettVurderLivshendelseOppgave(
+            OppgaveVurderLivshendelseDto(
+                aktørId = task.payload,
+                beskrivelse = "Adressebeskyttelse er opphevet",
+                saksId = løpendeFagsak.id.toString(),
+                tema = Tema.BAR,
+                behandlingstema = sisteBehandling.tilBarnetrygdBehandlingstema().value,
+                enhetsId = ENHETSNUMMER_VIKAFOSSEN,
+            ),
+        )
     }
 
     companion object {

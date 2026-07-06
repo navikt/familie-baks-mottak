@@ -4,8 +4,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelse
 import no.nav.familie.baks.mottak.integrasjoner.Adressebeskyttelsesgradering
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
@@ -35,14 +33,12 @@ class VurderAdressebeskyttelsehendelseTaskTest {
     private val mockPdlClient: PdlClientService = mockk()
     private val mockBaSakClient: BaSakClient = mockk()
     private val mockOppgaveClient: OppgaveClientService = mockk()
-    private val featureToggleService: FeatureToggleService = mockk()
 
     private val vurderAdressebeskyttelsehendelseTask =
         VurderAdressebeskyttelsehendelseTask(
             baSakClient = mockBaSakClient,
             pdlClientService = mockPdlClient,
             oppgaveClient = mockOppgaveClient,
-            featureToggleService = featureToggleService,
         )
 
     private val aktørId = "1234567890123"
@@ -55,7 +51,6 @@ class VurderAdressebeskyttelsehendelseTaskTest {
 
     @BeforeEach
     fun setUp() {
-        every { featureToggleService.isEnabled(FeatureToggle.SEND_OPPGAVE_OM_ADRESSEBESKYTTELSE_ER_FJERNET) } returns true
         every { mockPdlClient.hentPersonident(aktørId, Tema.BAR) } returns personIdent
     }
 
