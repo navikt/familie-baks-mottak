@@ -5,8 +5,6 @@ import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import no.nav.familie.baks.mottak.AbstractWiremockTest
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle.HENT_ARBEIDSFORDELING_MED_BEHANDLINGSTYPE
-import no.nav.familie.baks.mottak.fake.FakeFeatureToggleService
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.jsonMapper
@@ -24,9 +22,6 @@ import org.springframework.test.context.ActiveProfiles
 class ArbeidsfordelingClientTest : AbstractWiremockTest() {
     @Autowired
     lateinit var arbeidsfordelingClient: ArbeidsfordelingClient
-
-    @Autowired
-    lateinit var featureToggleService: FakeFeatureToggleService
 
     @Test
     @Tag("integration")
@@ -52,8 +47,6 @@ class ArbeidsfordelingClientTest : AbstractWiremockTest() {
     @Test
     @Tag("integration")
     fun `hentBehandlendeEnheterPåIdent skal returnere enhet på person med behandlingstype-parameter`() {
-        featureToggleService.set(HENT_ARBEIDSFORDELING_MED_BEHANDLINGSTYPE, true)
-
         stubFor(
             WireMock.post(urlEqualTo("/api/arbeidsfordeling/enhet/KON?behandlingstype=E%C3%98S")).withRequestBody(WireMock.equalToJson("""{"ident":"123"}""")).willReturn(
                 aResponse().withHeader("Content-Type", "application/json").withBody(
