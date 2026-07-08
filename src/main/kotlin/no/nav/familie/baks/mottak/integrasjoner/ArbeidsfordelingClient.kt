@@ -1,7 +1,5 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.kontrakter.felles.PersonIdent
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Tema
@@ -21,7 +19,6 @@ import java.util.Optional.ofNullable
 class ArbeidsfordelingClient(
     @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonUri: URI,
     @Qualifier("integrasjonerRestClient") private val restClient: RestClient,
-    private val featureToggleService: FeatureToggleService,
 ) {
     fun hentBehandlendeEnheterPåIdent(
         personIdent: String,
@@ -32,13 +29,8 @@ class ArbeidsfordelingClient(
             UriComponentsBuilder
                 .fromUri(integrasjonUri)
                 .pathSegment("arbeidsfordeling", "enhet", tema.toString())
-                .let {
-                    if (featureToggleService.isEnabled(FeatureToggle.HENT_ARBEIDSFORDELING_MED_BEHANDLINGSTYPE, false)) {
-                        it.queryParamIfPresent("behandlingstype", ofNullable(behandlingstype))
-                    } else {
-                        it
-                    }
-                }.build()
+                .queryParamIfPresent("behandlingstype", ofNullable(behandlingstype))
+                .build()
                 .encode()
                 .toUri()
 
