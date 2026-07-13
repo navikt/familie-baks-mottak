@@ -247,13 +247,13 @@ private fun List<RestFagsakDeltager>.harForelderEllerBarnPågåendeSak(baSakClie
 private fun RestFagsakDeltager.harPågåendeSak(baSakClient: BaSakClient): Boolean =
     when (fagsakStatus) {
         OPPRETTET, LØPENDE -> true
-        AVSLUTTET -> !sisteBehandlingHenlagtEllerTekniskOpphør(baSakClient.hentRestFagsak(fagsakId))
+        AVSLUTTET -> !sisteBehandlingHenlagtEllerTekniskEndring(baSakClient.hentRestFagsak(fagsakId))
     }
 
-private fun sisteBehandlingHenlagtEllerTekniskOpphør(fagsak: RestFagsak): Boolean {
+private fun sisteBehandlingHenlagtEllerTekniskEndring(fagsak: RestFagsak): Boolean {
     val sisteBehandling =
         fagsak.behandlinger
             .sortedBy { it.opprettetTidspunkt }
             .findLast { it.steg == "BEHANDLING_AVSLUTTET" } ?: return false
-    return sisteBehandling.type == "TEKNISK_OPPHØR" || sisteBehandling.resultat.startsWith("HENLAGT")
+    return sisteBehandling.type == "TEKNISK_ENDRING" || sisteBehandling.resultat.startsWith("HENLAGT")
 }
