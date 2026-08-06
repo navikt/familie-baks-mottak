@@ -2,8 +2,6 @@ package no.nav.familie.baks.mottak.journalføring
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.BarnetrygdOppgaveMapper
@@ -30,7 +28,6 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 class AutomatiskJournalføringBarnetrygdServiceTest {
-    private val mockedFeatureToggleService: FeatureToggleService = mockk()
     private val mockedBaSakClient: BaSakClient = mockk()
     private val mockedArbeidsfordelingClient: ArbeidsfordelingClient = mockk()
     private val mockedAdressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService = mockk()
@@ -39,7 +36,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
 
     private val automatiskJournalføringBarnetrygdService: AutomatiskJournalføringBarnetrygdService =
         AutomatiskJournalføringBarnetrygdService(
-            featureToggleService = mockedFeatureToggleService,
             baSakClient = mockedBaSakClient,
             arbeidsfordelingClient = mockedArbeidsfordelingClient,
             adressebeskyttelesesgraderingService = mockedAdressebeskyttelesesgraderingService,
@@ -49,7 +45,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
 
     @BeforeEach
     internal fun setUp() {
-        every { mockedFeatureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
         every { mockedBarnetrygdOppgaveMapper.hentBehandlingstype(any()) } returns Behandlingstype.NASJONAL
     }
 
@@ -346,56 +341,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
     }
 
     @Test
-    fun `skal ikke automatisk journalføre journalpost hvis det finnes en tilknyttet strengt fortrolig person og toggle er ikke på`() {
-        // Arrange
-        every { mockedFeatureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns false
-        val identifikator = "123"
-
-        val journalpost =
-            Journalpost(
-                journalpostId = "1",
-                journalposttype = Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                bruker =
-                    Bruker(
-                        id = identifikator,
-                        type = BrukerIdType.FNR,
-                    ),
-                kanal = "NAV_NO",
-                dokumenter =
-                    listOf(
-                        DokumentInfo(
-                            brevkode = "NAV 33-00.07",
-                            tittel = "Søknad",
-                            dokumentstatus = Dokumentstatus.FERDIGSTILT,
-                            dokumentvarianter = emptyList(),
-                            dokumentInfoId = "id",
-                        ),
-                    ),
-            )
-
-        every {
-            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
-                tema = Tema.BAR,
-                journalpost = journalpost,
-            )
-        } returns true
-
-        // Act
-        val skalAutomatiskJournalføres =
-            automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
-                journalpost,
-                false,
-            )
-
-        // Assert
-        assertThat(skalAutomatiskJournalføres).isFalse()
-    }
-
-    @Test
-    fun `skal automatisk journalføre journalpost hvis søker er en strengt fortrolig person og toggle er på`() {
-        every { mockedFeatureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
-
+    fun `skal automatisk journalføre journalpost hvis søker er en strengt fortrolig person`() {
         // Arrange
         val identifikator = "123"
         val fagsakId = 1L
@@ -481,9 +427,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
     }
 
     @Test
-    fun `skal ikke automatisk journalføre journalpost hvis søker ikke er en strengt fortrolig person men barna er og toggle er på`() {
-        every { mockedFeatureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
-
+    fun `skal ikke automatisk journalføre journalpost hvis søker ikke er en strengt fortrolig person men barna er`() {
         // Arrange
         val identifikator = "123"
         val fagsakId = 1L
@@ -655,10 +599,8 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
     }
 
     @Test
-    fun `skal ikke automatisk journalføre journalpost hvis enhet er 2103 og toggle er av`() {
+    fun `skal automatisk journalføre journalpost hvis enhet er 2103`() {
         // Arrange
-        every { mockedFeatureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns false
-
         val identifikator = "123"
         val fagsakId = 1L
 
@@ -704,94 +646,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
                 behandlinger = listOf(),
                 status = FagsakStatus.LØPENDE,
             )
-
-        every {
-            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
-                tema = Tema.BAR,
-                journalpost = journalpost,
-            )
-        } returns false
-
-        every {
-            mockedArbeidsfordelingClient.hentBehandlendeEnhetPåIdent(
-                personIdent = identifikator,
-                tema = Tema.BAR,
-                behandlingstype = any(),
-            )
-        } returns
-            Enhet(
-                enhetId = "2103",
-                enhetNavn = "Vikafossen",
-            )
-
-        // Act
-        val skalAutomatiskJournalføres =
-            automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
-                journalpost,
-                false,
-            )
-
-        // Assert
-        assertThat(skalAutomatiskJournalføres).isFalse()
-    }
-
-    @Test
-    fun `skal automatisk journalføre journalpost hvis enhet er 2103 og toggle er på`() {
-        // Arrange
-        every { mockedFeatureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false) } returns true
-
-        val identifikator = "123"
-        val fagsakId = 1L
-
-        val journalpost =
-            Journalpost(
-                journalpostId = "1",
-                journalposttype = Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                bruker =
-                    Bruker(
-                        id = identifikator,
-                        type = BrukerIdType.FNR,
-                    ),
-                kanal = "NAV_NO",
-                dokumenter =
-                    listOf(
-                        DokumentInfo(
-                            brevkode = "NAV 33-00.07",
-                            tittel = "Søknad",
-                            dokumentstatus = Dokumentstatus.FERDIGSTILT,
-                            dokumentvarianter = emptyList(),
-                            dokumentInfoId = "id",
-                        ),
-                    ),
-            )
-
-        every {
-            mockedJournalpostBrukerService.tilPersonIdent(
-                bruker = journalpost.bruker!!,
-                tema = Tema.BAR,
-            )
-        } returns identifikator
-
-        every { mockedBaSakClient.hentFagsaknummerPåPersonident(any()) } returns fagsakId
-
-        every {
-            mockedBaSakClient.hentMinimalRestFagsak(
-                fagsakId = fagsakId,
-            )
-        } returns
-            RestMinimalFagsak(
-                id = fagsakId,
-                behandlinger = listOf(),
-                status = FagsakStatus.LØPENDE,
-            )
-
-        every {
-            mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
-                tema = Tema.BAR,
-                journalpost = journalpost,
-            )
-        } returns false
 
         every {
             mockedAdressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(
