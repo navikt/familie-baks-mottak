@@ -22,10 +22,10 @@
         <jvmTarget>25</jvmTarget>
         <kotlin.version>2.4.10</kotlin.version>
         <mockk.version>1.14.11</mockk.version>
-        <confluent.version>8.3.0</confluent.version>
-        <prosessering.version>2.20260713101404_6072da6</prosessering.version>
-        <felles.version>4.20260622095330_affbfcf</felles.version>
-        <kontrakter.version>4.0_20260702124405_ce34af2</kontrakter.version>
+        <confluent.version>8.3.1</confluent.version>
+        <prosessering.version>2.20260727132135_b810544</prosessering.version>
+        <felles.version>4.20260809152656_dbeaaee</felles.version>
+        <kontrakter.version>4.0_20260730124851_08988e0</kontrakter.version>
         <mock-oauth2-server.version>6.0.0</mock-oauth2-server.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
@@ -107,9 +107,15 @@
         </dependency>
 
         <dependency>
-            <groupId>no.finn.unleash</groupId>
+            <groupId>io.getunleash</groupId>
             <artifactId>unleash-client-java</artifactId>
-            <version>4.4.1</version>
+            <version>12.2.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.squareup.okhttp3</groupId>
+                    <artifactId>okhttp</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
 

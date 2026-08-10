@@ -39,7 +39,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
-@ActiveProfiles("postgres", "mock-oauth", "mock-sts", "testcontainers")
+@ActiveProfiles("postgres", "mock-oauth", "testcontainers")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MottaFødselshendelseTaskTest : AbstractWiremockTest() {
     @Autowired
