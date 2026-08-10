@@ -1,7 +1,5 @@
 package no.nav.familie.baks.mottak.journalføring
 
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.BarnetrygdOppgaveMapper
@@ -13,7 +11,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class AutomatiskJournalføringBarnetrygdService(
-    private val featureToggleService: FeatureToggleService,
     private val baSakClient: BaSakClient,
     private val arbeidsfordelingClient: ArbeidsfordelingClient,
     private val adressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService,
@@ -26,14 +23,7 @@ class AutomatiskJournalføringBarnetrygdService(
         journalpost: Journalpost,
         brukerHarSakIInfotrygd: Boolean,
     ): Boolean {
-        val kode6Og19ToggleErPå = featureToggleService.isEnabled(FeatureToggle.AUTOMATISK_JOURNALFØR_ENHET_2103, defaultValue = false)
-
-        val enheterSomIkkeSkalHaAutomatiskJournalføring =
-            if (kode6Og19ToggleErPå) {
-                listOf("4863")
-            } else {
-                listOf("4863", "2103")
-            }
+        val enheterSomIkkeSkalHaAutomatiskJournalføring = listOf("4863")
 
         if (!journalpost.harBarnetrygdSøknad()) {
             return false
@@ -49,13 +39,9 @@ class AutomatiskJournalføringBarnetrygdService(
 
         val noenHarKode6Eller19 = adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(tema, journalpost)
 
-        if (kode6Og19ToggleErPå) {
-            val søkerHarKode6Eller19 = adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpostBruker(tema, journalpost)
+        val søkerHarKode6Eller19 = adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpostBruker(tema, journalpost)
 
-            if (!søkerHarKode6Eller19 && noenHarKode6Eller19) {
-                return false
-            }
-        } else if (noenHarKode6Eller19) {
+        if (!søkerHarKode6Eller19 && noenHarKode6Eller19) {
             return false
         }
 
