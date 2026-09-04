@@ -32,7 +32,7 @@
 
         <token-validation-spring.version>6.0.6</token-validation-spring.version>
         <avro.version>1.12.2</avro.version>
-        <avro.serializable.packages>no.nav.joarkjournalfoeringhendelser</avro.serializable.packages>
+        <avro.serializable.packages>no.nav.joarkjournalfoeringhendelser,no.nav.person.pdl.leesah</avro.serializable.packages>
 
         <!-- Http Client - nyeste versjon fra httpclient(5.5.1) skaper problemer med Spring Boot 3.5.7. Issue: HTTPCLIENT-2405. Skal være fikset i 3.5.8, men bør testes -->
         <httpclient5.version>5.5</httpclient5.version>

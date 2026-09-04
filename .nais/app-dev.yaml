@@ -77,7 +77,7 @@ spec:
     - name: SPRING_PROFILES_ACTIVE
       value: preprod
     - name: JDK_JAVA_OPTIONS
-      value: "-XX:MinRAMPercentage=25.0 -XX:MaxRAMPercentage=75.0 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -Dorg.apache.avro.SERIALIZABLE_PACKAGES=no.nav.joarkjournalfoeringhendelser"
+      value: "-XX:MinRAMPercentage=25.0 -XX:MaxRAMPercentage=75.0 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -Dorg.apache.avro.SERIALIZABLE_PACKAGES=no.nav.joarkjournalfoeringhendelser,no.nav.person.pdl.leesah"
   gcp: # Database
     sqlInstances:
       - type: POSTGRES_17 # Read on nais.io how to upgrade
