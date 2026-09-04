@@ -31,7 +31,8 @@
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
 
         <token-validation-spring.version>6.0.6</token-validation-spring.version>
-        <avro.version>1.12.1</avro.version>
+        <avro.version>1.12.2</avro.version>
+        <avro.serializable.packages>no.nav.joarkjournalfoeringhendelser,no.nav.person.pdl.leesah,no.nav.person.identhendelse.v1</avro.serializable.packages>
 
         <!-- Http Client - nyeste versjon fra httpclient(5.5.1) skaper problemer med Spring Boot 3.5.7. Issue: HTTPCLIENT-2405. Skal være fikset i 3.5.8, men bør testes -->
         <httpclient5.version>5.5</httpclient5.version>
@@ -517,6 +518,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <forkedProcessExitTimeoutInSeconds>10</forkedProcessExitTimeoutInSeconds>
+                    <systemPropertyVariables>
+                        <org.apache.avro.SERIALIZABLE_PACKAGES>${avro.serializable.packages}</org.apache.avro.SERIALIZABLE_PACKAGES>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
         </plugins>
