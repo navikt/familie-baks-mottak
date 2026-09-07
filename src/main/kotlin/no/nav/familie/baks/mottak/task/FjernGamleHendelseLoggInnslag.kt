@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 class FjernGamleHendelseLoggInnslag(
     val hendelsesloggRepository: HendelsesloggRepository,
 ) {
-    @Scheduled(cron = "0 0 9 * * *")
+    @Scheduled(cron = "0 0/5 * * * *")
     @Transactional
     fun fjernGamleHendelseLoggInnslag() {
         if (LeaderClient.isLeader() == true) {
