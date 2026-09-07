@@ -1,8 +1,11 @@
 package no.nav.familie.baks.mottak.task
 
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle
+import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.BarnetrygdOppgaveMapper
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingType
+import no.nav.familie.baks.mottak.integrasjoner.BehandlingÅrsak
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.KontantstøtteOppgaveMapper
@@ -30,6 +33,7 @@ class OpprettSøknadBehandlingISakTask(
     private val barnetrygdOppgaveMapper: BarnetrygdOppgaveMapper,
     private val ksSakClient: KsSakClient,
     private val baSakClient: BaSakClient,
+    private val featureToggleService: FeatureToggleService,
 ) : AsyncTaskStep {
     val log: Logger = LoggerFactory.getLogger(OpprettSøknadBehandlingISakTask::class.java)
 
@@ -71,6 +75,7 @@ class OpprettSøknadBehandlingISakTask(
                     log.info("Finnes allerede åpen behandling på fagsak $fagsakId m/ tema $tema. Hopper over opprettelsen av ny behandling")
                 } else {
                     val behandlingType = utledBehandlingstype(fagsak)
+                    val behandlingÅrsak = utledBehandlingsårsak()
                     val kategori = barnetrygdOppgaveMapper.utledBehandlingKategoriFraSøknad(journalpost)
                     val underkategori = barnetrygdOppgaveMapper.utledBehandlingUnderkategoriFraSøknad(journalpost)
                     val brevkode = journalpost.dokumenter?.firstOrNull { it.brevkode != null }?.brevkode
@@ -80,7 +85,7 @@ class OpprettSøknadBehandlingISakTask(
                     baSakClient.opprettBehandling(
                         kategori = kategori,
                         underkategori = underkategori,
-                        behandlingÅrsak = "SØKNAD",
+                        behandlingÅrsak = behandlingÅrsak,
                         søkersIdent = brukersIdent,
                         søknadMottattDato = journalpost.datoMottatt ?: LocalDateTime.now(),
                         behandlingType = behandlingType,
@@ -95,6 +100,13 @@ class OpprettSøknadBehandlingISakTask(
             }
         }
     }
+
+    private fun utledBehandlingsårsak(): BehandlingÅrsak =
+        if (featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK)) {
+            BehandlingÅrsak.AUTOMATISK_BEHANDLING_AV_SØKNAD
+        } else {
+            BehandlingÅrsak.SØKNAD
+        }
 
     private fun utledBehandlingstype(fagsak: RestMinimalFagsak): BehandlingType {
         val erFagsakLøpende = fagsak.status == FagsakStatus.LØPENDE
