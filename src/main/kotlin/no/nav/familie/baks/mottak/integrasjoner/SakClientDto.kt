@@ -138,4 +138,11 @@ enum class BehandlingStatus {
     AVSLUTTET,
 }
 
+enum class BehandlingÅrsak(
+    val visningsnavn: String,
+) {
+    SØKNAD("Søknad"),
+    AUTOMATISK_BEHANDLING_AV_SØKNAD("Automatisk behandling av søknad"),
+}
+
 fun RestMinimalFagsak.finnesÅpenBehandlingPåFagsak() = behandlinger.any { it.aktiv && it.status != BehandlingStatus.AVSLUTTET }
