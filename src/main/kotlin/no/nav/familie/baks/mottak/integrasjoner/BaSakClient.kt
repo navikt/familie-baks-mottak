@@ -222,7 +222,12 @@ class BaSakClient
             fagsakId: Long,
             søknadsinfo: Søknadsinfo,
         ) {
-            val uri = URI.create("$sakServiceUri/behandlinger")
+            val uri =
+                if (behandlingÅrsak == BehandlingÅrsak.AUTOMATISK_BEHANDLING_AV_SØKNAD) {
+                    URI.create("$sakServiceUri/behandlinger/automatisk-soknad")
+                } else {
+                    URI.create("$sakServiceUri/behandlinger")
+                }
             kotlin
                 .runCatching {
                     restClient

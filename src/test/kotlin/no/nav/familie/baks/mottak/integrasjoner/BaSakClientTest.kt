@@ -4,9 +4,11 @@ import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.post
+import com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.removeAllMappings
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
+import com.github.tomakehurst.wiremock.client.WireMock.verify
 import no.nav.familie.baks.mottak.AbstractWiremockTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ActiveProfiles
 import java.io.IOException
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @ActiveProfiles("dev", "mock-oauth")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -193,6 +196,77 @@ class BaSakClientTest : AbstractWiremockTest() {
             """
             {
               "data": [],
+              "status": "SUKSESS",
+              "melding": "Innhenting av data var vellykket",
+              "frontendFeilmelding": null,
+              "stacktrace": null
+            }
+            """.trimIndent()
+    }
+
+    @Nested
+    inner class OpprettBehandling {
+        @BeforeEach
+        fun setUp() {
+            removeAllMappings()
+        }
+
+        @Test
+        @Tag("integration")
+        fun `skal kalle behandlinger-automatisk-soknad når behandlingÅrsak er AUTOMATISK_BEHANDLING_AV_SØKNAD`() {
+            stubFor(
+                post(urlEqualTo("/api/behandlinger/automatisk-soknad"))
+                    .willReturn(
+                        aResponse()
+                            .withHeader("Content-Type", "application/json")
+                            .withBody(gyldigOpprettBehandlingResponse()),
+                    ),
+            )
+
+            baSakClient.opprettBehandling(
+                kategori = BehandlingKategori.NASJONAL,
+                underkategori = BehandlingUnderkategori.ORDINÆR,
+                søkersIdent = personIdent,
+                behandlingÅrsak = BehandlingÅrsak.AUTOMATISK_BEHANDLING_AV_SØKNAD,
+                søknadMottattDato = LocalDateTime.of(2026, 1, 1, 0, 0),
+                behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
+                fagsakId = fagsakId,
+                søknadsinfo = Søknadsinfo(journalpostId = "12345", erDigital = true),
+            )
+
+            verify(postRequestedFor(urlEqualTo("/api/behandlinger/automatisk-soknad")))
+        }
+
+        @Test
+        @Tag("integration")
+        fun `opprettBehandling skal kalle behandlinger når behandlingÅrsak ikke er AUTOMATISK_BEHANDLING_AV_SØKNAD`() {
+            stubFor(
+                post(urlEqualTo("/api/behandlinger"))
+                    .willReturn(
+                        aResponse()
+                            .withHeader("Content-Type", "application/json")
+                            .withBody(gyldigOpprettBehandlingResponse()),
+                    ),
+            )
+
+            baSakClient.opprettBehandling(
+                kategori = BehandlingKategori.NASJONAL,
+                underkategori = BehandlingUnderkategori.ORDINÆR,
+                søkersIdent = personIdent,
+                behandlingÅrsak = BehandlingÅrsak.SØKNAD,
+                søknadMottattDato = LocalDateTime.of(2026, 1, 1, 0, 0),
+                behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
+                fagsakId = fagsakId,
+                søknadsinfo = Søknadsinfo(journalpostId = "12345", erDigital = true),
+            )
+
+            verify(postRequestedFor(urlEqualTo("/api/behandlinger")))
+        }
+
+        private fun gyldigOpprettBehandlingResponse(): String =
+            """
+            {
+              "data": null,
               "status": "SUKSESS",
               "melding": "Innhenting av data var vellykket",
               "frontendFeilmelding": null,
