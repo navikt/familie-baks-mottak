@@ -25,7 +25,6 @@ jobs:
       build-image: true
       push-image: true
       byosbom: target/classes/META-INF/sbom/application.cdx.json
-    secrets: inherit
   deploy-dev:
     name: Deploy dev
     permissions:
@@ -37,7 +36,6 @@ jobs:
       image: ${{ needs.build.outputs.image }}
       cluster: dev-gcp
       resource: .nais/app-dev.yaml
-    secrets: inherit
   deploy-prod:
     name: Deploy prod
     permissions:
@@ -49,7 +47,6 @@ jobs:
       image: ${{ needs.build.outputs.image }}
       cluster: prod-gcp
       resource: .nais/app-prod.yaml
-    secrets: inherit
   varsle-slack:
     name: Slack-melding ved feil
     if: failure()
