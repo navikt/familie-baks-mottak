@@ -188,7 +188,7 @@
         <dependency>
             <groupId>no.nav.familie</groupId>
             <artifactId>baks-dokgen</artifactId>
-            <version>1.0_20260520085228_a2aa3fc</version>
+            <version>1.0_20260917100130_9146325</version>
         </dependency>
         <!-- Kafka -->
         <dependency>
@@ -290,7 +290,7 @@
         <dependency>
             <groupId>org.wiremock.integrations</groupId>
             <artifactId>wiremock-spring-boot</artifactId>
-            <version>4.2.2</version>
+            <version>4.2.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -328,7 +328,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>5.7.0.6970</version>
+                    <version>5.8.0.7211</version>
                 </plugin>
             </plugins>
         </pluginManagement>
