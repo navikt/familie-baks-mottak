@@ -769,4 +769,48 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
         // Assert
         assertThat(skalAutomatiskJournalføres).isTrue()
     }
+
+    @Test
+    fun `skal ikke automatisk journalføre journalpost om et vedlegg mangler tittel`() {
+        // Arrange
+        val journalpost =
+            Journalpost(
+                journalpostId = "1",
+                journalposttype = Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                bruker =
+                    Bruker(
+                        id = "123",
+                        type = BrukerIdType.FNR,
+                    ),
+                kanal = "NAV_NO",
+                dokumenter =
+                    listOf(
+                        DokumentInfo(
+                            brevkode = "NAV 33-00.07",
+                            tittel = "Søknad om ordinær barnetrygd",
+                            dokumentstatus = Dokumentstatus.FERDIGSTILT,
+                            dokumentvarianter = emptyList(),
+                            dokumentInfoId = "id",
+                        ),
+                        DokumentInfo(
+                            brevkode = null,
+                            tittel = "",
+                            dokumentstatus = Dokumentstatus.FERDIGSTILT,
+                            dokumentvarianter = emptyList(),
+                            dokumentInfoId = "vedleggId",
+                        ),
+                    ),
+            )
+
+        // Act
+        val skalAutomatiskJournalføres =
+            automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
+                journalpost,
+                false,
+            )
+
+        // Assert
+        assertThat(skalAutomatiskJournalføres).isFalse()
+    }
 }
