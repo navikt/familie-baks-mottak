@@ -177,6 +177,20 @@ class BaSakClient
             )
         }
 
+        fun harSøkerHattUtbetaling(fagsakId: Long): Boolean {
+            val uri = URI.create("$sakServiceUri/tilkjentytelse/fagsak/$fagsakId/soker-har-hatt-utbetaling")
+            return runCatching {
+                restClient
+                    .get()
+                    .uri(uri)
+                    .retrieve()
+                    .body<Ressurs<Boolean>>()!!
+            }.fold(
+                onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
+                onFailure = { throw IntegrasjonException("Feil ved sjekk av om søker har hatt utbetaling i ba-sak.", it, uri) },
+            )
+        }
+
         fun hentRestFagsak(fagsakId: Long): RestFagsak {
             val uri = URI.create("$sakServiceUri/fagsaker/$fagsakId")
             return runCatching {
