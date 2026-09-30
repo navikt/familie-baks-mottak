@@ -3,6 +3,7 @@ package no.nav.familie.baks.mottak.integrasjoner
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.removeAllMappings
@@ -16,6 +17,9 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ActiveProfiles
 import java.io.IOException
@@ -269,6 +273,87 @@ class BaSakClientTest : AbstractWiremockTest() {
               "data": null,
               "status": "SUKSESS",
               "melding": "Innhenting av data var vellykket",
+              "frontendFeilmelding": null,
+              "stacktrace": null
+            }
+            """.trimIndent()
+    }
+
+    @Nested
+    inner class HarSøkerHattUtbetaling {
+        private val url = "/api/tilkjentytelse/fagsak/$fagsakId/soker-har-hatt-utbetaling"
+
+        @BeforeEach
+        fun setUp() {
+            removeAllMappings()
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = [true, false])
+        @Tag("integration")
+        fun `skal returnere svaret fra ba-sak`(harHattUtbetaling: Boolean) {
+            stubFor(
+                get(urlEqualTo(url))
+                    .willReturn(
+                        aResponse()
+                            .withHeader("Content-Type", "application/json")
+                            .withBody(gyldigResponse(harHattUtbetaling)),
+                    ),
+            )
+
+            val response = baSakClient.harSøkerHattUtbetaling(fagsakId)
+
+            assertThat(response).isEqualTo(harHattUtbetaling)
+            verify(getRequestedFor(urlEqualTo(url)))
+        }
+
+        @Test
+        @Tag("integration")
+        fun `skal kaste IntegrasjonException når ba-sak returnerer respons uten data`() {
+            stubFor(
+                get(urlEqualTo(url))
+                    .willReturn(
+                        aResponse()
+                            .withHeader("Content-Type", "application/json")
+                            .withBody(responseUtenData()),
+                    ),
+            )
+
+            val exception = assertThrows<IntegrasjonException> { baSakClient.harSøkerHattUtbetaling(fagsakId) }
+
+            assertThat(exception.message).isEqualTo("Noe gikk galt")
+        }
+
+        @Test
+        @Tag("integration")
+        fun `skal kaste IntegrasjonException når kallet til ba-sak feiler`() {
+            stubFor(
+                get(urlEqualTo(url))
+                    .willReturn(aResponse().withStatus(500)),
+            )
+
+            val exception = assertThrows<IntegrasjonException> { baSakClient.harSøkerHattUtbetaling(fagsakId) }
+
+            assertThat(exception.message).isEqualTo("Feil ved sjekk av om søker har hatt utbetaling i ba-sak.")
+        }
+
+        private fun gyldigResponse(harHattUtbetaling: Boolean): String =
+            """
+            {
+              "data": $harHattUtbetaling,
+              "status": "SUKSESS",
+              "melding": "Innhenting av data var vellykket",
+              "frontendFeilmelding": null,
+              "stacktrace": null
+            }
+            """.trimIndent()
+
+        private fun responseUtenData(): String =
+            """
+            {
+              "data": null,
+              "status": "FEILET",
+              "melding": "Noe gikk galt",
               "frontendFeilmelding": null,
               "stacktrace": null
             }
