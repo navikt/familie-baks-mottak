@@ -281,7 +281,7 @@ class BaSakClientTest : AbstractWiremockTest() {
 
     @Nested
     inner class SøkerHarHattInnvilgetBarnetrygd {
-        private val url = "/api/barnetrygdhistorikk/fagsak/$fagsakId/soker-har-hatt-innvilget_barnetrygd"
+        private val url = "/api/barnetrygdhistorikk/fagsak/$fagsakId/soker-har-hatt-innvilget-barnetrygd"
 
         @BeforeEach
         fun setUp() {

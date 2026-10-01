@@ -178,7 +178,7 @@ class BaSakClient
         }
 
         fun søkerHarHattInnvilgetBarnetrygd(fagsakId: Long): Boolean {
-            val uri = URI.create("$sakServiceUri/barnetrygdhistorikk/fagsak/$fagsakId/soker-har-hatt-innvilget_barnetrygd")
+            val uri = URI.create("$sakServiceUri/barnetrygdhistorikk/fagsak/$fagsakId/soker-har-hatt-innvilget-barnetrygd")
             return runCatching {
                 restClient
                     .get()
