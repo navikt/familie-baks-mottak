@@ -280,8 +280,8 @@ class BaSakClientTest : AbstractWiremockTest() {
     }
 
     @Nested
-    inner class HarSøkerHattUtbetaling {
-        private val url = "/api/tilkjentytelse/fagsak/$fagsakId/soker-har-hatt-utbetaling"
+    inner class SøkerHarHattInnvilgetBarnetrygd {
+        private val url = "/api/barnetrygdhistorikk/fagsak/$fagsakId/soker-har-hatt-innvilget_barnetrygd"
 
         @BeforeEach
         fun setUp() {
@@ -301,7 +301,7 @@ class BaSakClientTest : AbstractWiremockTest() {
                     ),
             )
 
-            val response = baSakClient.harSøkerHattUtbetaling(fagsakId)
+            val response = baSakClient.søkerHarHattInnvilgetBarnetrygd(fagsakId)
 
             assertThat(response).isEqualTo(harHattUtbetaling)
             verify(getRequestedFor(urlEqualTo(url)))
@@ -319,7 +319,7 @@ class BaSakClientTest : AbstractWiremockTest() {
                     ),
             )
 
-            val exception = assertThrows<IntegrasjonException> { baSakClient.harSøkerHattUtbetaling(fagsakId) }
+            val exception = assertThrows<IntegrasjonException> { baSakClient.søkerHarHattInnvilgetBarnetrygd(fagsakId) }
 
             assertThat(exception.message).isEqualTo("Noe gikk galt")
         }
@@ -332,7 +332,7 @@ class BaSakClientTest : AbstractWiremockTest() {
                     .willReturn(aResponse().withStatus(500)),
             )
 
-            val exception = assertThrows<IntegrasjonException> { baSakClient.harSøkerHattUtbetaling(fagsakId) }
+            val exception = assertThrows<IntegrasjonException> { baSakClient.søkerHarHattInnvilgetBarnetrygd(fagsakId) }
 
             assertThat(exception.message).isEqualTo("Feil ved sjekk av om søker har hatt utbetaling i ba-sak.")
         }

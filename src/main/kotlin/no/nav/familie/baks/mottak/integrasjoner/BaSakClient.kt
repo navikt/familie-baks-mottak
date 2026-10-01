@@ -177,8 +177,8 @@ class BaSakClient
             )
         }
 
-        fun harSøkerHattUtbetaling(fagsakId: Long): Boolean {
-            val uri = URI.create("$sakServiceUri/tilkjentytelse/fagsak/$fagsakId/soker-har-hatt-utbetaling")
+        fun søkerHarHattInnvilgetBarnetrygd(fagsakId: Long): Boolean {
+            val uri = URI.create("$sakServiceUri/barnetrygdhistorikk/fagsak/$fagsakId/soker-har-hatt-innvilget_barnetrygd")
             return runCatching {
                 restClient
                     .get()

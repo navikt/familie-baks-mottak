@@ -73,7 +73,7 @@ class OpprettSøknadBehandlingISakTaskTest {
         every { barnetrygdOppgaveMapper.utledBehandlingKategoriFraSøknad(any()) } returns BehandlingKategori.NASJONAL
         every { barnetrygdOppgaveMapper.utledBehandlingUnderkategoriFraSøknad(any()) } returns BehandlingUnderkategori.ORDINÆR
         justRun { baSakClient.opprettBehandling(any(), any(), any(), any(), any(), any(), any(), any()) }
-        every { baSakClient.harSøkerHattUtbetaling(fagsakId) } returns false
+        every { baSakClient.søkerHarHattInnvilgetBarnetrygd(fagsakId) } returns false
     }
 
     private fun lagFagsak(status: FagsakStatus) = RestMinimalFagsak(id = fagsakId, behandlinger = emptyList(), status = status)
@@ -114,7 +114,7 @@ class OpprettSøknadBehandlingISakTaskTest {
             opprettSøknadBehandlingISakTask.doTask(task)
 
             // Assert
-            verify(exactly = 0) { baSakClient.harSøkerHattUtbetaling(any()) }
+            verify(exactly = 0) { baSakClient.søkerHarHattInnvilgetBarnetrygd(any()) }
             verify(exactly = 1) {
                 baSakClient.opprettBehandling(
                     kategori = any(),
@@ -158,7 +158,7 @@ class OpprettSøknadBehandlingISakTaskTest {
             // Arrange
             every { baSakClient.hentMinimalRestFagsak(fagsakId) } returns lagFagsak(FagsakStatus.AVSLUTTET)
             every { featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) } returns true
-            every { baSakClient.harSøkerHattUtbetaling(fagsakId) } returns true
+            every { baSakClient.søkerHarHattInnvilgetBarnetrygd(fagsakId) } returns true
 
             // Act
             opprettSøknadBehandlingISakTask.doTask(task)

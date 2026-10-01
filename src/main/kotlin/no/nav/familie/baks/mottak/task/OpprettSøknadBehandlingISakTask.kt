@@ -109,7 +109,7 @@ class OpprettSøknadBehandlingISakTask(
     ): BehandlingÅrsak =
         if (behandlingType == BehandlingType.FØRSTEGANGSBEHANDLING &&
             featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) &&
-            !baSakClient.harSøkerHattUtbetaling(fagsakId)
+            !baSakClient.søkerHarHattInnvilgetBarnetrygd(fagsakId)
         ) {
             BehandlingÅrsak.AUTOMATISK_BEHANDLING_AV_SØKNAD
         } else {
