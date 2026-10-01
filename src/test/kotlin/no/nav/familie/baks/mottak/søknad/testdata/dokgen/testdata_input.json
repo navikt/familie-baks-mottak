@@ -262,8 +262,12 @@
       },
       "spørsmål": {
         "erFosterbarn": {
-          "label": "Hvem av barna er fosterbarn?",
+          "label": "Hvem av barna bor i fosterhjem?",
           "verdi": "NEI"
+        },
+        "erIBeredskapshjem": {
+          "label": "Hvem av barna bor i beredskapshjem?",
+          "verdi": "JA"
         },
         "erAdoptertFraUtland": {
           "label": "Hvem av barna er adoptert fra utlandet?",
@@ -608,8 +612,12 @@
   ],
   "spørsmål": {
     "erNoenAvBarnaFosterbarn": {
-      "label": "Er noen av barna fosterbarn?",
+      "label": "Bor noen av barna i fosterhjem?",
       "verdi": "NEI"
+    },
+    "erNoenAvBarnaIBeredskapshjem": {
+      "label": "Bor noen av barna i beredskapshjem?",
+      "verdi": "JA"
     },
     "søktAsylForBarn": {
       "label": "Er det søkt om asyl i Norge for noen av barna?",
@@ -668,7 +676,8 @@
   ],
   "teksterUtenomSpørsmål": {
     "registrertMedAdressesperre": "Barnet er registrert med adressesperre.",
-    "opplystFosterbarn": "Du har opplyst at {navn} er fosterbarn",
+    "opplystFosterbarn": "Du har opplyst at {navn} bor i fosterhjem",
+    "opplystBeredskapshjem": "Du har opplyst at {navn} bor i beredskapshjem",
     "opplystInstitusjon": "Du har opplyst at {navn} er i institusjon",
     "opplystBarnOppholdUtenforNorge": "Du har opplyst at {navn} har oppholdt seg utenfor Norge i løpet av de siste tolv månedene",
     "opplystFaarHarFaattEllerSoektYtelse": "Du har opplyst at du får eller har søkt om barnetrygd for {navn} fra et annet EØS land.",
