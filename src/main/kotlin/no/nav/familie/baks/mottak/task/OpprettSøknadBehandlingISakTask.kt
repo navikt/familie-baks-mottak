@@ -75,7 +75,7 @@ class OpprettSøknadBehandlingISakTask(
                     log.info("Finnes allerede åpen behandling på fagsak $fagsakId m/ tema $tema. Hopper over opprettelsen av ny behandling")
                 } else {
                     val behandlingType = utledBehandlingstype(fagsak)
-                    val behandlingÅrsak = utledBehandlingsårsak(behandlingType)
+                    val behandlingÅrsak = utledBehandlingsårsak(behandlingType, fagsak.id)
                     val kategori = barnetrygdOppgaveMapper.utledBehandlingKategoriFraSøknad(journalpost)
                     val underkategori = barnetrygdOppgaveMapper.utledBehandlingUnderkategoriFraSøknad(journalpost)
                     val brevkode = journalpost.dokumenter?.firstOrNull { it.brevkode != null }?.brevkode
@@ -101,11 +101,15 @@ class OpprettSøknadBehandlingISakTask(
         }
     }
 
-    // Kun førstegangsbehandlinger skal behandles automatisk. Har bruker en fagsak med løpende
-    // utbetaling blir det en revurdering, og den skal fortsatt gå til manuell behandling.
-    private fun utledBehandlingsårsak(behandlingType: BehandlingType): BehandlingÅrsak =
+    // Kun førstegangsbehandlinger der søker aldri har hatt utbetaling skal behandles automatisk.
+    // Har bruker en fagsak med løpende utbetaling blir det en revurdering, og den skal fortsatt gå til manuell behandling.
+    private fun utledBehandlingsårsak(
+        behandlingType: BehandlingType,
+        fagsakId: Long,
+    ): BehandlingÅrsak =
         if (behandlingType == BehandlingType.FØRSTEGANGSBEHANDLING &&
-            featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK)
+            featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) &&
+            !baSakClient.søkerHarHattInnvilgetBarnetrygd(fagsakId)
         ) {
             BehandlingÅrsak.AUTOMATISK_BEHANDLING_AV_SØKNAD
         } else {
