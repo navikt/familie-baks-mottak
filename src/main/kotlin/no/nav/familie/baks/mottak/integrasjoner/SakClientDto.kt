@@ -119,7 +119,12 @@ enum class FagsakStatus {
     OPPRETTET,
     LØPENDE,
     AVSLUTTET,
+    LÅST,
 }
+
+data class LåsOppFagsakRequestDto(
+    val begrunnelse: String,
+)
 
 enum class BehandlingType {
     FØRSTEGANGSBEHANDLING,

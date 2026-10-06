@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
+import io.mockk.verifyOrder
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
@@ -13,6 +14,7 @@ import no.nav.familie.baks.mottak.integrasjoner.BehandlingType
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingUnderkategori
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingÅrsak
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus
+import no.nav.familie.baks.mottak.integrasjoner.IntegrasjonException
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.KontantstøtteOppgaveMapper
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
@@ -25,6 +27,7 @@ import no.nav.familie.prosessering.domene.Task
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class OpprettSøknadBehandlingISakTaskTest {
     private val journalpostClient = mockk<JournalpostClient>()
@@ -62,14 +65,7 @@ class OpprettSøknadBehandlingISakTaskTest {
 
     @BeforeEach
     fun setUp() {
-        every { journalpostClient.hentJournalpost(journalpostId) } returns
-            Journalpost(
-                journalpostId = journalpostId,
-                journalposttype = Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                tema = Tema.BAR.name,
-                bruker = null,
-            )
+        every { journalpostClient.hentJournalpost(journalpostId) } returns lagJournalpost(Tema.BAR)
         every { barnetrygdOppgaveMapper.utledBehandlingKategoriFraSøknad(any()) } returns BehandlingKategori.NASJONAL
         every { barnetrygdOppgaveMapper.utledBehandlingUnderkategoriFraSøknad(any()) } returns BehandlingUnderkategori.ORDINÆR
         justRun { baSakClient.opprettBehandling(any(), any(), any(), any(), any(), any(), any(), any()) }
@@ -202,4 +198,92 @@ class OpprettSøknadBehandlingISakTaskTest {
             }
         }
     }
+
+    @Nested
+    inner class LåstFagsak {
+        @Test
+        fun `skal låse opp låst fagsak i ba-sak før behandling opprettes`() {
+            // Arrange
+            every { baSakClient.hentMinimalRestFagsak(fagsakId) } returns lagFagsak(FagsakStatus.LÅST)
+            every { baSakClient.låsOppFagsak(fagsakId, any()) } returns lagFagsak(FagsakStatus.AVSLUTTET)
+            every { featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) } returns false
+
+            // Act
+            opprettSøknadBehandlingISakTask.doTask(task)
+
+            // Assert
+            verifyOrder {
+                baSakClient.låsOppFagsak(fagsakId, any())
+                baSakClient.opprettBehandling(
+                    kategori = any(),
+                    underkategori = any(),
+                    søkersIdent = any(),
+                    behandlingÅrsak = BehandlingÅrsak.SØKNAD,
+                    søknadMottattDato = any(),
+                    behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    fagsakId = fagsakId,
+                    søknadsinfo = any(),
+                )
+            }
+        }
+
+        @Test
+        fun `skal låse opp låst fagsak i ks-sak før behandling opprettes`() {
+            // Arrange
+            every { journalpostClient.hentJournalpost(journalpostId) } returns lagJournalpost(Tema.KON)
+            every { kontantstøtteOppgaveMapper.utledBehandlingKategoriFraSøknad(any()) } returns BehandlingKategori.NASJONAL
+            every { ksSakClient.hentMinimalRestFagsak(fagsakId) } returns lagFagsak(FagsakStatus.LÅST)
+            every { ksSakClient.låsOppFagsak(fagsakId, any()) } returns lagFagsak(FagsakStatus.AVSLUTTET)
+            justRun { ksSakClient.opprettBehandling(any(), any(), any(), any(), any()) }
+
+            // Act
+            opprettSøknadBehandlingISakTask.doTask(task)
+
+            // Assert
+            verifyOrder {
+                ksSakClient.låsOppFagsak(fagsakId, any())
+                ksSakClient.opprettBehandling(
+                    kategori = BehandlingKategori.NASJONAL.name,
+                    behandlingÅrsak = "SØKNAD",
+                    søkersIdent = personIdent,
+                    søknadMottattDato = any(),
+                    behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
+                )
+            }
+        }
+
+        @Test
+        fun `skal ikke låse opp fagsak som ikke er låst`() {
+            // Arrange
+            every { baSakClient.hentMinimalRestFagsak(fagsakId) } returns lagFagsak(FagsakStatus.AVSLUTTET)
+            every { featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) } returns false
+
+            // Act
+            opprettSøknadBehandlingISakTask.doTask(task)
+
+            // Assert
+            verify(exactly = 0) { baSakClient.låsOppFagsak(any(), any()) }
+            verify(exactly = 1) { baSakClient.opprettBehandling(any(), any(), any(), any(), any(), any(), any(), any()) }
+        }
+
+        @Test
+        fun `skal ikke opprette behandling når opplåsing av fagsak feiler`() {
+            // Arrange
+            every { baSakClient.hentMinimalRestFagsak(fagsakId) } returns lagFagsak(FagsakStatus.LÅST)
+            every { baSakClient.låsOppFagsak(fagsakId, any()) } throws IntegrasjonException("Feil ved opplåsing av fagsak")
+
+            // Act & Assert
+            assertThrows<IntegrasjonException> { opprettSøknadBehandlingISakTask.doTask(task) }
+            verify(exactly = 0) { baSakClient.opprettBehandling(any(), any(), any(), any(), any(), any(), any(), any()) }
+        }
+    }
+
+    private fun lagJournalpost(tema: Tema) =
+        Journalpost(
+            journalpostId = journalpostId,
+            journalposttype = Journalposttype.I,
+            journalstatus = Journalstatus.MOTTATT,
+            tema = tema.name,
+            bruker = null,
+        )
 }

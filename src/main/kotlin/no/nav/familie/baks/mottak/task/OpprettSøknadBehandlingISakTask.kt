@@ -45,7 +45,15 @@ class OpprettSøknadBehandlingISakTask(
 
         when (tema) {
             Tema.KON -> {
-                val fagsak = ksSakClient.hentMinimalRestFagsak(fagsakId.toLong())
+                val fagsak =
+                    ksSakClient.hentMinimalRestFagsak(fagsakId.toLong()).let {
+                        if (it.status == FagsakStatus.LÅST) {
+                            log.info("Fagsak $fagsakId m/ tema $tema er låst. Låser opp fagsak")
+                            ksSakClient.låsOppFagsak(it.id, BEGRUNNELSE_FOR_OPPLÅSING)
+                        } else {
+                            it
+                        }
+                    }
                 val finnesÅpenBehandlingPåFagsak = fagsak.finnesÅpenBehandlingPåFagsak()
 
                 if (finnesÅpenBehandlingPåFagsak) {
@@ -67,7 +75,15 @@ class OpprettSøknadBehandlingISakTask(
             }
 
             Tema.BAR -> {
-                val fagsak = baSakClient.hentMinimalRestFagsak(fagsakId.toLong())
+                val fagsak =
+                    baSakClient.hentMinimalRestFagsak(fagsakId.toLong()).let {
+                        if (it.status == FagsakStatus.LÅST) {
+                            log.info("Fagsak $fagsakId m/ tema $tema er låst. Låser opp fagsak")
+                            baSakClient.låsOppFagsak(it.id, BEGRUNNELSE_FOR_OPPLÅSING)
+                        } else {
+                            it
+                        }
+                    }
 
                 val finnesÅpenBehandlingPåFagsak = fagsak.finnesÅpenBehandlingPåFagsak()
 
@@ -129,6 +145,7 @@ class OpprettSøknadBehandlingISakTask(
     }
 
     companion object {
+        private const val BEGRUNNELSE_FOR_OPPLÅSING = "Fagsaken låses opp grunnet automatisk journalføring fra baks-mottak"
         const val TASK_STEP_TYPE = "OpprettSøknadBehandlingISakTask"
     }
 }
