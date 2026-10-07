@@ -100,23 +100,5 @@ class KsSakClient
         fun låsOppFagsak(
             fagsakId: Long,
             begrunnelse: String,
-        ): RestMinimalFagsak {
-            val uri = URI.create("$ksSakServiceUri/fagsaker/$fagsakId/laas-opp")
-
-            return runCatching {
-                restClient
-                    .patch()
-                    .uri(uri)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(
-                        LåsOppFagsakRequestDto(
-                            begrunnelse = begrunnelse,
-                        ),
-                    ).retrieve()
-                    .body<Ressurs<RestMinimalFagsak>>()!!
-            }.fold(
-                onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
-                onFailure = { throw IntegrasjonException("Feil ved opplåsing av fagsak", it, uri) },
-            )
-        }
+        ): RestMinimalFagsak = restClient.låsOppFagsak(ksSakServiceUri, fagsakId, begrunnelse)
     }
