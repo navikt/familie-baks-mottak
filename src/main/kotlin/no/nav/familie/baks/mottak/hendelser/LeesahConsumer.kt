@@ -29,6 +29,7 @@ import java.time.LocalDate
 class LeesahConsumer(
     val leesahService: LeesahService,
 ) {
+    // Utdatert metrikk: beholdes for eksisterende spørringer. Teller feilede konsumforsøk.
     val leesahFeiletCounter: Counter = Metrics.counter("barnetrygd.hendelse.leesha.feilet")
 
     @KafkaListener(

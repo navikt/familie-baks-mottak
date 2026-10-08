@@ -38,6 +38,15 @@ import java.time.LocalDateTime
 import java.util.Properties
 import kotlin.random.Random.Default.nextLong
 
+private enum class LeesahResultat(
+    val label: String,
+) {
+    REGISTRERT("registrert"),
+    IGNORERT("ignorert"),
+    IGNORERT_UNDER_18("ignorert_under_18"),
+    TASK_OPPRETTET("task_opprettet"),
+}
+
 @Service
 class LeesahService(
     private val hendelsesloggRepository: HendelsesloggRepository,
@@ -45,6 +54,7 @@ class LeesahService(
     @Value("\${FØDSELSHENDELSE_VENT_PÅ_TPS_MINUTTER}") private val triggerTidForTps: Long,
     private val environment: Environment,
 ) {
+    // Utdaterte tellere: beholdes for eksisterende spørringer. Nye paneler bruker leesah.hendelser.
     val dødsfallCounter: Counter = Metrics.counter("dodsfall")
     val dødsfallIgnorertCounter: Counter = Metrics.counter("dodsfall.ignorert")
     val fødselOpprettetCounter: Counter = Metrics.counter("fodsel.opprettet")
@@ -82,8 +92,27 @@ class LeesahService(
         oppdaterHendelseslogg(pdlHendelse)
     }
 
+    private fun tellHendelse(
+        pdlHendelse: PdlHendelse,
+        resultat: LeesahResultat,
+    ) {
+        Metrics
+            .counter(
+                "familie.baks.mottak.leesah.hendelser",
+                "opplysningstype",
+                METRIKK_OPPLYSNINGSTYPER.getValue(pdlHendelse.opplysningstype),
+                "endringstype",
+                METRIKK_ENDRINGSTYPER[pdlHendelse.endringstype] ?: "annet",
+                "resultat",
+                resultat.label,
+            ).increment()
+    }
+
+    private fun tellTaskOpprettet(pdlHendelse: PdlHendelse) = tellHendelse(pdlHendelse, LeesahResultat.TASK_OPPRETTET)
+
     private fun behandleDødsfallHendelse(pdlHendelse: PdlHendelse) {
         dødsfallCounter.increment()
+        tellHendelse(pdlHendelse, LeesahResultat.REGISTRERT)
 
         when (pdlHendelse.endringstype) {
             OPPRETTET -> {
@@ -91,9 +120,11 @@ class LeesahService(
                 if (pdlHendelse.dødsdato == null) {
                     log.error("Mangler dødsdato. Ignorerer hendelse ${pdlHendelse.hendelseId}")
                     dødsfallIgnorertCounter.increment()
+                    tellHendelse(pdlHendelse, LeesahResultat.IGNORERT)
                 } else {
                     opprettVurderBarnetrygdLivshendelseTaskForHendelse(VurderLivshendelseType.DØDSFALL, pdlHendelse)
                     opprettVurderKontantstøtteLivshendelseTaskForHendelse(VurderLivshendelseType.DØDSFALL, pdlHendelse)
+                    tellTaskOpprettet(pdlHendelse)
                 }
             }
 
@@ -109,6 +140,7 @@ class LeesahService(
                 .opprettTask(pdlHendelse)
                 .medTriggerTid(nåPlussEnTimeIProd(environment))
                 .also { taskService.save(it) }
+            tellTaskOpprettet(pdlHendelse)
         }
     }
 
@@ -122,6 +154,7 @@ class LeesahService(
                 .opprettTask(pdlHendelse)
                 .medTriggerTid(nåPlussEnTimeIProd(environment))
                 .also { taskService.save(it) }
+            tellTaskOpprettet(pdlHendelse)
         }
     }
 
@@ -134,11 +167,13 @@ class LeesahService(
                 if (fødselsdato == null) {
                     log.warn("Mangler fødselsdato. Ignorerer hendelse ${pdlHendelse.hendelseId}")
                     fødselIgnorertCounter.increment()
+                    tellHendelse(pdlHendelse, LeesahResultat.IGNORERT)
                 } else if (erUnder6mnd(fødselsdato)) {
                     when (pdlHendelse.endringstype) {
                         OPPRETTET -> fødselOpprettetCounter.increment()
                         KORRIGERT -> fødselKorrigertCounter.increment()
                     }
+                    tellHendelse(pdlHendelse, LeesahResultat.REGISTRERT)
 
                     val task =
                         Task(
@@ -153,15 +188,19 @@ class LeesahService(
                             nesteGyldigeTriggertidFødselshendelser(triggerTidForTps),
                         )
                     taskService.save(task)
+                    tellTaskOpprettet(pdlHendelse)
                 } else if (erUnder18år(fødselsdato)) {
                     fødselIgnorertUnder18årCounter.increment()
+                    tellHendelse(pdlHendelse, LeesahResultat.IGNORERT_UNDER_18)
                 } else {
                     fødselIgnorertCounter.increment()
+                    tellHendelse(pdlHendelse, LeesahResultat.IGNORERT)
                 }
             }
 
             ANNULLERT -> {
                 fødselAnnullertCounter.increment()
+                tellHendelse(pdlHendelse, LeesahResultat.REGISTRERT)
                 if (pdlHendelse.tidligereHendelseId != null) {
                     SECURE_LOGGER.info("Mottatt annulert behandleFødselsdatoHendelse $pdlHendelse")
                     val task =
@@ -182,6 +221,7 @@ class LeesahService(
                                 },
                         )
                     taskService.save(task)
+                    tellTaskOpprettet(pdlHendelse)
                 } else {
                     log.warn("Mottatt annuller fødsel uten tidligereHendelseId, hendelseId ${pdlHendelse.hendelseId}")
                 }
@@ -198,16 +238,25 @@ class LeesahService(
             OPPRETTET -> {
                 SECURE_LOGGER.info("Mottatt behandleUtflyttingHendelse $pdlHendelse")
                 utflyttingOpprettetCounter.increment()
+                tellHendelse(pdlHendelse, LeesahResultat.REGISTRERT)
 
                 opprettVurderBarnetrygdLivshendelseTaskForHendelse(VurderLivshendelseType.UTFLYTTING, pdlHendelse)
                 opprettVurderKontantstøtteLivshendelseTaskForHendelse(VurderLivshendelseType.UTFLYTTING, pdlHendelse)
+                tellTaskOpprettet(pdlHendelse)
             }
 
             else -> {
                 log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}")
                 when (pdlHendelse.endringstype) {
-                    ANNULLERT -> utflyttingAnnullertCounter.increment()
-                    KORRIGERT -> utflyttingKorrigertCounter.increment()
+                    ANNULLERT -> {
+                        utflyttingAnnullertCounter.increment()
+                        tellHendelse(pdlHendelse, LeesahResultat.REGISTRERT)
+                    }
+
+                    KORRIGERT -> {
+                        utflyttingKorrigertCounter.increment()
+                        tellHendelse(pdlHendelse, LeesahResultat.REGISTRERT)
+                    }
                 }
             }
         }
@@ -218,15 +267,15 @@ class LeesahService(
             OPPRETTET -> {
                 SECURE_LOGGER.info("Mottatt behandleSivilstandHendelse $pdlHendelse")
                 sivilstandOpprettetCounter.increment()
+                tellHendelse(pdlHendelse, LeesahResultat.REGISTRERT)
 
                 opprettTaskHvisSivilstandErGift(pdlHendelse)
             }
 
             else -> {
                 log.info("Ignorerer hendelse ${pdlHendelse.hendelseId}")
-                when (pdlHendelse.endringstype) {
-                    ANNULLERT -> sivilstandOpprettetCounter.increment()
-                    KORRIGERT -> sivilstandOpprettetCounter.increment()
+                if (pdlHendelse.endringstype == ANNULLERT || pdlHendelse.endringstype == KORRIGERT) {
+                    tellHendelse(pdlHendelse, LeesahResultat.IGNORERT)
                 }
             }
         }
@@ -235,8 +284,10 @@ class LeesahService(
     private fun opprettTaskHvisSivilstandErGift(pdlHendelse: PdlHendelse) {
         if (pdlHendelse.sivilstand in listOf(GIFT.name, REGISTRERT_PARTNER.name)) {
             opprettVurderBarnetrygdLivshendelseTaskForHendelse(SIVILSTAND, pdlHendelse)
+            tellTaskOpprettet(pdlHendelse)
         } else {
             sivilstandIgnorertCounter.increment()
+            tellHendelse(pdlHendelse, LeesahResultat.IGNORERT)
         }
     }
 
@@ -247,6 +298,7 @@ class LeesahService(
             -> {
                 SECURE_LOGGER.info("Mottatt behandleBostedsadresseHendelse $pdlHendelse")
                 opprettFinnmarkstilleggTask(pdlHendelse)
+                tellTaskOpprettet(pdlHendelse)
             }
 
             else -> {
@@ -280,6 +332,7 @@ class LeesahService(
             -> {
                 SECURE_LOGGER.info("Mottatt behandleOppholdsadresseHendelse $pdlHendelse")
                 opprettSvalbardtilleggTask(pdlHendelse)
+                tellTaskOpprettet(pdlHendelse)
             }
 
             else -> {
@@ -393,5 +446,23 @@ class LeesahService(
         const val OPPLYSNINGSTYPE_OPPHOLDSADRESSE = "OPPHOLDSADRESSE_V1"
         const val OPPLYSNINGSTYPE_FALSK_ID = "FALSK_ID_V1"
         const val ADRESSEBESKYTTELSE = "ADRESSEBESKYTTELSE_V1"
+        private val METRIKK_OPPLYSNINGSTYPER =
+            mapOf(
+                OPPLYSNINGSTYPE_DØDSFALL to "doedsfall",
+                OPPLYSNINGSTYPE_FØDSELSDATO to "foedselsdato",
+                OPPLYSNINGSTYPE_UTFLYTTING to "utflytting",
+                OPPLYSNINGSTYPE_SIVILSTAND to "sivilstand",
+                OPPLYSNINGSTYPE_BOSTEDSADRESSE to "bostedsadresse",
+                OPPLYSNINGSTYPE_OPPHOLDSADRESSE to "oppholdsadresse",
+                OPPLYSNINGSTYPE_FALSK_ID to "falsk_id",
+                ADRESSEBESKYTTELSE to "adressebeskyttelse",
+            )
+        private val METRIKK_ENDRINGSTYPER =
+            mapOf(
+                OPPRETTET to "opprettet",
+                KORRIGERT to "korrigert",
+                ANNULLERT to "annullert",
+                OPPHOERT to "opphoert",
+            )
     }
 }

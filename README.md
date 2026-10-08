@@ -50,7 +50,11 @@ For NAV-interne kan henvendelser rettes til #team-familie på slack. Ellers kan 
 
 
 ## Kort om bruk av Leesah-hendelser
-Vi lytter på 4 typer hendelser fra Leesah-topicen til PDL 
+Vi håndterer åtte opplysningstyper fra Leesah-topicet til PDL: fødselsdato, dødsfall, utflytting, sivilstand, bostedsadresse, oppholdsadresse, falsk identitet og adressebeskyttelse.
+
+`familie_baks_mottak_leesah_hendelser_total` samler de nye Leesah-tellingene med faste labels for `opplysningstype`, `endringstype` og `resultat`. Bruk `endringstype` i Grafana-spørringer som skal skille `opprettet`, `korrigert` og `annullert`; gruppering kun på `resultat` slår dem sammen. `resultat="task_opprettet"` teller én gang per hendelse etter at alle tilhørende tasks er lagret, før hendelsesloggen lagres. Dødsfall og utflytting lager to tasks, men telles én gang. `registrert` speiler de eldre tellerne for dødsfall, fødselsdato, utflytting og sivilstand, også når disse teller før task-lagring. `ignorert` og `ignorert_under_18` speiler eksisterende filtre. En hendelse kan derfor øke både `registrert` og `task_opprettet`. Summen av resultatene er ikke antall unike hendelser.
+
+De eldre Leesah-tellerne i `LeesahService`, feiltelleren i `LeesahConsumer` og filtertellerne i `MottaFødselshendelseTask` er utdaterte, men beholdes for eksisterende spørringer. De eldre tellerne har ulik betydning: `dodsfall` teller før filtrering, `fodsel.annullert` teller også uten tidligere hendelses-ID, og `barnetrygd.hendelse.leesha.feilet` teller feilede konsumforsøk. `sivilstand.opprettet` teller fra nå av bare opprettede sivilstandshendelser.
 ### Fødselhendelse
 ```mermaid
 sequenceDiagram

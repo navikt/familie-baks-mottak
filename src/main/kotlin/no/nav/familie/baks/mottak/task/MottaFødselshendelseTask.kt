@@ -35,6 +35,8 @@ class MottaFødselshendelseTask(
     private val pdlClientService: PdlClientService,
 ) : AsyncTaskStep {
     val log: Logger = LoggerFactory.getLogger(MottaFødselshendelseTask::class.java)
+
+    // Utdaterte tellere: beholdes for eksisterende spørringer, måler filtrering etter Leesah-rutingen.
     val barnHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.barn.har.dnr.eller.fdatnr")
     val forsørgerHarDnrCounter: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.forsorger.har.dnr.eller.fdatnr")
     val barnetManglerBostedsadresse: Counter = Metrics.counter("barnetrygd.hendelse.ignorert.bostedsadresse.null")
