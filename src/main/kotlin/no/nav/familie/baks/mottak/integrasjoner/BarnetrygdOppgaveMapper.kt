@@ -1,5 +1,6 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.harEøsSteg
 import no.nav.familie.kontrakter.felles.Behandlingstema
@@ -78,11 +79,14 @@ class BarnetrygdOppgaveMapper(
         check(journalpost.harBarnetrygdSøknad()) { "Journalpost m/ id ${journalpost.journalpostId} er ikke en barnetrygd søknad" }
         val søknad = søknadRepository.getByJournalpostId(journalpost.journalpostId)
 
-        return when {
+        return utledBehandlingKategoriFraSøknad(søknad)
+    }
+
+    fun utledBehandlingKategoriFraSøknad(søknad: DBBarnetrygdSøknad) =
+        when {
             søknad.harEøsSteg() -> BehandlingKategori.EØS
             else -> BehandlingKategori.NASJONAL
         }
-    }
 
     fun utledBehandlingUnderkategoriFraSøknad(journalpost: Journalpost) =
         when {

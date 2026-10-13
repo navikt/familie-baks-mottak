@@ -13,6 +13,9 @@ import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
 import no.nav.familie.baks.mottak.integrasjoner.Søknadsinfo
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
+import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadService
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.harDokumentasjonsbehovUtenVedlegg
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -34,6 +37,7 @@ class OpprettSøknadBehandlingISakTask(
     private val ksSakClient: KsSakClient,
     private val baSakClient: BaSakClient,
     private val featureToggleService: FeatureToggleService,
+    private val barnetrygdSøknadService: BarnetrygdSøknadService,
 ) : AsyncTaskStep {
     val log: Logger = LoggerFactory.getLogger(OpprettSøknadBehandlingISakTask::class.java)
 
@@ -74,9 +78,11 @@ class OpprettSøknadBehandlingISakTask(
                 if (finnesÅpenBehandlingPåFagsak) {
                     log.info("Finnes allerede åpen behandling på fagsak $fagsakId m/ tema $tema. Hopper over opprettelsen av ny behandling")
                 } else {
+                    val søknad = barnetrygdSøknadService.hentDBSøknadFraJournalpost(journalpost.journalpostId)
+
                     val behandlingType = utledBehandlingstype(fagsak)
-                    val behandlingÅrsak = utledBehandlingsårsak(behandlingType, fagsak.id)
-                    val kategori = barnetrygdOppgaveMapper.utledBehandlingKategoriFraSøknad(journalpost)
+                    val behandlingÅrsak = utledBehandlingsårsak(behandlingType, fagsak.id, søknad)
+                    val kategori = barnetrygdOppgaveMapper.utledBehandlingKategoriFraSøknad(søknad)
                     val underkategori = barnetrygdOppgaveMapper.utledBehandlingUnderkategoriFraSøknad(journalpost)
                     val brevkode = journalpost.dokumenter?.firstOrNull { it.brevkode != null }?.brevkode
 
@@ -103,12 +109,15 @@ class OpprettSøknadBehandlingISakTask(
 
     // Kun førstegangsbehandlinger der søker aldri har hatt utbetaling skal behandles automatisk.
     // Har bruker en fagsak med løpende utbetaling blir det en revurdering, og den skal fortsatt gå til manuell behandling.
+    // Søknader som har hatt dokumentasjonskrav uten at vedlegg har blitt lastet opp skal også til manuell behandling.
     private fun utledBehandlingsårsak(
         behandlingType: BehandlingType,
         fagsakId: Long,
+        søknad: DBBarnetrygdSøknad,
     ): BehandlingÅrsak =
         if (behandlingType == BehandlingType.FØRSTEGANGSBEHANDLING &&
             featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) &&
+            !søknad.harDokumentasjonsbehovUtenVedlegg() &&
             !baSakClient.søkerHarHattInnvilgetBarnetrygd(fagsakId)
         ) {
             BehandlingÅrsak.AUTOMATISK_BEHANDLING_AV_SØKNAD

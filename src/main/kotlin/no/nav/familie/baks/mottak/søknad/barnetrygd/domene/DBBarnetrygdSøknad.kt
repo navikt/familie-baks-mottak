@@ -11,6 +11,7 @@ import no.nav.familie.kontrakter.ba.søknad.StøttetVersjonertBarnetrygdSøknad
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV10
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV8
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
+import no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg
 import no.nav.familie.kontrakter.felles.jsonMapper
 import java.time.LocalDateTime
@@ -110,6 +111,19 @@ fun DBBarnetrygdSøknad.harEøsSteg(): Boolean {
         is VersjonertBarnetrygdSøknadV9 -> versjonertSøknad.barnetrygdSøknad.søker.harEøsSteg
         is VersjonertBarnetrygdSøknadV10 -> versjonertSøknad.barnetrygdSøknad.søker.harEøsSteg
     }
+}
+
+fun DBBarnetrygdSøknad.harDokumentasjonsbehovUtenVedlegg(): Boolean {
+    val dokumentasjon =
+        when (val versjonertSøknad = this.hentVersjonertBarnetrygdSøknad()) {
+            is VersjonertBarnetrygdSøknadV8 -> versjonertSøknad.barnetrygdSøknad.dokumentasjon
+            is VersjonertBarnetrygdSøknadV9 -> versjonertSøknad.barnetrygdSøknad.dokumentasjon
+            is VersjonertBarnetrygdSøknadV10 -> versjonertSøknad.barnetrygdSøknad.dokumentasjon
+        }
+
+    return dokumentasjon
+        .filter { it.dokumentasjonsbehov != Dokumentasjonsbehov.ANNEN_DOKUMENTASJON }
+        .any { it.opplastedeVedlegg.isEmpty() }
 }
 
 class FødselsnummerErNullException : Exception()
