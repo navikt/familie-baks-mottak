@@ -60,6 +60,7 @@ object SøknadTestData {
     fun barnetrygdSøknad(
         søker: SøkerV8 = lagSøker(),
         barn: List<BarnV8> = listOf(lagBarn()),
+        dokumentasjon: List<Søknaddokumentasjon> = listOf(lagAnnenDokumentasjon()),
     ): BarnetrygdSøknad =
         BarnetrygdSøknad(
             antallEøsSteg = 3,
@@ -68,24 +69,24 @@ object SøknadTestData {
             søker = søker,
             barn = barn,
             spørsmål = mapOf(),
-            dokumentasjon =
-                listOf(
-                    Søknaddokumentasjon(
-                        dokumentasjonsbehov = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON,
-                        harSendtInn = false,
-                        opplastedeVedlegg =
-                            listOf(
-                                Søknadsvedlegg(
-                                    dokumentId = "en-slags-uuid",
-                                    navn = "IMG 1337.png",
-                                    tittel = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON,
-                                ),
-                            ),
-                        dokumentasjonSpråkTittel = mapOf("nb" to "Bekreftelse fra barnevernet"),
-                    ),
-                ),
+            dokumentasjon = dokumentasjon,
             originalSpråk = "nb",
             teksterUtenomSpørsmål = mapOf(),
             finnesPersonMedAdressebeskyttelse = false,
+        )
+
+    fun lagAnnenDokumentasjon(): Søknaddokumentasjon =
+        Søknaddokumentasjon(
+            dokumentasjonsbehov = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON,
+            harSendtInn = false,
+            opplastedeVedlegg =
+                listOf(
+                    Søknadsvedlegg(
+                        dokumentId = "en-slags-uuid",
+                        navn = "IMG 1337.png",
+                        tittel = Dokumentasjonsbehov.ANNEN_DOKUMENTASJON,
+                    ),
+                ),
+            dokumentasjonSpråkTittel = mapOf("nb" to "Bekreftelse fra barnevernet"),
         )
 }
