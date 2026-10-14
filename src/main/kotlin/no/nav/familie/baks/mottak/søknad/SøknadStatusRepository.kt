@@ -16,10 +16,10 @@ class SøknadStatusRepository(
             mapOf("type" to søknadstype.journalføringTasktype()),
             LocalDateTime::class.java,
         )
-}
 
-fun Søknadstype.journalføringTasktype() =
-    when (this) {
-        Søknadstype.BARNETRYGD -> JournalførSøknadTask.JOURNALFØR_SØKNAD
-        Søknadstype.KONTANTSTØTTE -> JournalførKontantstøtteSøknadTask.JOURNALFØR_KONTANTSTØTTE_SØKNAD
-    }
+    private fun Søknadstype.journalføringTasktype() =
+        when (this) {
+            Søknadstype.BARNETRYGD -> JournalførSøknadTask.JOURNALFØR_SØKNAD
+            Søknadstype.KONTANTSTØTTE -> JournalførKontantstøtteSøknadTask.JOURNALFØR_KONTANTSTØTTE_SØKNAD
+        }
+}
