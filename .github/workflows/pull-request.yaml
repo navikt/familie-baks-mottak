@@ -52,7 +52,7 @@ jobs:
         run: mvn -B --no-transfer-progress package --settings .m2/maven-settings.xml --file pom.xml
 
       - name: Upload Report
-        uses: 'actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a' # ratchet:actions/upload-artifact@v4
+        uses: 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9' # ratchet:actions/upload-artifact@v4
         if: github.event_name != 'merge_group' && github.event_name != 'workflow_dispatch'
         with:
           name: jacoco-report
