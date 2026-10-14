@@ -1,7 +1,5 @@
 package no.nav.familie.baks.mottak.søknad
 
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
 import no.nav.familie.leader.LeaderClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -13,8 +11,7 @@ import java.time.LocalTime
 
 @Service
 class SøknadStatusService(
-    val barnetrygdSøknadRepository: SøknadRepository,
-    val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
+    private val søknadStatusRepository: SøknadStatusRepository,
 ) {
     @Scheduled(cron = "0 0/30 * * * ?")
     private fun loggHvisLiteAktivitetForBarnetrygdOgKontantstøtte() {
@@ -23,47 +20,48 @@ class SøknadStatusService(
             return
         }
 
-        val sistBarnetrygdSøknad = barnetrygdSøknadRepository.finnSisteLagredeSøknad()
-        val tidSidenSisteBarnetrygdSøknad = Duration.between(sistBarnetrygdSøknad.opprettetTid, LocalDateTime.now())
-        loggHvisLiteAktivitet(tidSidenSisteBarnetrygdSøknad, Søknadstype.BARNETRYGD)
-
-        val sistKontantstøtteSøknad = kontantstøtteSøknadRepository.finnSisteLagredeSøknad()
-        val tidSidenSisteKontantstøtteSøknad = Duration.between(sistKontantstøtteSøknad.opprettetTid, LocalDateTime.now())
-        loggHvisLiteAktivitet(tidSidenSisteKontantstøtteSøknad, Søknadstype.KONTANTSTØTTE)
+        loggHvisLiteAktivitet(Søknadstype.BARNETRYGD)
+        loggHvisLiteAktivitet(Søknadstype.KONTANTSTØTTE)
     }
 
     fun statusBarnetrygd(): StatusDto {
         logger.info("Sjekker status på barnetrygd søknad.")
-        val sistBarnetrygdSøknad = barnetrygdSøknadRepository.finnSisteLagredeSøknad()
-        val tidSidenSisteBarnetrygdSøknad = Duration.between(sistBarnetrygdSøknad.opprettetTid, LocalDateTime.now())
-        return lagStatusDto(tidSidenSisteBarnetrygdSøknad, Søknadstype.BARNETRYGD)
+        return lagStatusDto(Søknadstype.BARNETRYGD)
     }
 
     fun statusKontantstøtte(): StatusDto {
         logger.info("Sjekker status på kontantstøtte søknad.")
-        val sistKontantstøtteSøknad = kontantstøtteSøknadRepository.finnSisteLagredeSøknad()
-        val tidSidenSisteKontantstøtteSøknad = Duration.between(sistKontantstøtteSøknad.opprettetTid, LocalDateTime.now())
-        return lagStatusDto(tidSidenSisteKontantstøtteSøknad, Søknadstype.KONTANTSTØTTE)
+        return lagStatusDto(Søknadstype.KONTANTSTØTTE)
     }
 
-    private fun loggHvisLiteAktivitet(
-        tidSidenSisteSøknad: Duration,
-        søknadstype: Søknadstype,
-    ) {
+    private fun finnTidSidenSisteSøknad(søknadstype: Søknadstype): Duration? =
+        søknadStatusRepository
+            .finnTidspunktForSisteMottatteSøknad(søknadstype)
+            ?.let { Duration.between(it, LocalDateTime.now()) }
+
+    private fun loggHvisLiteAktivitet(søknadstype: Søknadstype) {
         if (erDagtid() && !erHelg()) {
+            val tidSidenSisteSøknad = finnTidSidenSisteSøknad(søknadstype)
             when {
+                tidSidenSisteSøknad == null -> logger.error("Status baks-mottak: Fant ingen mottatte søknader om ${søknadstype.name.lowercase()}")
                 tidSidenSisteSøknad.toHours() >= 3 && LocalTime.now().isAfter(LocalTime.of(10, 30)) -> logger.error("Status baks-mottak: Det er ${tidSidenSisteSøknad.toHours()} timer siden vi sist mottok en søknad om ${søknadstype.name.lowercase()}")
                 else -> logger.info("Status baks-mottak: Det er ${tidSidenSisteSøknad.toMinutes()} minutter siden vi sist mottok en søknad om ${søknadstype.name.lowercase()}")
             }
         }
     }
 
-    private fun lagStatusDto(
-        tidSidenSisteSøknad: Duration,
-        søknadstype: Søknadstype,
-    ) = when {
-        erTidspunktMedForventetAktivitet() -> lagDagStatus(tidSidenSisteSøknad, søknadstype)
-        else -> lagNattStatus(tidSidenSisteSøknad, søknadstype)
+    private fun lagStatusDto(søknadstype: Søknadstype): StatusDto {
+        val tidSidenSisteSøknad =
+            finnTidSidenSisteSøknad(søknadstype)
+                ?: return StatusDto(
+                    status = Plattformstatus.DOWN,
+                    description = "Fant ingen mottatte søknader om ${søknadstype.name.lowercase()}",
+                )
+
+        return when {
+            erTidspunktMedForventetAktivitet() -> lagDagStatus(tidSidenSisteSøknad, søknadstype)
+            else -> lagNattStatus(tidSidenSisteSøknad, søknadstype)
+        }
     }
 
     private fun lagDagStatus(

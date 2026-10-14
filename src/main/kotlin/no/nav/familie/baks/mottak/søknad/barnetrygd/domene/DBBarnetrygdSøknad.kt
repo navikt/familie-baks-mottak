@@ -27,8 +27,6 @@ data class DBBarnetrygdSøknad(
     val fnr: String,
     @Column(name = "opprettet_tid")
     val opprettetTid: LocalDateTime = LocalDateTime.now(),
-    @Column(name = "journalpost_id")
-    val journalpostId: String? = null,
 ) {
     fun hentVersjonertBarnetrygdSøknad(): StøttetVersjonertBarnetrygdSøknad = jsonMapper.readValue(søknadJson, StøttetVersjonertBarnetrygdSøknad::class.java)
 }

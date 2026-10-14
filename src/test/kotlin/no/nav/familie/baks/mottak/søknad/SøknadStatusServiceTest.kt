@@ -4,10 +4,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -15,9 +11,8 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 class SøknadStatusServiceTest {
-    private val søknadRepository = mockk<SøknadRepository>()
-    private val kontantstøtteSøknadRepository = mockk<KontantstøtteSøknadRepository>()
-    private val søknadStatusService = SøknadStatusService(søknadRepository, kontantstøtteSøknadRepository)
+    private val søknadStatusRepository = mockk<SøknadStatusRepository>()
+    private val søknadStatusService = SøknadStatusService(søknadStatusRepository)
 
     @BeforeEach
     fun beforeEach() {
@@ -33,12 +28,8 @@ class SøknadStatusServiceTest {
     fun `skal gi status DOWN dersom det ikke har kommet inn noen søknader på 12 timer for kontantstøtte`() {
         // Arrange
         every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 10, 0)
-        every { kontantstøtteSøknadRepository.finnSisteLagredeSøknad() } returns
-            DBKontantstøtteSøknad(
-                søknadJson = "",
-                opprettetTid = LocalDateTime.of(2024, 8, 1, 21, 59),
-                fnr = "",
-            )
+        every { søknadStatusRepository.finnTidspunktForSisteMottatteSøknad(Søknadstype.KONTANTSTØTTE) } returns
+            LocalDateTime.of(2024, 8, 1, 21, 59)
 
         // Act
         val statusKontantstøtte = søknadStatusService.statusKontantstøtte()
@@ -51,12 +42,8 @@ class SøknadStatusServiceTest {
     fun `skal gi status OK dersom det har kommet inn noen søknader på 12 timer for kontantstøtte`() {
         // Arrange
         every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 10, 0)
-        every { kontantstøtteSøknadRepository.finnSisteLagredeSøknad() } returns
-            DBKontantstøtteSøknad(
-                søknadJson = "",
-                opprettetTid = LocalDateTime.of(2024, 8, 2, 8, 59),
-                fnr = "",
-            )
+        every { søknadStatusRepository.finnTidspunktForSisteMottatteSøknad(Søknadstype.KONTANTSTØTTE) } returns
+            LocalDateTime.of(2024, 8, 2, 8, 59)
 
         // Act
         val statusKontantstøtte = søknadStatusService.statusKontantstøtte()
@@ -71,12 +58,8 @@ class SøknadStatusServiceTest {
     fun `skal gi status DOWN dersom det ikke har kommet inn noen søknader på 12 timer for barnetrygd`() {
         // Arrange
         every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 10, 0)
-        every { søknadRepository.finnSisteLagredeSøknad() } returns
-            DBBarnetrygdSøknad(
-                søknadJson = "",
-                opprettetTid = LocalDateTime.of(2024, 8, 1, 21, 59),
-                fnr = "",
-            )
+        every { søknadStatusRepository.finnTidspunktForSisteMottatteSøknad(Søknadstype.BARNETRYGD) } returns
+            LocalDateTime.of(2024, 8, 1, 21, 59)
 
         // Act
         val statusBarnetrygd = søknadStatusService.statusBarnetrygd()
@@ -89,12 +72,8 @@ class SøknadStatusServiceTest {
     fun `skal gi status OK dersom det har kommet inn noen søknader på 12 timer for barnetrygd`() {
         // Arrange
         every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 10, 0)
-        every { søknadRepository.finnSisteLagredeSøknad() } returns
-            DBBarnetrygdSøknad(
-                søknadJson = "",
-                opprettetTid = LocalDateTime.of(2024, 8, 2, 8, 59),
-                fnr = "",
-            )
+        every { søknadStatusRepository.finnTidspunktForSisteMottatteSøknad(Søknadstype.BARNETRYGD) } returns
+            LocalDateTime.of(2024, 8, 2, 8, 59)
 
         // Act
         val statusBarnetrygd = søknadStatusService.statusBarnetrygd()
@@ -109,12 +88,8 @@ class SøknadStatusServiceTest {
     fun `skal gi status DOWN dersom det er natt og det ikke har kommet inn noen søknader på 24 timer for kontantstøtte`() {
         // Arrange
         every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 2, 0)
-        every { kontantstøtteSøknadRepository.finnSisteLagredeSøknad() } returns
-            DBKontantstøtteSøknad(
-                søknadJson = "",
-                opprettetTid = LocalDateTime.of(2024, 8, 1, 1, 59),
-                fnr = "",
-            )
+        every { søknadStatusRepository.finnTidspunktForSisteMottatteSøknad(Søknadstype.KONTANTSTØTTE) } returns
+            LocalDateTime.of(2024, 8, 1, 1, 59)
 
         // Act
         val statusKontantstøtte = søknadStatusService.statusKontantstøtte()
@@ -127,16 +102,11 @@ class SøknadStatusServiceTest {
     fun `skal gi status OK dersom det er natt og det har kommet inn noen søknader på 12 timer for kontantstøtte`() {
         // Arrange
         every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 2, 0)
-        every { kontantstøtteSøknadRepository.finnSisteLagredeSøknad() } returns
-            DBKontantstøtteSøknad(
-                søknadJson = "",
-                opprettetTid = LocalDateTime.of(2024, 8, 1, 14, 59),
-                fnr = "",
-            )
+        every { søknadStatusRepository.finnTidspunktForSisteMottatteSøknad(Søknadstype.KONTANTSTØTTE) } returns
+            LocalDateTime.of(2024, 8, 1, 14, 59)
 
         // Act
         val statusKontantstøtte = søknadStatusService.statusKontantstøtte()
-        println(statusKontantstøtte)
 
         // Assert
         assertThat(statusKontantstøtte.status).isEqualTo(Plattformstatus.OK)
@@ -148,12 +118,8 @@ class SøknadStatusServiceTest {
     fun `skal gi status DOWN dersom det er natt og det ikke har kommet inn noen søknader på 24 timer for barnetrygd`() {
         // Arrange
         every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 2, 0)
-        every { søknadRepository.finnSisteLagredeSøknad() } returns
-            DBBarnetrygdSøknad(
-                søknadJson = "",
-                opprettetTid = LocalDateTime.of(2024, 8, 1, 1, 59),
-                fnr = "",
-            )
+        every { søknadStatusRepository.finnTidspunktForSisteMottatteSøknad(Søknadstype.BARNETRYGD) } returns
+            LocalDateTime.of(2024, 8, 1, 1, 59)
 
         // Act
         val statusBarnetrygd = søknadStatusService.statusBarnetrygd()
@@ -166,12 +132,8 @@ class SøknadStatusServiceTest {
     fun `skal gi status OK dersom det er natt og det ikke har kommet inn noen søknader på 24 timer for barnetrygd`() {
         // Arrange
         every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 2, 0)
-        every { søknadRepository.finnSisteLagredeSøknad() } returns
-            DBBarnetrygdSøknad(
-                søknadJson = "",
-                opprettetTid = LocalDateTime.of(2024, 8, 1, 14, 59),
-                fnr = "",
-            )
+        every { søknadStatusRepository.finnTidspunktForSisteMottatteSøknad(Søknadstype.BARNETRYGD) } returns
+            LocalDateTime.of(2024, 8, 1, 14, 59)
 
         // Act
         val statusBarnetrygd = søknadStatusService.statusBarnetrygd()
@@ -186,12 +148,8 @@ class SøknadStatusServiceTest {
     fun `skal gi status ISSUE dersom det er natt og det ikke har kommet inn noen søknader på 12 timer for kontantstøtte`() {
         // Arrange
         every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 2, 0)
-        every { kontantstøtteSøknadRepository.finnSisteLagredeSøknad() } returns
-            DBKontantstøtteSøknad(
-                søknadJson = "",
-                opprettetTid = LocalDateTime.of(2024, 8, 1, 13, 59),
-                fnr = "",
-            )
+        every { søknadStatusRepository.finnTidspunktForSisteMottatteSøknad(Søknadstype.KONTANTSTØTTE) } returns
+            LocalDateTime.of(2024, 8, 1, 13, 59)
 
         // Act
         val statusKontantstøtte = søknadStatusService.statusKontantstøtte()
@@ -204,17 +162,27 @@ class SøknadStatusServiceTest {
     fun `skal gi status ISSUE dersom det er natt og det ikke har kommet inn noen søknader på 12 timer for barnetrygd`() {
         // Arrange
         every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 2, 0)
-        every { søknadRepository.finnSisteLagredeSøknad() } returns
-            DBBarnetrygdSøknad(
-                søknadJson = "",
-                opprettetTid = LocalDateTime.of(2024, 8, 1, 13, 59),
-                fnr = "",
-            )
+        every { søknadStatusRepository.finnTidspunktForSisteMottatteSøknad(Søknadstype.BARNETRYGD) } returns
+            LocalDateTime.of(2024, 8, 1, 13, 59)
 
         // Act
         val statusBarnetrygd = søknadStatusService.statusBarnetrygd()
 
         // Assert
         assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.ISSUE)
+    }
+
+    @Test
+    fun `skal gi status DOWN dersom det ikke finnes noen mottatte søknader for barnetrygd`() {
+        // Arrange
+        every { LocalDateTime.now() } returns LocalDateTime.of(2024, 8, 2, 10, 0)
+        every { søknadStatusRepository.finnTidspunktForSisteMottatteSøknad(Søknadstype.BARNETRYGD) } returns null
+
+        // Act
+        val statusBarnetrygd = søknadStatusService.statusBarnetrygd()
+
+        // Assert
+        assertThat(statusBarnetrygd.status).isEqualTo(Plattformstatus.DOWN)
+        assertThat(statusBarnetrygd.description).isEqualTo("Fant ingen mottatte søknader om barnetrygd")
     }
 }

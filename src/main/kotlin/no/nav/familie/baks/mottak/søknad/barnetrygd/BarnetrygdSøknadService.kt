@@ -74,8 +74,10 @@ class BarnetrygdSøknadService(
         return map
     }
 
-    fun slettLagredeVedlegg(søknad: DBBarnetrygdSøknad) {
+    @Transactional
+    fun slettDBSøknadOgVedlegg(søknad: DBBarnetrygdSøknad) {
         vedleggRepository.slettAlleVedlegg(søknad.id)
+        søknadRepository.slettSøknad(søknad.id)
     }
 
     private fun hentOgLagreSøknadvedlegg(
