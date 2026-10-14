@@ -3,8 +3,7 @@ package no.nav.familie.baks.mottak.integrasjoner
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.baks.mottak.søknad.SøknadTestData
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Brevkoder
 import no.nav.familie.kontrakter.felles.BrukerIdType
@@ -13,23 +12,21 @@ import no.nav.familie.kontrakter.felles.journalpost.DokumentInfo
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import no.nav.familie.kontrakter.felles.journalpost.Journalposttype
 import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
-import no.nav.familie.kontrakter.felles.jsonMapper
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
 
 class BarnetrygdOppgaveMapperTest {
     private val enhetsnummerService: EnhetsnummerService = mockk()
     private val pdlClient: PdlClientService = mockk()
-    private val søknadRepository: SøknadRepository = mockk()
+    private val baksVersjonertSøknadClientService: BaksVersjonertSøknadClientService = mockk()
 
     private val barnetrygdOppgaveMapper =
         BarnetrygdOppgaveMapper(
             enhetsnummerService = enhetsnummerService,
             pdlClientService = pdlClient,
-            søknadRepository = søknadRepository,
+            baksVersjonertSøknadClientService = baksVersjonertSøknadClientService,
         )
 
     @Nested
@@ -163,13 +160,8 @@ class BarnetrygdOppgaveMapperTest {
                         ),
                 )
 
-            every { søknadRepository.getByJournalpostId(journalpost.journalpostId) } returns
-                DBBarnetrygdSøknad(
-                    id = 0,
-                    søknadJson = jsonMapper.writeValueAsString(SøknadTestData.barnetrygdSøknad()),
-                    fnr = "12345678093",
-                    opprettetTid = LocalDateTime.now(),
-                )
+            every { baksVersjonertSøknadClientService.hentVersjonertBarnetrygdSøknad(journalpost.journalpostId) } returns
+                VersjonertBarnetrygdSøknadV9(barnetrygdSøknad = SøknadTestData.barnetrygdSøknad())
 
             // Act
             val behandlingstype = barnetrygdOppgaveMapper.hentBehandlingstype(journalpost)

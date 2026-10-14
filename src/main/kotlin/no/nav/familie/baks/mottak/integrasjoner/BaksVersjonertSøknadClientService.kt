@@ -3,6 +3,7 @@ package no.nav.familie.baks.mottak.integrasjoner
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknad
 import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknad
 import org.slf4j.LoggerFactory
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.resilience.annotation.Retryable
 import org.springframework.stereotype.Service
 
@@ -12,6 +13,7 @@ private val logger = LoggerFactory.getLogger(BaksVersjonertSøknadClientService:
 class BaksVersjonertSøknadClientService(
     private val baksVersjonertSøknadClient: BaksVersjonertSøknadClient,
 ) {
+    @Cacheable("versjonertBarnetrygdSoknad", cacheManager = "shortLivedCacheManager")
     @Retryable(
         value = [RuntimeException::class],
         maxRetries = 3,
@@ -21,6 +23,7 @@ class BaksVersjonertSøknadClientService(
         journalpostId: String,
     ): VersjonertBarnetrygdSøknad = baksVersjonertSøknadClient.hentVersjonertBarnetrygdSøknad(journalpostId)
 
+    @Cacheable("versjonertKontantstotteSoknad", cacheManager = "shortLivedCacheManager")
     @Retryable(
         value = [RuntimeException::class],
         maxRetries = 3,

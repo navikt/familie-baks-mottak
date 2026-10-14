@@ -2,9 +2,8 @@ package no.nav.familie.baks.mottak.integrasjoner
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadTestData
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstøtteSøknad
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
 import no.nav.familie.kontrakter.felles.Brevkoder
 import no.nav.familie.kontrakter.felles.BrukerIdType
 import no.nav.familie.kontrakter.felles.journalpost.Bruker
@@ -12,23 +11,22 @@ import no.nav.familie.kontrakter.felles.journalpost.DokumentInfo
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import no.nav.familie.kontrakter.felles.journalpost.Journalposttype
 import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
-import no.nav.familie.kontrakter.felles.jsonMapper
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
+import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV6
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
 
 class KontantstøtteOppgaveMapperTest {
     private val enhetsnummerService: EnhetsnummerService = mockk()
     private val pdlClient: PdlClientService = mockk()
-    private val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository = mockk()
+    private val baksVersjonertSøknadClientService: BaksVersjonertSøknadClientService = mockk()
 
     private val kontantstøtteOppgaveMapper =
         KontantstøtteOppgaveMapper(
             enhetsnummerService = enhetsnummerService,
             pdlClientService = pdlClient,
-            kontantstøtteSøknadRepository = kontantstøtteSøknadRepository,
+            baksVersjonertSøknadClientService = baksVersjonertSøknadClientService,
         )
 
     @Nested
@@ -75,19 +73,47 @@ class KontantstøtteOppgaveMapperTest {
                         ),
                 )
 
-            every { kontantstøtteSøknadRepository.getByJournalpostId(journalpost.journalpostId) } returns
-                DBKontantstøtteSøknad(
-                    id = 0,
-                    søknadJson = jsonMapper.writeValueAsString(KontantstøtteSøknadTestData.kontantstøtteSøknad()),
-                    fnr = "12345678093",
-                    opprettetTid = LocalDateTime.now(),
-                )
+            every { baksVersjonertSøknadClientService.hentVersjonertKontantstøtteSøknad(journalpost.journalpostId) } returns
+                VersjonertKontantstøtteSøknadV6(kontantstøtteSøknad = KontantstøtteSøknadTestData.kontantstøtteSøknad())
 
             // Act
             val behandlingstype = kontantstøtteOppgaveMapper.hentBehandlingstype(journalpost)
 
             // Assert
             assertThat(behandlingstype).isEqualTo(Behandlingstype.NASJONAL)
+        }
+
+        @Test
+        fun `skal returnere behandlingstype eøs for digital ks søknad når søker har eøs-steg`() {
+            // Arrange
+            val journalpost =
+                Journalpost(
+                    journalpostId = "123",
+                    journalposttype = Journalposttype.I,
+                    journalstatus = Journalstatus.MOTTATT,
+                    kanal = "NAV_NO",
+                    dokumenter =
+                        listOf(
+                            DokumentInfo(
+                                dokumentInfoId = "321",
+                                brevkode = Brevkoder.KONTANTSTØTTE_SØKNAD,
+                            ),
+                        ),
+                )
+
+            every { baksVersjonertSøknadClientService.hentVersjonertKontantstøtteSøknad(journalpost.journalpostId) } returns
+                VersjonertKontantstøtteSøknadV6(
+                    kontantstøtteSøknad =
+                        KontantstøtteSøknadTestData.kontantstøtteSøknad(
+                            søker = KontantstøtteSøknadTestData.lagSøker().copy(harEøsSteg = true),
+                        ),
+                )
+
+            // Act
+            val behandlingstype = kontantstøtteOppgaveMapper.hentBehandlingstype(journalpost)
+
+            // Assert
+            assertThat(behandlingstype).isEqualTo(Behandlingstype.EØS)
         }
 
         @Test
@@ -111,19 +137,12 @@ class KontantstøtteOppgaveMapperTest {
                         ),
                 )
 
-            every { kontantstøtteSøknadRepository.getByJournalpostId(journalpost.journalpostId) } returns
-                DBKontantstøtteSøknad(
-                    id = 0,
-                    søknadJson = jsonMapper.writeValueAsString(KontantstøtteSøknadTestData.kontantstøtteSøknad()),
-                    fnr = dnummer,
-                    opprettetTid = LocalDateTime.now(),
-                )
-
             // Act
             val behandlingstype = kontantstøtteOppgaveMapper.hentBehandlingstype(journalpost)
 
             // Assert
             assertThat(behandlingstype).isEqualTo(Behandlingstype.EØS)
+            verify(exactly = 0) { baksVersjonertSøknadClientService.hentVersjonertKontantstøtteSøknad(any()) }
         }
 
         @Test

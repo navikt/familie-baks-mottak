@@ -1,6 +1,5 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.harEøsSteg
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Service
 class KontantstøtteOppgaveMapper(
     enhetsnummerService: EnhetsnummerService,
     pdlClientService: PdlClientService,
-    val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
+    private val baksVersjonertSøknadClientService: BaksVersjonertSøknadClientService,
 ) : AbstractOppgaveMapper(
         enhetsnummerService = enhetsnummerService,
         pdlClientService = pdlClientService,
@@ -51,7 +50,7 @@ class KontantstøtteOppgaveMapper(
     fun utledBehandlingKategoriFraSøknad(journalpost: Journalpost): BehandlingKategori {
         check(journalpost.harKontantstøtteSøknad()) { "Journalpost m/ id ${journalpost.journalpostId} er ikke en kontantstøtte søknad" }
 
-        val søknad = kontantstøtteSøknadRepository.getByJournalpostId(journalpost.journalpostId)
+        val søknad = baksVersjonertSøknadClientService.hentVersjonertKontantstøtteSøknad(journalpost.journalpostId)
 
         return when {
             søknad.harEøsSteg() -> BehandlingKategori.EØS

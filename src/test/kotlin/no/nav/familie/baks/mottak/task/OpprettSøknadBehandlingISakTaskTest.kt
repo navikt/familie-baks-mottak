@@ -7,6 +7,7 @@ import io.mockk.verify
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
+import no.nav.familie.baks.mottak.integrasjoner.BaksVersjonertSøknadClientService
 import no.nav.familie.baks.mottak.integrasjoner.BarnetrygdOppgaveMapper
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingType
@@ -18,15 +19,14 @@ import no.nav.familie.baks.mottak.integrasjoner.KontantstøtteOppgaveMapper
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
 import no.nav.familie.baks.mottak.søknad.SøknadTestData
-import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadService
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknad
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import no.nav.familie.kontrakter.felles.journalpost.Journalposttype
 import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
-import no.nav.familie.kontrakter.felles.jsonMapper
 import no.nav.familie.prosessering.domene.Task
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -39,7 +39,7 @@ class OpprettSøknadBehandlingISakTaskTest {
     private val ksSakClient = mockk<KsSakClient>()
     private val baSakClient = mockk<BaSakClient>()
     private val featureToggleService = mockk<FeatureToggleService>()
-    private val barnetrygdSøknadService = mockk<BarnetrygdSøknadService>()
+    private val baksVersjonertSøknadClientService = mockk<BaksVersjonertSøknadClientService>()
 
     private val opprettSøknadBehandlingISakTask =
         OpprettSøknadBehandlingISakTask(
@@ -49,7 +49,7 @@ class OpprettSøknadBehandlingISakTaskTest {
             ksSakClient = ksSakClient,
             baSakClient = baSakClient,
             featureToggleService = featureToggleService,
-            barnetrygdSøknadService = barnetrygdSøknadService,
+            baksVersjonertSøknadClientService = baksVersjonertSøknadClientService,
         )
 
     private val journalpostId = "1"
@@ -78,18 +78,14 @@ class OpprettSøknadBehandlingISakTaskTest {
                 tema = Tema.BAR.name,
                 bruker = null,
             )
-        every { barnetrygdOppgaveMapper.utledBehandlingKategoriFraSøknad(any<DBBarnetrygdSøknad>()) } returns BehandlingKategori.NASJONAL
+        every { barnetrygdOppgaveMapper.utledBehandlingKategoriFraSøknad(any<VersjonertBarnetrygdSøknad>()) } returns BehandlingKategori.NASJONAL
         every { barnetrygdOppgaveMapper.utledBehandlingUnderkategoriFraSøknad(any()) } returns BehandlingUnderkategori.ORDINÆR
         justRun { baSakClient.opprettBehandling(any(), any(), any(), any(), any(), any(), any(), any()) }
         every { baSakClient.søkerHarHattInnvilgetBarnetrygd(fagsakId) } returns false
-        every { barnetrygdSøknadService.hentDBSøknadFraJournalpost(journalpostId) } returns lagDBSøknad()
+        every { baksVersjonertSøknadClientService.hentVersjonertBarnetrygdSøknad(journalpostId) } returns lagSøknad()
     }
 
-    private fun lagDBSøknad(dokumentasjon: List<Søknaddokumentasjon> = listOf(SøknadTestData.lagAnnenDokumentasjon())) =
-        DBBarnetrygdSøknad(
-            søknadJson = jsonMapper.writeValueAsString(SøknadTestData.barnetrygdSøknad(dokumentasjon = dokumentasjon)),
-            fnr = personIdent,
-        )
+    private fun lagSøknad(dokumentasjon: List<Søknaddokumentasjon> = listOf(SøknadTestData.lagAnnenDokumentasjon())) = VersjonertBarnetrygdSøknadV9(barnetrygdSøknad = SøknadTestData.barnetrygdSøknad(dokumentasjon = dokumentasjon))
 
     private fun lagFagsak(status: FagsakStatus) = RestMinimalFagsak(id = fagsakId, behandlinger = emptyList(), status = status)
 
@@ -222,8 +218,8 @@ class OpprettSøknadBehandlingISakTaskTest {
             // Arrange
             every { baSakClient.hentMinimalRestFagsak(fagsakId) } returns lagFagsak(FagsakStatus.OPPRETTET)
             every { featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) } returns true
-            every { barnetrygdSøknadService.hentDBSøknadFraJournalpost(journalpostId) } returns
-                lagDBSøknad(
+            every { baksVersjonertSøknadClientService.hentVersjonertBarnetrygdSøknad(journalpostId) } returns
+                lagSøknad(
                     dokumentasjon =
                         listOf(
                             Søknaddokumentasjon(

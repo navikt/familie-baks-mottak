@@ -1,18 +1,18 @@
 package no.nav.familie.baks.mottak.søknad.barnetrygd.domene
 
 import no.nav.familie.baks.mottak.søknad.SøknadTestData
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ba.søknad.v7.Dokumentasjonsbehov
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknaddokumentasjon
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg
-import no.nav.familie.kontrakter.felles.jsonMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class DBBarnetrygdSøknadTest {
+class VersjonertBarnetrygdSøknadTest {
     @Test
     fun `skal ha dokumentasjonsbehov uten vedlegg når et dokumentasjonsbehov hverken har opplastet vedlegg eller er sendt inn tidligere`() {
         // Arrange
-        val søknad = lagDBSøknad(lagDokumentasjon(Dokumentasjonsbehov.AVTALE_DELT_BOSTED))
+        val søknad = lagSøknad(lagDokumentasjon(Dokumentasjonsbehov.AVTALE_DELT_BOSTED))
 
         // Act
         val harDokumentasjonsbehovUtenVedlegg = søknad.harDokumentasjonsbehovUtenVedlegg()
@@ -24,7 +24,7 @@ class DBBarnetrygdSøknadTest {
     @Test
     fun `skal ikke ha dokumentasjonsbehov uten vedlegg når dokumentasjonsbehovet har opplastet vedlegg`() {
         // Arrange
-        val søknad = lagDBSøknad(lagDokumentasjon(Dokumentasjonsbehov.AVTALE_DELT_BOSTED, opplastedeVedlegg = listOf(lagVedlegg())))
+        val søknad = lagSøknad(lagDokumentasjon(Dokumentasjonsbehov.AVTALE_DELT_BOSTED, opplastedeVedlegg = listOf(lagVedlegg())))
 
         // Act
         val harDokumentasjonsbehovUtenVedlegg = søknad.harDokumentasjonsbehovUtenVedlegg()
@@ -36,7 +36,7 @@ class DBBarnetrygdSøknadTest {
     @Test
     fun `skal ha dokumentasjonsbehov uten vedlegg når dokumentasjonen er sendt inn tidligere uten at vedlegg er lastet opp`() {
         // Arrange
-        val søknad = lagDBSøknad(lagDokumentasjon(Dokumentasjonsbehov.AVTALE_DELT_BOSTED, harSendtInn = true))
+        val søknad = lagSøknad(lagDokumentasjon(Dokumentasjonsbehov.AVTALE_DELT_BOSTED, harSendtInn = true))
 
         // Act
         val harDokumentasjonsbehovUtenVedlegg = søknad.harDokumentasjonsbehovUtenVedlegg()
@@ -48,7 +48,7 @@ class DBBarnetrygdSøknadTest {
     @Test
     fun `skal ikke ha dokumentasjonsbehov uten vedlegg når kun annen dokumentasjon mangler vedlegg`() {
         // Arrange
-        val søknad = lagDBSøknad(lagDokumentasjon(Dokumentasjonsbehov.ANNEN_DOKUMENTASJON))
+        val søknad = lagSøknad(lagDokumentasjon(Dokumentasjonsbehov.ANNEN_DOKUMENTASJON))
 
         // Act
         val harDokumentasjonsbehovUtenVedlegg = søknad.harDokumentasjonsbehovUtenVedlegg()
@@ -61,7 +61,7 @@ class DBBarnetrygdSøknadTest {
     fun `skal ha dokumentasjonsbehov uten vedlegg når ett av flere dokumentasjonsbehov mangler vedlegg`() {
         // Arrange
         val søknad =
-            lagDBSøknad(
+            lagSøknad(
                 lagDokumentasjon(Dokumentasjonsbehov.MEKLINGSATTEST, opplastedeVedlegg = listOf(lagVedlegg())),
                 lagDokumentasjon(Dokumentasjonsbehov.BOR_FAST_MED_SØKER),
             )
@@ -73,11 +73,7 @@ class DBBarnetrygdSøknadTest {
         assertThat(harDokumentasjonsbehovUtenVedlegg).isTrue()
     }
 
-    private fun lagDBSøknad(vararg dokumentasjon: Søknaddokumentasjon) =
-        DBBarnetrygdSøknad(
-            søknadJson = jsonMapper.writeValueAsString(SøknadTestData.barnetrygdSøknad(dokumentasjon = dokumentasjon.toList())),
-            fnr = "12345678910",
-        )
+    private fun lagSøknad(vararg dokumentasjon: Søknaddokumentasjon) = VersjonertBarnetrygdSøknadV9(barnetrygdSøknad = SøknadTestData.barnetrygdSøknad(dokumentasjon = dokumentasjon.toList()))
 
     private fun lagDokumentasjon(
         dokumentasjonsbehov: Dokumentasjonsbehov,
