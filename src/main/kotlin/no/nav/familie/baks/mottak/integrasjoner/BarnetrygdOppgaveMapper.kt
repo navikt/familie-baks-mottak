@@ -1,8 +1,7 @@
 package no.nav.familie.baks.mottak.integrasjoner
 
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.harEøsSteg
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknad
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Service
 class BarnetrygdOppgaveMapper(
     enhetsnummerService: EnhetsnummerService,
     pdlClientService: PdlClientService,
-    val søknadRepository: SøknadRepository,
+    private val baksVersjonertSøknadClientService: BaksVersjonertSøknadClientService,
 ) : AbstractOppgaveMapper(
         enhetsnummerService = enhetsnummerService,
         pdlClientService = pdlClientService,
@@ -77,12 +76,12 @@ class BarnetrygdOppgaveMapper(
 
     fun utledBehandlingKategoriFraSøknad(journalpost: Journalpost): BehandlingKategori {
         check(journalpost.harBarnetrygdSøknad()) { "Journalpost m/ id ${journalpost.journalpostId} er ikke en barnetrygd søknad" }
-        val søknad = søknadRepository.getByJournalpostId(journalpost.journalpostId)
+        val søknad = baksVersjonertSøknadClientService.hentVersjonertBarnetrygdSøknad(journalpost.journalpostId)
 
         return utledBehandlingKategoriFraSøknad(søknad)
     }
 
-    fun utledBehandlingKategoriFraSøknad(søknad: DBBarnetrygdSøknad) =
+    fun utledBehandlingKategoriFraSøknad(søknad: VersjonertBarnetrygdSøknad) =
         when {
             søknad.harEøsSteg() -> BehandlingKategori.EØS
             else -> BehandlingKategori.NASJONAL

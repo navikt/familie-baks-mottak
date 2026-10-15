@@ -3,6 +3,7 @@ package no.nav.familie.baks.mottak.task
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
+import no.nav.familie.baks.mottak.integrasjoner.BaksVersjonertSøknadClientService
 import no.nav.familie.baks.mottak.integrasjoner.BarnetrygdOppgaveMapper
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingType
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingÅrsak
@@ -13,9 +14,8 @@ import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
 import no.nav.familie.baks.mottak.integrasjoner.Søknadsinfo
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
-import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadService
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.harDokumentasjonsbehovUtenVedlegg
+import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknad
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -37,7 +37,7 @@ class OpprettSøknadBehandlingISakTask(
     private val ksSakClient: KsSakClient,
     private val baSakClient: BaSakClient,
     private val featureToggleService: FeatureToggleService,
-    private val barnetrygdSøknadService: BarnetrygdSøknadService,
+    private val baksVersjonertSøknadClientService: BaksVersjonertSøknadClientService,
 ) : AsyncTaskStep {
     val log: Logger = LoggerFactory.getLogger(OpprettSøknadBehandlingISakTask::class.java)
 
@@ -78,7 +78,7 @@ class OpprettSøknadBehandlingISakTask(
                 if (finnesÅpenBehandlingPåFagsak) {
                     log.info("Finnes allerede åpen behandling på fagsak $fagsakId m/ tema $tema. Hopper over opprettelsen av ny behandling")
                 } else {
-                    val søknad = barnetrygdSøknadService.hentDBSøknadFraJournalpost(journalpost.journalpostId)
+                    val søknad = baksVersjonertSøknadClientService.hentVersjonertBarnetrygdSøknad(journalpost.journalpostId)
 
                     val behandlingType = utledBehandlingstype(fagsak)
                     val behandlingÅrsak = utledBehandlingsårsak(behandlingType, fagsak.id, søknad)
@@ -113,7 +113,7 @@ class OpprettSøknadBehandlingISakTask(
     private fun utledBehandlingsårsak(
         behandlingType: BehandlingType,
         fagsakId: Long,
-        søknad: DBBarnetrygdSøknad,
+        søknad: VersjonertBarnetrygdSøknad,
     ): BehandlingÅrsak =
         if (behandlingType == BehandlingType.FØRSTEGANGSBEHANDLING &&
             featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) &&
