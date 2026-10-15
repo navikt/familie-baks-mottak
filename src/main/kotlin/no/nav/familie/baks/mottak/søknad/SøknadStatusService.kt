@@ -1,8 +1,14 @@
 package no.nav.familie.baks.mottak.søknad
 
+import no.nav.familie.baks.mottak.task.JournalførKontantstøtteSøknadTask
+import no.nav.familie.baks.mottak.task.JournalførSøknadTask
 import no.nav.familie.leader.LeaderClient
+import no.nav.familie.prosessering.domene.Status
+import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.Duration
@@ -11,7 +17,7 @@ import java.time.LocalTime
 
 @Service
 class SøknadStatusService(
-    private val søknadStatusRepository: SøknadStatusRepository,
+    private val taskService: TaskService,
 ) {
     @Scheduled(cron = "0 0/30 * * * ?")
     private fun loggHvisLiteAktivitetForBarnetrygdOgKontantstøtte() {
@@ -34,9 +40,17 @@ class SøknadStatusService(
         return lagStatusDto(Søknadstype.KONTANTSTØTTE)
     }
 
+    fun finnTidspunktForSisteMottatteSøknad(søknadstype: Søknadstype): LocalDateTime? =
+        taskService
+            .finnTasksMedStatus(
+                status = Status.entries,
+                type = søknadstype.journalføringTasktype(),
+                page = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "opprettetTid")),
+            ).firstOrNull()
+            ?.opprettetTid
+
     private fun finnTidSidenSisteSøknad(søknadstype: Søknadstype): Duration? =
-        søknadStatusRepository
-            .finnTidspunktForSisteMottatteSøknad(søknadstype)
+        finnTidspunktForSisteMottatteSøknad(søknadstype)
             ?.let { Duration.between(it, LocalDateTime.now()) }
 
     private fun loggHvisLiteAktivitet(søknadstype: Søknadstype) {
@@ -108,6 +122,12 @@ class SøknadStatusService(
     private fun erDagtid() = LocalDateTime.now().hour in 9..22
 
     private fun erTidspunktMedForventetAktivitet() = LocalDateTime.now().hour in 9..22
+
+    private fun Søknadstype.journalføringTasktype() =
+        when (this) {
+            Søknadstype.BARNETRYGD -> JournalførSøknadTask.JOURNALFØR_SØKNAD
+            Søknadstype.KONTANTSTØTTE -> JournalførKontantstøtteSøknadTask.JOURNALFØR_KONTANTSTØTTE_SØKNAD
+        }
 
     companion object {
         val logger: Logger = LoggerFactory.getLogger(SøknadStatusService::class.java)

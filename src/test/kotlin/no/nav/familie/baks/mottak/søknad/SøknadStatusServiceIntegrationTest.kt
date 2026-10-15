@@ -24,9 +24,9 @@ import java.util.UUID
 @ActiveProfiles("postgres", "testcontainers")
 @Tag("integration")
 @SpringBootTest(classes = [DevLauncherPostgres::class])
-class SøknadStatusRepositoryTest(
+class SøknadStatusServiceIntegrationTest(
     @Autowired
-    val søknadStatusRepository: SøknadStatusRepository,
+    val søknadStatusService: SøknadStatusService,
     @Autowired
     val taskService: TaskService,
 ) {
@@ -40,8 +40,8 @@ class SøknadStatusRepositoryTest(
         lagreFerdigTask(JournalførSøknadTask.JOURNALFØR_SØKNAD, nå)
 
         // Act
-        val sisteBarnetrygd = søknadStatusRepository.finnTidspunktForSisteMottatteSøknad(Søknadstype.BARNETRYGD)
-        val sisteKontantstøtte = søknadStatusRepository.finnTidspunktForSisteMottatteSøknad(Søknadstype.KONTANTSTØTTE)
+        val sisteBarnetrygd = søknadStatusService.finnTidspunktForSisteMottatteSøknad(Søknadstype.BARNETRYGD)
+        val sisteKontantstøtte = søknadStatusService.finnTidspunktForSisteMottatteSøknad(Søknadstype.KONTANTSTØTTE)
 
         // Assert
         assertThat(sisteBarnetrygd).isCloseTo(nå, within(1, ChronoUnit.MILLIS))
