@@ -50,7 +50,7 @@ class CacheConfig {
         }
 
     @Bean
-    fun shortLivedCacheManager(): CacheManager =
+    fun soknadCacheManager(): CacheManager =
         object : ConcurrentMapCacheManager() {
             override fun createConcurrentMapCache(name: String): Cache {
                 val concurrentMap =
