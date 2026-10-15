@@ -266,6 +266,12 @@ class BaSakClient
                 }
         }
 
+        fun sendAutomatiskBehandlingSøknadstatistikk(
+            statistikkDto: AutomatiskBehandlingSøknadStatistikkDto,
+        ) {
+            TODO()
+        }
+
         fun hentFagsakForSkjermetBarn(personIdent: String): List<RestFagsakSkjermetBarn> {
             val uri = URI.create("$sakServiceUri/fagsaker/hent-fagsaker-paa-person")
             return runCatching {
