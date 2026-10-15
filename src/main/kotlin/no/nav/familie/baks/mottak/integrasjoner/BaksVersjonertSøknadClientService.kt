@@ -13,7 +13,7 @@ private val logger = LoggerFactory.getLogger(BaksVersjonertSøknadClientService:
 class BaksVersjonertSøknadClientService(
     private val baksVersjonertSøknadClient: BaksVersjonertSøknadClient,
 ) {
-    @Cacheable("versjonertBarnetrygdSoknad", cacheManager = "shortLivedCacheManager")
+    @Cacheable("versjonertBarnetrygdSoknad", cacheManager = "soknadCacheManager")
     @Retryable(
         value = [RuntimeException::class],
         maxRetries = 3,
@@ -23,7 +23,7 @@ class BaksVersjonertSøknadClientService(
         journalpostId: String,
     ): VersjonertBarnetrygdSøknad = baksVersjonertSøknadClient.hentVersjonertBarnetrygdSøknad(journalpostId)
 
-    @Cacheable("versjonertKontantstotteSoknad", cacheManager = "shortLivedCacheManager")
+    @Cacheable("versjonertKontantstotteSoknad", cacheManager = "soknadCacheManager")
     @Retryable(
         value = [RuntimeException::class],
         maxRetries = 3,
