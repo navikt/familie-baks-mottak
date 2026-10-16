@@ -136,7 +136,7 @@ class OpprettSøknadBehandlingISakTask(
                         val statistikkDto =
                             AutomatiskBehandlingSøknadStatistikkDto(
                                 journalpostId = journalpost.journalpostId.toLong(),
-                                feilårsaker = `årsakerTilManuellBehandling`,
+                                feilårsaker = årsakerTilManuellBehandling,
                             )
                         taskService.save(
                             Task(
