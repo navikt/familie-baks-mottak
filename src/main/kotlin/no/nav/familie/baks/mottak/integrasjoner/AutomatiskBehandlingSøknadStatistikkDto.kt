@@ -6,7 +6,7 @@ data class AutomatiskBehandlingSøknadStatistikkDto(
 )
 
 enum class AutomatiskBehandlingSøknadFeilårsak {
-    FAGSAK_ER_LØPENDE,
-    SØKER_HAR_HATT_INNVILGET_BARNETRYGD,
+    SØKER_HAR_LØPENDE_BARNETRYGD,
+    SØKER_HAR_HATT_BARNETRYGD_TIDLIGERE,
     SØKNAD_MANGLER_VEDLEGG,
 }

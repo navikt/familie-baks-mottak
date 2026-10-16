@@ -154,6 +154,8 @@ class OpprettSøknadBehandlingISakTask(
         }
     }
 
+    // Kun førstegangsbehandlinger der søker aldri har hatt utbetaling skal behandles automatisk.
+    // Har bruker en fagsak med løpende utbetaling blir det en revurdering, og den skal fortsatt gå til manuell behandling.
     // Søknader som har hatt dokumentasjonskrav uten at vedlegg har blitt lastet opp skal også til manuell behandling.
     private fun utledBehandlingsårsak(
         behandlingType: BehandlingType,
@@ -171,8 +173,6 @@ class OpprettSøknadBehandlingISakTask(
             BehandlingÅrsak.SØKNAD
         }
 
-    // Kun førstegangsbehandlinger der søker aldri har hatt utbetaling skal behandles automatisk.
-    // Har bruker en fagsak med løpende utbetaling blir det en revurdering, og den skal fortsatt gå til manuell behandling.
     private fun hentSøkerHarHattInnvilgetBarnetrygd(
         behandlingType: BehandlingType,
         brukAutomatiskBehandlingÅrsak: Boolean,
@@ -190,8 +190,8 @@ class OpprettSøknadBehandlingISakTask(
         søknadManglerVedlegg: Boolean,
     ): List<AutomatiskBehandlingSøknadFeilårsak> =
         buildList {
-            if (fagsakErLøpende) add(AutomatiskBehandlingSøknadFeilårsak.FAGSAK_ER_LØPENDE)
-            if (søkerHarHattInnvilgetBarnetrygd == true) add(AutomatiskBehandlingSøknadFeilårsak.SØKER_HAR_HATT_INNVILGET_BARNETRYGD)
+            if (fagsakErLøpende) add(AutomatiskBehandlingSøknadFeilårsak.SØKER_HAR_LØPENDE_BARNETRYGD)
+            if (!fagsakErLøpende && søkerHarHattInnvilgetBarnetrygd == true) add(AutomatiskBehandlingSøknadFeilårsak.SØKER_HAR_HATT_BARNETRYGD_TIDLIGERE)
             if (søknadManglerVedlegg) add(AutomatiskBehandlingSøknadFeilårsak.SØKNAD_MANGLER_VEDLEGG)
         }
 

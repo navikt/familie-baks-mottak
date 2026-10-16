@@ -148,7 +148,7 @@ class OpprettSøknadBehandlingISakTaskTest {
                     søknadsinfo = any(),
                 )
             }
-            verifiserStatistikkTask(AutomatiskBehandlingSøknadFeilårsak.FAGSAK_ER_LØPENDE)
+            verifiserStatistikkTask(AutomatiskBehandlingSøknadFeilårsak.SØKER_HAR_LØPENDE_BARNETRYGD)
         }
 
         @Test
@@ -199,7 +199,7 @@ class OpprettSøknadBehandlingISakTaskTest {
                     søknadsinfo = any(),
                 )
             }
-            verifiserStatistikkTask(AutomatiskBehandlingSøknadFeilårsak.SØKER_HAR_HATT_INNVILGET_BARNETRYGD)
+            verifiserStatistikkTask(AutomatiskBehandlingSøknadFeilårsak.SØKER_HAR_HATT_BARNETRYGD_TIDLIGERE)
         }
 
         @Test
@@ -288,7 +288,7 @@ class OpprettSøknadBehandlingISakTaskTest {
 
             // Assert
             verifiserStatistikkTask(
-                AutomatiskBehandlingSøknadFeilårsak.SØKER_HAR_HATT_INNVILGET_BARNETRYGD,
+                AutomatiskBehandlingSøknadFeilårsak.SØKER_HAR_HATT_BARNETRYGD_TIDLIGERE,
                 AutomatiskBehandlingSøknadFeilårsak.SØKNAD_MANGLER_VEDLEGG,
             )
         }
