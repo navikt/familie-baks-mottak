@@ -129,8 +129,10 @@ class OpprettSøknadBehandlingISakTask(
                             søkerHarHattInnvilgetBarnetrygd = søkerHarHattInnvilgetBarnetrygd,
                             søknadManglerVedlegg = søknadManglerVedlegg,
                         )
+                    val skalSendeStatistikk =
+                        featureToggleService.isEnabled(FeatureToggle.SKAL_SENDE_STATISTIKK_AUTOMATISK_BEHANDLING_SØKNAD)
 
-                    if (årsakerTilManuellBehandling.isNotEmpty() && brukAutomatiskBehandlingÅrsak) {
+                    if (årsakerTilManuellBehandling.isNotEmpty() && brukAutomatiskBehandlingÅrsak && skalSendeStatistikk) {
                         val statistikkDto =
                             AutomatiskBehandlingSøknadStatistikkDto(
                                 journalpostId = journalpost.journalpostId.toLong(),

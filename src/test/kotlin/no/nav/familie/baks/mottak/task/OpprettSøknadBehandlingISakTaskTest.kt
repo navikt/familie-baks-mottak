@@ -91,6 +91,7 @@ class OpprettSøknadBehandlingISakTaskTest {
         justRun { baSakClient.opprettBehandling(any(), any(), any(), any(), any(), any(), any(), any()) }
         every { baSakClient.søkerHarHattInnvilgetBarnetrygd(fagsakId) } returns false
         every { baksVersjonertSøknadClientService.hentVersjonertBarnetrygdSøknad(journalpostId) } returns lagSøknad()
+        every { featureToggleService.isEnabled(FeatureToggle.SKAL_SENDE_STATISTIKK_AUTOMATISK_BEHANDLING_SØKNAD) } returns true
     }
 
     private fun lagSøknad(dokumentasjon: List<Søknaddokumentasjon> = listOf(SøknadTestData.lagAnnenDokumentasjon())) = VersjonertBarnetrygdSøknadV9(barnetrygdSøknad = SøknadTestData.barnetrygdSøknad(dokumentasjon = dokumentasjon))
