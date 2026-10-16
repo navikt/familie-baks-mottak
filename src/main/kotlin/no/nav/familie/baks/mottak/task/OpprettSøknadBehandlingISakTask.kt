@@ -112,27 +112,14 @@ class OpprettSøknadBehandlingISakTask(
 
                     log.info("Oppretter ny $kategori $behandlingType behandling med årsak $behandlingÅrsak i ba-sak")
 
-                    baSakClient.opprettBehandling(
-                        kategori = kategori,
-                        underkategori = underkategori,
-                        behandlingÅrsak = behandlingÅrsak,
-                        søkersIdent = brukersIdent,
-                        søknadMottattDato = journalpost.datoMottatt ?: LocalDateTime.now(),
-                        behandlingType = behandlingType,
-                        fagsakId = fagsakId.toLong(),
-                        søknadsinfo = Søknadsinfo(journalpostId = journalpost.journalpostId, brevkode = brevkode, erDigital = journalpost.erDigitalKanal()),
-                    )
-
                     val årsakerTilManuellBehandling =
                         utledStatistikkFeilårsaker(
                             fagsakErLøpende = fagsakErLøpende,
                             søkerHarHattInnvilgetBarnetrygd = søkerHarHattInnvilgetBarnetrygd,
                             søknadManglerVedlegg = søknadManglerVedlegg,
                         )
-                    val skalSendeStatistikk =
-                        featureToggleService.isEnabled(FeatureToggle.SKAL_SENDE_STATISTIKK_AUTOMATISK_BEHANDLING_SØKNAD)
 
-                    if (årsakerTilManuellBehandling.isNotEmpty() && brukAutomatiskBehandlingÅrsak && skalSendeStatistikk) {
+                    if (årsakerTilManuellBehandling.isNotEmpty() && brukAutomatiskBehandlingÅrsak) {
                         val statistikkDto =
                             AutomatiskBehandlingSøknadStatistikkDto(
                                 journalpostId = journalpost.journalpostId.toLong(),
@@ -145,6 +132,17 @@ class OpprettSøknadBehandlingISakTask(
                             ),
                         )
                     }
+
+                    baSakClient.opprettBehandling(
+                        kategori = kategori,
+                        underkategori = underkategori,
+                        behandlingÅrsak = behandlingÅrsak,
+                        søkersIdent = brukersIdent,
+                        søknadMottattDato = journalpost.datoMottatt ?: LocalDateTime.now(),
+                        behandlingType = behandlingType,
+                        fagsakId = fagsakId.toLong(),
+                        søknadsinfo = Søknadsinfo(journalpostId = journalpost.journalpostId, brevkode = brevkode, erDigital = journalpost.erDigitalKanal()),
+                    )
                 }
             }
 
