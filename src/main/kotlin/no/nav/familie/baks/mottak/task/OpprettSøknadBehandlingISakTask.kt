@@ -160,12 +160,12 @@ class OpprettSøknadBehandlingISakTask(
     private fun utledBehandlingsårsak(
         behandlingType: BehandlingType,
         brukAutomatiskBehandlingÅrsak: Boolean,
-        søkerHarHattInnvilgetBarnetrygd: Boolean?,
+        søkerHarHattInnvilgetBarnetrygd: Boolean,
         søknadManglerVedlegg: Boolean,
     ): BehandlingÅrsak =
         if (behandlingType == BehandlingType.FØRSTEGANGSBEHANDLING &&
             brukAutomatiskBehandlingÅrsak &&
-            søkerHarHattInnvilgetBarnetrygd == false &&
+            !søkerHarHattInnvilgetBarnetrygd &&
             !søknadManglerVedlegg
         ) {
             BehandlingÅrsak.AUTOMATISK_BEHANDLING_AV_SØKNAD
@@ -177,21 +177,19 @@ class OpprettSøknadBehandlingISakTask(
         behandlingType: BehandlingType,
         brukAutomatiskBehandlingÅrsak: Boolean,
         fagsakId: Long,
-    ): Boolean? =
-        if (behandlingType == BehandlingType.FØRSTEGANGSBEHANDLING && brukAutomatiskBehandlingÅrsak) {
+    ): Boolean =
+        behandlingType == BehandlingType.FØRSTEGANGSBEHANDLING &&
+            brukAutomatiskBehandlingÅrsak &&
             baSakClient.søkerHarHattInnvilgetBarnetrygd(fagsakId)
-        } else {
-            null
-        }
 
     private fun utledStatistikkFeilårsaker(
         fagsakErLøpende: Boolean,
-        søkerHarHattInnvilgetBarnetrygd: Boolean?,
+        søkerHarHattInnvilgetBarnetrygd: Boolean,
         søknadManglerVedlegg: Boolean,
     ): List<AutomatiskBehandlingSøknadFeilårsak> =
         buildList {
             if (fagsakErLøpende) add(AutomatiskBehandlingSøknadFeilårsak.SØKER_HAR_LØPENDE_BARNETRYGD)
-            if (!fagsakErLøpende && søkerHarHattInnvilgetBarnetrygd == true) add(AutomatiskBehandlingSøknadFeilårsak.SØKER_HAR_HATT_BARNETRYGD_TIDLIGERE)
+            if (!fagsakErLøpende && søkerHarHattInnvilgetBarnetrygd) add(AutomatiskBehandlingSøknadFeilårsak.SØKER_HAR_HATT_BARNETRYGD_TIDLIGERE)
             if (søknadManglerVedlegg) add(AutomatiskBehandlingSøknadFeilårsak.SØKNAD_MANGLER_VEDLEGG)
         }
 
