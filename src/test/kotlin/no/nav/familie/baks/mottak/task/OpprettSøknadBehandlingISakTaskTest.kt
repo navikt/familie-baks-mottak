@@ -3,9 +3,12 @@ package no.nav.familie.baks.mottak.task
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
+import no.nav.familie.baks.mottak.integrasjoner.AutomatiskBehandlingSøknadFeilårsak
+import no.nav.familie.baks.mottak.integrasjoner.AutomatiskBehandlingSøknadStatistikkDto
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.BaksVersjonertSøknadClientService
 import no.nav.familie.baks.mottak.integrasjoner.BarnetrygdOppgaveMapper
@@ -27,7 +30,10 @@ import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import no.nav.familie.kontrakter.felles.journalpost.Journalposttype
 import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
+import no.nav.familie.kontrakter.felles.jsonMapper
 import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.prosessering.internal.TaskService
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -40,6 +46,7 @@ class OpprettSøknadBehandlingISakTaskTest {
     private val baSakClient = mockk<BaSakClient>()
     private val featureToggleService = mockk<FeatureToggleService>()
     private val baksVersjonertSøknadClientService = mockk<BaksVersjonertSøknadClientService>()
+    private val taskService = mockk<TaskService>(relaxed = true)
 
     private val opprettSøknadBehandlingISakTask =
         OpprettSøknadBehandlingISakTask(
@@ -50,6 +57,7 @@ class OpprettSøknadBehandlingISakTaskTest {
             baSakClient = baSakClient,
             featureToggleService = featureToggleService,
             baksVersjonertSøknadClientService = baksVersjonertSøknadClientService,
+            taskService = taskService,
         )
 
     private val journalpostId = "1"
@@ -113,6 +121,7 @@ class OpprettSøknadBehandlingISakTaskTest {
                     søknadsinfo = any(),
                 )
             }
+            verify(exactly = 0) { taskService.save(any()) }
         }
 
         @Test
@@ -138,6 +147,7 @@ class OpprettSøknadBehandlingISakTaskTest {
                     søknadsinfo = any(),
                 )
             }
+            verifiserStatistikkTask(AutomatiskBehandlingSøknadFeilårsak.SØKER_HAR_LØPENDE_BARNETRYGD)
         }
 
         @Test
@@ -162,6 +172,7 @@ class OpprettSøknadBehandlingISakTaskTest {
                     søknadsinfo = any(),
                 )
             }
+            verify(exactly = 0) { taskService.save(any()) }
         }
 
         @Test
@@ -187,6 +198,7 @@ class OpprettSøknadBehandlingISakTaskTest {
                     søknadsinfo = any(),
                 )
             }
+            verifiserStatistikkTask(AutomatiskBehandlingSøknadFeilårsak.SØKER_HAR_HATT_BARNETRYGD_TIDLIGERE)
         }
 
         @Test
@@ -211,6 +223,7 @@ class OpprettSøknadBehandlingISakTaskTest {
                     søknadsinfo = any(),
                 )
             }
+            verify(exactly = 0) { taskService.save(any()) }
         }
 
         @Test
@@ -247,6 +260,46 @@ class OpprettSøknadBehandlingISakTaskTest {
                     søknadsinfo = any(),
                 )
             }
+            verifiserStatistikkTask(AutomatiskBehandlingSøknadFeilårsak.SØKNAD_MANGLER_VEDLEGG)
         }
+
+        @Test
+        fun `skal sende flere årsaker til manuell behandling`() {
+            // Arrange
+            every { baSakClient.hentMinimalRestFagsak(fagsakId) } returns lagFagsak(FagsakStatus.AVSLUTTET)
+            every { featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) } returns true
+            every { baSakClient.søkerHarHattInnvilgetBarnetrygd(fagsakId) } returns true
+            every { baksVersjonertSøknadClientService.hentVersjonertBarnetrygdSøknad(journalpostId) } returns
+                lagSøknad(
+                    dokumentasjon =
+                        listOf(
+                            Søknaddokumentasjon(
+                                dokumentasjonsbehov = Dokumentasjonsbehov.AVTALE_DELT_BOSTED,
+                                harSendtInn = false,
+                                opplastedeVedlegg = emptyList(),
+                                dokumentasjonSpråkTittel = mapOf("nb" to "Avtale om delt bosted"),
+                            ),
+                        ),
+                )
+
+            // Act
+            opprettSøknadBehandlingISakTask.doTask(task)
+
+            // Assert
+            verifiserStatistikkTask(
+                AutomatiskBehandlingSøknadFeilårsak.SØKER_HAR_HATT_BARNETRYGD_TIDLIGERE,
+                AutomatiskBehandlingSøknadFeilårsak.SØKNAD_MANGLER_VEDLEGG,
+            )
+        }
+    }
+
+    private fun verifiserStatistikkTask(vararg forventedeFeilårsaker: AutomatiskBehandlingSøknadFeilårsak) {
+        val taskSlot = slot<Task>()
+        verify(exactly = 1) { taskService.save(capture(taskSlot)) }
+
+        val statistikkDto = jsonMapper.readValue(taskSlot.captured.payload, AutomatiskBehandlingSøknadStatistikkDto::class.java)
+        assertThat(taskSlot.captured.type).isEqualTo(SendAutomatiskBehandlingSøknadstatistikkTilBaSakTask.TASK_STEP_TYPE)
+        assertThat(statistikkDto.journalpostId).isEqualTo(journalpostId.toLong())
+        assertThat(statistikkDto.feilårsaker).containsExactlyInAnyOrder(*forventedeFeilårsaker)
     }
 }
