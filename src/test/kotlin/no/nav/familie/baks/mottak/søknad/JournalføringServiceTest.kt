@@ -3,9 +3,13 @@ package no.nav.familie.baks.mottak.søknad
 import io.mockk.junit5.MockKExtension
 import no.nav.familie.baks.mottak.DevLauncherPostgres
 import no.nav.familie.baks.mottak.søknad.barnetrygd.BarnetrygdSøknadService
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBVedlegg
+import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadVedleggRepository
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.tilDBSøknad
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadService
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.KontantstøtteSøknadTestData
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.DBKontantstotteVedlegg
+import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteVedleggRepository
 import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.tilDBKontantstøtteSøknad
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -14,7 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import java.util.UUID
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @ExtendWith(SpringExtension::class, MockKExtension::class)
 @ActiveProfiles("postgres", "mock-dokarkiv", "testcontainers")
@@ -28,6 +35,10 @@ class JournalføringServiceTest(
     val barnetrygdSøknadService: BarnetrygdSøknadService,
     @Autowired
     val kontantstøtteSøknadService: KontantstøtteSøknadService,
+    @Autowired
+    val søknadVedleggRepository: SøknadVedleggRepository,
+    @Autowired
+    val kontantstøtteVedleggRepository: KontantstøtteVedleggRepository,
 ) {
     val søknad = SøknadTestData.barnetrygdSøknad()
     val dbSøknad = søknad.tilDBSøknad()
@@ -66,47 +77,32 @@ class JournalføringServiceTest(
     }
 
     @Test
-    fun `journalPostId blir lagt på dbSøknaden`() {
+    fun `barnetrygdsøknad og vedlegg slettes fra databasen etter journalføring`() {
+        // Arrange
         val dbSøknadFraDB = barnetrygdSøknadService.lagreDBSøknad(dbSøknad)
-        assertEquals(null, dbSøknadFraDB.journalpostId)
-        journalføringService.journalførBarnetrygdSøknad(dbSøknadFraDB, testPDF)
-        val overskrevetDBSøknad = barnetrygdSøknadService.hentDBSøknad(dbSøknadFraDB.id)
+        søknadVedleggRepository.save(DBVedlegg(dokumentId = UUID.randomUUID().toString(), søknadId = dbSøknadFraDB.id, data = testPDF))
 
-        assertEquals("123", overskrevetDBSøknad!!.journalpostId)
+        // Act
+        journalføringService.journalførBarnetrygdSøknad(dbSøknadFraDB, testPDF)
+
+        // Assert
+        assertNull(barnetrygdSøknadService.hentDBSøknad(dbSøknadFraDB.id))
+        assertTrue(søknadVedleggRepository.hentAlleVedlegg(dbSøknadFraDB.id).isEmpty())
     }
 
     @Test
-    fun `journalPostId blir lagt på dbKontantstøtteSøknad`() {
+    fun `kontantstøttesøknad og vedlegg slettes fra databasen etter journalføring`() {
+        // Arrange
         val dbKontantstøtteSøknadFraDB = kontantstøtteSøknadService.lagreDBKontantstøtteSøknad(dbKontantstøtteSøknad)
-        assertEquals(null, dbKontantstøtteSøknadFraDB.journalpostId)
+        kontantstøtteVedleggRepository.save(
+            DBKontantstotteVedlegg(dokumentId = UUID.randomUUID().toString(), søknadId = dbKontantstøtteSøknadFraDB.id, data = testPDF),
+        )
+
+        // Act
         journalføringService.journalførKontantstøtteSøknad(dbKontantstøtteSøknadFraDB, testPDF)
-        val overskrevetDBKontantstøtteSøknad =
-            kontantstøtteSøknadService.hentDBKontantstøtteSøknad(dbKontantstøtteSøknadFraDB.id)
 
-        assertEquals("123", overskrevetDBKontantstøtteSøknad!!.journalpostId)
-    }
-
-    @Test
-    fun `journalPostId skal ikke bli satt hvis den allerede finnes på dbSøknad`() {
-        val dbSøknadMedJournalpostId = dbSøknad.copy(journalpostId = "1")
-        val dbSøknadFraDB = barnetrygdSøknadService.lagreDBSøknad(dbSøknadMedJournalpostId)
-
-        journalføringService.journalførBarnetrygdSøknad(dbSøknadFraDB, testPDF)
-        val ikkeOverskrevetDBSøknad = barnetrygdSøknadService.hentDBSøknad(dbSøknadFraDB.id)
-
-        assertEquals("1", ikkeOverskrevetDBSøknad!!.journalpostId)
-    }
-
-    @Test
-    fun `journalPostId skal ikke bli satt hvis den allerede finnes på dbKontantstøtteSøknad`() {
-        val dbKontantstøtteSøknadMedJournalpostId = dbKontantstøtteSøknad.copy(journalpostId = "1")
-        val dbKontantstøtteSøknadFraDB =
-            kontantstøtteSøknadService.lagreDBKontantstøtteSøknad(dbKontantstøtteSøknadMedJournalpostId)
-
-        journalføringService.journalførKontantstøtteSøknad(dbKontantstøtteSøknadFraDB, testPDF)
-        val ikkeOverskrevetDBSøknad =
-            kontantstøtteSøknadService.hentDBKontantstøtteSøknad(dbKontantstøtteSøknadFraDB.id)
-
-        assertEquals("1", ikkeOverskrevetDBSøknad!!.journalpostId)
+        // Assert
+        assertNull(kontantstøtteSøknadService.hentDBKontantstøtteSøknad(dbKontantstøtteSøknadFraDB.id))
+        assertTrue(kontantstøtteVedleggRepository.hentAlleVedlegg(dbKontantstøtteSøknadFraDB.id).isEmpty())
     }
 }
