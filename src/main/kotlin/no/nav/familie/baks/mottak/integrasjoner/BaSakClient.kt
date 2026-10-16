@@ -269,7 +269,19 @@ class BaSakClient
         fun sendAutomatiskBehandlingSøknadstatistikk(
             statistikkDto: AutomatiskBehandlingSøknadStatistikkDto,
         ) {
-            TODO()
+            val uri = URI.create("$sakServiceUri/behandlinger/automatisk-soknad/statistikk")
+
+            runCatching {
+                restClient
+                    .post()
+                    .uri(uri)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(statistikkDto)
+                    .retrieve()
+                    .toBodilessEntity()
+            }.onFailure {
+                throw IntegrasjonException("Feil ved sending av statistikk for automatisk behandling av søknad til ba-sak.", it, uri)
+            }
         }
 
         fun hentFagsakForSkjermetBarn(personIdent: String): List<RestFagsakSkjermetBarn> {
