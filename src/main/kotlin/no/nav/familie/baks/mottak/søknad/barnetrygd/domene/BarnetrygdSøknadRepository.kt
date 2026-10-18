@@ -12,7 +12,6 @@ interface SøknadRepository : JpaRepository<DBBarnetrygdSøknad, String> {
     fun hentDBSøknad(soknadId: Long): DBBarnetrygdSøknad?
 
     @Modifying
-    @Transactional
     @Query(value = "DELETE FROM Soknad s WHERE s.id = :soknadId")
     fun slettSøknad(soknadId: Long)
 }

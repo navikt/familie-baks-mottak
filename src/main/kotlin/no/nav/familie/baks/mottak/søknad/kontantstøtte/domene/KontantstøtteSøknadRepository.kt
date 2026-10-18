@@ -12,7 +12,6 @@ interface KontantstøtteSøknadRepository : JpaRepository<DBKontantstøtteSøkna
     fun hentSøknad(soknadId: Long): DBKontantstøtteSøknad?
 
     @Modifying
-    @Transactional
     @Query(value = "DELETE FROM kontantstotte_soknad s WHERE s.id = :soknadId")
     fun slettSøknad(soknadId: Long)
 }
