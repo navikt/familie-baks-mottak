@@ -11,10 +11,9 @@ interface KontantstøtteSøknadRepository : JpaRepository<DBKontantstøtteSøkna
     @Query(value = "SELECT s FROM kontantstotte_soknad s WHERE s.id = :soknadId")
     fun hentSøknad(soknadId: Long): DBKontantstøtteSøknad?
 
-    @Query(
-        "SELECT s FROM kontantstotte_soknad s ORDER BY s.opprettetTid DESC LIMIT 1",
-    )
-    fun finnSisteLagredeSøknad(): DBKontantstøtteSøknad
+    @Modifying
+    @Query(value = "DELETE FROM kontantstotte_soknad s WHERE s.id = :soknadId")
+    fun slettSøknad(soknadId: Long)
 }
 
 @Repository

@@ -85,8 +85,10 @@ class KontantstøtteSøknadService(
         return vedleggMap
     }
 
-    fun slettLagredeDBKontantstøtteVedlegg(søknad: DBKontantstøtteSøknad) {
+    @Transactional
+    fun slettDBKontantstøtteSøknadOgVedlegg(søknad: DBKontantstøtteSøknad) {
         kontantstøtteVedleggRepository.slettAlleVedlegg(søknad.id)
+        kontantstøtteSøknadRepository.slettSøknad(søknad.id)
     }
 
     private fun hentOgLagreSøknadvedlegg(

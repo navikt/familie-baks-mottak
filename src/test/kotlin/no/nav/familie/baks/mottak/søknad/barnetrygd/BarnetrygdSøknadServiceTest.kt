@@ -2,6 +2,7 @@ package no.nav.familie.baks.mottak.søknad.barnetrygd
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verifyOrder
 import no.nav.familie.baks.mottak.integrasjoner.FamilieDokumentClientService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBBarnetrygdSøknad
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.DBVedlegg
@@ -156,9 +157,9 @@ class BarnetrygdSøknadServiceTest {
     }
 
     @Nested
-    inner class SlettLagredeVedleggTest {
+    inner class SlettDBSøknadOgVedleggTest {
         @Test
-        fun `skal slette lagrede vedlegg i repoet`() {
+        fun `skal slette vedlegg og søknad i repoene`() {
             // Arrange
             val søknad =
                 DBBarnetrygdSøknad(
@@ -166,16 +167,17 @@ class BarnetrygdSøknadServiceTest {
                     fnr = "123",
                 )
 
-            every {
-                mockVedleggRepository.slettAlleVedlegg(søknad.id)
-            } returns Unit
+            every { mockVedleggRepository.slettAlleVedlegg(søknad.id) } returns Unit
+            every { mockSøknadRepository.slettSøknad(søknad.id) } returns Unit
 
             // Act
-            val resultat =
-                barnetrygdSøknadService.slettLagredeVedlegg(søknad)
+            barnetrygdSøknadService.slettDBSøknadOgVedlegg(søknad)
 
-            // assert
-            assertThat(resultat).isEqualTo(Unit)
+            // Assert
+            verifyOrder {
+                mockVedleggRepository.slettAlleVedlegg(søknad.id)
+                mockSøknadRepository.slettSøknad(søknad.id)
+            }
         }
     }
 }
