@@ -81,21 +81,22 @@ class OpprettSøknadBehandlingISakTask(
                 if (finnesÅpenBehandlingPåFagsak) {
                     log.info("Finnes allerede åpen behandling på fagsak $fagsakId m/ tema $tema. Hopper over opprettelsen av ny behandling")
                 } else {
-                    val søknad = baksVersjonertSøknadClientService.hentVersjonertBarnetrygdSøknad(journalpost.journalpostId)
-
                     val behandlingType = utledBehandlingstype(fagsak)
 
                     val brukAutomatiskBehandlingÅrsak =
                         featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK)
 
-                    val søkerHarHattInnvilgetBarnetrygd =
-                        hentSøkerHarHattInnvilgetBarnetrygd(
-                            behandlingType = behandlingType,
-                            brukAutomatiskBehandlingÅrsak = brukAutomatiskBehandlingÅrsak,
-                            fagsakId = fagsak.id,
-                        )
-
+                    val søknad = baksVersjonertSøknadClientService.hentVersjonertBarnetrygdSøknad(journalpost.journalpostId)
                     val søknadManglerVedlegg = søknad.harDokumentasjonsbehovUtenVedlegg()
+
+                    val skalSjekkeTidligereInnvilgetBarnetrygd = behandlingType == BehandlingType.FØRSTEGANGSBEHANDLING && brukAutomatiskBehandlingÅrsak
+
+                    val søkerHarHattInnvilgetBarnetrygd =
+                        if (skalSjekkeTidligereInnvilgetBarnetrygd) {
+                            baSakClient.søkerHarHattInnvilgetBarnetrygd(fagsak.id)
+                        } else {
+                            false
+                        }
 
                     val behandlingÅrsak =
                         utledBehandlingsårsak(
@@ -127,7 +128,7 @@ class OpprettSøknadBehandlingISakTask(
                             )
                         taskService.save(
                             Task(
-                                type = `SendAutovedtakSøknadstatistikkTilBaSakTask`.TASK_STEP_TYPE,
+                                type = SendAutovedtakSøknadstatistikkTilBaSakTask.TASK_STEP_TYPE,
                                 payload = jsonMapper.writeValueAsString(statistikkDto),
                             ),
                         )
@@ -170,15 +171,6 @@ class OpprettSøknadBehandlingISakTask(
         } else {
             BehandlingÅrsak.SØKNAD
         }
-
-    private fun hentSøkerHarHattInnvilgetBarnetrygd(
-        behandlingType: BehandlingType,
-        brukAutomatiskBehandlingÅrsak: Boolean,
-        fagsakId: Long,
-    ): Boolean =
-        behandlingType == BehandlingType.FØRSTEGANGSBEHANDLING &&
-            brukAutomatiskBehandlingÅrsak &&
-            baSakClient.søkerHarHattInnvilgetBarnetrygd(fagsakId)
 
     private fun utledStatistikkFeilårsaker(
         fagsakErLøpende: Boolean,
