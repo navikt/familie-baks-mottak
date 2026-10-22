@@ -2,8 +2,8 @@ package no.nav.familie.baks.mottak.task
 
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
-import no.nav.familie.baks.mottak.integrasjoner.AutomatiskBehandlingSøknadFeilårsak
-import no.nav.familie.baks.mottak.integrasjoner.AutomatiskBehandlingSøknadStatistikkDto
+import no.nav.familie.baks.mottak.integrasjoner.AutovedtakSøknadFeilårsak
+import no.nav.familie.baks.mottak.integrasjoner.AutovedtakSøknadStatistikkDto
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.BaksVersjonertSøknadClientService
 import no.nav.familie.baks.mottak.integrasjoner.BarnetrygdOppgaveMapper
@@ -121,13 +121,13 @@ class OpprettSøknadBehandlingISakTask(
 
                     if (årsakerTilManuellBehandling.isNotEmpty() && brukAutomatiskBehandlingÅrsak) {
                         val statistikkDto =
-                            AutomatiskBehandlingSøknadStatistikkDto(
+                            AutovedtakSøknadStatistikkDto(
                                 journalpostId = journalpost.journalpostId.toLong(),
                                 feilårsaker = årsakerTilManuellBehandling,
                             )
                         taskService.save(
                             Task(
-                                type = SendAutomatiskBehandlingSøknadstatistikkTilBaSakTask.TASK_STEP_TYPE,
+                                type = `SendAutovedtakSøknadstatistikkTilBaSakTask`.TASK_STEP_TYPE,
                                 payload = jsonMapper.writeValueAsString(statistikkDto),
                             ),
                         )
@@ -184,11 +184,11 @@ class OpprettSøknadBehandlingISakTask(
         fagsakErLøpende: Boolean,
         søkerHarHattInnvilgetBarnetrygd: Boolean,
         søknadManglerVedlegg: Boolean,
-    ): List<AutomatiskBehandlingSøknadFeilårsak> =
+    ): List<AutovedtakSøknadFeilårsak> =
         buildList {
-            if (fagsakErLøpende) add(AutomatiskBehandlingSøknadFeilårsak.SØKER_HAR_LØPENDE_BARNETRYGD)
-            if (!fagsakErLøpende && søkerHarHattInnvilgetBarnetrygd) add(AutomatiskBehandlingSøknadFeilårsak.SØKER_HAR_HATT_BARNETRYGD_TIDLIGERE)
-            if (søknadManglerVedlegg) add(AutomatiskBehandlingSøknadFeilårsak.SØKNAD_MANGLER_VEDLEGG)
+            if (fagsakErLøpende) add(AutovedtakSøknadFeilårsak.SØKER_HAR_LØPENDE_BARNETRYGD)
+            if (!fagsakErLøpende && søkerHarHattInnvilgetBarnetrygd) add(AutovedtakSøknadFeilårsak.SØKER_HAR_HATT_BARNETRYGD_TIDLIGERE)
+            if (søknadManglerVedlegg) add(AutovedtakSøknadFeilårsak.SØKNAD_MANGLER_VEDLEGG)
         }
 
     private fun utledBehandlingstype(fagsak: RestMinimalFagsak): BehandlingType {

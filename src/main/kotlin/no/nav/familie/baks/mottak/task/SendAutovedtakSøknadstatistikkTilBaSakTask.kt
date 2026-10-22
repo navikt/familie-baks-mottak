@@ -1,6 +1,6 @@
 package no.nav.familie.baks.mottak.task
 
-import no.nav.familie.baks.mottak.integrasjoner.AutomatiskBehandlingSøknadStatistikkDto
+import no.nav.familie.baks.mottak.integrasjoner.AutovedtakSøknadStatistikkDto
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.kontrakter.felles.jsonMapper
 import no.nav.familie.prosessering.AsyncTaskStep
@@ -10,24 +10,24 @@ import org.springframework.stereotype.Service
 
 @Service
 @TaskStepBeskrivelse(
-    taskStepType = SendAutomatiskBehandlingSøknadstatistikkTilBaSakTask.TASK_STEP_TYPE,
+    taskStepType = SendAutovedtakSøknadstatistikkTilBaSakTask.TASK_STEP_TYPE,
     beskrivelse = "Sender statistikk om automatisk behandling av søknader til ba-sak",
     maxAntallFeil = 3,
     settTilManuellOppfølgning = true,
 )
-class SendAutomatiskBehandlingSøknadstatistikkTilBaSakTask(
+class SendAutovedtakSøknadstatistikkTilBaSakTask(
     private val baSakClient: BaSakClient,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
         val statistikkDto =
             jsonMapper.readValue(
                 task.payload,
-                AutomatiskBehandlingSøknadStatistikkDto::class.java,
+                AutovedtakSøknadStatistikkDto::class.java,
             )
-        baSakClient.sendAutomatiskBehandlingSøknadstatistikk(statistikkDto)
+        baSakClient.sendAutovedtakSøknadstatistikk(statistikkDto)
     }
 
     companion object {
-        const val TASK_STEP_TYPE = "sendAutomatiskBehandlingSøknadstatistikkTilBaSakTask"
+        const val TASK_STEP_TYPE = "sendAutovedtakSøknadstatistikkTilBaSakTask"
     }
 }

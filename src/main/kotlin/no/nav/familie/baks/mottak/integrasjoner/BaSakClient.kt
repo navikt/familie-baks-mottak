@@ -266,8 +266,8 @@ class BaSakClient
                 }
         }
 
-        fun sendAutomatiskBehandlingSøknadstatistikk(
-            statistikkDto: AutomatiskBehandlingSøknadStatistikkDto,
+        fun sendAutovedtakSøknadstatistikk(
+            statistikkDto: AutovedtakSøknadStatistikkDto,
         ) {
             val uri = URI.create("$sakServiceUri/behandlinger/automatisk-soknad/statistikk")
 

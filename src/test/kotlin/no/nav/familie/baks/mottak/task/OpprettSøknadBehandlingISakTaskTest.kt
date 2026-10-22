@@ -7,8 +7,8 @@ import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggle
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
-import no.nav.familie.baks.mottak.integrasjoner.AutomatiskBehandlingSøknadFeilårsak
-import no.nav.familie.baks.mottak.integrasjoner.AutomatiskBehandlingSøknadStatistikkDto
+import no.nav.familie.baks.mottak.integrasjoner.AutovedtakSøknadFeilårsak
+import no.nav.familie.baks.mottak.integrasjoner.AutovedtakSøknadStatistikkDto
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.BaksVersjonertSøknadClientService
 import no.nav.familie.baks.mottak.integrasjoner.BarnetrygdOppgaveMapper
@@ -147,7 +147,7 @@ class OpprettSøknadBehandlingISakTaskTest {
                     søknadsinfo = any(),
                 )
             }
-            verifiserStatistikkTask(AutomatiskBehandlingSøknadFeilårsak.SØKER_HAR_LØPENDE_BARNETRYGD)
+            verifiserStatistikkTask(AutovedtakSøknadFeilårsak.SØKER_HAR_LØPENDE_BARNETRYGD)
         }
 
         @Test
@@ -198,7 +198,7 @@ class OpprettSøknadBehandlingISakTaskTest {
                     søknadsinfo = any(),
                 )
             }
-            verifiserStatistikkTask(AutomatiskBehandlingSøknadFeilårsak.SØKER_HAR_HATT_BARNETRYGD_TIDLIGERE)
+            verifiserStatistikkTask(AutovedtakSøknadFeilårsak.SØKER_HAR_HATT_BARNETRYGD_TIDLIGERE)
         }
 
         @Test
@@ -260,7 +260,7 @@ class OpprettSøknadBehandlingISakTaskTest {
                     søknadsinfo = any(),
                 )
             }
-            verifiserStatistikkTask(AutomatiskBehandlingSøknadFeilårsak.SØKNAD_MANGLER_VEDLEGG)
+            verifiserStatistikkTask(AutovedtakSøknadFeilårsak.SØKNAD_MANGLER_VEDLEGG)
         }
 
         @Test
@@ -287,18 +287,18 @@ class OpprettSøknadBehandlingISakTaskTest {
 
             // Assert
             verifiserStatistikkTask(
-                AutomatiskBehandlingSøknadFeilårsak.SØKER_HAR_HATT_BARNETRYGD_TIDLIGERE,
-                AutomatiskBehandlingSøknadFeilårsak.SØKNAD_MANGLER_VEDLEGG,
+                AutovedtakSøknadFeilårsak.SØKER_HAR_HATT_BARNETRYGD_TIDLIGERE,
+                AutovedtakSøknadFeilårsak.SØKNAD_MANGLER_VEDLEGG,
             )
         }
     }
 
-    private fun verifiserStatistikkTask(vararg forventedeFeilårsaker: AutomatiskBehandlingSøknadFeilårsak) {
+    private fun verifiserStatistikkTask(vararg forventedeFeilårsaker: AutovedtakSøknadFeilårsak) {
         val taskSlot = slot<Task>()
         verify(exactly = 1) { taskService.save(capture(taskSlot)) }
 
-        val statistikkDto = jsonMapper.readValue(taskSlot.captured.payload, AutomatiskBehandlingSøknadStatistikkDto::class.java)
-        assertThat(taskSlot.captured.type).isEqualTo(SendAutomatiskBehandlingSøknadstatistikkTilBaSakTask.TASK_STEP_TYPE)
+        val statistikkDto = jsonMapper.readValue(taskSlot.captured.payload, AutovedtakSøknadStatistikkDto::class.java)
+        assertThat(taskSlot.captured.type).isEqualTo(`SendAutovedtakSøknadstatistikkTilBaSakTask`.TASK_STEP_TYPE)
         assertThat(statistikkDto.journalpostId).isEqualTo(journalpostId.toLong())
         assertThat(statistikkDto.feilårsaker).containsExactlyInAnyOrder(*forventedeFeilårsaker)
     }
