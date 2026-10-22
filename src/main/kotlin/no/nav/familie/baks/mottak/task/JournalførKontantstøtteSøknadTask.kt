@@ -13,7 +13,6 @@ import no.nav.familie.prosessering.domene.Task
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import org.springframework.web.client.HttpClientErrorException
 
 @Service
 @TaskStepBeskrivelse(
@@ -62,13 +61,6 @@ class JournalførKontantstøtteSøknadTask(
                     ByteArray(0)
                 }
             journalføringService.journalførKontantstøtteSøknad(dbKontantstøtteSøknad, bokmålPdf, orginalspråkPdf)
-        } catch (e: HttpClientErrorException.Conflict) {
-            // Dersom søknaden allerede er journalført får vi 409-Conflict. Vi ønsker ikke å feile tasken når dette skjer.
-            logger.error("409 conflict for eksternReferanseId ved journalføring av kontantstøtte-søknad. taskId=${task.id}. Se task eller securelog")
-            SECURE_LOGGER.error(
-                "409 conflict for eksternReferanseId ved journalføring av kontantstøtte-søknad $task ${e.responseBodyAsString}",
-                e,
-            )
         } catch (e: Exception) {
             logger.error("Uventet feil ved journalføring av kontantstøtte-søknad. taskId=${task.id}. Se task eller securelog")
             SECURE_LOGGER.error("Uventet feil ved journalføring søknad $task", e)

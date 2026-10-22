@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.util.Properties
+import kotlin.test.assertNull
 
 @ExtendWith(SpringExtension::class)
 @ActiveProfiles("postgres", "mock-dokarkiv-conflict", "mock-dokgen", "testcontainers")
@@ -29,18 +30,21 @@ class EksternReferanseIdTest(
     val dbSøknad = søknad.tilDBSøknad()
 
     @Test
-    fun `ved (409 Conflict) fra dokarkiv skal HttpClientErrorException Conflict catches og håndteres i task'en`() {
-        val dbSøknadFraDBFirst = barnetrygdSøknadService.lagreDBSøknad(dbSøknad.copy(journalpostId = null))
-        val properties = Properties().apply { this["søkersFødselsnummer"] = dbSøknadFraDBFirst.fnr }
+    fun `ved 409 Conflict fra dokarkiv skal tasken ikke feile og søknaden slettes fra databasen`() {
+        // Arrange
+        val dbSøknadFraDB = barnetrygdSøknadService.lagreDBSøknad(dbSøknad)
+        val properties = Properties().apply { this["søkersFødselsnummer"] = dbSøknadFraDB.fnr }
 
+        // Act & Assert
         assertDoesNotThrow {
             journalførSøknadTask.doTask(
                 Task(
                     type = JournalførSøknadTask.JOURNALFØR_SØKNAD,
-                    payload = dbSøknadFraDBFirst.id.toString(),
+                    payload = dbSøknadFraDB.id.toString(),
                     properties = properties,
                 ),
             )
         }
+        assertNull(barnetrygdSøknadService.hentDBSøknad(dbSøknadFraDB.id))
     }
 }

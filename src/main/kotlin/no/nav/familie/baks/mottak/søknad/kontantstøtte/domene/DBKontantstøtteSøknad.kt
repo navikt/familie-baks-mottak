@@ -32,8 +32,6 @@ data class DBKontantstøtteSøknad(
     val fnr: String,
     @Column(name = "opprettet_tid")
     val opprettetTid: LocalDateTime = LocalDateTime.now(),
-    @Column(name = "journalpost_id")
-    val journalpostId: String? = null,
 ) {
     fun hentVersjonertKontantstøtteSøknad(): StøttetVersjonertKontantstøtteSøknad = jsonMapper.readValue(søknadJson, StøttetVersjonertKontantstøtteSøknad::class.java)
 }
