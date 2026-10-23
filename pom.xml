@@ -188,7 +188,7 @@
         <dependency>
             <groupId>no.nav.familie</groupId>
             <artifactId>baks-dokgen</artifactId>
-            <version>1.0_20261001085327_8c0da95</version>
+            <version>1.0_20261023081422_6d525f0</version>
         </dependency>
         <!-- Kafka -->
         <dependency>
@@ -274,6 +274,12 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test-junit5</artifactId>
             <version>${kotlin.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>3.0.8</version>
             <scope>test</scope>
         </dependency>
         <dependency>
