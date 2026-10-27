@@ -48,4 +48,21 @@ class CacheConfig {
                 return ConcurrentMapCache(name, concurrentMap, true)
             }
         }
+
+    @Bean
+    fun soknadCacheManager(): CacheManager =
+        object : ConcurrentMapCacheManager() {
+            override fun createConcurrentMapCache(name: String): Cache {
+                val concurrentMap =
+                    Caffeine
+                        .newBuilder()
+                        .initialCapacity(10)
+                        .maximumSize(100)
+                        .expireAfterWrite(10, TimeUnit.MINUTES)
+                        .recordStats()
+                        .build<Any, Any>()
+                        .asMap()
+                return ConcurrentMapCache(name, concurrentMap, true)
+            }
+        }
 }

@@ -77,12 +77,6 @@ class KontantstøtteSøknadService(
 
     fun hentDBKontantstøtteSøknad(søknadId: Long): DBKontantstøtteSøknad? = kontantstøtteSøknadRepository.hentSøknad(søknadId)
 
-    fun finnDBKontantstøtteSøknadForJournalpost(journalpostId: String): DBKontantstøtteSøknad? = kontantstøtteSøknadRepository.finnSøknadForJournalpost(journalpostId = journalpostId)
-
-    fun hentDBKontantstøtteSøknadForJournalpost(journalpostId: String): DBKontantstøtteSøknad =
-        kontantstøtteSøknadRepository.finnSøknadForJournalpost(journalpostId = journalpostId)
-            ?: throw IllegalStateException("Fant ikke søknad for journalpost $journalpostId")
-
     fun hentLagredeDBKontantstøtteVedlegg(søknad: DBKontantstøtteSøknad): Map<String, DBKontantstotteVedlegg> {
         val vedleggMap = mutableMapOf<String, DBKontantstotteVedlegg>()
         kontantstøtteVedleggRepository.hentAlleVedlegg(søknad.id).forEach {
@@ -91,8 +85,10 @@ class KontantstøtteSøknadService(
         return vedleggMap
     }
 
-    fun slettLagredeDBKontantstøtteVedlegg(søknad: DBKontantstøtteSøknad) {
+    @Transactional
+    fun slettDBKontantstøtteSøknadOgVedlegg(søknad: DBKontantstøtteSøknad) {
         kontantstøtteVedleggRepository.slettAlleVedlegg(søknad.id)
+        kontantstøtteSøknadRepository.slettSøknad(søknad.id)
     }
 
     private fun hentOgLagreSøknadvedlegg(

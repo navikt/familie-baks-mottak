@@ -4,8 +4,6 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.baks.mottak.DevLauncher
 import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
-import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.SøknadRepository
-import no.nav.familie.baks.mottak.søknad.kontantstøtte.domene.KontantstøtteSøknadRepository
 import no.nav.familie.kontrakter.felles.Behandlingstema
 import no.nav.familie.kontrakter.felles.BrukerIdType
 import no.nav.familie.kontrakter.felles.Tema
@@ -32,26 +30,23 @@ class OppgaveMapperTest(
     private val journalpostClient: JournalpostClient,
     @Autowired
     private val mockPdlClientService: PdlClientService,
-    @Autowired
-    private val barnetrygdSøknadRepository: SøknadRepository,
-    @Autowired
-    private val kontantstøtteSøknadRepository: KontantstøtteSøknadRepository,
 ) {
     private val mockEnhetsnummerService: EnhetsnummerService = mockk()
+    private val mockBaksVersjonertSøknadClientService: BaksVersjonertSøknadClientService = mockk()
     private val featureToggleService: FeatureToggleService = mockk()
 
     private val barnetrygdOppgaveMapper: IOppgaveMapper =
         BarnetrygdOppgaveMapper(
             enhetsnummerService = mockEnhetsnummerService,
             pdlClientService = mockPdlClientService,
-            søknadRepository = barnetrygdSøknadRepository,
+            baksVersjonertSøknadClientService = mockBaksVersjonertSøknadClientService,
         )
 
     private val kontantstøtteOppgaveMapper: IOppgaveMapper =
         KontantstøtteOppgaveMapper(
             enhetsnummerService = mockEnhetsnummerService,
             pdlClientService = mockPdlClientService,
-            kontantstøtteSøknadRepository = kontantstøtteSøknadRepository,
+            baksVersjonertSøknadClientService = mockBaksVersjonertSøknadClientService,
         )
 
     @BeforeEach

@@ -8,6 +8,7 @@ import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.BARN
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus.AVSLUTTET
+import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus.LÅST
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus.LØPENDE
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus.OPPRETTET
 import no.nav.familie.baks.mottak.integrasjoner.Identgruppe
@@ -247,7 +248,7 @@ private fun List<RestFagsakDeltager>.harForelderEllerBarnPågåendeSak(baSakClie
 private fun RestFagsakDeltager.harPågåendeSak(baSakClient: BaSakClient): Boolean =
     when (fagsakStatus) {
         OPPRETTET, LØPENDE -> true
-        AVSLUTTET -> !sisteBehandlingHenlagtEllerTekniskEndring(baSakClient.hentRestFagsak(fagsakId))
+        AVSLUTTET, LÅST -> !sisteBehandlingHenlagtEllerTekniskEndring(baSakClient.hentRestFagsak(fagsakId))
     }
 
 private fun sisteBehandlingHenlagtEllerTekniskEndring(fagsak: RestFagsak): Boolean {

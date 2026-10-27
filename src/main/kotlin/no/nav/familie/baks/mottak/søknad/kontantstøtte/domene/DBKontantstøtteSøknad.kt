@@ -10,9 +10,6 @@ import jakarta.persistence.Table
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.Vedlegg
 import no.nav.familie.kontrakter.felles.jsonMapper
 import no.nav.familie.kontrakter.ks.søknad.StøttetVersjonertKontantstøtteSøknad
-import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV4
-import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV5
-import no.nav.familie.kontrakter.ks.søknad.VersjonertKontantstøtteSøknadV6
 import no.nav.familie.kontrakter.ks.søknad.v1.Søknadsvedlegg
 import java.time.LocalDateTime
 import no.nav.familie.kontrakter.ks.søknad.v4.KontantstøtteSøknad as KontantstøtteSøknadV4
@@ -35,20 +32,8 @@ data class DBKontantstøtteSøknad(
     val fnr: String,
     @Column(name = "opprettet_tid")
     val opprettetTid: LocalDateTime = LocalDateTime.now(),
-    @Column(name = "journalpost_id")
-    val journalpostId: String? = null,
 ) {
     fun hentVersjonertKontantstøtteSøknad(): StøttetVersjonertKontantstøtteSøknad = jsonMapper.readValue(søknadJson, StøttetVersjonertKontantstøtteSøknad::class.java)
-}
-
-fun DBKontantstøtteSøknad.harEøsSteg(): Boolean {
-    val versjonertSøknad = this.hentVersjonertKontantstøtteSøknad()
-
-    return when (versjonertSøknad) {
-        is VersjonertKontantstøtteSøknadV4 -> versjonertSøknad.kontantstøtteSøknad.søker.harEøsSteg
-        is VersjonertKontantstøtteSøknadV5 -> versjonertSøknad.kontantstøtteSøknad.søker.harEøsSteg
-        is VersjonertKontantstøtteSøknadV6 -> versjonertSøknad.kontantstøtteSøknad.søker.harEøsSteg
-    }
 }
 
 @Entity(name = "kontantstotte_soknad_vedlegg")

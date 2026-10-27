@@ -9,6 +9,7 @@ import no.nav.familie.kontrakter.felles.dokarkiv.v2.ArkiverDokumentRequest
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.web.client.HttpClientErrorException
 
 @Service
 class JournalføringService(
@@ -21,28 +22,20 @@ class JournalføringService(
         pdf: ByteArray,
         pdfOriginalSpråk: ByteArray = ByteArray(0),
     ) {
-        if (dbBarnetrygdSøknad.journalpostId == null) {
-            val vedlegg = barnetrygdSøknadService.hentLagredeVedlegg(dbBarnetrygdSøknad)
+        val vedlegg = barnetrygdSøknadService.hentLagredeVedlegg(dbBarnetrygdSøknad)
 
-            val arkiverDokumentRequest =
-                ArkiverDokumentRequestMapper.toDto(
-                    dbBarnetrygdSøknad = dbBarnetrygdSøknad,
-                    versjonertBarnetrygdSøknad = dbBarnetrygdSøknad.hentVersjonertBarnetrygdSøknad(),
-                    pdf = pdf,
-                    vedleggMap = vedlegg,
-                    pdfOriginalSpråk = pdfOriginalSpråk,
-                )
-            val journalpostId: String = arkiverSøknad(arkiverDokumentRequest)
-            val dbSøknadMedJournalpostId = dbBarnetrygdSøknad.copy(journalpostId = journalpostId)
+        val arkiverDokumentRequest =
+            ArkiverDokumentRequestMapper.toDto(
+                dbBarnetrygdSøknad = dbBarnetrygdSøknad,
+                versjonertBarnetrygdSøknad = dbBarnetrygdSøknad.hentVersjonertBarnetrygdSøknad(),
+                pdf = pdf,
+                vedleggMap = vedlegg,
+                pdfOriginalSpråk = pdfOriginalSpråk,
+            )
+        arkiverSøknadHvisIkkeAlleredeArkivert(arkiverDokumentRequest)
 
-            barnetrygdSøknadService.lagreDBSøknad(dbSøknadMedJournalpostId)
-            log.info("Søknaden er journalført og lagret til database")
-
-            barnetrygdSøknadService.slettLagredeVedlegg(dbBarnetrygdSøknad)
-            log.info("Vedlegg for søknad slettet fra database etter journalføring")
-        } else {
-            log.warn("Søknaden har allerede blitt journalført med journalpostId: ${dbBarnetrygdSøknad.journalpostId}")
-        }
+        barnetrygdSøknadService.slettDBSøknadOgVedlegg(dbBarnetrygdSøknad)
+        log.info("Søknad og vedlegg er slettet fra databasen etter journalføring")
     }
 
     fun journalførKontantstøtteSøknad(
@@ -50,27 +43,20 @@ class JournalføringService(
         pdf: ByteArray,
         pdfOriginalSpråk: ByteArray = ByteArray(0),
     ) {
-        if (dbKontantstøtteSøknad.journalpostId == null) {
-            val vedlegg = kontantstøtteSøknadService.hentLagredeDBKontantstøtteVedlegg(dbKontantstøtteSøknad)
+        val vedlegg = kontantstøtteSøknadService.hentLagredeDBKontantstøtteVedlegg(dbKontantstøtteSøknad)
 
-            val arkiverDokumentRequest =
-                ArkiverDokumentRequestMapper.toDto(
-                    dbKontantstøtteSøknad = dbKontantstøtteSøknad,
-                    versjonertSøknad = dbKontantstøtteSøknad.hentVersjonertKontantstøtteSøknad(),
-                    pdf = pdf,
-                    vedleggMap = vedlegg,
-                    pdfOriginalSpråk = pdfOriginalSpråk,
-                )
-            val journalpostId: String = arkiverSøknad(arkiverDokumentRequest)
-            val dbSøknadMedJournalpostId = dbKontantstøtteSøknad.copy(journalpostId = journalpostId)
-            kontantstøtteSøknadService.lagreDBKontantstøtteSøknad(dbSøknadMedJournalpostId)
-            log.info("Søknaden er journalført og lagret til database")
+        val arkiverDokumentRequest =
+            ArkiverDokumentRequestMapper.toDto(
+                dbKontantstøtteSøknad = dbKontantstøtteSøknad,
+                versjonertSøknad = dbKontantstøtteSøknad.hentVersjonertKontantstøtteSøknad(),
+                pdf = pdf,
+                vedleggMap = vedlegg,
+                pdfOriginalSpråk = pdfOriginalSpråk,
+            )
+        arkiverSøknadHvisIkkeAlleredeArkivert(arkiverDokumentRequest)
 
-            kontantstøtteSøknadService.slettLagredeDBKontantstøtteVedlegg(dbKontantstøtteSøknad)
-            log.info("Vedlegg for søknad slettet fra database etter journalføring")
-        } else {
-            log.warn("Søknaden har allerede blitt journalført med journalpostId: ${dbKontantstøtteSøknad.journalpostId}")
-        }
+        kontantstøtteSøknadService.slettDBKontantstøtteSøknadOgVedlegg(dbKontantstøtteSøknad)
+        log.info("Søknad og vedlegg er slettet fra databasen etter journalføring")
     }
 
     fun arkiverSøknad(arkiverDokumentRequest: ArkiverDokumentRequest): String {
@@ -79,7 +65,21 @@ class JournalføringService(
         return arkiverDokumentResponse.journalpostId
     }
 
+    private fun arkiverSøknadHvisIkkeAlleredeArkivert(arkiverDokumentRequest: ArkiverDokumentRequest) {
+        try {
+            arkiverSøknad(arkiverDokumentRequest)
+        } catch (e: HttpClientErrorException.Conflict) {
+            // Dokarkiv svarer 409 når søknaden allerede er journalført med samme eksternReferanseId
+            log.error("409 conflict for eksternReferanseId=${arkiverDokumentRequest.eksternReferanseId} ved journalføring av søknad. Søknaden er allerede journalført")
+            SECURE_LOGGER.error(
+                "409 conflict for eksternReferanseId=${arkiverDokumentRequest.eksternReferanseId} ved journalføring av søknad ${e.responseBodyAsString}",
+                e,
+            )
+        }
+    }
+
     companion object {
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
+        private val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
     }
 }

@@ -2,8 +2,12 @@ package no.nav.familie.baks.mottak.task
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
+import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.DokarkivClient
+import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
+import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
+import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.journalpost.Journalstatus
 import no.nav.familie.prosessering.AsyncTaskStep
@@ -23,6 +27,8 @@ class OppdaterOgFerdigstillJournalpostTask(
     private val journalpostClient: JournalpostClient,
     private val dokarkivClient: DokarkivClient,
     private val taskService: TaskService,
+    private val baSakClient: BaSakClient,
+    private val ksSakClient: KsSakClient,
 ) : AsyncTaskStep {
     val log: Logger = LoggerFactory.getLogger(OppdaterOgFerdigstillJournalpostTask::class.java)
     val secureLogger: Logger = LoggerFactory.getLogger("secureLogger")
@@ -41,6 +47,8 @@ class OppdaterOgFerdigstillJournalpostTask(
 
         when (journalpost.journalstatus) {
             Journalstatus.MOTTATT -> {
+                låsOppFagsakHvisLåst(fagsakId.toLong(), tema)
+
                 runCatching {
                     // forsøk å journalføre automatisk
                     dokarkivClient.oppdaterJournalpostSak(journalpost, fagsakId, tema)
@@ -92,7 +100,30 @@ class OppdaterOgFerdigstillJournalpostTask(
         }
     }
 
+    // Joark avviser ferdigstilling mot avsluttet sak. Opplåsing av fagsaken gjenåpner saken i Joark.
+    private fun låsOppFagsakHvisLåst(
+        fagsakId: Long,
+        tema: Tema,
+    ) {
+        when (tema) {
+            Tema.BAR -> baSakClient.hentMinimalRestFagsak(fagsakId).låsOppHvisLåst(tema, baSakClient::låsOppFagsak)
+            Tema.KON -> ksSakClient.hentMinimalRestFagsak(fagsakId).låsOppHvisLåst(tema, ksSakClient::låsOppFagsak)
+            else -> Unit
+        }
+    }
+
+    private fun RestMinimalFagsak.låsOppHvisLåst(
+        tema: Tema,
+        låsOppFagsak: (fagsakId: Long, begrunnelse: String) -> RestMinimalFagsak,
+    ) {
+        if (status != FagsakStatus.LÅST) return
+
+        log.info("Fagsak $id m/ tema $tema er låst. Låser opp fagsak")
+        låsOppFagsak(id, BEGRUNNELSE_FOR_OPPLÅSING)
+    }
+
     companion object {
+        private const val BEGRUNNELSE_FOR_OPPLÅSING = "Fagsaken låses opp grunnet automatisk journalføring fra baks-mottak"
         const val TASK_STEP_TYPE = "oppdaterOgFerdigstillJournalpost"
     }
 }

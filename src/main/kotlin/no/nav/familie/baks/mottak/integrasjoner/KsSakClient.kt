@@ -96,4 +96,9 @@ class KsSakClient
                     throw IntegrasjonException("Feil ved opprettelse av behandling i ks-sak.", it, uri)
                 }
         }
+
+        fun låsOppFagsak(
+            fagsakId: Long,
+            begrunnelse: String,
+        ): RestMinimalFagsak = restClient.låsOppFagsak(ksSakServiceUri, fagsakId, begrunnelse)
     }

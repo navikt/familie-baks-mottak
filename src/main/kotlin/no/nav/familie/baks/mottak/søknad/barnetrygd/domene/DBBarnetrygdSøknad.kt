@@ -8,9 +8,6 @@ import jakarta.persistence.Id
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import no.nav.familie.kontrakter.ba.søknad.StøttetVersjonertBarnetrygdSøknad
-import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV10
-import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV8
-import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
 import no.nav.familie.kontrakter.ba.søknad.v7.Søknadsvedlegg
 import no.nav.familie.kontrakter.felles.jsonMapper
 import java.time.LocalDateTime
@@ -30,8 +27,6 @@ data class DBBarnetrygdSøknad(
     val fnr: String,
     @Column(name = "opprettet_tid")
     val opprettetTid: LocalDateTime = LocalDateTime.now(),
-    @Column(name = "journalpost_id")
-    val journalpostId: String? = null,
 ) {
     fun hentVersjonertBarnetrygdSøknad(): StøttetVersjonertBarnetrygdSøknad = jsonMapper.readValue(søknadJson, StøttetVersjonertBarnetrygdSøknad::class.java)
 }
@@ -101,15 +96,5 @@ fun Søknadsvedlegg.tilDBVedlegg(
         søknadId = søknad.id,
         data = data,
     )
-
-fun DBBarnetrygdSøknad.harEøsSteg(): Boolean {
-    val versjonertSøknad = this.hentVersjonertBarnetrygdSøknad()
-
-    return when (versjonertSøknad) {
-        is VersjonertBarnetrygdSøknadV8 -> versjonertSøknad.barnetrygdSøknad.søker.harEøsSteg
-        is VersjonertBarnetrygdSøknadV9 -> versjonertSøknad.barnetrygdSøknad.søker.harEøsSteg
-        is VersjonertBarnetrygdSøknadV10 -> versjonertSøknad.barnetrygdSøknad.søker.harEøsSteg
-    }
-}
 
 class FødselsnummerErNullException : Exception()

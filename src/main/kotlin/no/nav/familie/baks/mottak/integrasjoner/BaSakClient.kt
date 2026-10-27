@@ -177,6 +177,20 @@ class BaSakClient
             )
         }
 
+        fun søkerHarHattInnvilgetBarnetrygd(fagsakId: Long): Boolean {
+            val uri = URI.create("$sakServiceUri/barnetrygdhistorikk/fagsak/$fagsakId/soker-har-hatt-innvilget-barnetrygd")
+            return runCatching {
+                restClient
+                    .get()
+                    .uri(uri)
+                    .retrieve()
+                    .body<Ressurs<Boolean>>()!!
+            }.fold(
+                onSuccess = { it.data ?: throw IntegrasjonException(it.melding, null, uri) },
+                onFailure = { throw IntegrasjonException("Feil ved sjekk av om søker har hatt utbetaling i ba-sak.", it, uri) },
+            )
+        }
+
         fun hentRestFagsak(fagsakId: Long): RestFagsak {
             val uri = URI.create("$sakServiceUri/fagsaker/$fagsakId")
             return runCatching {
@@ -252,6 +266,24 @@ class BaSakClient
                 }
         }
 
+        fun sendAutovedtakSøknadstatistikk(
+            statistikkDto: AutovedtakSøknadStatistikkDto,
+        ) {
+            val uri = URI.create("$sakServiceUri/behandlinger/automatisk-soknad/statistikk")
+
+            runCatching {
+                restClient
+                    .post()
+                    .uri(uri)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(statistikkDto)
+                    .retrieve()
+                    .toBodilessEntity()
+            }.onFailure {
+                throw IntegrasjonException("Feil ved sending av statistikk for automatisk behandling av søknad til ba-sak.", it, uri)
+            }
+        }
+
         fun hentFagsakForSkjermetBarn(personIdent: String): List<RestFagsakSkjermetBarn> {
             val uri = URI.create("$sakServiceUri/fagsaker/hent-fagsaker-paa-person")
             return runCatching {
@@ -271,4 +303,9 @@ class BaSakClient
                 onFailure = { throw IntegrasjonException("Feil ved henting av fagsak skjermet barn fra ba-sak.", it, uri) },
             )
         }
+
+        fun låsOppFagsak(
+            fagsakId: Long,
+            begrunnelse: String,
+        ): RestMinimalFagsak = restClient.låsOppFagsak(sakServiceUri, fagsakId, begrunnelse)
     }
