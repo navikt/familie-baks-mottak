@@ -16,6 +16,7 @@ import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
 import no.nav.familie.baks.mottak.integrasjoner.Søknadsinfo
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
+import no.nav.familie.baks.mottak.journalføring.AdressebeskyttelesesgraderingService
 import no.nav.familie.baks.mottak.søknad.barnetrygd.domene.harDokumentasjonsbehovUtenVedlegg
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.jsonMapper
@@ -42,6 +43,7 @@ class OpprettSøknadBehandlingISakTask(
     private val featureToggleService: FeatureToggleService,
     private val taskService: TaskService,
     private val baksVersjonertSøknadClientService: BaksVersjonertSøknadClientService,
+    private val adressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService,
 ) : AsyncTaskStep {
     val log: Logger = LoggerFactory.getLogger(OpprettSøknadBehandlingISakTask::class.java)
 
@@ -104,6 +106,9 @@ class OpprettSøknadBehandlingISakTask(
                             brukAutomatiskBehandlingÅrsak = brukAutomatiskBehandlingÅrsak,
                             søkerHarHattInnvilgetBarnetrygd = søkerHarHattInnvilgetBarnetrygd,
                             søknadManglerVedlegg = søknadManglerVedlegg,
+                            søkerEllerBarnHarStrengtFortroligAdresse = {
+                                adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(tema, journalpost)
+                            },
                         )
 
                     val kategori = barnetrygdOppgaveMapper.utledBehandlingKategoriFraSøknad(søknad)
@@ -153,19 +158,18 @@ class OpprettSøknadBehandlingISakTask(
         }
     }
 
-    // Kun førstegangsbehandlinger der søker aldri har hatt utbetaling skal behandles automatisk.
-    // Har bruker en fagsak med løpende utbetaling blir det en revurdering, og den skal fortsatt gå til manuell behandling.
-    // Søknader som har hatt dokumentasjonskrav uten at vedlegg har blitt lastet opp skal også til manuell behandling.
     private fun utledBehandlingsårsak(
         behandlingType: BehandlingType,
         brukAutomatiskBehandlingÅrsak: Boolean,
         søkerHarHattInnvilgetBarnetrygd: Boolean,
         søknadManglerVedlegg: Boolean,
+        søkerEllerBarnHarStrengtFortroligAdresse: () -> Boolean,
     ): BehandlingÅrsak =
         if (behandlingType == BehandlingType.FØRSTEGANGSBEHANDLING &&
             brukAutomatiskBehandlingÅrsak &&
             !søkerHarHattInnvilgetBarnetrygd &&
-            !søknadManglerVedlegg
+            !søknadManglerVedlegg &&
+            !søkerEllerBarnHarStrengtFortroligAdresse()
         ) {
             BehandlingÅrsak.AUTOMATISK_BEHANDLING_AV_SØKNAD
         } else {

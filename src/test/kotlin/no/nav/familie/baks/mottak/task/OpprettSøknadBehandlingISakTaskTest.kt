@@ -21,6 +21,7 @@ import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.KontantstøtteOppgaveMapper
 import no.nav.familie.baks.mottak.integrasjoner.KsSakClient
 import no.nav.familie.baks.mottak.integrasjoner.RestMinimalFagsak
+import no.nav.familie.baks.mottak.journalføring.AdressebeskyttelesesgraderingService
 import no.nav.familie.baks.mottak.søknad.SøknadTestData
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknad
 import no.nav.familie.kontrakter.ba.søknad.VersjonertBarnetrygdSøknadV9
@@ -34,6 +35,7 @@ import no.nav.familie.kontrakter.felles.jsonMapper
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -47,6 +49,7 @@ class OpprettSøknadBehandlingISakTaskTest {
     private val featureToggleService = mockk<FeatureToggleService>()
     private val baksVersjonertSøknadClientService = mockk<BaksVersjonertSøknadClientService>()
     private val taskService = mockk<TaskService>(relaxed = true)
+    private val adressebeskyttelesesgraderingService = mockk<AdressebeskyttelesesgraderingService>()
 
     private val opprettSøknadBehandlingISakTask =
         OpprettSøknadBehandlingISakTask(
@@ -58,6 +61,7 @@ class OpprettSøknadBehandlingISakTaskTest {
             featureToggleService = featureToggleService,
             baksVersjonertSøknadClientService = baksVersjonertSøknadClientService,
             taskService = taskService,
+            adressebeskyttelesesgraderingService = adressebeskyttelesesgraderingService,
         )
 
     private val journalpostId = "1"
@@ -91,6 +95,7 @@ class OpprettSøknadBehandlingISakTaskTest {
         justRun { baSakClient.opprettBehandling(any(), any(), any(), any(), any(), any(), any(), any()) }
         every { baSakClient.søkerHarHattInnvilgetBarnetrygd(fagsakId) } returns false
         every { baksVersjonertSøknadClientService.hentVersjonertBarnetrygdSøknad(journalpostId) } returns lagSøknad()
+        every { adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(Tema.BAR, any()) } returns false
     }
 
     private fun lagSøknad(dokumentasjon: List<Søknaddokumentasjon> = listOf(SøknadTestData.lagAnnenDokumentasjon())) = VersjonertBarnetrygdSøknadV9(barnetrygdSøknad = SøknadTestData.barnetrygdSøknad(dokumentasjon = dokumentasjon))
@@ -290,6 +295,70 @@ class OpprettSøknadBehandlingISakTaskTest {
                 AutovedtakSøknadFeilårsak.SØKER_HAR_HATT_BARNETRYGD_TIDLIGERE,
                 AutovedtakSøknadFeilårsak.SØKNAD_MANGLER_VEDLEGG,
             )
+        }
+
+        @Test
+        fun `skal opprette manuell førstegangsbehandling uten statistikk når søker eller barn har strengt fortrolig adresse`() {
+            // Arrange
+            every { baSakClient.hentMinimalRestFagsak(fagsakId) } returns lagFagsak(FagsakStatus.OPPRETTET)
+            every { featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) } returns true
+            every { adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(Tema.BAR, any()) } returns true
+
+            // Act
+            opprettSøknadBehandlingISakTask.doTask(task)
+
+            // Assert
+            verify(exactly = 1) {
+                baSakClient.opprettBehandling(
+                    kategori = any(),
+                    underkategori = any(),
+                    søkersIdent = any(),
+                    behandlingÅrsak = BehandlingÅrsak.SØKNAD,
+                    søknadMottattDato = any(),
+                    behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    fagsakId = any(),
+                    søknadsinfo = any(),
+                )
+            }
+            verify(exactly = 0) { taskService.save(any()) }
+        }
+
+        @Test
+        fun `skal ikke sjekke adressebeskyttelse når søknaden uansett skal behandles manuelt`() {
+            // Arrange
+            every { baSakClient.hentMinimalRestFagsak(fagsakId) } returns lagFagsak(FagsakStatus.LØPENDE)
+            every { featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) } returns true
+
+            // Act
+            opprettSøknadBehandlingISakTask.doTask(task)
+
+            // Assert
+            verify(exactly = 0) { adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(any(), any()) }
+        }
+
+        @Test
+        fun `skal ikke sjekke adressebeskyttelse når toggelen er av`() {
+            // Arrange
+            every { baSakClient.hentMinimalRestFagsak(fagsakId) } returns lagFagsak(FagsakStatus.OPPRETTET)
+            every { featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) } returns false
+
+            // Act
+            opprettSøknadBehandlingISakTask.doTask(task)
+
+            // Assert
+            verify(exactly = 0) { adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(any(), any()) }
+        }
+
+        @Test
+        fun `skal feile og ikke opprette behandling når oppslag av adressebeskyttelse feiler`() {
+            // Arrange
+            every { baSakClient.hentMinimalRestFagsak(fagsakId) } returns lagFagsak(FagsakStatus.OPPRETTET)
+            every { featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) } returns true
+            every { adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(Tema.BAR, any()) } throws RuntimeException("PDL nede")
+
+            // Act & Assert
+            assertThatThrownBy { opprettSøknadBehandlingISakTask.doTask(task) }.isInstanceOf(RuntimeException::class.java)
+            verify(exactly = 0) { baSakClient.opprettBehandling(any(), any(), any(), any(), any(), any(), any(), any()) }
         }
     }
 
