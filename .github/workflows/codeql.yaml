@@ -57,11 +57,10 @@ jobs:
       # Autobuild attempts to build any compiled languages (C/C++, C#, Go, Java, or Swift).
       # If this step fails, then you should remove it and run the build manually (see below)
       - name: Sett opp java
-        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # ratchet:actions/setup-java@v4
+        uses: navikt/familie-baks-gha-workflows/.github/actions/setup-java-maven@main # ratchet:exclude
         with:
-          java-version: 25
-          distribution: 'temurin'
-          cache: 'maven'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          java-version: '25'
       - name: Bygg
         env:
           GITHUB_USERNAME: x-access-token
