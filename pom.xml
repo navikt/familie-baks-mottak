@@ -23,7 +23,7 @@
         <kotlin.version>2.4.21</kotlin.version>
         <mockk.version>1.14.11</mockk.version>
         <confluent.version>8.3.2</confluent.version>
-        <prosessering.version>2.20261026155201_99f3bfc</prosessering.version>
+        <prosessering.version>2.20261027150838_57ccae7</prosessering.version>
         <felles.version>4.20261026180911_c3ff6d9</felles.version>
         <kontrakter.version>4.0_20261026123216_8087cb5</kontrakter.version>
         <mock-oauth2-server.version>6.1.2</mock-oauth2-server.version>
@@ -110,7 +110,7 @@
         <dependency>
             <groupId>io.getunleash</groupId>
             <artifactId>unleash-client-java</artifactId>
-            <version>12.3.0</version>
+            <version>12.3.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.squareup.okhttp3</groupId>
