@@ -1,7 +1,5 @@
 package no.nav.familie.baks.mottak.task
 
-import io.micrometer.core.instrument.Counter
-import io.micrometer.core.instrument.Metrics
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.BARN
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
@@ -41,7 +39,6 @@ class JournalhendelseBarnetrygdRutingTask(
     private val journalpostBrukerService: JournalpostBrukerService,
 ) : AbstractJournalhendelseRutingTask(taskService) {
     private val tema = Tema.BAR
-    private val sakssystemMarkeringCounter = mutableMapOf<String, Counter>()
 
     private val log: Logger = LoggerFactory.getLogger(JournalhendelseBarnetrygdRutingTask::class.java)
 
@@ -73,7 +70,7 @@ class JournalhendelseBarnetrygdRutingTask(
         Thread.sleep(1000L)
 
         val baSak = brukersIdent?.let { søkEtterSakIBaSak(it) }
-        val sakssystemMarkering = hentSakssystemMarkering(baSak)
+        val sakssystemMarkering = baSak?.let { "${it.part} har sak i BA-sak" } ?: ""
 
         val skalAutomatiskJournalføreJournalpost =
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
@@ -98,29 +95,6 @@ class JournalhendelseBarnetrygdRutingTask(
         } else {
             opprettJournalføringOppgaveTask(sakssystemMarkering = sakssystemMarkering, task = task)
         }
-    }
-
-    private fun hentSakssystemMarkering(baSak: Sakspart?): String {
-        val sakssystemMarkering =
-            when {
-                baSak != null -> {
-                    incrementSakssystemMarkering("BA_SAK")
-                    "${baSak.part} har sak i BA-sak"
-                }
-
-                else -> {
-                    incrementSakssystemMarkering("Ingen")
-                    ""
-                }
-            }
-        return sakssystemMarkering
-    }
-
-    private fun incrementSakssystemMarkering(saksystem: String) {
-        if (!sakssystemMarkeringCounter.containsKey(saksystem)) {
-            sakssystemMarkeringCounter[saksystem] = Metrics.counter("barnetrygd.ruting.saksystem", "saksystem", saksystem)
-        }
-        sakssystemMarkeringCounter[saksystem]!!.increment()
     }
 
     private fun søkEtterSakIBaSak(brukersIdent: String): Sakspart? {
