@@ -5,21 +5,18 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.hendelser.JournalhendelseServiceTest
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.BARN
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus.LØPENDE
 import no.nav.familie.baks.mottak.integrasjoner.IdentInformasjon
-import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveClientService
 import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.journalføring.AutomatiskJournalføringBarnetrygdService
 import no.nav.familie.baks.mottak.journalføring.JournalpostBrukerService
-import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.kontrakter.felles.BrukerIdType
 import no.nav.familie.kontrakter.felles.journalpost.Bruker
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
@@ -32,8 +29,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import no.nav.familie.kontrakter.ba.infotrygd.Sak as SakDto
-import no.nav.familie.kontrakter.ba.infotrygd.Stønad as StønadDto
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SkanHendelseTaskLøypeTest {
@@ -42,8 +37,6 @@ class SkanHendelseTaskLøypeTest {
     private val mockSakClient: BaSakClient = mockk()
     private val mockTaskService: TaskService = mockk(relaxed = true)
     private val mockPdlClient: PdlClientService = mockk(relaxed = true)
-    private val mockInfotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
-    private val mockFeatureToggleService: FeatureToggleService = mockk()
     private val mockAutomatiskJournalføringBarnetrygdService: AutomatiskJournalføringBarnetrygdService = mockk()
     private val mockJournalpostBrukerService: JournalpostBrukerService = mockk()
 
@@ -51,10 +44,8 @@ class SkanHendelseTaskLøypeTest {
         JournalhendelseBarnetrygdRutingTask(
             pdlClientService = mockPdlClient,
             baSakClient = mockSakClient,
-            infotrygdBarnetrygdClient = mockInfotrygdBarnetrygdClient,
             taskService = mockTaskService,
             journalpostClient = mockJournalpostClient,
-            featureToggleService = mockFeatureToggleService,
             automatiskJournalføringBarnetrygdService = mockAutomatiskJournalføringBarnetrygdService,
             journalpostBrukerService = mockJournalpostBrukerService,
         )
@@ -101,18 +92,6 @@ class SkanHendelseTaskLøypeTest {
             mockSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
         } returns emptyList()
 
-        every {
-            mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
-        } returns InfotrygdSøkResponse(emptyList(), emptyList())
-
-        every {
-            mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
-        } returns InfotrygdSøkResponse(emptyList(), emptyList())
-
-        every {
-            mockFeatureToggleService.isEnabled(any(), any())
-        } returns false
-
         every { mockJournalpostBrukerService.tilPersonIdent(any(), any()) } returns "12345678910"
     }
 
@@ -133,7 +112,7 @@ class SkanHendelseTaskLøypeTest {
         } returns 1L
 
         every {
-            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any())
+            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any())
         } returns false
 
         // Act
@@ -158,7 +137,7 @@ class SkanHendelseTaskLøypeTest {
         } returns listOf(RestFagsakDeltager("12345678910", BARN, 1L, LØPENDE))
 
         every {
-            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any())
+            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any())
         } returns false
 
         every {
@@ -175,64 +154,6 @@ class SkanHendelseTaskLøypeTest {
     }
 
     @Test
-    fun `Oppretter oppgave med beskrivelse som sier at bruker har sak i Infotrygd`() {
-        // Arrange
-        val sakssystemMarkering = slot<String>()
-        every {
-            mockOppgaveClient.opprettJournalføringsoppgave(any(), capture(sakssystemMarkering))
-        } returns OppgaveResponse(1)
-
-        every {
-            mockInfotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
-        } returns InfotrygdSøkResponse(listOf(StønadDto()), listOf(StønadDto()))
-
-        every {
-            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any())
-        } returns false
-
-        every {
-            mockSakClient.hentFagsaknummerPåPersonident(any())
-        } returns 1L
-
-        // Act
-        kjørRutingTaskOgReturnerNesteTask().run {
-            journalføringSteg.doTask(this)
-        }
-
-        // Assert
-        assertThat(sakssystemMarkering.captured).contains("Bruker har sak i Infotrygd")
-    }
-
-    @Test
-    fun `Oppretter oppgave med beskrivelse som sier at søsken har sak i Infotrygd`() {
-        // Arrange
-        val sakssystemMarkering = slot<String>()
-        every {
-            mockOppgaveClient.opprettJournalføringsoppgave(any(), capture(sakssystemMarkering))
-        } returns OppgaveResponse(1)
-
-        every {
-            mockInfotrygdBarnetrygdClient.hentSaker(any(), any())
-        } returns InfotrygdSøkResponse(emptyList(), listOf(SakDto(status = "UB")))
-
-        every {
-            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any())
-        } returns false
-
-        every {
-            mockSakClient.hentFagsaknummerPåPersonident(any())
-        } returns 1L
-
-        // Act
-        kjørRutingTaskOgReturnerNesteTask().run {
-            journalføringSteg.doTask(this)
-        }
-
-        // Assert
-        assertThat(sakssystemMarkering.captured).contains("Søsken har sak i Infotrygd")
-    }
-
-    @Test
     fun `Oppretter oppgave uten markering av sakssystem når bruker ikke har sak fra før`() {
         // Arrange
         every {
@@ -240,7 +161,7 @@ class SkanHendelseTaskLøypeTest {
         } returns OppgaveResponse(1)
 
         every {
-            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any())
+            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any())
         } returns false
 
         every {
@@ -266,7 +187,7 @@ class SkanHendelseTaskLøypeTest {
         } returns OppgaveResponse(1)
 
         every {
-            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any(), any())
+            mockAutomatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(any())
         } returns false
 
         every {

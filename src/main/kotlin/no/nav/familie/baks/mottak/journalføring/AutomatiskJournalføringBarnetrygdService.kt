@@ -19,17 +19,10 @@ class AutomatiskJournalføringBarnetrygdService(
 ) {
     private val tema = Tema.BAR
 
-    fun skalAutomatiskJournalføres(
-        journalpost: Journalpost,
-        brukerHarSakIInfotrygd: Boolean,
-    ): Boolean {
+    fun skalAutomatiskJournalføres(journalpost: Journalpost): Boolean {
         val enheterSomIkkeSkalHaAutomatiskJournalføring = listOf("4863")
 
         if (!journalpost.harBarnetrygdSøknad()) {
-            return false
-        }
-
-        if (brukerHarSakIInfotrygd) {
             return false
         }
 

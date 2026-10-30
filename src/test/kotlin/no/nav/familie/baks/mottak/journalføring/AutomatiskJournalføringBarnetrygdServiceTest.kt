@@ -72,38 +72,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
         val skalAutomatiskJournalføres =
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
-                false,
-            )
-
-        // Assert
-        assertThat(skalAutomatiskJournalføres).isFalse()
-    }
-
-    @Test
-    fun `skal ikke automatisk journalføre journalpost om bruker har fagsak i infotrygd`() {
-        // Arrange
-        val journalpost =
-            Journalpost(
-                journalpostId = "1",
-                journalposttype = Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                dokumenter =
-                    listOf(
-                        DokumentInfo(
-                            brevkode = "NAV 33-00.07",
-                            tittel = "Søknad",
-                            dokumentstatus = Dokumentstatus.FERDIGSTILT,
-                            dokumentvarianter = emptyList(),
-                            dokumentInfoId = "id",
-                        ),
-                    ),
-            )
-
-        // Act
-        val skalAutomatiskJournalføres =
-            automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
-                journalpost,
-                true,
             )
 
         // Assert
@@ -135,7 +103,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
         val skalAutomatiskJournalføres =
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
-                false,
             )
 
         // Assert
@@ -208,7 +175,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
         val skalAutomatiskJournalføres =
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
-                false,
             )
 
         // Assert
@@ -305,7 +271,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
         val skalAutomatiskJournalføres =
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
-                false,
             )
 
         // Assert
@@ -333,7 +298,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
         val skalAutomatiskJournalføres =
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
-                false,
             )
 
         // Assert
@@ -419,7 +383,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
         val skalAutomatiskJournalføres =
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
-                false,
             )
 
         // Assert
@@ -505,7 +468,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
         val skalAutomatiskJournalføres =
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
-                false,
             )
 
         // Assert
@@ -591,7 +553,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
         val skalAutomatiskJournalføres =
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
-                false,
             )
 
         // Assert
@@ -677,7 +638,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
         val skalAutomatiskJournalføres =
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
-                false,
             )
 
         // Assert
@@ -763,7 +723,6 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
         val skalAutomatiskJournalføres =
             automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
                 journalpost,
-                false,
             )
 
         // Assert
