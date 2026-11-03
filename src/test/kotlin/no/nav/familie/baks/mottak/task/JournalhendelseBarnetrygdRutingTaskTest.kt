@@ -4,9 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.familie.baks.mottak.config.featureToggle.FeatureToggleService
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
-import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.integrasjoner.PdlNotFoundException
@@ -29,10 +27,8 @@ import kotlin.test.assertEquals
 class JournalhendelseBarnetrygdRutingTaskTest {
     private val pdlClient: PdlClientService = mockk()
     private val baSakClient: BaSakClient = mockk()
-    private val infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient = mockk()
     private val taskService: TaskService = mockk()
     private val journalpostClient: JournalpostClient = mockk()
-    private val featureToggleService: FeatureToggleService = mockk()
     private val automatiskJournalføringBarnetrygdService: AutomatiskJournalføringBarnetrygdService = mockk()
     private val journalpostBrukerService: JournalpostBrukerService = mockk()
 
@@ -40,10 +36,8 @@ class JournalhendelseBarnetrygdRutingTaskTest {
         JournalhendelseBarnetrygdRutingTask(
             pdlClientService = pdlClient,
             baSakClient = baSakClient,
-            infotrygdBarnetrygdClient = infotrygdBarnetrygdClient,
             taskService = taskService,
             journalpostClient = journalpostClient,
-            featureToggleService = featureToggleService,
             automatiskJournalføringBarnetrygdService = automatiskJournalføringBarnetrygdService,
             journalpostBrukerService = journalpostBrukerService,
         )
@@ -83,7 +77,7 @@ class JournalhendelseBarnetrygdRutingTaskTest {
 
         verify(exactly = 1) { taskService.save(any()) }
         assertEquals(OpprettJournalføringOppgaveTask.TASK_STEP_TYPE, opprettetTask.type)
-        assertEquals("Ingen bruker er satt på journalpost. Kan ikke utlede om bruker har sak i Infotrygd eller BA-sak.", opprettetTask.payload)
+        assertEquals("Ingen bruker er satt på journalpost. Kan ikke utlede om bruker har sak i BA-sak.", opprettetTask.payload)
     }
 
     @Test
