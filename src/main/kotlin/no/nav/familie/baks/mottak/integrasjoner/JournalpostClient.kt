@@ -5,10 +5,7 @@ import no.nav.familie.kontrakter.felles.getDataOrThrow
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.body
@@ -20,10 +17,10 @@ private val logger = LoggerFactory.getLogger(JournalpostClient::class.java)
 class JournalpostClient
     @Autowired
     constructor(
-        @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonerServiceUri: URI,
-        @Qualifier("integrasjonerRestClient") private val restClient: RestClient,
+        private val integrasjonerClientProvider: IntegrasjonerClientProvider,
     ) {
         fun hentJournalpost(journalpostId: String): Journalpost {
+            val (integrasjonerServiceUri, restClient) = integrasjonerClientProvider.hentKlient()
             val uri = URI.create("$integrasjonerServiceUri/journalpost?journalpostId=$journalpostId")
             logger.debug("henter journalpost med id {}", journalpostId)
             return try {

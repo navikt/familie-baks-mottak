@@ -64,6 +64,8 @@ spec:
           cluster: dev-gcp
         - application: familie-dokument
           cluster: dev-gcp
+        - application: familie-integrasjoner
+          cluster: dev-gcp
         - application: logging
           namespace: nais-system
       external:

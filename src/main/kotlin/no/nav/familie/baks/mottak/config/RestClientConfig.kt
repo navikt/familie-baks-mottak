@@ -27,6 +27,11 @@ class RestClientConfig(
         @Value("\${FAMILIE_INTEGRASJONER_SCOPE}") scope: String,
     ): RestClient = entraIDRestClientFactory.lagMaskinTilMaskinRestKlient(scope)
 
+    @Bean("integrasjonerGcpRestClient")
+    fun integrasjonerGcpRestClient(
+        @Value("\${FAMILIE_INTEGRASJONER_GCP_SCOPE}") scope: String,
+    ): RestClient = entraIDRestClientFactory.lagMaskinTilMaskinRestKlient(scope)
+
     @Bean("unauthenticatedRestClient")
     fun unauthenticatedRestClient(): RestClient =
         RestClient

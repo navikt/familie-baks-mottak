@@ -8,8 +8,6 @@ import no.nav.familie.kontrakter.felles.dokarkiv.v2.ArkiverDokumentRequest
 import no.nav.familie.kontrakter.felles.getDataOrThrow
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
@@ -20,14 +18,14 @@ private val logger = LoggerFactory.getLogger(DokarkivClient::class.java)
 
 @Component
 class DokarkivClient(
-    @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonUri: URI,
-    @Qualifier("integrasjonerRestClient") private val restClient: RestClient,
+    private val integrasjonerClientProvider: IntegrasjonerClientProvider,
 ) {
     fun oppdaterJournalpostSak(
         jp: Journalpost,
         fagsakId: String,
         tema: Tema,
     ) {
+        val (integrasjonUri, restClient) = integrasjonerClientProvider.hentKlient()
         logger.info("Oppdaterer journalpost ${jp.journalpostId} med fagsaktilknytning $fagsakId ")
         val uri = URI.create("$integrasjonUri/arkiv/v2/${jp.journalpostId}")
         val sak =
@@ -43,7 +41,7 @@ class DokarkivClient(
                 tema = tema.name,
                 sak = sak,
             )
-        when (val response = utførRequest(uri, request)) {
+        when (val response = utførRequest(uri, restClient, request)) {
             is Throwable -> throw IntegrasjonException(
                 "Oppdatering av journalpost ${jp.journalpostId} med fagsak $fagsakId feilet",
                 response,
@@ -54,6 +52,7 @@ class DokarkivClient(
     }
 
     fun arkiver(arkiverDokumentRequest: ArkiverDokumentRequest): ArkiverDokumentResponse {
+        val (integrasjonUri, restClient) = integrasjonerClientProvider.hentKlient()
         val uri = URI.create("$integrasjonUri/arkiv/v4")
         val response =
             restClient
@@ -67,15 +66,17 @@ class DokarkivClient(
     }
 
     fun ferdigstillJournalpost(journalpostId: String) {
+        val (integrasjonUri, restClient) = integrasjonerClientProvider.hentKlient()
         logger.info("Forsøker å ferdigstille journalpost $journalpostId")
         val uri = URI.create("$integrasjonUri/arkiv/v2/$journalpostId/ferdigstill?journalfoerendeEnhet=9999")
-        when (val response = utførRequest(uri)) {
+        when (val response = utførRequest(uri, restClient)) {
             is Throwable -> throw IntegrasjonException("Ferdigstilling av journalpost $journalpostId feilet", response, uri)
         }
     }
 
     private fun utførRequest(
         uri: URI,
+        restClient: RestClient,
         request: Any = "",
     ): Any =
         Result
