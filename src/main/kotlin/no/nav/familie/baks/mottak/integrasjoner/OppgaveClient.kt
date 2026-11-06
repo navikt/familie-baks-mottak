@@ -15,8 +15,6 @@ import no.nav.familie.kontrakter.felles.oppgave.OpprettOppgaveRequest
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.NestedExceptionUtils
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -30,8 +28,7 @@ private val logger = LoggerFactory.getLogger(OppgaveClient::class.java)
 class OppgaveClient
     @Autowired
     constructor(
-        @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonUri: URI,
-        @Qualifier("integrasjonerRestClient") private val restClient: RestClient,
+        private val integrasjonerClientProvider: IntegrasjonerClientProvider,
         private val oppgaveMapperService: OppgaveMapperService,
     ) {
         val secureLog: Logger = LoggerFactory.getLogger("secureLogger")
@@ -40,6 +37,7 @@ class OppgaveClient
             journalpost: Journalpost,
             beskrivelse: String? = null,
         ): OppgaveResponse {
+            val (integrasjonUri, restClient) = integrasjonerClientProvider.hentKlient()
             logger.info("Oppretter journalføringsoppgave for ${if (journalpost.erDigitalKanal()) "digital søknad" else "papirsøknad"}")
             val uri = URI.create("$integrasjonUri/oppgave/opprett")
             val request =
@@ -49,10 +47,11 @@ class OppgaveClient
                     beskrivelse,
                 )
             secureLog.info("Oppretter journalføringsoppgave for ${journalpost.journalpostId} ${request.beskrivelse}")
-            return responseFraOpprettOppgave(uri, request)
+            return responseFraOpprettOppgave(uri, restClient, request)
         }
 
         fun opprettVurderLivshendelseOppgave(dto: OppgaveVurderLivshendelseDto): OppgaveResponse {
+            val (integrasjonUri, restClient) = integrasjonerClientProvider.hentKlient()
             logger.info("Oppretter \"Vurder livshendelse\"-oppgave")
 
             val uri = URI.create("$integrasjonUri/oppgave/opprett")
@@ -72,13 +71,14 @@ class OppgaveClient
                 )
 
             secureLog.info("Oppretter vurderLivshendlseOppgave $request")
-            return responseFraOpprettOppgave(uri, request)
+            return responseFraOpprettOppgave(uri, restClient, request)
         }
 
         fun oppdaterOppgaveBeskrivelse(
             patchOppgave: Oppgave,
             beskrivelse: String,
         ): OppgaveResponse {
+            val (integrasjonUri, restClient) = integrasjonerClientProvider.hentKlient()
             val uri = URI.create("$integrasjonUri/oppgave/${patchOppgave.id}/oppdater")
             return Result
                 .runCatching {
@@ -106,6 +106,7 @@ class OppgaveClient
             journalpostId: String,
             oppgavetype: Oppgavetype?,
         ): List<Oppgave> {
+            val (integrasjonUri, restClient) = integrasjonerClientProvider.hentKlient()
             logger.info("Søker etter aktive oppgaver for $journalpostId")
             val uri = URI.create("$integrasjonUri/oppgave/v4")
             val request = FinnOppgaveRequest(journalpostId = journalpostId, tema = Tema.BAR, oppgavetype = oppgavetype)
@@ -132,6 +133,7 @@ class OppgaveClient
             oppgavetype: Oppgavetype,
             tema: Tema,
         ): List<Oppgave> {
+            val (integrasjonUri, restClient) = integrasjonerClientProvider.hentKlient()
             secureLog.info("Søker etter aktive oppgaver med tema $tema for aktørId $aktørId")
             val uri = URI.create("$integrasjonUri/oppgave/v4")
             val request = FinnOppgaveRequest(aktørId = aktørId, tema = tema, oppgavetype = oppgavetype)
@@ -155,6 +157,7 @@ class OppgaveClient
 
         private fun responseFraOpprettOppgave(
             uri: URI,
+            restClient: RestClient,
             request: OpprettOppgaveRequest,
         ): OppgaveResponse =
             Result

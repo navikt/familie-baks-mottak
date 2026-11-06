@@ -7,6 +7,7 @@ import org.wiremock.spring.EnableWireMock
     classes = [DevLauncher::class],
     properties = [
         "FAMILIE_INTEGRASJONER_API_URL=http://localhost:\${wiremock.server.port}/api",
+        "FAMILIE_INTEGRASJONER_GCP_API_URL=http://localhost:\${wiremock.server.port}/api",
         "PDL_URL=http://localhost:\${wiremock.server.port}/api",
         "NORG2_API_URL=http://localhost:\${wiremock.server.port}/norg2",
         "FAMILIE_BA_INFOTRYGD_API_URL=http://localhost:\${wiremock.server.port}",
