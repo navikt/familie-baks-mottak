@@ -39,9 +39,13 @@ prosessering:
       milliseconds: 5000
 
 management:
+  endpoint.info.access: none
   endpoint.health.show-details: always
+  info:
+    defaults:
+      enabled: false
   endpoints.web:
-    exposure.include: info, health, metrics, prometheus
+    exposure.include: health, metrics, prometheus
     base-path: "/internal"
   health:
     db:
