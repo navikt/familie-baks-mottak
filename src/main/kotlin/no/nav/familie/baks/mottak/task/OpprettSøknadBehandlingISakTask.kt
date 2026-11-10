@@ -99,11 +99,7 @@ class OpprettSøknadBehandlingISakTask(
                     val skalSjekkeTidligereInnvilgetBarnetrygd = behandlingType == BehandlingType.FØRSTEGANGSBEHANDLING && brukAutomatiskBehandlingÅrsak
 
                     val søkerHarHattInnvilgetBarnetrygd =
-                        if (skalSjekkeTidligereInnvilgetBarnetrygd) {
-                            baSakClient.søkerHarHattInnvilgetBarnetrygd(fagsak.id)
-                        } else {
-                            false
-                        }
+                        skalSjekkeTidligereInnvilgetBarnetrygd && baSakClient.søkerHarHattInnvilgetBarnetrygd(fagsak.id)
 
                     val behandlingÅrsak =
                         utledBehandlingsårsak(
