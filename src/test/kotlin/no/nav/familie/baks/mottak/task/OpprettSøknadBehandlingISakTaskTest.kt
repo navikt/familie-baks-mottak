@@ -274,6 +274,8 @@ class OpprettSøknadBehandlingISakTaskTest {
             every { baSakClient.hentMinimalRestFagsak(fagsakId) } returns lagFagsak(FagsakStatus.AVSLUTTET)
             every { featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) } returns true
             every { baSakClient.søkerHarHattInnvilgetBarnetrygd(fagsakId) } returns true
+            every { barnetrygdOppgaveMapper.utledBehandlingKategoriFraSøknad(any<VersjonertBarnetrygdSøknad>()) } returns BehandlingKategori.EØS
+            every { adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(Tema.BAR, any()) } returns true
             every { baksVersjonertSøknadClientService.hentVersjonertBarnetrygdSøknad(journalpostId) } returns
                 lagSøknad(
                     dokumentasjon =
@@ -294,11 +296,13 @@ class OpprettSøknadBehandlingISakTaskTest {
             verifiserStatistikkTask(
                 AutovedtakSøknadFeilårsak.SØKER_HAR_HATT_BARNETRYGD_TIDLIGERE,
                 AutovedtakSøknadFeilårsak.SØKNAD_MANGLER_VEDLEGG,
+                AutovedtakSøknadFeilårsak.SØKNAD_HAR_TEMA_EØS,
+                AutovedtakSøknadFeilårsak.SØKER_ELLER_BARN_HAR_KODE_6_ELLER_19,
             )
         }
 
         @Test
-        fun `skal opprette manuell førstegangsbehandling uten statistikk når søker eller barn har strengt fortrolig adresse`() {
+        fun `skal opprette manuell førstegangsbehandling og sende statistikk når søker eller barn har kode 6 eller 19`() {
             // Arrange
             every { baSakClient.hentMinimalRestFagsak(fagsakId) } returns lagFagsak(FagsakStatus.OPPRETTET)
             every { featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) } returns true
@@ -320,20 +324,50 @@ class OpprettSøknadBehandlingISakTaskTest {
                     søknadsinfo = any(),
                 )
             }
-            verify(exactly = 0) { taskService.save(any()) }
+            verifiserStatistikkTask(AutovedtakSøknadFeilårsak.SØKER_ELLER_BARN_HAR_KODE_6_ELLER_19)
         }
 
         @Test
-        fun `skal ikke sjekke adressebeskyttelse når søknaden uansett skal behandles manuelt`() {
+        fun `skal sende EØS som årsak til manuell behandling`() {
             // Arrange
-            every { baSakClient.hentMinimalRestFagsak(fagsakId) } returns lagFagsak(FagsakStatus.LØPENDE)
+            every { baSakClient.hentMinimalRestFagsak(fagsakId) } returns lagFagsak(FagsakStatus.OPPRETTET)
             every { featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) } returns true
+            every { barnetrygdOppgaveMapper.utledBehandlingKategoriFraSøknad(any<VersjonertBarnetrygdSøknad>()) } returns BehandlingKategori.EØS
 
             // Act
             opprettSøknadBehandlingISakTask.doTask(task)
 
             // Assert
-            verify(exactly = 0) { adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(any(), any()) }
+            verify(exactly = 1) {
+                baSakClient.opprettBehandling(
+                    kategori = BehandlingKategori.EØS,
+                    underkategori = any(),
+                    søkersIdent = any(),
+                    behandlingÅrsak = BehandlingÅrsak.SØKNAD,
+                    søknadMottattDato = any(),
+                    behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    fagsakId = any(),
+                    søknadsinfo = any(),
+                )
+            }
+            verifiserStatistikkTask(AutovedtakSøknadFeilårsak.SØKNAD_HAR_TEMA_EØS)
+        }
+
+        @Test
+        fun `skal sjekke adressebeskyttelse for statistikk selv om søknaden uansett skal behandles manuelt`() {
+            // Arrange
+            every { baSakClient.hentMinimalRestFagsak(fagsakId) } returns lagFagsak(FagsakStatus.LØPENDE)
+            every { featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) } returns true
+            every { adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(Tema.BAR, any()) } returns true
+
+            // Act
+            opprettSøknadBehandlingISakTask.doTask(task)
+
+            // Assert
+            verifiserStatistikkTask(
+                AutovedtakSøknadFeilårsak.SØKER_HAR_LØPENDE_BARNETRYGD,
+                AutovedtakSøknadFeilårsak.SØKER_ELLER_BARN_HAR_KODE_6_ELLER_19,
+            )
         }
 
         @Test
@@ -347,6 +381,7 @@ class OpprettSøknadBehandlingISakTaskTest {
 
             // Assert
             verify(exactly = 0) { adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(any(), any()) }
+            verify(exactly = 0) { taskService.save(any()) }
         }
 
         @Test
