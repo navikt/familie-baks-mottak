@@ -26,7 +26,7 @@
         <prosessering.version>2.20261102130928_50eba5f</prosessering.version>
         <felles.version>4.20261026180911_c3ff6d9</felles.version>
         <kontrakter.version>4.0_20261108214032_20eed0c</kontrakter.version>
-        <mock-oauth2-server.version>6.1.3</mock-oauth2-server.version>
+        <mock-oauth2-server.version>6.1.4</mock-oauth2-server.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
 
