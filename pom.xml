@@ -188,7 +188,7 @@
         <dependency>
             <groupId>no.nav.familie</groupId>
             <artifactId>baks-dokgen</artifactId>
-            <version>1.0_20261023081422_6d525f0</version>
+            <version>1.0_20261111110022_fa12368</version>
         </dependency>
         <!-- Kafka -->
         <dependency>
