@@ -39,8 +39,11 @@ prosessering:
       milliseconds: 5000
 
 management:
-  endpoint.info.access: none
-  endpoint.health.show-details: always
+  endpoint:
+    info.access: none
+    health:
+      probes.enabled: true
+      show-details: always
   info:
     defaults:
       enabled: false

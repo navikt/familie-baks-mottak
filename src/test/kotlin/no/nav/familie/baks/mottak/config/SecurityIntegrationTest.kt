@@ -47,7 +47,7 @@ class SecurityIntegrationTest {
     @Nested
     inner class OffentligeEndepunkter {
         @ParameterizedTest
-        @ValueSource(strings = ["/internal", "/internal/health", "/internal/metrics", "/internal/metrics/jvm.memory.used", "/internal/prometheus"])
+        @ValueSource(strings = ["/internal", "/internal/health", "/internal/health/readiness", "/internal/health/liveness", "/internal/metrics", "/internal/metrics/jvm.memory.used", "/internal/prometheus"])
         fun `skal tillate offentlige internal-endepunkter uten token`(path: String) {
             restTestClient
                 .get()
