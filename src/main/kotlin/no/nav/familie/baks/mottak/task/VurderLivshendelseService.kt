@@ -470,7 +470,7 @@ class VurderLivshendelseService(
             }
 
             is Oppgave -> {
-                log.info("Fant åpen oppgave på aktørId=$aktørIdForOppgave oppgaveId=${oppgave.id}")
+                log.info("Fant åpen oppgave oppgaveId=${oppgave.id}")
                 secureLog.info("Fant åpen oppgave: $oppgave")
                 oppdaterOppgaveMedNyBeskrivelse(oppgave = oppgave, beskrivelse = "${VurderLivshendelseType.SIVILSTAND.beskrivelse}: Bruker eller barn er registrert som ${if (sivilstandType == SIVILSTANDTYPE.GIFT) "gift" else "registrert partner"}")
                 task.metadata["oppgaveId"] = oppgave.id.toString()
