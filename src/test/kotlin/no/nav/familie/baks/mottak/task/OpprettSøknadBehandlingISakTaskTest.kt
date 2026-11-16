@@ -269,12 +269,39 @@ class OpprettSøknadBehandlingISakTaskTest {
         }
 
         @Test
+        fun `skal opprette manuell førstegangsbehandling når det søkes om utvidet barnetrygd`() {
+            // Arrange
+            every { baSakClient.hentMinimalRestFagsak(fagsakId) } returns lagFagsak(FagsakStatus.OPPRETTET)
+            every { featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) } returns true
+            every { barnetrygdOppgaveMapper.utledBehandlingUnderkategoriFraSøknad(any()) } returns BehandlingUnderkategori.UTVIDET
+
+            // Act
+            opprettSøknadBehandlingISakTask.doTask(task)
+
+            // Assert
+            verify(exactly = 1) {
+                baSakClient.opprettBehandling(
+                    kategori = any(),
+                    underkategori = BehandlingUnderkategori.UTVIDET,
+                    søkersIdent = any(),
+                    behandlingÅrsak = BehandlingÅrsak.SØKNAD,
+                    søknadMottattDato = any(),
+                    behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    fagsakId = any(),
+                    søknadsinfo = any(),
+                )
+            }
+            verifiserStatistikkTask(AutovedtakSøknadFeilårsak.SØKNAD_OM_UTVIDET_BARNETRYGD)
+        }
+
+        @Test
         fun `skal sende flere årsaker til manuell behandling`() {
             // Arrange
             every { baSakClient.hentMinimalRestFagsak(fagsakId) } returns lagFagsak(FagsakStatus.AVSLUTTET)
             every { featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) } returns true
             every { baSakClient.søkerHarHattInnvilgetBarnetrygd(fagsakId) } returns true
             every { barnetrygdOppgaveMapper.utledBehandlingKategoriFraSøknad(any<VersjonertBarnetrygdSøknad>()) } returns BehandlingKategori.EØS
+            every { barnetrygdOppgaveMapper.utledBehandlingUnderkategoriFraSøknad(any()) } returns BehandlingUnderkategori.UTVIDET
             every { adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(Tema.BAR, any()) } returns true
             every { baksVersjonertSøknadClientService.hentVersjonertBarnetrygdSøknad(journalpostId) } returns
                 lagSøknad(
@@ -297,6 +324,7 @@ class OpprettSøknadBehandlingISakTaskTest {
                 AutovedtakSøknadFeilårsak.SØKER_HAR_HATT_BARNETRYGD_TIDLIGERE,
                 AutovedtakSøknadFeilårsak.SØKNAD_MANGLER_VEDLEGG,
                 AutovedtakSøknadFeilårsak.SØKNAD_HAR_TEMA_EØS,
+                AutovedtakSøknadFeilårsak.SØKNAD_OM_UTVIDET_BARNETRYGD,
                 AutovedtakSøknadFeilårsak.SØKER_ELLER_BARN_HAR_KODE_6_ELLER_19,
             )
         }
