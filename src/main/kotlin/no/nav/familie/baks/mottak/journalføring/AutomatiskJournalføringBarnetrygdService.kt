@@ -3,11 +3,13 @@ package no.nav.familie.baks.mottak.journalføring
 import no.nav.familie.baks.mottak.integrasjoner.ArbeidsfordelingClient
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.BarnetrygdOppgaveMapper
+import no.nav.familie.baks.mottak.integrasjoner.PdlClientService
 import no.nav.familie.baks.mottak.integrasjoner.finnesÅpenBehandlingPåFagsak
 import no.nav.familie.kontrakter.felles.BrukerIdType
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class AutomatiskJournalføringBarnetrygdService(
@@ -16,6 +18,7 @@ class AutomatiskJournalføringBarnetrygdService(
     private val adressebeskyttelesesgraderingService: AdressebeskyttelesesgraderingService,
     private val journalpostBrukerService: JournalpostBrukerService,
     private val barnetrygdOppgaveMapper: BarnetrygdOppgaveMapper,
+    private val pdlClientService: PdlClientService,
 ) {
     private val tema = Tema.BAR
 
@@ -45,6 +48,11 @@ class AutomatiskJournalføringBarnetrygdService(
         }
 
         val personIdent = journalpostBrukerService.tilPersonIdent(bruker, tema)
+
+        if (!erSøkerMyndig(personIdent)) {
+            return false
+        }
+
         val behandlingstype = barnetrygdOppgaveMapper.hentBehandlingstype(journalpost)
         val enhetId = arbeidsfordelingClient.hentBehandlendeEnhetPåIdent(personIdent, tema, behandlingstype).enhetId
 
@@ -60,5 +68,16 @@ class AutomatiskJournalføringBarnetrygdService(
         }
 
         return true
+    }
+
+    private fun erSøkerMyndig(personIdent: String): Boolean {
+        val fødselsdato =
+            pdlClientService
+                .hentPerson(personIdent, "hentperson-fødselsdato", tema)
+                .fødsel
+                .firstOrNull()
+                ?.fødselsdato ?: return false
+
+        return !LocalDate.now().isBefore(fødselsdato.plusYears(18))
     }
 }
