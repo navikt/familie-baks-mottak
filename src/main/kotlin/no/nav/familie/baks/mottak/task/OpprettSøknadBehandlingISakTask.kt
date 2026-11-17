@@ -9,6 +9,7 @@ import no.nav.familie.baks.mottak.integrasjoner.BaksVersjonertSøknadClientServi
 import no.nav.familie.baks.mottak.integrasjoner.BarnetrygdOppgaveMapper
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingKategori
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingType
+import no.nav.familie.baks.mottak.integrasjoner.BehandlingUnderkategori
 import no.nav.familie.baks.mottak.integrasjoner.BehandlingÅrsak
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
@@ -92,6 +93,7 @@ class OpprettSøknadBehandlingISakTask(
                     val søknad = baksVersjonertSøknadClientService.hentVersjonertBarnetrygdSøknad(journalpost.journalpostId)
                     val søknadManglerVedlegg = søknad.harDokumentasjonsbehovUtenVedlegg()
                     val kategori = barnetrygdOppgaveMapper.utledBehandlingKategoriFraSøknad(søknad)
+                    val underkategori = barnetrygdOppgaveMapper.utledBehandlingUnderkategoriFraSøknad(journalpost)
                     val søkerEllerBarnHarKode6Eller19 =
                         brukAutomatiskBehandlingÅrsak &&
                             adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(tema, journalpost)
@@ -108,10 +110,10 @@ class OpprettSøknadBehandlingISakTask(
                             søkerHarHattInnvilgetBarnetrygd = søkerHarHattInnvilgetBarnetrygd,
                             søknadManglerVedlegg = søknadManglerVedlegg,
                             søknadHarTemaEøs = kategori == BehandlingKategori.EØS,
+                            søknadErUtvidet = underkategori == BehandlingUnderkategori.UTVIDET,
                             søkerEllerBarnHarKode6Eller19 = søkerEllerBarnHarKode6Eller19,
                         )
 
-                    val underkategori = barnetrygdOppgaveMapper.utledBehandlingUnderkategoriFraSøknad(journalpost)
                     val brevkode = journalpost.dokumenter?.firstOrNull { it.brevkode != null }?.brevkode
                     val fagsakErLøpende = fagsak.status == FagsakStatus.LØPENDE
 
@@ -123,6 +125,7 @@ class OpprettSøknadBehandlingISakTask(
                             søkerHarHattInnvilgetBarnetrygd = søkerHarHattInnvilgetBarnetrygd,
                             søknadManglerVedlegg = søknadManglerVedlegg,
                             søknadHarTemaEøs = kategori == BehandlingKategori.EØS,
+                            søknadErUtvidet = underkategori == BehandlingUnderkategori.UTVIDET,
                             søkerEllerBarnHarKode6Eller19 = søkerEllerBarnHarKode6Eller19,
                         )
 
@@ -165,6 +168,7 @@ class OpprettSøknadBehandlingISakTask(
         søkerHarHattInnvilgetBarnetrygd: Boolean,
         søknadManglerVedlegg: Boolean,
         søknadHarTemaEøs: Boolean,
+        søknadErUtvidet: Boolean,
         søkerEllerBarnHarKode6Eller19: Boolean,
     ): BehandlingÅrsak =
         if (behandlingType == BehandlingType.FØRSTEGANGSBEHANDLING &&
@@ -172,6 +176,7 @@ class OpprettSøknadBehandlingISakTask(
             !søkerHarHattInnvilgetBarnetrygd &&
             !søknadManglerVedlegg &&
             !søknadHarTemaEøs &&
+            !søknadErUtvidet &&
             !søkerEllerBarnHarKode6Eller19
         ) {
             BehandlingÅrsak.AUTOMATISK_BEHANDLING_AV_SØKNAD
@@ -184,6 +189,7 @@ class OpprettSøknadBehandlingISakTask(
         søkerHarHattInnvilgetBarnetrygd: Boolean,
         søknadManglerVedlegg: Boolean,
         søknadHarTemaEøs: Boolean,
+        søknadErUtvidet: Boolean,
         søkerEllerBarnHarKode6Eller19: Boolean,
     ): List<AutovedtakSøknadFeilårsak> =
         buildList {
@@ -191,6 +197,7 @@ class OpprettSøknadBehandlingISakTask(
             if (!fagsakErLøpende && søkerHarHattInnvilgetBarnetrygd) add(AutovedtakSøknadFeilårsak.SØKER_HAR_HATT_BARNETRYGD_TIDLIGERE)
             if (søknadManglerVedlegg) add(AutovedtakSøknadFeilårsak.SØKNAD_MANGLER_VEDLEGG)
             if (søknadHarTemaEøs) add(AutovedtakSøknadFeilårsak.SØKNAD_HAR_TEMA_EØS)
+            if (søknadErUtvidet) add(AutovedtakSøknadFeilårsak.SØKNAD_OM_UTVIDET_BARNETRYGD)
             if (søkerEllerBarnHarKode6Eller19) add(AutovedtakSøknadFeilårsak.SØKER_ELLER_BARN_HAR_KODE_6_ELLER_19)
         }
 
