@@ -144,7 +144,12 @@ class OpprettSøknadBehandlingISakTask(
                         underkategori = underkategori,
                         behandlingÅrsak = behandlingÅrsak,
                         søkersIdent = brukersIdent,
-                        søknadMottattDato = journalpost.datoMottatt ?: LocalDateTime.now(),
+                        søknadMottattDato =
+                            if (behandlingÅrsak == BehandlingÅrsak.AUTOMATISK_BEHANDLING_AV_SØKNAD) {
+                                LocalDateTime.of(2026, 4, 15, 12, 0)
+                            } else {
+                                journalpost.datoMottatt ?: LocalDateTime.now()
+                            },
                         behandlingType = behandlingType,
                         fagsakId = fagsakId.toLong(),
                         søknadsinfo = Søknadsinfo(journalpostId = journalpost.journalpostId, brevkode = brevkode, erDigital = journalpost.erDigitalKanal()),
