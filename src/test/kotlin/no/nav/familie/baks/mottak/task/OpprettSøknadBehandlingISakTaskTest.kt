@@ -232,7 +232,7 @@ class OpprettSøknadBehandlingISakTaskTest {
         }
 
         @Test
-        fun `skal opprette manuell førstegangsbehandling når søknaden har dokumentasjonsbehov uten vedlegg`() {
+        fun `skal opprette automatisk førstegangsbehandling når søknaden har dokumentasjonsbehov uten vedlegg`() {
             // Arrange
             every { baSakClient.hentMinimalRestFagsak(fagsakId) } returns lagFagsak(FagsakStatus.OPPRETTET)
             every { featureToggleService.isEnabled(FeatureToggle.BRUK_AUTOMATISK_BEHANDLING_ÅRSAK) } returns true
@@ -258,14 +258,14 @@ class OpprettSøknadBehandlingISakTaskTest {
                     kategori = any(),
                     underkategori = any(),
                     søkersIdent = any(),
-                    behandlingÅrsak = BehandlingÅrsak.SØKNAD,
+                    behandlingÅrsak = BehandlingÅrsak.AUTOMATISK_BEHANDLING_AV_SØKNAD,
                     søknadMottattDato = any(),
                     behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
                     fagsakId = any(),
                     søknadsinfo = any(),
                 )
             }
-            verifiserStatistikkTask(AutovedtakSøknadFeilårsak.SØKNAD_MANGLER_VEDLEGG)
+            verify(exactly = 0) { taskService.save(any()) }
         }
 
         @Test
@@ -303,18 +303,6 @@ class OpprettSøknadBehandlingISakTaskTest {
             every { barnetrygdOppgaveMapper.utledBehandlingKategoriFraSøknad(any<VersjonertBarnetrygdSøknad>()) } returns BehandlingKategori.EØS
             every { barnetrygdOppgaveMapper.utledBehandlingUnderkategoriFraSøknad(any()) } returns BehandlingUnderkategori.UTVIDET
             every { adressebeskyttelesesgraderingService.finnesStrengtFortroligAdressebeskyttelsegraderingPåJournalpost(Tema.BAR, any()) } returns true
-            every { baksVersjonertSøknadClientService.hentVersjonertBarnetrygdSøknad(journalpostId) } returns
-                lagSøknad(
-                    dokumentasjon =
-                        listOf(
-                            Søknaddokumentasjon(
-                                dokumentasjonsbehov = Dokumentasjonsbehov.AVTALE_DELT_BOSTED,
-                                harSendtInn = false,
-                                opplastedeVedlegg = emptyList(),
-                                dokumentasjonSpråkTittel = mapOf("nb" to "Avtale om delt bosted"),
-                            ),
-                        ),
-                )
 
             // Act
             opprettSøknadBehandlingISakTask.doTask(task)
@@ -322,7 +310,6 @@ class OpprettSøknadBehandlingISakTaskTest {
             // Assert
             verifiserStatistikkTask(
                 AutovedtakSøknadFeilårsak.SØKER_HAR_HATT_BARNETRYGD_TIDLIGERE,
-                AutovedtakSøknadFeilårsak.SØKNAD_MANGLER_VEDLEGG,
                 AutovedtakSøknadFeilårsak.SØKNAD_HAR_TEMA_EØS,
                 AutovedtakSøknadFeilårsak.SØKNAD_OM_UTVIDET_BARNETRYGD,
                 AutovedtakSøknadFeilårsak.SØKER_ELLER_BARN_HAR_KODE_6_ELLER_19,
