@@ -28,6 +28,7 @@ import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -759,7 +760,7 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
     }
 
     @Test
-    fun `skal ikke automatisk journalføre journalpost hvis fødselsdato til søker er ukjent`() {
+    fun `skal kaste feil hvis fødselsdato til søker er ukjent`() {
         // Arrange
         val identifikator = "123"
         val journalpost = lagDigitalBarnetrygdsøknad(identifikator)
@@ -769,14 +770,14 @@ class AutomatiskJournalføringBarnetrygdServiceTest {
         every { mockedPdlClientService.hentPerson(identifikator, "hentperson-fødselsdato", Tema.BAR) } returns
             PdlPersonData(fødsel = listOf(Fødsel(null)))
 
-        // Act
-        val skalAutomatiskJournalføres =
-            automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
-                journalpost,
-            )
-
-        // Assert
-        assertThat(skalAutomatiskJournalføres).isFalse()
+        // Act & Assert
+        val feil =
+            assertThrows<IllegalStateException> {
+                automatiskJournalføringBarnetrygdService.skalAutomatiskJournalføres(
+                    journalpost,
+                )
+            }
+        assertThat(feil.message).isEqualTo("Fant ikke fødselsdato for søker på journalpost 1")
     }
 
     @Test

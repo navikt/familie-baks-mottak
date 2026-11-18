@@ -49,7 +49,7 @@ class AutomatiskJournalføringBarnetrygdService(
 
         val personIdent = journalpostBrukerService.tilPersonIdent(bruker, tema)
 
-        if (!erSøkerMyndig(personIdent)) {
+        if (!erSøkerMyndig(personIdent, journalpost.journalpostId)) {
             return false
         }
 
@@ -70,13 +70,16 @@ class AutomatiskJournalføringBarnetrygdService(
         return true
     }
 
-    private fun erSøkerMyndig(personIdent: String): Boolean {
+    private fun erSøkerMyndig(
+        personIdent: String,
+        journalpostId: String,
+    ): Boolean {
         val fødselsdato =
             pdlClientService
                 .hentPerson(personIdent, "hentperson-fødselsdato", tema)
                 .fødsel
                 .firstOrNull()
-                ?.fødselsdato ?: return false
+                ?.fødselsdato ?: error("Fant ikke fødselsdato for søker på journalpost $journalpostId")
 
         return !LocalDate.now().isBefore(fødselsdato.plusYears(18))
     }
