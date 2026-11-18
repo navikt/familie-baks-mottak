@@ -308,7 +308,7 @@ data class Dødsfall(
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Fødsel(
-    @JsonProperty(value = "foedselsdato") val fødselsdato: LocalDate,
+    @JsonProperty(value = "foedselsdato") val fødselsdato: LocalDate?,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
