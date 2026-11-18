@@ -14,7 +14,6 @@ import no.nav.familie.baks.mottak.domene.HendelsesloggRepository
 import no.nav.familie.baks.mottak.integrasjoner.BaSakClient
 import no.nav.familie.baks.mottak.integrasjoner.FagsakDeltagerRolle.FORELDER
 import no.nav.familie.baks.mottak.integrasjoner.FagsakStatus.LØPENDE
-import no.nav.familie.baks.mottak.integrasjoner.InfotrygdBarnetrygdClient
 import no.nav.familie.baks.mottak.integrasjoner.JournalpostClient
 import no.nav.familie.baks.mottak.integrasjoner.OppgaveClientService
 import no.nav.familie.baks.mottak.integrasjoner.PdlClient
@@ -22,7 +21,6 @@ import no.nav.familie.baks.mottak.integrasjoner.RestFagsakDeltager
 import no.nav.familie.baks.mottak.task.JournalhendelseBarnetrygdRutingTask
 import no.nav.familie.baks.mottak.task.OpprettJournalføringOppgaveTask
 import no.nav.familie.baks.mottak.task.SendTilBaSakTask
-import no.nav.familie.kontrakter.ba.infotrygd.InfotrygdSøkResponse
 import no.nav.familie.kontrakter.felles.BrukerIdType
 import no.nav.familie.kontrakter.felles.journalpost.Bruker
 import no.nav.familie.kontrakter.felles.journalpost.Journalpost
@@ -53,9 +51,6 @@ class JournalhendelseServiceTest {
 
     @MockK
     lateinit var baSakClient: BaSakClient
-
-    @MockK
-    lateinit var infotrygdBarnetrygdClient: InfotrygdBarnetrygdClient
 
     @MockK
     lateinit var pdlClient: PdlClient
@@ -245,14 +240,6 @@ class JournalhendelseServiceTest {
         every {
             baSakClient.hentRestFagsakDeltagerListe(any(), emptyList())
         } returns listOf(RestFagsakDeltager("12345678910", FORELDER, 1L, LØPENDE))
-
-        every {
-            infotrygdBarnetrygdClient.hentLøpendeUtbetalinger(any(), any())
-        } returns InfotrygdSøkResponse(emptyList(), emptyList())
-
-        every {
-            infotrygdBarnetrygdClient.hentSaker(any(), any())
-        } returns InfotrygdSøkResponse(emptyList(), emptyList())
 
         val task =
             OpprettJournalføringOppgaveTask(

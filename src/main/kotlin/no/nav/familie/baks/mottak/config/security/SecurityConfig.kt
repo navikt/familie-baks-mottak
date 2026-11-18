@@ -55,7 +55,10 @@ class SecurityConfig(
             securityMatcher(NegatedRequestMatcher(PathPatternRequestMatcher.pathPattern("/api/task/**")))
 
             authorizeHttpRequests {
-                authorize("/internal/**", permitAll)
+                authorize("/internal", permitAll)
+                authorize("/internal/health/**", permitAll)
+                authorize("/internal/metrics/**", permitAll)
+                authorize("/internal/prometheus", permitAll)
                 authorize("/api/ping", permitAll)
                 authorize("/api/kontantstotte/ping", permitAll)
                 authorize("/api/status/barnetrygd", permitAll)

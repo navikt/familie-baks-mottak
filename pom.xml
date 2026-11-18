@@ -22,11 +22,11 @@
         <jvmTarget>25</jvmTarget>
         <kotlin.version>2.4.21</kotlin.version>
         <mockk.version>1.14.11</mockk.version>
-        <confluent.version>8.3.2</confluent.version>
-        <prosessering.version>2.20261026155201_99f3bfc</prosessering.version>
+        <confluent.version>8.4.0</confluent.version>
+        <prosessering.version>2.20261102130928_50eba5f</prosessering.version>
         <felles.version>4.20261026180911_c3ff6d9</felles.version>
-        <kontrakter.version>4.0_20261026123216_8087cb5</kontrakter.version>
-        <mock-oauth2-server.version>6.1.2</mock-oauth2-server.version>
+        <kontrakter.version>4.0_20261108214032_20eed0c</kontrakter.version>
+        <mock-oauth2-server.version>6.1.4</mock-oauth2-server.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
 
@@ -110,7 +110,7 @@
         <dependency>
             <groupId>io.getunleash</groupId>
             <artifactId>unleash-client-java</artifactId>
-            <version>12.3.0</version>
+            <version>12.3.2</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.squareup.okhttp3</groupId>
@@ -188,7 +188,7 @@
         <dependency>
             <groupId>no.nav.familie</groupId>
             <artifactId>baks-dokgen</artifactId>
-            <version>1.0_20261023081422_6d525f0</version>
+            <version>1.0_20261111131711_a0d3cf4</version>
         </dependency>
         <!-- Kafka -->
         <dependency>
@@ -361,7 +361,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.6.1</version>
+                <version>3.7.0</version>
                 <executions>
                     <execution>
                         <id>add-generated-sources</id>
@@ -515,7 +515,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.15</version>
+                <version>0.8.16</version>
                 <configuration>
                     <excludes>
                         <exclude>**/*config.*</exclude>

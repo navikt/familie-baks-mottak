@@ -5,26 +5,22 @@ import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Tema
 import no.nav.familie.kontrakter.felles.arbeidsfordeling.Enhet
 import no.nav.familie.kontrakter.felles.oppgave.Behandlingstype
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
-import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 import org.springframework.web.util.UriComponentsBuilder
-import java.net.URI
 import java.util.Optional.ofNullable
 
 @Component
 class ArbeidsfordelingClient(
-    @param:Value("\${FAMILIE_INTEGRASJONER_API_URL}") private val integrasjonUri: URI,
-    @Qualifier("integrasjonerRestClient") private val restClient: RestClient,
+    private val integrasjonerClientProvider: IntegrasjonerClientProvider,
 ) {
     fun hentBehandlendeEnheterPåIdent(
         personIdent: String,
         tema: Tema,
         behandlingstype: Behandlingstype?,
     ): List<Enhet> {
+        val (integrasjonUri, restClient) = integrasjonerClientProvider.hentKlient()
         val uri =
             UriComponentsBuilder
                 .fromUri(integrasjonUri)

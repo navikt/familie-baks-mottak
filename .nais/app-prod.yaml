@@ -14,11 +14,11 @@ spec:
   port: 8090
   leaderElection: true
   liveness:
-    path: /internal/health
+    path: /internal/health/liveness
     initialDelay: 50
     failureThreshold: 10
   readiness:
-    path: /internal/health
+    path: /internal/health/readiness
     initialDelay: 50
     failureThreshold: 10
   prometheus:
@@ -58,6 +58,8 @@ spec:
           cluster: prod-gcp
         - application: familie-dokument
           cluster: prod-gcp
+        - application: familie-integrasjoner
+          cluster: prod-gcp
         - application: logging
           namespace: nais-system
       external:
@@ -80,7 +82,7 @@ spec:
         autoBackupHour: 2
         pointInTimeRecovery: false
         diskAutoresize: true
-        highAvailability: false
+        highAvailability: true
         databases:
           - name: familie-baks-mottak
             envVarPrefix: DB
