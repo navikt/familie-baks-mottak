@@ -21,7 +21,7 @@
         <java.version>25</java.version>
         <jvmTarget>25</jvmTarget>
         <kotlin.version>2.4.21</kotlin.version>
-        <mockk.version>1.14.11</mockk.version>
+        <mockk.version>1.14.12</mockk.version>
         <confluent.version>8.4.1</confluent.version>
         <prosessering.version>2.20261102130928_50eba5f</prosessering.version>
         <felles.version>4.20261026180911_c3ff6d9</felles.version>
@@ -361,7 +361,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.7.0</version>
+                <version>3.8.0</version>
                 <executions>
                     <execution>
                         <id>add-generated-sources</id>
