@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.2</version>
+        <version>4.2.0</version>
     </parent>
 
     <properties>
@@ -26,7 +26,7 @@
         <prosessering.version>2.20261102130928_50eba5f</prosessering.version>
         <felles.version>4.20261026180911_c3ff6d9</felles.version>
         <kontrakter.version>4.0_20261118131100_72bb819</kontrakter.version>
-        <mock-oauth2-server.version>7.0.0</mock-oauth2-server.version>
+        <mock-oauth2-server.version>7.0.1</mock-oauth2-server.version>
 
         <main-class>no.nav.familie.baks.mottak.LauncherKt</main-class>
 
